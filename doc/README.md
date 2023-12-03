@@ -7,15 +7,15 @@ typically saved on a data cartridge, such as steerpoints/waypoints and other avi
 into a DCS model at the start of a flight.
 
 This document covers the basic usage of the tool and describes general concepts applicable to
-all supported airframes. After reading through this overview, you may consult the
-airframe-specific documentation,
+all supported airframes. After reading through this overview, look over the airframe-specific
+documentation
 
 * [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md)
 * [F-16C Viper](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F16C.md)
 
 for additional details on JAFDTC's capabilities and operation on a specific airframe.
 
-## Preliminaries
+# Preliminaries
 
 JAFDTC allows you to manage multiple avionics *Configurations*. In JAFDTC, a *Configuration* is
 composed of individual *System Configurations*, or *Systems*, that correspond to systems in
@@ -46,22 +46,22 @@ from the default for the airframe, JAFDTC will update the BINGO value in the avi
 uploading. If you do not change the value, JAFDTC will not make any changes to that parameter
 in the airframe. 
 
-## Configuration Storage
+# Configuration Storage
 
 JAFDTC stores configuration and supporting files, such as settings, in the `Documents\JAFDTC`
 folder. Configurations are found in the `Configs` folder. Generally, you should not need to
 access the files in the `JAFDTC` folder as JAFDTC provides import and export functions (see
 below) to allow the exchange of information.
 
-> As with all things, there are exceptions. A good general rule is if the UI can do something,
-> use the UI and don't try to work around it.
+> As with all things, there are exceptions. A good general rule is if the JAFDTC UI can do
+> something, use the UI and don't try to work around it.
 
-## User Interface
+# User Interface
 
 The JAFDTC user interface is based around a single window that displays a list of configrations
 for an airframe and allows you to edit the specfic systems in a configuration.
 
-### Configuration List Page
+## Configuration List Page
 
 The main page of the JAFDTC user interface is the *Configuration List Page* that provides
 a number of controls to manipulate configurations,
@@ -79,7 +79,7 @@ The primary components of this page include,
 
 The reaminder of this section will discuss each of these elements in more detail.
 
-#### Filter Search Box
+### Filter Search Box
 
 The filter box controls which configurations the
 [configuration list](#configuration-list)
@@ -90,10 +90,11 @@ that contain "test" anywhere in their name (comparisons are always case-insensit
 ![](images/Core_Cfg_List_Filter.png)
 
 As you type, the application will show a list of matching configurations. Typing `Return` or
-clicking on the *Accept Filter Icon* will select the filter. Clicking on the `X` icon will
-remove any filtering and display all configurations.
+clicking on the *Accept Filter Icon* will select the filter. You can pick a specific
+configuration by clicking on its name in the matching configuration list. Clicking on the `X`
+icon will remove any filtering and display all configurations.
 
-#### Current Airframe Selection
+### Current Airframe Selection
 
 The combo box control in the upper right of the interface allows you to select the airframe
 currently in use. The
@@ -105,20 +106,21 @@ selected airframe.
 JAFDTC remembers the last airframe you selected and will return to that airframe the next time
 it is launched.
 
-#### Configuration List
+### Configuration List
 
 The bulk of the page is taken up by a list of defined configurations for the selected airframe.
 Each row in this list corresponds to a configuration. On the left side of a row is the name of
 the configuration and a brief summary of what it changes in the avionics. On the right side of
-the row is a set of icons that also indicate which systems the configuration modifies. The page
-only allows at most configuration to be selected at a time.
+the row is a set of icons that also indicate which systems the configuration modifies. Systems
+that are linked to other systems are shown with a small gold dot in the lower right corner.
+this page only allows at most configuration to be selected at a time.
 
 Double-clicking a row will open up the
 [System Editor Page](#system-editor-page)
 for the configuration that allows you to edit information in the configuration. Right-clicking
 on a row will bring up a context menu with additional options. 
 
-#### Command Bar
+### Command Bar
 
 The command bar at the top of the page provides quick access to the operations you can perform
 on Configurations. The following screen shot shows the command bar in its "open" state (accessed
@@ -158,7 +160,7 @@ Depending on the state of the system, commands may be disabled. For example, *Ed
 when there is no configuration selected and *Load to Jet* is disabled if DCS is not running
 a mission with the appropriate airframe.
 
-#### Status Area
+### Status Area
 
 The status area occupies the bottom part of the configuration list page. On the right side of
 this region is information showing the current status of DCS. There are three pieces of
@@ -179,7 +181,7 @@ installed. On the right, DCS is running a mission with an F-16C Viper.
 The left side of the status area identifies the pilot and wing as specified through the JAFDTC
 [Settings](#settings).
 
-### System Editor Page
+## System Editor Page
 
 The specific systems availble in a configuration vary from airframe to airframe. The system
 editor page provides a list of systems from which you can display per-system editors as the
@@ -192,36 +194,52 @@ back button that returns you to the
 [Configuration List](#configuration-list-page)
 page when clicked. Below these two items is text identifying the *Current Airframe*.
 
+### System List
+
 The *System List* provides the systems that make up the configuration. Each system has an
 associated icon. The color of the icon indicates the state of the system: blue icons mark
 systems whose configuration has changed from defaults, white icons mark systems that have not
-been changed. Clicking on a row in this list changes the system editor to the right to edit
-the selected system.
+been changed. A small gold dot marks those systems that are linked to other configurations.
+
+> A white icon with a gold dot indicates a system that is linked to another configuration
+> in which the system has not been changed.
+
+Clicking on a row in this list changes the system editor to the right to edit the selected
+system.
+
+### System Configuration Editor
 
 The bulk of the page is taken up by the system editor on the right. The content of this editor
-depends on which system seleted from the *System List* to the left. See the
+depends on which system seleted from the *System List* to the left. In the figure above, the
+editor is showing the steerpoint list associated with the selected steerpoints system. See the
 [airframe discussions](#airframe-specific-documentation)
 for further details on the specific system editors. Though largely specific to a particular
 airframe, many systems provide common *Reset* and *Link* buttons along the bottom of the
 editor.
 
+### Common Editor Controls
+
+Depending on the system, the bottom edge of the system configuration editor may contain link
+and reset buttons that provide common link and reset functions for systems.
+
 The *Reset* button restores the default settings to the selected system. This button is
 disabled when the system is in its default configruation.
 
 The *Link* button connects the system to another configuration. This allows you to, for
-example, have a single common radio configuration that you can share across different
-configurations. This way, you can make a single change to the shared configuration and have
-the linked systems update.
+example, have a single common radio system configuration that you can share across different
+configurations. This way, you can make a single change to the shared system configuration and
+have the linked systems automatically update.
 
 > Links are tracked per system. That is, Systems A and B in Configuration X can be linked
 > to completely different configurations if desired.
 
 Changes to a system are pushed to all linked (either directly or indirectly) systems.
 
-> For example, assume Configuration A is linked to Configuration B and Configuration B is
-> linked to Configuration C. All changes to Configuration C will be pushed to A and B.
+> For example, assume System X in Configuration A is linked to Configuration B and System X
+> in Configuration B is linked to Configuration C. Changes to System X in Configuration
+> C will be reflected in the Configraution A and B setups for System X.
 
-While linked, edits to a linked configuration are disabled. The *Link* button changes based
+While linked, edits to the system configuration are disabled. The *Link* button changes based
 on whether or not the system is linked,
 
 ![](images/Core_Cfg_Edit_Link.png)
@@ -229,9 +247,10 @@ on whether or not the system is linked,
 When unlinked, the button displays "Link To". Clicking the button brings up a list of
 potential configurations to link to. Once linked, the button changes to "Unlink From" and
 identifies the specific configuration the system is presently linked to. When unlinking, the
-system configuration is not changed, but will no longer receive updates.
+system configuration is not changed, but will no longer receive updates. Icons for linked
+systems are badged with a small gold dot as described earlier.
 
-### Settings
+## Settings
 
 You can access the JAFDTC settings through the Settings button on the command bar overflow menu
 as
@@ -258,11 +277,11 @@ There are multiple controls in the settings,
 JAFDTC saves its settings to a file in `Documents\JAFDTC`. Clicking "OK" will accept any
 changes in the dialog, while "Cancel" will discard any changes.
 
-## DCS Integration
+# DCS Integration
 
 JAFDTC integrates with DCS to allow you to setup your jet according to a configuration.
 
-### Interacting with DCS
+## Interacting with DCS
 
 The primary interaction between JAFDTC and DCS involves uploading configurations to the jet.
 Some airframes support addition interactions with the JAFDTC UI as the
@@ -304,9 +323,7 @@ in the Viper, JAFDTC allows you to use the FLIR WX button to trigger configurati
 > see the airframe-specific documentation listed
 > [below](#airframe-specific-documentation).
 
-
-
-### Support Scripts
+## Support Scripts
 To interoperate with DCS, JAFDTC installs Lua within the `Scripts` hierarchy in the DCS
 installation(s) present in the `Saved Games` folder associated with your profile. JAFDTC can
 install this support in two places,
