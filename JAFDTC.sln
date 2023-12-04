@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34202.233
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JAFDTC", "JAFDTC\JAFDTC\JAFDTC.csproj", "{627F214D-A5DB-4A71-8EAE-340B6B30DD37}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "JAFDTC Installer", "JAFDTC Installer\JAFDTC Installer.vdproj", "{1BB51507-3B1F-4A8F-A47D-D81637D1885B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|ARM64 = Release|ARM64
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Debug|ARM64.Build.0 = Debug|ARM64
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Debug|x64.ActiveCfg = Debug|x64
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Debug|x64.Build.0 = Debug|x64
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Debug|x64.Deploy.0 = Debug|x64
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Debug|x86.ActiveCfg = Debug|x86
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Debug|x86.Build.0 = Debug|x86
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Debug|x86.Deploy.0 = Debug|x86
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Release|ARM64.ActiveCfg = Release|ARM64
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Release|ARM64.Build.0 = Release|ARM64
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Release|ARM64.Deploy.0 = Release|ARM64
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Release|x64.ActiveCfg = Release|x64
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Release|x64.Build.0 = Release|x64
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Release|x64.Deploy.0 = Release|x64
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Release|x86.ActiveCfg = Release|x86
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Release|x86.Build.0 = Release|x86
+		{627F214D-A5DB-4A71-8EAE-340B6B30DD37}.Release|x86.Deploy.0 = Release|x86
+		{1BB51507-3B1F-4A8F-A47D-D81637D1885B}.Debug|ARM64.ActiveCfg = Debug
+		{1BB51507-3B1F-4A8F-A47D-D81637D1885B}.Debug|x64.ActiveCfg = Debug
+		{1BB51507-3B1F-4A8F-A47D-D81637D1885B}.Debug|x86.ActiveCfg = Debug
+		{1BB51507-3B1F-4A8F-A47D-D81637D1885B}.Debug|x86.Build.0 = Debug
+		{1BB51507-3B1F-4A8F-A47D-D81637D1885B}.Release|ARM64.ActiveCfg = Release
+		{1BB51507-3B1F-4A8F-A47D-D81637D1885B}.Release|x64.ActiveCfg = Release
+		{1BB51507-3B1F-4A8F-A47D-D81637D1885B}.Release|x86.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B7F0C3E7-5EC4-4150-B1AE-C544C9B4D0A2}
+	EndGlobalSection
+EndGlobal
