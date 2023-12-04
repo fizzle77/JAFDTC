@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+SettingsDialog.xaml : ui xaml for settings dialog
+
+Copyright(C) 2023 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<ContentDialog
+    x:Class="JAFDTC.UI.App.SettingsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.App"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="JAFDTC Settings"
+    DefaultButton="Primary"
+    PrimaryButtonText="OK"
+    CloseButtonText="Cancel">
+
+    <ContentDialog.Resources>
+        <Style TargetType="local:SettingsDialog" BasedOn="{StaticResource DefaultContentDialogStyle}"/>
+    </ContentDialog.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Margin="0,12,0,0" Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+            <TextBlock Width="80" VerticalAlignment="Center" HorizontalTextAlignment="Right">
+                Wing Name
+            </TextBlock>
+            <TextBox Width="220" Margin="12,0,0,0"
+                     VerticalAlignment="Center"
+                     x:Name="uiSetValueWingName"
+                     LostFocus="SetValueWingName_LostFocus">
+            </TextBox>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Margin="0,12,0,0" Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+            <TextBlock Width="80" VerticalAlignment="Center" HorizontalTextAlignment="Right">
+                Callsign
+            </TextBlock>
+            <TextBox Width="220" Margin="12,0,0,0"
+                     VerticalAlignment="Center"
+                     x:Name="uiSetValueCallsign"
+                     LostFocus="SetValueCallsign_LostFocus">
+            </TextBox>
+        </StackPanel>
+        <CheckBox Grid.Row="2" Margin="0,24,0,0"
+                  x:Name="uiSetCkbxRemainOnTop"
+                  HorizontalAlignment="Center"
+                  Click="SetCkbxRemainOnTop_Click">
+            JAFDTC Window Remains on Top
+        </CheckBox>
+        <Button Grid.Row="3" Margin="0,24,0,0"
+                x:Name="uiSetBtnInstall"
+                HorizontalAlignment="Stretch"
+                Click="SetBtnInstall_Click">
+            Install DCS Lua Support
+        </Button>
+        <Button Grid.Row="4" Margin="0,12,0,0"
+                x:Name="uiSetBtnUninstall"
+                HorizontalAlignment="Stretch"
+                Click="SetBtnUninstall_Click">
+            Uninstall DCS Lua Support
+        </Button>
+    </Grid>
+</ContentDialog>

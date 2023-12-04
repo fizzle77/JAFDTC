@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+F16CEditMFDPage.xaml.cs : ui xaml for viper mfd setup editor page
+
+Copyright(C) 2023 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<Page
+    x:Class="JAFDTC.UI.F16C.F16CEditMFDPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.F16C"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
+    NavigationCacheMode="Enabled">
+
+    <Grid Margin="16,16,16,8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0 : master mode selection
+        ===============================================================================================================
+        -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock Margin="0,0,12,0" VerticalAlignment="Center">
+                Avionics Master Mode
+            </TextBlock>
+            <ComboBox Width="350"
+                      x:Name="uiModeSelectCombo"
+                      VerticalAlignment="Center"
+                      SelectionChanged="ModeSelectCombo_SelectionChanged"
+                      ToolTipService.ToolTip="Selects Master Mode to Edit">
+                <!-- Tag is enum JAFDTC.Models.F16C.MFD.Modes -->
+                <ComboBox.Items>
+                    <Grid Tag="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiModeSelectItem1Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
+                            Navigation – NAV
+                        </TextBlock>
+                    </Grid>
+                    <Grid Tag="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiModeSelectItem2Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
+                            Air-to-Ground – ICP AG
+                        </TextBlock>
+                    </Grid>
+                    <Grid Tag="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiModeSelectItem3Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
+                            Air-to-Air Master Mode – ICP AA
+                        </TextBlock>
+                    </Grid>
+                    <Grid Tag="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiModeSelectItem4Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;" />
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
+                            Dogfight Missle Override – DGFT MSL OVRD
+                        </TextBlock>
+                    </Grid>
+                    <Grid Tag="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiModeSelectItem5Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
+                            Dogfight Override – DGFT DOGFIGHT
+                        </TextBlock>
+                    </Grid>
+                </ComboBox.Items>
+            </ComboBox>
+            <Button Margin="24,0,6,0" VerticalAlignment="Center"
+                    x:Name="uiModePrevBtn"
+                    ToolTipService.ToolTip="Selects Previous Master Mode"
+                    Click="BtnModePrev_Click">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
+            </Button>
+            <Button VerticalAlignment="Center"
+                    x:Name="uiModeNextBtn"
+                    ToolTipService.ToolTip="Selects Next Master Mode"
+                    Click="BtnModeNext_Click">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
+            </Button>
+        </StackPanel>
+
+        <!--
+        ===============================================================================================================
+        row 1 : title row
+        ===============================================================================================================
+        -->
+        <StackPanel Grid.Row="1" Margin="0,24,0,0">
+            <TextBlock Margin="0,0,12,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}"
+                       VerticalAlignment="Center">
+                MFD Display Format to OSB Mapping:
+            </TextBlock>
+        </StackPanel>
+
+        <!--
+        ===============================================================================================================
+        row 1 : mfd setup
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="2" Margin="12,12,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="32"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- label column -->
+            
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,12,0"
+                       VerticalAlignment="Center"
+                       HorizontalTextAlignment="Right">
+               Format
+            </TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,10,12,0"
+                       VerticalAlignment="Center"
+                       HorizontalTextAlignment="Right">
+                Initial
+            </TextBlock>
+
+            <!-- left MFD column -->
+
+            <!-- title row -->
+            <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,12,0,12"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                Left Multi-Function Display
+            </TextBlock>
+
+            <!-- left MFD format setup -->
+
+            <!-- controls are tagged with "L." and the OSB number -->
+            <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,0"
+                        x:Name="uiFormatSelComboLOSB14"
+                        Tag="L.14"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        SelectionChanged="FormatSelectCombo_SelectionChanged"
+                        ToolTipService.ToolTip="Left MFD Format, OSB 14">
+            </ComboBox>
+            <ToggleButton Grid.Row="2" Grid.Column="1" Margin="0,8,0,0"
+                            x:Name="uiInitLOSB14Toggle"
+                            Tag="14"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Stretch"
+                            Click="InitLeftOSB_Click">
+                OSB 14
+            </ToggleButton>
+
+            <ComboBox Grid.Row="1" Grid.Column="2" Margin="12,0,0,0"
+                        x:Name="uiFormatSelComboLOSB13"
+                        Tag="L.13"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        SelectionChanged="FormatSelectCombo_SelectionChanged"
+                        ToolTipService.ToolTip="Left MFD Format, OSB 13">
+            </ComboBox>
+            <ToggleButton Grid.Row="2" Grid.Column="2" Margin="12,8,0,0"
+                            x:Name="uiInitLOSB13Toggle"
+                            Tag="13"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Stretch"
+                            Click="InitLeftOSB_Click">
+                OSB 13
+            </ToggleButton>
+
+            <ComboBox Grid.Row="1" Grid.Column="3" Margin="12,0,0,0"
+                        x:Name="uiFormatSelComboLOSB12"
+                        Tag="L.12"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        SelectionChanged="FormatSelectCombo_SelectionChanged"
+                        ToolTipService.ToolTip="Left MFD Format, OSB 12">
+            </ComboBox>
+            <ToggleButton Grid.Row="2" Grid.Column="3" Margin="12,8,0,0"
+                            x:Name="uiInitLOSB12Toggle"
+                            Tag="12"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Stretch"
+                            Click="InitLeftOSB_Click">
+                OSB 12
+            </ToggleButton>
+
+            <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,12,0,0"
+                    x:Name="uiResetLMFDBtn"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Click="BtnResetLMFD_Click">
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon Margin="0,0,6,0"
+                                FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                    <TextBlock VerticalAlignment="center">Reset to Defaults</TextBlock>
+                </StackPanel>
+            </Button>
+
+            <!-- right MFD column -->
+
+            <!-- title row -->
+            <TextBlock Grid.Row="0" Grid.Column="5" Grid.ColumnSpan="3" Margin="0,12,0,12"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center">
+                Right Multi-Function Display
+            </TextBlock>
+
+            <!-- right MFD format setup -->
+
+            <!-- controls are tagged with "R." and the OSB number -->
+            <ComboBox Grid.Row="1" Grid.Column="5" Margin="0,0,0,0"
+                      x:Name="uiFormatSelComboROSB14"
+                      Tag="R.14"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Stretch"
+                      SelectionChanged="FormatSelectCombo_SelectionChanged"
+                      ToolTipService.ToolTip="Right MFD Format, OSB 14">
+            </ComboBox>
+            <ToggleButton Grid.Row="2" Grid.Column="5" Margin="0,8,0,0"
+                            x:Name="uiInitROSB14Toggle"
+                            Tag="14"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Stretch"
+                            Click="InitRightOSB_Click">
+                OSB 14
+            </ToggleButton>
+
+            <ComboBox Grid.Row="1" Grid.Column="6" Margin="12,0,0,0"
+                      x:Name="uiFormatSelComboROSB13"
+                      Tag="R.13"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Stretch"
+                      SelectionChanged="FormatSelectCombo_SelectionChanged"
+                      ToolTipService.ToolTip="Right MFD Format, OSB 13">
+            </ComboBox>
+            <ToggleButton Grid.Row="2" Grid.Column="6" Margin="12,8,0,0"
+                          x:Name="uiInitROSB13Toggle"
+                          Tag="13"
+                          VerticalAlignment="Center"
+                          HorizontalAlignment="Stretch"
+                          Click="InitRightOSB_Click">
+                OSB 13
+            </ToggleButton>
+
+            <ComboBox Grid.Row="1" Grid.Column="7" Margin="12,0,0,0"
+                      x:Name="uiFormatSelComboROSB12"
+                      Tag="R.12"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Stretch"
+                      SelectionChanged="FormatSelectCombo_SelectionChanged"
+                      ToolTipService.ToolTip="Right MFD Format, OSB 12">
+            </ComboBox>
+            <ToggleButton Grid.Row="2" Grid.Column="7" Margin="12,8,0,0"
+                          x:Name="uiInitROSB12Toggle"
+                          Tag="12"
+                          VerticalAlignment="Center"
+                          HorizontalAlignment="Stretch"
+                          Click="InitRightOSB_Click">
+                OSB 12
+            </ToggleButton>
+
+            <Button Grid.Row="3" Grid.Column="5" Grid.ColumnSpan="3" Margin="0,12,0,0"
+                    x:Name="uiResetRMFDBtn"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Click="BtnResetRMFD_Click">
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon Margin="0,0,6,0"
+                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                    <TextBlock VerticalAlignment="center">Reset to Defaults</TextBlock>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 4 : link / reset
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button Width="140"
+                        x:Name="uiPageBtnLink"
+                        Click="PageBtnLink_Click"
+                        ToolTipService.ToolTip="Link or Unlink this Setup to CMDS Setup from Another Configuration">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE723;"/>
+                        <TextBlock VerticalAlignment="center"
+                                   x:Name="uiPageBtnTxtLink">
+                            FIXUP
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <TextBlock Margin="12,0,24,0"
+                           x:Name="uiPageTxtLink"
+                           VerticalAlignment="center">
+                    FIXUP
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button x:Name="uiResetAllBtn"
+                        ToolTipService.ToolTip="TODO"
+                        Click="BtnResetAll_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                        <TextBlock VerticalAlignment="center">Reset System to Defaults</TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

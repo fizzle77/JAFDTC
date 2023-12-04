@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+F16CPilotDbaseDialog.xaml : ui xaml for f-16c pilot database dialog
+
+Copyright(C) 2023 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<ContentDialog
+    x:Class="JAFDTC.UI.F16C.F16CPilotDbaseDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.F16C"
+    xmlns:local_model="using:JAFDTC.Models.F16C.DLNK"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Viper Drivers"
+    DefaultButton="Primary"
+    PrimaryButtonText="OK"
+    CloseButtonText="Cancel">
+
+    <ContentDialog.Resources>
+        
+        <Style TargetType="local:F16CPilotDbaseDialog" BasedOn="{StaticResource DefaultContentDialogStyle}"/>
+
+        <!-- brush for error fields. -->
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+
+    </ContentDialog.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0 : new driver
+        ===============================================================================================================
+        -->
+        <StackPanel Grid.Row="0" Margin="0,12,0,0" Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+            <TextBlock VerticalAlignment="Center">
+                Callsign
+            </TextBlock>
+            <TextBox Width="160" Margin="12,0,0,0"
+                     x:Name="uiPDbValueCallsign"
+                     VerticalAlignment="Center"
+                     TextChanged="PDbValue_TextChanged"
+                     ToolTipService.ToolTip="Callsign, Must be Unique (Case-Insensitive)">
+            </TextBox>
+            <TextBlock Margin="24,0,0,0" VerticalAlignment="Center">
+                TNDL
+            </TextBlock>
+            <TextBox Width="100" Margin="12,0,0,0"
+                     x:Name="uiPDbValueTNDL"
+                     VerticalAlignment="Center"
+                     MaxLength="5"
+                     TextChanged="PDbValue_TextChanged"
+                     ToolTipService.ToolTip="TNDL Value for Pilot (5-digit Octal)">
+            </TextBox>
+            <Button Margin="20,0,0,0"
+                    x:Name="uiPDbBtnAdd"
+                    Click="PDbBtnAdd_Click">
+                <FontIcon Margin="0,0,0,0"
+                          FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+            </Button>
+        </StackPanel>
+
+        <!--
+        ===============================================================================================================
+        row 1 : existing drivers
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="1" Margin="0,12,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- local row 0, column 0 : headers
+              -->
+            <Grid Grid.Row="0" Grid.Column="0" Margin="12,18,12,0"
+                  VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0"
+                           Style="{StaticResource TableHeaderTextStyle}">
+                    TNDL
+                </TextBlock>
+                <TextBlock Grid.Row="0" Grid.Column="1"
+                           Style="{StaticResource TableHeaderTextStyle}">
+                    Callsign
+                </TextBlock>
+            </Grid>
+            <TextBlock Grid.Row="0" Grid.Column="1"/>
+
+            <!-- local row 1, column 0 : list of pilots
+              -->
+            <ListView Grid.Row="1" Grid.Column="0" Width="400" Height="200" Margin="0,0,12,0"
+                      x:Name="uiPDbListView"
+                      VerticalAlignment="Top"
+                      SelectionMode="Extended"
+                      SelectionChanged="PDbListView_SelectionChanged"
+                      ItemsSource="{x:Bind Pilots}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local_model:ViperDriver">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="5*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Margin="0,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind TNDL}"/>
+                            <TextBlock Grid.Column="1" Margin="8,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Left"
+                                       FontWeight="Medium"
+                                       FontSize="16"
+                                       Text="{x:Bind Name}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <!-- local row 0-1, column 1 : buttons
+              -->
+            <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"
+                  VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" Margin="0,12,0,0"
+                        x:Name="uiPDbBtnExport"
+                        Click="PDbBtnExport_Click"
+                        ToolTipService.ToolTip="Export the Selected Pilots to a File">
+                    <FontIcon Margin="0,0,0,0"
+                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE898;"/>
+                </Button>
+                <Button Grid.Row="1" Margin="0,12,0,0"
+                        x:Name="uiPDbBtnImport"
+                        Click="PDbBtnImport_Click"
+                        ToolTipService.ToolTip="Import Pilots from an Export File">
+                    <FontIcon Margin="0,0,0,0"
+                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE896;"/>
+                </Button>
+                <Button Grid.Row="2" Margin="0,24,0,12"
+                        x:Name="uiPDbBtnDelete"
+                        Click="PDbBtnDelete_Click"
+                        ToolTipService.ToolTip="Delete the Selected Pilots from the Database">
+                    <FontIcon Margin="0,0,0,0"
+                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE74D;"/>
+                </Button>
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentDialog>

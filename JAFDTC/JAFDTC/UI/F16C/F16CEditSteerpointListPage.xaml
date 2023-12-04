@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+F16CEditSteerpointListPage.xaml : ui xaml for viper steerpoint editor list page
+
+Copyright(C) 2023 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<Page
+    x:Class="JAFDTC.UI.F16C.F16CEditSteerpointListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.Models.F16C.STPT"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+
+    <Grid Margin="16,8,16,8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0 : command bar
+        ===============================================================================================================
+        -->
+        <CommandBar Grid.Row="0"
+                    HorizontalAlignment="Center">
+            <AppBarButton x:Name="uiBarAdd" Icon="Add" Label="Add"
+                          Click="CmdAdd_Click"
+                          ToolTipService.ToolTip="Add a New Steerpoint"/>
+            <AppBarButton x:Name="uiBarEdit" Icon="Edit" Label="Edit"
+                          Click="CmdOpen_Click"
+                          ToolTipService.ToolTip="Edit Currently Selected Steerpoint"/>
+            <AppBarButton x:Name="uiBarCopy" Icon="Copy" Label="Delete"
+                          Click="CmdCopy_Click"
+                          ToolTipService.ToolTip="Copy Currently Selected Steerpoint(s)"/>
+            <AppBarButton x:Name="uiBarPaste" Icon="Paste" Label="Delete"
+                          Click="CmdPaste_Click"
+                          ToolTipService.ToolTip="TODO"/>
+            <AppBarSeparator/>
+            <AppBarButton x:Name="uiBarDelete" Icon="Delete" Label="Delete"
+                          Click="CmdDelete_Click"
+                          ToolTipService.ToolTip="Delete Currently Selected Steerpoint(s)"/>
+            <AppBarSeparator/>
+            <AppBarButton x:Name="uiBarRenumber" Icon="AllApps" Label="Renumber"
+                          Click="CmdRenumber_Click"
+                          ToolTipService.ToolTip="Renumber the List of Steerpoints"/>
+            <AppBarSeparator/>
+            <AppBarButton x:Name="uiBarImport" Icon="Download" Label="Import"
+                          Click="CmdImport_Click"
+                          ToolTipService.ToolTip="Import all Steerpoints from a File"/>
+            <AppBarButton x:Name="uiBarExport" Icon="Upload" Label="Export"
+                          Click="CmdExport_Click"
+                          ToolTipService.ToolTip="Export all Steerpoints to a File"/>
+            <AppBarSeparator/>
+        </CommandBar>
+
+        <!--
+        ===============================================================================================================
+        row 1 : list view
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="1" Margin="0,12,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="0" Margin="16,0,12,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="32"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="256"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="56"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Margin="0,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}">
+                    #
+                </TextBlock>
+                <TextBlock Grid.Column="1" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Left"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Name"/>
+                <TextBlock Grid.Column="2" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Latitude, Longitude, and Altitude"/>
+                <TextBlock Grid.Column="3" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="TOS"/>
+                <TextBlock Grid.Column="4" Margin="6,0,6,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Refs"/>
+            </Grid>
+
+            <ListView Grid.Row="1"
+                      x:Name="uiStptListView"
+                      IsDoubleTapEnabled="True"
+                      AllowDrop="True"
+                      CanReorderItems="True"
+                      ReorderMode="Enabled"
+                      SelectionMode="Extended"
+                      SelectionChanged="StptList_SelectionChanged"
+                      RightTapped="StptList_RightTapped"
+                      DoubleTapped="StptList_DoubleTapped"
+                      ItemsSource="{x:Bind EditSTPT.Points}">
+                <ListView.Resources>
+                    <MenuFlyout x:Name="uiStptListCtxMenuFlyout">
+                        <MenuFlyout.Items>
+                            <MenuFlyoutItem Text="Edit" Icon="Edit" Click="CmdOpen_Click"/>
+                            <MenuFlyoutItem Text="Copy" Icon="Copy" Click="CmdCopy_Click"/>
+                            <MenuFlyoutItem Text="Paste" Icon="Paste" Click="CmdPaste_Click"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Text="Delete" Icon="Delete" Click="CmdDelete_Click"/>
+                        </MenuFlyout.Items>
+                    </MenuFlyout>
+                </ListView.Resources>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:SteerpointInfo">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="32"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="256"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="56"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Margin="0,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind Number, Mode=TwoWay}"/>
+                            <TextBlock Grid.Column="1" Margin="6,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Left"
+                                       FontWeight="Medium"
+                                       FontSize="16"
+                                       Text="{x:Bind Name, Mode=TwoWay}"/>
+                            <TextBlock Grid.Column="2" Margin="6,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind Location}"/>
+                            <TextBlock Grid.Column="3" Margin="6,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind TOS, Mode=TwoWay}"/>
+                            <TextBlock Grid.Column="4" Margin="6,1,6,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       FontFamily="Segoe Fluent Icons"
+                                       FontSize="16"
+                                       Text="{x:Bind RefPtGlyph}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 2 : link / reset
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="2" Margin="0,12,0,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button Width="140"
+                        x:Name="uiPageBtnLink"
+                        Click="PageBtnLink_Click"
+                        ToolTipService.ToolTip="Link or Unlink this Setup to CMDS Setup from Another Configuration">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE723;"/>
+                        <TextBlock VerticalAlignment="center"
+                                   x:Name="uiPageBtnTxtLink">
+                            FIXUP
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <TextBlock Margin="12,0,24,0"
+                           x:Name="uiPageTxtLink"
+                           VerticalAlignment="center">
+                    FIXUP
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button x:Name="uiPageBtnResetAll"
+                        ToolTipService.ToolTip="TODO"
+                        Click="PageBtnResetAll_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                        <TextBlock VerticalAlignment="center">Reset System to Defaults</TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

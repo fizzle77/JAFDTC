@@ -1,0 +1,139 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>JAFDTC</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+	<EnableMsixTooling>true</EnableMsixTooling>
+	<PublishProfile>Properties\PublishProfiles\win10-$(Platform).pubxml</PublishProfile>
+	<PlatformTarget>x64</PlatformTarget>
+	<ApplicationIcon>Images\JAFDTC_Icon.ico</ApplicationIcon>
+	<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+	<WindowsPackageType>MSIX</WindowsPackageType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Models\F16C\COMM\**" />
+    <EmbeddedResource Remove="Models\F16C\COMM\**" />
+    <None Remove="Models\F16C\COMM\**" />
+    <Page Remove="Models\F16C\COMM\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Audio\ux_action.wav" />
+    <None Remove="Audio\ux_cap_cpan.wav" />
+    <None Remove="Audio\ux_cap_wypt.wav" />
+    <None Remove="Audio\ux_error.wav" />
+    <None Remove="Data\db-emitters.json" />
+    <None Remove="Data\db-poi-airbases.json" />
+    <None Remove="DCS\Hooks\JAFDTCHook.lua" />
+    <None Remove="DCS\JAFDTC.lua" />
+    <None Remove="DCS\JAFDTC\A10CFunctions.lua" />
+    <None Remove="DCS\JAFDTC\AV8BFunctions.lua" />
+    <None Remove="DCS\JAFDTC\commonFunctions.lua" />
+    <None Remove="DCS\JAFDTC\f15EFunctions.lua" />
+    <None Remove="DCS\JAFDTC\f16CFunctions.lua" />
+    <None Remove="DCS\JAFDTC\fa18CFunctions.lua" />
+    <None Remove="DCS\JAFDTC\waypointCapture.dlg" />
+    <None Remove="Images\LockScreenLogo.scale-200.png" />
+    <None Remove="Images\SplashScreen.scale-200.png" />
+    <None Remove="Images\Square150x150Logo.scale-200.png" />
+    <None Remove="Images\Square44x44Logo.scale-200.png" />
+    <None Remove="Images\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <None Remove="Images\Wide310x150Logo.scale-200.png" />
+    <None Remove="Package.appxmanifest" />
+    <None Remove="UI\Base\EditNavpointListPage.xaml" />
+    <None Remove="UI\Base\EditNavpointPage.xaml" />
+    <None Remove="UI\Base\EditRadioPage.xaml" />
+    <None Remove="UI\F16C\F16CEditHTSThreatsPage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Audio\ux_action.wav" />
+    <Content Include="Audio\ux_cap_cpan.wav" />
+    <Content Include="Audio\ux_cap_wypt.wav" />
+    <Content Include="Audio\ux_error.wav" />
+    <Content Include="Data\db-emitters.json" />
+    <Content Include="Data\db-poi-airbases.json" />
+    <Content Include="DCS\Hooks\JAFDTCHook.lua" />
+    <Content Include="DCS\JAFDTC\A10CFunctions.lua" />
+    <Content Include="DCS\JAFDTC\AV8BFunctions.lua" />
+    <Content Include="DCS\JAFDTC\JAFDTC.lua" />
+    <Content Include="DCS\JAFDTC\CommonFunctions.lua" />
+    <Content Include="DCS\JAFDTC\F15EFunctions.lua" />
+    <Content Include="DCS\JAFDTC\F16CFunctions.lua" />
+    <Content Include="DCS\JAFDTC\FA18CFunctions.lua" />
+    <Content Include="DCS\JAFDTC\WaypointCapture.dlg" />
+    <Content Include="Images\JAFDTC_Icon.ico" />
+    <Content Include="Images\LockScreenLogo.scale-200.png" />
+    <Content Include="Images\SplashScreen.scale-200.png" />
+    <Content Include="Images\Square150x150Logo.scale-200.png" />
+    <Content Include="Images\Square44x44Logo.scale-200.png" />
+    <Content Include="Images\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <Content Include="Images\Wide310x150Logo.scale-200.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.WinUI" Version="7.1.2" />
+    <PackageReference Include="CommunityToolkit.WinUI.UI" Version="7.1.2" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231008000" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\F16C\F16CEditHTSThreatsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\F15E\" />
+    <Folder Include="Models\FA18C\" />
+    <Folder Include="UI\FA18C\" />
+    <Folder Include="UI\F15E\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PRIResource Remove="Models\F16C\COMM\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Base\EditRadioPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Base\EditNavpointPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Base\EditNavpointListPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+</Project>

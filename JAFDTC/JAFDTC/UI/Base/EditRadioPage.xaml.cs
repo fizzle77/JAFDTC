@@ -1,0 +1,725 @@
+// ********************************************************************************************************************
+//
+// EditRadioPage.cs : ui c# for general radio setup editor page
+//
+// Copyright(C) 2023 ilominar/raven
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+// for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.  If not, see
+// <https://www.gnu.org/licenses/>.
+//
+// ********************************************************************************************************************
+
+using JAFDTC.Models;
+using JAFDTC.UI.App;
+using JAFDTC.Utilities;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using Microsoft.UI.Dispatching;
+
+// To learn more about WinUI, the WinUI project structure,
+// and more about our project templates, see: http://aka.ms/winui-project-info.
+
+namespace JAFDTC.UI.Base
+{
+    /// <summary>
+    /// TODO: document
+    /// </summary>
+    public class RadioPresetItem : BindableObject
+    {
+        public IEditRadioPageHelper NavHelper { get; }
+
+        public object Tag { get; set; }
+
+        public int Radio { get; set; }
+
+        private string _description;
+        public string Description
+        {
+            get => _description;
+            set => SetProperty(ref _description, value, null);
+        }
+
+        private string _preset;
+        public string Preset
+        {
+            get => _preset;
+            set
+            {
+                string error = (NavHelper.ValidatePreset(Radio, value, false)) ? null : "Invalid preset";
+                SetProperty(ref _preset, value, error);
+            }
+        }
+
+        private string _frequency;
+        public string Frequency
+        {
+            get => _frequency;
+            set
+            {
+                string error = "Invalid frequency";
+                if (NavHelper.ValidateFrequency(Radio, value, false))
+                {
+                    value = NavHelper.FixupFrequency(Radio, value);
+                    error = null;
+                }
+                SetProperty(ref _frequency, value, error);
+            }
+        }
+
+        private bool _isEnabled;
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set => SetProperty(ref _isEnabled, value, null);
+        }
+
+        public RadioPresetItem(IEditRadioPageHelper helper, int tag, int radio)
+            => (NavHelper, Tag, Radio, Preset, Frequency, Description, IsEnabled) = (helper, tag, radio, "", "", "", true);
+    }
+
+    /// <summary>
+    /// TODO: document
+    /// </summary>
+    public class RadioMiscItem : BindableObject
+    {
+        public IEditRadioPageHelper NavHelper { get; }
+
+        public int Radio { get; set; }
+
+        private string _defaultTuning;
+        public string DefaultTuning
+        {
+            get => _defaultTuning;
+            set
+            {
+                string error = "Invalid frequency";
+                if (NavHelper.ValidateFrequency(Radio, value))
+                {
+                    value = NavHelper.FixupFrequency(Radio, value);
+                    error = null;
+                }
+                else if (NavHelper.ValidatePreset(Radio, value))
+                {
+                    error = null;
+                }
+                SetProperty(ref _defaultTuning, value, error);
+            }
+        }
+
+        private bool _isMonitorEnabled;
+        public bool IsMonitorEnabled
+        {
+            get => _isMonitorEnabled;
+            set => SetProperty(ref _isMonitorEnabled, value, null);
+        }
+
+        public RadioMiscItem(IEditRadioPageHelper helper, int radio)
+            => (NavHelper, Radio, DefaultTuning, IsMonitorEnabled) = (helper, radio, "", false);
+    }
+
+    /// <summary>
+    /// TODO: document
+    /// </summary>
+    public sealed partial class EditRadioPage : Page
+    {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // properties
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        private ConfigEditorPageNavArgs NavArgs { get; set; }
+
+        private IEditRadioPageHelper NavHelper { get; set; }
+
+        // NOTE: changes to the Config object may only occur through the marshall methods. bindings to and edits by
+        // NOTE: the ui are always directed at the EditPresets/EditRadio properties.
+        //
+        private IConfiguration Config { get; set; }
+
+        private ObservableCollection<RadioPresetItem> EditPresets { get; set; }
+
+        private int EditRadio { get; set; }
+
+        private RadioMiscItem EditMisc { get; set; }
+
+        private int EditItemTag { get; set; }
+
+        private bool IsRebuildPending { get; set; }
+
+        private bool IsRebuildingUI { get; set; }
+
+        // ---- read-only properties
+
+        private readonly Dictionary<string, string> _configNameToUID;
+        private readonly List<string> _configNameList;
+
+        private readonly List<TextBlock> _radioSelComboText;
+        private readonly List<FontIcon> _radioSelComboIcons;
+        private readonly Brush _defaultBorderBrush;
+        private readonly Brush _defaultBkgndBrush;
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // construction
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        public EditRadioPage()
+        {
+            InitializeComponent();
+
+            EditPresets = new ObservableCollection<RadioPresetItem>();
+            EditRadio = 0;
+            EditItemTag = 1;
+
+            _configNameToUID = new Dictionary<string, string>();
+            _configNameList = new List<string>();
+
+            _radioSelComboText = new List<TextBlock>()
+            {
+                uiRadSelectItem0Text, uiRadSelectItem1Text, uiRadSelectItem2Text, uiRadSelectItem3Text
+            };
+            _radioSelComboIcons = new List<FontIcon>()
+            {
+                uiRadSelectItem0Icon, uiRadSelectItem1Icon, uiRadSelectItem2Icon, uiRadSelectItem3Icon
+            };
+            _defaultBorderBrush = uiRadPrevBtn.BorderBrush;
+            _defaultBkgndBrush = uiRadPrevBtn.Background;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // data marshalling
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        // marshall data between our local radio state and the appropriate preset set in the radio configuration.
+        //
+        private void CopyConfigToEdit(int radio)
+        {
+            foreach (RadioPresetItem item in EditPresets)
+            {
+                item.ErrorsChanged -= PreField_DataValidationError;
+                item.PropertyChanged -= PreField_PropertyChanged;
+            }
+            NavHelper.CopyConfigToEdit(radio, Config, EditPresets, EditMisc);
+            foreach (RadioPresetItem item in EditPresets)
+            {
+                item.Tag = EditItemTag++;
+                item.ErrorsChanged += PreField_DataValidationError;
+                item.PropertyChanged += PreField_PropertyChanged;
+            }
+        }
+
+        private void CopyEditToConfig(int radio, bool isPersist = false)
+        {
+            if (!CurStateHasErrors() && !EditMisc.HasErrors)
+            {
+                NavHelper.CopyEditToConfig(radio, EditPresets, EditMisc, Config);
+                if (isPersist)
+                {
+                    Config.Save(this, NavHelper.SystemTag);
+                }
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // field validation
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// set the border brush and background for a TextBox based on validity. valid fields use the defaults, invalid
+        /// fields use ErrorFieldBorderBrush from the resources.
+        /// </summary>
+        private void SetFieldValidState(TextBox field, bool isValid)
+        {
+            field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+        }
+
+        private TextBox FindFieldForPresetItem(RadioPresetItem item, string name)
+        {
+            Grid listRowGrid = Utilities.FindControl<Grid>(uiPreListView, typeof(Grid), item.Tag);
+            return (listRowGrid != null) ? Utilities.FindControl<TextBox>(listRowGrid, typeof(TextBox), name) : null;
+        }
+
+        private void ValidateAllFields()
+        {
+            foreach (RadioPresetItem item in EditPresets)
+            {
+                TextBox fieldPreset = FindFieldForPresetItem(item, "Preset");
+                if (fieldPreset != null)
+                {
+                    SetFieldValidState(fieldPreset, ((List<string>)item.GetErrors("Preset")).Count == 0);
+                }
+                TextBox fieldFreq = FindFieldForPresetItem(item, "Frequency");
+                if (fieldFreq != null)
+                {
+                    SetFieldValidState(fieldFreq, ((List<string>)item.GetErrors("Frequency")).Count == 0);
+                }
+            }
+            SetFieldValidState(uiMiscValueDefaultFreq, ((List<string>)EditMisc.GetErrors("DefaultTuning")).Count == 0);
+        }
+
+        // validation error: update ui state for the various components that may have errors.
+        //
+        private void PreField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
+        {
+            RadioPresetItem item = (RadioPresetItem)sender;
+            Grid listRowGrid = Utilities.FindControl<Grid>(uiPreListView, typeof(Grid), item.Tag);
+            if (args.PropertyName == null)
+            {
+                ValidateAllFields();
+            }
+            else if (listRowGrid != null)
+            {
+                List<string> errors = (List<string>)item.GetErrors(args.PropertyName);
+                TextBox field = Utilities.FindControl<TextBox>(listRowGrid, typeof(TextBox), args.PropertyName);
+                SetFieldValidState(field, (errors.Count == 0));
+            }
+            RebuildInterfaceState();
+        }
+
+        private void MiscField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
+        {
+            RadioMiscItem item = (RadioMiscItem)sender;
+            if (args.PropertyName == null)
+            {
+                ValidateAllFields();
+            }
+            else if (args.PropertyName == "DefaultTuning")
+            {
+                List<string> errors = (List<string>)item.GetErrors(args.PropertyName);
+                SetFieldValidState(uiMiscValueDefaultFreq, (errors.Count == 0));
+            }
+            RebuildInterfaceState();
+        }
+
+        // property changed: rebuild interface state to account for configuration changes.
+        //
+        private void PreField_PropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if ((args.PropertyName == "Preset") && (EditPresets.Count > 1))
+            {
+                // TODO: check for repeated preset numbers here also, or nah?
+                for (int i = 1; i < EditPresets.Count; i++)
+                {
+                    if (int.Parse(EditPresets[i].Preset) < int.Parse(EditPresets[i - 1].Preset))
+                    {
+                        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+                        {
+                            SortPresets();
+                        });
+                        break;
+                    }
+                }
+            }
+        }
+
+        // returns true if the current state has errors, false otherwise.
+        //
+        private bool CurStateHasErrors()
+        {
+            foreach (RadioPresetItem item in EditPresets)
+            {
+                if (item.HasErrors)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // ui support
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        // create a new radio preset and add it to the preset list. the new item is initialized from a preset in the
+        // configuration or natively here. the preset number will be set to +1 beyond max, if that would put it out
+        // of range, we will start to fill unassigned presets. frequency defaults to the lowest valid frequency.
+        //
+        void AddNewPreset(int radio)
+        {
+            Int64 mask = 0;
+            int newPreset = 1;
+            int newIndex = EditPresets.Count;
+            foreach (RadioPresetItem item in EditPresets)
+            {
+                int preset = int.Parse(item.Preset);
+                mask |= ((Int64)1 << preset);
+                newPreset = Math.Max(newPreset, preset + 1);
+            }
+            if (newPreset > 20)
+            {
+                newIndex = 0;
+                for (newPreset = 1; (newPreset < 20) && ((mask & ((Int64)1 << newPreset)) != 0); newPreset++)
+                    newIndex++;
+            }
+
+            RadioPresetItem newItem = new(NavHelper, EditItemTag++, radio);
+            newItem.ErrorsChanged += PreField_DataValidationError;
+            newItem.PropertyChanged += PreField_PropertyChanged;
+            newItem.Preset = newPreset.ToString();
+            newItem.Frequency = NavHelper.RadioDefaultFrequency(radio);
+            EditPresets.Insert(newIndex, newItem);
+        }
+
+        // sort the current list of presets by name in place in the presets list. this is done in place to
+        // avoid changing the EditPresets instance.
+        //
+        private void SortPresets()
+        {
+            var sortableList = new List<RadioPresetItem>(EditPresets);
+            sortableList.Sort((a, b) => int.Parse(a.Preset).CompareTo(int.Parse(b.Preset)));
+            for (int i = 0; i < sortableList.Count; i++)
+            {
+                EditPresets.Move(EditPresets.IndexOf(sortableList[i]), i);
+            }
+        }
+
+        // change the selected cmds program and update various ui and model state.
+        //
+        private void SelectRadio(int radio)
+        {
+            if (radio != EditRadio)
+            {
+                CopyEditToConfig(EditRadio, true);
+                EditRadio = radio;
+                CopyConfigToEdit(EditRadio);
+                RebuildInterfaceState();
+            }
+        }
+
+        // returns the preset item with the given tag, null if no such item is found.
+        //
+        private RadioPresetItem FindPresetItemByTag(object tag)
+        {
+            foreach (RadioPresetItem item in EditPresets)
+            {
+                if (item.Tag.Equals(tag))
+                {
+                    return item;
+                }
+            }
+            return null;
+        }
+
+        // update the "blue dot" state on the radio select menu to show the blue dot when the setup of the
+        // corresponding radio differs from defaults.
+        //
+        private void RebuildRadioSelectMenu()
+        {
+            for (int i = 0; i < NavHelper.RadioNames.Count; i++)
+            {
+                Visibility viz = Visibility.Collapsed;
+                if (((EditRadio == i) && (EditPresets.Count > 0)) ||
+                    ((EditRadio != i) && (NavHelper.RadioPresetCount(i, Config) > 0)))
+                {
+                    viz = Visibility.Visible;
+                }
+                _radioSelComboIcons[i].Visibility = viz;
+            }
+        }
+
+        // TODO: document
+        private void RebuildLinkControls()
+        {
+            Utilities.RebuildLinkControls(Config, NavHelper.SystemTag, NavArgs.UIDtoConfigMap,
+                                          uiPageBtnTxtLink, uiPageTxtLink);
+        }
+
+        // TODO: document
+        private void RebuildPerRadioMiscControls()
+        {
+            uiMiscCkbxMonitor.Visibility = (NavHelper.RadioCanMonitorGuard(EditRadio)) ? Visibility.Visible
+                                                                                       : Visibility.Collapsed;
+
+            if (string.IsNullOrEmpty(EditMisc.DefaultTuning) || EditMisc.HasErrors)
+            {
+                uiMiscTextDefaultLabel.Text = "";
+            }
+            else if (int.TryParse(EditMisc.DefaultTuning, out _))
+            {
+                uiMiscTextDefaultLabel.Text = "Preset";
+            }
+            else
+            {
+                uiMiscTextDefaultLabel.Text = "MHz";
+            }
+
+            uiMiscTextDefaultTitle.Text = $"COM {EditRadio + 1} Initial Frequency or Preset";
+        }
+
+        // update the enable state on the ui elements based on the current settings. link controls must be set up
+        // vi RebuildLinkControls() prior to calling this function.
+        //
+        private void RebuildEnableState()
+        {
+            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(NavHelper.SystemTag));
+
+            if ((EditPresets.Count > 0) && (EditPresets[0].IsEnabled != isEditable))
+            {
+                foreach (RadioPresetItem item in EditPresets)
+                {
+                    item.IsEnabled = isEditable;
+                }
+            }
+
+            Utilities.SetEnableState(uiBarAdd, isEditable && (EditPresets.Count < NavHelper.RadioMaxPresets(EditRadio)));
+            Utilities.SetEnableState(uiBarImport, isEditable);
+            Utilities.SetEnableState(uiBarExport, isEditable && (EditPresets.Count > 0));
+
+            Utilities.SetEnableState(uiMiscValueDefaultFreq, isEditable);
+            Utilities.SetEnableState(uiMiscCkbxMonitor, isEditable);
+
+            bool isDefault = NavHelper.RadioSysIsDefault(Config) && (EditPresets.Count == 0);
+            Utilities.SetEnableState(uiPageBtnResetAll, !isDefault);
+
+            Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
+
+            bool isNoErrs = !CurStateHasErrors();
+            Utilities.SetEnableState(uiRadSelectCombo, isNoErrs);
+            Utilities.SetEnableState(uiRadNextBtn, (isNoErrs && (EditRadio < (NavHelper.RadioNames.Count - 1))));
+            Utilities.SetEnableState(uiRadPrevBtn, (isNoErrs && (EditRadio > 0)));
+        }
+
+        // rebuild the state of controls on the page in response to a change in the configuration.
+        //
+        private void RebuildInterfaceState()
+        {
+            if (!IsRebuildPending)
+            {
+                IsRebuildPending = true;
+                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+                {
+                    IsRebuildingUI = true;
+                    RebuildRadioSelectMenu();
+                    RebuildPerRadioMiscControls();
+                    RebuildLinkControls();
+                    RebuildEnableState();
+                    IsRebuildingUI = false;
+                    IsRebuildPending = false;
+                });
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // ui interactions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        // ---- page buttons ------------------------------------------------------------------------------------------
+
+        // reset all button click: reset all cmds settings back to their defaults.
+        //
+        private async void PageBtnResetAll_Click(object sender, RoutedEventArgs args)
+        {
+            ContentDialogResult result = await Utilities.Message2BDialog(
+                Content.XamlRoot,
+                "Reset System Configruation?",
+                "Are you sure you want to reset the entire radio configuration to avionics defaults? This action cannot be undone.",
+                "Reset"
+            );
+            if (result == ContentDialogResult.Primary)
+            {
+                Config.UnlinkSystem(NavHelper.SystemTag);
+                NavHelper.RadioSysReset(Config);
+                Config.Save(this, NavHelper.SystemTag);
+                CopyConfigToEdit(EditRadio);
+            }
+        }
+
+        // TODO: document
+        private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
+        {
+            string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, NavHelper.SystemTag,
+                                                                    _configNameList);
+            if (selectedItem == null)
+            {
+                CopyEditToConfig(EditRadio, true);
+                Config.UnlinkSystem(NavHelper.SystemTag);
+                Config.Save(this);
+                CopyConfigToEdit(EditRadio);
+            }
+            else if (selectedItem.Length > 0)
+            {
+                Config.LinkSystemTo(NavHelper.SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selectedItem]]);
+                Config.Save(this);
+                CopyConfigToEdit(EditRadio);
+            }
+        }
+
+        // ---- commands ----------------------------------------------------------------------------------------------
+
+        // TODO: document
+        private void CmdAdd_Click(object sender, RoutedEventArgs args)
+        {
+            // TODO: scroll to visible after adding new preset?
+            AddNewPreset(EditRadio);
+            CopyEditToConfig(EditRadio, true);
+        }
+
+        // TODO: implement
+        private async void CmdImport_Click(object sender, RoutedEventArgs args)
+        {
+            await Utilities.Message1BDialog(Content.XamlRoot, "Sad Trombone", "Not yet supported, you'll have to do it the old-fashioned way...");
+        }
+
+        // TODO: implement
+        private async void CmdExport_Click(object sender, RoutedEventArgs args)
+        {
+            await Utilities.Message1BDialog(Content.XamlRoot, "Sad Trombone", "Not yet supported, you'll have to do it the old-fashioned way...");
+        }
+
+        // ---- radio selection ---------------------------------------------------------------------------------------
+
+        // previous radio button click: advance to the previous radio.
+        //
+        private void RadBtnPrev_Click(object sender, RoutedEventArgs args)
+        {
+            SelectRadio(EditRadio - 1);
+            uiRadSelectCombo.SelectedIndex = EditRadio;
+        }
+
+        // next radio button click: advance to the next radio.
+        //
+        private void RadBtnNext_Click(object sender, RoutedEventArgs args)
+        {
+            SelectRadio(EditRadio + 1);
+            uiRadSelectCombo.SelectedIndex = EditRadio;
+        }
+
+        // radio select combo click: switch to the selected radio. the tag of the sender (a TextBlock) gives us the
+        // radio number to select.
+        //
+        private void RadSelectCombo_SelectionChanged(object sender, RoutedEventArgs args)
+        {
+            Grid item = (Grid)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                // NOTE: assume tag == index here...
+                SelectRadio(int.Parse((string)item.Tag));
+            }
+        }
+
+        // ---- miscellaneous controls --------------------------------------------------------------------------------
+
+        // monitor guard check: copy the local backing values to the configuration.
+        //
+        private void MiscCkbxMonitor_Click(object sender, RoutedEventArgs args)
+        {
+            // HACK: x:Bind doesn't work with bools? seems that way? this is a hack.
+            //
+            CheckBox cbox = (CheckBox)sender;
+            EditMisc.IsMonitorEnabled = (bool)cbox.IsChecked;
+            CopyEditToConfig(EditRadio, true);
+        }
+
+        // ---- preset list -------------------------------------------------------------------------------------------
+
+        // TODO: document
+        private void PreBntDelete_Click(object sender, RoutedEventArgs args)
+        {
+            Button btn = (Button)sender;
+            RadioPresetItem item = FindPresetItemByTag(btn.Tag);
+            if (item != null)
+            {
+                EditPresets.Remove(item);
+                CopyEditToConfig(EditRadio, true);
+            }
+        }
+
+        // ---- text field changes ------------------------------------------------------------------------------------
+
+        // text box lost focus: copy the local backing values to the configuration (note this is predicated on error
+        // status) and save (which will rebuild the interface state).
+        //
+        // NOTE: though the text box has lost focus, the update may not yet have propagated into state. use the
+        // NOTE: dispatch queue to give in-flight state updates time to complete.
+        //
+        private void PageTextBox_LostFocus(object sender, RoutedEventArgs args)
+        {
+            // CONSIDER: may be better here to handle this in a property changed handler rather than here?
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+            {
+                CopyEditToConfig(EditRadio, true);
+            });
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // events
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        // configuration saved: rebuild interface state to align with the latest save.
+        //
+        private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
+        {
+            RebuildInterfaceState();
+        }
+
+        // on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
+        // we are editing.
+        //
+        // we do not use page caching here as we're just tracking the configuration state.
+        //
+        protected override void OnNavigatedTo(NavigationEventArgs args)
+        {
+            NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
+
+            NavHelper = (IEditRadioPageHelper)Activator.CreateInstance(NavArgs.EditorHelperType);
+
+            EditMisc = new RadioMiscItem(NavHelper, 0);
+            EditMisc.ErrorsChanged += MiscField_DataValidationError;
+
+            while (uiRadSelectCombo.Items.Count > NavHelper.RadioNames.Count)
+            {
+                uiRadSelectCombo.Items.RemoveAt(uiRadSelectCombo.Items.Count - 1);
+            }
+            for (int i = 0; i < NavHelper.RadioNames.Count; i++)
+            {
+                _radioSelComboText[i].Text = NavHelper.RadioNames[i];
+            }
+
+            Config = NavArgs.Config;
+            Config.ConfigurationSaved += ConfigurationSavedHandler;
+            CopyConfigToEdit(EditRadio);
+
+            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, NavHelper.SystemTag,
+                                           _configNameList, _configNameToUID);
+
+            uiRadSelectCombo.SelectedIndex = EditRadio;
+            RebuildInterfaceState();
+
+            base.OnNavigatedTo(args);
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs args)
+        {
+            Config.ConfigurationSaved -= ConfigurationSavedHandler;
+
+            base.OnNavigatedFrom(args);
+        }
+    }
+}

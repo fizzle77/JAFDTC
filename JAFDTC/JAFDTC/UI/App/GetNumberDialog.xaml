@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+GetNumberDialog.xaml : ui xaml for dialog to grab an integer value
+
+Copyright(C) 2023 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<ContentDialog
+    x:Class="JAFDTC.UI.App.GetNumberDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.App"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Untitled"
+    DefaultButton="Primary"
+    PrimaryButtonText="OK"
+    CloseButtonText="Cancel">
+
+    <ContentDialog.Resources>
+        <Style TargetType="local:GetNumberDialog" BasedOn="{StaticResource DefaultContentDialogStyle}"/>
+    </ContentDialog.Resources>
+
+    <TextBox x:Name="uiNumberText"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Center"
+             Header="Enter value:"
+             PlaceholderText="Value"
+             MaxLength="116"
+             Width="500"
+             TextChanging="GetNumberDialog_TextChanging"/>
+</ContentDialog>

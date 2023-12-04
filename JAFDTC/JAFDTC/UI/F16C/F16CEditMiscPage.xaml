@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+F16CEditMiscPage.xaml.cs : ui xaml for viper misc setup editor page
+
+Copyright(C) 2023 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<Page
+    x:Class="JAFDTC.UI.F16C.F16CEditMiscPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.F16C"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
+    NavigationCacheMode="Enabled">
+
+    <Page.Resources>
+
+        <!-- brush for error fields.
+          -->
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        left column 
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="0" Grid.Column="0" Margin="16,8,12,8"
+              VerticalAlignment="Top"
+              HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <!-- TACAN setup
+              -->
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                TACAN Configuration:
+            </TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                TACAN Channel
+            </TextBlock>
+            <StackPanel Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
+                <TextBox Width="90"
+                         x:Name="uiTACANValueChan"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         Text="{x:Bind EditMisc.TACANChannel, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         MaxLength="3"
+                         HorizontalAlignment="Left"
+                         LostFocus="MiscTextBox_LostFocus"
+                         ToolTipService.ToolTip="TACAN Channel Selection"/>
+                <ComboBox Margin="12,0,0,0" Width="64"
+                          x:Name="uiTACANComboBand"
+                          VerticalAlignment="Center"
+                          SelectionChanged="TACANComboBand_SelectionChanged"
+                          ToolTipService.ToolTip="TACAN Mode Selection">
+                    <!--                SelectionChanged="ALICSelectCombo_SelectionChanged" -->
+                    <!-- Tag is enum TODO -->
+                    <ComboBox.Items>
+                        <TextBlock Text="X" Tag="0"/>
+                        <TextBlock Text="Y" Tag="1"/>
+                    </ComboBox.Items>
+                </ComboBox>
+            </StackPanel>
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="16,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                Setup TACAN for Yardstick
+            </TextBlock>
+            <CheckBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0"
+                      x:Name="uiTACANCkboxIsYard"
+                      VerticalAlignment="Center"
+                      Click="TACANCkboxIsYard_Click"
+                      ToolTipService.ToolTip="Switch TACAN to A/A Mode for use as a Yardstick"/>
+
+            <!-- ALOW DED page
+              -->
+            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                ALOW DED Page:
+            </TextBlock>
+            <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right"
+                       VerticalAlignment="Center">
+                CARA ALOW Setting
+            </TextBlock>
+            <StackPanel Grid.Row="4" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
+                <TextBox Width="90"
+                         x:Name="uiALOWValueCARAALOW"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         Text="{x:Bind EditMisc.ALOWCARAALOW, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         MaxLength="5"
+                         HorizontalAlignment="Left"
+                         LostFocus="MiscTextBox_LostFocus"
+                         ToolTipService.ToolTip="ALOW DED Page: CARA ALLOW Setting (feet, AGL)"/>
+                <TextBlock Margin="12,0,0,0"
+                           Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                           HorizontalTextAlignment="Right">
+                    feet
+                </TextBlock>
+            </StackPanel>
+
+            <TextBlock Grid.Row="5" Grid.Column="0" Margin="16,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                MSL FLOOR Setting
+            </TextBlock>
+            <StackPanel Grid.Row="5" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
+                <TextBox Width="90"
+                         x:Name="uiALOWValueMSLFLOOR"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         Text="{x:Bind EditMisc.ALOWMSLFloor, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         MaxLength="5"
+                         HorizontalAlignment="Left"
+                         LostFocus="MiscTextBox_LostFocus"
+                         ToolTipService.ToolTip="ALOW DED Page: MSL FLOOR Setting (feet, MSL)"/>
+                <TextBlock Margin="12,0,0,0"
+                           Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                           HorizontalTextAlignment="Right">
+                    feet
+                </TextBlock>
+            </StackPanel>
+
+            <!-- BNGO DED page
+              -->
+            <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,24,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                BNGO DED Page:
+            </TextBlock>
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="16,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                BINGO Setting
+            </TextBlock>
+            <StackPanel Grid.Row="7" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
+                <TextBox Width="90"
+                         x:Name="uiBINGOValueBINGO"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         Text="{x:Bind EditMisc.Bingo, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         MaxLength="5"
+                         HorizontalAlignment="Left"
+                         LostFocus="MiscTextBox_LostFocus"
+                         ToolTipService.ToolTip="BINGO Setting (lbs.)"/>
+                <TextBlock Margin="12,0,0,0"
+                           Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                           HorizontalTextAlignment="Right">
+                    pounds
+                </TextBlock>
+            </StackPanel>
+
+            <!-- BULL DED page
+              -->
+            <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,24,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                BULL DED Page:
+            </TextBlock>
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="16,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                Show BULLS References
+            </TextBlock>
+            <CheckBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0"
+                      x:Name="uiBULLCkboxShowRefs"
+                      VerticalAlignment="Center"
+                      Click="BULLCkboxShowRefs_Click"
+                      ToolTipService.ToolTip="Show BULLS information in FCR, HAD, and HSD MFD Formats"/>
+
+            <TextBlock Grid.Row="10" Grid.Column="0" Margin="16,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                Bullseye Steerpoint
+            </TextBlock>
+            <TextBox Grid.Row="10" Grid.Column="1" Width="90" Margin="12,12,0,0"
+                     x:Name="uiBULLValueSP"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     Text="{x:Bind EditMisc.BullseyeWP, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     MaxLength="3"
+                     HorizontalAlignment="Left"
+                     LostFocus="MiscTextBox_LostFocus"
+                     ToolTipService.ToolTip="BULLSEYE BULL Steerpoint"/>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        right column 
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="0" Grid.Column="1" Margin="12,8,16,8"
+              VerticalAlignment="Top"
+              HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ILS setup
+              -->
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                ILS Configuration:
+            </TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right"
+                       VerticalAlignment="Center">
+                Localizer
+            </TextBlock>
+            <StackPanel Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
+                <TextBox Width="86"
+                         x:Name="uiILSValueFreq"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         Text="{x:Bind EditMisc.ILSFrequency, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         MaxLength="6"
+                         HorizontalAlignment="Left"
+                         LostFocus="MiscTextBox_LostFocus"
+                         ToolTipService.ToolTip="ILS Localizer Frequency (MHz)"/>
+                <TextBlock Margin="6,0,12,0"
+                           Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                    MHz,
+                </TextBlock>
+                <TextBox Width="72"
+                         x:Name="uiILSValueCourse"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         Text="{x:Bind EditMisc.ILSCourse, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         MaxLength="3"
+                         HorizontalAlignment="Left"
+                         LostFocus="MiscTextBox_LostFocus"
+                         ToolTipService.ToolTip="ILS Final Approach Course"/>
+                <TextBlock Margin="6,0,0,0"
+                           Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                    °
+                </TextBlock>
+            </StackPanel>
+
+            <!-- LASR DED page
+              -->
+            <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,24,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                LASR DED Page:
+            </TextBlock>
+            <TextBlock Grid.Row="3" Grid.Column="0" Margin="16,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                TGP Laser Code
+            </TextBlock>
+            <TextBox Grid.Row="3" Grid.Column="1" Width="86" Margin="12,12,0,0"
+                     x:Name="uiLASRValueTGP"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     Text="{x:Bind EditMisc.LaserTGPCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     MaxLength="4"
+                     HorizontalAlignment="Left"
+                     LostFocus="MiscTextBox_LostFocus"
+                     ToolTipService.ToolTip="TGP Laser Code"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Margin="16,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                LST Laser Code
+            </TextBlock>
+            <TextBox Grid.Row="4" Grid.Column="1" Width="86" Margin="12,12,0,0"
+                     x:Name="uiLASRValueLST"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     Text="{x:Bind EditMisc.LaserLSTCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     MaxLength="4"
+                     HorizontalAlignment="Left"
+                     LostFocus="MiscTextBox_LostFocus"
+                     ToolTipService.ToolTip="TGP LST Laser Code"/>
+
+            <TextBlock Grid.Row="5" Grid.Column="0" Margin="16,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                Laser ST Time
+            </TextBlock>
+            <StackPanel Grid.Row="5" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
+                <TextBox Width="86"
+                         x:Name="uiLASRValueTime"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         Text="{x:Bind EditMisc.LaserStartTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         MaxLength="3"
+                         HorizontalAlignment="Left"
+                         LostFocus="MiscTextBox_LostFocus"
+                         ToolTipService.ToolTip="Auto Lase at Time To Impact (Seconds)"/>
+                <TextBlock Margin="12,0,0,0"
+                           Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                           HorizontalTextAlignment="Right">
+                    seconds
+                </TextBlock>
+            </StackPanel>
+
+            <!-- HMCS DED page
+              -->
+            <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,24,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                HMCS DED Page, Symbology Intensity:
+            </TextBlock>
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="16,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right"
+                       VerticalAlignment="Center">
+                HUD Blanking
+            </TextBlock>
+            <CheckBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0"
+                      x:Name="uiHMCSCkboxBlankHUD"
+                      VerticalAlignment="Center"
+                      Click="HMCSCkboxBlankHUD_Click"
+                      ToolTipService.ToolTip="Blank the JHMCS in HUD Region"/>
+
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="16,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right"
+                       VerticalAlignment="Center">
+                Cockpit Blanking
+            </TextBlock>
+            <CheckBox Grid.Row="8" Grid.Column="1" Margin="12,12,0,0"
+                      x:Name="uiHMCSCkboxBlankCock"
+                      VerticalAlignment="Center"
+                      Click="HMCSCkboxBlankCock_Click"
+                      ToolTipService.ToolTip="Blank the JHMCS in Cockpit Region"/>
+
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="16,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right"
+                       VerticalAlignment="Center">
+                RWR Display
+            </TextBlock>
+            <CheckBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0"
+                      x:Name="uiHMCSCkboxShowRWR"
+                      VerticalAlignment="Center"
+                      Click="HMCSCkboxShowRWR_Click"
+                      ToolTipService.ToolTip="Show RWR Information in JHMCS"/>
+
+            <TextBlock Grid.Row="10" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right"
+                       VerticalAlignment="Center">
+                Declutter Level
+            </TextBlock>
+            <ComboBox Grid.Row="10" Grid.Column="1" Width="125" Margin="12,12,0,0"
+                      x:Name="uiHMCSComboDeclutSelect"
+                      VerticalAlignment="Center"
+                      SelectionChanged="HMCSComboDeclutSelect_SelectionChanged"
+                      ToolTipService.ToolTip="Select Declutter Mode for JHMCS (1 Least, 3 Most)">
+                <ComboBox.Items>
+                    <!-- tag is enum HMCSDeclutterLevels -->
+                    <TextBlock Text="LVL1 (Least)" Tag="0"/>
+                    <TextBlock Text="LVL2" Tag="1"/>
+                    <TextBlock Text="LVL3 (Most)" Tag="2"/>
+                </ComboBox.Items>
+            </ComboBox>
+            <TextBlock Grid.Row="11" Grid.Column="0" Margin="12,8,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right"
+                       VerticalAlignment="Center">
+                Symbology Intensity
+            </TextBlock>
+            <Slider Grid.Row="11" Grid.Column="1" Margin="12,12,0,0"
+                    x:Name="uiHMCSSliderIntensity"
+                    VerticalAlignment="Bottom"
+                    ValueChanged="HMCSSliderIntensity_ValueChanged"/>
+        </Grid>
+
+        <!-- commands
+          -->
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="12,12,12,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button Width="140"
+                        x:Name="uiPageBtnLink"
+                        Click="PageBtnLink_Click"
+                        ToolTipService.ToolTip="Link or Unlink this Setup to CMDS Setup from Another Configuration">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE723;"/>
+                        <TextBlock VerticalAlignment="center"
+                                   x:Name="uiPageBtnTxtLink">
+                            FIXUP
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <TextBlock Margin="12,0,24,0"
+                           x:Name="uiPageTxtLink"
+                           VerticalAlignment="center">
+                    FIXUP
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button x:Name="uiPageBtnReset"
+                        ToolTipService.ToolTip="TODO"
+                        Click="PageBtnReset_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                        <TextBlock VerticalAlignment="center">Reset System to Defaults</TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

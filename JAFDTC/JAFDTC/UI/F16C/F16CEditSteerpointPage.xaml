@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+F16CEditSteerpointPage.xaml : ui xaml for viper steerpoint editor page
+
+Copyright(C) 2023 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<Page
+    x:Class="JAFDTC.UI.F16C.F16CEditSteerpointPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.F16C"
+    xmlns:ui="using:CommunityToolkit.WinUI.UI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+
+    <Page.Resources>
+
+        <!-- style for enabled static text -->
+        <Style x:Key="EnabledStaticTextStyle" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimary}"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- style for disabled static text -->
+        <Style x:Key="DisabledStaticTextStyle" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{StaticResource TextFillColorDisabled}"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- brush for error fields. -->
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+
+    </Page.Resources>
+
+    <Grid Margin="16,8,16,12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0 : fill methods
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="0" Margin="0,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- select poi
+              -->
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                       HorizontalAlignment="Left"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                Steerpoint Initial Setup
+            </TextBlock>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,12"
+                       HorizontalTextAlignment="Right"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                Points of Interest
+            </TextBlock>
+
+            <ComboBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,12"
+                      x:Name="uiPoIComboSelect"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Center"
+                      ItemsSource="{x:Bind CurPoIs}"
+                      SelectionChanged="PoIComboSelect_SelectionChanged"
+                      ToolTipService.ToolTip="Selects a point of interest to use to fill in steerpoint information">
+            </ComboBox>
+            <Button Grid.Row="1" Grid.Column="2" Margin="12,0,0,0"
+                        x:Name="uiPoIBtnApply"
+                        VerticalAlignment="Center"
+                        Click="PoIBtnApply_Click"
+                        ToolTipService.ToolTip="Applies selected PoI to Steerpoint Information">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
+            </Button>
+
+            <Button Grid.Row="1" Grid.Column="3" Margin="24,12,0,12"
+                    x:Name="uiPoIBtnCapture"
+                    VerticalAlignment="Center"
+                    Click="PoIBtnCapture_Click"
+                    ToolTipService.ToolTip="Capture steerpoint LAT, LON, ALT from DCS">
+                Capture from DCS
+            </Button>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 1 : steerpoint details
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="1" Margin="0,12,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           x:Name="uiStptTextNum"
+                           Style="{StaticResource EditorTitleTextBlockStyle}">
+                    Steerpoint FIXUP Information
+                </TextBlock>
+                <Button Grid.Column="1" Margin="0,0,6,0"
+                        x:Name="uiStptBtnPrev"
+                        VerticalAlignment="Center"
+                        Click="StptBtnPrev_Click"
+                        ToolTipService.ToolTip="Moves to Previous Steerpoint for Editing">
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
+                </Button>
+                <Button Grid.Column="2" Margin="0,0,6,0"
+                        x:Name="uiStptBtnAdd"
+                        VerticalAlignment="Center"
+                        Click="StptBtnAdd_Click"
+                        ToolTipService.ToolTip="Adds New Steerpoint to End of List">
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
+                </Button>
+                <Button Grid.Column="3"
+                        x:Name="uiStptBtnNext"
+                        VerticalAlignment="Center"
+                        Click="StptBtnNext_Click"
+                        ToolTipService.ToolTip="Moves to Next Steerpoint for Editing">
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
+                </Button>
+            </Grid>
+
+            <!-- steerpoint name field
+              -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,0"
+                       HorizontalTextAlignment="Right"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                Name
+            </TextBlock>
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
+                     x:Name="uiStptValueName"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     Text="{x:Bind EditStpt.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     MaxLength="48"
+                     ToolTipService.ToolTip="Name of steerpoint"/>
+
+            <!-- lat/lon/alt name field
+              -->
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0"
+                       HorizontalTextAlignment="Right"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                LAT / LON / ALT / TOS
+            </TextBlock>
+            <Grid Grid.Row="2" Grid.Column="1" Margin="12,12,0,0"
+                  VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="125"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="125"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0"
+                         x:Name="uiStptValueLat"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         Text="{x:Bind EditStpt.LatUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ui:TextBoxExtensions.MaskPlaceholder="–"
+                         ui:TextBoxExtensions.Regex="^[nNsS] [\d]{2}° [\d]{2}\.[\d]{3}’$"
+                         ui:TextBoxExtensions.CustomMask="N:[nNsS]"
+                         ui:TextBoxExtensions.Mask="N 99° 99.999’"
+                         LostFocus="StptTextBox_LostFocus"
+                         ToolTipService.ToolTip="Latitude of steerpoint in DDM format: [N|S] 00° 00.000’"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
+                         x:Name="uiStptValueLon"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         Text="{x:Bind EditStpt.LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ui:TextBoxExtensions.MaskPlaceholder="–"
+                         ui:TextBoxExtensions.Regex="^[eEwW] [\d]{3}° [\d]{2}\.[\d]{3}’$"
+                         ui:TextBoxExtensions.CustomMask="E:[eEwW]"
+                         ui:TextBoxExtensions.Mask="E 999° 99.999’"
+                         LostFocus="StptTextBox_LostFocus"
+                         ToolTipService.ToolTip="Longitude of steerpoint in DDM format: [E|W] 000° 00.000’"/>
+                <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"
+                         x:Name="uiStptValueAlt"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         Text="{x:Bind EditStpt.Alt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         LostFocus="StptTextBox_LostFocus"
+                         ToolTipService.ToolTip="Altitude of steerpoint in feet"/>
+                <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
+                           x:Name="uiStptAltitudeUnitsText"
+                           Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                    ft
+                </TextBlock>
+                <TextBox Grid.Row="0" Grid.Column="4" Margin="24,0,0,0"
+                         x:Name="uiStptValueTOS"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         Text="{x:Bind EditStpt.TOS, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ui:TextBoxExtensions.MaskPlaceholder="–"
+                         ui:TextBoxExtensions.Regex="^[\d]{2}:[\d]{2}:[\d]{2}’$"
+                         ui:TextBoxExtensions.Mask="99:99:99"
+                         LostFocus="StptTextBox_LostFocus"
+                         ToolTipService.ToolTip="Time Over Steerpoint (TOS) of steerpoint in format: HH:MM:SS"/>
+            </Grid>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 2 : referenced points
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="2" Margin="0,12,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Margin="0,12,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}"
+                       VerticalAlignment="Center">
+                Referenced Points
+            </TextBlock>
+
+            <!-- referenced points
+              -->
+            <Grid Grid.Row="2" Margin="12,12,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="110"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- oap header row
+                      -->
+                    <TextBlock Grid.Row="0" Grid.Column="2"
+                               Style="{StaticResource TableHeaderTextStyle}">
+                        Range (ft)
+                    </TextBlock>
+                    <TextBlock Grid.Row="0" Grid.Column="3"
+                               Style="{StaticResource TableHeaderTextStyle}">
+                        Bearing (° True)
+                    </TextBlock>
+                    <TextBlock Grid.Row="0" Grid.Column="4"
+                               Style="{StaticResource TableHeaderTextStyle}">
+                        Elevation (ft)
+                    </TextBlock>
+
+                    <!-- oap 1 parameters
+                      -->
+                    <ComboBox Grid.Row="1" Grid.Column="0" Margin="0,12,0,0"
+                              x:Name="uiStptOAP0Combo"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Stretch"
+                              SelectionChanged="OAPCombo_SelectionChanged"
+                              Tag="0"
+                              ToolTipService.ToolTip="Enable or Disable OAP 1 for This Steerpoint">
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon VerticalAlignment="Center" FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE738;"/>
+                            <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">None</TextBlock>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon VerticalAlignment="Center" FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE879;"/>
+                            <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">OAP 1</TextBlock>
+                        </StackPanel>
+                    </ComboBox>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
+                               x:Name="uiStptOAP0TextTitle"
+                               VerticalAlignment="Center"
+                               HorizontalTextAlignment="Right"
+                               Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                        OAP 1
+                    </TextBlock>
+                    <TextBox Grid.Row="1" Grid.Column="2" Margin="12,12,0,0"
+                             x:Name="uiStptOAPValueRange0"
+                             Style="{StaticResource EditorParamEditTextBoxStyle}"
+                             Text="{x:Bind EditStpt.OAP[0].Range, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             PlaceholderText = "0"
+                             MaxLength="8"
+                             LostFocus="StptTextBox_LostFocus"
+                             ToolTipService.ToolTip="TODO"/>
+                    <TextBox Grid.Row="1" Grid.Column="3" Margin="12,12,0,0"
+                             x:Name="uiStptOAPValueBrng0"
+                             Style="{StaticResource EditorParamEditTextBoxStyle}"
+                             Text="{x:Bind EditStpt.OAP[0].Brng, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             PlaceholderText = "0.0"
+                             MaxLength="5"
+                             LostFocus="StptTextBox_LostFocus"
+                             ToolTipService.ToolTip="TODO"/>
+                    <TextBox Grid.Row="1" Grid.Column="4" Margin="12,12,0,0"
+                             x:Name="uiStptOAPValueElev0"
+                             Style="{StaticResource EditorParamEditTextBoxStyle}"
+                             Text="{x:Bind EditStpt.OAP[0].Elev, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             PlaceholderText = "0"
+                             MaxLength="8"
+                             LostFocus="StptTextBox_LostFocus"
+                             ToolTipService.ToolTip="TODO"/>
+
+                    <!-- oap 2 parameters
+                      -->
+                    <ComboBox Grid.Row="2" Grid.Column="0" Margin="0,12,0,0"
+                              x:Name="uiStptOAP1Combo"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Stretch"
+                              SelectionChanged="OAPCombo_SelectionChanged"
+                              Tag="1"
+                              ToolTipService.ToolTip="Enable or Disable OAP 2 for This Steerpoint">
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon VerticalAlignment="Center" FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE738;"/>
+                            <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">None</TextBlock>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon VerticalAlignment="Center" FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE879;"/>
+                            <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">OAP 2</TextBlock>
+                        </StackPanel>
+                    </ComboBox>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Margin="12,12,0,0"
+                               x:Name="uiStptOAP1TextTitle"
+                               HorizontalTextAlignment="Right"
+                               Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                        OAP 2
+                    </TextBlock>
+                    <TextBox Grid.Row="2" Grid.Column="2" Margin="12,12,0,0"
+                             x:Name="uiStptOAPValueRange1"
+                             Style="{StaticResource EditorParamEditTextBoxStyle}"
+                             Text="{x:Bind EditStpt.OAP[1].Range, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             PlaceholderText = "0"
+                             MaxLength="8"
+                             LostFocus="StptTextBox_LostFocus"
+                             ToolTipService.ToolTip="TODO"/>
+                    <TextBox Grid.Row="2" Grid.Column="3" Margin="12,12,0,0"
+                             x:Name="uiStptOAPValueBrng1"
+                             Style="{StaticResource EditorParamEditTextBoxStyle}"
+                             Text="{x:Bind EditStpt.OAP[1].Brng, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             PlaceholderText = "0.0"
+                             MaxLength="5"
+                             LostFocus="StptTextBox_LostFocus"
+                             ToolTipService.ToolTip="TODO"/>
+                    <TextBox Grid.Row="2" Grid.Column="4" Margin="12,12,0,0"
+                             x:Name="uiStptOAPValueElev1"
+                             Style="{StaticResource EditorParamEditTextBoxStyle}"
+                             Text="{x:Bind EditStpt.OAP[1].Elev, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             PlaceholderText = "0"
+                             MaxLength="8"
+                             LostFocus="StptTextBox_LostFocus"
+                             ToolTipService.ToolTip="TODO"/>
+
+                    <!-- vip/vrp header row
+                      -->
+                    <TextBlock Grid.Row="3" Grid.Column="2" Margin="0,12,0,0"
+                               x:Name="uiStptVxPRngTextHeader"
+                               Style="{StaticResource TableHeaderTextStyle}">
+                        Range (ft)
+                    </TextBlock>
+                    <TextBlock Grid.Row="3" Grid.Column="3" Margin="0,12,0,0"
+                               Style="{StaticResource TableHeaderTextStyle}">
+                        Bearing (° True)
+                    </TextBlock>
+                    <TextBlock Grid.Row="3" Grid.Column="4" Margin="0,12,0,0"
+                               Style="{StaticResource TableHeaderTextStyle}">
+                        Elevation (ft)
+                    </TextBlock>
+
+                    <!-- vip/vrp 1 parameters
+                      -->
+                    <ComboBox Grid.Row="4" Grid.Column="0" Margin="0,12,0,0"
+                              x:Name="uiStptVxPCombo"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Stretch"
+                              SelectionChanged="VizCombo_SelectionChanged"
+                              ToolTipService.ToolTip="TODO">
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon VerticalAlignment="Center" FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE738;"/>
+                            <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">None</TextBlock>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon VerticalAlignment="Center" FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xF138;"/>
+                            <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">VIP</TextBlock>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon VerticalAlignment="Center" FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xF16B;"/>
+                            <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">VRP</TextBlock>
+                        </StackPanel>
+                    </ComboBox>
+                    <TextBlock Grid.Row="4" Grid.Column="1" Margin="12,12,0,0"
+                               x:Name="uiStptVxP0TextTitle"
+                               HorizontalTextAlignment="Right"
+                               Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                        Target to VRP
+                    </TextBlock>
+                    <TextBox Grid.Row="4" Grid.Column="2" Margin="12,12,0,0"
+                             x:Name="uiStptVxPValueRange0"
+                             Style="{StaticResource EditorParamEditTextBoxStyle}"
+                             Text="{x:Bind EditStpt.VxP[0].Range, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             PlaceholderText="0"
+                             MaxLength="8"
+                             LostFocus="StptTextBox_LostFocus"
+                             ToolTipService.ToolTip="TODO"/>
+                    <TextBox Grid.Row="4" Grid.Column="3" Margin="12,12,0,0"
+                             x:Name="uiStptVxPValueBrng0"
+                             Style="{StaticResource EditorParamEditTextBoxStyle}"
+                             Text="{x:Bind EditStpt.VxP[0].Brng, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             PlaceholderText="0.0"
+                             MaxLength="5"
+                             LostFocus="StptTextBox_LostFocus"
+                             ToolTipService.ToolTip="TODO"/>
+                    <TextBox Grid.Row="4" Grid.Column="4" Margin="12,12,0,0"
+                             x:Name="uiStptVxPValueElev0"
+                             Style="{StaticResource EditorParamEditTextBoxStyle}"
+                             Text="{x:Bind EditStpt.VxP[0].Elev, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             PlaceholderText="0"
+                             MaxLength="8"
+                             LostFocus="StptTextBox_LostFocus"
+                             ToolTipService.ToolTip="TODO"/>
+
+                    <!-- vip/vrp 2 parameters
+                      -->
+                    <TextBlock Grid.Row="5" Grid.Column="1" Margin="12,12,0,0"
+                               x:Name="uiStptVxP1TextTitle"
+                               HorizontalTextAlignment="Right"
+                               Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                        Target to PUP
+                    </TextBlock>
+                    <TextBox Grid.Row="5" Grid.Column="2" Margin="12,12,0,0"
+                             x:Name="uiStptVxPValueRange1"
+                             Style="{StaticResource EditorParamEditTextBoxStyle}"
+                             Text="{x:Bind EditStpt.VxP[1].Range, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             PlaceholderText="0"
+                             MaxLength="8"
+                             LostFocus="StptTextBox_LostFocus"
+                             ToolTipService.ToolTip="TODO"/>
+                    <TextBox Grid.Row="5" Grid.Column="3" Margin="12,12,0,0"
+                             x:Name="uiStptVxPValueBrng1"
+                             Style="{StaticResource EditorParamEditTextBoxStyle}"
+                             Text="{x:Bind EditStpt.VxP[1].Brng, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             PlaceholderText="0.0"
+                             MaxLength="5"
+                             LostFocus="StptTextBox_LostFocus"
+                             ToolTipService.ToolTip="TODO"/>
+                    <TextBox Grid.Row="5" Grid.Column="4" Margin="12,12,0,0"
+                             x:Name="uiStptVxPValueElev1"
+                             Style="{StaticResource EditorParamEditTextBoxStyle}"
+                             Text="{x:Bind EditStpt.VxP[1].Elev, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             PlaceholderText="0"
+                             MaxLength="8"
+                             LostFocus="StptTextBox_LostFocus"
+                             ToolTipService.ToolTip="TODO"/>
+
+                </Grid>
+            </Grid>
+
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 4 : buttons
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="110"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="3" Margin="20,0,0,0"
+                    x:Name="uiAcceptBtnOK"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Click="AcceptBtnOK_Click"
+                    ToolTipService.ToolTip="TODO">
+                OK
+            </Button>
+            <Button Grid.Column="4" Margin="12,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Click="AcceptBtnCancel_Click"
+                    ToolTipService.ToolTip="TODO">
+                Cancel
+            </Button>
+        </Grid>
+
+    </Grid>
+</Page>

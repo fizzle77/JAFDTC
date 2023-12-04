@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+EditRadioPage.cs : ui xaml for general radio setup editor page
+
+Copyright(C) 2023 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<Page
+    x:Class="JAFDTC.UI.Base.EditRadioPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.Base"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+
+    <Page.Resources>
+
+        <!-- brush for error fields. -->
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+
+    </Page.Resources>
+
+    <Grid Margin="6,8,6,8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0 : radio selection
+        ===============================================================================================================
+        -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+            <ComboBox Margin="0,0,0,0" Width="300"
+                      x:Name="uiRadSelectCombo"
+                      VerticalAlignment="Center"
+                      SelectionChanged="RadSelectCombo_SelectionChanged"
+                      ToolTipService.ToolTip="Selects Radio to Edit">
+                <!-- provide 4 items for 4 radios, cut back based on actual needs -->
+                <ComboBox.Items>
+                    <Grid Tag="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiRadSelectItem0Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0"
+                                   x:Name="uiRadSelectItem0Text"
+                                   VerticalAlignment="Center">
+                            COM 1: FIXUP
+                        </TextBlock>
+                    </Grid>
+                    <Grid Tag="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiRadSelectItem1Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0"
+                                   x:Name="uiRadSelectItem1Text"
+                                   VerticalAlignment="Center">
+                            COM 2: FIXUP
+                        </TextBlock>
+                    </Grid>
+                    <Grid Tag="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiRadSelectItem2Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0"
+                                   x:Name="uiRadSelectItem2Text"
+                                   VerticalAlignment="Center">
+                            COM 3: FIXUP
+                        </TextBlock>
+                    </Grid>
+                    <Grid Tag="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiRadSelectItem3Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0"
+                                   x:Name="uiRadSelectItem3Text"
+                                   VerticalAlignment="Center">
+                            COM 4: FIXUP
+                        </TextBlock>
+                    </Grid>
+                </ComboBox.Items>
+            </ComboBox>
+            <Button Margin="24,0,6,0" VerticalAlignment="Center"
+                    x:Name="uiRadPrevBtn"
+                    ToolTipService.ToolTip="Selects Previous Radio"
+                    Click="RadBtnPrev_Click">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
+            </Button>
+            <Button VerticalAlignment="Center"
+                    x:Name="uiRadNextBtn"
+                    ToolTipService.ToolTip="Selects Next Radio"
+                    Click="RadBtnNext_Click">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
+            </Button>
+            <CommandBar Margin="56,0,0,0" HorizontalAlignment="Center">
+                <AppBarButton x:Name="uiBarAdd" Icon="Add" Label="Add"
+                          Click="CmdAdd_Click"
+                          ToolTipService.ToolTip="Add a New Preset to Radio"/>
+                <AppBarSeparator/>
+                <AppBarButton x:Name="uiBarImport" Icon="Download" Label="Import"
+                          Click="CmdImport_Click"
+                          ToolTipService.ToolTip="Import Radio Presets from a File"/>
+                <AppBarButton x:Name="uiBarExport" Icon="Upload" Label="Export"
+                          Click="CmdExport_Click"
+                          ToolTipService.ToolTip="Export Radio Presets to a File"/>
+                <AppBarSeparator/>
+            </CommandBar>
+        </StackPanel>
+
+        <!--
+        ===============================================================================================================
+        row 1 : preset list
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="1" Margin="0,24,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="0" Margin="16,0,12,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="72"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Style="{StaticResource TableHeaderTextStyle}">
+                    Preset
+                </TextBlock>
+                <TextBlock Grid.Column="1" Style="{StaticResource TableHeaderTextStyle}">
+                    Frequency (MHz)
+                </TextBlock>
+                <TextBlock Grid.Column="2" Style="{StaticResource TableHeaderTextStyle}">
+                    Description
+                </TextBlock>
+            </Grid>
+
+            <ListView Grid.Row="1"
+                      x:Name="uiPreListView"
+                      SelectionMode="None"
+                      ItemsSource="{x:Bind EditPresets}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:RadioPresetItem">
+                        <Grid Margin="0,6,0,8"
+                              Tag="{x:Bind Tag}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="72"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Column="0" Margin="0,0,0,0"
+                                     VerticalAlignment="Center"
+                                     HorizontalTextAlignment="Center"
+                                     MaxLength="2"
+                                     Tag="Preset"
+                                     LostFocus="PageTextBox_LostFocus"
+                                     IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     Text="{x:Bind Preset, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                            <TextBox Grid.Column="1" Margin="6,0,0,0"
+                                     VerticalAlignment="Center"
+                                     HorizontalTextAlignment="Left"
+                                     MaxLength="7"
+                                     Tag="Frequency"
+                                     LostFocus="PageTextBox_LostFocus"
+                                     IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     Text="{x:Bind Frequency, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                            <TextBox Grid.Column="2" Margin="6,0,0,0"
+                                     VerticalAlignment="Center"
+                                     HorizontalTextAlignment="Center"
+                                     Tag="Description"
+                                     LostFocus="PageTextBox_LostFocus"
+                                     FontWeight="Medium"
+                                     FontSize="16"
+                                     IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     Text="{x:Bind Description, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                            <Button  Grid.Column="3" Margin="12,0,0,0"
+                                     VerticalAlignment="Center"
+                                     IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     Tag="{x:Bind Tag}"
+                                     ToolTipService.ToolTip="Delete this Preset"
+                                     Click="PreBntDelete_Click">
+                                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 2 : miscellaneous
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="2" Margin="16,18,0,18">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           x:Name="uiMiscTextDefaultTitle"
+                           VerticalAlignment="Center">
+                    FIXUP Initial Frequency or Preset
+                </TextBlock>
+                <TextBox Grid.Column="1" Margin="12,0,0,0"
+                         x:Name="uiMiscValueDefaultFreq"
+                         VerticalAlignment="Center"
+                         MaxLength="7"
+                         LostFocus="PageTextBox_LostFocus"
+                         Text="{x:Bind EditMisc.DefaultTuning, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                <TextBlock Grid.Column="2" Margin="8,0,0,0"
+                           x:Name="uiMiscTextDefaultLabel"
+                           VerticalAlignment="Center">
+                    FIXUP
+                </TextBlock>
+                <CheckBox Grid.Column="4" Margin="24,0,8,0"
+                          x:Name="uiMiscCkbxMonitor"
+                          IsChecked="{x:Bind EditMisc.IsMonitorEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                          VerticalAlignment="Center"
+                          Click="MiscCkbxMonitor_Click">
+                    Monitor UHF Guard Frequency (243.0 MHz)
+                </CheckBox>
+            </Grid>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 3 : link / reset
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="3" Margin="8,12,8,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button Width="140"
+                        x:Name="uiPageBtnLink"
+                        Click="PageBtnLink_Click"
+                        ToolTipService.ToolTip="Link or Unlink this Setup to Radio Setup from Another Configuration">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE723;"/>
+                        <TextBlock VerticalAlignment="center"
+                                   x:Name="uiPageBtnTxtLink">
+                            FIXUP
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <TextBlock Margin="12,0,24,0"
+                           x:Name="uiPageTxtLink"
+                           VerticalAlignment="center">
+                    FIXUP
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button x:Name="uiPageBtnResetAll"
+                        ToolTipService.ToolTip="TODO"
+                        Click="PageBtnResetAll_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                        <TextBlock VerticalAlignment="center">Reset System to Defaults</TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

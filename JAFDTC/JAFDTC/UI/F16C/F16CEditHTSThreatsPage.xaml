@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+F16CEditHTSPage.cs : ui xaml for viper hts threat editor page
+
+Copyright(C) 2023 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<Page
+    x:Class="JAFDTC.UI.F16C.F16CEditHTSThreatsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.F16C"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+
+    <Grid Margin="16,8,16,8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0 : title
+        ===============================================================================================================
+        -->
+        <StackPanel Grid.Row="0">
+            <TextBlock Style="{StaticResource EditorTitleTextBlockStyle}"
+                       VerticalAlignment="Center">
+                HTS Threat Class Definitions:
+            </TextBlock>
+        </StackPanel>
+
+        <!--
+        ===============================================================================================================
+        row 1 : threat list
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="1" Margin="12,12,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="0" Margin="16,0,12,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition Width="62"/>
+                    <ColumnDefinition Width="62"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Margin="0,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Enabled"/>
+                <TextBlock Grid.Column="1" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Class"/>
+                <TextBlock Grid.Column="2" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Code"/>
+                <TextBlock Grid.Column="3" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="RWR"/>
+                <TextBlock Grid.Column="4" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Country"/>
+                <TextBlock Grid.Column="5" Margin="6,0,6,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Type"/>
+                <TextBlock Grid.Column="6" Margin="6,0,6,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Name"/>
+            </Grid>
+
+            <ListView Grid.Row="1"
+                      x:Name="uiStptListView"
+                      SelectionMode="Single"
+                      ItemsSource="{x:Bind EditEmitterList}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:EmitterListItem">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="52"/>
+                                <ColumnDefinition Width="52"/>
+                                <ColumnDefinition Width="52"/>
+                                <ColumnDefinition Width="62"/>
+                                <ColumnDefinition Width="62"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <CheckBox Grid.Column="0" Margin="20,2,0,2"
+                                      VerticalAlignment="Center"
+                                      IsEnabled="{x:Bind IsEnabled}"
+                                      IsChecked="{x:Bind IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Grid.Column="1" Margin="6,2,0,2"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind HTSTable}"/>
+                            <TextBlock Grid.Column="2" Margin="6,2,0,2"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind ALICCode}"/>
+                            <TextBlock Grid.Column="3" Margin="6,2,0,2"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind F16RWR}"/>
+                            <TextBlock Grid.Column="4" Margin="6,2,0,2"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind Country}"/>
+                            <TextBlock Grid.Column="5" Margin="6,1,6,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind Type}"/>
+                            <TextBlock Grid.Column="6" Margin="6,1,6,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Left"
+                                       Text="{x:Bind Name}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 2 : list buttons
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="2" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Width="200"
+                    x:Name="uiListBtnSet"
+                    VerticalAlignment="Center"
+                    Click="ListBtnSet_Click"
+                    ToolTipService.ToolTip="TODO">
+                Enable All Classes
+            </Button>
+            <Button Grid.Column="2" Width="200"
+                    x:Name="uiListBtnClear"
+                    VerticalAlignment="Center"
+                    Click="ListBtnClear_Click"
+                    ToolTipService.ToolTip="TODO">
+                Disable All Clases
+            </Button>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 3 : page buttons
+        ===============================================================================================================
+        -->
+        <StackPanel Grid.Row="3" Margin="0,24,0,8"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button Width="200"
+                    x:Name="uiPageBtnDone"
+                    VerticalAlignment="Center"
+                    Click="PageBtnDone_Click"
+                    ToolTipService.ToolTip="Done Making Changes to the Threats">
+                Done
+            </Button>
+        </StackPanel>
+    </Grid>
+</Page>

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+ConfigurationListPage.xaml : ui xaml for configuration list page that provides the top-level ui
+
+Copyright(C) 2023 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<Page
+    x:Class="JAFDTC.UI.App.ConfigurationListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.Models"
+    xmlns:ui="using:JAFDTC.UI.App"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    NavigationCacheMode="Enabled">
+
+    <Page.Resources>
+
+        <!-- brush for ok status -->
+        <SolidColorBrush x:Key="StatusOKBrush" Color="Green"/>
+
+        <!-- brush for error status -->
+        <SolidColorBrush x:Key="StatusErrorBrush" Color="Red"/>
+        
+        <!-- brush for linked system icons -->
+        <SolidColorBrush x:Key="LinkedSysIconBrush" Color="{StaticResource TextFillColorTertiary}"/>
+
+    </Page.Resources>
+
+    <Grid Margin="12,0,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0 : header row
+        ===============================================================================================================
+        -->
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+
+            <!-- airframe drop-down selection -->
+            <ComboBox Width="180"
+                      x:Name="uiBarComboAirframe"
+                      VerticalAlignment="Center"
+                      SelectionChanged="BarComboAirframe_SelectionChanged"
+                      ToolTipService.ToolTip="Select Airframe Type">
+                <!-- Tag is enum JAFDTC.AirframeTypes -->
+                <ComboBox.Items>
+                    <TextBlock Text="A-10C Warthog" Tag="1"/>
+                    <!--
+                    <TextBlock Text="AH-64D Apache" Tag="2"/>
+                    <TextBlock Text="AV-8B Harrier" Tag="3"/>
+                    -->
+                    <!--
+                    <TextBlock Text="F-15E Strike Eagle" Tag="4"/>
+                    -->
+                    <TextBlock Text="F-16C Viper" Tag="5"/>
+                    <!--
+                    <TextBlock Text="F/A-18C Hornet" Tag="6"/>
+                    -->
+                </ComboBox.Items>
+            </ComboBox>
+
+            <CommandBar Margin="12,0,0,0">
+                <AppBarButton x:Name="uiBarBtnAdd" Icon="Add" Label="Add"
+                              Click="CmdAdd_Click"
+                              ToolTipService.ToolTip="Add New Configuration"/>
+                <AppBarButton x:Name="uiBarBtnEdit" Icon="Edit" Label="Edit"
+                              Click="CmdOpen_Click"
+                              ToolTipService.ToolTip="Edit Selected Configuration"/>
+                <AppBarButton x:Name="uiBarBtnCopy" Label="Duplicate"
+                              Click="CmdCopy_Click"
+                              ToolTipService.ToolTip="Duplicate Selected Configuration">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7C4;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="uiBarBtnPaste" Icon="Paste" Label="Paste"
+                              Click="CmdPaste_Click"
+                              ToolTipService.ToolTip="Paste Information Into Selected Configuration"/>
+                <AppBarButton x:Name="uiBarBtnRename" Icon="Rename" Label="Rename"
+                              Click="CmdRename_Click"
+                              ToolTipService.ToolTip="Rename Selected Configuration"/>
+                <AppBarSeparator/>
+                <AppBarButton x:Name="uiBarBtnDelete" Icon="Delete" Label="Delete"
+                              Click="CmdDelete_Click"
+                              ToolTipService.ToolTip="Delete Selected Configuration"/>
+                <AppBarSeparator/>
+                <AppBarButton x:Name="uiBarBtnImport" Icon="Download" Label="Import"
+                              Click="CmdImport_Click"
+                              ToolTipService.ToolTip="Create New Configuration from File"/>
+                <AppBarButton x:Name="uiBarBtnExport" Icon="Upload" Label="Export"
+                              Click="CmdExport_Click"
+                              ToolTipService.ToolTip="Export Selected Configuration to File"/>
+                <AppBarSeparator/>
+                <AppBarButton x:Name="uiBarBtnLoadJet" Label="Load to Jet"
+                              Click="CmdLoadJet_Click"
+                              ToolTipService.ToolTip="Upload Selected Configuration to Jet">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE709;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton Label="Settings" Icon="Setting" Click="CmdSettings_Click"/>
+                    <AppBarSeparator/>
+                    <AppBarButton Label="About" Click="CmdAbout_Click">
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE946;"/>
+                    </AppBarButton>
+                </CommandBar.SecondaryCommands>
+            </CommandBar>
+        </StackPanel>
+
+        <!--
+        ===============================================================================================================
+        row 0 : content region
+        ===============================================================================================================
+        -->
+        <ui:ConfigurationListView Grid.Row="1" Margin="0,4,0,0"
+                  x:Name="uiCfgListView"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Stretch"
+                  IsDoubleTapEnabled="True"
+                  SelectionChanged="CfgListView_SelectionChanged"
+                  RightTapped="CfgListView_RightTapped"
+                  DoubleTapped="CfgListView_DoubleClick"
+                  ItemsSource="{x:Bind ConfigList.ConfigsFiltered}">
+            <ui:ConfigurationListView.Resources>
+                <MenuFlyout x:Name="uiCfgListCtxMenuFlyout">
+                    <MenuFlyout.Items>
+                        <MenuFlyoutItem Text="Edit" Icon="Edit" Click="CmdOpen_Click"/>
+                        <MenuFlyoutItem Text="Duplicate" Click="CmdCopy_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7C4;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Paste" Icon="Paste" Click="CmdPaste_Click"/>
+                        <MenuFlyoutItem Text="Rename" Icon="Rename" Click="CmdRename_Click"/>
+                        <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Text="Export" Icon="Upload" Click="CmdExport_Click"/>
+                        <MenuFlyoutItem Text="Load to Jet" Click="CmdLoadJet_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE709;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Text="Delete" Icon="Delete" Click="CmdDelete_Click"/>
+                    </MenuFlyout.Items>
+                </MenuFlyout>
+            </ui:ConfigurationListView.Resources>
+            <ui:ConfigurationListView.ItemTemplate>
+                <DataTemplate x:DataType="local:IConfiguration">
+                    <Grid Margin="7">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0"
+                                    VerticalAlignment="Center">
+                            <TextBlock Margin="0,0,0,1"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Text="{x:Bind Name}"/>
+                            <TextBlock FontSize="12"
+                                       FontStyle="Italic"
+                                       Foreground="{StaticResource TextFillColorTertiary}"
+                                       Text="{x:Bind UpdatesInfoText}"/>
+                        </StackPanel>
+                        <Grid Grid.Column="1">
+                            <!--
+                            these TextBlocks will overlay on top of each other, given all SFI glyphs are the same
+                            width by design. we will use the Loaded event from the top-most TextBlock to show/hide
+                            badge icons to overlay on top of the system icons via text highlighter.
+                            
+                            basically, assume the overlay is always transparent, use the TextHighlighters to set
+                            characters corresponding to badges to non-transparent.
+                            
+                            F0B6 circle, EA21 action circle, EA81 big circle
+                            -->
+                            <TextBlock VerticalAlignment="Center"
+                                       HorizontalAlignment="Right"
+                                       Foreground="{ThemeResource SystemAccentColor}"
+                                       FontFamily="Segoe Fluent Icons"
+                                       FontSize="20"
+                                       Text="{x:Bind UpdatesIcons}"/>
+                            <TextBlock VerticalAlignment="Center"
+                                       HorizontalAlignment="Right"
+                                       FontFamily="Segoe Fluent Icons"
+                                       FontSize="20"
+                                       Tag="uiCfgListViewItemBadges"
+                                       Text="{x:Bind UpdatesIconBadges}">
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="White" Opacity="0.0" />
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ui:ConfigurationListView.ItemTemplate>
+        </ui:ConfigurationListView>
+
+        <!--
+        ===============================================================================================================
+        row 2 : dcs status row
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="2" Margin="0,4,0,4"
+              Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Margin="12,6,0,6"
+                       FontWeight="Medium"
+                       Foreground="{ThemeResource TextFillColorTertiary}"
+                       VerticalAlignment="Center">
+                DCS Status:
+            </TextBlock>
+
+            <TextBlock Grid.Column="1" Margin="12,6,0,6"
+                       Foreground="{ThemeResource TextFillColorTertiary}"
+                       VerticalAlignment="Center">
+                Pilot in Pit
+            </TextBlock>
+            <FontIcon Grid.Column="2" Margin="6,1,0,0"
+                      x:Name="uiStatsIconExport"
+                      VerticalAlignment="Center"
+                      FontSize="14" FontFamily="Segoe Fluent Icons"/>
+            <TextBlock Grid.Column="3" Margin="2,6,0,6"
+                       x:Name="uiStatsAirframe"
+                       Foreground="{ThemeResource TextFillColorTertiary}"
+                       VerticalAlignment="Center">
+                FIXUP
+            </TextBlock>
+
+            <TextBlock Grid.Column="4" Margin="12,6,0,6"
+                       Foreground="{ThemeResource TextFillColorTertiary}"
+                       VerticalAlignment="Center">
+                Running
+            </TextBlock>
+            <FontIcon Grid.Column="5" Margin="6,1,0,0"
+                      x:Name="uiStatsIconLaunch"
+                      VerticalAlignment="Center"
+                      FontSize="14" FontFamily="Segoe Fluent Icons"/>
+
+            <TextBlock Grid.Column="6" Margin="12,6,0,6"
+                       Foreground="{ThemeResource TextFillColorTertiary}"
+                       VerticalAlignment="Center">
+                Lua Installed
+            </TextBlock>
+            <FontIcon Grid.Column="7" Margin="6,1,0,0"
+                      x:Name="uiStatsIconLua"
+                      VerticalAlignment="Center"
+                      FontSize="14" FontFamily="Segoe Fluent Icons"/>
+            <TextBlock Grid.Column="9" Margin="0,0,12,0"
+                       x:Name="uiStatsValuePilot"
+                       Foreground="{ThemeResource TextFillColorTertiary}"
+                       VerticalAlignment="Center">
+                FIXUP
+            </TextBlock>
+        </Grid>
+    </Grid>
+</Page>

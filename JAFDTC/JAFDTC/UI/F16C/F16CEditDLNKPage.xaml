@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+F16CEditDLNKPage.cs : ui xaml for viper data link editor page
+
+Copyright(C) 2023 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<Page
+    x:Class="JAFDTC.UI.F16C.F16CEditDLNKPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.F16C"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
+    NavigationCacheMode="Enabled">
+
+    <Page.Resources>
+
+        <!-- brush for error fields. -->
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+
+    </Page.Resources>
+
+    <Grid Margin="16,8,0,8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0-1 : title, ownship
+        ===============================================================================================================
+        -->
+        <TextBlock Grid.Row="0"
+                   Style="{StaticResource EditorTitleTextBlockStyle}">
+            Ownship Setup:
+        </TextBlock>
+
+        <Grid Grid.Row="1" Margin="12,12,0,0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center">
+                    Ownship TNDL Entry
+                </TextBlock>
+                <ComboBox Width="72" Margin="12,0,0,0"
+                          x:Name="uiOwnComboEntry"
+                          VerticalAlignment="Center"
+                          SelectionChanged="OwnComboEntry_SelectionChanged">
+                    <ComboBox.Items>
+                        <TextBlock VerticalAlignment="Center">1</TextBlock>
+                        <TextBlock VerticalAlignment="Center">2</TextBlock>
+                        <TextBlock VerticalAlignment="Center">3</TextBlock>
+                        <TextBlock VerticalAlignment="Center">4</TextBlock>
+                        <TextBlock VerticalAlignment="Center">5</TextBlock>
+                        <TextBlock VerticalAlignment="Center">6</TextBlock>
+                        <TextBlock VerticalAlignment="Center">7</TextBlock>
+                        <TextBlock VerticalAlignment="Center">8</TextBlock>
+                    </ComboBox.Items>
+                </ComboBox>
+                <CheckBox Margin="24,0,0,0"
+                          x:Name="uiOwnCkbxLead"
+                          IsChecked="{x:Bind EditDLNK.IsOwnshipLead, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                          Click="OwnCkbxLead_Click">
+                    Flight Lead
+                </CheckBox>
+            </StackPanel>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 2-3 : title, tndl
+        ===============================================================================================================
+        -->
+        <TextBlock Grid.Row="2" Margin="0,24,0,0"
+                   Style="{StaticResource EditorTitleTextBlockStyle}">
+            Team TNDL Programming:
+        </TextBlock>
+
+        <Grid Grid.Row="3" Margin="0,12,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Row="0" Grid.Column="0">
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="56"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="160"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- row 0, header -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,0,6"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            Entry
+                        </TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Margin="12,0,0,6"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            TDOA
+                        </TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Margin="12,0,0,6"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            TNDL
+                        </TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="3" Margin="12,0,0,6"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            Callsign
+                        </TextBlock>
+
+                        <!-- row 1, entry 1 -->
+                        <TextBlock Grid.Row="1" Grid.Column="0"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            1
+                        </TextBlock>
+                        <CheckBox Grid.Row="1" Grid.Column="1" Margin="24,0,0,0"
+                                  x:Name="uiTNDLCkbxTDOA1"
+                                  VerticalAlignment="Center"
+                                  Tag="0"
+                                  IsChecked="{x:Bind EditDLNK.TeamMembers[0].TDOA, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Click="TNDLCkbxTDOA_Click"/>
+                        <TextBox Grid.Row="1" Grid.Column="2" Margin="12,0,0,0"
+                                 x:Name="uiTNDLTextTNDL1"
+                                 VerticalAlignment="Center"
+                                 Tag="0"
+                                 MaxLength="5"
+                                 Text="{x:Bind EditDLNK.TeamMembers[0].TNDL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 LostFocus="TNDLTextTNDL_LostFocus"/>
+                        <ComboBox Grid.Row="1" Grid.Column="3" Width="148" Margin="12,0,0,0"
+                                  x:Name="uiTNDLComboCallsign1"
+                                  VerticalAlignment="Center"
+                                  Tag="0"
+                                  SelectionChanged="TNDLComboCallsign_SelectionChanged">
+                        </ComboBox>
+
+                        <!-- row 2, entry 2 -->
+                        <TextBlock Grid.Row="2" Grid.Column="0"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            2
+                        </TextBlock>
+                        <CheckBox Grid.Row="2" Grid.Column="1" Margin="24,12,0,0"
+                                  x:Name="uiTNDLCkbxTDOA2"
+                                  VerticalAlignment="Center"
+                                  Tag="1"
+                                  IsChecked="{x:Bind EditDLNK.TeamMembers[1].TDOA, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Click="TNDLCkbxTDOA_Click"/>
+                        <TextBox Grid.Row="2" Grid.Column="2" Margin="12,12,0,0"
+                                 x:Name="uiTNDLTextTNDL2"
+                                 VerticalAlignment="Center"
+                                 Tag="1"
+                                 MaxLength="5"
+                                 Text="{x:Bind EditDLNK.TeamMembers[1].TNDL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 LostFocus="TNDLTextTNDL_LostFocus"/>
+                        <ComboBox Grid.Row="2" Grid.Column="3" Width="148" Margin="12,12,0,0"
+                                  x:Name="uiTNDLComboCallsign2"
+                                  VerticalAlignment="Center"
+                                  Tag="1"
+                                  SelectionChanged="TNDLComboCallsign_SelectionChanged">
+                        </ComboBox>
+
+                        <!-- row 3, entry 3 -->
+                        <TextBlock Grid.Row="3" Grid.Column="0"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            3
+                        </TextBlock>
+                        <CheckBox Grid.Row="3" Grid.Column="1" Margin="24,12,0,0"
+                                  x:Name="uiTNDLCkbxTDOA3"
+                                  VerticalAlignment="Center"
+                                  Tag="2"
+                                  IsChecked="{x:Bind EditDLNK.TeamMembers[2].TDOA, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Click="TNDLCkbxTDOA_Click"/>
+                        <TextBox Grid.Row="3" Grid.Column="2" Margin="12,12,0,0"
+                                 x:Name="uiTNDLTextTNDL3"
+                                 VerticalAlignment="Center"
+                                 Tag="2"
+                                 MaxLength="5"
+                                 Text="{x:Bind EditDLNK.TeamMembers[2].TNDL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 LostFocus="TNDLTextTNDL_LostFocus"/>
+                        <ComboBox Grid.Row="3" Grid.Column="3" Width="148" Margin="12,12,0,0"
+                                  x:Name="uiTNDLComboCallsign3"
+                                  VerticalAlignment="Center"
+                                  Tag="2"
+                                  SelectionChanged="TNDLComboCallsign_SelectionChanged">
+                        </ComboBox>
+
+                        <!-- row 4, entry 4 -->
+                        <TextBlock Grid.Row="4" Grid.Column="0"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            4
+                        </TextBlock>
+                        <CheckBox Grid.Row="4" Grid.Column="1" Margin="24,12,0,0"
+                                  x:Name="uiTNDLCkbxTDOA4"
+                                  VerticalAlignment="Center"
+                                  Tag="3"
+                                  IsChecked="{x:Bind EditDLNK.TeamMembers[3].TDOA, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Click="TNDLCkbxTDOA_Click"/>
+                        <TextBox Grid.Row="4" Grid.Column="2" Margin="12,12,0,0"
+                                 x:Name="uiTNDLTextTNDL4"
+                                 VerticalAlignment="Center"
+                                 Tag="3"
+                                 MaxLength="5"
+                                 Text="{x:Bind EditDLNK.TeamMembers[3].TNDL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 LostFocus="TNDLTextTNDL_LostFocus"/>
+                        <ComboBox Grid.Row="4" Grid.Column="3" Width="148" Margin="12,12,0,0"
+                                  x:Name="uiTNDLComboCallsign4"
+                                  VerticalAlignment="Center"
+                                  Tag="3"
+                                  SelectionChanged="TNDLComboCallsign_SelectionChanged">
+                        </ComboBox>
+                    </Grid>
+                </Grid>
+
+                <Grid Grid.Row="0" Grid.Column="1">
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="56"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="160"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- row 0, header -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,0,6"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            Entry
+                        </TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Margin="12,0,0,6"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            TDOA
+                        </TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Margin="12,0,0,6"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            TNDL
+                        </TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="3" Margin="12,0,0,6"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            Callsign
+                        </TextBlock>
+
+                        <!-- row 1, entry 5 -->
+                        <TextBlock Grid.Row="1" Grid.Column="0"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            5
+                        </TextBlock>
+                        <CheckBox Grid.Row="1" Grid.Column="1" Margin="24,0,0,0"
+                                  x:Name="uiTNDLCkbxTDOA5"
+                                  VerticalAlignment="Center"
+                                  Tag="4"
+                                  IsChecked="{x:Bind EditDLNK.TeamMembers[4].TDOA, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Click="TNDLCkbxTDOA_Click"/>
+                        <TextBox Grid.Row="1" Grid.Column="2" Margin="12,0,0,0"
+                                 x:Name="uiTNDLTextTNDL5"
+                                 VerticalAlignment="Center"
+                                 Tag="4"
+                                 MaxLength="5"
+                                 Text="{x:Bind EditDLNK.TeamMembers[4].TNDL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 LostFocus="TNDLTextTNDL_LostFocus"/>
+                        <ComboBox Grid.Row="1" Grid.Column="3" Width="148" Margin="12,0,0,0"
+                                  x:Name="uiTNDLComboCallsign5"
+                                  VerticalAlignment="Center"
+                                  Tag="4"
+                                  SelectionChanged="TNDLComboCallsign_SelectionChanged">
+                        </ComboBox>
+
+                        <!-- row 2, entry 6 -->
+                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,12,0,0"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            6
+                        </TextBlock>
+                        <CheckBox Grid.Row="2" Grid.Column="1" Margin="24,12,0,0"
+                                  x:Name="uiTNDLCkbxTDOA6"
+                                  VerticalAlignment="Center"
+                                  Tag="5"
+                                  IsChecked="{x:Bind EditDLNK.TeamMembers[5].TDOA, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Click="TNDLCkbxTDOA_Click"/>
+                        <TextBox Grid.Row="2" Grid.Column="2" Margin="12,12,0,0"
+                                 x:Name="uiTNDLTextTNDL6"
+                                 VerticalAlignment="Center"
+                                 Tag="5"
+                                 MaxLength="5"
+                                 Text="{x:Bind EditDLNK.TeamMembers[5].TNDL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 LostFocus="TNDLTextTNDL_LostFocus"/>
+                        <ComboBox Grid.Row="2" Grid.Column="3" Width="148" Margin="12,12,0,0"
+                                  x:Name="uiTNDLComboCallsign6"
+                                  VerticalAlignment="Center"
+                                  Tag="5"
+                                  SelectionChanged="TNDLComboCallsign_SelectionChanged">
+                        </ComboBox>
+
+                        <!-- row 3, entry 7 -->
+                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,12,0,0"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            7
+                        </TextBlock>
+                        <CheckBox Grid.Row="3" Grid.Column="1" Margin="24,12,0,0"
+                                  x:Name="uiTNDLCkbxTDOA7"
+                                  VerticalAlignment="Center"
+                                  Tag="6"
+                                  IsChecked="{x:Bind EditDLNK.TeamMembers[6].TDOA, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Click="TNDLCkbxTDOA_Click"/>
+                        <TextBox Grid.Row="3" Grid.Column="2" Margin="12,12,0,0"
+                                 x:Name="uiTNDLTextTNDL7"
+                                 VerticalAlignment="Center"
+                                 Tag="6"
+                                 MaxLength="5"
+                                 Text="{x:Bind EditDLNK.TeamMembers[6].TNDL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 LostFocus="TNDLTextTNDL_LostFocus"/>
+                        <ComboBox Grid.Row="3" Grid.Column="3" Width="148" Margin="12,12,0,0"
+                                  x:Name="uiTNDLComboCallsign7"
+                                  VerticalAlignment="Center"
+                                  Tag="6"
+                                  SelectionChanged="TNDLComboCallsign_SelectionChanged">
+                        </ComboBox>
+
+                        <!-- row 4, entry 8 -->
+                        <TextBlock Grid.Row="4" Grid.Column="0" Margin="0,12,0,0"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource TableHeaderTextStyle}">
+                            8
+                        </TextBlock>
+                        <CheckBox Grid.Row="4" Grid.Column="1" Margin="24,12,0,0"
+                                  x:Name="uiTNDLCkbxTDOA8"
+                                  VerticalAlignment="Center"
+                                  Tag="7"
+                                  IsChecked="{x:Bind EditDLNK.TeamMembers[7].TDOA, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Click="TNDLCkbxTDOA_Click"/>
+                        <TextBox Grid.Row="4" Grid.Column="2" Margin="12,12,0,0"
+                                 x:Name="uiTNDLTextTNDL8"
+                                 VerticalAlignment="Center"
+                                 Tag="7"
+                                 MaxLength="5"
+                                 Text="{x:Bind EditDLNK.TeamMembers[7].TNDL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 LostFocus="TNDLTextTNDL_LostFocus"/>
+                        <ComboBox Grid.Row="4" Grid.Column="3" Width="148" Margin="12,12,0,0"
+                                  x:Name="uiTNDLComboCallsign8"
+                                  VerticalAlignment="Center"
+                                  Tag="7"
+                                  SelectionChanged="TNDLComboCallsign_SelectionChanged">
+                        </ComboBox>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 4 : pilot db
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="4" Margin="0,24,0,24">
+            <Button x:Name="uiPDbBtnEdit"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Click="PDbBtnEdit_Click">
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon Margin="0,0,6,0"
+                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE77B;"/>
+                    <TextBlock VerticalAlignment="center">
+                        Edit Pilot Database
+                    </TextBlock>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 6 : link / reset
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="6" Margin="0,0,16,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button Width="140"
+                        x:Name="uiPageBtnLink"
+                        Click="PageBtnLink_Click"
+                        ToolTipService.ToolTip="Link or Unlink this Setup to CMDS Setup from Another Configuration">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE723;"/>
+                        <TextBlock VerticalAlignment="center"
+                                   x:Name="uiPageBtnTxtLink">
+                            FIXUP
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <TextBlock Margin="12,0,24,0"
+                           x:Name="uiPageTxtLink"
+                           VerticalAlignment="center">
+                    FIXUP
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button x:Name="uiPageBtnResetAll"
+                        Click="PageBtnResetAll_Click"
+                        ToolTipService.ToolTip="TODO">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                        <TextBlock VerticalAlignment="center">
+                            Reset System to Defaults
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</Page>
