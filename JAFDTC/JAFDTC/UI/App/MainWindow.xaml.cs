@@ -159,7 +159,10 @@ namespace JAFDTC.UI.App
             // presenter.IsResizable = false;
             // presenter.IsMaximizable = false;
 
-            uiAppContentFrame.Navigate(typeof(ConfigurationListPage), null);
+            if ((Application.Current as JAFDTC.App).IsAppStartupGood)
+            {
+                uiAppContentFrame.Navigate(typeof(ConfigurationListPage), null);
+            }
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -283,11 +286,19 @@ namespace JAFDTC.UI.App
         /// content frame loaded: check for and handle the dcs lua install along with splash now that we have a
         /// xamlroot at which we can target dialogs. hand off the config filter control to teh config list page.
         /// </summary>
-        private void AppContentFrame_Loaded(object sender, RoutedEventArgs args)
+        private async void AppContentFrame_Loaded(object sender, RoutedEventArgs args)
         {
-            Sploosh(DCSLuaManager.LuaCheck());
-
-            ConfigListPage.ConfigFilterBox = uiAppConfigFilterBox;
+            if ((Application.Current as JAFDTC.App).IsAppStartupGood)
+            {
+                Sploosh(DCSLuaManager.LuaCheck());
+                ConfigListPage.ConfigFilterBox = uiAppConfigFilterBox;
+            }
+            else
+            {
+                uiAppConfigFilterBox.IsEnabled = false;
+                await Utilities.Message1BDialog(Content.XamlRoot, "Bad Joss Captain...",
+                                                "Unable to launch JAFDTC due to a fatal error");
+            }
         }
 
         /// <summary>

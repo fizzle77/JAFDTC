@@ -48,6 +48,8 @@ namespace JAFDTC
 
         public MainWindow Window { get; private set; }
 
+        public bool IsAppStartupGood { get; private set; }
+
         public IConfiguration CurrentConfig { get; set; }
 
         private DispatcherTimer CheckDCSTimer { get; set; }
@@ -200,24 +202,27 @@ namespace JAFDTC
 
             try
             {
+                IsAppStartupGood = false;
+
                 FileManager.Preflight();
                 Settings.Preflight();
+
+                IsJAFDTCPinnedToTop = Settings.IsAlwaysOnTop;
+                IsUploadInFlight = false;
+
+                DataReceiver.DataReceived += DataReceiver_DataReceived;
+                DataReceiver.Start();
+
+                CheckDCSTimer = new DispatcherTimer();
+                CheckDCSTimer.Tick += CheckDCSTimer_Tick;
+                CheckDCSTimer.Interval = new TimeSpan(0, 0, 10);
+
+                IsAppStartupGood = true;
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO: handle this "gracefully": if this fails, we're screwed...
+                FileManager.Log($"App:App exception {ex}");
             }
-
-            DataReceiver.DataReceived += DataReceiver_DataReceived;
-            DataReceiver.Start();
-
-            CheckDCSTimer = new DispatcherTimer();
-            CheckDCSTimer.Tick += CheckDCSTimer_Tick;
-            CheckDCSTimer.Interval = new TimeSpan(0, 0, 10);
-
-            IsJAFDTCPinnedToTop = Settings.IsAlwaysOnTop;
-
-            IsUploadInFlight = false;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -226,9 +231,10 @@ namespace JAFDTC
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // upload given configuration to dcs. the configuration is only uploaded if dcs is available, the configuration
-        // is valid, and the current dcs airframe matches the airframe of the configuration.
-        //
+        /// <summary>
+        /// upload given configuration to dcs. the configuration is only uploaded if dcs is available, the configuration
+        /// is valid, and the current dcs airframe matches the airframe of the configuration.
+        /// </summary>
         public void UploadConfigurationToJet(IConfiguration cfg)
         {
             if (!IsDCSAvailable || (cfg == null) || (cfg.Airframe != DCSActiveAirframe) || !cfg.UploadAgent.Load())
@@ -246,9 +252,10 @@ namespace JAFDTC
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // process markers from the dcs event stream. play a sound to indicate uploading has started or ended based
-        // on the marker. actions are carried out on the main thread via dispatch.
-        //
+        /// <summary>
+        /// process markers from the dcs event stream. play a sound to indicate uploading has started or ended based
+        /// on the marker. actions are carried out on the main thread via dispatch.
+        /// </summary>
         private void ProcessMarker(DataReceiver.Data data)
         {
             if (!IsUploadInFlight && !string.IsNullOrEmpty(data.Marker))
@@ -271,9 +278,10 @@ namespace JAFDTC
             }
         }
 
-        // process upload commands from the dcs event stream. triggers a configuration upload once the upload button
-        // has been pressed for the specified amount of time.
-        //
+        /// <summary>
+        /// process upload commands from the dcs event stream. triggers a configuration upload once the upload button
+        /// has been pressed for the specified amount of time.
+        /// </summary>
         private void ProcessUploadCommand(DataReceiver.Data data)
         {
             if (IsUploadInFlight)
@@ -306,9 +314,10 @@ namespace JAFDTC
             }
         }
 
-        // process the pin/unpin commands from the dcs event stream. these change the order of the window stack
-        // to keep jafdtc always on top or allow it to be lowered into the background.
-        //
+        /// <summary>
+        /// process the pin/unpin commands from the dcs event stream. these change the order of the window stack
+        /// to keep jafdtc always on top or allow it to be lowered into the background.
+        /// </summary>
         private void ProcessWindowStackCommand(DataReceiver.Data data)
         {
             bool isUpdateWindowLayer = false;
@@ -340,9 +349,10 @@ namespace JAFDTC
             }
         }
 
-        // process the increment and decrement commands from the dcs event stream. these change the currently selected
-        // configuration and (optionally) inform the user of the new configuration.
-        //
+        /// <summary>
+        /// process the increment and decrement commands from the dcs event stream. these change the currently selected
+        /// configuration and (optionally) inform the user of the new configuration.
+        /// </summary>
         private void ProcessIncrDecrCommands(DataReceiver.Data data)
         {
             if (!IncPressed && (data.Increment == "1"))
@@ -372,9 +382,10 @@ namespace JAFDTC
             }
         }
 
-        // handle an inbound data packet from dcs. this packet provides information on which airframe is curerently
-        // active, state of the dtc, and cockpit control state that we use to trigger dtc actions.
-        //
+        /// <summary>
+        /// handle an inbound data packet from dcs. this packet provides information on which airframe is curerently
+        /// active, state of the dtc, and cockpit control state that we use to trigger dtc actions.
+        /// </summary>
         private void DataReceiver_DataReceived(DataReceiver.Data data)
         {
             if (Window != null)
@@ -395,26 +406,29 @@ namespace JAFDTC
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // application launched: create the main window, set it up, and activate it to get this show on the road.
-        //
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        /// <summary>
+        /// application launched: create the main window, set it up, and activate it to get this show on the road.
+        /// </summary>
+        protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             Window = new MainWindow();
             Window.Activated += MainWindow_Activated;
             Window.Activate();
         }
 
-        // check dcs timer ticks: update IsDCSAvailable state based on lua installation, dcs process running, and
-        // indications dcs export is running. force regeneration of dcs state.
-        //
+        /// <summary>
+        /// check dcs timer ticks: update IsDCSAvailable state based on lua installation, dcs process running, and
+        /// indications dcs export is running. force regeneration of dcs state.
+        /// </summary>
         private void CheckDCSTimer_Tick(object sender, object args)
         {
             _ = IsDCSAvailable;
         }
 
-        // window activated: when a window is activated or deactivated, start or stop (respectively) the dcs state
-        // check timer to monitor that state for the rest of the ui. force regeneration of dcs state.
-        //
+        /// <summary>
+        /// window activated: when a window is activated or deactivated, start or stop (respectively) the dcs state
+        /// check timer to monitor that state for the rest of the ui. force regeneration of dcs state.
+        /// </summary>
         private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
         {
             if (args.WindowActivationState == WindowActivationState.Deactivated)
