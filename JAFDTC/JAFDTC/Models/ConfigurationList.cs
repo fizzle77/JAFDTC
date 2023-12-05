@@ -175,7 +175,7 @@ namespace JAFDTC.Models
 
         /// <summary>
         /// add a new configuration to the model from json by deserializing the json string into a new instance
-        /// for the given airframe and saving it to the filesystem.
+        /// for the given airframe and saving it to the filesystem. resets any uid from the json.
         ///
         /// this method implicitly clears any filtering that is in place so we don't have configurations disappearing
         /// from the ui on adds.
@@ -185,6 +185,7 @@ namespace JAFDTC.Models
             IConfiguration config = Configuration.FactoryJSON(airframe, json, name);
             if (config != null)
             {
+                config.ResetUID();
                 config.ConfigurationSaved += ConfigurationSavedHandler;
                 Configs.Add(config);
                 UIDtoConfigMap[config.UID] = config;
