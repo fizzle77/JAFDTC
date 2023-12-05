@@ -504,39 +504,26 @@ namespace JAFDTC.UI.App
         {
             try
             {
-                FileManager.Log("import...");
                 FileOpenPicker picker = new()
                 {
                     SuggestedStartLocation = PickerLocationId.Desktop
                 };
                 picker.FileTypeFilter.Add(".json");
-                FileManager.Log((picker != null) ? "picker OK" : "picker NULL");
-                var wind = (Application.Current as JAFDTC.App)?.Window;
-                FileManager.Log((wind != null) ? "wind OK" : "wind NULL");
-                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(wind);
-                FileManager.Log($"hwnd {hwnd}");
+                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
                 WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-                FileManager.Log("init OK");
 
                 StorageFile file = await picker.PickSingleFileAsync();
-                FileManager.Log((file != null) ? "file OK" : "file NULL");
                 if (file != null)
                 {
                     IConfiguration config = (IConfiguration)uiCfgListView.SelectedItem;
-                    try
-                    {
-                        string json = await FileIO.ReadTextAsync(file);
-                        PromptForConfigName("Name Imported Configuration", null, null, AddJSONConfigNameOpHandler, json);
-                    }
-                    catch // (Exception ex)
-                    {
-                        await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed", "Unable to import into a new configuration.");
-                    }
+                    string json = await FileIO.ReadTextAsync(file);
+                    PromptForConfigName("Name Imported Configuration", null, null, AddJSONConfigNameOpHandler, json);
                 }
             }
             catch (Exception ex)
             {
-                FileManager.Log($"except {ex}");
+                FileManager.Log($"ConfigurationListPage:CmdImport_Click exception {ex}");
+                await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed", "Unable to import into a new configuration.");
             }
         }
 
@@ -548,37 +535,26 @@ namespace JAFDTC.UI.App
         {
             try
             {
-                FileManager.Log("export...");
                 FileSavePicker picker = new()
                 {
                     SuggestedStartLocation = PickerLocationId.Desktop,
                     SuggestedFileName = "Configuration"
                 };
-                FileManager.Log((picker != null) ? "picker OK" : "picker NULL");
                 picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
                 var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-                FileManager.Log($"hwnd {hwnd}");
                 InitializeWithWindow.Initialize(picker, hwnd);
-                FileManager.Log("init OK");
 
                 StorageFile file = await picker.PickSaveFileAsync();
-                FileManager.Log((file != null) ? "file OK" : "file NULL");
                 if (file != null)
                 {
                     IConfiguration config = (IConfiguration)uiCfgListView.SelectedItem;
-                    try
-                    {
-                        await FileIO.WriteTextAsync(file, config.Serialize());
-                    }
-                    catch // (Exception ex)
-                    {
-                        await Utilities.Message1BDialog(Content.XamlRoot, "Export Failed", "Unable to export the configuration.");
-                    }
+                    await FileIO.WriteTextAsync(file, config.Serialize());
                 }
             }
             catch (Exception ex)
             {
-                FileManager.Log($"except {ex}");
+                FileManager.Log($"ConfigurationListPage:CmdExport_Click exception {ex}");
+                await Utilities.Message1BDialog(Content.XamlRoot, "Export Failed", "Unable to export the configuration.");
             }
         }
 

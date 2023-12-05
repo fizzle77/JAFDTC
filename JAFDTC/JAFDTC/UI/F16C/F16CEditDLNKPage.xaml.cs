@@ -250,48 +250,56 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private async Task<List<ViperDriver>> PilotDbImport(List<ViperDriver> curDbase)
         {
-            // ---- pick file
-
-            FileOpenPicker picker = new()
-            {
-                SuggestedStartLocation = PickerLocationId.Desktop
-            };
-            picker.FileTypeFilter.Add(".json");
-            var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-            InitializeWithWindow.Initialize(picker, hwnd);
-
-            StorageFile file = await picker.PickSingleFileAsync();
-
-            // ---- do the import
-
             List<ViperDriver> newDbase = new(curDbase);
-            if ((file != null) && (file.FileType.ToLower() == ".json"))
+            try
             {
-                ContentDialogResult action = await Utilities.Message3BDialog(Content.XamlRoot,
-                    "Import Pilots",
-                    "Do you want to replace or append to the pilots currently in the database?",
-                    "Replace",
-                    "Append",
-                    "Cancel");
-                if (action != ContentDialogResult.None)
+                // ---- pick file
+
+                FileOpenPicker picker = new()
                 {
-                    List<ViperDriver> fileDrivers = FileManager.LoadUserDbase<ViperDriver>(file.Path);
-                    if (fileDrivers != null)
+                    SuggestedStartLocation = PickerLocationId.Desktop
+                };
+                picker.FileTypeFilter.Add(".json");
+                var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
+                InitializeWithWindow.Initialize(picker, hwnd);
+
+                StorageFile file = await picker.PickSingleFileAsync();
+
+                // ---- do the import
+
+                if ((file != null) && (file.FileType.ToLower() == ".json"))
+                {
+                    ContentDialogResult action = await Utilities.Message3BDialog(Content.XamlRoot,
+                        "Import Pilots",
+                        "Do you want to replace or append to the pilots currently in the database?",
+                        "Replace",
+                        "Append",
+                        "Cancel");
+                    if (action != ContentDialogResult.None)
                     {
-                        if (action == ContentDialogResult.Primary)
+                        List<ViperDriver> fileDrivers = FileManager.LoadUserDbase<ViperDriver>(file.Path);
+                        if (fileDrivers != null)
                         {
-                            newDbase.Clear();
+                            if (action == ContentDialogResult.Primary)
+                            {
+                                newDbase.Clear();
+                            }
+                            foreach (ViperDriver driver in fileDrivers)
+                            {
+                                newDbase.Add(driver);
+                            }
                         }
-                        foreach (ViperDriver driver in fileDrivers)
+                        else
                         {
-                            newDbase.Add(driver);
+                            await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed", "Unable to read the pilots from the database file.");
                         }
-                    }
-                    else
-                    {
-                        await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed", "Unable to read the pilots from the JSON file.");
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                FileManager.Log($"F16CEditDLNKPage:PilotDbImport exception {ex}");
+                await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed", "Unable to import pilots.");
             }
             return newDbase;
         }
@@ -301,27 +309,27 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private async void PilotDbExport(List<ViperDriver> exportDrivers)
         {
-            string filename = "Viper Drivers";
-            FileSavePicker picker = new()
+            try
             {
-                SuggestedStartLocation = PickerLocationId.Desktop,
-                SuggestedFileName = filename
-            };
-            picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
-            var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-            InitializeWithWindow.Initialize(picker, hwnd);
+                FileSavePicker picker = new()
+                {
+                    SuggestedStartLocation = PickerLocationId.Desktop,
+                    SuggestedFileName = "Viper Drivers"
+                };
+                picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
+                var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
+                InitializeWithWindow.Initialize(picker, hwnd);
 
-            StorageFile file = await picker.PickSaveFileAsync();
-            if (file != null)
-            {
-                try
+                StorageFile file = await picker.PickSaveFileAsync();
+                if (file != null)
                 {
                     FileManager.SaveUserDbase<ViperDriver>(file.Path, exportDrivers);
                 }
-                catch
-                {
-                    await Utilities.Message1BDialog(Content.XamlRoot, "Export Failed", "Unable to export the pilot database to the file.");
-                }
+            }
+            catch (Exception ex)
+            {
+                FileManager.Log($"F16CEditDLNKPage:PilotDbExport exception {ex}");
+                await Utilities.Message1BDialog(Content.XamlRoot, "Export Failed", "Unable to export pilots.");
             }
         }
 

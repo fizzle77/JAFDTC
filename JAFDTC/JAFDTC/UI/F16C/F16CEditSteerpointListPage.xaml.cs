@@ -293,95 +293,104 @@ namespace JAFDTC.UI.F16C
         // TODO: document
         private async void CmdImport_Click(object sender, RoutedEventArgs args)
         {
-            // ---- pick file
-
-            FileOpenPicker picker = new()
+            try
             {
-                SuggestedStartLocation = PickerLocationId.Desktop
-            };
-            picker.FileTypeFilter.Add(".json");
-            picker.FileTypeFilter.Add(".cf");
-            picker.FileTypeFilter.Add(".miz");
-            var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-            InitializeWithWindow.Initialize(picker, hwnd);
+                // ---- pick file
 
-            StorageFile file = await picker.PickSingleFileAsync();
-
-            // ---- do the import
-
-            IImportHelper importer;
-            if ((file != null) && (file.FileType.ToLower() == ".json"))
-            {
-                ContentDialogResult action = await Utilities.Message3BDialog(Content.XamlRoot,
-                    "Import Steerpoints",
-                    "Do you want to replace or append to the steerpoints currently in the configuration?",
-                    "Replace",
-                    "Append",
-                    "Cancel");
-                if (action != ContentDialogResult.None)
+                FileOpenPicker picker = new()
                 {
-                    string json = FileManager.ReadFile(file.Path);
-                    if ((json != null) &&
-                        !EditSTPT.DeserializeNavpoints(json, (action == ContentDialogResult.Primary)))
-                    {
-                        await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed", "Unable to read the steerpoints from the JSON file.");
-                    }
-                    CopyEditToConfig(true);
-                }
-                return;
-            }
-            else if ((file != null) && (file.FileType.ToLower() == ".cf"))
-            {
-                importer = new ImportHelperCF(AirframeTypes.F16C, file.Path);
-            }
-            else if ((file != null) && (file.FileType.ToLower() == ".miz"))
-            {
-                importer = new ImportHelperMIZ(AirframeTypes.F16C, file.Path);
-            }
-            else
-            {
-                return;
-            }
+                    SuggestedStartLocation = PickerLocationId.Desktop
+                };
+                picker.FileTypeFilter.Add(".json");
+                picker.FileTypeFilter.Add(".cf");
+                picker.FileTypeFilter.Add(".miz");
+                var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
+                InitializeWithWindow.Initialize(picker, hwnd);
 
-            // ---- use the helper
+                StorageFile file = await picker.PickSingleFileAsync();
 
-            GetListDialog flightList = new(importer.Flights())
-            {
-                XamlRoot = Content.XamlRoot,
-                Title = "Select a Flight to Import Steerpoints From",
-                PrimaryButtonText = "Replace",
-                SecondaryButtonText = "Append",
-                CloseButtonText = "Cancel"
-            };
-            ContentDialogResult result = await flightList.ShowAsync(ContentDialogPlacement.Popup);
-            bool isReplace = (result == ContentDialogResult.Primary);
-            if (result != ContentDialogResult.None)
-            {
-                List<Dictionary<string, string>> importStpts = importer.Waypoints(flightList.SelectedItem);
-                if ((importStpts != null) && (importStpts.Count > 0))
+                // ---- do the import
+
+                IImportHelper importer;
+                if ((file != null) && (file.FileType.ToLower() == ".json"))
                 {
-                    if (result == ContentDialogResult.Primary)
+                    ContentDialogResult action = await Utilities.Message3BDialog(Content.XamlRoot,
+                        "Import Steerpoints",
+                        "Do you want to replace or append to the steerpoints currently in the configuration?",
+                        "Replace",
+                        "Append",
+                        "Cancel");
+                    if (action != ContentDialogResult.None)
                     {
-                        EditSTPT.Reset();
-                    }
-                    foreach (Dictionary<string, string> importStpt in importStpts)
-                    {
-                        SteerpointInfo stpt = new()
+                        string json = FileManager.ReadFile(file.Path);
+                        if ((json != null) &&
+                            !EditSTPT.DeserializeNavpoints(json, (action == ContentDialogResult.Primary)))
                         {
-                            Name = (importStpt.ContainsKey("name")) ? importStpt["name"] : "",
-                            Lat = (importStpt.ContainsKey("lat")) ? importStpt["lat"] : "",
-                            Lon = (importStpt.ContainsKey("lon")) ? importStpt["lon"] : "",
-                            Alt = (importStpt.ContainsKey("alt")) ? importStpt["alt"] : ""
-                        };
-                        EditSTPT.Add(stpt);
+                            await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed", "Unable to read the steerpoints from the JSON file.");
+                        }
+                        CopyEditToConfig(true);
                     }
-                    CopyEditToConfig(true);
+                    return;
+                }
+                else if ((file != null) && (file.FileType.ToLower() == ".cf"))
+                {
+                    importer = new ImportHelperCF(AirframeTypes.F16C, file.Path);
+                }
+                else if ((file != null) && (file.FileType.ToLower() == ".miz"))
+                {
+                    importer = new ImportHelperMIZ(AirframeTypes.F16C, file.Path);
                 }
                 else
                 {
-                    await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed", "Unable to read the steerpoints from the file.");
+                    return;
                 }
-                RebuildInterfaceState();
+
+                // ---- use the helper
+
+                GetListDialog flightList = new(importer.Flights())
+                {
+                    XamlRoot = Content.XamlRoot,
+                    Title = "Select a Flight to Import Steerpoints From",
+                    PrimaryButtonText = "Replace",
+                    SecondaryButtonText = "Append",
+                    CloseButtonText = "Cancel"
+                };
+                ContentDialogResult result = await flightList.ShowAsync(ContentDialogPlacement.Popup);
+                bool isReplace = (result == ContentDialogResult.Primary);
+                if (result != ContentDialogResult.None)
+                {
+                    List<Dictionary<string, string>> importStpts = importer.Waypoints(flightList.SelectedItem);
+                    if ((importStpts != null) && (importStpts.Count > 0))
+                    {
+                        if (result == ContentDialogResult.Primary)
+                        {
+                            EditSTPT.Reset();
+                        }
+                        foreach (Dictionary<string, string> importStpt in importStpts)
+                        {
+                            SteerpointInfo stpt = new()
+                            {
+                                Name = (importStpt.ContainsKey("name")) ? importStpt["name"] : "",
+                                Lat = (importStpt.ContainsKey("lat")) ? importStpt["lat"] : "",
+                                Lon = (importStpt.ContainsKey("lon")) ? importStpt["lon"] : "",
+                                Alt = (importStpt.ContainsKey("alt")) ? importStpt["alt"] : ""
+                            };
+                            EditSTPT.Add(stpt);
+                        }
+                        CopyEditToConfig(true);
+                    }
+                    else
+                    {
+                        await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed",
+                                                        "Unable to read the steerpoints from the file.");
+                    }
+                    RebuildInterfaceState();
+                }
+            }
+            catch (Exception ex)
+            {
+                FileManager.Log($"F16CEditSteerpointListPage:CmdImport_Click exception {ex}");
+                await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed", "Unable to import the steerpoints.");
             }
         }
 
@@ -390,27 +399,28 @@ namespace JAFDTC.UI.F16C
         //
         private async void CmdExport_Click(object sender, RoutedEventArgs args)
         {
-            string filename = ((Config.Name.Length > 0) ? Config.Name + " " : "") + "Steerpoints";
-            FileSavePicker picker = new()
+            try
             {
-                SuggestedStartLocation = PickerLocationId.Desktop,
-                SuggestedFileName = filename
-            };
-            picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
-            var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-            InitializeWithWindow.Initialize(picker, hwnd);
+                string filename = ((Config.Name.Length > 0) ? Config.Name + " " : "") + "Steerpoints";
+                FileSavePicker picker = new()
+                {
+                    SuggestedStartLocation = PickerLocationId.Desktop,
+                    SuggestedFileName = filename
+                };
+                picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
+                var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
+                InitializeWithWindow.Initialize(picker, hwnd);
 
-            StorageFile file = await picker.PickSaveFileAsync();
-            if (file != null)
-            {
-                try
+                StorageFile file = await picker.PickSaveFileAsync();
+                if (file != null)
                 {
                     FileManager.WriteFile(file.Path, EditSTPT.SerializeNavpoints());
                 }
-                catch
-                {
-                    await Utilities.Message1BDialog(Content.XamlRoot, "Export Failed", "Unable to write the steerpoints to the file.");
-                }
+            }
+            catch (Exception ex)
+            {
+                FileManager.Log($"F16CEditSteerpointListPage:CmdExport_Click exception {ex}");
+                await Utilities.Message1BDialog(Content.XamlRoot, "Export Failed", "Unable to export the steerpoints.");
             }
         }
 

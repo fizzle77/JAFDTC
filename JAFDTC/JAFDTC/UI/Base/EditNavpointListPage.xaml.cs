@@ -331,83 +331,92 @@ namespace JAFDTC.UI.Base
         // TODO: document
         private async void CmdImport_Click(object sender, RoutedEventArgs args)
         {
-            // ---- pick file
-
-            FileOpenPicker picker = new()
+            try
             {
-                SuggestedStartLocation = PickerLocationId.Desktop
-            };
-            picker.FileTypeFilter.Add(".json");
-            picker.FileTypeFilter.Add(".cf");
-            picker.FileTypeFilter.Add(".miz");
-            var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-            InitializeWithWindow.Initialize(picker, hwnd);
+                // ---- pick file
 
-            StorageFile file = await picker.PickSingleFileAsync();
-
-            // ---- do the import
-
-            IImportHelper importer;
-            if ((file != null) && (file.FileType.ToLower() == ".json"))
-            {
-                ContentDialogResult action = await Utilities.Message3BDialog(Content.XamlRoot,
-                    $"Import {NavHelper.NavptName}",
-                    $"Do you want to replace or append to the {NavHelper.NavptName} currently in the configuration?",
-                    $"Replace",
-                    $"Append",
-                    $"Cancel");
-                if (action != ContentDialogResult.None)
+                FileOpenPicker picker = new()
                 {
-                    string json = FileManager.ReadFile(file.Path);
-                    if ((json != null) && !NavHelper.PasteNavpoints(Config, json, (action == ContentDialogResult.Primary)))
+                    SuggestedStartLocation = PickerLocationId.Desktop
+                };
+                picker.FileTypeFilter.Add(".json");
+                picker.FileTypeFilter.Add(".cf");
+                picker.FileTypeFilter.Add(".miz");
+                var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
+                InitializeWithWindow.Initialize(picker, hwnd);
+
+                StorageFile file = await picker.PickSingleFileAsync();
+
+                // ---- do the import
+
+                IImportHelper importer;
+                if ((file != null) && (file.FileType.ToLower() == ".json"))
+                {
+                    ContentDialogResult action = await Utilities.Message3BDialog(Content.XamlRoot,
+                        $"Import {NavHelper.NavptName}",
+                        $"Do you want to replace or append to the {NavHelper.NavptName} currently in the configuration?",
+                        $"Replace",
+                        $"Append",
+                        $"Cancel");
+                    if (action != ContentDialogResult.None)
                     {
-                        await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed",
-                                                        $"Unable to read the {NavHelper.NavptName} from the JSON file.");
+                        string json = FileManager.ReadFile(file.Path);
+                        if ((json != null) && !NavHelper.PasteNavpoints(Config, json, (action == ContentDialogResult.Primary)))
+                        {
+                            await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed",
+                                                            $"Unable to read the {NavHelper.NavptName} from the JSON file.");
+                        }
+                        CopyEditToConfig(true);
                     }
-                    CopyEditToConfig(true);
+                    return;
                 }
-                return;
-            }
-            else if ((file != null) && (file.FileType.ToLower() == ".cf"))
-            {
-                importer = new ImportHelperCF(NavHelper.AirframeType, file.Path);
-            }
-            else if ((file != null) && (file.FileType.ToLower() == ".miz"))
-            {
-                importer = new ImportHelperMIZ(NavHelper.AirframeType, file.Path);
-            }
-            else
-            {
-                return;
-            }
-
-            // ---- use the helper
-
-            GetListDialog flightList = new(importer.Flights())
-            {
-                XamlRoot = Content.XamlRoot,
-                Title = $"Select a Flight to Import {NavHelper.NavptName} From",
-                PrimaryButtonText = "Replace",
-                SecondaryButtonText = "Append",
-                CloseButtonText = "Cancel"
-            };
-            ContentDialogResult result = await flightList.ShowAsync(ContentDialogPlacement.Popup);
-            bool isReplace = (result == ContentDialogResult.Primary);
-            if (result != ContentDialogResult.None)
-            {
-                List<Dictionary<string, string>> importWypts = importer.Waypoints(flightList.SelectedItem);
-                if ((importWypts != null) && (importWypts.Count > 0))
+                else if ((file != null) && (file.FileType.ToLower() == ".cf"))
                 {
-                    NavHelper.ImportNavpoints(Config, importWypts, isReplace);
-                    Config.Save(this, NavHelper.SystemTag);
-                    CopyConfigToEdit();
+                    importer = new ImportHelperCF(NavHelper.AirframeType, file.Path);
+                }
+                else if ((file != null) && (file.FileType.ToLower() == ".miz"))
+                {
+                    importer = new ImportHelperMIZ(NavHelper.AirframeType, file.Path);
                 }
                 else
                 {
-                    await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed",
-                                                    $"Unable to read the {NavHelper.NavptName} from the file.");
+                    return;
                 }
-                RebuildInterfaceState();
+
+                // ---- use the helper
+
+                GetListDialog flightList = new(importer.Flights())
+                {
+                    XamlRoot = Content.XamlRoot,
+                    Title = $"Select a Flight to Import {NavHelper.NavptName} From",
+                    PrimaryButtonText = "Replace",
+                    SecondaryButtonText = "Append",
+                    CloseButtonText = "Cancel"
+                };
+                ContentDialogResult result = await flightList.ShowAsync(ContentDialogPlacement.Popup);
+                bool isReplace = (result == ContentDialogResult.Primary);
+                if (result != ContentDialogResult.None)
+                {
+                    List<Dictionary<string, string>> importWypts = importer.Waypoints(flightList.SelectedItem);
+                    if ((importWypts != null) && (importWypts.Count > 0))
+                    {
+                        NavHelper.ImportNavpoints(Config, importWypts, isReplace);
+                        Config.Save(this, NavHelper.SystemTag);
+                        CopyConfigToEdit();
+                    }
+                    else
+                    {
+                        await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed",
+                                                        $"Unable to read the {NavHelper.NavptName} from the file.");
+                    }
+                    RebuildInterfaceState();
+                }
+            }
+            catch (Exception ex)
+            {
+                FileManager.Log($"EditNavpointListPAge:CmdImport_Click exception {ex}");
+                await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed",
+                                                $"Unable to import the {NavHelper.NavptName.ToLower()}s.");
             }
         }
 
@@ -416,28 +425,29 @@ namespace JAFDTC.UI.Base
         //
         private async void CmdExport_Click(object sender, RoutedEventArgs args)
         {
-            string filename = ((Config.Name.Length > 0) ? Config.Name + " " : "") + NavHelper.NavptName;
-            FileSavePicker picker = new()
+            try
             {
-                SuggestedStartLocation = PickerLocationId.Desktop,
-                SuggestedFileName = filename
-            };
-            picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
-            var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-            InitializeWithWindow.Initialize(picker, hwnd);
+                string filename = ((Config.Name.Length > 0) ? Config.Name + " " : "") + NavHelper.NavptName;
+                FileSavePicker picker = new()
+                {
+                    SuggestedStartLocation = PickerLocationId.Desktop,
+                    SuggestedFileName = filename
+                };
+                picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
+                var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
+                InitializeWithWindow.Initialize(picker, hwnd);
 
-            StorageFile file = await picker.PickSaveFileAsync();
-            if (file != null)
-            {
-                try
+                StorageFile file = await picker.PickSaveFileAsync();
+                if (file != null)
                 {
                     FileManager.WriteFile(file.Path, NavHelper.ExportNavpoints(Config));
                 }
-                catch
-                {
-                    await Utilities.Message1BDialog(Content.XamlRoot, "Export Failed",
-                                                    $"Unable to write the {NavHelper.NavptName} to the file.");
-                }
+            }
+            catch (Exception ex)
+            {
+                FileManager.Log($"EditNavpointListPage:CmdExport_Click exception {ex}");
+                await Utilities.Message1BDialog(Content.XamlRoot, "Export Failed",
+                                                $"Unable to export the {NavHelper.NavptName.ToLower()}s.");
             }
         }
 
