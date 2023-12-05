@@ -60,7 +60,8 @@ namespace JAFDTC.Utilities
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// pre-flight the file manager by checking paths and creating the settings folder if necessary. 
+        /// pre-flight the file manager by checking paths and creating the settings folder if necessary. throws an
+        /// exception on issues.
         /// </summary>
         /// <exception cref="Exception"></exception>
         public static void Preflight()
@@ -79,8 +80,8 @@ namespace JAFDTC.Utilities
             }
             catch (Exception ex)
             {
-                string msg = $"Unable to create settings folder: {_settingsDirPath}. Make sure the path is correct and that you have appropriate permissions.";
                 _settingsDirPath = null;
+                string msg = $"Unable to create settings folder: {_settingsDirPath}. Make sure the path is correct and that you have appropriate permissions.";
                 throw new Exception(msg, ex);
             }
         }
@@ -187,7 +188,6 @@ namespace JAFDTC.Utilities
         /// <summary>
         /// serialize the settings object to json and write the json to the settings file.
         /// </summary>
-        /// <param name="settings"></param>
         public static void WriteSettings(SettingsData settings)
         {
             try
@@ -195,9 +195,9 @@ namespace JAFDTC.Utilities
                 string json = JsonSerializer.Serialize(settings, Globals.JSONOptions);
                 WriteFile(_settingsPath, json);
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO: handle error?
+                FileManager.Log($"Settings:WriteSettings exception {ex}");
             }
         }
 
@@ -220,6 +220,7 @@ namespace JAFDTC.Utilities
                 AirframeTypes.F15E => Path.Combine(_settingsDirPath, "Configs", "F15E"),
                 AirframeTypes.F16C => Path.Combine(_settingsDirPath, "Configs", "F16C"),
                 AirframeTypes.FA18C => Path.Combine(_settingsDirPath, "Configs", "FA18C"),
+                AirframeTypes.M2000C => Path.Combine(_settingsDirPath, "Configs", "M2000C"),
                 _ => Path.Combine(_settingsDirPath, "Configs"),
             };
         }
@@ -328,8 +329,9 @@ namespace JAFDTC.Utilities
                 string json = ReadFile(path);
                 dbase = (List<T>)JsonSerializer.Deserialize<List<T>>(json);
             }
-            catch // (Exception e)
+            catch (Exception ex)
             {
+                FileManager.Log($"FileManager:LoadUserDbase exception {ex}");
             }
             return dbase;
         }
@@ -348,8 +350,9 @@ namespace JAFDTC.Utilities
                 WriteFile(path, json);
                 return true;
             }
-            catch // (Exception e)
+            catch (Exception ex)
             {
+                FileManager.Log($"FileManager:SaveUserDbase exception {ex}");
             }
             return false;
         }
@@ -374,9 +377,9 @@ namespace JAFDTC.Utilities
                     return JsonSerializer.Deserialize<Dictionary<string, List<PointOfInterest>>>(json);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO: report error?
+                FileManager.Log($"FileManager:LoadPointsOfInterest exception {ex}");
             }
             return new Dictionary<string, List<PointOfInterest>>();
         }
@@ -401,9 +404,9 @@ namespace JAFDTC.Utilities
                     return JsonSerializer.Deserialize<Emitter[]>(json);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO: report error?
+                FileManager.Log($"FileManager:LoadEmitters exception {ex}");
             }
             return Array.Empty<Emitter>();
         }
