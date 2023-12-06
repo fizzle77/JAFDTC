@@ -281,6 +281,8 @@ namespace JAFDTC.UI.App
         {
             if (!IsNavPending && (uiCfgListView.SelectedItem is IConfiguration config))
             {
+                config.CleanupSystemLinks(new List<string>(ConfigList.UIDtoConfigMap.Keys));
+
                 IsNavPending = true;
                 CurConfigEditing = config;
                 MainWindow mainWindow = (MainWindow)(Application.Current as JAFDTC.App)?.Window;

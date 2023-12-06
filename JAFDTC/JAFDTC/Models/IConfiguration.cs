@@ -172,6 +172,11 @@ namespace JAFDTC.Models
         public string SystemLinkedTo(string systemTag);
 
         /// <summary>
+        /// TODO: document
+        /// </summary>
+        public void CleanupSystemLinks(List<string> validUIDs);
+
+        /// <summary>
         /// persist the configuration to storage, posting a ConfigurationSaved event with an argument set up
         /// appropriately. the invoked by parameter identifies the object  that invoked the save. the sync system tag
         /// identifies the system (if any) that may need to be synchronized with configurations that link to this

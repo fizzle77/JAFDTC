@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -202,7 +203,23 @@ namespace JAFDTC.Models
 
         public string SystemLinkedTo(string systemTag)
         {
-            return (LinkedSysMap.ContainsKey(systemTag)) ? LinkedSysMap[systemTag] : null;
+            return ((LinkedSysMap != null) && LinkedSysMap.ContainsKey(systemTag)) ? LinkedSysMap[systemTag] : null;
+        }
+
+        public void CleanupSystemLinks(List<string> validUIDs)
+        {
+            List<string> invalidUIDs = new List<string>();
+            foreach (KeyValuePair<string, string> kvp in LinkedSysMap)
+            {
+                if (!validUIDs.Contains(kvp.Key))
+                {
+                    invalidUIDs.Add(kvp.Key);
+                }
+            }
+            foreach (string uid in invalidUIDs)
+            {
+                LinkedSysMap.Remove(uid);
+            }
         }
 
         public abstract void ConfigurationUpdated();
