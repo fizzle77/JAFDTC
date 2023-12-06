@@ -21,30 +21,18 @@ using JAFDTC.Models;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.HTS;
-using JAFDTC.UI;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text.RegularExpressions;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 namespace JAFDTC.UI.F16C
 {
@@ -458,10 +446,11 @@ namespace JAFDTC.UI.F16C
         //
         private async void MANBtnAdd_Click(object sender, RoutedEventArgs args)
         {
+            Button btnAdd = (Button)sender;
             GetListDialog dialog = new(_emitterTitles, "Emitter", 425)
             {
                 XamlRoot = Content.XamlRoot,
-                Title = "Select an Emitter to Add",
+                Title = $"Select an Emitter for HTS MAN Table, Entry {int.Parse((string)btnAdd.Tag) + 1}",
                 PrimaryButtonText = "Add",
                 CloseButtonText = "Cancel",
             };

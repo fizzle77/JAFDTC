@@ -62,7 +62,7 @@ https://www.gnu.org/licenses/.
                       VerticalAlignment="Center"
                       ToolTipService.ToolTip="Selects ALIC Table to Edit"
                       SelectionChanged="ALICSelectCombo_SelectionChanged">
-                <!-- Tag is table number on [1,3] -->
+                <!-- Tag is table index on [0,2] as string -->
                 <ComboBox.Items>
                     <Grid Tag="0">
                         <Grid.ColumnDefinitions>

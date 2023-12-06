@@ -21,15 +21,10 @@ using JAFDTC.Models;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.HARM;
-using JAFDTC.UI;
 using JAFDTC.UI.App;
-using JAFDTC.Utilities;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
@@ -38,19 +33,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace JAFDTC.UI.F16C
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// TODO: document
     /// </summary>
     public sealed partial class F16CEditHARMPage : Page
     {
@@ -507,10 +494,13 @@ namespace JAFDTC.UI.F16C
         //
         private async void ALICBtnAdd_Click(object sender, RoutedEventArgs args)
         {
+            Button btnAdd = (Button)sender;
+            string te = $"T{int.Parse((string)btnAdd.Tag) + 1}";
+            string table = $"Table {int.Parse((string)((Grid)uiALICSelectCombo.SelectedItem).Tag) + 1}";
             GetListDialog dialog = new(_emitterTitles, "Emitter", 425)
             {
                 XamlRoot = Content.XamlRoot,
-                Title = "Select an Emitter to Add",
+                Title = $"Select an Emitter for ALIC {table}, Entry {te}",
                 PrimaryButtonText = "Add",
                 CloseButtonText = "Cancel",
             };
