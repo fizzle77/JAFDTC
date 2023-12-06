@@ -164,7 +164,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T1 of the HTS MAN Table from the Emitter List"
                     Click="MANBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- hts manual entry 2/8 -->
@@ -212,7 +212,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T2 of the HTS MAN Table from the Emitter List"
                     Click="MANBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- hts manual entry 3/8 -->
@@ -260,7 +260,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T3 of the HTS MAN Table from the Emitter List"
                     Click="MANBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- hts manual entry 4/8 -->
@@ -308,7 +308,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T4 of the HTS MAN Table from the Emitter List"
                     Click="MANBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- hts manual entry 5/8 -->
@@ -356,7 +356,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T5 of the HTS MAN Table from the Emitter List"
                     Click="MANBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- hts manual entry 6/8 -->
@@ -404,7 +404,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T6 of the HTS MAN Table from the Emitter List"
                     Click="MANBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- hts manual entry 7/8 -->
@@ -452,7 +452,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T7 of the HTS MAN Table from the Emitter List"
                     Click="MANBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- hts manual entry 8/8 -->
@@ -500,7 +500,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T8 of the HTS MAN Table from the Emitter List"
                     Click="MANBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- reset table -->

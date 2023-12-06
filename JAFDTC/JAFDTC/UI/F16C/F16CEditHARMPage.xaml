@@ -230,7 +230,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T1 of the ALIC Table from the Emitter List"
                     Click="ALICBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- alic entry 2/5 -->
@@ -278,7 +278,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T2 of the ALIC Table from the Emitter List"
                     Click="ALICBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- alic entry 3/5 -->
@@ -326,7 +326,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T3 of the ALIC Table from the Emitter List"
                     Click="ALICBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- alic entry 4/5 -->
@@ -374,7 +374,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T4 of the ALIC Table from the Emitter List"
                     Click="ALICBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- alic entry 5/5 -->
@@ -422,7 +422,7 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Set the Entry in T5 of the ALIC Table from the Emitter List"
                     Click="ALICBtnAdd_Click">
-                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- reset table -->
