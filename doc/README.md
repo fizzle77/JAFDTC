@@ -149,6 +149,9 @@ The command bar includes the following commands,
   [here](#interacting-with-dcs)
   for further details.
 
+> Importing a configuration will implicitly clear all links to other configurations that may
+> have been in place at the time of export.
+
 The overflow menu (exposed by clicking on the "..." button) holds two commands,
 
 * *Settings* opens up the
@@ -232,6 +235,8 @@ have the linked systems automatically update.
 
 > Links are tracked per system. That is, Systems A and B in Configuration X can be linked
 > to completely different configurations if desired.
+
+> At present, links are **not** preserved across export/import operations.
 
 Changes to a system are pushed to all linked (either directly or indirectly) systems.
 

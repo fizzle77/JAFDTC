@@ -26,7 +26,7 @@ of the
 ## CMDS: Countermeasures
 
 The countermeasures system manages parameters set through the CMDS DED page. These parameters
-contorl the operation of the countermeasures and allow you to setup different programs for the
+control the operation of the countermeasures and allow you to setup different programs for the
 chaff and flare dispensers.
 
 ![](images/Viper_Sys_CMDS.png)
@@ -43,10 +43,12 @@ the number of consumables (flares or chaff) that trigger a BINGO warning from th
 
 ### Countermeasure Programs
 
-The Viper supports six countermeasure programs: MAN1, MAN2, MAN3, MAN4, PANIC, and BYPASS. The
-program selection menu selects which of the programs is being edited in the chaff and flare
-columns below. A blue dot next to the program name in the menu indicates the program has been
-changed from default values.
+The Viper supports six countermeasure programs: MAN1, MAN2, MAN3, MAN4, PANIC, and BYPASS. Each
+program has settings for the sequencing of dispnesing flares and chaff when running the
+program. The program selection menu selects which of the programs is being edited in the chaff
+and flare columns below. A blue dot next to the program name in the program selection menu
+indicates the program has been changed from default values. The upward- and downward-pointing
+chevrons to the right of the progam selection menu step through the available programs.
 
 In the chaff and flare columns, you can edit the burst quantity (BQ), burst interval (BI),
 salvo quantity (SQ), and salvo interval (SI) parameters for the program selected in the
@@ -159,11 +161,37 @@ that will let you specify a file to save the exported information to.
 
 ## HARM ALIC
 
-TODO
+The HARM ALIC system manages parameters set through the HARM DED page. These parameters
+control the progarmming of the three ALIC tables that specify the threats the AGM-88
+HARM can target.
 
 ![](images/Viper_Sys_ALIC.png)
 
-TODO
+The editor allows you to edit specific countermeasure programs in the countermeasure
+system.  The common controls implement the link and reset functionality described
+[earlier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#common-editor-controls).
+
+### Table Selection
+
+The Viper supports three ALIC tables: 1, 2, and 3. The table selection menu selects which of
+the tables is being edited in the remainder of the view. A blue dot next to the table name in
+the table select menu indicates the table has been changed from default values. The upward-
+and downward-pointing chevrons to the right of the table selection menu step through the
+tables.
+
+### Table Programming
+
+Each ALIC table has five entries T1 through T5 that identify an emitter the HARM can target.
+You can change the targeted emitter by entering the appropirate code in the edit field. A
+blue dot to the left of the field indicates the table entry has changed form the default.
+Codes can be found in DCS documentation. In addition, clicking the emitter button on the
+right side of each entry will bring up a dialog that will let you select an emitter from
+a list of known emitters.
+
+![](images/Viper_Sys_ALIC_Emit.png)
+
+Below the table entries is a button that resets the table contents to their default values.
+Clearing the code field in an entry will also reset that specific entry to its default value.
 
 ## HARM HTS
 
