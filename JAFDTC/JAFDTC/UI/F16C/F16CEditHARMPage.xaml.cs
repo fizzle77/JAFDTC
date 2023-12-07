@@ -145,11 +145,11 @@ namespace JAFDTC.UI.F16C
             };
             _tableFields = new List<List<TextBlock>>()
             {
-                new List<TextBlock>() { uiT1RWRText, uiT1ValueCountry, uiT1ValueType, uiT1ValueName },
-                new List<TextBlock>() { uiT2RWRText, uiT2ValueCountry, uiT2ValueType, uiT2ValueName },
-                new List<TextBlock>() { uiT3RWRText, uiT3ValueCountry, uiT3ValueType, uiT3ValueName },
-                new List<TextBlock>() { uiT4RWRText, uiT4ValueCountry, uiT4ValueType, uiT4ValueName },
-                new List<TextBlock>() { uiT5RWRText, uiT5ValueCountry, uiT5ValueType, uiT5ValueName }
+                new() { uiT1RWRText, uiT1ValueCountry, uiT1ValueType, uiT1ValueName },
+                new() { uiT2RWRText, uiT2ValueCountry, uiT2ValueType, uiT2ValueName },
+                new() { uiT3RWRText, uiT3ValueCountry, uiT3ValueType, uiT3ValueName },
+                new() { uiT4RWRText, uiT4ValueCountry, uiT4ValueType, uiT4ValueName },
+                new() { uiT5RWRText, uiT5ValueCountry, uiT5ValueType, uiT5ValueName }
             };
             _defaultBorderBrush = uiT1ValueCode.BorderBrush;
             _defaultBkgndBrush = uiT1ValueCode.Background;
@@ -265,17 +265,28 @@ namespace JAFDTC.UI.F16C
             return EditHARM.Tables[0].HasErrors;
         }
 
+        // returns true if the current table being edited is default, false otherwise.
+        private bool EditTableIsDefault()
+        {
+            ObservableCollection<TableCode> table = EditHARM.Tables[0].Table;
+            ObservableCollection<TableCode> defaultTable = _harmSysDefaults.Tables[EditTable].Table;
+            for (int i = 0; i < table.Count; i++)
+            {
+                if (!string.IsNullOrEmpty(table[i].Code) && (table[i].Code != defaultTable[i].Code))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         // returns true if the current state is default, false otherwise.
         private bool PageIsDefault()
         {
             ObservableCollection<TableCode> table = EditHARM.Tables[0].Table;
             for (int i = 0; i < EditHARM.Tables.Length; i++)
             {
-                if (((EditTable == i) && ((table[0].Code != _harmSysDefaults.Tables[i].Table[0].Code) ||
-                                          (table[1].Code != _harmSysDefaults.Tables[i].Table[1].Code) ||
-                                          (table[2].Code != _harmSysDefaults.Tables[i].Table[2].Code) ||
-                                          (table[3].Code != _harmSysDefaults.Tables[i].Table[3].Code) ||
-                                          (table[4].Code != _harmSysDefaults.Tables[i].Table[4].Code))) ||
+                if (((EditTable == i) && !EditTableIsDefault()) ||
                     ((EditTable != i) && !Config.HARM.Tables[i].IsDefault))
                 {
                     return false;
@@ -310,11 +321,7 @@ namespace JAFDTC.UI.F16C
             for (int i = 0; i < Config.HARM.Tables.Length; i++)
             {
                 Visibility viz = Visibility.Collapsed;
-                if (((EditTable == i) && ((table[0].Code != _harmSysDefaults.Tables[i].Table[0].Code) ||
-                                          (table[1].Code != _harmSysDefaults.Tables[i].Table[1].Code) ||
-                                          (table[2].Code != _harmSysDefaults.Tables[i].Table[2].Code) ||
-                                          (table[3].Code != _harmSysDefaults.Tables[i].Table[3].Code) ||
-                                          (table[4].Code != _harmSysDefaults.Tables[i].Table[4].Code))) ||
+                if (((EditTable == i) && !EditTableIsDefault()) ||
                     ((EditTable != i) && !Config.HARM.Tables[i].IsDefault))
                 {
                     viz = Visibility.Visible;
@@ -360,7 +367,7 @@ namespace JAFDTC.UI.F16C
             var table = _harmSysDefaults.Tables[EditTable];
             for (int i = 0; i < table.Table.Count; i++)
             {
-                _tableCodeFields[0].PlaceholderText = table.Table[i].Code;
+                _tableCodeFields[i].PlaceholderText = table.Table[i].Code;
             }
         }
 
