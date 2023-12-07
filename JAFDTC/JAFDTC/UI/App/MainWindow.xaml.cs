@@ -241,7 +241,7 @@ namespace JAFDTC.UI.App
         {
             if (ExtendsContentIntoTitleBar == true)
             {
-                SetRegionsForCustomTitleBar();
+                SetRegionsForCustomTitleBar(uiAppConfigFilterBox.Visibility != Visibility.Visible);
             }
         }
 
