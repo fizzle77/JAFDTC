@@ -81,11 +81,11 @@ namespace JAFDTC.Models.F16C.HARM
             Number = number;
             Table = new ObservableCollection<TableCode>
             {
-                new TableCode(t1),
-                new TableCode(t2),
-                new TableCode(t3),
-                new TableCode(t4),
-                new TableCode(t5)
+                new(t1),
+                new(t2),
+                new(t3),
+                new(t4),
+                new(t5)
             };
         }
 

@@ -55,9 +55,9 @@ namespace JAFDTC.Models.F16C.HARM
         {
             Tables = new ALICTable[3]
             {
-                new ALICTable((int)TableNumbers.TABLE1, "110", "104", "103", "115", "107"),
-                new ALICTable((int)TableNumbers.TABLE2, "120", "119", "117", "121", "109"),
-                new ALICTable((int)TableNumbers.TABLE3, "123", "122", "108", "126", "118")
+                new((int)TableNumbers.TABLE1, "110", "104", "103", "115", "107"),
+                new((int)TableNumbers.TABLE2, "120", "119", "117", "121", "109"),
+                new((int)TableNumbers.TABLE3, "123", "122", "108", "126", "118")
             }
         };
 
@@ -89,9 +89,9 @@ namespace JAFDTC.Models.F16C.HARM
 		{
             Tables = new ALICTable[3]
             {
-                new ALICTable((int) TableNumbers.TABLE1),
-                new ALICTable((int) TableNumbers.TABLE2),
-                new ALICTable((int) TableNumbers.TABLE3),
+                new((int) TableNumbers.TABLE1),
+                new((int) TableNumbers.TABLE2),
+                new((int) TableNumbers.TABLE3),
             };
         }
 
@@ -99,9 +99,9 @@ namespace JAFDTC.Models.F16C.HARM
         {
             Tables = new ALICTable[3]
             {
-                new ALICTable(other.Tables[(int) TableNumbers.TABLE1]),
-                new ALICTable(other.Tables[(int) TableNumbers.TABLE2]),
-                new ALICTable(other.Tables[(int) TableNumbers.TABLE3])
+                new(other.Tables[(int) TableNumbers.TABLE1]),
+                new(other.Tables[(int) TableNumbers.TABLE2]),
+                new(other.Tables[(int) TableNumbers.TABLE3])
             };
         }
 
