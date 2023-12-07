@@ -161,8 +161,9 @@ namespace JAFDTC.UI
                 {
                     while (config.SystemLinkedTo(systemTag) != null)
                     {
-                        config = uidToConfigMap[config.SystemLinkedTo(systemTag)];
-                        if (config.UID == myUID)
+                        string linkUID = config.SystemLinkedTo(systemTag);
+                        config = (uidToConfigMap.ContainsKey(linkUID)) ? uidToConfigMap[linkUID] : null;
+                        if ((config == null) || (config.UID == myUID))
                         {
                             config = null;
                             break;
