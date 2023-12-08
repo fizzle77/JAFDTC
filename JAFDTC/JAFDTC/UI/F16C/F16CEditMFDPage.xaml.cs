@@ -548,7 +548,6 @@ namespace JAFDTC.UI.F16C
             foreach (ToggleButton toggle in _rightToggles)
             {
                 toggle.IsChecked = ((string)toggle.Tag == (string)toggleClicked.Tag);
-                Debug.WriteLine(toggle.Tag + " " + toggleClicked.Tag + " " + toggle.IsChecked.ToString());
             }
             EditMFDModeConfig.RightMFD.SelectedOSB = (string)toggleClicked.Tag;
             CopyEditToConfig(EditMode, true);

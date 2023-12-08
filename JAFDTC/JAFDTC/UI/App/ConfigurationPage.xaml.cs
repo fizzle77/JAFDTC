@@ -150,8 +150,6 @@ namespace JAFDTC.UI.App
             info.EditorPageBadgeFg = (ConfigEditor.IsSystemLinked(Config, info.Tag))
                                     ? new SolidColorBrush(Color.FromArgb(0xFF, 0xB8, 0x86, 0x0B))       // DarkGoldenrod
                                     : new SolidColorBrush(Color.FromArgb(0x00, 0x00, 0x00, 0x00));      // Transparent
-
-            Debug.WriteLine($"{ConfigEditor.IsSystemLinked(Config, info.Tag)}");
         }
 
         // TODO: document
