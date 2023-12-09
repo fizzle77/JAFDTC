@@ -18,7 +18,6 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
-using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.CMDS;
 using JAFDTC.UI.App;
@@ -281,8 +280,9 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // change the selected cmds program and update various ui and model state.
-        //
+        /// <summary>
+        /// change the selected cmds program and update various ui and model state.
+        /// </summary>
         private void SelectProgram(int program)
         {
             if (program != EditProgram)
@@ -294,7 +294,9 @@ namespace JAFDTC.UI.F16C
             }
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void RebuildProgramSelectMenu()
         {
             for (int i = 0; i < Config.CMDS.Programs.Length; i++)
@@ -309,11 +311,32 @@ namespace JAFDTC.UI.F16C
             }
         }
 
-        // update the placeholder text to match the defaults for the selected program.
-        //
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private CMProgramCanvasParams ConvertCfgCMDStoCMCanvas(CMDSProgramCore pgm, CMDSProgramCore pgmDflt, bool isChaff)
+        {
+            int sq, bq;
+            double si, bi;
+
+            sq = int.Parse((!string.IsNullOrEmpty(pgm.SQ)) ? pgm.SQ : pgmDflt.SQ);
+            bq = int.Parse((!string.IsNullOrEmpty(pgm.BQ)) ? pgm.BQ : pgmDflt.BQ);
+            si = double.Parse((!string.IsNullOrEmpty(pgm.SI)) ? pgm.SI : pgmDflt.SI);
+            bi = double.Parse((!string.IsNullOrEmpty(pgm.BI)) ? pgm.BI : pgmDflt.BI);
+            if ((sq == 0) || (bq == 0))
+            {
+                sq = bq = 0;
+                si = bi = 0.0;
+            }
+            return new(isChaff, bq, bi, sq, si);
+        }
+
+        /// <summary>
+        /// update the placeholder text in the programming fields to match the defaults for the selected program.
+        /// </summary>
         private void RebuildFieldPlaceholders()
         {
-            var pgm = _cmdsSysDefaults.Programs[EditProgram];
+            CMDSProgram pgm = _cmdsSysDefaults.Programs[EditProgram];
             uiChaffValueBingo.PlaceholderText = _cmdsSysDefaults.BingoChaff;
             uiPgmChaffValueBQ.PlaceholderText = pgm.Chaff.BQ;
             uiPgmChaffValueBI.PlaceholderText = pgm.Chaff.BI;
@@ -327,7 +350,22 @@ namespace JAFDTC.UI.F16C
             uiPgmFlareValueSI.PlaceholderText = pgm.Flare.SI;
         }
 
-        // TODO: document
+        /// <summary>
+        /// update the canvai that show the chaff and flare programs visually.
+        /// </summary>
+        private void RebuildProgramCanvi()
+        {
+            CMDSProgram pgm = _cmdsSysDefaults.Programs[EditProgram];
+            CMProgramCanvasParams chaff = ConvertCfgCMDStoCMCanvas(EditCMDS.Programs[0].Chaff, pgm.Chaff, true);
+            CMProgramCanvasParams flare = ConvertCfgCMDStoCMCanvas(EditCMDS.Programs[0].Flare, pgm.Flare, false);
+
+            uiCMPgmFlareCanvas.SetProgram(flare, chaff);
+            uiCMPgmChaffCanvas.SetProgram(chaff, flare);
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void RebuildLinkControls()
         {
             Utilities.RebuildLinkControls(Config, CMDSSystem.SystemTag, NavArgs.UIDtoConfigMap,
@@ -378,8 +416,9 @@ namespace JAFDTC.UI.F16C
             Utilities.SetEnableState(uiPgmSelectCombo, isNoErrs);
         }
 
-        // rebuild the state of controls on the page in response to a change in the configuration.
-        //
+        /// <summary>
+        /// rebuild the state of controls on the page in response to a change in the configuration.
+        /// </summary>
         private void RebuildInterfaceState()
         {
             if (!IsRebuildPending)
@@ -390,6 +429,7 @@ namespace JAFDTC.UI.F16C
                     IsRebuildingUI = true;
                     RebuildProgramSelectMenu();
                     RebuildFieldPlaceholders();
+                    RebuildProgramCanvi();
                     RebuildLinkControls();
                     RebuildEnableState();
                     IsRebuildingUI = false;
@@ -406,8 +446,9 @@ namespace JAFDTC.UI.F16C
 
         // ---- page buttons ------------------------------------------------------------------------------------------
 
-        // reset all button click: reset all cmds settings back to their defaults.
-        //
+        /// <summary>
+        /// reset all button click: reset all cmds settings back to their defaults.
+        /// </summary>
         private async void PageBtnResetAll_Click(object sender, RoutedEventArgs args)
         {
             ContentDialogResult result = await Utilities.Message2BDialog(
@@ -425,7 +466,9 @@ namespace JAFDTC.UI.F16C
             }
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
         {
             string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, CMDSSystem.SystemTag,
@@ -445,16 +488,18 @@ namespace JAFDTC.UI.F16C
             }
         }
 
-        // reset chaff program click: set all chaff program values to default.
-        //
+        /// <summary>
+        /// reset chaff program click: set all chaff program values to default.
+        /// </summary>
         private void PgmChaffBtnReset_Click(object sender, RoutedEventArgs args)
         {
             EditCMDS.Programs[0].Chaff.Reset();
             CopyEditToConfig(EditProgram, true);
         }
 
-        // reset flare program click: set all flare program values to default.
-        //
+        /// <summary>
+        /// reset flare program click: set all flare program values to default.
+        /// </summary>
         private void PgmFlareBtnReset_Click(object sender, RoutedEventArgs args)
         {
             EditCMDS.Programs[0].Flare.Reset();
@@ -463,25 +508,28 @@ namespace JAFDTC.UI.F16C
 
         // ---- program selection -------------------------------------------------------------------------------------
 
-        // previous program button click: advance to the previous program.
-        //
+        /// <summary>
+        /// previous program button click: advance to the previous program.
+        /// </summary>
         private void PgmBtnPrev_Click(object sender, RoutedEventArgs args)
         {
             SelectProgram(EditProgram - 1);
             uiPgmSelectCombo.SelectedIndex = EditProgram;
         }
 
-        // next program button click: advance to the next program.
-        //
+        /// <summary>
+        /// next program button click: advance to the next program.
+        /// </summary>
         private void PgmBtnNext_Click(object sender, RoutedEventArgs args)
         {
             SelectProgram(EditProgram + 1);
             uiPgmSelectCombo.SelectedIndex = EditProgram;
         }
 
-        // program select combo click: switch to the selected program. the tag of the sender (a TextBlock) gives us
-        // the program number to select.
-        //
+        /// <summary>
+        /// program select combo click: switch to the selected program. the tag of the sender (a TextBlock) gives us
+        /// the program number to select.
+        /// </summary>
         private void PgmSelectCombo_SelectionChanged(object sender, RoutedEventArgs args)
         {
             Grid item = (Grid)((ComboBox)sender).SelectedItem;
@@ -494,12 +542,14 @@ namespace JAFDTC.UI.F16C
 
         // ---- text field changes ------------------------------------------------------------------------------------
 
-        // text box lost focus: copy the local backing values to the configuration (note this is predicated on error
-        // status) and rebuild the interface state.
-        //
-        // NOTE: though the text box has lost focus, the update may not yet have propagated into state. use the
-        // NOTE: dispatch queue to give in-flight state updates time to complete.
-        //
+        /// <summary>
+        /// text box lost focus: copy the local backing values to the configuration (note this is predicated on error
+        /// status) and rebuild the interface state.
+        ///
+        /// NOTE: though the text box has lost focus, the update may not yet have propagated into state. use the
+        /// NOTE: dispatch queue to give in-flight state updates time to complete.
+        /// 
+        /// </summary>
         private void CMDSTextBox_LostFocus(object sender, RoutedEventArgs args)
         {
             // CONSIDER: may be better here to handle this in a property changed handler rather than here?

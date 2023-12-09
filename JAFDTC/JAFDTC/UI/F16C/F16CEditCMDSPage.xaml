@@ -56,6 +56,7 @@ https://www.gnu.org/licenses/.
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -425,10 +426,52 @@ https://www.gnu.org/licenses/.
 
         <!--
         ===============================================================================================================
-        row 5 : link / reset
+        row 4 : program visual display
         ===============================================================================================================
         -->
-        <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,4">
+        <Grid Grid.Row="4" Margin="12,12,12,24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0"
+                       VerticalAlignment="Center"
+                       HorizontalTextAlignment="Right">
+                Chaff
+            </TextBlock>
+            <!-- TODO: why can't we use a static resource for foreground? -->
+            <local:F16CCMProgramCanvas Grid.Row="0" Grid.Column="1" Margin="12,12,0,0"
+                                       x:Name="uiCMPgmChaffCanvas"
+                                       Foreground="DarkGray"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Stretch">
+            </local:F16CCMProgramCanvas>
+
+            <TextBlock Grid.Row="1" Grid.Column="0"
+                       VerticalAlignment="Center"
+                       HorizontalTextAlignment="Right">
+                Flare
+            </TextBlock>
+            <!-- TODO: why can't we use a static resource for foreground? -->
+            <local:F16CCMProgramCanvas Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
+                                       x:Name="uiCMPgmFlareCanvas"
+                                       Foreground="DarkGray"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Stretch">
+            </local:F16CCMProgramCanvas>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 6 : link / reset
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
