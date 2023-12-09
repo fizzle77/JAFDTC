@@ -56,6 +56,12 @@ program menu. The background of the field will turn red if you enter a value tha
 of the allowable range. Clicking the reset button at the bottom of the column will reset all
 four of the parameters (BQ, BI, SQ, and SI) in the column to their default values.
 
+### Countermeasure Program Visualizer
+
+Below the programming table is a graphical representation of the countermeasure programs. This
+shows the timing of the flare and chaff releases on a common timeline. Gold circles represent
+flares while teal diamonds represent chaff.
+
 ## DLNK: Datalink
 
 The datalink system manages parameters set through the DED DLNK page. These parameters control
@@ -102,6 +108,10 @@ the pilot database will cause JAFDTC to track the corresponding entry as your ow
 pilot entry in the database is indicated by a bullet (see entry 5 above) and is determined by
 looking for a callsign in the pilot database that matches the callsign set through the
 [JAFDTC settings](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#settings).
+
+> You should make sure to set up your callsign through the
+> [JAFDTC settings](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#settings)
+> to get the most out of the datalink support in JAFDTC.
 
 ### Setting Up Multiple Pilots
 

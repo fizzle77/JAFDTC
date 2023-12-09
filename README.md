@@ -1,6 +1,6 @@
 # JAFDTC: Just Another #%*@^!& DTC
 
-*Just Another #%*@^!% DTC* (JAFDTC) is a native C# WinUI Windows application that allows you to
+Just Another #%*@^!% DTC (JAFDTC) is a native C# WinUI Windows application that allows you to
 upload data typically saved on a data cartridge, such as steerpoints/waypoints and other
 avionics setup, into a DCS model at the start of a flight. The application supports the
 following DCS airframes.
