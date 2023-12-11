@@ -78,6 +78,7 @@ https://www.gnu.org/licenses/.
             <!-- select poi
               -->
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                       x:Name="uiPoITextTitle"
                        HorizontalAlignment="Left"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
                 Steerpoint Initial Setup

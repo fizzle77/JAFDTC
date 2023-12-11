@@ -246,6 +246,7 @@ namespace JAFDTC.UI.Base
                 IsRebuildPending = true;
                 DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
                 {
+                    uiPoITextTitle.Text = $"{NavHelper.NavptName} Initial Setup";
                     uiNavptTextNum.Text = $"{NavHelper.NavptName} {EditNavpt.Number} Information";
                     RebuildEnableState();
                     IsRebuildPending = false;
