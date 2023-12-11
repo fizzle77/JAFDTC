@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// A10CConfigurationEditor.cs : supports editors for the a10c configuration
+// A10CConfigurationEditor.cs : supports editors for the a-10c configuration
 //
 // Copyright(C) 2023 ilominar/raven
 //

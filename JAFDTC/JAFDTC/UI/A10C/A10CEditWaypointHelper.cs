@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// A10CEditWaypointHelper.cs : IEditNavpointPageHelper for the a10c configuration
+// A10CEditWaypointHelper.cs : IEditNavpointPageHelper for the a-10c configuration
 //
 // Copyright(C) 2023 ilominar/raven
 //

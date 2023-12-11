@@ -1,7 +1,6 @@
-﻿using JAFDTC.Models.A10C;
-// ********************************************************************************************************************
+﻿// ********************************************************************************************************************
 //
-// A10CEditWaypointListHelper.cs : IEditNavpointListPageHelper for the a10c configuration
+// A10CEditWaypointListHelper.cs : IEditNavpointListPageHelper for the a-10c configuration
 //
 // Copyright(C) 2023 ilominar/raven
 //
@@ -18,6 +17,7 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.Models.Base;
 using JAFDTC.Models;
@@ -35,7 +35,7 @@ namespace JAFDTC.UI.A10C
     /// <summary>
     /// TODO: docuemnt
     /// </summary>
-    class A10CEditWaypointListHelper : IEditNavpointListPageHelper
+    internal class A10CEditWaypointListHelper : IEditNavpointListPageHelper
     {
         public static ConfigEditorPageInfo PageInfo
             => new(WYPTSystem.SystemTag, "Waypoints", "WYPT", Glyphs.WYPT,
