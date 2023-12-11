@@ -287,14 +287,16 @@ namespace JAFDTC.Models.F16C.Upload
         }
 
         /// <summary>
-        /// build the set of commands necessary to enter a lat/lon coordinate into the steerpoint system.
+        /// build the set of commands necessary to enter a lat/lon coordinate into the steerpoint system. once
+        /// separators and spaces are removed, the coordinate string should start with N/S/E/W followed by the
+        /// digits and/or characters that should be typed in to the ufc.
         /// <summary>
         public static string BuildCoordinate(Device ufc, string coord)
         {
             string coordStr = RemoveSeparators(coord.Replace(" ", ""));
 
             StringBuilder sb = new();
-            foreach (char c in coordStr.ToCharArray())
+            foreach (char c in coordStr.ToUpper().ToCharArray())
             {
                 switch (c)
                 {
