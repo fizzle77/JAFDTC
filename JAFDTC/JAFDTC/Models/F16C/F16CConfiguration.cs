@@ -27,6 +27,8 @@ using JAFDTC.Models.F16C.Misc;
 using JAFDTC.Models.F16C.Radio;
 using JAFDTC.Models.F16C.STPT;
 using JAFDTC.UI.F16C;
+using JAFDTC.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
@@ -234,8 +236,9 @@ namespace JAFDTC.Models.F16C
                     isSuccess = true;
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                FileManager.Log($"F16CConfigruation:Deserialize exception {ex}");
             }
             return isSuccess;
         }

@@ -23,6 +23,9 @@ using System.Text.Json.Serialization;
 
 namespace JAFDTC.Models.AV8B.WYPT
 {
+    /// <summary>
+    /// TODO: document
+    /// </summary>
     public class WaypointInfo : NavpointInfoBase
     {
         // ------------------------------------------------------------------------------------------------------------

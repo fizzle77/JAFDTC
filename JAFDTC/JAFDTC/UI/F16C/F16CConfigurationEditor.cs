@@ -67,8 +67,7 @@ namespace JAFDTC.UI.F16C
 
         public F16CConfigurationEditor() { }
 
-        public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo()
-            => _configEditorPageInfo;
+        public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo() => _configEditorPageInfo;
 
         public override ISystem SystemForConfig(IConfiguration config, string tag)
         {

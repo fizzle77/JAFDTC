@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// WYPTSystem.cs -- a-v8b waypoint system configuration
+// WYPTSystem.cs -- av-8b waypoint system configuration
 //
 // Copyright(C) 2023 ilominar/raven
 //
@@ -23,9 +23,12 @@ using System.Collections.ObjectModel;
 
 namespace JAFDTC.Models.AV8B.WYPT
 {
+    /// <summary>
+    /// TODO: document
+    /// </summary>
     public class WYPTSystem : NavpointSystemBase<WaypointInfo>
     {
-        public const string SystemTag = "JAFDTC:AV8B:STPT";
+        public const string SystemTag = "JAFDTC:AV8B:WYPT";
         public const string WYPTListTag = $"{SystemTag}:LIST";
 
         // ------------------------------------------------------------------------------------------------------------
