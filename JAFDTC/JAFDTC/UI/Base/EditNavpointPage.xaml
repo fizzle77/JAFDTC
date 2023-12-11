@@ -81,7 +81,7 @@ https://www.gnu.org/licenses/.
                        x:Name="uiPoITextTitle"
                        HorizontalAlignment="Left"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
-                Steerpoint Initial Setup
+                FIXUP:Type Initial Setup
             </TextBlock>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,12"
@@ -147,7 +147,7 @@ https://www.gnu.org/licenses/.
                 <TextBlock Grid.Column="0"
                            x:Name="uiNavptTextNum"
                            Style="{StaticResource EditorTitleTextBlockStyle}">
-                    Steerpoint FIXUP Information
+                    FIXUP:Type FIXUP:Count Information
                 </TextBlock>
                 <Button Grid.Column="1" Margin="0,0,6,0"
                         x:Name="uiNavptBtnPrev"
