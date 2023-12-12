@@ -392,6 +392,5 @@ namespace JAFDTC.UI.Base
 
             base.OnNavigatedTo(args);
         }
-
     }
 }

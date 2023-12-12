@@ -21,6 +21,7 @@
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.AV8B;
 using JAFDTC.Models.F16C;
+using JAFDTC.Models.FA18C;
 using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
@@ -250,7 +251,7 @@ namespace JAFDTC.Models
                 AirframeTypes.AV8B  => new AV8BConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
                 AirframeTypes.F15E  => null,
                 AirframeTypes.F16C  => new F16CConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
-                AirframeTypes.FA18C => null,
+                AirframeTypes.FA18C => new FA18CConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
                 AirframeTypes.None  => null,
                 _                   => null,
             };
@@ -272,13 +273,14 @@ namespace JAFDTC.Models
                     AirframeTypes.AV8B  => JsonSerializer.Deserialize<AV8BConfiguration>(json),
                     AirframeTypes.F15E  => null,
                     AirframeTypes.F16C  => JsonSerializer.Deserialize<F16CConfiguration>(json),
-                    AirframeTypes.FA18C => null,
+                    AirframeTypes.FA18C => JsonSerializer.Deserialize<FA18CConfiguration>(json),
                     AirframeTypes.None  => null,
                     _                   => null,
                 };
             }
-            catch // (Exception e)
+            catch (Exception ex)
             {
+                FileManager.Log($"Configuration:FactoryJSON exception {ex}");
                 config = null;
             }
             if ((config != null) && !string.IsNullOrEmpty(name))

@@ -80,8 +80,9 @@ https://www.gnu.org/licenses/.
                     <TextBlock Text="F-15E Strike Eagle" Tag="4"/>
                     -->
                     <TextBlock Text="F-16C Viper" Tag="5"/>
-                    <!--
                     <TextBlock Text="F/A-18C Hornet" Tag="6"/>
+                    <!--
+                    <TextBlock Text="Mirage 2000C" Tag="7"/>
                     -->
                 </ComboBox.Items>
             </ComboBox>

@@ -95,8 +95,6 @@
 
   <ItemGroup>
     <Folder Include="Models\F15E\" />
-    <Folder Include="Models\FA18C\" />
-    <Folder Include="UI\FA18C\" />
     <Folder Include="UI\F15E\" />
   </ItemGroup>
 
