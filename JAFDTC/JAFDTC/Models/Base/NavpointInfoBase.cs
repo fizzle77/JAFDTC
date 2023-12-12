@@ -135,13 +135,15 @@ namespace JAFDTC.Models.Base
                                         IsDecimalFieldValid(_lon, -180.0, 180.0, false));
 
         [JsonIgnore]
-        public virtual string Location => ((string.IsNullOrEmpty(Lat)) ? "Unknown" : LatUI) + ", " +
-                                          ((string.IsNullOrEmpty(Lon)) ? "Unknown" : LonUI) + " / " +
+        public virtual string Location => ((string.IsNullOrEmpty(Lat)) ? "Unknown" : RemoveLLDegZeroFill(LatUI)) + ", " +
+                                          ((string.IsNullOrEmpty(Lon)) ? "Unknown" : RemoveLLDegZeroFill(LonUI)) + " / " +
                                           ((string.IsNullOrEmpty(Alt)) ? "Unknown" : Alt + "’");
 
         // ---- private read-only
 
-        private static readonly Dictionary<LLFormat, Regex> _formatRegexLat = new()
+        private static readonly Regex _regexRemoveDegZeroPad = new(@"^([NSEWnsew] )([0]*)([1-9].*)$");
+
+        private static readonly Dictionary<LLFormat, Regex> _regexFormatLat = new()
         {
             [LLFormat.DD] = new(@"^([\-][0-9]\.[0-9]{6,12})|([\-][1-8][0-9]\.[0-9]{6,12})|([\-]90\.[0]{6,12})$"),
             [LLFormat.DMS] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]’ [0-5][0-9]’’)|([NSns] 90° 00’ 00’’)$"),
@@ -150,7 +152,7 @@ namespace JAFDTC.Models.Base
             [LLFormat.DDM_P2] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([NSns] 90° 00\.00’)$"),
         };
 
-        private static readonly Dictionary<LLFormat, Regex> _formatRegexLon = new()
+        private static readonly Dictionary<LLFormat, Regex> _regexFormatLon = new()
         {
             [LLFormat.DD] = new(@"^([\-][0-9]\.[0-9]{6,12})|([\-][1-9][0-9]\.[0-9]{6,12})|([\-]1[0-7][0-9]\.[0-9]{6,12})|([\-]180\.[0]{6,12})$"),
             [LLFormat.DMS] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]’ [0-5][0-9]’’)|([EWew] 1[0-7][0-9]° [0-5][0-9]’ [0-5][0-9]’’)|([EWew] 180° 00’ 00’’)$"),
@@ -187,12 +189,12 @@ namespace JAFDTC.Models.Base
         /// <summary>
         /// returns true regex for a latitude in the specified format.
         /// </summary>
-        public static Regex LatRegexFor(LLFormat fmt) => _formatRegexLat[fmt];
+        public static Regex LatRegexFor(LLFormat fmt) => _regexFormatLat[fmt];
 
         /// <summary>
         /// returns true regex for a latitude in the specified format.
         /// </summary>
-        public static Regex LonRegexFor(LLFormat fmt) => _formatRegexLon[fmt];
+        public static Regex LonRegexFor(LLFormat fmt) => _regexFormatLon[fmt];
 
         /// <summary>
         /// returns the string represented the specified format of a latitude in DD format.
@@ -229,10 +231,10 @@ namespace JAFDTC.Models.Base
             => fmt switch
             {
                 LLFormat.DD => latFmt,
-                LLFormat.DMS => CoreDMStoDD(latFmt, _formatRegexLat[fmt], "N"),
-                LLFormat.DDM_P3ZF => CoreDDMtoDD(latFmt, _formatRegexLat[fmt], "N"),
-                LLFormat.DDM_P2ZF => CoreDDMtoDD(latFmt, _formatRegexLat[fmt], "N"),
-                LLFormat.DDM_P2 => CoreDDMtoDD(latFmt, _formatRegexLat[fmt], "N"),
+                LLFormat.DMS => CoreDMStoDD(latFmt, _regexFormatLat[fmt], "N"),
+                LLFormat.DDM_P3ZF => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
+                LLFormat.DDM_P2ZF => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
+                LLFormat.DDM_P2 => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
                 _ => "",
             };
 
@@ -243,12 +245,17 @@ namespace JAFDTC.Models.Base
             => fmt switch
             {
                 LLFormat.DD => lonFmt,
-                LLFormat.DMS => CoreDMStoDD(lonFmt, _formatRegexLon[fmt], "E"),
-                LLFormat.DDM_P3ZF => CoreDDMtoDD(lonFmt, _formatRegexLon[fmt], "E"),
-                LLFormat.DDM_P2ZF => CoreDDMtoDD(lonFmt, _formatRegexLon[fmt], "E"),
-                LLFormat.DDM_P2 => CoreDDMtoDD(lonFmt, _formatRegexLon[fmt], "E"),
+                LLFormat.DMS => CoreDMStoDD(lonFmt, _regexFormatLon[fmt], "E"),
+                LLFormat.DDM_P3ZF => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
+                LLFormat.DDM_P2ZF => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
+                LLFormat.DDM_P2 => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
                 _ => "",
             };
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public static string RemoveLLDegZeroFill(string coord) => _regexRemoveDegZeroPad.Replace(coord, "$1$3");
 
         // ---- decimal degrees <--> degrees, decimal minutes ---------------------------------------------------------
 
