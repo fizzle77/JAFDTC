@@ -152,10 +152,5 @@ namespace JAFDTC.Models.F16C.CMDS
         {
             SetProgram();
         }
-
-        // TODO: document
-        public void CleanUp()
-        {
-        }
     }
 }

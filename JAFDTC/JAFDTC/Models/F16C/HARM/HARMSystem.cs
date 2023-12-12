@@ -125,14 +125,5 @@ namespace JAFDTC.Models.F16C.HARM
                 table.Reset();
             }
         }
-
-        // TODO: document
-        public void CleanUp()
-        {
-            foreach (ALICTable table in Tables)
-            {
-                table.CleanUp();
-            }
-        }
     }
 }

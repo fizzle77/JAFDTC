@@ -170,17 +170,5 @@ namespace JAFDTC.Models.F16C.STPT
                 VxP[i].Reset();
             }
         }
-
-        // cleanup the steerpoint by adjusting content as necessary.
-        //
-        public override void CleanUp()
-        {
-            base.CleanUp();
-            for (int i = 0; i < OAP.Length; i++)
-            {
-                OAP[i].CleanUp();
-                VxP[i].CleanUp();
-            }
-        }
     }
 }

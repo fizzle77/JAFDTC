@@ -189,13 +189,5 @@ namespace JAFDTC.Models.F16C.CMDS
                 program.Reset();
             }
         }
-
-        public void CleanUp()
-        {
-            foreach (CMDSProgram program in Programs)
-            {
-                program.CleanUp();
-            }
-        }
     }
 }

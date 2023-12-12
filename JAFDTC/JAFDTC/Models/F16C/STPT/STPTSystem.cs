@@ -81,15 +81,6 @@ namespace JAFDTC.Models.F16C.STPT
         }
 #endif
 
-        // TODO: document
-        public void CleanUp()
-        {
-            for (int i = 0; i < Points.Count; i++)
-            {
-                Points[i].CleanUp();
-            }
-        }
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // steerpoint management

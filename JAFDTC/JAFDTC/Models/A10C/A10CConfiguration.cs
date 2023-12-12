@@ -120,8 +120,6 @@ namespace JAFDTC.Models.A10C
 
             // TODO: if the version number is older than current, may need to update object
 
-            WYPT.CleanUp();
-
             ConfigurationUpdated();
 
             Version = VersionCfgA10C;

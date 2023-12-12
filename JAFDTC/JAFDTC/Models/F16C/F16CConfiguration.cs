@@ -179,15 +179,6 @@ namespace JAFDTC.Models.F16C
 
             // TODO: if the version number is older than current, may need to update object
 
-            CMDS.CleanUp();
-            DLNK.CleanUp();
-            HARM.CleanUp();
-            HTS.CleanUp();
-            MFD.CleanUp();
-            Misc.CleanUp();
-            Radio.CleanUp();
-            STPT.CleanUp();
-
             ConfigurationUpdated();
 
             Version = VersionCfgF16C;

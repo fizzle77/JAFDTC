@@ -73,10 +73,5 @@ namespace JAFDTC.Models.Base
         /// reset the preset to default values. the preset number field is set to 1.
         /// </summary>
         public virtual void Reset() => (Preset, Frequency, Description) = (1, "", "");
-
-        /// <summary>
-        /// cleanup the preset.
-        /// </summary>
-        public virtual void CleanUp() { }
     }
 }

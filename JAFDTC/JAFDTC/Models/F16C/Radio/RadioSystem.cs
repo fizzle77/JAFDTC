@@ -132,8 +132,6 @@ namespace JAFDTC.Models.F16C.Radio
             COMM2DefaultTuning = "";
         }
 
-        public void CleanUp() { }
-
         /// <summary>
         /// TODO: document
         /// </summary>

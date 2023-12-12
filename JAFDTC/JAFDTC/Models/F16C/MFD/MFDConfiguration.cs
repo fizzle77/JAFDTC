@@ -94,10 +94,5 @@ namespace JAFDTC.Models.F16C.MFD
 			OSB13 = "";
 			OSB12 = "";
 		}
-
-        // TODO: document
-		public void CleanUp()
-		{
-		}
 	}
 }

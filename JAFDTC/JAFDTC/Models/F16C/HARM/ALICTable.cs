@@ -114,10 +114,5 @@ namespace JAFDTC.Models.F16C.HARM
                 Table.Add(new TableCode());
             }
         }
-
-        // TODO: document
-        public void CleanUp()
-        {
-        }
     }
 }

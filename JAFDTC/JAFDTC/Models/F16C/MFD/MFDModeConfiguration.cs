@@ -87,11 +87,5 @@ namespace JAFDTC.Models.F16C.MFD
             LeftMFD.Reset();
             RightMFD.Reset();
         }
-
-        public void CleanUp()
-        {
-            LeftMFD.CleanUp();
-            RightMFD.CleanUp();
-        }
     }
 }

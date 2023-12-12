@@ -107,12 +107,5 @@ namespace JAFDTC.Models.AV8B.WYPT
         {
             base.Reset();
         }
-
-        // cleanup the steerpoint by adjusting content as necessary.
-        //
-        public override void CleanUp()
-        {
-            base.CleanUp();
-        }
     }
 }

@@ -178,11 +178,6 @@ namespace JAFDTC.Models.Base
         /// </summary>
         public virtual void Reset() => (Name, Lat, Lon, Alt) = ("", "", "", "");
 
-        /// <summary>
-        /// cleanup the steerpoint by adjusting content as necessary.
-        /// </summary>
-        public virtual void CleanUp() { }
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // format conversion

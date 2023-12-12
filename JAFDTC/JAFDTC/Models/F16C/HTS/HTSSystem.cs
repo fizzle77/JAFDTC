@@ -141,9 +141,5 @@ namespace JAFDTC.Models.F16C.HTS
             }
             EnabledThreats[0] = false;
         }
-
-        public void CleanUp()
-        {
-        }
     }
 }

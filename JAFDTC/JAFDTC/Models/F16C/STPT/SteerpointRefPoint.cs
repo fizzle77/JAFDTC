@@ -143,11 +143,5 @@ namespace JAFDTC.Models.F16C.STPT
 
         // TODO: document
         public void Reset() => (Type, Range, Brng, Elev) = (RefPointTypes.NONE, "", "", "");
-
-        // cleanup the steerpoint by adjusting content as necessary.
-        //
-        public void CleanUp()
-        {
-        }
     }
 }

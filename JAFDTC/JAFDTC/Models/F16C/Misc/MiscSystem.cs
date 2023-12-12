@@ -505,9 +505,5 @@ namespace JAFDTC.Models.F16C.Misc
             HMCSDisplayRWR = "";
             HMCSDeclutterLvl = "";
         }
-
-        public void CleanUp()
-        {
-        }
     }
 }

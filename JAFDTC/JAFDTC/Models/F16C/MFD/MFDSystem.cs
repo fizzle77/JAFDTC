@@ -172,14 +172,5 @@ namespace JAFDTC.Models.F16C.MFD
                 config.Reset();
             }
         }
-
-        // TODO: document
-        public void CleanUp()
-        {
-            foreach (MFDModeConfiguration config in ModeConfigs)
-            {
-                config.CleanUp();
-            }
-        }
     }
 }

@@ -121,8 +121,6 @@ namespace JAFDTC.Models.AV8B
 
             // TODO: if the version number is older than current, may need to update object
 
-            WYPT.CleanUp();
-
             ConfigurationUpdated();
 
             Version = VersionCfgAV8B;

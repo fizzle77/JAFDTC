@@ -112,9 +112,5 @@ namespace JAFDTC.Models.F16C.DLNK
                 TeamMembers[i].Reset();
             }
         }
-
-        public void CleanUp()
-        {
-        }
     }
 }
