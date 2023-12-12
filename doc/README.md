@@ -12,26 +12,28 @@ documentation
 
 * [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md)
 * [F-16C Viper](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F16C.md)
+* [F/A-18C Hornet](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_FA18C.md)
 
 for additional details on JAFDTC's capabilities and operation on a specific airframe.
 
 # Preliminaries
 
+Before discussing the user interface, it is helpful to outline some of the key abstractions
+that JAFDTC uses.
+
+## Configurations & Systems
+
 JAFDTC allows you to manage multiple avionics *Configurations*. In JAFDTC, a *Configuration* is
-composed of individual *System Configurations*, or *Systems*, that correspond to systems in
-an airframe such as radios, countermeasures, navigation, and so on. *Configurations* and
+composed of multiple *System Configurations*, or *Systems*, that each correspond to systems
+in an airframe such as radios, countermeasures, navigation, and so on. *Configurations* and
 *Systems* are unique to a specific airframe, though differnt airframes may have systems that
-provide similar functionality. Configurations are named by the user when they are created.
+provide similar functionality.
+
+A name identifies a configuration in the user interface. This name is set up when the
+configuration is first created and may be changed later.
 
 > Configuration names must be unique across all configurations for an airframe and may contain
 > any character. Names are case-insensitive so "A2G" and "a2g" are treated as the same name.
-
-JAFDTC allows you to link *System Configurations* between different *Configurations* for the
-same airframe. When linked, changes to the source system configuration are automatically
-reflected in all linked systems.
-
-> Linking system configurations is described further
-> [below](#system-editor-page).
 
 The specific systems available in a configuration, along with the system parameters that
 JAFDTC can apply, vary from airframe to airframe (see the airframe-specific documentation
@@ -39,12 +41,49 @@ mentioned above for more information). Some systems may not exist in some airfra
 "common" systems may operate differently and track different information in different
 airframes.
 
-Once built, a *Configuration* can be uploaded into the airframe in DCS. JAFDTC walks through
-the configuration, updating parameters in systems that differ from their default. For
-example, consider a BINGO warning system. In this example, if you change the BINGO value
-from the default for the airframe, JAFDTC will update the BINGO value in the avionics when
-uploading. If you do not change the value, JAFDTC will not make any changes to that parameter
-in the airframe. 
+## Linking Systems
+
+JAFDTC allows you to link *System Configurations* between different *Configurations* for the
+same airframe. When linked, changes to the source system configuration are automatically
+reflected in all linked systems. This allows you to "compose" configurations from shared
+components.
+
+Links are particularly useful when you have basic setups that you tend to reuse often. For
+example, you might want to always configure your MFDs one way for A2G and another way for
+A2A. Let's assume configurations for our airframe support an MFD system (MFD) that sets up
+cockpit displays and a navigation system (NAV) that sets up steerpoints.
+
+Once you setup your A2G and A2A MFD configurations, you can simply link to them from new
+configurations to avoid having to set the MFDs up again in the new configuration.
+
+![](images/Core_Cfg_Links.png)
+
+Any change you make to the MFD system in "A2G Fav" or "A2A Fav" will be immediately
+reflected in the configurations that link to these system configurations; in this example,
+"A2G Mission", "A2A Mission", and "Range A2A". Once linked, only the original is editable.
+That is, the A2G MFD system will be read-only in "A2G Mission" but may be edited through
+"A2G Fav".
+
+Links connect individual systems in two different configurations. Though "A2A Fav" and
+"A2G Mission" have linked their MFD system configurations, they have completely independent
+NAV system configurations.
+
+Furhter, different systems can link to different configurations. In the above picutre,
+"Range A2A" gets it's MFD setup from "A2A Fav" and its NAV setup from "KLAS STPTs". There
+is no limit to the number of systems that may link to a particular setup.
+
+> Linking system configurations is described further
+> [below](#system-editor-page).
+
+## Uploading Configurations
+
+Once built, a *Configuration* can be uploaded into the airframe in DCS through scripting
+engine that DCS exposes to the local system. To upload, JAFDTC walks through the
+configuration, updating parameters in systems that differ from their default. For example,
+consider a BINGO warning system. In this example, if you change the BINGO value from the
+default for the airframe, JAFDTC will update the BINGO value in the avionics when uploading.
+If you do not change the value, JAFDTC will not make any changes to that parameter in the
+airframe. 
 
 # Configuration Storage
 
@@ -179,7 +218,8 @@ For example,
 ![](images/Core_Cfg_DCS_Status.png)
 
 shows two different DCS statuses. On the left, DCS is not running but the Lua support is
-installed. On the right, DCS is running a mission with an F-16C Viper.
+installed. On the right, DCS is running a mission where the player is piloting an F-16C
+Viper.
 
 The left side of the status area identifies the pilot and wing as specified through the JAFDTC
 [Settings](#settings).
@@ -202,10 +242,15 @@ page when clicked. Below these two items is text identifying the *Current Airfra
 The *System List* provides the systems that make up the configuration. Each system has an
 associated icon. The color of the icon indicates the state of the system: blue icons mark
 systems whose configuration has changed from defaults, white icons mark systems that have not
-been changed. A small gold dot marks those systems that are linked to other configurations.
+been changed.
+
+> JAFDTC uses the system highlight color; if you change it, the blue icons may be a different
+> color based on your choice.
+
+A small gold dot marks those systems that are linked to other configurations.
 
 > A white icon with a gold dot indicates a system that is linked to another configuration
-> in which the system has not been changed.
+> in which the system has not been changed from defaults.
 
 Clicking on a row in this list changes the system editor to the right to edit the selected
 system.
@@ -230,8 +275,10 @@ disabled when the system is in its default configruation.
 
 The *Link* button connects the system to another configuration. This allows you to, for
 example, have a single common radio system configuration that you can share across different
-configurations. This way, you can make a single change to the shared system configuration and
-have the linked systems automatically update.
+configurations (as discussed
+[here](#linking-systems)).
+This way, you can make a single change to the shared system configuration and have the linked
+systems automatically update.
 
 > Links are tracked per system. That is, Systems A and B in Configuration X can be linked
 > to completely different configurations if desired.
@@ -244,16 +291,25 @@ Changes to a system are pushed to all linked (either directly or indirectly) sys
 > in Configuration B is linked to Configuration C. Changes to System X in Configuration
 > C will be reflected in the Configraution A and B setups for System X.
 
-While linked, edits to the system configuration are disabled. The *Link* button changes based
-on whether or not the system is linked,
+While linked, edits to the system configuration are disabled (the system configuration is
+edited through the source configuration). The *Link* button changes based on whether or not
+the system is linked,
 
 ![](images/Core_Cfg_Edit_Link.png)
 
 When unlinked, the button displays "Link To". Clicking the button brings up a list of
-potential configurations to link to. Once linked, the button changes to "Unlink From" and
-identifies the specific configuration the system is presently linked to. When unlinking, the
-system configuration is not changed, but will no longer receive updates. Icons for linked
-systems are badged with a small gold dot as described earlier.
+potential source configurations the system can be linked to.
+
+> In the earlier example
+> [here](#linking-systems),
+> to link the MFD configuration in "A2G Fav" to "A2G Mission" you would click the "Link To"
+> button in the MFD system editor in "A2G Mission" and select "A2G Fav" from the list of
+> possible configurations to link to.
+
+Once linked, the button changes to "Unlink From" and identifies the specific configuration the
+system is presently linked to. When unlinking, the system configuration does not change, but
+will no longer receive updates from the source configuration. Icons for linked systems are
+badged with a small gold dot as described earlier.
 
 ## Settings
 

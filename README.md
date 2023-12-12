@@ -7,6 +7,7 @@ following DCS airframes.
 
 * A-10C Warthog
 * F-16C Viper
+* F/A-18C Hornet
 
 Support for additional airframes is planned.
 

@@ -23,6 +23,10 @@ Each of these systems implements the link and reset functionality mentioned in t
 of the
 [system editor page](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#system-editor-page).
 
+Priort to uploading, you should ensure the relevant systems are powered up and functional.
+Typically, uploads should occur as one of the last steps prior to taxi once you have systems
+powered up, stores loaded, and so on.
+
 ## CMDS: Countermeasures
 
 The countermeasures system manages parameters set through the CMDS DED page. These parameters
