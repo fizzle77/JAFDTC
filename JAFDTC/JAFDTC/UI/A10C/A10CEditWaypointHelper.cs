@@ -44,7 +44,7 @@ namespace JAFDTC.UI.A10C
             => new()
             {
                 ["MaskPlaceholder"] = "–",
-                ["Regex"] = "^[nNsS] [\\d]{2}° [\\d]{2}’ [\\d]{2}’’$",
+                ["Regex"] = "^[nNsS] [\\d]{2}° [\\d]{2}\\.[\\d]{3}’$",
                 ["CustomMask"] = "N:[nNsS]",
                 ["Mask"] = "N 99° 99.999’",
             };
@@ -69,26 +69,26 @@ namespace JAFDTC.UI.A10C
 
         public void CopyConfigToEdit(int index, IConfiguration config, INavpointInfo edit)
         {
-            A10CConfiguration a10cConfig = (A10CConfiguration)config;
-            WaypointInfo a10cWypt = (WaypointInfo)edit;
-            a10cWypt.Number = a10cConfig.WYPT.Points[index].Number;
-            a10cWypt.Name = new(a10cConfig.WYPT.Points[index].Name);
-            a10cWypt.LatUI = NavpointInfoBase.ConvertLatDDtoDDM(new(a10cConfig.WYPT.Points[index].Lat));
-            a10cWypt.LonUI = NavpointInfoBase.ConvertLonDDtoDDM(new(a10cConfig.WYPT.Points[index].Lon));
-            a10cWypt.Alt = new(a10cConfig.WYPT.Points[index].Alt);
+            WaypointInfo wyptSrc = ((A10CConfiguration)config).WYPT.Points[index];
+            WaypointInfo wyptDst = (WaypointInfo)edit;
+            wyptDst.Number = wyptSrc.Number;
+            wyptDst.Name = new(wyptSrc.Name);
+            wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(wyptSrc.Lat, NavpointInfoBase.LLFormat.DDM_P3ZF);
+            wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(wyptSrc.Lon, NavpointInfoBase.LLFormat.DDM_P3ZF);
+            wyptDst.Alt = new(wyptSrc.Alt);
         }
 
         public bool CopyEditToConfig(int index, INavpointInfo edit, IConfiguration config)
         {
-            A10CConfiguration a10cConfig = (A10CConfiguration)config;
-            WaypointInfo a10cWypt = (WaypointInfo)edit;
-            if (!a10cWypt.HasErrors)
+            WaypointInfo wyptDst = ((A10CConfiguration)config).WYPT.Points[index];
+            WaypointInfo wyptSrc = (WaypointInfo)edit;
+            if (!wyptSrc.HasErrors)
             {
-                a10cConfig.WYPT.Points[index].Number = a10cWypt.Number;
-                a10cConfig.WYPT.Points[index].Name = a10cWypt.Name;
-                a10cConfig.WYPT.Points[index].Lat = a10cWypt.Lat;
-                a10cConfig.WYPT.Points[index].Lon = a10cWypt.Lon;
-                a10cConfig.WYPT.Points[index].Alt = a10cWypt.Alt;
+                wyptDst.Number = wyptSrc.Number;
+                wyptDst.Name = wyptSrc.Name;
+                wyptDst.Lat = wyptSrc.Lat;
+                wyptDst.Lon = wyptSrc.Lon;
+                wyptDst.Alt = wyptSrc.Alt;
                 return true;
             }
             return false;
@@ -113,11 +113,12 @@ namespace JAFDTC.UI.A10C
         {
             if (poi != null)
             {
-                ((WaypointInfo)edit).Name = poi.Name;
-                ((WaypointInfo)edit).LatUI = NavpointInfoBase.ConvertLatDDtoDDM(poi.Latitude);
-                ((WaypointInfo)edit).LonUI = NavpointInfoBase.ConvertLonDDtoDDM(poi.Longitude);
-                ((WaypointInfo)edit).Alt = poi.Elevation.ToString();
-                ((WaypointInfo)edit).ClearErrors();
+                WaypointInfo wyptDst = (WaypointInfo)edit;
+                wyptDst.Name = poi.Name;
+                wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(poi.Latitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
+                wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(poi.Longitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
+                wyptDst.Alt = poi.Elevation.ToString();
+                wyptDst.ClearErrors();
             }
         }
 

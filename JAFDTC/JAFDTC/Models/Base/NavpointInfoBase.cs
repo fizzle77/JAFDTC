@@ -19,6 +19,7 @@
 
 using JAFDTC.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
@@ -32,14 +33,17 @@ namespace JAFDTC.Models.Base
     /// </summary>
     public abstract class NavpointInfoBase : BindableObject, INavpointInfo
     {
-        // regular expressions for the DDM and DMS strings that the class supports. conversion to/from DDM/DMS
-        // expect or produce strings in these formats.
+        // known lat/lon coordinate formats for use with the conversion functions [Lat|Lon]RegexFor(),
+        // ConvertFrom[Lat|Lon]DD(), and ConvertTo[Lat|Lon]DD().
         //
-        protected static readonly Regex DDMlatRegex = new(@"^[NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{3}’$");
-        protected static readonly Regex DDMlonRegex = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{3}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{3}’)$");
-
-        protected static readonly Regex DMSlatRegex = new(@"^[NSns] [0-8][0-9]° [0-5][0-9]’ [0-5][0-9]’’$");
-        protected static readonly Regex DMSlonRegex = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]’ [0-5][0-9]’’)|([EWew] 1[0-7][0-9]° [0-5][0-9]’ [0-5][0-9]’’)$");
+        public enum LLFormat
+        {
+            DD,             // decimal degrees
+            DMS,            // degrees, minutes, seconds
+            DDM_P3ZF,       // degrees, decimal minutes (to 3-digit precision), zero-fill degrees
+            DDM_P2ZF,       // degrees, decimal minutes (to 2-digit precision), zero-fill degrees
+            DDM_P2,         // degrees, decimal minutes (to 2-digit precision) 
+        }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -132,12 +136,32 @@ namespace JAFDTC.Models.Base
 
         [JsonIgnore]
         public virtual string Location => ((string.IsNullOrEmpty(Lat)) ? "Unknown" : LatUI) + ", " +
-                                          ((string.IsNullOrEmpty(Lon)) ? "Unknown" : LonUI) + ", " +
-                                          ((string.IsNullOrEmpty(Alt)) ? "Unknown" : Alt);
+                                          ((string.IsNullOrEmpty(Lon)) ? "Unknown" : LonUI) + " / " +
+                                          ((string.IsNullOrEmpty(Alt)) ? "Unknown" : Alt + "’");
+
+        // ---- private read-only
+
+        private static readonly Dictionary<LLFormat, Regex> _formatRegexLat = new()
+        {
+            [LLFormat.DD] = new(@"^([\-][0-9]\.[0-9]{6,12})|([\-][1-8][0-9]\.[0-9]{6,12})|([\-]90\.[0]{6,12})$"),
+            [LLFormat.DMS] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]’ [0-5][0-9]’’)|([NSns] 90° 00’ 00’’)$"),
+            [LLFormat.DDM_P3ZF] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{3}’)|([NSns] 90° 00\.000’)$"),
+            [LLFormat.DDM_P2ZF] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([NSns] 90° 00\.00’)$"),
+            [LLFormat.DDM_P2] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([NSns] 90° 00\.00’)$"),
+        };
+
+        private static readonly Dictionary<LLFormat, Regex> _formatRegexLon = new()
+        {
+            [LLFormat.DD] = new(@"^([\-][0-9]\.[0-9]{6,12})|([\-][1-9][0-9]\.[0-9]{6,12})|([\-]1[0-7][0-9]\.[0-9]{6,12})|([\-]180\.[0]{6,12})$"),
+            [LLFormat.DMS] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]’ [0-5][0-9]’’)|([EWew] 1[0-7][0-9]° [0-5][0-9]’ [0-5][0-9]’’)|([EWew] 180° 00’ 00’’)$"),
+            [LLFormat.DDM_P3ZF] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{3}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{3}’)|([EWew] 180° 00\.000’)$"),
+            [LLFormat.DDM_P2ZF] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{2}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{2}’)|([EWew] 180° 00\.00’)$"),
+            [LLFormat.DDM_P2] = new(@"^([EWew] [0-9]° [0-5][0-9]\.[0-9]{2}’)|([EWew] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([EWew] 180° 00\.00’)$"),
+        };
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // consturction
+        // construction
         //
         // ------------------------------------------------------------------------------------------------------------
 
@@ -165,9 +189,75 @@ namespace JAFDTC.Models.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// returns true regex for a latitude in the specified format.
+        /// </summary>
+        public static Regex LatRegexFor(LLFormat fmt) => _formatRegexLat[fmt];
+
+        /// <summary>
+        /// returns true regex for a latitude in the specified format.
+        /// </summary>
+        public static Regex LonRegexFor(LLFormat fmt) => _formatRegexLon[fmt];
+
+        /// <summary>
+        /// returns the string represented the specified format of a latitude in DD format.
+        /// </summary>
+        public static string ConvertFromLatDD(string latDD, LLFormat dstFmt)
+            => dstFmt switch
+            {
+                LLFormat.DD => latDD,
+                LLFormat.DMS => CoreDDtoDMS(latDD, 90.0, "N", "S"),
+                LLFormat.DDM_P3ZF => CoreDDtoDDM(latDD, 90.0, "N", "S", 3, true),
+                LLFormat.DDM_P2ZF => CoreDDtoDDM(latDD, 90.0, "N", "S", 2, true),
+                LLFormat.DDM_P2 => CoreDDtoDDM(latDD, 90.0, "N", "S", 2, false),
+                _ => "",
+            };
+
+        /// <summary>
+        /// returns the string represented the specified format of a longitude in DD format.
+        /// </summary>
+        public static string ConvertFromLonDD(string lonDD, LLFormat dstFmt)
+            => dstFmt switch
+            {
+                LLFormat.DD => lonDD,
+                LLFormat.DMS => CoreDDtoDMS(lonDD, 180.0, "E", "W"),
+                LLFormat.DDM_P3ZF => CoreDDtoDDM(lonDD, 180.0, "E", "W", 3, true),
+                LLFormat.DDM_P2ZF => CoreDDtoDDM(lonDD, 180.0, "E", "W", 2, true),
+                LLFormat.DDM_P2 => CoreDDtoDDM(lonDD, 180.0, "E", "W", 2, false),
+                _ => "",
+            };
+
+        /// <summary>
+        /// returns the string representing the DD format of a latitude in the specified format.
+        /// </summary>
+        public static string ConvertToLatDD(string latFmt, LLFormat fmt)
+            => fmt switch
+            {
+                LLFormat.DD => latFmt,
+                LLFormat.DMS => CoreDMStoDD(latFmt, _formatRegexLat[fmt], "N"),
+                LLFormat.DDM_P3ZF => CoreDDMtoDD(latFmt, _formatRegexLat[fmt], "N"),
+                LLFormat.DDM_P2ZF => CoreDDMtoDD(latFmt, _formatRegexLat[fmt], "N"),
+                LLFormat.DDM_P2 => CoreDDMtoDD(latFmt, _formatRegexLat[fmt], "N"),
+                _ => "",
+            };
+
+        /// <summary>
+        /// returns the string representing the DD format of a longitude in the specified format.
+        /// </summary>
+        public static string ConvertToLonDD(string lonFmt, LLFormat fmt)
+            => fmt switch
+            {
+                LLFormat.DD => lonFmt,
+                LLFormat.DMS => CoreDMStoDD(lonFmt, _formatRegexLon[fmt], "E"),
+                LLFormat.DDM_P3ZF => CoreDDMtoDD(lonFmt, _formatRegexLon[fmt], "E"),
+                LLFormat.DDM_P2ZF => CoreDDMtoDD(lonFmt, _formatRegexLon[fmt], "E"),
+                LLFormat.DDM_P2 => CoreDDMtoDD(lonFmt, _formatRegexLon[fmt], "E"),
+                _ => "",
+            };
+
         // ---- decimal degrees <--> degrees, decimal minutes ---------------------------------------------------------
 
-        private static string CoreDDtoDDM(string ddValue, double max, string posDir, string negDir)
+        private static string CoreDDtoDDM(string ddValue, double max, string posDir, string negDir, int precision = 3, bool fillDeg = true)
         {
             if (double.TryParse(ddValue, out double dd) && (Math.Abs(dd) < max))
             {
@@ -176,7 +266,14 @@ namespace JAFDTC.Models.Base
                 int d = (int)Math.Truncate(dd);
                 double dm = (dd - (double)d) * 60.0;
                 string pad = (dm < 10.0) ? "0" : "";
-                return (max >= 100.0) ? $"{dir} {d,3:D3}° {pad}{dm:F3}’" : $"{dir} {d,2:D2}° {pad}{dm:F3}’";
+
+                string dOut = $"{d}";
+                if (fillDeg)
+                {
+                    dOut = (max > 100.0) ? $"{d,3:D3}" : $"{d,2:D2}";
+                }
+                string dmOut = string.Format(string.Format("{{0}}{{1:F{0}}}", precision), pad, dm);
+                return $"{dir} {dOut}° {dmOut}’";
             }
             return "";
         }
@@ -195,14 +292,6 @@ namespace JAFDTC.Models.Base
             }
             return "";
         }
-
-        public static string ConvertLatDDtoDDM(string ddValue) => CoreDDtoDDM(ddValue, 90.0, "N", "S");
-
-        public static string ConvertLatDDMtoDD(string ddValue) => CoreDDMtoDD(ddValue, DDMlatRegex, "N");
-
-        public static string ConvertLonDDtoDDM(string ddValue) => CoreDDtoDDM(ddValue, 180.0, "E", "W");
-
-        public static string ConvertLonDDMtoDD(string ddValue) => CoreDDMtoDD(ddValue, DDMlonRegex, "E");
 
         // ---- decimal degrees <--> degrees, minutes, seconds --------------------------------------------------------
 
@@ -236,13 +325,5 @@ namespace JAFDTC.Models.Base
             }
             return "";
         }
-
-        public static string ConvertLatDDtoDMS(string ddValue) => CoreDDtoDMS(ddValue, 90.0, "N", "S");
-
-        public static string ConvertLatDMStoDD(string ddValue) => CoreDMStoDD(ddValue, DMSlatRegex, "N");
-
-        public static string ConvertLonDDtoDMS(string ddValue) => CoreDDtoDMS(ddValue, 180.0, "E", "W");
-
-        public static string ConvertLonDMStoDD(string ddValue) => CoreDMStoDD(ddValue, DMSlonRegex, "E");
     }
 }

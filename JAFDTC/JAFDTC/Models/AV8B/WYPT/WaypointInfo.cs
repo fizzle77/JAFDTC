@@ -41,16 +41,17 @@ namespace JAFDTC.Models.AV8B.WYPT
         [JsonIgnore]
         public override string LatUI
         {
-            get => ConvertLatDDtoDMS(Lat);
+            // TODO: need to validate ui format for harrier
+            get => ConvertFromLatDD(Lat, LLFormat.DMS);
             set
             {
                 string error = "Invalid latitude DMS format";
-                if (IsRegexFieldValid(value, DMSlatRegex, false))
+                if (IsRegexFieldValid(value, LatRegexFor(LLFormat.DMS), false))
                 {
                     value = value.ToUpper();
                     error = null;
                 }
-                Lat = ConvertLatDMStoDD(value);
+                Lat = ConvertToLatDD(value, LLFormat.DMS);
                 SetProperty(ref _latUI, value, error);
             }
         }
@@ -60,16 +61,17 @@ namespace JAFDTC.Models.AV8B.WYPT
         [JsonIgnore]
         public override string LonUI
         {
-            get => ConvertLonDDtoDMS(Lon);
+            // TODO: need to validate ui format for harrier
+            get => ConvertFromLonDD(Lon, LLFormat.DMS);
             set
             {
                 string error = "Invalid longitude DMS format";
-                if (IsRegexFieldValid(value, DMSlonRegex, false))
+                if (IsRegexFieldValid(value, LonRegexFor(LLFormat.DMS), false))
                 {
                     value = value.ToUpper();
                     error = null;
                 }
-                Lon = ConvertLonDMStoDD(value);
+                Lon = ConvertToLonDD(value, LLFormat.DMS);
                 SetProperty(ref _lonUI, value, error);
             }
         }

@@ -55,26 +55,26 @@ namespace JAFDTC.UI.AV8B
 
         public void CopyConfigToEdit(int index, IConfiguration config, INavpointInfo edit)
         {
-            AV8BConfiguration av8bConfig = (AV8BConfiguration)config;
-            WaypointInfo av8bWypt = (WaypointInfo)edit;
-            av8bWypt.Number = av8bConfig.WYPT.Points[index].Number;
-            av8bWypt.Name = new(av8bConfig.WYPT.Points[index].Name);
-            av8bWypt.LatUI = NavpointInfoBase.ConvertLatDDtoDMS(new(av8bConfig.WYPT.Points[index].Lat));
-            av8bWypt.LonUI = NavpointInfoBase.ConvertLonDDtoDMS(new(av8bConfig.WYPT.Points[index].Lon));
-            av8bWypt.Alt = new(av8bConfig.WYPT.Points[index].Alt);
+            WaypointInfo wyptSrc = ((AV8BConfiguration)config).WYPT.Points[index];
+            WaypointInfo wyptDst = (WaypointInfo)edit;
+            wyptDst.Number = wyptSrc.Number;
+            wyptDst.Name = new(wyptSrc.Name);
+            wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(wyptSrc.Lat, NavpointInfoBase.LLFormat.DDM_P3ZF);
+            wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(wyptSrc.Lon, NavpointInfoBase.LLFormat.DDM_P3ZF);
+            wyptDst.Alt = new(wyptSrc.Alt);
         }
 
         public bool CopyEditToConfig(int index,INavpointInfo edit, IConfiguration config)
         {
-            AV8BConfiguration av8bConfig = (AV8BConfiguration)config;
-            WaypointInfo av8bWypt = (WaypointInfo)edit;
-            if (!av8bWypt.HasErrors)
+            WaypointInfo wyptSrc = (WaypointInfo)edit;
+            WaypointInfo wyptDst = ((AV8BConfiguration)config).WYPT.Points[index];
+            if (!wyptSrc.HasErrors)
             {
-                av8bConfig.WYPT.Points[index].Number = av8bWypt.Number;
-                av8bConfig.WYPT.Points[index].Name = av8bWypt.Name;
-                av8bConfig.WYPT.Points[index].Lat = av8bWypt.Lat;
-                av8bConfig.WYPT.Points[index].Lon = av8bWypt.Lon;
-                av8bConfig.WYPT.Points[index].Alt = av8bWypt.Alt;
+                wyptDst.Number = wyptSrc.Number;
+                wyptDst.Name = wyptSrc.Name;
+                wyptDst.Lat = wyptSrc.Lat;
+                wyptDst.Lon = wyptSrc.Lon;
+                wyptDst.Alt = wyptSrc.Alt;
                 return true;
             }
             return false;
@@ -99,11 +99,12 @@ namespace JAFDTC.UI.AV8B
         {
             if (poi != null)
             {
-                ((WaypointInfo)edit).Name = poi.Name;
-                ((WaypointInfo)edit).LatUI = NavpointInfoBase.ConvertLatDDtoDMS(poi.Latitude);
-                ((WaypointInfo)edit).LonUI = NavpointInfoBase.ConvertLonDDtoDMS(poi.Longitude);
-                ((WaypointInfo)edit).Alt = poi.Elevation.ToString();
-                ((WaypointInfo)edit).ClearErrors();
+                WaypointInfo wyptDst = (WaypointInfo)edit;
+                wyptDst.Name = poi.Name;
+                wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(poi.Latitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
+                wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(poi.Longitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
+                wyptDst.Alt = poi.Elevation.ToString();
+                wyptDst.ClearErrors();
             }
         }
 

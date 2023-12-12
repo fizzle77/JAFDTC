@@ -41,16 +41,16 @@ namespace JAFDTC.Models.A10C.WYPT
         [JsonIgnore]
         public override string LatUI
         {
-            get => ConvertLatDDtoDDM(Lat);
+            get => ConvertFromLatDD(Lat, LLFormat.DDM_P3ZF);
             set
             {
                 string error = "Invalid latitude DDM format";
-                if (IsRegexFieldValid(value, DDMlatRegex, false))
+                if (IsRegexFieldValid(value, LatRegexFor(LLFormat.DDM_P3ZF), false))
                 {
                     value = value.ToUpper();
                     error = null;
                 }
-                Lat = ConvertLatDDMtoDD(value);
+                Lat = ConvertToLatDD(value, LLFormat.DDM_P3ZF);
                 SetProperty(ref _latUI, value, error);
             }
         }
@@ -60,16 +60,16 @@ namespace JAFDTC.Models.A10C.WYPT
         [JsonIgnore]
         public override string LonUI
         {
-            get => ConvertLonDDtoDDM(Lon);
+            get => ConvertFromLonDD(Lon, LLFormat.DDM_P3ZF);
             set
             {
                 string error = "Invalid longitude DDM format";
-                if (IsRegexFieldValid(value, DDMlonRegex, false))
+                if (IsRegexFieldValid(value, LonRegexFor(LLFormat.DDM_P3ZF), false))
                 {
                     value = value.ToUpper();
                     error = null;
                 }
-                Lon = ConvertLonDDMtoDD(value);
+                Lon = ConvertToLonDD(value, LLFormat.DDM_P3ZF);
                 SetProperty(ref _lonUI, value, error);
             }
         }

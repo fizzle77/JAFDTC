@@ -177,24 +177,25 @@ namespace JAFDTC.UI.F16C
         //
         private void CopyConfigToEdit(int index)
         {
-            EditStpt.Number = Config.STPT.Points[index].Number;
-            EditStpt.Name = new(Config.STPT.Points[index].Name);
-            EditStpt.LatUI = NavpointInfoBase.ConvertLatDDtoDDM(new(Config.STPT.Points[index].Lat));
-            EditStpt.LonUI = NavpointInfoBase.ConvertLonDDtoDDM(new(Config.STPT.Points[index].Lon));
-            EditStpt.Alt = new(Config.STPT.Points[index].Alt);
-            EditStpt.TOS = new(Config.STPT.Points[index].TOS);
+            SteerpointInfo stptSrc = Config.STPT.Points[index];
+            EditStpt.Number = stptSrc.Number;
+            EditStpt.Name = new(stptSrc.Name);
+            EditStpt.LatUI = NavpointInfoBase.ConvertFromLatDD(stptSrc.Lat, NavpointInfoBase.LLFormat.DDM_P3ZF);
+            EditStpt.LonUI = NavpointInfoBase.ConvertFromLonDD(stptSrc.Lon, NavpointInfoBase.LLFormat.DDM_P3ZF);
+            EditStpt.Alt = new(stptSrc.Alt);
+            EditStpt.TOS = new(stptSrc.TOS);
 
             for (int i = 0; i < EditStpt.OAP.Length; i++)
             {
-                EditStpt.OAP[i].Type = Config.STPT.Points[index].OAP[i].Type;
-                EditStpt.OAP[i].Range = new(Config.STPT.Points[index].OAP[i].Range);
-                EditStpt.OAP[i].Brng = new(Config.STPT.Points[index].OAP[i].Brng);
-                EditStpt.OAP[i].Elev = new(Config.STPT.Points[index].OAP[i].Elev);
+                EditStpt.OAP[i].Type = stptSrc.OAP[i].Type;
+                EditStpt.OAP[i].Range = new(stptSrc.OAP[i].Range);
+                EditStpt.OAP[i].Brng = new(stptSrc.OAP[i].Brng);
+                EditStpt.OAP[i].Elev = new(stptSrc.OAP[i].Elev);
 
-                EditStpt.VxP[i].Type = Config.STPT.Points[index].VxP[i].Type;
-                EditStpt.VxP[i].Range = new(Config.STPT.Points[index].VxP[i].Range);
-                EditStpt.VxP[i].Brng = new(Config.STPT.Points[index].VxP[i].Brng);
-                EditStpt.VxP[i].Elev = new(Config.STPT.Points[index].VxP[i].Elev);
+                EditStpt.VxP[i].Type = stptSrc.VxP[i].Type;
+                EditStpt.VxP[i].Range = new(stptSrc.VxP[i].Range);
+                EditStpt.VxP[i].Brng = new(stptSrc.VxP[i].Brng);
+                EditStpt.VxP[i].Elev = new(stptSrc.VxP[i].Elev);
             }
         }
 
@@ -202,28 +203,29 @@ namespace JAFDTC.UI.F16C
         {
             if (!EditStpt.HasErrors)
             {
-                Config.STPT.Points[index].Number = EditStpt.Number;
-                Config.STPT.Points[index].Name = EditStpt.Name;
-                Config.STPT.Points[index].Lat = EditStpt.Lat;
-                Config.STPT.Points[index].Lon = EditStpt.Lon;
-                Config.STPT.Points[index].Alt = EditStpt.Alt;
+                SteerpointInfo stptDst = Config.STPT.Points[index];
+                stptDst.Number = EditStpt.Number;
+                stptDst.Name = EditStpt.Name;
+                stptDst.Lat = EditStpt.Lat;
+                stptDst.Lon = EditStpt.Lon;
+                stptDst.Alt = EditStpt.Alt;
                 //
                 // TOS field uses text mask and can come back as "--:--:--" when empty. this is really "" and, since
                 // that value is OK, remove the error.
                 //
-                Config.STPT.Points[index].TOS = (EditStpt.TOS == "––:––:––") ? "" : EditStpt.TOS;
+                stptDst.TOS = (EditStpt.TOS == "––:––:––") ? "" : EditStpt.TOS;
 
                 for (int i = 0; i < EditStpt.OAP.Length; i++)
                 {
-                    Config.STPT.Points[index].OAP[i].Type = EditStpt.OAP[i].Type;
-                    Config.STPT.Points[index].OAP[i].Range = EditStpt.OAP[i].Range;
-                    Config.STPT.Points[index].OAP[i].Brng = EditStpt.OAP[i].Brng;
-                    Config.STPT.Points[index].OAP[i].Elev = EditStpt.OAP[i].Elev;
+                    stptDst.OAP[i].Type = EditStpt.OAP[i].Type;
+                    stptDst.OAP[i].Range = EditStpt.OAP[i].Range;
+                    stptDst.OAP[i].Brng = EditStpt.OAP[i].Brng;
+                    stptDst.OAP[i].Elev = EditStpt.OAP[i].Elev;
 
-                    Config.STPT.Points[index].VxP[i].Type = EditStpt.VxP[i].Type;
-                    Config.STPT.Points[index].VxP[i].Range = EditStpt.VxP[i].Range;
-                    Config.STPT.Points[index].VxP[i].Brng = EditStpt.VxP[i].Brng;
-                    Config.STPT.Points[index].VxP[i].Elev = EditStpt.VxP[i].Elev;
+                    stptDst.VxP[i].Type = EditStpt.VxP[i].Type;
+                    stptDst.VxP[i].Range = EditStpt.VxP[i].Range;
+                    stptDst.VxP[i].Brng = EditStpt.VxP[i].Brng;
+                    stptDst.VxP[i].Elev = EditStpt.VxP[i].Elev;
                 }
 
                 if (isPersist)
@@ -494,8 +496,8 @@ namespace JAFDTC.UI.F16C
         {
             PointOfInterest poi = (PointOfInterest)uiPoIComboSelect.SelectedItem;
             EditStpt.Name = poi.Name;
-            EditStpt.LatUI = NavpointInfoBase.ConvertLatDDtoDDM(poi.Latitude);
-            EditStpt.LonUI = NavpointInfoBase.ConvertLonDDtoDDM(poi.Longitude);
+            EditStpt.LatUI = NavpointInfoBase.ConvertFromLatDD(poi.Latitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
+            EditStpt.LonUI = NavpointInfoBase.ConvertFromLonDD(poi.Longitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
             EditStpt.Alt = poi.Elevation.ToString();
             EditStpt.TOS = "";
             EditStpt.ClearErrors();
