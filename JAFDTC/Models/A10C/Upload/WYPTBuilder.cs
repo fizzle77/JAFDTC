@@ -39,7 +39,7 @@ namespace JAFDTC.Models.A10C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public WYPTBuilder(A10CConfiguration cfg, A10CCommands a10c, StringBuilder sb) : base(cfg, a10c, sb) { }
+        public WYPTBuilder(A10CConfiguration cfg, A10CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //

@@ -22,6 +22,9 @@ using System.Text;
 
 namespace JAFDTC.Models.DCS
 {
+    /// <summary>
+    /// TODO: document
+    /// </summary>
     public abstract class BuilderBase
     {
         protected readonly IAirframeDeviceManager _aircraft;

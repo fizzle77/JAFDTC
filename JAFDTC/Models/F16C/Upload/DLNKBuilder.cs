@@ -35,7 +35,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public DLNKBuilder(F16CConfiguration cfg, F16CCommands f16c, StringBuilder sb) : base(cfg, f16c, sb) { }
+        public DLNKBuilder(F16CConfiguration cfg, F16CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //

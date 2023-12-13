@@ -43,7 +43,7 @@ namespace JAFDTC.Models.A10C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public A10CBuilderBase(A10CConfiguration cfg, A10CCommands av8b, StringBuilder sb) : base(av8b, sb)
+        public A10CBuilderBase(A10CConfiguration cfg, A10CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb)
             => (_cfg) = (cfg);
     }
 }

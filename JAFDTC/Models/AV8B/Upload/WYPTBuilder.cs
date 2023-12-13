@@ -34,7 +34,7 @@ namespace JAFDTC.Models.AV8B.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public WYPTBuilder(AV8BConfiguration cfg, AV8BCommands av8b, StringBuilder sb) : base(cfg, av8b, sb) { }
+        public WYPTBuilder(AV8BConfiguration cfg, AV8BCommands _dcsCmds, StringBuilder sb) : base(cfg, _dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //

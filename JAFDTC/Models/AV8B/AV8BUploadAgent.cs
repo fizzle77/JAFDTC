@@ -41,8 +41,7 @@ namespace JAFDTC.Models.AV8B
         /// </summary>
         private class AV8BSetup : BuilderBase
         {
-            public AV8BSetup(AV8BCommands av8b, StringBuilder sb) : base(av8b, sb) { }
-
+            public AV8BSetup(AV8BCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
             public override void Build()
             {
                 AppendCommand(Marker("upload"));
@@ -69,7 +68,7 @@ namespace JAFDTC.Models.AV8B
         // ------------------------------------------------------------------------------------------------------------
 
         private readonly AV8BConfiguration _cfg;
-        private readonly AV8BCommands _av8b;
+        private readonly AV8BCommands _dcsCmds;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -77,7 +76,7 @@ namespace JAFDTC.Models.AV8B
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public AV8BUploadAgent(AV8BConfiguration cfg) => (_cfg, _av8b) = (cfg, new AV8BCommands());
+        public AV8BUploadAgent(AV8BConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new AV8BCommands());
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -92,11 +91,11 @@ namespace JAFDTC.Models.AV8B
         {
             StringBuilder sb = new();
 
-            new AV8BSetup(_av8b, sb).Build();
+            new AV8BSetup(_dcsCmds, sb).Build();
 
-            new WYPTBuilder(_cfg, _av8b, sb).Build();
+            new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
 
-            new AV8BTeardown(_av8b, sb).Build();
+            new AV8BTeardown(_dcsCmds, sb).Build();
 
             if (sb.Length > 0)
             {

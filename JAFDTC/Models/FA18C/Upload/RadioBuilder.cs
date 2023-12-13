@@ -49,7 +49,7 @@ namespace JAFDTC.Models.FA18C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public RadioBuilder(FA18CConfiguration cfg, FA18CCommands f16c, StringBuilder sb) : base(cfg, f16c, sb) { }
+        public RadioBuilder(FA18CConfiguration cfg, FA18CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //

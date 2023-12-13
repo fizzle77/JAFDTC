@@ -39,7 +39,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public STPTBuilder(F16CConfiguration cfg, F16CCommands f16c, StringBuilder sb) : base(cfg, f16c, sb) { }
+        public STPTBuilder(F16CConfiguration cfg, F16CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //

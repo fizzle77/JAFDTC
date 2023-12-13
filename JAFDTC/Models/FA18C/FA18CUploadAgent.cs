@@ -37,7 +37,7 @@ namespace JAFDTC.Models.FA18C
         // ------------------------------------------------------------------------------------------------------------
 
         private readonly FA18CConfiguration _cfg;
-        private readonly FA18CCommands _fa18c;
+        private readonly FA18CCommands _dcsCmds;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -45,7 +45,7 @@ namespace JAFDTC.Models.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public FA18CUploadAgent(FA18CConfiguration cfg) => (_cfg, _fa18c) = (cfg, new FA18CCommands());
+        public FA18CUploadAgent(FA18CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new FA18CCommands());
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -57,8 +57,8 @@ namespace JAFDTC.Models.FA18C
         {
             StringBuilder sb = new();
 
-            new RadioBuilder(_cfg, _fa18c, sb).Build();
-            new WYPTBuilder(_cfg, _fa18c, sb).Build();
+            new RadioBuilder(_cfg, _dcsCmds, sb).Build();
+            new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
 
             if (sb.Length > 0)
             {

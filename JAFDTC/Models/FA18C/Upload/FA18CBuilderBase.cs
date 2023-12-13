@@ -43,7 +43,7 @@ namespace JAFDTC.Models.FA18C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public FA18CBuilderBase(FA18CConfiguration cfg, FA18CCommands fa18c, StringBuilder sb) : base(fa18c, sb)
+        public FA18CBuilderBase(FA18CConfiguration cfg, FA18CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb)
             => (_cfg) = (cfg);
     }
 }

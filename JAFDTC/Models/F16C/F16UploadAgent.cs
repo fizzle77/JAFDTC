@@ -42,7 +42,7 @@ namespace JAFDTC.Models.F16C
         /// </summary>
         private class F16CSetup : BuilderBase
         {
-            public F16CSetup(F16CCommands f16c, StringBuilder sb) : base(f16c, sb) { }
+            public F16CSetup(F16CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
 
             public override void Build()
             {
@@ -65,7 +65,7 @@ namespace JAFDTC.Models.F16C
         /// </summary>
         private class F16CTeardown : BuilderBase
         {
-            public F16CTeardown(F16CCommands f16c, StringBuilder sb) : base(f16c, sb) { }
+            public F16CTeardown(F16CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
 
             public override void Build()
             {
@@ -80,7 +80,7 @@ namespace JAFDTC.Models.F16C
         // ------------------------------------------------------------------------------------------------------------
 
         private readonly F16CConfiguration _cfg;
-        private readonly F16CCommands _f16c;
+        private readonly F16CCommands _dcsCmds;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -88,7 +88,7 @@ namespace JAFDTC.Models.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F16CUploadAgent(F16CConfiguration cfg) => (_cfg, _f16c) = (cfg, new F16CCommands());
+        public F16CUploadAgent(F16CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new F16CCommands());
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -100,22 +100,22 @@ namespace JAFDTC.Models.F16C
         {
             StringBuilder sb = new();
 
-            new F16CSetup(_f16c, sb).Build();
+            new F16CSetup(_dcsCmds, sb).Build();
 
-            new MiscBuilder(_cfg, _f16c, sb).Build();
-            new CMDSBuilder(_cfg, _f16c, sb).Build();
-            new STPTBuilder(_cfg, _f16c, sb).Build();
+            new MiscBuilder(_cfg, _dcsCmds, sb).Build();
+            new CMDSBuilder(_cfg, _dcsCmds, sb).Build();
+            new STPTBuilder(_cfg, _dcsCmds, sb).Build();
             //
             // NOTE: hts must be done before mfd as mfd might set the man threat class which is only
             // NOTE: available if the hts manual table has been set up.
             //
-            new HTSBuilder(_cfg, _f16c, sb).Build();
-            new MFDBuilder(_cfg, _f16c, sb).Build();
-            new HARMBuilder(_cfg, _f16c, sb).Build();
-            new RadioBuilder(_cfg, _f16c, sb).Build();
-            new DLNKBuilder(_cfg, _f16c, sb).Build();
+            new HTSBuilder(_cfg, _dcsCmds, sb).Build();
+            new MFDBuilder(_cfg, _dcsCmds, sb).Build();
+            new HARMBuilder(_cfg, _dcsCmds, sb).Build();
+            new RadioBuilder(_cfg, _dcsCmds, sb).Build();
+            new DLNKBuilder(_cfg, _dcsCmds, sb).Build();
 
-            new F16CTeardown(_f16c, sb).Build();
+            new F16CTeardown(_dcsCmds, sb).Build();
 
             if (sb.Length > 0)
             {

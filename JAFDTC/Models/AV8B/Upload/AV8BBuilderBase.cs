@@ -43,7 +43,7 @@ namespace JAFDTC.Models.AV8B.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public AV8BBuilderBase(AV8BConfiguration cfg, AV8BCommands av8b, StringBuilder sb) : base(av8b, sb)
+        public AV8BBuilderBase(AV8BConfiguration cfg, AV8BCommands _dcsCmds, StringBuilder sb) : base(_dcsCmds, sb)
             => (_cfg) = (cfg);
     }
 }

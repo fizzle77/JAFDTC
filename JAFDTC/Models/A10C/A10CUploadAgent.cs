@@ -41,7 +41,7 @@ namespace JAFDTC.Models.A10C
         /// </summary>
         private class AV8BSetup : BuilderBase
         {
-            public AV8BSetup(A10CCommands a10c, StringBuilder sb) : base(a10c, sb) { }
+            public AV8BSetup(A10CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
 
             public override void Build()
             {
@@ -54,7 +54,7 @@ namespace JAFDTC.Models.A10C
         /// </summary>
         private class AV8BTeardown : BuilderBase
         {
-            public AV8BTeardown(A10CCommands a10c, StringBuilder sb) : base(a10c, sb) { }
+            public AV8BTeardown(A10CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
 
             public override void Build()
             {
@@ -69,7 +69,7 @@ namespace JAFDTC.Models.A10C
         // ------------------------------------------------------------------------------------------------------------
 
         private readonly A10CConfiguration _cfg;
-        private readonly A10CCommands _a10c;
+        private readonly A10CCommands _dcsCmds;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -77,7 +77,7 @@ namespace JAFDTC.Models.A10C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public A10CUploadAgent(A10CConfiguration cfg) => (_cfg, _a10c) = (cfg, new A10CCommands());
+        public A10CUploadAgent(A10CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new A10CCommands());
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -92,11 +92,11 @@ namespace JAFDTC.Models.A10C
         {
             StringBuilder sb = new();
 
-            new AV8BSetup(_a10c, sb).Build();
+            new AV8BSetup(_dcsCmds, sb).Build();
 
-            new WYPTBuilder(_cfg, _a10c, sb).Build();
+            new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
 
-            new AV8BTeardown(_a10c, sb).Build();
+            new AV8BTeardown(_dcsCmds, sb).Build();
 
             if (sb.Length > 0)
             {
