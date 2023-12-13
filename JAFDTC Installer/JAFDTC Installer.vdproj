@@ -102,7 +102,7 @@
         {
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E2453D771C3D4C6FA54C6C57A3E09FE8"
             {
-            "SourcePath" = "8:..\\JAFDTC\\JAFDTC\\Images\\JAFDTC_Icon.ico"
+            "SourcePath" = "8:..\\JAFDTC\\Images\\JAFDTC_Icon.ico"
             "TargetName" = "8:JAFDTC_Icon.ico"
             "Tag" = "8:"
             "Folder" = "8:_317C8FB995AB4638A7906463197DE148"
