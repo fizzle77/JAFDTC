@@ -430,13 +430,8 @@ namespace JAFDTC.UI.Base
         {
             for (int i = 0; i < NavHelper.RadioNames.Count; i++)
             {
-                Visibility viz = Visibility.Collapsed;
-                if (((EditRadio == i) && (EditPresets.Count > 0)) ||
-                    ((EditRadio != i) && (NavHelper.RadioPresetCount(i, Config) > 0)))
-                {
-                    viz = Visibility.Visible;
-                }
-                _radioSelComboIcons[i].Visibility = viz;
+                _radioSelComboIcons[i].Visibility = (NavHelper.RadioModuleIsDefault(Config, i)) ? Visibility.Collapsed
+                                                                                                : Visibility.Visible;
             }
         }
 

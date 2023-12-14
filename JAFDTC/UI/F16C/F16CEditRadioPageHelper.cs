@@ -117,6 +117,19 @@ namespace JAFDTC.UI.F16C
             ((F16CConfiguration)config).Radio.Reset();
         }
 
+        public bool RadioModuleIsDefault(IConfiguration config, int radio)
+        {
+            return radio switch
+            {
+                (int)Radios.COMM1 => ((((F16CConfiguration)config).Radio.Presets[(int)Radios.COMM1].Count == 0) &&
+                                      !((F16CConfiguration)config).Radio.IsCOMM1MonitorGuard &&
+                                      string.IsNullOrEmpty(((F16CConfiguration)config).Radio.COMM1DefaultTuning)),
+                (int)Radios.COMM2 => ((((F16CConfiguration)config).Radio.Presets[(int)Radios.COMM2].Count == 0) &&
+                                      string.IsNullOrEmpty(((F16CConfiguration)config).Radio.COMM2DefaultTuning)),
+                _ => false
+            };
+        }
+
         public bool RadioSysIsDefault(IConfiguration config)
         {
             return ((F16CConfiguration)config).Radio.IsDefault;

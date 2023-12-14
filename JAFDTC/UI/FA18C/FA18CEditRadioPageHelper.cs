@@ -121,6 +121,18 @@ namespace JAFDTC.UI.FA18C
             return ((FA18CConfiguration)config).Radio.IsDefault;
         }
 
+        public bool RadioModuleIsDefault(IConfiguration config, int radio)
+        {
+            return radio switch
+            {
+                (int)Radios.COMM1 => ((((FA18CConfiguration)config).Radio.Presets[(int)Radios.COMM1].Count == 0) &&
+                                      string.IsNullOrEmpty(((FA18CConfiguration)config).Radio.COMM1DefaultTuning)),
+                (int)Radios.COMM2 => ((((FA18CConfiguration)config).Radio.Presets[(int)Radios.COMM2].Count == 0) &&
+                                      string.IsNullOrEmpty(((FA18CConfiguration)config).Radio.COMM2DefaultTuning)),
+                _ => false
+            };
+        }
+
         public bool RadioCanMonitorGuard(int radio)
         {
             return false;

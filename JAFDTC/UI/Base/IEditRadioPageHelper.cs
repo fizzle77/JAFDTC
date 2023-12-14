@@ -66,6 +66,11 @@ namespace JAFDTC.UI.Base
         public bool RadioSysIsDefault(IConfiguration config);
 
         /// <summary>
+        /// returns true if the radio from the radio system in the configuration is currently in a default state.
+        /// </summary>
+        public bool RadioModuleIsDefault(IConfiguration config, int radio);
+
+        /// <summary>
         /// retruns true if the indicated radio (specified by index within RadioNames) can mointor an appropriate
         /// guard frequency.
         /// </summary>
