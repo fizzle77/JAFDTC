@@ -148,11 +148,16 @@ namespace JAFDTC.UI.FA18C
 
         public bool ValidateFrequency(int radio, string freq, bool isNoEValid = true)
         {
-            // TODO: legal freqencies are more complex than >30, <400. fix this at some point...
             return radio switch
             {
-                (int)Radios.COMM1 => BindableObject.IsDecimalFieldValid(freq, 30.0, 400.0, isNoEValid),
-                (int)Radios.COMM2 => BindableObject.IsDecimalFieldValid(freq, 30.0, 400.0, isNoEValid),
+                (int)Radios.COMM1 => BindableObject.IsDecimalFieldValid(freq, 30.0, 87.975, isNoEValid) ||
+                                     BindableObject.IsDecimalFieldValid(freq, 108.0, 115.975, isNoEValid) ||
+                                     BindableObject.IsDecimalFieldValid(freq, 118.0, 173.975, isNoEValid) ||
+                                     BindableObject.IsDecimalFieldValid(freq, 225.0, 399.975, isNoEValid),
+                (int)Radios.COMM2 => BindableObject.IsDecimalFieldValid(freq, 30.0, 87.975, isNoEValid) ||
+                                     BindableObject.IsDecimalFieldValid(freq, 108.0, 115.975, isNoEValid) ||
+                                     BindableObject.IsDecimalFieldValid(freq, 118.0, 173.975, isNoEValid) ||
+                                     BindableObject.IsDecimalFieldValid(freq, 225.0, 399.975, isNoEValid),
                 _ => false,
             };
         }
