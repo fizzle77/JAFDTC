@@ -29,7 +29,7 @@ namespace JAFDTC.Models.F16C.Upload
     /// command builder for the miscellaneous setups in the viper (TACAN/ILS, ALOW, BINDO, LASR, BULLS, and HMCS).
     /// translates cmds setup in F16CConfiguration into commands that drive the dcs clickable cockpit.
     /// </summary>
-    internal class MiscBuilder : F16CBuilderBase
+    internal class MiscBuilder : F16CBuilderBase, IBuilder
     {
         // ------------------------------------------------------------------------------------------------------------
         //

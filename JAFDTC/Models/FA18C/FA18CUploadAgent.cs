@@ -19,16 +19,16 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.FA18C.Upload;
-using JAFDTC.Utilities.Networking;
 using System.Diagnostics;
 using System.Text;
 
 namespace JAFDTC.Models.FA18C
 {
     /// <summary>
-    /// TODO: document
+    /// upload agent responsible for building a stream of commands for use by dcs to set up hornet avionics according
+    /// to a configuration.
     /// </summary>
-    public class FA18CUploadAgent : IUploadAgent
+    public class FA18CUploadAgent : UploadAgentBase, IUploadAgent
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -53,23 +53,10 @@ namespace JAFDTC.Models.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public bool Load()
+        public override void BuildSystems(StringBuilder sb)
         {
-            StringBuilder sb = new();
-
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
-
-            if (sb.Length > 0)
-            {
-                sb.Remove(sb.Length - 1, 1);
-            }
-            string str = sb.ToString();
-            if (str != "")
-            {
-                return DataSender.Send(str);
-            }
-            return true;
         }
     }
 }

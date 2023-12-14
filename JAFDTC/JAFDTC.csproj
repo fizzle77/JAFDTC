@@ -94,7 +94,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\F15E\" />
     <Folder Include="UI\F15E\" />
   </ItemGroup>
 

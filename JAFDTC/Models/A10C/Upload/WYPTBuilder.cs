@@ -31,7 +31,7 @@ namespace JAFDTC.Models.A10C.Upload
     /// command builder for the waypoint system in the warthog. translates cmds setup in F16CConfiguration into
     /// commands that drive the dcs clickable cockpit.
     /// </summary>
-    internal class WYPTBuilder : A10CBuilderBase
+    internal class WYPTBuilder : A10CBuilderBase, IBuilder
     {
         // ------------------------------------------------------------------------------------------------------------
         //

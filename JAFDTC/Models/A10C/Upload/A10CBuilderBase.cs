@@ -27,7 +27,7 @@ namespace JAFDTC.Models.A10C.Upload
     /// abstract base class for the warthog upload functionality. provides functions to support building command
     /// streams.
     /// </summary>
-    internal abstract class A10CBuilderBase : BuilderBase
+    internal abstract class A10CBuilderBase : BuilderBase, IBuilder
     {
         // ------------------------------------------------------------------------------------------------------------
         //

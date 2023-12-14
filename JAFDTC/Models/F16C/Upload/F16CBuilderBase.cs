@@ -27,7 +27,7 @@ namespace JAFDTC.Models.F16C.Upload
     /// abstract base class for the viper upload functionality. provides functions to support building command
     /// streams.
     /// </summary>
-    internal abstract class F16CBuilderBase : BuilderBase
+    internal abstract class F16CBuilderBase : BuilderBase, IBuilder
     {
         // ------------------------------------------------------------------------------------------------------------
         //

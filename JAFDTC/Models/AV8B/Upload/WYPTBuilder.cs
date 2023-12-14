@@ -17,6 +17,7 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.DCS;
 using System.Diagnostics;
 using System.Text;
 
@@ -26,7 +27,7 @@ namespace JAFDTC.Models.AV8B.Upload
     /// command builder for the waypoint system in the harrier. translates cmds setup in F16CConfiguration into
     /// commands that drive the dcs clickable cockpit.
     /// </summary>
-    internal class WYPTBuilder : AV8BBuilderBase
+    internal class WYPTBuilder : AV8BBuilderBase, IBuilder
     {
         // ------------------------------------------------------------------------------------------------------------
         //

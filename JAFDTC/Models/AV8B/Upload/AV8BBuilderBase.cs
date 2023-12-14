@@ -27,7 +27,7 @@ namespace JAFDTC.Models.AV8B.Upload
     /// abstract base class for the harrier upload functionality. provides functions to support building command
     /// streams.
     /// </summary>
-    internal abstract class AV8BBuilderBase : BuilderBase
+    internal abstract class AV8BBuilderBase : BuilderBase, IBuilder
     {
         // ------------------------------------------------------------------------------------------------------------
         //

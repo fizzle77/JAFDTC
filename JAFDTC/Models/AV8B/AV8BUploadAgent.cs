@@ -18,49 +18,17 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.AV8B.Upload;
-using JAFDTC.Models.DCS;
-using JAFDTC.Utilities.Networking;
 using System.Diagnostics;
 using System.Text;
 
 namespace JAFDTC.Models.AV8B
 {
     /// <summary>
-    /// TODO: document
+    /// upload agent responsible for building a stream of commands for use by dcs to set up harrier avionics according
+    /// to a configuration.
     /// </summary>
-    internal class AV8BUploadAgent : IUploadAgent
+    internal class AV8BUploadAgent : UploadAgentBase, IUploadAgent
     {
-        // ------------------------------------------------------------------------------------------------------------
-        //
-        // private classes
-        //
-        // ------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private class AV8BSetup : BuilderBase
-        {
-            public AV8BSetup(AV8BCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
-            public override void Build()
-            {
-                AppendCommand(Marker("upload"));
-            }
-        }
-
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private class AV8BTeardown : BuilderBase
-        {
-            public AV8BTeardown(AV8BCommands av8b, StringBuilder sb) : base(av8b, sb) { }
-
-            public override void Build()
-            {
-                AppendCommand(Marker(""));
-            }
-        }
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -87,26 +55,9 @@ namespace JAFDTC.Models.AV8B
         /// <summary>
         /// TODO: document
         /// </summary>
-        public bool Load()
+        public override void BuildSystems(StringBuilder sb)
         {
-            StringBuilder sb = new();
-
-            new AV8BSetup(_dcsCmds, sb).Build();
-
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
-
-            new AV8BTeardown(_dcsCmds, sb).Build();
-
-            if (sb.Length > 0)
-            {
-                sb.Remove(sb.Length - 1, 1);
-            }
-            string str = sb.ToString();
-            if (str != "")
-            {
-                return DataSender.Send(str);
-            }
-            return true;
         }
     }
 }

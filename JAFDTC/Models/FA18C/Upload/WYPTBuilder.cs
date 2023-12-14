@@ -27,7 +27,7 @@ namespace JAFDTC.Models.FA18C.Upload
     /// <summary>
     /// TODO: document
     /// </summary>
-    internal class WYPTBuilder : FA18CBuilderBase
+    internal class WYPTBuilder : FA18CBuilderBase, IBuilder
     {
         // ------------------------------------------------------------------------------------------------------------
         //

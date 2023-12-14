@@ -31,7 +31,7 @@ namespace JAFDTC.Models.F16C.Upload
     /// command builder for the radio system (com1/com2 uhf/vhf radios) in the viper. translates radio setup in
     /// F16CConfiguration into commands that drive the dcs clickable cockpit.
     /// </summary>
-    internal class RadioBuilder : F16CBuilderBase
+    internal class RadioBuilder : F16CBuilderBase, IBuilder
     {
         // ------------------------------------------------------------------------------------------------------------
         //

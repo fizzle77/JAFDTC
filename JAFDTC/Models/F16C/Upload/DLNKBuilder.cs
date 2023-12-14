@@ -27,7 +27,7 @@ namespace JAFDTC.Models.F16C.Upload
     /// command builder for the datalink system in the viper. translates cmds setup in F16CConfiguration into commands
     /// that drive the dcs clickable cockpit.
     /// </summary>
-    internal class DLNKBuilder : F16CBuilderBase
+    internal class DLNKBuilder : F16CBuilderBase, IBuilder
     {
         // ------------------------------------------------------------------------------------------------------------
         //

@@ -20,16 +20,16 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C.Upload;
-using JAFDTC.Utilities.Networking;
 using System.Diagnostics;
 using System.Text;
 
 namespace JAFDTC.Models.F16C
 {
     /// <summary>
-    /// TODO: document
+    /// upload agent responsible for building a stream of commands for use by dcs to set up viper avionics according
+    /// to a configuration.
     /// </summary>
-    public class F16CUploadAgent : IUploadAgent
+    public class F16CUploadAgent : UploadAgentBase, IUploadAgent
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -38,17 +38,18 @@ namespace JAFDTC.Models.F16C
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// generates the command sequence for setup in the viper.
+        /// generates the command sequence for setup in the viper. this includes making sure the left and right
+        /// hardpoints have power applied.
         /// </summary>
-        private class F16CSetup : BuilderBase
+        private class F16CSetupBuilder : CoreSetupBuilder, IBuilder
         {
-            public F16CSetup(F16CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
+            public F16CSetupBuilder(F16CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
 
             public override void Build()
             {
-                Device sms = _aircraft.GetDevice("SMS");
+                base.Build();
 
-                AppendCommand(Marker("upload"));
+                Device sms = _aircraft.GetDevice("SMS");
 
                 AppendCommand(StartCondition("LeftHdptNotOn"));
                 AppendCommand(sms.GetCommand("LEFT_HDPT"));
@@ -57,19 +58,8 @@ namespace JAFDTC.Models.F16C
                 AppendCommand(StartCondition("RightHdptNotOn"));
                 AppendCommand(sms.GetCommand("RIGHT_HDPT"));
                 AppendCommand(EndCondition("RightHdptNotOn"));
-            }
-        }
 
-        /// <summary>
-        /// generates the command sequence for teardown in the viper.
-        /// </summary>
-        private class F16CTeardown : BuilderBase
-        {
-            public F16CTeardown(F16CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
-
-            public override void Build()
-            {
-                AppendCommand(Marker(""));
+                // TODO: ensure cmds is on?
             }
         }
 
@@ -96,12 +86,8 @@ namespace JAFDTC.Models.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public bool Load()
+        public override void BuildSystems(StringBuilder sb)
         {
-            StringBuilder sb = new();
-
-            new F16CSetup(_dcsCmds, sb).Build();
-
             new MiscBuilder(_cfg, _dcsCmds, sb).Build();
             new CMDSBuilder(_cfg, _dcsCmds, sb).Build();
             new STPTBuilder(_cfg, _dcsCmds, sb).Build();
@@ -114,19 +100,8 @@ namespace JAFDTC.Models.F16C
             new HARMBuilder(_cfg, _dcsCmds, sb).Build();
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new DLNKBuilder(_cfg, _dcsCmds, sb).Build();
-
-            new F16CTeardown(_dcsCmds, sb).Build();
-
-            if (sb.Length > 0)
-            {
-                sb.Remove(sb.Length - 1, 1);
-            }
-            string str = sb.ToString();
-            if (str != "")
-            {
-                return DataSender.Send(str);
-            }
-            return true;
         }
+
+        public override IBuilder SetupBuilder(StringBuilder sb) => new F16CSetupBuilder(_dcsCmds, sb);
     }
 }

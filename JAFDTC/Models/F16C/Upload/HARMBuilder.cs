@@ -29,7 +29,7 @@ namespace JAFDTC.Models.F16C.Upload
     /// command builder for the harm alic system in the viper. translates harm alic setup in F16CConfiguration into
     /// commands that drive the dcs clickable cockpit.
     /// </summary>
-    internal class HARMBuilder : F16CBuilderBase
+    internal class HARMBuilder : F16CBuilderBase, IBuilder
     {
         // ------------------------------------------------------------------------------------------------------------
         //

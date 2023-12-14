@@ -27,7 +27,7 @@ namespace JAFDTC.Models.FA18C.Upload
     /// abstract base class for the hornet upload functionality. provides functions to support building command
     /// streams.
     /// </summary>
-    internal abstract class FA18CBuilderBase : BuilderBase
+    internal abstract class FA18CBuilderBase : BuilderBase, IBuilder
     {
         // ------------------------------------------------------------------------------------------------------------
         //

@@ -25,18 +25,41 @@ namespace JAFDTC.Models.DCS
     /// <summary>
     /// TODO: document
     /// </summary>
-    public abstract class BuilderBase
+    public abstract class BuilderBase : IBuilder
     {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // properties
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
         protected readonly IAirframeDeviceManager _aircraft;
         private readonly StringBuilder _sb;
 
-        public BuilderBase(IAirframeDeviceManager aircraft, StringBuilder sb)
-        {
-            _aircraft = aircraft;
-            _sb = sb;
-        }
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // construction
+        //
+        // ------------------------------------------------------------------------------------------------------------
 
+        public BuilderBase(IAirframeDeviceManager aircraft, StringBuilder sb) => (_aircraft, _sb) = (aircraft, sb);
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // methods
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         public abstract void Build();
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // protected methods
+        //
+        // ------------------------------------------------------------------------------------------------------------
 
         protected void AppendCommand(string s)
         {

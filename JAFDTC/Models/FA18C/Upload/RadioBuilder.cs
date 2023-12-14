@@ -31,7 +31,7 @@ namespace JAFDTC.Models.FA18C.Upload
     /// command builder for the radio system (com1/com2 uhf/vhf radios) in the hornet. translates radio setup in
     /// FA18CConfiguration into commands that drive the dcs clickable cockpit.
     /// </summary>
-    internal class RadioBuilder : FA18CBuilderBase
+    internal class RadioBuilder : FA18CBuilderBase, IBuilder
     {
         private enum ComKnobPresets
         {
