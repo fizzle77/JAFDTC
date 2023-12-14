@@ -252,12 +252,14 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
                            x:Name="uiMiscTextDefaultTitle"
                            VerticalAlignment="Center">
-                    FIXUP Initial Frequency or Preset
+                    FIXUP Initial Frequency/Preset
                 </TextBlock>
                 <TextBox Grid.Column="1" Margin="12,0,0,0"
                          x:Name="uiMiscValueDefaultFreq"
@@ -271,11 +273,24 @@ https://www.gnu.org/licenses/.
                     FIXUP
                 </TextBlock>
                 <CheckBox Grid.Column="4" Margin="24,0,8,0"
-                          x:Name="uiMiscCkbxMonitor"
-                          IsChecked="{x:Bind EditMisc.IsMonitorEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                          x:Name="uiMiscCkbxAux1"
+                          IsChecked="{x:Bind EditMisc.IsAux1Enabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                           VerticalAlignment="Center"
-                          Click="MiscCkbxMonitor_Click">
-                    Monitor UHF Guard Frequency (243.0 MHz)
+                          Click="MiscCkbxAux1_Click">
+                    <TextBlock x:Name="uiMiscTextAux1"
+                               VerticalAlignment="Center">
+                        FIXUP Aux1
+                    </TextBlock>
+                </CheckBox>
+                <CheckBox Grid.Column="6" Margin="24,0,8,0"
+                          x:Name="uiMiscCkbxAux2"
+                          IsChecked="{x:Bind EditMisc.IsAux2Enabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                          VerticalAlignment="Center"
+                          Click="MiscCkbxAux2_Click">
+                    <TextBlock x:Name="uiMiscTextAux2"
+                               VerticalAlignment="Center">
+                        FIXUP Aux2
+                    </TextBlock>
                 </CheckBox>
             </Grid>
         </Grid>

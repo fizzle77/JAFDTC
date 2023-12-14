@@ -133,9 +133,14 @@ namespace JAFDTC.UI.FA18C
             };
         }
 
-        public bool RadioCanMonitorGuard(int radio)
+        public string RadioAux1Title(int radio)
         {
-            return false;
+            return null;
+        }
+
+        public string RadioAux2Title(int radio)
+        {
+            return null;
         }
 
         public int RadioMaxPresets(int radio)
@@ -160,6 +165,7 @@ namespace JAFDTC.UI.FA18C
 
         public bool ValidateFrequency(int radio, string freq, bool isNoEValid = true)
         {
+            // TODO: valid freqs are discrete, not continuous, need to check that as well
             return radio switch
             {
                 (int)Radios.COMM1 => BindableObject.IsDecimalFieldValid(freq, 30.0, 87.975, isNoEValid) ||

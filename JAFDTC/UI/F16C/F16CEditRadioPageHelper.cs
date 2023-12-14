@@ -63,7 +63,7 @@ namespace JAFDTC.UI.F16C
         {
             if (radio == (int)Radios.COMM1)
             {
-                editMisc.IsMonitorEnabled = ((F16CConfiguration)config).Radio.IsCOMM1MonitorGuard;
+                editMisc.IsAux2Enabled = ((F16CConfiguration)config).Radio.IsCOMM1MonitorGuard;
                 editMisc.DefaultTuning = ((F16CConfiguration)config).Radio.COMM1DefaultTuning;
             }
             else if (radio == (int)Radios.COMM2)
@@ -91,7 +91,7 @@ namespace JAFDTC.UI.F16C
         {
             if (radio == (int)Radios.COMM1)
             {
-                ((F16CConfiguration)config).Radio.IsCOMM1MonitorGuard = editMisc.IsMonitorEnabled;
+                ((F16CConfiguration)config).Radio.IsCOMM1MonitorGuard = editMisc.IsAux2Enabled;
                 ((F16CConfiguration)config).Radio.COMM1DefaultTuning = editMisc.DefaultTuning;
             }
             else if (radio == (int)Radios.COMM2)
@@ -135,9 +135,14 @@ namespace JAFDTC.UI.F16C
             return ((F16CConfiguration)config).Radio.IsDefault;
         }
 
-        public bool RadioCanMonitorGuard(int radio)
+        public string RadioAux1Title(int radio)
         {
-            return radio == (int)Radios.COMM1;
+            return null;
+        }
+
+        public string RadioAux2Title(int radio)
+        {
+            return (radio == (int)Radios.COMM1) ? "Monitor Guard (243.0MHz)" : null;
         }
 
         public int RadioMaxPresets(int radio)
@@ -162,6 +167,7 @@ namespace JAFDTC.UI.F16C
 
         public bool ValidateFrequency(int radio, string freq, bool isNoEValid = true)
         {
+            // TODO: valid freqs are discrete, not continuous, need to check that as well
             return radio switch
             {
                 (int)Radios.COMM1 => BindableObject.IsDecimalFieldValid(freq, 225.0, 399.975, isNoEValid),

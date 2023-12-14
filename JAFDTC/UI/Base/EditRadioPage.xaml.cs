@@ -120,15 +120,22 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        private bool _isMonitorEnabled;
-        public bool IsMonitorEnabled
+        private bool _isAux1Enabled;
+        public bool IsAux1Enabled
         {
-            get => _isMonitorEnabled;
-            set => SetProperty(ref _isMonitorEnabled, value, null);
+            get => _isAux1Enabled;
+            set => SetProperty(ref _isAux1Enabled, value, null);
+        }
+
+        private bool _isAux2Enabled;
+        public bool IsAux2Enabled
+        {
+            get => _isAux2Enabled;
+            set => SetProperty(ref _isAux2Enabled, value, null);
         }
 
         public RadioMiscItem(IEditRadioPageHelper helper, int radio)
-            => (NavHelper, Radio, DefaultTuning, IsMonitorEnabled) = (helper, radio, "", false);
+            => (NavHelper, Radio, DefaultTuning, IsAux1Enabled, IsAux2Enabled) = (helper, radio, "", false, false);
     }
 
     /// <summary>
@@ -208,8 +215,9 @@ namespace JAFDTC.UI.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // marshall data between our local radio state and the appropriate preset set in the radio configuration.
-        //
+        /// <summary>
+        /// marshall data between the appropriate preset set in the radio configuration and our local radio state.
+        /// </summary>
         private void CopyConfigToEdit(int radio)
         {
             foreach (RadioPresetItem item in EditPresets)
@@ -226,6 +234,9 @@ namespace JAFDTC.UI.Base
             }
         }
 
+        /// <summary>
+        /// marshall data between our local radio state and the appropriate preset set in the radio configuration.
+        /// </summary>
         private void CopyEditToConfig(int radio, bool isPersist = false)
         {
             if (!CurStateHasErrors() && !EditMisc.HasErrors)
@@ -278,8 +289,9 @@ namespace JAFDTC.UI.Base
             SetFieldValidState(uiMiscValueDefaultFreq, ((List<string>)EditMisc.GetErrors("DefaultTuning")).Count == 0);
         }
 
-        // validation error: update ui state for the various components that may have errors.
-        //
+        /// <summary>
+        /// validation error: update ui state for the various components that may have errors.
+        /// </summary>
         private void PreField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
         {
             RadioPresetItem item = (RadioPresetItem)sender;
@@ -312,8 +324,9 @@ namespace JAFDTC.UI.Base
             RebuildInterfaceState();
         }
 
-        // property changed: rebuild interface state to account for configuration changes.
-        //
+        /// <summary>
+        /// property changed: rebuild interface state to account for configuration changes.
+        /// </summary>
         private void PreField_PropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             if ((args.PropertyName == "Preset") && (EditPresets.Count > 1))
@@ -333,8 +346,9 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // returns true if the current state has errors, false otherwise.
-        //
+        /// <summary>
+        /// returns true if the current state has errors, false otherwise.
+        /// </summary>
         private bool CurStateHasErrors()
         {
             foreach (RadioPresetItem item in EditPresets)
@@ -353,10 +367,12 @@ namespace JAFDTC.UI.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // create a new radio preset and add it to the preset list. the new item is initialized from a preset in the
-        // configuration or natively here. the preset number will be set to +1 beyond max, if that would put it out
-        // of range, we will start to fill unassigned presets. frequency defaults to the lowest valid frequency.
-        //
+        /// <summary>
+        /// create a new radio preset and add it to the preset list. the new item is initialized from a preset in the
+        /// configuration or natively here. the preset number will be set to +1 beyond max, if that would put it out
+        /// of range, we will start to fill unassigned presets. frequency defaults to the lowest valid frequency.
+        /// </summary>
+        /// <param name="radio"></param>
         void AddNewPreset(int radio)
         {
             Int64 mask = 0;
@@ -383,9 +399,10 @@ namespace JAFDTC.UI.Base
             EditPresets.Insert(newIndex, newItem);
         }
 
-        // sort the current list of presets by name in place in the presets list. this is done in place to
-        // avoid changing the EditPresets instance.
-        //
+        /// <summary>
+        /// sort the current list of presets by name in place in the presets list. this is done in place to
+        /// avoid changing the EditPresets instance.
+        /// </summary>
         private void SortPresets()
         {
             var sortableList = new List<RadioPresetItem>(EditPresets);
@@ -396,8 +413,9 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // change the selected cmds program and update various ui and model state.
-        //
+        /// <summary>
+        /// change the selected cmds program and update various ui and model state.
+        /// </summary>
         private void SelectRadio(int radio)
         {
             if (radio != EditRadio)
@@ -409,8 +427,9 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // returns the preset item with the given tag, null if no such item is found.
-        //
+        /// <summary>
+        /// returns the preset item with the given tag, null if no such item is found.
+        /// </summary>
         private RadioPresetItem FindPresetItemByTag(object tag)
         {
             foreach (RadioPresetItem item in EditPresets)
@@ -423,9 +442,10 @@ namespace JAFDTC.UI.Base
             return null;
         }
 
-        // update the "blue dot" state on the radio select menu to show the blue dot when the setup of the
-        // corresponding radio differs from defaults.
-        //
+        /// <summary>
+        /// update the "blue dot" state on the radio select menu to show the blue dot when the setup of the
+        /// corresponding radio differs from defaults.
+        /// </summary>
         private void RebuildRadioSelectMenu()
         {
             for (int i = 0; i < NavHelper.RadioNames.Count; i++)
@@ -435,18 +455,39 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void RebuildLinkControls()
         {
             Utilities.RebuildLinkControls(Config, NavHelper.SystemTag, NavArgs.UIDtoConfigMap,
                                           uiPageBtnTxtLink, uiPageTxtLink);
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void RebuildPerRadioMiscControls()
         {
-            uiMiscCkbxMonitor.Visibility = (NavHelper.RadioCanMonitorGuard(EditRadio)) ? Visibility.Visible
-                                                                                       : Visibility.Collapsed;
+            if (string.IsNullOrEmpty(NavHelper.RadioAux1Title(EditRadio)))
+            {
+                uiMiscCkbxAux1.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                uiMiscCkbxAux1.Visibility = Visibility.Visible;
+                uiMiscTextAux1.Text = NavHelper.RadioAux1Title(EditRadio);
+            }
+
+            if (string.IsNullOrEmpty(NavHelper.RadioAux2Title(EditRadio)))
+            {
+                uiMiscCkbxAux2.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                uiMiscCkbxAux2.Visibility = Visibility.Visible;
+                uiMiscTextAux2.Text = NavHelper.RadioAux2Title(EditRadio);
+            }
 
             if (string.IsNullOrEmpty(EditMisc.DefaultTuning) || EditMisc.HasErrors)
             {
@@ -461,12 +502,13 @@ namespace JAFDTC.UI.Base
                 uiMiscTextDefaultLabel.Text = "MHz";
             }
 
-            uiMiscTextDefaultTitle.Text = $"COM {EditRadio + 1} Initial Frequency or Preset";
+            uiMiscTextDefaultTitle.Text = $"COM {EditRadio + 1} Initial Frequency / Preset";
         }
 
-        // update the enable state on the ui elements based on the current settings. link controls must be set up
-        // vi RebuildLinkControls() prior to calling this function.
-        //
+        /// <summary>
+        /// update the enable state on the ui elements based on the current settings. link controls must be set up via
+        /// RebuildLinkControls() prior to calling this function.
+        /// </summary>
         private void RebuildEnableState()
         {
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(NavHelper.SystemTag));
@@ -484,7 +526,8 @@ namespace JAFDTC.UI.Base
             Utilities.SetEnableState(uiBarExport, isEditable && (EditPresets.Count > 0));
 
             Utilities.SetEnableState(uiMiscValueDefaultFreq, isEditable);
-            Utilities.SetEnableState(uiMiscCkbxMonitor, isEditable);
+            Utilities.SetEnableState(uiMiscCkbxAux1, isEditable);
+            Utilities.SetEnableState(uiMiscCkbxAux2, isEditable);
 
             bool isDefault = NavHelper.RadioSysIsDefault(Config) && (EditPresets.Count == 0);
             Utilities.SetEnableState(uiPageBtnResetAll, !isDefault);
@@ -497,8 +540,9 @@ namespace JAFDTC.UI.Base
             Utilities.SetEnableState(uiRadPrevBtn, (isNoErrs && (EditRadio > 0)));
         }
 
-        // rebuild the state of controls on the page in response to a change in the configuration.
-        //
+        /// <summary>
+        /// rebuild the state of controls on the page in response to a change in the configuration.
+        /// </summary>
         private void RebuildInterfaceState()
         {
             if (!IsRebuildPending)
@@ -525,8 +569,9 @@ namespace JAFDTC.UI.Base
 
         // ---- page buttons ------------------------------------------------------------------------------------------
 
-        // reset all button click: reset all cmds settings back to their defaults.
-        //
+        /// <summary>
+        /// reset all button click: reset all cmds settings back to their defaults.
+        /// </summary>
         private async void PageBtnResetAll_Click(object sender, RoutedEventArgs args)
         {
             ContentDialogResult result = await Utilities.Message2BDialog(
@@ -544,7 +589,9 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
         {
             string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, NavHelper.SystemTag,
@@ -566,7 +613,9 @@ namespace JAFDTC.UI.Base
 
         // ---- commands ----------------------------------------------------------------------------------------------
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void CmdAdd_Click(object sender, RoutedEventArgs args)
         {
             // TODO: scroll to visible after adding new preset?
@@ -574,39 +623,48 @@ namespace JAFDTC.UI.Base
             CopyEditToConfig(EditRadio, true);
         }
 
-        // TODO: implement
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private async void CmdImport_Click(object sender, RoutedEventArgs args)
         {
+            // TODO: implement
             await Utilities.Message1BDialog(Content.XamlRoot, "Sad Trombone", "Not yet supported, you'll have to do it the old-fashioned way...");
         }
 
-        // TODO: implement
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private async void CmdExport_Click(object sender, RoutedEventArgs args)
         {
+            // TODO: implement
             await Utilities.Message1BDialog(Content.XamlRoot, "Sad Trombone", "Not yet supported, you'll have to do it the old-fashioned way...");
         }
 
         // ---- radio selection ---------------------------------------------------------------------------------------
 
-        // previous radio button click: advance to the previous radio.
-        //
+        /// <summary>
+        /// previous radio button click: advance to the previous radio.
+        /// </summary>
         private void RadBtnPrev_Click(object sender, RoutedEventArgs args)
         {
             SelectRadio(EditRadio - 1);
             uiRadSelectCombo.SelectedIndex = EditRadio;
         }
 
-        // next radio button click: advance to the next radio.
-        //
+        /// <summary>
+        /// next radio button click: advance to the next radio.
+        /// </summary>
         private void RadBtnNext_Click(object sender, RoutedEventArgs args)
         {
             SelectRadio(EditRadio + 1);
             uiRadSelectCombo.SelectedIndex = EditRadio;
         }
 
-        // radio select combo click: switch to the selected radio. the tag of the sender (a TextBlock) gives us the
-        // radio number to select.
-        //
+        /// <summary>
+        /// radio select combo click: switch to the selected radio. the tag of the sender (a TextBlock) gives us the
+        /// radio number to select.
+        /// </summary>
         private void RadSelectCombo_SelectionChanged(object sender, RoutedEventArgs args)
         {
             Grid item = (Grid)((ComboBox)sender).SelectedItem;
@@ -619,20 +677,35 @@ namespace JAFDTC.UI.Base
 
         // ---- miscellaneous controls --------------------------------------------------------------------------------
 
-        // monitor guard check: copy the local backing values to the configuration.
-        //
-        private void MiscCkbxMonitor_Click(object sender, RoutedEventArgs args)
+        /// <summary>
+        /// aux checkbox 1 click: copy the local backing values to the configuration.
+        /// </summary>
+        private void MiscCkbxAux1_Click(object sender, RoutedEventArgs args)
         {
             // HACK: x:Bind doesn't work with bools? seems that way? this is a hack.
             //
             CheckBox cbox = (CheckBox)sender;
-            EditMisc.IsMonitorEnabled = (bool)cbox.IsChecked;
+            EditMisc.IsAux1Enabled = (bool)cbox.IsChecked;
+            CopyEditToConfig(EditRadio, true);
+        }
+
+        /// <summary>
+        /// aux checkbox 2 click: copy the local backing values to the configuration.
+        /// </summary>
+        private void MiscCkbxAux2_Click(object sender, RoutedEventArgs args)
+        {
+            // HACK: x:Bind doesn't work with bools? seems that way? this is a hack.
+            //
+            CheckBox cbox = (CheckBox)sender;
+            EditMisc.IsAux2Enabled = (bool)cbox.IsChecked;
             CopyEditToConfig(EditRadio, true);
         }
 
         // ---- preset list -------------------------------------------------------------------------------------------
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void PreBntDelete_Click(object sender, RoutedEventArgs args)
         {
             Button btn = (Button)sender;
@@ -646,12 +719,13 @@ namespace JAFDTC.UI.Base
 
         // ---- text field changes ------------------------------------------------------------------------------------
 
-        // text box lost focus: copy the local backing values to the configuration (note this is predicated on error
-        // status) and save (which will rebuild the interface state).
-        //
-        // NOTE: though the text box has lost focus, the update may not yet have propagated into state. use the
-        // NOTE: dispatch queue to give in-flight state updates time to complete.
-        //
+        /// <summary>
+        /// text box lost focus: copy the local backing values to the configuration (note this is predicated on error
+        /// status) and save (which will rebuild the interface state).
+        ///
+        /// NOTE: though the text box has lost focus, the update may not yet have propagated into state. use the
+        /// NOTE: dispatch queue to give in-flight state updates time to complete.
+        /// </summary>
         private void PageTextBox_LostFocus(object sender, RoutedEventArgs args)
         {
             // CONSIDER: may be better here to handle this in a property changed handler rather than here?
@@ -667,18 +741,20 @@ namespace JAFDTC.UI.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // configuration saved: rebuild interface state to align with the latest save.
-        //
+        /// <summary>
+        /// configuration saved: rebuild interface state to align with the latest save.
+        /// </summary>
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
         {
             RebuildInterfaceState();
         }
 
-        // on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
-        // we are editing.
-        //
-        // we do not use page caching here as we're just tracking the configuration state.
-        //
+        /// <summary>
+        /// on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
+        /// we are editing.
+        /// 
+        /// we do not use page caching here as we're just tracking the configuration state.
+        /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;

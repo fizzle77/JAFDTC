@@ -71,10 +71,16 @@ namespace JAFDTC.UI.Base
         public bool RadioModuleIsDefault(IConfiguration config, int radio);
 
         /// <summary>
-        /// retruns true if the indicated radio (specified by index within RadioNames) can mointor an appropriate
-        /// guard frequency.
+        /// retruns the string title to use on the indicated radio (specified by index within RadioNames) can for the
+        /// "aux 1" miscellaneous checkbox control, null if no such control is desired.
         /// </summary>
-        public bool RadioCanMonitorGuard(int radio);
+        public string RadioAux1Title(int radio);
+
+        /// <summary>
+        /// retruns the string title to use on the indicated radio (specified by index within RadioNames) can for the
+        /// "aux 2" miscellaneous checkbox control, null if no such control is desired.
+        /// </summary>
+        public string RadioAux2Title(int radio);
 
         /// <summary>
         /// returns the number of presets available to the indicated radio (specified by index within RadioNames).
