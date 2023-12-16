@@ -76,9 +76,7 @@ https://www.gnu.org/licenses/.
                     <TextBlock Text="AH-64D Apache" Tag="2"/>
                     <TextBlock Text="AV-8B Harrier" Tag="3"/>
                     -->
-                    <!--
                     <TextBlock Text="F-15E Strike Eagle" Tag="4"/>
-                    -->
                     <TextBlock Text="F-16C Viper" Tag="5"/>
                     <TextBlock Text="F/A-18C Hornet" Tag="6"/>
                     <!--

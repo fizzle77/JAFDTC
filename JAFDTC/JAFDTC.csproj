@@ -94,10 +94,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UI\F15E\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PRIResource Remove="Models\F16C\COMM\**" />
   </ItemGroup>
 

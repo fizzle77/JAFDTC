@@ -20,6 +20,7 @@
 
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.AV8B;
+using JAFDTC.Models.F15E;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.FA18C;
 using JAFDTC.Utilities;
@@ -249,7 +250,7 @@ namespace JAFDTC.Models
                 AirframeTypes.A10C  => new A10CConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
                 AirframeTypes.AH64D => null,
                 AirframeTypes.AV8B  => new AV8BConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
-                AirframeTypes.F15E  => null,
+                AirframeTypes.F15E  => new F15EConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
                 AirframeTypes.F16C  => new F16CConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
                 AirframeTypes.FA18C => new FA18CConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
                 AirframeTypes.None  => null,
@@ -271,7 +272,7 @@ namespace JAFDTC.Models
                     AirframeTypes.A10C  => JsonSerializer.Deserialize<A10CConfiguration>(json),
                     AirframeTypes.AH64D => null,
                     AirframeTypes.AV8B  => JsonSerializer.Deserialize<AV8BConfiguration>(json),
-                    AirframeTypes.F15E  => null,
+                    AirframeTypes.F15E  => JsonSerializer.Deserialize<F15EConfiguration>(json),
                     AirframeTypes.F16C  => JsonSerializer.Deserialize<F16CConfiguration>(json),
                     AirframeTypes.FA18C => JsonSerializer.Deserialize<FA18CConfiguration>(json),
                     AirframeTypes.None  => null,
