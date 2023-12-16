@@ -100,15 +100,24 @@ namespace JAFDTC.UI.Base
 
         /// <summary>
         /// returns true if the preset string is valid for the indicated radio (specified by index within
-        /// RadioNames).
+        /// RadioNames), false otherwise. the isNoEValid parameter determines if null or empty values are considered
+        /// valid.
         /// </summary>
         public bool ValidatePreset(int radio, string preset, bool isNoEValid = true);
 
         /// <summary>
         /// returns true if the frequency string is valid for the indicated radio (specified by index within
-        /// RadioNames).
+        /// RadioNames), false otherwise. the isNoEValid parameter determines if null or empty values are considered
+        /// valid.
         /// </summary>
         public bool ValidateFrequency(int radio, string freq, bool isNoEValid = true);
+
+        /// <summary>
+        /// returns the value to use for the default tuning for the indicated radio (specified by index within
+        /// RadioNames), null otherwise. the isNoEValid parameter determines if null or empty values are considered
+        /// valid (note that if they are, a null input will return empty string). 
+        /// </summary>
+        public string ValidateDefaultTuning(int radio, string value, bool isNoEValid = true);
 
         /// <summary>
         /// TODO: document

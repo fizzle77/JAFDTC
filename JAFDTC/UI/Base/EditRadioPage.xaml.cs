@@ -106,14 +106,11 @@ namespace JAFDTC.UI.Base
             get => _defaultTuning;
             set
             {
-                string error = "Invalid frequency";
-                if (NavHelper.ValidateFrequency(Radio, value))
+                string error = "Invalid default tuning";
+                string newValue = NavHelper.ValidateDefaultTuning(Radio, value);
+                if (newValue != null)
                 {
-                    value = NavHelper.FixupFrequency(Radio, value);
-                    error = null;
-                }
-                else if (NavHelper.ValidatePreset(Radio, value))
-                {
+                    value = newValue;
                     error = null;
                 }
                 SetProperty(ref _defaultTuning, value, error);

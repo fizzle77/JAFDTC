@@ -178,6 +178,19 @@ namespace JAFDTC.UI.F16C
             };
         }
 
+        public string ValidateDefaultTuning(int radio, string value, bool isNoEValid = true)
+        {
+            if (ValidateFrequency(radio, value, isNoEValid))
+            {
+                return FixupFrequency(radio, value);
+            }
+            else if (ValidatePreset(radio, value, isNoEValid))
+            {
+                return value;
+            }
+            return null;
+        }
+
         public string FixupPreset(int radio, string preset)
         {
             return BindableObject.FixupIntegerField(preset);
