@@ -221,6 +221,7 @@ namespace JAFDTC.Utilities
                 AirframeTypes.F16C => Path.Combine(_settingsDirPath, "Configs", "F16C"),
                 AirframeTypes.FA18C => Path.Combine(_settingsDirPath, "Configs", "FA18C"),
                 AirframeTypes.M2000C => Path.Combine(_settingsDirPath, "Configs", "M2000C"),
+                AirframeTypes.F14AB => Path.Combine(_settingsDirPath, "Configs", "F14AB"),
                 _ => Path.Combine(_settingsDirPath, "Configs"),
             };
         }

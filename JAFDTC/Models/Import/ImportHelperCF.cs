@@ -46,17 +46,19 @@ namespace JAFDTC.Models.Import
 
         private bool IsMatchingAirframe(string airframe)
         {
-            switch (Airframe)
+            return Airframe switch
             {
-                case AirframeTypes.None: return false;
-                case AirframeTypes.A10C: return false;
-                case AirframeTypes.AH64D: return false;
-                case AirframeTypes.AV8B: return false;
-                case AirframeTypes.F15E: return false;
-                case AirframeTypes.F16C: return (airframe == "F-16C_50");
-                case AirframeTypes.FA18C: return false;
-                default: return false;
-            }
+                AirframeTypes.None => false,
+                AirframeTypes.A10C => (airframe == "A-10C_2"),
+                AirframeTypes.AH64D => (airframe == "AH-64D_BLK_II"),
+                AirframeTypes.AV8B => (airframe == "AV8BNA"),
+                AirframeTypes.F15E => (airframe == "F-15ESE"),
+                AirframeTypes.F16C => (airframe == "F-16C_50"),
+                AirframeTypes.FA18C => (airframe == "FA-18C_hornet"),
+                AirframeTypes.M2000C => (airframe == "M-2000C"),
+                AirframeTypes.F14AB => (airframe == "F-14A-135-GR") || (airframe == "F-14B"),
+                _ => false,
+            };
         }
 
         public override List<string> Flights()

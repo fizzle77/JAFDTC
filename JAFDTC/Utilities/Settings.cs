@@ -90,6 +90,8 @@ namespace JAFDTC.Utilities
                 [AirframeTypes.F15E] = 80,
                 [AirframeTypes.F16C] = 200,
                 [AirframeTypes.FA18C] = 200,
+                [AirframeTypes.M2000C] = 200,
+                [AirframeTypes.F14AB] = 200,
             };
         }
     }

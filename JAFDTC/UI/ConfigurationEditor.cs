@@ -127,6 +127,8 @@ namespace JAFDTC.UI
                 AirframeTypes.F16C => new F16CConfigurationEditor(),
                 AirframeTypes.F15E => new F15EConfigurationEditor(),
                 AirframeTypes.FA18C => new FA18CConfigurationEditor(),
+                AirframeTypes.M2000C => null,
+                AirframeTypes.F14AB => null,
                 _ => null,
             };
         }

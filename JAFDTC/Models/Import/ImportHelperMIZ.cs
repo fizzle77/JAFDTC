@@ -56,13 +56,14 @@ namespace JAFDTC.Models.Import
             return Airframe switch
             {
                 AirframeTypes.None => false,
-                AirframeTypes.A10C => false,
-                AirframeTypes.AH64D => false,
-                AirframeTypes.AV8B => false,
-                AirframeTypes.F15E => false,
+                AirframeTypes.A10C => (airframe == "A-10C_2"),
+                AirframeTypes.AH64D => (airframe == "AH-64D_BLK_II"),
+                AirframeTypes.AV8B => (airframe == "AV8BNA"),
+                AirframeTypes.F15E => (airframe == "F-15ESE"),
                 AirframeTypes.F16C => (airframe == "F-16C_50"),
-                AirframeTypes.FA18C => false,
-                AirframeTypes.M2000C => false,
+                AirframeTypes.FA18C => (airframe == "FA-18C_hornet"),
+                AirframeTypes.M2000C => (airframe == "M-2000C"),
+                AirframeTypes.F14AB => (airframe == "F-14A-135-GR") || (airframe == "F-14B"),
                 _ => false,
             };
         }
