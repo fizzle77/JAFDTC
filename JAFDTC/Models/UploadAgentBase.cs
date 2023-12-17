@@ -103,7 +103,7 @@ namespace JAFDTC.Models
             string str = sb.ToString();
             if (str != "")
             {
-                return DataSender.Send(str);
+                return CockpitCmdTx.Send(str);
             }
             return true;
         }

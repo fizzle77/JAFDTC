@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// DataSender.cs -- tcp tx path
+// CockpitCmdTx.cs -- cockpit command tcp tx path
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
 // Copyright(C) 2023 ilominar/raven
@@ -25,14 +25,15 @@ using System.Net.Sockets;
 namespace JAFDTC.Utilities.Networking
 {
     /// <summary>
-    /// support for sending command sequences to dcs to drive the cockpit controls used to set up the avionics on
-    /// the jet.
+    /// supports sending command sequences to dcs to drive the cockpit controls necessary to set up the avionics on
+    /// the jet according to a configuration.
     /// </summary>
-    internal sealed class DataSender
+    internal sealed class CockpitCmdTx
     {
-        // send a command string to dcs through the tcp connection with the lua export functionality. returns
-        // true on success, false on failure.
-        //
+        /// <summary>
+        /// send a command string to dcs through the tcp connection with the lua export functionality. returns
+        /// true on success, false on failure.
+        /// </summary>
         public static bool Send(string str)
         {
             try
