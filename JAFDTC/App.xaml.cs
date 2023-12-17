@@ -130,18 +130,18 @@ namespace JAFDTC
             {
                 if ((DateTimeOffset.Now - LastDCSExportCheck) > TimeSpan.FromSeconds(1.0))
                 {
-                    if (_isDCSExporting && (DataReceiver.NumPackets == LastDCSExportPacketCount))
+                    if (_isDCSExporting && (TelemDataRx.Instance.NumPackets == LastDCSExportPacketCount))
                     {
                         DCSActiveAirframe = AirframeTypes.None;
                         _isDCSExporting = false;
                         OnPropertyChanged(nameof(IsDCSExporting));
                     }
-                    else if(!_isDCSExporting && (DataReceiver.NumPackets != LastDCSExportPacketCount))
+                    else if(!_isDCSExporting && (TelemDataRx.Instance.NumPackets != LastDCSExportPacketCount))
                     {
                         _isDCSExporting = true;
                         OnPropertyChanged(nameof(IsDCSExporting));
                     }
-                    LastDCSExportPacketCount = DataReceiver.NumPackets;
+                    LastDCSExportPacketCount = TelemDataRx.Instance.NumPackets;
                 }
                 LastDCSExportCheck = DateTimeOffset.Now;
                 return _isDCSExporting;
@@ -197,7 +197,8 @@ namespace JAFDTC
                 ["F15E"] = AirframeTypes.F15E,
                 ["F16CM"] = AirframeTypes.F16C,
                 ["FA18C"] = AirframeTypes.FA18C,
-                ["M2000C"] = AirframeTypes.M2000C
+                ["M2000C"] = AirframeTypes.M2000C,
+                ["F14AB"] = AirframeTypes.F14AB
             };
 
             try
@@ -210,8 +211,8 @@ namespace JAFDTC
                 IsJAFDTCPinnedToTop = Settings.IsAlwaysOnTop;
                 IsUploadInFlight = false;
 
-                DataReceiver.DataReceived += DataReceiver_DataReceived;
-                DataReceiver.Start();
+                TelemDataRx.Instance.TelemDataReceived += TelemDataReceiver_DataReceived;
+                TelemDataRx.Instance.Start();
 
                 CheckDCSTimer = new DispatcherTimer();
                 CheckDCSTimer.Tick += CheckDCSTimer_Tick;
@@ -256,7 +257,7 @@ namespace JAFDTC
         /// process markers from the dcs event stream. play a sound to indicate uploading has started or ended based
         /// on the marker. actions are carried out on the main thread via dispatch.
         /// </summary>
-        private void ProcessMarker(DataReceiver.Data data)
+        private void ProcessMarker(TelemDataRx.TelemData data)
         {
             if (!IsUploadInFlight && !string.IsNullOrEmpty(data.Marker))
             {
@@ -282,7 +283,7 @@ namespace JAFDTC
         /// process upload commands from the dcs event stream. triggers a configuration upload once the upload button
         /// has been pressed for the specified amount of time.
         /// </summary>
-        private void ProcessUploadCommand(DataReceiver.Data data)
+        private void ProcessUploadCommand(TelemDataRx.TelemData data)
         {
             if (IsUploadInFlight)
             {
@@ -318,7 +319,7 @@ namespace JAFDTC
         /// process the pin/unpin commands from the dcs event stream. these change the order of the window stack
         /// to keep jafdtc always on top or allow it to be lowered into the background.
         /// </summary>
-        private void ProcessWindowStackCommand(DataReceiver.Data data)
+        private void ProcessWindowStackCommand(TelemDataRx.TelemData data)
         {
             bool isUpdateWindowLayer = false;
             if (data.ToggleJAFDTC == "1")
@@ -353,7 +354,7 @@ namespace JAFDTC
         /// process the increment and decrement commands from the dcs event stream. these change the currently selected
         /// configuration and (optionally) inform the user of the new configuration.
         /// </summary>
-        private void ProcessIncrDecrCommands(DataReceiver.Data data)
+        private void ProcessIncrDecrCommands(TelemDataRx.TelemData data)
         {
             if (!IncPressed && (data.Increment == "1"))
             {
@@ -383,10 +384,10 @@ namespace JAFDTC
         }
 
         /// <summary>
-        /// handle an inbound data packet from dcs. this packet provides information on which airframe is curerently
-        /// active, state of the dtc, and cockpit control state that we use to trigger dtc actions.
+        /// handle an inbound telemetry data packet from dcs. this packet provides information on which airframe is
+        /// curerently active, state of the dtc, and cockpit control state that we use to trigger dtc actions.
         /// </summary>
-        private void DataReceiver_DataReceived(DataReceiver.Data data)
+        private void TelemDataReceiver_DataReceived(TelemDataRx.TelemData data)
         {
             if (Window != null)
             {
