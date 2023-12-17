@@ -46,6 +46,8 @@ namespace JAFDTC.UI.App
 
         public bool IsAppOnTop { get; set; }
 
+        public bool IsNewVersCheckDisabled { get; set; }
+
         public bool IsLuaInstallRequested { get; set; }
         
         public bool ISLuaUninstallRequested { get; set; }
@@ -57,12 +59,14 @@ namespace JAFDTC.UI.App
             WingName = Settings.WingName;
             Callsign = Settings.Callsign;
             IsAppOnTop = Settings.IsAlwaysOnTop;
+            IsNewVersCheckDisabled = Settings.IsNewVersCheckDisabled;
             IsLuaInstallRequested = false;
             ISLuaUninstallRequested = false;
 
             uiSetValueWingName.Text = WingName;
             uiSetValueCallsign.Text = Callsign;
             uiSetCkbxRemainOnTop.IsChecked = IsAppOnTop;
+            uiSetCkbxVersionCheck.IsChecked = !IsNewVersCheckDisabled;
 
             if (DCSLuaManager.IsLuaInstalled())
             {
@@ -100,6 +104,15 @@ namespace JAFDTC.UI.App
             if (ckbox != null)
             {
                 IsAppOnTop = (bool)ckbox.IsChecked;
+            }
+        }
+
+        private void SetCkbxVersionCheck_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox ckbox = (CheckBox)sender;
+            if (ckbox != null)
+            {
+                IsNewVersCheckDisabled = !(bool)ckbox.IsChecked;
             }
         }
 

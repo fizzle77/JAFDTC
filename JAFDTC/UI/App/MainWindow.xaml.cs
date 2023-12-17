@@ -25,6 +25,8 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using Windows.Foundation;
 using Windows.Graphics;
@@ -290,8 +292,18 @@ namespace JAFDTC.UI.App
         {
             if ((Application.Current as JAFDTC.App).IsAppStartupGood)
             {
-                Sploosh(DCSLuaManager.LuaCheck());
                 ConfigListPage.ConfigFilterBox = uiAppConfigFilterBox;
+
+                Sploosh(DCSLuaManager.LuaCheck());
+
+                if (Settings.IsVersionUpdated)
+                {
+                    await Utilities.Message1BDialog(Content.XamlRoot, "Welcome to JAFDTC!", $"Version {Settings.VersionJAFDTC}");
+                }
+                else if (!Settings.IsNewVersCheckDisabled)
+                {
+                    CheckForUpdates();
+                }
             }
             else
             {
@@ -302,8 +314,9 @@ namespace JAFDTC.UI.App
         }
 
         /// <summary>
-        /// internal splash sequencing that installs or updates lua and displays the splash screen on new versions.
-        /// before calling, use DCSLuaManager.LuaCheck() to determine the current situation with lua.
+        /// internal sequencing for use at splash (and changes to lua installations) that that installs or updates lua
+        /// on new versions. before calling, use DCSLuaManager.LuaCheck() to determine the current situation with lua,
+        /// the result of this check is passed in through the parameter.
         /// </summary>
         public async void Sploosh(DCSLuaManagerCheckResult result)
         {
@@ -376,12 +389,86 @@ namespace JAFDTC.UI.App
                 }
             }
 
-            if (Settings.IsVersionUpdated)
+            ConfigListPage.RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// check for, and process, jafdtc updates. if there is a new version, and user wants to pull it, download
+        /// from github.
+        /// </summary>
+        private async void CheckForUpdates()
+        {
+            string githubVersion = Globals.VersionJAFDTC;
+            try
             {
-                await Utilities.Message1BDialog(Content.XamlRoot, "Welcome to JAFDTC!", $"Version v{Settings.VersionJAFDTC}");
+                using HttpClient client = new();
+                githubVersion = await client.GetStringAsync("https://raw.githubusercontent.com/51st-Vfw/JAFDTC/main/VERSION.txt");
+            }
+            catch (System.Exception ex)
+            {
+                FileManager.Log($"MainWindow:CheckForUpdates get version exception {ex}");
             }
 
-            ConfigListPage.RebuildInterfaceState();
+            if ((githubVersion != Settings.SkipJAFDTCVersion) && (githubVersion != Globals.VersionJAFDTC))
+            {
+                ContentDialogResult actionUpdate = await Utilities.Message3BDialog(
+                    Content.XamlRoot,
+                    $"New Version Available",
+                    $"JAFDTC version {githubVersion} and its release notes are available on GitHub at\n\n" +
+                    $"    https://github.com/51st-Vfw/JAFDTC/releases/tag/{githubVersion}\n\n" +
+                    $"JAFDTC can download the installer package to your “Downloads” folder now if you would like.",
+                    $"Download",
+                    $"Skip This Version",
+                    $"Later");
+                if (actionUpdate == ContentDialogResult.Primary)
+                {
+                    try
+                    {
+                        string url = $"https://github.com/51st-Vfw/JAFDTC/releases/download/{githubVersion}/JAFDTC.Installer.msi";
+                        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                                                   "Downloads", "JAFDTC.Installer.msi");
+
+                        ContentDialogResult actionReplace = ContentDialogResult.Primary;
+                        if (File.Exists(path))
+                        {
+                            actionReplace = await Utilities.Message2BDialog(
+                                Content.XamlRoot,
+                                $"JAFDTC Package Exists",
+                                $"There is already a “JAFDTC.Installer.msi” file in your Downloads folder. Would you like to replace it?",
+                                $"Replace",
+                                $"Cancel Download");
+                        }
+
+                        if (actionReplace == ContentDialogResult.Primary)
+                        {
+                            FileManager.Log($"MainWindow:CheckForUpdates {url} --> {path}");
+
+                            using HttpClient client = new();
+                            Stream msiStream = await client.GetStreamAsync(url);
+
+                            using FileStream fileStream = new(path, FileMode.Create);
+                            await msiStream.CopyToAsync(fileStream);
+
+                            string msg = $"JAFDTC {githubVersion} package successfully copied to your Downloads folder, " +
+                                         $"please install it at your convenience.";
+                            await Utilities.Message1BDialog(Content.XamlRoot, "Qapla'!", msg);
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        FileManager.Log($"MainWindow:CheckForUpdates get .msi exception {ex}");
+
+                        await Utilities.Message1BDialog(
+                            Content.XamlRoot,
+                            "Sad Trombone",
+                            "Unable to download latest JAFDTC package for reasons mysterious. Maybe try again later?");
+                    }
+                }
+                else if (actionUpdate == ContentDialogResult.Secondary)
+                {
+                    Settings.SkipJAFDTCVersion = githubVersion;
+                }
+            }
         }
     }
 }

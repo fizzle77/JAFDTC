@@ -26,7 +26,8 @@ using System.Diagnostics;
 namespace JAFDTC.Utilities
 {
     /// <summary>
-    /// class underlying settings data. an instance of this class is persisted to storage.
+    /// class underlying jafdtc settings data. an instance of this class is serialized/deserialized to storage to
+    /// persist the settings.
     /// </summary>
     public sealed class SettingsData
     {
@@ -38,9 +39,11 @@ namespace JAFDTC.Utilities
 
         public string VersionJAFDTC { get; set; }
 
+        public string SkipJAFDTCVersion { get; set; }
+
         public bool IsSkipDCSLuaInstall { get; set; }
-        
-        public Dictionary<string, DCSLuaManager.DCSLuaVersion> VersionDCSLua { get; set; }
+
+        public Dictionary<string, DCSLuaManager.DCSLuaVersion> VersionDCSLua { get; }
 
         public int LastAirframeSelection { get; set; }
 
@@ -52,11 +55,13 @@ namespace JAFDTC.Utilities
 
         public bool IsAlwaysOnTop { get; set; }
 
-        public int TCPPortTx { get; set; }
-        
-        public int UDPPortRx { get; set; }
+        public bool IsNewVersCheckDisabled { get; set; }
 
-        public Dictionary<AirframeTypes, int> CommandDelaysMs { get; set; }
+        public int TCPPortTx { get; }
+        
+        public int UDPPortRx { get; }
+
+        public Dictionary<AirframeTypes, int> CommandDelaysMs { get; }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -67,6 +72,7 @@ namespace JAFDTC.Utilities
         public SettingsData()
         {
             VersionJAFDTC = "";
+            SkipJAFDTCVersion = "";
 
             IsSkipDCSLuaInstall = false;
             VersionDCSLua = new Dictionary<string, DCSLuaManager.DCSLuaVersion>();
@@ -76,8 +82,10 @@ namespace JAFDTC.Utilities
             WingName = "";
             Callsign = "";
             IsAlwaysOnTop = false;
+            IsNewVersCheckDisabled = false;
 
-            // NOTE: these need to be kept in sync with corresponding port number values in Lua.
+            // NOTE: the tx/rx ports need to be kept in sync with corresponding port numbers in Lua and cannot be
+            // NOTE: changed without corresponding changes to the Lua files. they are readonly here.
             //
             TCPPortTx = 42001;
             UDPPortRx = 42002;
@@ -97,7 +105,8 @@ namespace JAFDTC.Utilities
     }
     
 	/// <summary>
-    /// TODO: document
+    /// wrapper class to provide access to jafdtc settings to interested parties. prior to any access to the settings,
+    /// the Preflight() function should be called.
     /// </summary>
     public static class Settings
 	{
@@ -109,6 +118,8 @@ namespace JAFDTC.Utilities
 
         public static bool IsVersionUpdated { get; set; }
 
+        // ---- private properties
+
         private static SettingsData _currentSettings = null;
 
         // ------------------------------------------------------------------------------------------------------------
@@ -116,14 +127,33 @@ namespace JAFDTC.Utilities
         // accessors for settings
         //
         // ------------------------------------------------------------------------------------------------------------
-        
+
+        // these accessors wrap the current settings object we track here. set accessors implicitly update the
+        // persistent settings file via FileManager.WriteSettings() on changes.
+
         public static string VersionJAFDTC
-		{
-			get => _currentSettings.VersionJAFDTC;
-			set
-			{
-				_currentSettings.VersionJAFDTC = value;
-                FileManager.WriteSettings(_currentSettings);
+        {
+            get => _currentSettings.VersionJAFDTC;
+            set
+            {
+                if (_currentSettings.VersionJAFDTC != value)
+                {
+                    _currentSettings.VersionJAFDTC = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static string SkipJAFDTCVersion
+        {
+            get => _currentSettings.SkipJAFDTCVersion;
+            set
+            {
+                if (_currentSettings.SkipJAFDTCVersion != value)
+                {
+                    _currentSettings.SkipJAFDTCVersion = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
             }
         }
 
@@ -132,8 +162,11 @@ namespace JAFDTC.Utilities
             get => _currentSettings.IsSkipDCSLuaInstall;
             set
             {
-                _currentSettings.IsSkipDCSLuaInstall = value;
-                FileManager.WriteSettings(_currentSettings);
+                if (_currentSettings.IsSkipDCSLuaInstall != value)
+                {
+                    _currentSettings.IsSkipDCSLuaInstall = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
             }
         }
 
@@ -144,8 +177,11 @@ namespace JAFDTC.Utilities
 
         public static void SetVersionDCSLua(string key, DCSLuaManager.DCSLuaVersion version)
         {
-            _currentSettings.VersionDCSLua[key] = version;
-            FileManager.WriteSettings(_currentSettings);
+            if (!_currentSettings.VersionDCSLua.ContainsKey(key) || (_currentSettings.VersionDCSLua[key] != version))
+            {
+                _currentSettings.VersionDCSLua[key] = version;
+                FileManager.WriteSettings(_currentSettings);
+            }
         }
 
         public static string WingName
@@ -153,8 +189,11 @@ namespace JAFDTC.Utilities
             get => _currentSettings.WingName;
             set
             {
-                _currentSettings.WingName = value;
-                FileManager.WriteSettings(_currentSettings);
+                if (_currentSettings.WingName != value)
+                {
+                    _currentSettings.WingName = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
             }
         }
 
@@ -163,8 +202,11 @@ namespace JAFDTC.Utilities
             get => _currentSettings.Callsign;
             set
             {
-                _currentSettings.Callsign = value;
-                FileManager.WriteSettings(_currentSettings);
+                if (_currentSettings.Callsign != value)
+                {
+                    _currentSettings.Callsign = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
             }
         }
 
@@ -173,18 +215,37 @@ namespace JAFDTC.Utilities
             get => _currentSettings.IsAlwaysOnTop;
             set
             {
-                _currentSettings.IsAlwaysOnTop = value;
-                FileManager.WriteSettings(_currentSettings);
+                if (_currentSettings.IsAlwaysOnTop != value)
+                {
+                    _currentSettings.IsAlwaysOnTop = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
             }
         }
 
+        public static bool IsNewVersCheckDisabled
+        {
+            get => _currentSettings.IsNewVersCheckDisabled;
+            set
+            {
+                if (_currentSettings.IsNewVersCheckDisabled != value)
+                {
+                    _currentSettings.IsNewVersCheckDisabled = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+        
         public static int LastAirframeSelection
         {
             get => _currentSettings.LastAirframeSelection;
             set
             {
-                _currentSettings.LastAirframeSelection = value;
-                FileManager.WriteSettings(_currentSettings);
+                if (_currentSettings.LastAirframeSelection != value)
+                {
+                    _currentSettings.LastAirframeSelection = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
             }
         }
 
@@ -193,29 +254,22 @@ namespace JAFDTC.Utilities
             get => _currentSettings.LastConfigSelection;
             set
             {
-                _currentSettings.LastConfigSelection = value;
-                FileManager.WriteSettings(_currentSettings);
+                if (_currentSettings.LastConfigSelection != value)
+                {
+                    _currentSettings.LastConfigSelection = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
             }
         }
 
         public static int TCPPortTx
 		{
 			get => _currentSettings.TCPPortTx;
-			set
-			{
-				_currentSettings.TCPPortTx = value;
-                FileManager.WriteSettings(_currentSettings);
-            }
         }
 
 		public static int UDPPortRx
 		{
 			get => _currentSettings.UDPPortRx;
-			set
-			{
-				_currentSettings.UDPPortRx = value;
-                FileManager.WriteSettings(_currentSettings);
-            }
         }
 
         public static Dictionary<AirframeTypes, int> CommandDelaysMs
@@ -229,21 +283,26 @@ namespace JAFDTC.Utilities
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // TODO: document
+        /// <summary>
+        /// prepare the settings manager for use in the application by reading the settings from the settings file.
+        /// if the version has changed, make a note so we can report the update later. this function is typically
+        /// called exactly once prior to any access to the settings.
+        /// </summary>
         public static void Preflight()
         {
             Settings.IsVersionUpdated = false;
 
             _currentSettings = FileManager.ReadSettings();
 
-            // TODO: handle settings version updates here if necessary...
-
             if (Settings.VersionJAFDTC != Globals.VersionJAFDTC)
             {
+                // TODO: handle any updates to the settings necessitated by the version change
+
                 Settings.IsVersionUpdated = true;
                 Settings.IsSkipDCSLuaInstall = false;
+                Settings.SkipJAFDTCVersion = "";
+                Settings.VersionJAFDTC = Globals.VersionJAFDTC;
             }
-            Settings.VersionJAFDTC = VersionJAFDTC;
         }
 	}
 }

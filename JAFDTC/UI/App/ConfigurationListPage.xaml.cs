@@ -597,18 +597,13 @@ namespace JAFDTC.UI.App
                 }
                 Settings.IsSkipDCSLuaInstall = false;
             }
-            if ((result == ContentDialogResult.Primary) && (Settings.WingName != dialog.WingName))
+            if (result == ContentDialogResult.Primary)
             {
                 Settings.WingName = dialog.WingName;
-            }
-            if ((result == ContentDialogResult.Primary) && (Settings.Callsign != dialog.Callsign))
-            {
                 Settings.Callsign = dialog.Callsign;
-            }
-            if ((result == ContentDialogResult.Primary) && (Settings.IsAlwaysOnTop != dialog.IsAppOnTop))
-            {
                 Settings.IsAlwaysOnTop = dialog.IsAppOnTop;
                 ((OverlappedPresenter)CurApp.Window.AppWindow.Presenter).IsAlwaysOnTop = Settings.IsAlwaysOnTop;
+                Settings.IsNewVersCheckDisabled = dialog.IsNewVersCheckDisabled;
             }
             RebuildInterfaceState();
         }
@@ -627,7 +622,7 @@ namespace JAFDTC.UI.App
                              $"On borrowed time until ED releases their native solution (2 weeks!)...\n" +
                              $"\n" +
                              $"A Raven / 51st VFW fork";
-            await Utilities.Message1BDialog(Content.XamlRoot, $"JAFDTC v{Settings.VersionJAFDTC}", content);
+            await Utilities.Message1BDialog(Content.XamlRoot, $"JAFDTC {Settings.VersionJAFDTC}", content);
         }
 
         // ---- configuration list ------------------------------------------------------------------------------------
