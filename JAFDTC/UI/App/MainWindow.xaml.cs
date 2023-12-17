@@ -28,6 +28,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Graphics;
 
@@ -293,23 +294,21 @@ namespace JAFDTC.UI.App
             if ((Application.Current as JAFDTC.App).IsAppStartupGood)
             {
                 ConfigListPage.ConfigFilterBox = uiAppConfigFilterBox;
-
+                if (!Settings.IsNewVersCheckDisabled)
+                {
+                    await CheckForUpdates();
+                }
                 Sploosh(DCSLuaManager.LuaCheck());
-
                 if (Settings.IsVersionUpdated)
                 {
                     await Utilities.Message1BDialog(Content.XamlRoot, "Welcome to JAFDTC!", $"Version {Settings.VersionJAFDTC}");
-                }
-                else if (!Settings.IsNewVersCheckDisabled)
-                {
-                    CheckForUpdates();
                 }
             }
             else
             {
                 uiAppConfigFilterBox.IsEnabled = false;
                 await Utilities.Message1BDialog(Content.XamlRoot, "Bad Joss Captain...",
-                                                "Unable to launch JAFDTC due to a fatal error");
+                                                "Unable to launch JAFDTC due to a fatal error and reasons...");
             }
         }
 
@@ -394,9 +393,9 @@ namespace JAFDTC.UI.App
 
         /// <summary>
         /// check for, and process, jafdtc updates. if there is a new version, and user wants to pull it, download
-        /// from github.
+        /// from github. returns the version string for the latest version.
         /// </summary>
-        private async void CheckForUpdates()
+        private async Task<string> CheckForUpdates()
         {
             string githubVersion = Globals.VersionJAFDTC;
             try
@@ -469,6 +468,7 @@ namespace JAFDTC.UI.App
                     Settings.SkipJAFDTCVersion = githubVersion;
                 }
             }
+            return githubVersion;
         }
     }
 }
