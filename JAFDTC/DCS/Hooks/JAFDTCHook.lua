@@ -118,8 +118,11 @@ end
 function JAFDTCHook:sendToJAFDTC()
     local str = "["
     for k,v in pairs(self.coordList) do
-        local json = '{"latitude":"' .. v.latitude .. '", "longitude":"' .. v.longitude .. '", "elevation":"' .. v.elevation .. '", "target":"' .. tostring(v.target) .. '"}'
+        local json = '{"Latitude":"' .. v.latitude .. '", "Longitude":"' .. v.longitude .. '", "Elevation":"' .. v.elevation .. '", "IsTarget":' .. tostring(v.target) .. '}'
         str = str .. json .. ","
+    end
+    if str ~= "[" then
+        str = str:sub(1,-2)
     end
     str = str .. "]"
     self:sendData(str)

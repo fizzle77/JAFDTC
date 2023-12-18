@@ -44,11 +44,11 @@ namespace JAFDTC.Utilities.Networking
         /// </summary>
         public class WyptCaptureData
         {
-            public string Latitude { get; set; }            // latitude of capture (TBD)
+            public string Latitude { get; set; }            // latitude of capture (dd)
 
-            public string Longitude { get; set; }           // longitude of capture (TBD)
+            public string Longitude { get; set; }           // longitude of capture (dd)
 
-            public string Elevation { get; set; }           // elevation of capture (TBD)
+            public string Elevation { get; set; }           // elevation of capture (ft)
 
             public bool IsTarget { get; set; }              // true => capture is a target point
         }
@@ -59,7 +59,7 @@ namespace JAFDTC.Utilities.Networking
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public static event Action<WyptCaptureData[]> WyptCaptureDataReceived;
+        public event Action<WyptCaptureData[]> WyptCaptureDataReceived;
 
         // ---- private properties
 
