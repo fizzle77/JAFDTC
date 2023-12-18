@@ -29,7 +29,7 @@ local JAFDTCHook =
     coordList = {},
 
     udpSocket = nil,
-    udpPort = 42002
+    udpPort = 42003
 }
 
 function JAFDTCHook:log(str)
@@ -134,18 +134,18 @@ function JAFDTCHook:createDialog()
     local x = (screenWidth / 2) - 19
     local y = (screenHeight / 2) - 19
 
-    self.dialog = DialogLoader.spawnDialogFromFile(lfs.writedir() .. "Scripts\\JAFDTC\\waypointCapture.dlg")
+    self.dialog = DialogLoader.spawnDialogFromFile(lfs.writedir() .. "Scripts\\JAFDTC\\WaypointCapture.dlg")
     self.dialog:setVisible(true)
     self.dialog:setBounds(math.floor(x), math.floor(y), self.dialogWidth, self.dialogHeight)
     self.dialog:addHotKeyCallback(
-        "Ctrl+Shift+d",
+        "Ctrl+Shift+j",
         function()
             self:toggle()
         end
     )
 
     self.dialog:addHotKeyCallback(
-        "Ctrl+Shift+s",
+        "Ctrl+Shift+r",
         function()
             self:createDialog()
         end
