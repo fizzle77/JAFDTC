@@ -57,9 +57,11 @@ namespace JAFDTC.Utilities
 
         public bool IsNewVersCheckDisabled { get; set; }
 
-        public int TCPPortTx { get; }
+        public int TCPPortCmdTx { get; }
         
-        public int UDPPortRx { get; }
+        public int UDPPortTelRx { get; }
+
+        public int UDPPortCapRx { get; }
 
         public Dictionary<AirframeTypes, int> CommandDelaysMs { get; }
 
@@ -87,8 +89,9 @@ namespace JAFDTC.Utilities
             // NOTE: the tx/rx ports need to be kept in sync with corresponding port numbers in Lua and cannot be
             // NOTE: changed without corresponding changes to the Lua files. they are readonly here.
             //
-            TCPPortTx = 42001;
-            UDPPortRx = 42002;
+            TCPPortCmdTx = 42001;               // clickable cockpit commands to dcs
+            UDPPortTelRx = 42002;               // telemetry from dcs
+            UDPPortCapRx = 42003;               // waypoint capture from dcs
 
             CommandDelaysMs = new Dictionary<AirframeTypes, int>()
             {
@@ -262,14 +265,19 @@ namespace JAFDTC.Utilities
             }
         }
 
-        public static int TCPPortTx
+        public static int TCPPortCmdTx
 		{
-			get => _currentSettings.TCPPortTx;
+			get => _currentSettings.TCPPortCmdTx;
         }
 
-		public static int UDPPortRx
-		{
-			get => _currentSettings.UDPPortRx;
+        public static int UDPPortTelRx
+        {
+            get => _currentSettings.UDPPortTelRx;
+        }
+
+        public static int UDPPortCapRx
+        {
+            get => _currentSettings.UDPPortCapRx;
         }
 
         public static Dictionary<AirframeTypes, int> CommandDelaysMs

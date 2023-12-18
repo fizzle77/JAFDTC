@@ -38,7 +38,7 @@ namespace JAFDTC.Utilities.Networking
         {
             try
             {
-                using TcpClient tcpClient = new("127.0.0.1", Settings.TCPPortTx);
+                using TcpClient tcpClient = new("127.0.0.1", Settings.TCPPortCmdTx);
                 using NetworkStream ns = tcpClient.GetStream();
                 using StreamWriter sw = new(ns);
                 string data = "[" + str + "]";

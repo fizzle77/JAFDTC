@@ -100,7 +100,7 @@ namespace JAFDTC.Utilities.Networking
 
         public void Start()
 		{
-			_socket.StartReceiving("127.0.0.1", Settings.UDPPortRx, (string s) =>
+			_socket.StartReceiving("127.0.0.1", Settings.UDPPortTelRx, (string s) =>
 			{
                 TelemData data = JsonSerializer.Deserialize<TelemData>(s);
 				if (data != null)
