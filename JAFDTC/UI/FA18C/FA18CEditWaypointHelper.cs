@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.FA18C
 {
@@ -118,6 +119,19 @@ namespace JAFDTC.UI.FA18C
                 wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(poi.Latitude, NavpointInfoBase.LLFormat.DDM_P2ZF);
                 wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(poi.Longitude, NavpointInfoBase.LLFormat.DDM_P2ZF);
                 wyptDst.Alt = poi.Elevation.ToString();
+                wyptDst.ClearErrors();
+            }
+        }
+
+        public void ApplyCapture(INavpointInfo edit, WyptCaptureData wypt)
+        {
+            if (wypt != null)
+            {
+                WaypointInfo wyptDst = (WaypointInfo)edit;
+                wyptDst.Name = "DCS Capture";
+                wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(wypt.Latitude, NavpointInfoBase.LLFormat.DDM_P2ZF);
+                wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(wypt.Longitude, NavpointInfoBase.LLFormat.DDM_P2ZF);
+                wyptDst.Alt = wypt.Elevation.ToString();
                 wyptDst.ClearErrors();
             }
         }

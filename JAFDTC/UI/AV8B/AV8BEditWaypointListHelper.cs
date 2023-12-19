@@ -29,6 +29,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.UI.Xaml.Controls;
+using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.AV8B
 {
@@ -126,6 +127,11 @@ namespace JAFDTC.UI.AV8B
         public string ExportNavpoints(IConfiguration config)
         {
             return ((AV8BConfiguration)config).WYPT.SerializeNavpoints();
+        }
+
+        public void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
+        {
+            // TODO: implement
         }
 
         public object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt)

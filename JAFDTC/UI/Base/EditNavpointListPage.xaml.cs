@@ -22,6 +22,7 @@ using JAFDTC.Models.Base;
 using JAFDTC.Models.Import;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
+using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -38,6 +39,9 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
+
+using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
+using Microsoft.UI.Dispatching;
 
 namespace JAFDTC.UI.Base
 {
@@ -74,6 +78,8 @@ namespace JAFDTC.UI.Base
 
         private bool IsMarshalling { get; set; }
 
+        private int CaptureIndex { get; set; }
+
         // ---- read-only properties
 
         private readonly Dictionary<string, string> _configNameToUID;
@@ -101,8 +107,9 @@ namespace JAFDTC.UI.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // marshall data between our local state and the steerpoint configuration.
-        //
+        /// <summary>
+        /// marshall data from the configuration navpoint system to the local edit state.
+        /// </summary>
         private void CopyConfigToEdit()
         {
             IsMarshalling = true;
@@ -110,6 +117,9 @@ namespace JAFDTC.UI.Base
             IsMarshalling = false;
         }
 
+        /// <summary>
+        /// marshall data from the local edit state to the configuration navpoint system.
+        /// </summary>
         private void CopyEditToConfig(bool isPersist = false)
         {
             IsMarshalling = true;
@@ -126,8 +136,9 @@ namespace JAFDTC.UI.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // launch the proper detail page to edit the specified navpoint.
-        //
+        /// <summary>
+        /// launch the proper detail page to edit the specified navpoint.
+        /// </summary>
         private void EditNavpoint(INavpointInfo navpt)
         {
             CopyEditToConfig(true);
@@ -136,8 +147,9 @@ namespace JAFDTC.UI.Base
                                 new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
         }
 
-        // renumber waypoints sequentially starting from StartingNavptNum.
-        //
+        /// <summary>
+        /// renumber waypoints sequentially starting from StartingNavptNum.
+        /// </summary>
         private void RenumberWaypoints()
         {
             for (int i = 0; i < EditNavpt.Count; i++)
@@ -147,15 +159,18 @@ namespace JAFDTC.UI.Base
             CopyEditToConfig(true);
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void RebuildLinkControls()
         {
             Utilities.RebuildLinkControls(Config, NavHelper.SystemTag, NavArgs.UIDtoConfigMap, uiPageBtnTxtLink, uiPageTxtLink);
         }
 
-        // update the enable state on the ui elements based on the current settings. link controls must be set up
-        // vi RebuildLinkControls() prior to calling this function.
-        //
+        /// <summary>
+        /// update the enable state on the ui elements based on the current settings. link controls must be set up
+        /// vi RebuildLinkControls() prior to calling this function.
+        /// </summary>
         private void RebuildEnableState()
         {
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(NavHelper.SystemTag));
@@ -166,7 +181,8 @@ namespace JAFDTC.UI.Base
             Utilities.SetEnableState(uiBarPaste, isEditable && IsClipboardValid);
             Utilities.SetEnableState(uiBarDelete, isEditable && (uiNavptListView.SelectedItems.Count > 0));
 
-            Utilities.SetEnableState(uiBarImport, isEditable && (EditNavpt.Count > 0));
+            Utilities.SetEnableState(uiBarCapture, isEditable);
+            Utilities.SetEnableState(uiBarImport, isEditable);
             Utilities.SetEnableState(uiBarExport, isEditable && (EditNavpt.Count > 0));
             Utilities.SetEnableState(uiBarRenumber, isEditable && (EditNavpt.Count > 0));
 
@@ -178,8 +194,9 @@ namespace JAFDTC.UI.Base
             uiNavptListView.ReorderMode = (isEditable) ? ListViewReorderMode.Enabled : ListViewReorderMode.Disabled;
         }
 
-        // rebuild the state of controls on the page in response to a change in the configuration.
-        //
+        /// <summary>
+        /// rebuild the state of controls on the page in response to a change in the configuration.
+        /// </summary>
         private void RebuildInterfaceState()
         {
             RebuildLinkControls();
@@ -194,8 +211,9 @@ namespace JAFDTC.UI.Base
 
         // ---- buttons -----------------------------------------------------------------------------------------------
 
-        // reset all button click: remove all steerpoints from the configuration and save it.
-        //
+        /// <summary>
+        /// reset all button click: remove all steerpoints from the configuration and save it.
+        /// </summary>
         private async void PageBtnResetAll_Click(object sender, RoutedEventArgs e)
         {
             ContentDialog dialog = new()
@@ -216,7 +234,9 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
         {
             string selItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, NavHelper.SystemTag, _configNameList);
@@ -237,8 +257,9 @@ namespace JAFDTC.UI.Base
 
         // ---- command bar / commands --------------------------------------------------------------------------------
 
-        // open navpoint button or context menu edit click: open the selected navpoint.
-        //
+        /// <summary>
+        /// open navpoint button or context menu edit click: open the selected navpoint.
+        /// </summary>
         private void CmdOpen_Click(object sender, RoutedEventArgs args)
         {
             if (uiNavptListView.SelectedItem is INavpointInfo navpt)
@@ -247,8 +268,9 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // add navpoint: append a new navpoint and save the configuration.
-        //
+        /// <summary>
+        /// add navpoint: append a new navpoint and save the configuration.
+        /// </summary>
         private void CmdAdd_Click(object sender, RoutedEventArgs args)
         {
             NavHelper.AddNavpoint(Config);
@@ -256,18 +278,20 @@ namespace JAFDTC.UI.Base
             CopyConfigToEdit();
         }
 
-        // copy button or context menu copy click: serialize the selected navpoint to json and put the text on the
-        // clipboard.
-        //
+        /// <summary>
+        /// copy button or context menu copy click: serialize the selected navpoint to json and put the text on the
+        /// clipboard.
+        /// </summary>
         private void CmdCopy_Click(object sender, RoutedEventArgs args)
         {
             General.DataToClipboard(NavHelper.NavptListTag,
                                     JsonSerializer.Serialize(uiNavptListView.SelectedItems, Configuration.JsonOptions));
         }
 
-        // paste button: deserialize the navpoints on the clipboard from json and append them to the end of the
-        // navpoint list.
-        //
+        /// <summary>
+        /// paste button: deserialize the navpoints on the clipboard from json and append them to the end of the
+        /// navpoint list.
+        /// </summary>
         private async void CmdPaste_Click(object sender, RoutedEventArgs args)
         {
             ClipboardData cboard = await General.ClipboardDataAsync();
@@ -279,9 +303,10 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // delete button or context menu edit click: delete the selected waypoint(s), clear the selection, renumber
-        // the remaining waypoints, and save the updated configuration.
-        //
+        /// <summary>
+        /// delete button or context menu edit click: delete the selected waypoint(s), clear the selection, renumber
+        /// the remaining waypoints, and save the updated configuration.
+        /// </summary>
         private async void CmdDelete_Click(object sender, RoutedEventArgs args)
         {
             Debug.Assert(uiNavptListView.SelectedItems.Count > 0);
@@ -308,9 +333,10 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // renumber button click: prompt the user for the new starting navpoint number, renumber the navpoints and
-        // save the updated configuration.
-        //
+        /// <summary>
+        /// renumber button click: prompt the user for the new starting navpoint number, renumber the navpoints and
+        /// save the updated configuration.
+        /// </summary>
         private async void CmdRenumber_Click(object sender, RoutedEventArgs args)
         {
             GetNumberDialog dialog = new(null, null, 1, 700)
@@ -328,7 +354,60 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private async void CmdCapture_Click(object sender, RoutedEventArgs args)
+        {
+            ContentDialogResult result = ContentDialogResult.Primary;
+            if (EditNavpt.Count > 0)
+            {
+                result = await Utilities.Message2BDialog(
+                    Content.XamlRoot,
+                    $"Capture {NavHelper.NavptName} from DCS",
+                    $"Would you like to append coordiantes captured from DCS to the end of the " +
+                    $"{NavHelper.NavptName.ToLower()} list or replace starting from the current selection?",
+                    $"Append",
+                    $"Replace");
+            }
+            if (result == ContentDialogResult.Primary)
+            {
+                CaptureIndex = EditNavpt.Count;
+            }
+            else
+            {
+                CaptureIndex = (uiNavptListView.SelectedIndex >= 0) ? uiNavptListView.SelectedIndex : 0;
+            }
+
+            CopyEditToConfig(true);
+
+            WyptCaptureDataRx.Instance.WyptCaptureDataReceived += CmdCapture_WyptCaptureDataReceived;
+            await Utilities.Message1BDialog(
+                Content.XamlRoot,
+                $"Capturing {NavHelper.NavptName} in DCS",
+                $"From DCS, type [CTRL]-[SHIFT]-J to show the coordinate selection dialog, then move the crosshair over " +
+                $"the desired point in the F10 map. Click “Done” below when finished.",
+                $"Done");
+            WyptCaptureDataRx.Instance.WyptCaptureDataReceived -= CmdCapture_WyptCaptureDataReceived;
+
+            CopyConfigToEdit();
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void CmdCapture_WyptCaptureDataReceived(WyptCaptureData[] wypts)
+        {
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+            {
+                NavHelper.CaptureNavpoints(Config, wypts, CaptureIndex);
+            });
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private async void CmdImport_Click(object sender, RoutedEventArgs args)
         {
             try
@@ -420,9 +499,10 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // export command: prompt the user for a path to save the waypoints to, then serialize the waypoints and
-        // save them to the requested file.
-        //
+        /// <summary>
+        /// export command: prompt the user for a path to save the waypoints to, then serialize the waypoints and
+        /// save them to the requested file.
+        /// </summary>
         private async void CmdExport_Click(object sender, RoutedEventArgs args)
         {
             try
@@ -453,15 +533,17 @@ namespace JAFDTC.UI.Base
 
         // ---- navigation point list ---------------------------------------------------------------------------------
 
-        // steerpoint list selection change: update ui state to be consistent.
-        //
+        /// <summary>
+        /// steerpoint list selection change: update ui state to be consistent.
+        /// </summary>
         private void NavptList_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
             RebuildInterfaceState();
         }
 
-        // steerpoint list right click: bring up the steerpoint context menu to select from.
-        //
+        /// <summary>
+        /// steerpoint list right click: bring up the steerpoint context menu to select from.
+        /// </summary>
         private void NavptList_RightTapped(object sender, RightTappedRoutedEventArgs args)
         {
             ListView listView = (ListView)sender;
@@ -492,8 +574,9 @@ namespace JAFDTC.UI.Base
             uiNavptListCtxMenuFlyout.ShowAt(listView, args.GetPosition(listView));
         }
 
-        // steertpoint list double click: open the selected steerpoint in the editor.
-        //
+        /// <summary>
+        /// steertpoint list double click: open the selected steerpoint in the editor.
+        /// </summary>
         private void NavptList_DoubleTapped(object sender, RoutedEventArgs args)
         {
             if (uiNavptListView.SelectedItems.Count > 0)
@@ -508,8 +591,9 @@ namespace JAFDTC.UI.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // check for clipboard content changes and update state as necessary.
-        //
+        /// <summary>
+        /// check for clipboard content changes and update state as necessary.
+        /// </summary>
         private async void ClipboardChangedHandler(object sender, object args)
         {
             ClipboardData cboard = await General.ClipboardDataAsync();
@@ -517,8 +601,9 @@ namespace JAFDTC.UI.Base
             RebuildInterfaceState();
         }
 
-        // when collection changes, renumber. just in case.
-        //
+        /// <summary>
+        /// when collection changes, renumber. just in case.
+        /// </summary>
         private void CollectionChangedHandler(object sender, NotifyCollectionChangedEventArgs args)
         {
             // TODO: this is a bit of a hack since there's no clear way to know when a re-order via drag has completed
@@ -531,7 +616,9 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void WindowActivatedHandler(object sender, WindowActivatedEventArgs args)
         {
             if ((args.WindowActivationState == WindowActivationState.PointerActivated) ||
@@ -547,19 +634,20 @@ namespace JAFDTC.UI.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // on configuration saved, pull changes from the config if the save was done by someone else. rebuild the
-        // interface state to align with the latest save (assuming we go here through a CopyEditToConfig).
-        //
+        /// <summary>
+        /// on configuration saved, pull changes from the config if the save was done by someone else. rebuild the
+        /// interface state to align with the latest save (assuming we go here through a CopyEditToConfig).
+        /// </summary>
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
         {
             RebuildInterfaceState();
         }
 
-        // on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
-        // we are editing.
-        //
-        // we do not use page caching here as we're just tracking the configuration state.
-        //
+        /// <summary>
+        /// on navigating to this page, set up our internal and ui state based on the configuration we are editing.
+        ///
+        /// we do not use page caching here as we're just tracking the configuration state.
+        /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
@@ -588,6 +676,10 @@ namespace JAFDTC.UI.Base
             base.OnNavigatedTo(args);
         }
 
+        /// <summary>
+        /// on navigating from this page, tear down our internal and ui state based on the configuration we are
+        /// editing.
+        /// </summary>
         protected override void OnNavigatedFrom(NavigationEventArgs args)
         {
             Config.ConfigurationSaved -= ConfigurationSavedHandler;

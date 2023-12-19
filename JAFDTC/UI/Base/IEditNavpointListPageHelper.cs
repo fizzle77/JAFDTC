@@ -23,6 +23,7 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.Base
 {
@@ -97,6 +98,11 @@ namespace JAFDTC.UI.Base
         /// TODO: document
         /// </summary>
         public string ExportNavpoints(IConfiguration config);
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex);
 
         /// <summary>
         /// return an object to use as the argument to the navpoint editor. this object is passed in through the

@@ -30,6 +30,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
+using JAFDTC.Models.A10C;
 
 namespace JAFDTC.UI.FA18C
 {
@@ -127,6 +129,35 @@ namespace JAFDTC.UI.FA18C
         public string ExportNavpoints(IConfiguration config)
         {
             return ((FA18CConfiguration)config).WYPT.SerializeNavpoints();
+        }
+
+        public void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
+        {
+            // TODO: implement target points
+            WYPTSystem wyptSys = ((FA18CConfiguration)config).WYPT;
+            for (int i = 0; i < wypts.Length; i++)
+            {
+                if (!wypts[i].IsTarget && (startIndex < wyptSys.Count))
+                {
+                    wyptSys.Points[startIndex].Name = $"WP{i + 1} DCS Capture";
+                    wyptSys.Points[startIndex].Lat = wypts[i].Latitude;
+                    wyptSys.Points[startIndex].Lon = wypts[i].Longitude;
+                    wyptSys.Points[startIndex].Alt = wypts[i].Elevation;
+                    startIndex++;
+                }
+                else if (!wypts[i].IsTarget)
+                {
+                    WaypointInfo wypt = new()
+                    {
+                        Name = $"WP{i + 1} DCS Capture",
+                        Lat = wypts[i].Latitude,
+                        Lon = wypts[i].Longitude,
+                        Alt = wypts[i].Elevation
+                    };
+                    wyptSys.Add(wypt);
+                    startIndex++;
+                }
+            }
         }
 
         public object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt)

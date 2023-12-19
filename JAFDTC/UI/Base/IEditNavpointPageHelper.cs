@@ -23,6 +23,7 @@ using JAFDTC.Models.DCS;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.Base
 {
@@ -98,6 +99,12 @@ namespace JAFDTC.UI.Base
         /// navpoint. the edit navpoint is unchanged if the poi is null.
         /// </summary>
         public void ApplyPoI(INavpointInfo edit, PointOfInterest poi);
+
+        /// <summary>
+        /// apply the coordinates captured from dcs to the edit navpoint by copying parameters (lat, lon, etc.) from
+        /// the capture to the edit navpoint. the edit navpoint is unchanged if the capture is null.
+        /// </summary>
+        public void ApplyCapture(INavpointInfo edit, WyptCaptureData wypt);
 
         /// <summary>
         /// add a navigation point to the end of the navpoint list in the configuration. this updates, but does not

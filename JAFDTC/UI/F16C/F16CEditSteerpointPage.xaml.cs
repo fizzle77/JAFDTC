@@ -36,6 +36,8 @@ using Microsoft.UI.Dispatching;
 using JAFDTC.Models.F16C.Misc;
 using Windows.Graphics.Printing.Workflow;
 using Microsoft.VisualBasic.FileIO;
+using JAFDTC.Utilities.Networking;
+using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.F16C
 {
@@ -420,8 +422,7 @@ namespace JAFDTC.UI.F16C
             }
 
             Utilities.SetEnableState(uiPoIBtnApply, isEditable && (uiPoIComboSelect.SelectedIndex > 0));
-            // TODO: capture is always disabled for now
-            Utilities.SetEnableState(uiPoIBtnCapture, false);
+            Utilities.SetEnableState(uiPoIBtnCapture, isEditable);
 
             Utilities.SetEnableState(uiStptBtnPrev, !CurStateHasErrors() && (EditStptIndex > 0));
             Utilities.SetEnableState(uiStptBtnAdd, isEditable && !CurStateHasErrors());
@@ -507,9 +508,40 @@ namespace JAFDTC.UI.F16C
             RebuildInterfaceState();
         }
 
-        // TODO: implement
-        private void PoIBtnCapture_Click(object sender, RoutedEventArgs args)
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private async void PoIBtnCapture_Click(object sender, RoutedEventArgs args)
         {
+            WyptCaptureDataRx.Instance.WyptCaptureDataReceived += PoIBtnCapture_WyptCaptureDataReceived;
+            await Utilities.Message1BDialog(
+                Content.XamlRoot,
+                $"Capturing Steerpoint in DCS",
+                $"From DCS, type [CTRL]-[SHIFT]-J to show the coordinate selection dialog, then move the crosshair over " +
+                $"the desired point in the F10 map. Click “Done” below when finished.",
+                $"Done");
+            WyptCaptureDataRx.Instance.WyptCaptureDataReceived -= PoIBtnCapture_WyptCaptureDataReceived;
+
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void PoIBtnCapture_WyptCaptureDataReceived(WyptCaptureData[] wypts)
+        {
+            if ((wypts.Length > 0) && !wypts[0].IsTarget)
+            {
+                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                {
+                    EditStpt.Name = "DCS Capture";
+                    EditStpt.LatUI = NavpointInfoBase.ConvertFromLatDD(wypts[0].Latitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
+                    EditStpt.LonUI = NavpointInfoBase.ConvertFromLonDD(wypts[0].Longitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
+                    EditStpt.Alt = wypts[0].Elevation.ToString();
+                    EditStpt.TOS = "";
+                    EditStpt.ClearErrors();
+                });
+            }
         }
 
         // ---- steerpoint management ---------------------------------------------------------------------------------

@@ -214,6 +214,8 @@ namespace JAFDTC
                 TelemDataRx.Instance.TelemDataReceived += TelemDataReceiver_DataReceived;
                 TelemDataRx.Instance.Start();
 
+                WyptCaptureDataRx.Instance.Start();
+
                 CheckDCSTimer = new DispatcherTimer();
                 CheckDCSTimer.Tick += CheckDCSTimer_Tick;
                 CheckDCSTimer.Interval = new TimeSpan(0, 0, 10);

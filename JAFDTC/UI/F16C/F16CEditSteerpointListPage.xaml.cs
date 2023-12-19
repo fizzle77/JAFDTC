@@ -39,6 +39,10 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
+using JAFDTC.Utilities.Networking;
+using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
+using Microsoft.UI.Dispatching;
+using JAFDTC.Models.A10C;
 
 namespace JAFDTC.UI.F16C
 {
@@ -68,6 +72,8 @@ namespace JAFDTC.UI.F16C
         private int StartingStptNum { get; set; }
 
         private bool IsClipboardValid { get; set; }
+
+        private int CaptureIndex { get; set; }
 
         // ---- read-only properties
 
@@ -165,6 +171,7 @@ namespace JAFDTC.UI.F16C
             Utilities.SetEnableState(uiBarPaste, isEditable && IsClipboardValid);
             Utilities.SetEnableState(uiBarDelete, isEditable && (uiStptListView.SelectedItems.Count > 0));
 
+            Utilities.SetEnableState(uiBarCapture, isEditable);
             Utilities.SetEnableState(uiBarImport, isEditable);
             Utilities.SetEnableState(uiBarExport, isEditable && (EditSTPT.Count > 0));
             Utilities.SetEnableState(uiBarRenumber, isEditable && (EditSTPT.Count > 0));
@@ -288,6 +295,79 @@ namespace JAFDTC.UI.F16C
                 RenumberSteerpoints();
                 RebuildInterfaceState();
             }
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private async void CmdCapture_Click(object sender, RoutedEventArgs args)
+        {
+            ContentDialogResult result = ContentDialogResult.Primary;
+            if (EditSTPT.Count > 0)
+            {
+                result = await Utilities.Message2BDialog(
+                    Content.XamlRoot,
+                    $"Capture Steerpoint from DCS",
+                    $"Would you like to append coordiantes captured from DCS to the end of the " +
+                    $"Steerpoint list or replace starting from the current selection?",
+                    $"Append",
+                    $"Replace");
+            }
+            if (result == ContentDialogResult.Primary)
+            {
+                CaptureIndex = EditSTPT.Count;
+            }
+            else
+            {
+                CaptureIndex = (uiStptListView.SelectedIndex >= 0) ? uiStptListView.SelectedIndex : 0;
+            }
+
+            CopyEditToConfig(true);
+
+            WyptCaptureDataRx.Instance.WyptCaptureDataReceived += CmdCapture_WyptCaptureDataReceived;
+            await Utilities.Message1BDialog(
+                Content.XamlRoot,
+                $"Capturing Steerpoint in DCS",
+                $"From DCS, type [CTRL]-[SHIFT]-J to show the coordinate selection dialog, then move the crosshair over " +
+                $"the desired point in the F10 map. Click “Done” below when finished.",
+                $"Done");
+            WyptCaptureDataRx.Instance.WyptCaptureDataReceived -= CmdCapture_WyptCaptureDataReceived;
+
+            CopyConfigToEdit();
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void CmdCapture_WyptCaptureDataReceived(WyptCaptureData[] wypts)
+        {
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+            {
+                for (int i = 0; i < wypts.Length; i++)
+                {
+                    if (!wypts[i].IsTarget && (CaptureIndex < EditSTPT.Count))
+                    {
+                        EditSTPT.Points[CaptureIndex].Name = $"WP{i + 1} DCS Capture";
+                        EditSTPT.Points[CaptureIndex].Lat = wypts[i].Latitude;
+                        EditSTPT.Points[CaptureIndex].Lon = wypts[i].Longitude;
+                        EditSTPT.Points[CaptureIndex].Alt = wypts[i].Elevation;
+                        CaptureIndex++;
+                    }
+                    else if (!wypts[i].IsTarget)
+                    {
+                        SteerpointInfo stpt = new()
+                        {
+                            Name = $"WP{i + 1} DCS Capture",
+                            Lat = wypts[i].Latitude,
+                            Lon = wypts[i].Longitude,
+                            Alt = wypts[i].Elevation
+                        };
+                        EditSTPT.Add(stpt);
+                        CaptureIndex++;
+                    }
+                }
+            });
         }
 
         // TODO: document

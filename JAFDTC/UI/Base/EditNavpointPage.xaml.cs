@@ -21,6 +21,7 @@ using CommunityToolkit.WinUI.UI;
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
+using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -31,6 +32,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+
+using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.Base
 {
@@ -225,8 +228,7 @@ namespace JAFDTC.UI.Base
             }
 
             Utilities.SetEnableState(uiPoIBtnApply, isEditable && (uiPoIComboSelect.SelectedIndex > 0));
-            // TODO: capture is always disabled for now
-            Utilities.SetEnableState(uiPoIBtnCapture, false);
+            Utilities.SetEnableState(uiPoIBtnCapture, isEditable);
 
             Utilities.SetEnableState(uiNavptBtnPrev, !CurStateHasErrors() && (EditNavptIndex > 0));
             Utilities.SetEnableState(uiNavptBtnAdd, isEditable && !CurStateHasErrors());
@@ -262,15 +264,17 @@ namespace JAFDTC.UI.Base
 
         // ---- buttons -----------------------------------------------------------------------------------------------
 
-        // cancel click: unwind navigation without saving any changes to the configuration.
-        //
+        /// <summary>
+        /// cancel click: unwind navigation without saving any changes to the configuration.
+        /// </summary>
         private void AcceptBtnCancel_Click(object sender, RoutedEventArgs args)
         {
             Frame.GoBack();
         }
 
-        // ok click: save configuration and navigate back to previous page in nav stack.
-        //
+        /// <summary>
+        /// ok click: save configuration and navigate back to previous page in nav stack.
+        /// </summary>
         private void AcceptBtnOK_Click(object sender, RoutedEventArgs args)
         {
             if (NavHelper.HasErrors(EditNavpt))
@@ -286,15 +290,17 @@ namespace JAFDTC.UI.Base
 
         // ---- poi management ----------------------------------------------------------------------------------------
 
-        // poi combo selection changed: update enable state in the ui.
-        //
+        /// <summary>
+        /// poi combo selection changed: update enable state in the ui.
+        /// </summary>
         private void PoIComboSelect_SelectionChanged(object sender, RoutedEventArgs args)
         {
             RebuildEnableState();
         }
 
-        // apply poi click: copy poi information into current steerpoint and reset poi selection to "none".
-        //
+        /// <summary>
+        /// apply poi click: copy poi information into current steerpoint and reset poi selection to "none".
+        /// </summary>
         private void PoIBtnApply_Click(object sender, RoutedEventArgs args)
         {
             NavHelper.ApplyPoI(EditNavpt, (PointOfInterest)uiPoIComboSelect.SelectedItem);
@@ -302,15 +308,43 @@ namespace JAFDTC.UI.Base
             CopyEditToConfig(EditNavptIndex, true);
         }
 
-        // TODO: implement
-        private void PoIBtnCapture_Click(object sender, RoutedEventArgs args)
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private async void PoIBtnCapture_Click(object sender, RoutedEventArgs args)
         {
+            WyptCaptureDataRx.Instance.WyptCaptureDataReceived += PoIBtnCapture_WyptCaptureDataReceived;
+            await Utilities.Message1BDialog(
+                Content.XamlRoot,
+                $"Capturing {NavHelper.NavptName} in DCS",
+                $"From DCS, type [CTRL]-[SHIFT]-J to show the coordinate selection dialog, then move the crosshair over " +
+                $"the desired point in the F10 map. Click “Done” below when finished.",
+                $"Done");
+            WyptCaptureDataRx.Instance.WyptCaptureDataReceived -= PoIBtnCapture_WyptCaptureDataReceived;
+
+            CopyEditToConfig(EditNavptIndex, true);
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void PoIBtnCapture_WyptCaptureDataReceived(WyptCaptureData[] wypts)
+        {
+            if ((wypts.Length > 0) && !wypts[0].IsTarget)
+            {
+                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                {
+                    NavHelper.ApplyCapture(EditNavpt, wypts[0]);
+                });
+            }
         }
 
         // ---- steerpoint management ---------------------------------------------------------------------------------
 
-        // steerpoint previous click: save the current steerpoint and move to the previous steerpoint.
-        //
+        /// <summary>
+        /// steerpoint previous click: save the current steerpoint and move to the previous steerpoint.
+        /// </summary>
         private void NavptBtnPrev_Click(object sender, RoutedEventArgs args)
         {
             CopyEditToConfig(EditNavptIndex, true);
@@ -319,8 +353,9 @@ namespace JAFDTC.UI.Base
             RebuildInterfaceState();
         }
 
-        // steerpoint previous click: save the current steerpoint and move to the next steerpoint.
-        //
+        /// <summary>
+        /// steerpoint previous click: save the current steerpoint and move to the next steerpoint.
+        /// </summary>
         private void NavptBtnNext_Click(object sender, RoutedEventArgs args)
         {
             CopyEditToConfig(EditNavptIndex, true);
@@ -329,8 +364,9 @@ namespace JAFDTC.UI.Base
             RebuildInterfaceState();
         }
 
-        // steerpoint add click: save the current steerpoint and add a new steerpoint to the end of the list.
-        //
+        /// <summary>
+        /// steerpoint add click: save the current steerpoint and add a new steerpoint to the end of the list.
+        /// </summary>
         private void NavptBtnAdd_Click(object sender, RoutedEventArgs args)
         {
             CopyEditToConfig(EditNavptIndex, true);
@@ -341,7 +377,9 @@ namespace JAFDTC.UI.Base
 
         // ---- text field changes ------------------------------------------------------------------------------------
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void NavptTextBox_LostFocus(object sender, RoutedEventArgs args)
         {
             RebuildEnableState();
@@ -353,6 +391,9 @@ namespace JAFDTC.UI.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void UpdateLatLonTextBoxFormat(TextBox textBox, Dictionary<string, string> format)
         {
             if (format != null)
@@ -369,9 +410,11 @@ namespace JAFDTC.UI.Base
                 }
             }
         }
-        // on navigating to this page, set up and tear down our internal and ui state based on the configuration we
-        // are editing.
-        //
+
+        /// <summary>
+        /// on navigating to this page, set up and tear down our internal and ui state based on the configuration we
+        /// are editing.
+        /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             NavArgs = (EditNavptPageNavArgs)args.Parameter;

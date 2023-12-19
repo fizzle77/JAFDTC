@@ -50,28 +50,35 @@ https://www.gnu.org/licenses/.
                           ToolTipService.ToolTip="Add a New Steerpoint"/>
             <AppBarButton x:Name="uiBarEdit" Icon="Edit" Label="Edit"
                           Click="CmdOpen_Click"
-                          ToolTipService.ToolTip="Edit Currently Selected Steerpoint"/>
+                          ToolTipService.ToolTip="Edit Selected Steerpoint"/>
             <AppBarButton x:Name="uiBarCopy" Icon="Copy" Label="Delete"
                           Click="CmdCopy_Click"
-                          ToolTipService.ToolTip="Copy Currently Selected Steerpoint(s)"/>
+                          ToolTipService.ToolTip="Copy Selected Steerpoint(s)"/>
             <AppBarButton x:Name="uiBarPaste" Icon="Paste" Label="Delete"
                           Click="CmdPaste_Click"
                           ToolTipService.ToolTip="TODO"/>
             <AppBarSeparator/>
             <AppBarButton x:Name="uiBarDelete" Icon="Delete" Label="Delete"
                           Click="CmdDelete_Click"
-                          ToolTipService.ToolTip="Delete Currently Selected Steerpoint(s)"/>
+                          ToolTipService.ToolTip="Delete Selected Steerpoint(s)"/>
             <AppBarSeparator/>
             <AppBarButton x:Name="uiBarRenumber" Icon="AllApps" Label="Renumber"
                           Click="CmdRenumber_Click"
                           ToolTipService.ToolTip="Renumber the List of Steerpoints"/>
             <AppBarSeparator/>
+            <AppBarButton x:Name="uiBarCapture" Label="Capture"
+                          Click="CmdCapture_Click"
+                          ToolTipService.ToolTip="Capture Steerpoints(s) from DCS">
+                <AppBarButton.Icon>
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7B7;"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
             <AppBarButton x:Name="uiBarImport" Icon="Download" Label="Import"
                           Click="CmdImport_Click"
-                          ToolTipService.ToolTip="Import all Steerpoints from a File"/>
+                          ToolTipService.ToolTip="Import Steerpoints from a File"/>
             <AppBarButton x:Name="uiBarExport" Icon="Upload" Label="Export"
                           Click="CmdExport_Click"
-                          ToolTipService.ToolTip="Export all Steerpoints to a File"/>
+                          ToolTipService.ToolTip="Export Steerpoints to a File"/>
             <AppBarSeparator/>
         </CommandBar>
 
