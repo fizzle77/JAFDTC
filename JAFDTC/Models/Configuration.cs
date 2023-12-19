@@ -210,12 +210,12 @@ namespace JAFDTC.Models
 
         public void CleanupSystemLinks(List<string> validUIDs)
         {
-            List<string> invalidUIDs = new List<string>();
+            List<string> invalidUIDs = new();
             foreach (KeyValuePair<string, string> kvp in LinkedSysMap)
             {
-                if (!validUIDs.Contains(kvp.Key))
+                if (!validUIDs.Contains(kvp.Value))
                 {
-                    invalidUIDs.Add(kvp.Key);
+                    invalidUIDs.Add(kvp.Value);
                 }
             }
             foreach (string uid in invalidUIDs)
