@@ -96,13 +96,13 @@ https://www.gnu.org/licenses/.
                       VerticalAlignment="Center"
                       ItemsSource="{x:Bind CurPoIs}"
                       SelectionChanged="PoIComboSelect_SelectionChanged"
-                      ToolTipService.ToolTip="Selects a point of interest to use to fill in steerpoint information">
+                      ToolTipService.ToolTip="Selects a point of interest to use to fill in navpoint information">
             </ComboBox>
             <Button Grid.Row="1" Grid.Column="2" Margin="12,0,0,0"
                         x:Name="uiPoIBtnApply"
                         VerticalAlignment="Center"
                         Click="PoIBtnApply_Click"
-                        ToolTipService.ToolTip="Applies selected PoI to Steerpoint Information">
+                        ToolTipService.ToolTip="Applies selected PoI to navpoint Information">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
             </Button>
 
@@ -153,21 +153,21 @@ https://www.gnu.org/licenses/.
                         x:Name="uiNavptBtnPrev"
                         VerticalAlignment="Center"
                         Click="NavptBtnPrev_Click"
-                        ToolTipService.ToolTip="Moves to Previous Steerpoint for Editing">
+                        ToolTipService.ToolTip="Moves to previous navpoint for editing">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
                 </Button>
                 <Button Grid.Column="2" Margin="0,0,6,0"
                         x:Name="uiNavptBtnAdd"
                         VerticalAlignment="Center"
                         Click="NavptBtnAdd_Click"
-                        ToolTipService.ToolTip="Adds New Steerpoint to End of List">
+                        ToolTipService.ToolTip="Adds new navpoint to end of list">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
                 </Button>
                 <Button Grid.Column="3"
                         x:Name="uiNavptBtnNext"
                         VerticalAlignment="Center"
                         Click="NavptBtnNext_Click"
-                        ToolTipService.ToolTip="Moves to Next Steerpoint for Editing">
+                        ToolTipService.ToolTip="Moves to next navpoint for editing">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
                 </Button>
             </Grid>
@@ -211,7 +211,7 @@ https://www.gnu.org/licenses/.
                          ui:TextBoxExtensions.CustomMask="N:[nNsS]"
                          ui:TextBoxExtensions.Mask="N 99° 99’ 99’’"
                          LostFocus="NavptTextBox_LostFocus"
-                         ToolTipService.ToolTip="Latitude of steerpoint in DDM format: [N|S] 00° 00.000’"/>
+                         ToolTipService.ToolTip="Latitude of navpoint"/>
                 <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
                          x:Name="uiNavptValueLon"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
@@ -221,14 +221,14 @@ https://www.gnu.org/licenses/.
                          ui:TextBoxExtensions.CustomMask="E:[eEwW]"
                          ui:TextBoxExtensions.Mask="E 999° 99’ 99’’"
                          LostFocus="NavptTextBox_LostFocus"
-                         ToolTipService.ToolTip="Longitude of steerpoint in DDM format: [E|W] 000° 00.000’"/>
+                         ToolTipService.ToolTip="Longitude of navpoint"/>
                 <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"
                          x:Name="uiNavptValueAlt"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditNavpt.Alt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          PlaceholderText="0"
                          LostFocus="NavptTextBox_LostFocus"
-                         ToolTipService.ToolTip="Altitude of steerpoint in feet"/>
+                         ToolTipService.ToolTip="Altitude of navpoint in feet"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
                            x:Name="uiNavptAltitudeUnitsText"
                            Style="{StaticResource EditorParamStaticTextBlockStyle}">
@@ -255,15 +255,13 @@ https://www.gnu.org/licenses/.
                     x:Name="uiAcceptBtnOK"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Click="AcceptBtnOK_Click"
-                    ToolTipService.ToolTip="TODO">
+                    Click="AcceptBtnOK_Click">
                 OK
             </Button>
             <Button Grid.Column="4" Margin="12,0,0,0"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Click="AcceptBtnCancel_Click"
-                    ToolTipService.ToolTip="TODO">
+                    Click="AcceptBtnCancel_Click">
                 Cancel
             </Button>
         </Grid>

@@ -46,38 +46,38 @@ https://www.gnu.org/licenses/.
                     HorizontalAlignment="Center">
             <AppBarButton x:Name="uiBarAdd" Icon="Add" Label="Add"
                           Click="CmdAdd_Click"
-                          ToolTipService.ToolTip="Add a New Navpoint"/>
+                          ToolTipService.ToolTip="Add a new navpoint"/>
             <AppBarButton x:Name="uiBarEdit" Icon="Edit" Label="Edit"
                           Click="CmdOpen_Click"
-                          ToolTipService.ToolTip="Edit Selected Navpoint"/>
+                          ToolTipService.ToolTip="Edit selected navpoint"/>
             <AppBarButton x:Name="uiBarCopy" Icon="Copy" Label="Delete"
                           Click="CmdCopy_Click"
-                          ToolTipService.ToolTip="Copy Selected Navpoint(s)"/>
+                          ToolTipService.ToolTip="Copy selected navpoints"/>
             <AppBarButton x:Name="uiBarPaste" Icon="Paste" Label="Delete"
                           Click="CmdPaste_Click"
-                          ToolTipService.ToolTip="Past Navpoints from Clipboard"/>
+                          ToolTipService.ToolTip="Paste navpoints from clipboard"/>
             <AppBarSeparator/>
             <AppBarButton x:Name="uiBarDelete" Icon="Delete" Label="Delete"
                           Click="CmdDelete_Click"
-                          ToolTipService.ToolTip="Delete Selected Navpoint(s)"/>
+                          ToolTipService.ToolTip="Delete selected navpoints"/>
             <AppBarSeparator/>
             <AppBarButton x:Name="uiBarRenumber" Icon="AllApps" Label="Renumber"
                           Click="CmdRenumber_Click"
-                          ToolTipService.ToolTip="Renumber the List of Navpoints"/>
+                          ToolTipService.ToolTip="Renumber the list of navpoints"/>
             <AppBarSeparator/>
             <AppBarButton x:Name="uiBarCapture" Label="Capture"
                           Click="CmdCapture_Click"
-                          ToolTipService.ToolTip="Capture Navpoint(s) from DCS">
+                          ToolTipService.ToolTip="Capture navpoints from DCS">
                 <AppBarButton.Icon>
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7B7;"/>
                 </AppBarButton.Icon>
             </AppBarButton>
             <AppBarButton x:Name="uiBarImport" Icon="Download" Label="Import"
                           Click="CmdImport_Click"
-                          ToolTipService.ToolTip="Import Navpoints from a File"/>
+                          ToolTipService.ToolTip="Import navpoints from a file"/>
             <AppBarButton x:Name="uiBarExport" Icon="Upload" Label="Export"
                           Click="CmdExport_Click"
-                          ToolTipService.ToolTip="Export Navpoints to a File"/>
+                          ToolTipService.ToolTip="Export navpoints to a file"/>
             <AppBarSeparator/>
         </CommandBar>
 
@@ -184,7 +184,7 @@ https://www.gnu.org/licenses/.
                 <Button Width="140"
                         x:Name="uiPageBtnLink"
                         Click="PageBtnLink_Click"
-                        ToolTipService.ToolTip="Link or Unlink this Setup to CMDS Setup from Another Configuration">
+                        ToolTipService.ToolTip="Link or unlink this system to navpoint system in another configuration">
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Margin="0,0,6,0"
                                   FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE723;"/>

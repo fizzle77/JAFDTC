@@ -102,7 +102,7 @@ https://www.gnu.org/licenses/.
                         x:Name="uiPoIBtnApply"
                         VerticalAlignment="Center"
                         Click="PoIBtnApply_Click"
-                        ToolTipService.ToolTip="Applies selected PoI to Steerpoint Information">
+                        ToolTipService.ToolTip="Applies selected PoI to steerpoint information">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
             </Button>
 
@@ -153,21 +153,21 @@ https://www.gnu.org/licenses/.
                         x:Name="uiStptBtnPrev"
                         VerticalAlignment="Center"
                         Click="StptBtnPrev_Click"
-                        ToolTipService.ToolTip="Moves to Previous Steerpoint for Editing">
+                        ToolTipService.ToolTip="Moves to previous steerpoint for editing">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
                 </Button>
                 <Button Grid.Column="2" Margin="0,0,6,0"
                         x:Name="uiStptBtnAdd"
                         VerticalAlignment="Center"
                         Click="StptBtnAdd_Click"
-                        ToolTipService.ToolTip="Adds New Steerpoint to End of List">
+                        ToolTipService.ToolTip="Adds new steerpoint to end of list">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
                 </Button>
                 <Button Grid.Column="3"
                         x:Name="uiStptBtnNext"
                         VerticalAlignment="Center"
                         Click="StptBtnNext_Click"
-                        ToolTipService.ToolTip="Moves to Next Steerpoint for Editing">
+                        ToolTipService.ToolTip="Moves to next steerpoint for editing">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
                 </Button>
             </Grid>
@@ -310,7 +310,7 @@ https://www.gnu.org/licenses/.
                               HorizontalAlignment="Stretch"
                               SelectionChanged="OAPCombo_SelectionChanged"
                               Tag="0"
-                              ToolTipService.ToolTip="Enable or Disable OAP 1 for This Steerpoint">
+                              ToolTipService.ToolTip="Enable or disable OAP 1 for this steerpoint">
                         <StackPanel Orientation="Horizontal">
                             <FontIcon VerticalAlignment="Center" FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE738;"/>
                             <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">None</TextBlock>
@@ -360,7 +360,7 @@ https://www.gnu.org/licenses/.
                               HorizontalAlignment="Stretch"
                               SelectionChanged="OAPCombo_SelectionChanged"
                               Tag="1"
-                              ToolTipService.ToolTip="Enable or Disable OAP 2 for This Steerpoint">
+                              ToolTipService.ToolTip="Enable or disable OAP 2 for this steerpoint">
                         <StackPanel Orientation="Horizontal">
                             <FontIcon VerticalAlignment="Center" FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE738;"/>
                             <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">None</TextBlock>
@@ -525,15 +525,13 @@ https://www.gnu.org/licenses/.
                     x:Name="uiAcceptBtnOK"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Click="AcceptBtnOK_Click"
-                    ToolTipService.ToolTip="TODO">
+                    Click="AcceptBtnOK_Click">
                 OK
             </Button>
             <Button Grid.Column="4" Margin="12,0,0,0"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Click="AcceptBtnCancel_Click"
-                    ToolTipService.ToolTip="TODO">
+                    Click="AcceptBtnCancel_Click">
                 Cancel
             </Button>
         </Grid>
