@@ -383,7 +383,8 @@ namespace JAFDTC.UI.App
                 {
                     string msg = $"JAFDTC Lua support successfully added to or updated in the DCS installation{sucPlural} at:\n\n" +
                                  $"{successes}\n" +
-                                 $"You can uninstall Lua support later through the JAFDTC Settings page.";
+                                 $"If DCS is currently running, please restart it to apply these changes. You can uninstall Lua " +
+                                 $"support later through the JAFDTC Settings page.";
                     await Utilities.Message1BDialog(Content.XamlRoot, "Qapla'!", msg);
                 }
             }
