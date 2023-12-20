@@ -8,13 +8,20 @@ into a DCS model at the start of a flight.
 
 This document covers the basic usage of the tool and describes general concepts applicable to
 all supported airframes. After reading through this overview, look over the airframe-specific
-documentation
+documentation for the supported airframes.
 
-* [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md)
-* [F-16C Viper](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F16C.md)
-* [F/A-18C Hornet](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_FA18C.md)
+| Airframe | Configurable Systems |
+|:--------:|---------|
+| [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | Waypoints
+| [AV-8B Harrier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_AV8B.md) | Waypoints
+| [F-14A/B Tomcat](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F14AB.md) | Waypoints
+| [F-15E Strike Eagle](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F15E.md) | Radios
+| [F-16C Viper](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F16C.md) | Countermeasures, Datalink, HARM (ALIC, HTS), MFD Formats, Radios, Steerpoints, Miscellaneous DED Systems
+| [F/A-18C Hornet](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_FA18C.md) | Waypoints, Radios
+| [Mirage M-2000C](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_M2000C.md) | Waypoints
 
-for additional details on JAFDTC's capabilities and operation on a specific airframe.
+The above links provide additional details on JAFDTC's capabilities and operation on a specific
+airframe.
 
 # Preliminaries
 
@@ -95,7 +102,7 @@ below) to allow the exchange of information.
 > As with all things, there are exceptions. A good general rule is if the JAFDTC UI can do
 > something, use the UI and don't try to work around it.
 
-# User Interface
+# User Interface Overview
 
 The JAFDTC user interface is based around a single window that displays a list of configrations
 for an airframe and allows you to edit the specfic systems in a configuration.
@@ -109,12 +116,12 @@ a number of controls to manipulate configurations,
 
 The primary components of this page include,
 
-* The *Filter Search Box* that filters the configurations shown in the configuration list.
-* The *Current Airframe* combo box that selects a supported airframe.
-* The *Command Bar* that allows you to manipulate configurations.
-* The *Configuration List* with individual rows for each configuration for the selected
+- The **Filter Search Box** that filters the configurations shown in the configuration list.
+- The **Current Airframe** combo box that selects a supported airframe.
+- The **Command Bar** that allows you to manipulate configurations.
+- The **Configuration List** with individual rows for each configuration for the selected
   airframe.
-* The *Status Area* that holds inforamtion on the current DCS status and pilot.
+- The **Status Area** that holds inforamtion on the current DCS status and pilot.
 
 The reaminder of this section will discuss each of these elements in more detail.
 
@@ -169,22 +176,22 @@ by clicking on the "..." button).
 
 The command bar includes the following commands,
 
-* *Add* will add a new configuration to the database after prompting for a name for the new
+- **Add** will add a new configuration to the database after prompting for a name for the new
   configuration.
-* *Edit* will open the
+- **Edit** will open the
   [System Editor Page](#system-editor-page)
   for the selected configuration to allow you to edit the configuration. You can also edit a
   configuration by double-clicking on the configuration in the configuration list.
-* *Duplicate* creates a copy of the selected configuration after prompting for a name for the
+- **Duplicate** creates a copy of the selected configuration after prompting for a name for the
   copy of the configuration.
-* *Paste* pastes information from the clipboard into the selected configuration.
-* *Rename* renames the selected configuration.
-* *Delete* removes the currently selected configuration from the database.
-* *Import* creates a new configuration from a file previously created with the *Export*
+- **Paste** pastes information from the clipboard into the selected configuration.
+- **Rename** renames the selected configuration.
+- **Delete** removes the currently selected configuration from the database.
+- **Import** creates a new configuration from a file previously created with the *Export*
   command.
-* *Export* creates a file that contains the selected configuration suitable for import using
+- **Export** creates a file that contains the selected configuration suitable for import using
   the *Import* command.
-* *Load to Jet* uploads the selected configuration to DCS, see
+- **Load to Jet** uploads the selected configuration to DCS, see
   [here](#interacting-with-dcs)
   for further details.
 
@@ -193,13 +200,13 @@ The command bar includes the following commands,
 
 The overflow menu (exposed by clicking on the "..." button) holds two commands,
 
-* *Settings* opens up the
+- **Settings** opens up the
   [JAFDTC Settings](#settings)
   dialog to allow you to change JAFDTC settings.
-* *About* opens a dialog box that identifies the JAFDTC version and similar information.
+- **About** opens a dialog box that identifies the JAFDTC version and similar information.
 
-Depending on the state of the system, commands may be disabled. For example, *Edit* is disabled
-when there is no configuration selected and *Load to Jet* is disabled if DCS is not running
+Depending on the state of the system, commands may be disabled. For example, **Edit** is disabled
+when there is no configuration selected and **Load to Jet** is disabled if DCS is not running
 a mission with the appropriate airframe.
 
 ### Status Area
@@ -208,9 +215,9 @@ The status area occupies the bottom part of the configuration list page. On the 
 this region is information showing the current status of DCS. There are three pieces of
 status here, each marked with a red cross or green checkmark,
 
-* *Lua Installed* indicates that the Lua support is properly installed in DCS.
-* *Running* indicates that DCS is currently running (though not necessarily running a mission).
-* *Pilot in Pit* indicates that DCS is currently running a mission along with the type of
+- **Lua Installed** indicates that the Lua support is properly installed in DCS.
+- **Running** indicates that DCS is currently running (though not necessarily running a mission).
+- **Pilot in Pit** indicates that DCS is currently running a mission along with the type of
   airframe currently in use.
 
 For example,
@@ -270,10 +277,10 @@ editor.
 Depending on the system, the bottom edge of the system configuration editor may contain link
 and reset buttons that provide common link and reset functions for systems.
 
-The *Reset* button restores the default settings to the selected system. This button is
+The **Reset** button restores the default settings to the selected system. This button is
 disabled when the system is in its default configruation.
 
-The *Link* button connects the system to another configuration. This allows you to, for
+The **Link** button connects the system to another configuration. This allows you to, for
 example, have a single common radio system configuration that you can share across different
 configurations (as discussed
 [here](#linking-systems)).
@@ -321,17 +328,19 @@ as
 
 There are multiple controls in the settings,
 
-* The *Wing Name* and *Callsign* text fields allow you to specify your wing and callsign.
+- The **Wing Name** and **Callsign** text fields allow you to specify your wing and callsign.
   This information appears in the lower right corner of the
   [configuration list page](#configuration-list-page).
   Some airframes also use this inforamtion for configuration.
-* The *JAFDTC Window Remains on Top* check box selects whether JAFDTC will always remain on
+- The **JAFDTC Window Remains on Top** check box selects whether JAFDTC will always remain on
   top of the window stack, even while DCS has focus. This allows you to keep the DCS UI
   visible in non-VR operation.
-* The *Install DCS Lua Support* button installs
+- The **Check for New Versions at Launch** check box determines whether JAFDTC will check if a
+  new version is available each time it is launched.
+- The **Install DCS Lua Support** button installs
   [DCS Lua support](#support-scripts)
   if the support is not currently installed (the button is disabled if support is in place).
-* The *Uninstall DCS Lua Support* button will uninstall
+- The **Uninstall DCS Lua Support** button will uninstall
   [DCS Lua support](#support-scripts)
   if the support is currently installed (the button is disabled if support is not in place).
 
@@ -389,16 +398,20 @@ To interoperate with DCS, JAFDTC installs Lua within the `Scripts` hierarchy in 
 installation(s) present in the `Saved Games` folder associated with your profile. JAFDTC can
 install this support in two places,
 
-* `Saved Games\DCS\Scripts`
-* `Saved Games\DCS.openbeta\Scripts`
+- `Saved Games\DCS\Scripts`
+- `Saved Games\DCS.openbeta\Scripts`
 
 JAFDTC will install in one or both of these directories based on which versions of DCS are
 installed on your system. Within these areas, JAFDTC makes three changes,
 
-* Adds scripts in the `Scripts\JAFDTC` folder that enable integration with supported airframes
-* Adds a `JAFDTCHooks.lua` script to the `Scripts\Hooks` folder that enables integration with DCS
-* Adds a line to `Scripts\Export.lua` to load JAFDTC support into DCS at mission start
+- Adds scripts in the `Scripts\JAFDTC` folder that enable integration with supported airframes
+- Adds a `JAFDTCHooks.lua` script to the `Scripts\Hooks` folder that enables integration with DCS
+- Adds a line to `Scripts\Export.lua` to load JAFDTC support into DCS at mission start
 
 JAFDTC will automatically update these files as needed, notifying you when an update is made.
+
+> If DCS is running when JAFDTC installs or updates the DCS support scripts, you should restart
+> DCS to make sure DCS picks up the latest version of the DCS support.
+
 While JAFDTC allows you to decline the installation, doing so will prevent JAFDTC from
 interacting with DCS in any capacity.

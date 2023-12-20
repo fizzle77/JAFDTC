@@ -7,7 +7,9 @@ JAFDTC supports the following configuration in the Hornet,
 * WYPT waypoint system
 * COM1/COM2 radio presets and initial configuration
 
-Each of these areas is covered in more depth below.
+Each of these areas is covered in more depth below. See the
+[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
+for more on the aspects of JAFDTC that are common to multiple airframes.
 
 # Configurable Systems
 

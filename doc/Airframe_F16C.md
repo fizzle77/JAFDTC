@@ -14,7 +14,9 @@ JAFDTC supports the following configuration in the Viper,
 * COM1/COM2 radio presets and initial configuration
 * STPT steerpoint system including OAP, VIP, and VRP reference points
 
-Each of these areas is covered in more depth below.
+Each of these areas is covered in more depth below. See the
+[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
+for more on the aspects of JAFDTC that are common to multiple airframes.
 
 # Configurable Systems on the Viper
 
