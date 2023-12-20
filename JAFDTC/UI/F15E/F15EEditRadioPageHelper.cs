@@ -64,11 +64,13 @@ namespace JAFDTC.UI.F15E
         {
             if (radio == (int)Radios.COMM1)
             {
+                editMisc.IsAux1Enabled = ((F15EConfiguration)config).Radio.IsCOMM1PresetMode;
                 editMisc.IsAux2Enabled = ((F15EConfiguration)config).Radio.IsCOMM1MonitorGuard;
                 editMisc.DefaultTuning = ((F15EConfiguration)config).Radio.COMM1DefaultTuning;
             }
             else if (radio == (int)Radios.COMM2)
             {
+                editMisc.IsAux1Enabled = ((F15EConfiguration)config).Radio.IsCOMM2PresetMode;
                 editMisc.IsAux2Enabled = ((F15EConfiguration)config).Radio.IsCOMM2MonitorGuard;
                 editMisc.DefaultTuning = ((F15EConfiguration)config).Radio.COMM2DefaultTuning;
             }
@@ -93,11 +95,13 @@ namespace JAFDTC.UI.F15E
         {
             if (radio == (int)Radios.COMM1)
             {
+                ((F15EConfiguration)config).Radio.IsCOMM1PresetMode = editMisc.IsAux1Enabled;
                 ((F15EConfiguration)config).Radio.IsCOMM1MonitorGuard = editMisc.IsAux2Enabled;
                 ((F15EConfiguration)config).Radio.COMM1DefaultTuning = editMisc.DefaultTuning;
             }
             else if (radio == (int)Radios.COMM2)
             {
+                ((F15EConfiguration)config).Radio.IsCOMM2PresetMode = editMisc.IsAux1Enabled;
                 ((F15EConfiguration)config).Radio.IsCOMM2MonitorGuard = editMisc.IsAux2Enabled;
                 ((F15EConfiguration)config).Radio.COMM2DefaultTuning = editMisc.DefaultTuning;
             }
