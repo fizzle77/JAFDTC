@@ -25,7 +25,7 @@ namespace JAFDTC.Models.AV8B
 {
     /// <summary>
     /// upload agent responsible for building a stream of commands for use by dcs to set up harrier avionics according
-    /// to a configuration.
+    /// to an AV8BConfiguration configuration.
     /// </summary>
     internal class AV8BUploadAgent : UploadAgentBase, IUploadAgent
     {
@@ -53,7 +53,8 @@ namespace JAFDTC.Models.AV8B
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// build the dcs commands necessary to configure the systems as the configuration associated with this
+        /// instance describes.
         /// </summary>
         public override void BuildSystems(StringBuilder sb)
         {

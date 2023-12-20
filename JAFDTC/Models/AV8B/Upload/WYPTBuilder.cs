@@ -17,14 +17,16 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.AV8B.WYPT;
 using JAFDTC.Models.DCS;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
 
 namespace JAFDTC.Models.AV8B.Upload
 {
     /// <summary>
-    /// command builder for the waypoint system in the harrier. translates cmds setup in F16CConfiguration into
+    /// command builder for the waypoint system in the harrier. translates cmds setup in AV8BConfiguration into
     /// commands that drive the dcs clickable cockpit.
     /// </summary>
     internal class WYPTBuilder : AV8BBuilderBase, IBuilder
@@ -44,11 +46,39 @@ namespace JAFDTC.Models.AV8B.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// configure waypoint system via the cdu according to the non-default programming settings (this function is
+        /// safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// </summary>
         public override void Build()
         {
-            // TODO: implement
+            ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
+            Device lmpcd = _aircraft.GetDevice("LMPCD");
+            Device ufc = _aircraft.GetDevice("UFC");
+            Device odu = _aircraft.GetDevice("ODU");
+
+            if (wypts.Count > 0)
+            {
+                AppendCommand(lmpcd.GetCommand("MPCD_L_2"));
+                for (int i = 0; i < wypts.Count; i++)
+                {
+                    if (wypts[i].IsValid)
+                    {
+                        AppendCommand(ufc.GetCommand("7"));
+                        AppendCommand(ufc.GetCommand("7"));
+                        AppendCommand(ufc.GetCommand("UFC_ENTER"));
+                        AppendCommand(odu.GetCommand("ODU_OPT2"));
+
+                        AppendCommand(Build2864Coordinate(ufc, wypts[i].LatUI));
+                        AppendCommand(ufc.GetCommand("UFC_ENTER"));
+
+                        AppendCommand(Build2864Coordinate(ufc, wypts[i].LonUI));
+                        AppendCommand(ufc.GetCommand("UFC_ENTER"));
+
+                        AppendCommand(odu.GetCommand("ODU_OPT1"));
+                    }
+                }
+                AppendCommand(lmpcd.GetCommand("MPCD_L_2"));
+            }
         }
     }
 }

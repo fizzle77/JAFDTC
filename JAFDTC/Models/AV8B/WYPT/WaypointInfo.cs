@@ -24,7 +24,7 @@ using System.Text.Json.Serialization;
 namespace JAFDTC.Models.AV8B.WYPT
 {
     /// <summary>
-    /// TODO: document
+    /// waypoint for the harrier based on the basic NavpointInfoBase implementation set up to use dms coordinates.
     /// </summary>
     public class WaypointInfo : NavpointInfoBase
     {
@@ -41,7 +41,6 @@ namespace JAFDTC.Models.AV8B.WYPT
         [JsonIgnore]
         public override string LatUI
         {
-            // TODO: need to validate ui format for harrier
             get => ConvertFromLatDD(Lat, LLFormat.DMS);
             set
             {
@@ -61,7 +60,6 @@ namespace JAFDTC.Models.AV8B.WYPT
         [JsonIgnore]
         public override string LonUI
         {
-            // TODO: need to validate ui format for harrier
             get => ConvertFromLonDD(Lon, LLFormat.DMS);
             set
             {
@@ -94,18 +92,5 @@ namespace JAFDTC.Models.AV8B.WYPT
         }
 
         public virtual object Clone() => new WaypointInfo(this);
-
-        // ------------------------------------------------------------------------------------------------------------
-        //
-        // methods
-        //
-        // ------------------------------------------------------------------------------------------------------------
-
-        // reset the steerpoint to default values. the Number field is not changed.
-        //
-        public override void Reset()
-        {
-            base.Reset();
-        }
     }
 }

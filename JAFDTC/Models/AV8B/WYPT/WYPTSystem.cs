@@ -24,7 +24,8 @@ using System.Collections.ObjectModel;
 namespace JAFDTC.Models.AV8B.WYPT
 {
     /// <summary>
-    /// TODO: document
+    /// waypoint system for the harrier based on the basic NavpointSystemBase implementation set up to use the
+    /// instances of WaypointInfo for the waypoints.
     /// </summary>
     public class WYPTSystem : NavpointSystemBase<WaypointInfo>
     {
@@ -49,10 +50,10 @@ namespace JAFDTC.Models.AV8B.WYPT
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // create a new steerpoint or take an existing steerpoint and add it to the end of the steerpoint list. the
-        // steerpoint is numbered to follow the last steerpoint in the list. returns the steerpoint added, null on
-        // error.
-        //
+        /// <summary>
+        /// create a new waypoint or take an existing waypoint and add it to the end of the waypoint list. the
+        /// waypoint is numbered to follow the last waypoint in the list. returns the waypoint added, null on error.
+        /// </summary>
         public override WaypointInfo Add(WaypointInfo wypt = null)
         {
             wypt ??= new();

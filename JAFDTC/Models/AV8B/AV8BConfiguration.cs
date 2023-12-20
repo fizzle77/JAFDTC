@@ -20,16 +20,16 @@
 using JAFDTC.Models.AV8B.WYPT;
 using JAFDTC.UI.AV8B;
 using JAFDTC.Utilities;
+using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using JAFDTC.UI.F16C;
 
 namespace JAFDTC.Models.AV8B
 {
     /// <summary>
-    /// TODO: document
+    /// main configuration object for the harrier. the harrier supports a single configurable system: waypoints.
     /// </summary>
     public class AV8BConfiguration : Configuration
     {
@@ -153,8 +153,9 @@ namespace JAFDTC.Models.AV8B
                     isSuccess = true;
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                FileManager.Log($"AV8BConfiguration:Deserialize exception {ex}");
             }
             return isSuccess;
         }
