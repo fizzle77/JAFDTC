@@ -66,6 +66,7 @@ namespace JAFDTC.Models.DCS
             _sb.Append(s);
         }
 
+        // TODO: deprecate
         protected static string BuildDigits(Device d, string s)
         {
             StringBuilder sb = new();
@@ -82,6 +83,32 @@ namespace JAFDTC.Models.DCS
             foreach (var c in s.ToCharArray())
             {
                 sb.Append(d.GetCommand(c.ToString()));
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// build the set of commands necessary to enter a lat/lon coordinate into a navpoint system that uses
+        /// the 2/8/6/4 buttons to enter N/S/E/W directions. coordinate is specified as a string. prior to processing,
+        /// all separators are removed. the coordinate string should start with N/S/E/W followed by the digits
+        /// and/or characters that should be typed in to the keypad. they key pad device must have single-character
+        /// commands that map to the non-separator characters that may appear in the coordinate string.
+        /// <summary>
+        protected static string Build2864Coordinate(Device kpad, string coord)
+        {
+            string coordStr = RemoveSeparators(coord.Replace(" ", ""));
+
+            StringBuilder sb = new();
+            foreach (char c in coordStr.ToUpper().ToCharArray())
+            {
+                switch (c)
+                {
+                    case 'N': sb.Append(kpad.GetCommand("2")); break;
+                    case 'S': sb.Append(kpad.GetCommand("8")); break;
+                    case 'E': sb.Append(kpad.GetCommand("6")); break;
+                    case 'W': sb.Append(kpad.GetCommand("4")); break;
+                    default: sb.Append(kpad.GetCommand(c.ToString())); break;
+                }
             }
             return sb.ToString();
         }
