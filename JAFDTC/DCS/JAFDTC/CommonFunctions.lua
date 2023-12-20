@@ -26,12 +26,15 @@ end
 function JAFDTC_GetPlayerAircraftType()
     local data = LoGetSelfData();
     if data then
-	    local model = data["Name"];
-        if model == "TODO_HARRIER" then return "AV8B" end
+	    local model = string.upper(data["Name"])
+        if model == "AV8BNA" then return "AV8B" end
         if model == "A-10C_2" then return "A10C" end
+        if model == "F-14A-135-GR" then return "F14AB" end
+        if model == "F-14B" then return "F14AB" end
         if model == "F-15ESE" then return "F15E" end
         if model == "F-16C_50" then return "F16CM" end
-        if model == "FA-18C_hornet" then return "FA18C" end
+        if model == "FA-18C_HORNET" then return "FA18C" end
+        if model == "M-2000C" then return "M2000C" end
 	    return model;
     end
     return "Unknown"

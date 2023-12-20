@@ -20,9 +20,11 @@
 using JAFDTC.Models;
 using JAFDTC.UI.A10C;
 using JAFDTC.UI.AV8B;
+using JAFDTC.UI.F14AB;
 using JAFDTC.UI.F16C;
 using JAFDTC.UI.F15E;
 using JAFDTC.UI.FA18C;
+using JAFDTC.UI.M2000C;
 using JAFDTC.UI.App;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -124,11 +126,11 @@ namespace JAFDTC.UI
                 AirframeTypes.A10C => new A10CConfigurationEditor(),
                 AirframeTypes.AH64D => null,
                 AirframeTypes.AV8B => new AV8BConfigurationEditor(),
+                AirframeTypes.F14AB => new F14ABConfigurationEditor(),
                 AirframeTypes.F16C => new F16CConfigurationEditor(),
                 AirframeTypes.F15E => new F15EConfigurationEditor(),
                 AirframeTypes.FA18C => new FA18CConfigurationEditor(),
-                AirframeTypes.M2000C => null,
-                AirframeTypes.F14AB => null,
+                AirframeTypes.M2000C => new M2000CConfigurationEditor(),
                 _ => null,
             };
         }

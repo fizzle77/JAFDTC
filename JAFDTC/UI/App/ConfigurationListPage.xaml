@@ -74,15 +74,13 @@ https://www.gnu.org/licenses/.
                     <TextBlock Text="A-10C Warthog" Tag="1"/>
                     <!--
                     <TextBlock Text="AH-64D Apache" Tag="2"/>
+                    -->
                     <TextBlock Text="AV-8B Harrier" Tag="3"/>
                     <TextBlock Text="F-14A/B Tomcat" Tag="8"/>
-                    -->
                     <TextBlock Text="F-15E Strike Eagle" Tag="4"/>
                     <TextBlock Text="F-16C Viper" Tag="5"/>
                     <TextBlock Text="F/A-18C Hornet" Tag="6"/>
-                    <!--
                     <TextBlock Text="Mirage 2000C" Tag="7"/>
-                    -->
                 </ComboBox.Items>
             </ComboBox>
 
