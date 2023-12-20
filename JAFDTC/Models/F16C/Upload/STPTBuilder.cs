@@ -95,11 +95,11 @@ namespace JAFDTC.Models.F16C.Upload
                     PredAppendDigitsWithEnter(ufc, stptId);
                     AppendCommand(ufc.GetCommand("DOWN"));
 
-                    AppendCommand(BuildCoordinate(ufc, stpt.LatUI));
+                    AppendCommand(Build2864Coordinate(ufc, stpt.LatUI));
                     AppendCommand(ufc.GetCommand("ENTR"));
                     AppendCommand(ufc.GetCommand("DOWN"));
 
-                    AppendCommand(BuildCoordinate(ufc, stpt.LonUI));
+                    AppendCommand(Build2864Coordinate(ufc, stpt.LonUI));
                     AppendCommand(ufc.GetCommand("ENTR"));
                     AppendCommand(ufc.GetCommand("DOWN"));
 
@@ -284,30 +284,6 @@ namespace JAFDTC.Models.F16C.Upload
 
             PredAppendDigitsNoSepWithEnter(ufc, elev, true);
             AppendCommand(ufc.GetCommand("DOWN"));
-        }
-
-        /// <summary>
-        /// build the set of commands necessary to enter a lat/lon coordinate into the steerpoint system. once
-        /// separators and spaces are removed, the coordinate string should start with N/S/E/W followed by the
-        /// digits and/or characters that should be typed in to the ufc.
-        /// <summary>
-        public static string BuildCoordinate(Device ufc, string coord)
-        {
-            string coordStr = RemoveSeparators(coord.Replace(" ", ""));
-
-            StringBuilder sb = new();
-            foreach (char c in coordStr.ToUpper().ToCharArray())
-            {
-                switch (c)
-                {
-                    case 'N': sb.Append(ufc.GetCommand("2")); break;
-                    case 'S': sb.Append(ufc.GetCommand("8")); break;
-                    case 'E': sb.Append(ufc.GetCommand("6")); break;
-                    case 'W': sb.Append(ufc.GetCommand("4")); break;
-                    default: sb.Append(ufc.GetCommand(c.ToString())); break;
-                }
-            }
-            return sb.ToString();
         }
     }
 }

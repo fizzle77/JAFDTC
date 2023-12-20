@@ -77,11 +77,11 @@ namespace JAFDTC.Models.FA18C.Upload
                     {
                         AppendCommand(ufc.GetCommand("Opt1"));
                         AppendCommand(Wait());
-                        AppendCommand(BuildCoordinate(ufc, NavpointInfoBase.RemoveLLDegZeroFill(wypt.LatUI)));    // DDM
+                        AppendCommand(Build2864Coordinate(ufc, NavpointInfoBase.RemoveLLDegZeroFill(wypt.LatUI)));    // DDM
                         AppendCommand(ufc.GetCommand("ENT"));
                         AppendCommand(WaitLong());
 
-                        AppendCommand(BuildCoordinate(ufc, NavpointInfoBase.RemoveLLDegZeroFill(wypt.LonUI)));    // DDM
+                        AppendCommand(Build2864Coordinate(ufc, NavpointInfoBase.RemoveLLDegZeroFill(wypt.LonUI)));    // DDM
                         AppendCommand(ufc.GetCommand("ENT"));
                         AppendCommand(WaitLong());
 
@@ -251,29 +251,5 @@ namespace JAFDTC.Models.FA18C.Upload
             return sb.ToString();
         }
 #endif
-
-        /// <summary>
-        /// build the set of commands necessary to enter a lat/lon coordinate into the steerpoint system. once
-        /// separators and spaces are removed, the coordinate string should start with N/S/E/W followed by the
-        /// digits and/or characters that should be typed in to the ufc.
-        /// <summary>
-        public static string BuildCoordinate(Device ufc, string coord)
-        {
-            string coordStr = RemoveSeparators(coord.Replace(" ", ""));
-
-            StringBuilder sb = new();
-            foreach (char c in coordStr.ToUpper().ToCharArray())
-            {
-                switch (c)
-                {
-                    case 'N': sb.Append(ufc.GetCommand("2")); break;
-                    case 'S': sb.Append(ufc.GetCommand("8")); break;
-                    case 'E': sb.Append(ufc.GetCommand("6")); break;
-                    case 'W': sb.Append(ufc.GetCommand("4")); break;
-                    default: sb.Append(ufc.GetCommand(c.ToString())); break;
-                }
-            }
-            return sb.ToString();
-        }
     }
 }
