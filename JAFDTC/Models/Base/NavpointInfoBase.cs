@@ -42,7 +42,8 @@ namespace JAFDTC.Models.Base
             DMS,            // degrees, minutes, seconds
             DDM_P3ZF,       // degrees, decimal minutes (to 3-digit precision), zero-fill degrees
             DDM_P2ZF,       // degrees, decimal minutes (to 2-digit precision), zero-fill degrees
-            DDM_P2,         // degrees, decimal minutes (to 2-digit precision) 
+            DDM_P2,         // degrees, decimal minutes (to 2-digit precision)
+            DDM_P1,         // degrees, decimal minutes (to 1-digit precision)
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -150,6 +151,7 @@ namespace JAFDTC.Models.Base
             [LLFormat.DDM_P3ZF] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{3}’)|([NSns] 90° 00\.000’)$"),
             [LLFormat.DDM_P2ZF] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([NSns] 90° 00\.00’)$"),
             [LLFormat.DDM_P2] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([NSns] 90° 00\.00’)$"),
+            [LLFormat.DDM_P1] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([NSns] 90° 00\.0’)$"),
         };
 
         private static readonly Dictionary<LLFormat, Regex> _regexFormatLon = new()
@@ -159,6 +161,7 @@ namespace JAFDTC.Models.Base
             [LLFormat.DDM_P3ZF] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{3}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{3}’)|([EWew] 180° 00\.000’)$"),
             [LLFormat.DDM_P2ZF] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{2}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{2}’)|([EWew] 180° 00\.00’)$"),
             [LLFormat.DDM_P2] = new(@"^([EWew] [0-9]° [0-5][0-9]\.[0-9]{2}’)|([EWew] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([EWew] 180° 00\.00’)$"),
+            [LLFormat.DDM_P1] = new(@"^([EWew] [0-9]° [0-5][0-9]\.[0-9]’)|([EWew] [0-8][0-9]° [0-5][0-9]\.[0-9]’)|([EWew] 180° 00\.0’)$"),
         };
 
         // ------------------------------------------------------------------------------------------------------------
@@ -207,6 +210,7 @@ namespace JAFDTC.Models.Base
                 LLFormat.DDM_P3ZF => CoreDDtoDDM(latDD, 90.0, "N", "S", 3, true),
                 LLFormat.DDM_P2ZF => CoreDDtoDDM(latDD, 90.0, "N", "S", 2, true),
                 LLFormat.DDM_P2 => CoreDDtoDDM(latDD, 90.0, "N", "S", 2, false),
+                LLFormat.DDM_P1 => CoreDDtoDDM(latDD, 90.0, "N", "S", 1, false),
                 _ => "",
             };
 
@@ -221,6 +225,7 @@ namespace JAFDTC.Models.Base
                 LLFormat.DDM_P3ZF => CoreDDtoDDM(lonDD, 180.0, "E", "W", 3, true),
                 LLFormat.DDM_P2ZF => CoreDDtoDDM(lonDD, 180.0, "E", "W", 2, true),
                 LLFormat.DDM_P2 => CoreDDtoDDM(lonDD, 180.0, "E", "W", 2, false),
+                LLFormat.DDM_P1 => CoreDDtoDDM(lonDD, 180.0, "E", "W", 1, false),
                 _ => "",
             };
 
@@ -235,6 +240,7 @@ namespace JAFDTC.Models.Base
                 LLFormat.DDM_P3ZF => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
                 LLFormat.DDM_P2ZF => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
                 LLFormat.DDM_P2 => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
+                LLFormat.DDM_P1 => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
                 _ => "",
             };
 
@@ -249,6 +255,7 @@ namespace JAFDTC.Models.Base
                 LLFormat.DDM_P3ZF => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
                 LLFormat.DDM_P2ZF => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
                 LLFormat.DDM_P2 => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
+                LLFormat.DDM_P1 => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
                 _ => "",
             };
 
