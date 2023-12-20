@@ -174,8 +174,9 @@ namespace JAFDTC.UI.Base
         private void RebuildEnableState()
         {
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(NavHelper.SystemTag));
+            bool isFull = EditNavpt.Count >= NavHelper.NavptMaxCount;
 
-            Utilities.SetEnableState(uiBarAdd, isEditable);
+            Utilities.SetEnableState(uiBarAdd, isEditable && !isFull);
             Utilities.SetEnableState(uiBarEdit, isEditable && (uiNavptListView.SelectedItems.Count == 1));
             Utilities.SetEnableState(uiBarCopy, isEditable && (uiNavptListView.SelectedItems.Count > 0));
             Utilities.SetEnableState(uiBarPaste, isEditable && IsClipboardValid);
@@ -276,6 +277,7 @@ namespace JAFDTC.UI.Base
             NavHelper.AddNavpoint(Config);
             Config.Save(this, NavHelper.SystemTag);
             CopyConfigToEdit();
+            RebuildInterfaceState();
         }
 
         /// <summary>
@@ -294,12 +296,14 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void CmdPaste_Click(object sender, RoutedEventArgs args)
         {
+            // TODO: need to check paste against maximum navpoint count
             ClipboardData cboard = await General.ClipboardDataAsync();
             if (cboard?.SystemTag == NavHelper.NavptListTag)
             {
                 NavHelper.PasteNavpoints(Config, cboard.Data);
                 Config.Save(this, NavHelper.SystemTag);
                 CopyConfigToEdit();
+                RebuildInterfaceState();
             }
         }
 
@@ -330,6 +334,7 @@ namespace JAFDTC.UI.Base
                     EditNavpt.Remove(navpt);
                 }
                 CopyEditToConfig(true);
+                RebuildInterfaceState();
             }
         }
 
@@ -348,6 +353,7 @@ namespace JAFDTC.UI.Base
             };
             if (await dialog.ShowAsync(ContentDialogPlacement.Popup) == ContentDialogResult.Primary)
             {
+                // TODO: need to check renumbering against maximum navpoint number
                 StartingNavptNum = dialog.Value;
                 RenumberWaypoints();
                 RebuildInterfaceState();
@@ -410,6 +416,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void CmdImport_Click(object sender, RoutedEventArgs args)
         {
+            // TODO: need to check import against maximum navpoint count
             try
             {
                 // ---- pick file

@@ -49,15 +49,21 @@ namespace JAFDTC.UI.Base
         public AirframeTypes AirframeType { get; }
 
         /// <summary>
-        /// return the name to refer to a navpoint (waypoint, steerpoint, etc.) by in the user interface. the string
-        /// should be singular and capitalized.
+        /// return the name to use to refer to a navpoint (waypoint, steerpoint, etc.) by in the user interface. the
+        /// string should be singular and capitalized.
         /// </summary>
         public string NavptName { get; }
 
         /// <summary>
-        /// return the type of the editor interface to use to edit a specific navpoint.
+        /// return the type of the class for the editor interface page to use to edit a navpoint.
         /// </summary>
         public Type NavptEditorType { get; }
+
+        /// <summary>
+        /// return the maximum number of navpoints the system supports. valid navpoint numbers are always on
+        /// [0, NavpointMaxCount).
+        /// </summary>
+        public int NavptMaxCount { get; }
 
         /// <summary>
         /// set up the user interface for the navpoint list editor. this method is called at OnNavigatedTo. 

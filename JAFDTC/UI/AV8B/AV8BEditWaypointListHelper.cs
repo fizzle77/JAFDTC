@@ -58,6 +58,9 @@ namespace JAFDTC.UI.AV8B
 
         public Type NavptEditorType => typeof(EditNavpointPage);
 
+        // TODO: validate maximum navpoint count
+        public int NavptMaxCount => int.MaxValue;
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // methods
