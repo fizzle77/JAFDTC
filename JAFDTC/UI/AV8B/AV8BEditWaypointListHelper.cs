@@ -23,12 +23,13 @@ using JAFDTC.Models.AV8B.WYPT;
 using JAFDTC.Models.Base;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.UI.Xaml.Controls;
+
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.AV8B
@@ -123,7 +124,7 @@ namespace JAFDTC.UI.AV8B
                     Lon = (importStpt.ContainsKey("lon")) ? importStpt["lon"] : "",
                     Alt = (importStpt.ContainsKey("alt")) ? importStpt["alt"] : ""
                 };
-                ((AV8BConfiguration)config).WYPT.Add();
+                ((AV8BConfiguration)config).WYPT.Add(wypt);
             }
         }
 
@@ -134,7 +135,30 @@ namespace JAFDTC.UI.AV8B
 
         public void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
         {
-            // TODO: implement
+            WYPTSystem wyptSys = ((AV8BConfiguration)config).WYPT;
+            for (int i = 0; i < wypts.Length; i++)
+            {
+                if (!wypts[i].IsTarget && (startIndex < wyptSys.Count))
+                {
+                    wyptSys.Points[startIndex].Name = $"WP{i + 1} DCS Capture";
+                    wyptSys.Points[startIndex].Lat = wypts[i].Latitude;
+                    wyptSys.Points[startIndex].Lon = wypts[i].Longitude;
+                    wyptSys.Points[startIndex].Alt = wypts[i].Elevation;
+                    startIndex++;
+                }
+                else if (!wypts[i].IsTarget)
+                {
+                    WaypointInfo wypt = new()
+                    {
+                        Name = $"WP{i + 1} DCS Capture",
+                        Lat = wypts[i].Latitude,
+                        Lon = wypts[i].Longitude,
+                        Alt = wypts[i].Elevation
+                    };
+                    wyptSys.Add(wypt);
+                    startIndex++;
+                }
+            }
         }
 
         public object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt)

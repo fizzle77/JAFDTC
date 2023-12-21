@@ -28,6 +28,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.AV8B
@@ -60,8 +61,8 @@ namespace JAFDTC.UI.AV8B
             WaypointInfo wyptDst = (WaypointInfo)edit;
             wyptDst.Number = wyptSrc.Number;
             wyptDst.Name = new(wyptSrc.Name);
-            wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(wyptSrc.Lat, NavpointInfoBase.LLFormat.DDM_P3ZF);
-            wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(wyptSrc.Lon, NavpointInfoBase.LLFormat.DDM_P3ZF);
+            wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(wyptSrc.Lat, NavpointInfoBase.LLFormat.DMS);
+            wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(wyptSrc.Lon, NavpointInfoBase.LLFormat.DMS);
             wyptDst.Alt = new(wyptSrc.Alt);
         }
 
@@ -102,8 +103,8 @@ namespace JAFDTC.UI.AV8B
             {
                 WaypointInfo wyptDst = (WaypointInfo)edit;
                 wyptDst.Name = poi.Name;
-                wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(poi.Latitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
-                wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(poi.Longitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
+                wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(poi.Latitude, NavpointInfoBase.LLFormat.DMS);
+                wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(poi.Longitude, NavpointInfoBase.LLFormat.DMS);
                 wyptDst.Alt = poi.Elevation.ToString();
                 wyptDst.ClearErrors();
             }
@@ -115,8 +116,8 @@ namespace JAFDTC.UI.AV8B
             {
                 WaypointInfo wyptDst = (WaypointInfo)edit;
                 wyptDst.Name = "DCS Capture";
-                wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(wypt.Latitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
-                wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(wypt.Longitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
+                wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(wypt.Latitude, NavpointInfoBase.LLFormat.DMS);
+                wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(wypt.Longitude, NavpointInfoBase.LLFormat.DMS);
                 wyptDst.Alt = wypt.Elevation.ToString();
                 wyptDst.ClearErrors();
             }
