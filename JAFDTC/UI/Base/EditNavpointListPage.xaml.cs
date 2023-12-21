@@ -23,6 +23,7 @@ using JAFDTC.Models.Import;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -41,7 +42,6 @@ using Windows.Storage;
 using WinRT.Interop;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
-using Microsoft.UI.Dispatching;
 
 namespace JAFDTC.UI.Base
 {
@@ -63,7 +63,7 @@ namespace JAFDTC.UI.Base
 
         private ConfigEditorPageNavArgs NavArgs { get; set; }
 
-        private IEditNavpointListPageHelper NavHelper { get; set; }
+        private IEditNavpointListPageHelper PageHelper { get; set; }
 
         // NOTE: changes to the Config object here may only occur through the marshall methods. bindings to and edits
         // NOTE: by the ui are always directed at the EditWYPT property.
@@ -113,7 +113,7 @@ namespace JAFDTC.UI.Base
         private void CopyConfigToEdit()
         {
             IsMarshalling = true;
-            NavHelper.CopyConfigToEdit(Config, EditNavpt);
+            PageHelper.CopyConfigToEdit(Config, EditNavpt);
             IsMarshalling = false;
         }
 
@@ -123,9 +123,9 @@ namespace JAFDTC.UI.Base
         private void CopyEditToConfig(bool isPersist = false)
         {
             IsMarshalling = true;
-            if (NavHelper.CopyEditToConfig(EditNavpt, Config) && isPersist)
+            if (PageHelper.CopyEditToConfig(EditNavpt, Config) && isPersist)
             {
-                Config.Save(this, NavHelper.SystemTag);
+                Config.Save(this, PageHelper.SystemTag);
             }
             IsMarshalling = false;
         }
@@ -143,7 +143,7 @@ namespace JAFDTC.UI.Base
         {
             CopyEditToConfig(true);
             NavArgs.BackButton.IsEnabled = false;
-            this.Frame.Navigate(NavHelper.NavptEditorType, NavHelper.NavptEditorArg(this, Config, EditNavpt.IndexOf(navpt)),
+            this.Frame.Navigate(PageHelper.NavptEditorType, PageHelper.NavptEditorArg(this, Config, EditNavpt.IndexOf(navpt)),
                                 new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
         }
 
@@ -164,7 +164,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void RebuildLinkControls()
         {
-            Utilities.RebuildLinkControls(Config, NavHelper.SystemTag, NavArgs.UIDtoConfigMap, uiPageBtnTxtLink, uiPageTxtLink);
+            Utilities.RebuildLinkControls(Config, PageHelper.SystemTag, NavArgs.UIDtoConfigMap, uiPageBtnTxtLink, uiPageTxtLink);
         }
 
         /// <summary>
@@ -173,8 +173,8 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void RebuildEnableState()
         {
-            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(NavHelper.SystemTag));
-            bool isFull = EditNavpt.Count >= NavHelper.NavptMaxCount;
+            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(PageHelper.SystemTag));
+            bool isFull = EditNavpt.Count >= PageHelper.NavptMaxCount;
 
             Utilities.SetEnableState(uiBarAdd, isEditable && !isFull);
             Utilities.SetEnableState(uiBarEdit, isEditable && (uiNavptListView.SelectedItems.Count == 1));
@@ -220,17 +220,17 @@ namespace JAFDTC.UI.Base
             ContentDialog dialog = new()
             {
                 XamlRoot = Content.XamlRoot,
-                Title = $"Reset {NavHelper.NavptName}?",
-                Content = $"Are you sure you want to delete all {NavHelper.NavptName.ToLower()}? This action cannot be undone.",
+                Title = $"Reset {PageHelper.NavptName}?",
+                Content = $"Are you sure you want to delete all {PageHelper.NavptName.ToLower()}? This action cannot be undone.",
                 PrimaryButtonText = "Delete All",
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Primary
             };
             if (await dialog.ShowAsync(ContentDialogPlacement.Popup) == ContentDialogResult.Primary)
             {
-                Config.UnlinkSystem(NavHelper.SystemTag);
-                NavHelper.ResetSystem(Config);
-                Config.Save(this, NavHelper.SystemTag);
+                Config.UnlinkSystem(PageHelper.SystemTag);
+                PageHelper.ResetSystem(Config);
+                Config.Save(this, PageHelper.SystemTag);
                 CopyConfigToEdit();
             }
         }
@@ -240,17 +240,17 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
         {
-            string selItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, NavHelper.SystemTag, _configNameList);
+            string selItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, PageHelper.SystemTag, _configNameList);
             if (selItem == null)
             {
                 CopyEditToConfig(true);
-                Config.UnlinkSystem(NavHelper.SystemTag);
+                Config.UnlinkSystem(PageHelper.SystemTag);
                 Config.Save(this);
                 CopyConfigToEdit();
             }
             else if (selItem.Length > 0)
             {
-                Config.LinkSystemTo(NavHelper.SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selItem]]);
+                Config.LinkSystemTo(PageHelper.SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selItem]]);
                 Config.Save(this);
                 CopyConfigToEdit();
             }
@@ -274,8 +274,8 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void CmdAdd_Click(object sender, RoutedEventArgs args)
         {
-            NavHelper.AddNavpoint(Config);
-            Config.Save(this, NavHelper.SystemTag);
+            PageHelper.AddNavpoint(Config);
+            Config.Save(this, PageHelper.SystemTag);
             CopyConfigToEdit();
             RebuildInterfaceState();
         }
@@ -286,7 +286,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void CmdCopy_Click(object sender, RoutedEventArgs args)
         {
-            General.DataToClipboard(NavHelper.NavptListTag,
+            General.DataToClipboard(PageHelper.NavptListTag,
                                     JsonSerializer.Serialize(uiNavptListView.SelectedItems, Configuration.JsonOptions));
         }
 
@@ -298,10 +298,10 @@ namespace JAFDTC.UI.Base
         {
             // TODO: need to check paste against maximum navpoint count
             ClipboardData cboard = await General.ClipboardDataAsync();
-            if (cboard?.SystemTag == NavHelper.NavptListTag)
+            if (cboard?.SystemTag == PageHelper.NavptListTag)
             {
-                NavHelper.PasteNavpoints(Config, cboard.Data);
-                Config.Save(this, NavHelper.SystemTag);
+                PageHelper.PasteNavpoints(Config, cboard.Data);
+                Config.Save(this, PageHelper.SystemTag);
                 CopyConfigToEdit();
                 RebuildInterfaceState();
             }
@@ -315,11 +315,11 @@ namespace JAFDTC.UI.Base
         {
             Debug.Assert(uiNavptListView.SelectedItems.Count > 0);
 
-            string title = (uiNavptListView.SelectedItems.Count == 1) ? $"Delete {NavHelper.NavptName}?"
-                                                                      : $"Delete {NavHelper.NavptName}s?";
+            string title = (uiNavptListView.SelectedItems.Count == 1) ? $"Delete {PageHelper.NavptName}?"
+                                                                      : $"Delete {PageHelper.NavptName}s?";
             string content = (uiNavptListView.SelectedItems.Count == 1)
-                ? $"Are you sure you want to delete this {NavHelper.NavptName.ToLower()}? This action cannot be undone."
-                : $"Are you sure you want to delete these {NavHelper.NavptName.ToLower()}? This action cannot be undone.";
+                ? $"Are you sure you want to delete this {PageHelper.NavptName.ToLower()}? This action cannot be undone."
+                : $"Are you sure you want to delete these {PageHelper.NavptName.ToLower()}? This action cannot be undone.";
             if (await Utilities.Message2BDialog(Content.XamlRoot, title, content, "Delete") == ContentDialogResult.Primary)
             {
                 List<INavpointInfo> deleteList = new();
@@ -370,9 +370,9 @@ namespace JAFDTC.UI.Base
             {
                 result = await Utilities.Message2BDialog(
                     Content.XamlRoot,
-                    $"Capture {NavHelper.NavptName} from DCS",
+                    $"Capture {PageHelper.NavptName} from DCS",
                     $"Would you like to append coordiantes captured from DCS to the end of the " +
-                    $"{NavHelper.NavptName.ToLower()} list or replace starting from the current selection?",
+                    $"{PageHelper.NavptName.ToLower()} list or replace starting from the current selection?",
                     $"Append",
                     $"Replace");
             }
@@ -390,7 +390,7 @@ namespace JAFDTC.UI.Base
             WyptCaptureDataRx.Instance.WyptCaptureDataReceived += CmdCapture_WyptCaptureDataReceived;
             await Utilities.Message1BDialog(
                 Content.XamlRoot,
-                $"Capturing {NavHelper.NavptName} in DCS",
+                $"Capturing {PageHelper.NavptName} in DCS",
                 $"From DCS, type [CTRL]-[SHIFT]-J to show the coordinate selection dialog, then move the crosshair over " +
                 $"the desired point in the F10 map. Click “Done” below when finished.",
                 $"Done");
@@ -407,7 +407,7 @@ namespace JAFDTC.UI.Base
         {
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
             {
-                NavHelper.CaptureNavpoints(Config, wypts, CaptureIndex);
+                PageHelper.CaptureNavpoints(Config, wypts, CaptureIndex);
             });
         }
 
@@ -439,18 +439,18 @@ namespace JAFDTC.UI.Base
                 if ((file != null) && (file.FileType.ToLower() == ".json"))
                 {
                     ContentDialogResult action = await Utilities.Message3BDialog(Content.XamlRoot,
-                        $"Import {NavHelper.NavptName}",
-                        $"Do you want to replace or append to the {NavHelper.NavptName} currently in the configuration?",
+                        $"Import {PageHelper.NavptName}",
+                        $"Do you want to replace or append to the {PageHelper.NavptName} currently in the configuration?",
                         $"Replace",
                         $"Append",
                         $"Cancel");
                     if (action != ContentDialogResult.None)
                     {
                         string json = FileManager.ReadFile(file.Path);
-                        if ((json != null) && !NavHelper.PasteNavpoints(Config, json, (action == ContentDialogResult.Primary)))
+                        if ((json != null) && !PageHelper.PasteNavpoints(Config, json, (action == ContentDialogResult.Primary)))
                         {
                             await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed",
-                                                            $"Unable to read the {NavHelper.NavptName} from the JSON file.");
+                                                            $"Unable to read the {PageHelper.NavptName} from the JSON file.");
                         }
                         CopyEditToConfig(true);
                     }
@@ -458,11 +458,11 @@ namespace JAFDTC.UI.Base
                 }
                 else if ((file != null) && (file.FileType.ToLower() == ".cf"))
                 {
-                    importer = new ImportHelperCF(NavHelper.AirframeType, file.Path);
+                    importer = new ImportHelperCF(PageHelper.AirframeType, file.Path);
                 }
                 else if ((file != null) && (file.FileType.ToLower() == ".miz"))
                 {
-                    importer = new ImportHelperMIZ(NavHelper.AirframeType, file.Path);
+                    importer = new ImportHelperMIZ(PageHelper.AirframeType, file.Path);
                 }
                 else
                 {
@@ -474,7 +474,7 @@ namespace JAFDTC.UI.Base
                 GetListDialog flightList = new(importer.Flights())
                 {
                     XamlRoot = Content.XamlRoot,
-                    Title = $"Select a Flight to Import {NavHelper.NavptName} From",
+                    Title = $"Select a Flight to Import {PageHelper.NavptName} From",
                     PrimaryButtonText = "Replace",
                     SecondaryButtonText = "Append",
                     CloseButtonText = "Cancel"
@@ -486,14 +486,14 @@ namespace JAFDTC.UI.Base
                     List<Dictionary<string, string>> importWypts = importer.Waypoints(flightList.SelectedItem);
                     if ((importWypts != null) && (importWypts.Count > 0))
                     {
-                        NavHelper.ImportNavpoints(Config, importWypts, isReplace);
-                        Config.Save(this, NavHelper.SystemTag);
+                        PageHelper.ImportNavpoints(Config, importWypts, isReplace);
+                        Config.Save(this, PageHelper.SystemTag);
                         CopyConfigToEdit();
                     }
                     else
                     {
                         await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed",
-                                                        $"Unable to read the {NavHelper.NavptName} from the file.");
+                                                        $"Unable to read the {PageHelper.NavptName} from the file.");
                     }
                     RebuildInterfaceState();
                 }
@@ -502,7 +502,7 @@ namespace JAFDTC.UI.Base
             {
                 FileManager.Log($"EditNavpointListPAge:CmdImport_Click exception {ex}");
                 await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed",
-                                                $"Unable to import the {NavHelper.NavptName.ToLower()}s.");
+                                                $"Unable to import the {PageHelper.NavptName.ToLower()}s.");
             }
         }
 
@@ -514,7 +514,7 @@ namespace JAFDTC.UI.Base
         {
             try
             {
-                string filename = ((Config.Name.Length > 0) ? Config.Name + " " : "") + NavHelper.NavptName;
+                string filename = ((Config.Name.Length > 0) ? Config.Name + " " : "") + PageHelper.NavptName;
                 FileSavePicker picker = new()
                 {
                     SuggestedStartLocation = PickerLocationId.Desktop,
@@ -527,14 +527,14 @@ namespace JAFDTC.UI.Base
                 StorageFile file = await picker.PickSaveFileAsync();
                 if (file != null)
                 {
-                    FileManager.WriteFile(file.Path, NavHelper.ExportNavpoints(Config));
+                    FileManager.WriteFile(file.Path, PageHelper.ExportNavpoints(Config));
                 }
             }
             catch (Exception ex)
             {
                 FileManager.Log($"EditNavpointListPage:CmdExport_Click exception {ex}");
                 await Utilities.Message1BDialog(Content.XamlRoot, "Export Failed",
-                                                $"Unable to export the {NavHelper.NavptName.ToLower()}s.");
+                                                $"Unable to export the {PageHelper.NavptName.ToLower()}s.");
             }
         }
 
@@ -561,7 +561,7 @@ namespace JAFDTC.UI.Base
                 RebuildInterfaceState();
             }
 
-            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(NavHelper.SystemTag));
+            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(PageHelper.SystemTag));
             uiNavptListCtxMenuFlyout.Items[0].IsEnabled = false;     // edit
             uiNavptListCtxMenuFlyout.Items[1].IsEnabled = false;     // copy
             uiNavptListCtxMenuFlyout.Items[2].IsEnabled = false;     // paste
@@ -604,7 +604,7 @@ namespace JAFDTC.UI.Base
         private async void ClipboardChangedHandler(object sender, object args)
         {
             ClipboardData cboard = await General.ClipboardDataAsync();
-            IsClipboardValid = ((cboard != null) && (cboard.SystemTag.StartsWith(NavHelper.NavptListTag)));
+            IsClipboardValid = ((cboard != null) && (cboard.SystemTag.StartsWith(PageHelper.NavptListTag)));
             RebuildInterfaceState();
         }
 
@@ -659,9 +659,9 @@ namespace JAFDTC.UI.Base
         {
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
 
-            NavHelper = (IEditNavpointListPageHelper)Activator.CreateInstance(NavArgs.EditorHelperType);
+            PageHelper = (IEditNavpointListPageHelper)Activator.CreateInstance(NavArgs.EditorHelperType);
 
-            NavHelper.SetupUserInterface(NavArgs.Config, uiNavptListView);
+            PageHelper.SetupUserInterface(NavArgs.Config, uiNavptListView);
 
             Config = NavArgs.Config;
             CopyConfigToEdit();
@@ -674,7 +674,7 @@ namespace JAFDTC.UI.Base
             Clipboard.ContentChanged += ClipboardChangedHandler;
             ((Application.Current as JAFDTC.App)?.Window).Activated += WindowActivatedHandler;
 
-            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, NavHelper.SystemTag,
+            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, PageHelper.SystemTag,
                                            _configNameList, _configNameToUID);
 
             ClipboardChangedHandler(null, null);
