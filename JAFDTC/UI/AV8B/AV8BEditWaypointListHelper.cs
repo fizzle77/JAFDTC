@@ -41,7 +41,7 @@ namespace JAFDTC.UI.AV8B
     {
         public static ConfigEditorPageInfo PageInfo
             => new(WYPTSystem.SystemTag, "Waypoints", "WYPT", Glyphs.WYPT,
-                   typeof(EditNavpointListPage), typeof(AV8BEditWaypointListHelper));
+                   typeof(AV8BEditWaypointListPage), typeof(AV8BEditWaypointListHelper));
 
         // ------------------------------------------------------------------------------------------------------------
         //

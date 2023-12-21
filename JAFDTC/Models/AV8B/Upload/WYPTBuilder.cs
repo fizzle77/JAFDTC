@@ -63,8 +63,16 @@ namespace JAFDTC.Models.AV8B.Upload
                 {
                     if (wypts[i].IsValid)
                     {
-                        AppendCommand(ufc.GetCommand("7"));
-                        AppendCommand(ufc.GetCommand("7"));
+                        if (_cfg.WYPT.IsAppendMode)
+                        {
+                            AppendCommand(ufc.GetCommand($"{wypts[i].Number - 1}"));
+                            AppendCommand(ufc.GetCommand($"{wypts[i].Number}"));
+                        }
+                        else
+                        {
+                            AppendCommand(ufc.GetCommand("7"));
+                            AppendCommand(ufc.GetCommand("7"));
+                        }
                         AppendCommand(ufc.GetCommand("UFC_ENTER"));
                         AppendCommand(odu.GetCommand("ODU_OPT2"));
 

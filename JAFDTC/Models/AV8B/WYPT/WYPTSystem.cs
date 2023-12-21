@@ -34,13 +34,22 @@ namespace JAFDTC.Models.AV8B.WYPT
 
         // ------------------------------------------------------------------------------------------------------------
         //
+        // properties
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        public bool IsAppendMode { get; set; }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
         // construction
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public WYPTSystem() => (Points) = (new ObservableCollection<WaypointInfo>());
+        public WYPTSystem() => (Points, IsAppendMode) = (new ObservableCollection<WaypointInfo>(), false);
 
-        public WYPTSystem(WYPTSystem other) => (Points) = (new ObservableCollection<WaypointInfo>(other.Points));
+        public WYPTSystem(WYPTSystem other)
+            => (Points, IsAppendMode) = (new ObservableCollection<WaypointInfo>(other.Points), other.IsAppendMode);
 
         public virtual object Clone() => new WYPTSystem(this);
 
