@@ -18,6 +18,7 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.FA18C.CMS;
 using JAFDTC.Models.FA18C.Radio;
 using JAFDTC.Models.FA18C.WYPT;
 using JAFDTC.UI.FA18C;
@@ -43,6 +44,8 @@ namespace JAFDTC.Models.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        public CMSSystem CMS { get; set; }
+
         public RadioSystem Radio { get; set; }
 
         public WYPTSystem WYPT { get; set; }
@@ -59,6 +62,7 @@ namespace JAFDTC.Models.FA18C
         public FA18CConfiguration(string uid, string name, Dictionary<string, string> linkedSysMap)
             : base(VersionCfgFA18C, AirframeTypes.FA18C, uid, name, linkedSysMap)
         {
+            CMS = new CMSSystem();
             Radio = new RadioSystem();
             WYPT = new WYPTSystem();
             ConfigurationUpdated();
@@ -73,6 +77,7 @@ namespace JAFDTC.Models.FA18C
             }
             FA18CConfiguration clone = new("", Name, linkedSysMap)
             {
+                CMS = (CMSSystem)CMS.Clone(),
                 Radio = (RadioSystem)Radio.Clone(),
                 WYPT = (WYPTSystem)WYPT.Clone()
             };
@@ -105,7 +110,7 @@ namespace JAFDTC.Models.FA18C
             string stpts = "";
             if (!WYPT.IsDefault)
             {
-                stpts = $" along with {WYPT.Count} steerpoint" + ((WYPT.Count > 1) ? "s" : "");
+                stpts = $" along with {WYPT.Count} waypoint" + ((WYPT.Count > 1) ? "s" : "");
             }
             UpdatesInfoText = updatesStrings["UpdatesInfoText"] + stpts;
             UpdatesIcons = updatesStrings["UpdatesIcons"];
@@ -117,6 +122,7 @@ namespace JAFDTC.Models.FA18C
             return systemTag switch
             {
                 null => JsonSerializer.Serialize(this, Configuration.JsonOptions),
+                CMSSystem.SystemTag => JsonSerializer.Serialize(CMS, Configuration.JsonOptions),
                 RadioSystem.SystemTag => JsonSerializer.Serialize(Radio, Configuration.JsonOptions),
                 WYPTSystem.SystemTag => JsonSerializer.Serialize(WYPT, Configuration.JsonOptions),
                 _ => null
@@ -125,6 +131,7 @@ namespace JAFDTC.Models.FA18C
 
         public override void AfterLoadFromJSON()
         {
+            CMS ??= new CMSSystem();
             Radio ??= new RadioSystem();
             WYPT ??= new WYPTSystem();
 
@@ -141,7 +148,8 @@ namespace JAFDTC.Models.FA18C
         {
             return (!string.IsNullOrEmpty(cboardTag) &&
                     (((systemTag != null) && (cboardTag.StartsWith(systemTag))) ||
-                     ((systemTag == null) && ((cboardTag == RadioSystem.SystemTag) ||
+                     ((systemTag == null) && ((cboardTag == CMSSystem.SystemTag) ||
+                                              (cboardTag == RadioSystem.SystemTag) ||
                                               (cboardTag == WYPTSystem.SystemTag)))));
         }
 
@@ -153,6 +161,7 @@ namespace JAFDTC.Models.FA18C
             {
                 switch (systemTag)
                 {
+                    case CMSSystem.SystemTag: CMS = JsonSerializer.Deserialize<CMSSystem>(json); break;
                     case RadioSystem.SystemTag: Radio = JsonSerializer.Deserialize<RadioSystem>(json); break;
                     case WYPTSystem.SystemTag: WYPT = JsonSerializer.Deserialize<WYPTSystem>(json); break;
                     default: isHandled = false; break;

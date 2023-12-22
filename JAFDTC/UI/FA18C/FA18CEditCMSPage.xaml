@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="JAFDTC.UI.FA18C.FA18CEditCMSPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.FA18C"
+    xmlns:ui_base="using:JAFDTC.UI.F16C"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+
+    <Page.Resources>
+
+        <!-- style for enabled static text -->
+        <Style x:Key="EnabledStaticTextStyle" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimary}"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- style for disabled static text -->
+        <Style x:Key="DisabledStaticTextStyle" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{StaticResource TextFillColorDisabled}"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- brush for error fields. -->
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+
+    </Page.Resources>
+
+    <Grid Margin="16,12,16,8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0 : program select
+        ===============================================================================================================
+        -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+            <TextBlock Margin="0,0,12,0" VerticalAlignment="Center">
+                CMS CM Program
+            </TextBlock>
+            <ComboBox Width="130"
+                      x:Name="uiPgmSelectCombo"
+                      VerticalAlignment="Center"
+                      SelectionChanged="PgmSelectCombo_SelectionChanged"
+                      ToolTipService.ToolTip="Selects CMS Program to Edit">
+                <!-- Tag is enum JAFDTC.Models.FA18C.CMS.ProgramNumbers, Tag == index -->
+                <ComboBox.Items>
+                    <Grid Tag="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiPgmSelectItem1Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Text="PROG 1"/>
+                    </Grid>
+                    <Grid Tag="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiPgmSelectItem2Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Text="PROG 2"/>
+                    </Grid>
+                    <Grid Tag="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiPgmSelectItem3Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Text="PROG 3"/>
+                    </Grid>
+                    <Grid Tag="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiPgmSelectItem4Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;" />
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Text="PROG 4"/>
+                    </Grid>
+                    <Grid Tag="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0"
+                                  x:Name="uiPgmSelectItem5Icon"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Text="PROG 5"/>
+                    </Grid>
+                </ComboBox.Items>
+            </ComboBox>
+            <Button Margin="24,0,6,0" VerticalAlignment="Center"
+                    x:Name="uiPgmPrevBtn"
+                    ToolTipService.ToolTip="Selects Previous CMS Program"
+                    Click="PgmBtnPrev_Click">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
+            </Button>
+            <Button VerticalAlignment="Center"
+                    x:Name="uiPgmNextBtn"
+                    ToolTipService.ToolTip="Selects Next CMS Program"
+                    Click="PgmBtnNext_Click">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
+            </Button>
+        </StackPanel>
+
+        <!--
+        ===============================================================================================================
+        row 1 : program parameters
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="1" Margin="4,18,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="130"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- CHAFF Q -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,24,12,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                Chaff CM Quantity
+            </TextBlock>
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,12,0,0"
+                     x:Name="uiPgmValueChaffQ"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     Text="{x:Bind EditCMS.Programs[0].ChaffQ, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     MaxLength="8"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Stretch"
+                     LostFocus="CMSTextBox_LostFocus"
+                     ToolTipService.ToolTip="TODO"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Margin="12,12,0,0" VerticalAlignment="Center">chaff</TextBlock>
+
+            <!-- FLARE Q -->
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,12,12,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                Flare CM Quantity
+            </TextBlock>
+            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,12,0,0"
+                     x:Name="uiPgmValueFlareQ"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     Text="{x:Bind EditCMS.Programs[0].FlareQ, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     MaxLength="8"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Stretch"
+                     LostFocus="CMSTextBox_LostFocus"
+                     ToolTipService.ToolTip="TODO"/>
+            <TextBlock Grid.Row="2" Grid.Column="2" Margin="12,12,0,0" VerticalAlignment="Center">flares</TextBlock>
+
+            <!-- SQ -->
+            <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,12,12,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                Program Repeat Count
+            </TextBlock>
+            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,12,0,0"
+                     x:Name="uiPgmValueSQ"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     Text="{x:Bind EditCMS.Programs[0].SQ, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     MaxLength="8"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Stretch"
+                     LostFocus="CMSTextBox_LostFocus"
+                     ToolTipService.ToolTip="TODO"/>
+            <TextBlock Grid.Row="3" Grid.Column="2" Margin="12,12,0,0" VerticalAlignment="Center">bursts</TextBlock>
+
+            <!-- SI -->
+            <TextBlock Grid.Row="4" Grid.Column="0" Margin="0,12,12,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                Program Repeat Interval
+            </TextBlock>
+            <TextBox Grid.Row="4" Grid.Column="1" Margin="0,12,0,0"
+                     x:Name="uiPgmValueSI"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     Text="{x:Bind EditCMS.Programs[0].SI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     MaxLength="8"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Stretch"
+                     LostFocus="CMSTextBox_LostFocus"
+                     ToolTipService.ToolTip="TODO"/>
+            <TextBlock Grid.Row="4" Grid.Column="2" Margin="12,12,0,0" VerticalAlignment="Center">seconds</TextBlock>
+
+            <!-- CM program reset -->
+            <Button Grid.Row="5" Grid.Column="1" Margin="0,12,0,0"
+                    x:Name="uiPgmBtnReset"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Click="PgmBtnReset_Click"
+                    ToolTipService.ToolTip="TODO">
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon Margin="0,0,6,0"
+                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                    <TextBlock VerticalAlignment="center">Reset</TextBlock>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 2 : program visual display
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="2" Margin="12,12,12,24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0"
+                       VerticalAlignment="Center"
+                       HorizontalTextAlignment="Right">
+                Chaff
+            </TextBlock>
+            <!-- TODO: why can't we use a static resource for foreground? -->
+            <ui_base:F16CCMProgramCanvas Grid.Row="0" Grid.Column="1" Margin="12,12,0,0"
+                                         x:Name="uiCMPgmChaffCanvas"
+                                         Foreground="DarkGray"
+                                         VerticalAlignment="Center"
+                                         HorizontalAlignment="Stretch">
+            </ui_base:F16CCMProgramCanvas>
+            <TextBlock Grid.Row="1" Grid.Column="0"
+                       VerticalAlignment="Center"
+                       HorizontalTextAlignment="Right">
+                Flare
+            </TextBlock>
+            <!-- TODO: why can't we use a static resource for foreground? -->
+            <ui_base:F16CCMProgramCanvas Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
+                                         x:Name="uiCMPgmFlareCanvas"
+                                         Foreground="DarkGray"
+                                         VerticalAlignment="Center"
+                                         HorizontalAlignment="Stretch">
+            </ui_base:F16CCMProgramCanvas>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 4 : link / reset
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button Width="140"
+                        x:Name="uiPageBtnLink"
+                        Click="PageBtnLink_Click"
+                        ToolTipService.ToolTip="Link or Unlink this Setup to CMS Setup from Another Configuration">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE723;"/>
+                        <TextBlock VerticalAlignment="center"
+                                   x:Name="uiPageBtnTxtLink">
+                            FIXUP
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <TextBlock Margin="12,0,24,0"
+                           x:Name="uiPageTxtLink"
+                           VerticalAlignment="center">
+                    FIXUP
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button x:Name="uiPageBtnResetAll"
+                        Click="PageBtnResetAll_Click"
+                        ToolTipService.ToolTip="TODO">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                        <TextBlock VerticalAlignment="center">
+                            Reset System to Defaults
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

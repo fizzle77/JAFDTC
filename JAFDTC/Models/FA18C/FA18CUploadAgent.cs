@@ -18,6 +18,7 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.FA18C.CMS;
 using JAFDTC.Models.FA18C.Upload;
 using System.Diagnostics;
 using System.Text;
@@ -55,8 +56,9 @@ namespace JAFDTC.Models.FA18C
 
         public override void BuildSystems(StringBuilder sb)
         {
-            new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
+            new CMSBuilder(_cfg, _dcsCmds, sb).Build();
+            new RadioBuilder(_cfg, _dcsCmds, sb).Build();
         }
     }
 }
