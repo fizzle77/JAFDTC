@@ -58,7 +58,7 @@ namespace JAFDTC.Models.FA18C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure radio system (com1/com2 uhf/vhf radios) via the icp/ded according to the non-default programming
+        /// configure radio system (com1/com2 uhf/vhf radios) via the ufc according to the non-default programming
         /// settings (this function is safe to call with a configuration with default settings: defaults are skipped as
         /// necessary).
         /// <summary>
