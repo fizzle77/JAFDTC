@@ -21,6 +21,7 @@ using JAFDTC.Models;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.CMDS;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Base;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;

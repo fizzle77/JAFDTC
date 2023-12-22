@@ -3,7 +3,6 @@ using JAFDTC.Models.FA18C;
 using JAFDTC.Models.FA18C.CMS;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
-using JAFDTC.UI.F16C;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;

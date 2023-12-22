@@ -23,6 +23,7 @@ https://www.gnu.org/licenses/.
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:JAFDTC.UI.F16C"
+    xmlns:ui_base="using:JAFDTC.UI.Base"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -445,12 +446,12 @@ https://www.gnu.org/licenses/.
                 Chaff
             </TextBlock>
             <!-- TODO: why can't we use a static resource for foreground? -->
-            <local:F16CCMProgramCanvas Grid.Row="0" Grid.Column="1" Margin="12,12,0,0"
-                                       x:Name="uiCMPgmChaffCanvas"
-                                       Foreground="DarkGray"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Stretch">
-            </local:F16CCMProgramCanvas>
+            <ui_base:CMProgramCanvas Grid.Row="0" Grid.Column="1" Margin="12,12,0,0"
+                                     x:Name="uiCMPgmChaffCanvas"
+                                     Foreground="DarkGray"
+                                     VerticalAlignment="Center"
+                                     HorizontalAlignment="Stretch">
+            </ui_base:CMProgramCanvas>
 
             <TextBlock Grid.Row="1" Grid.Column="0"
                        VerticalAlignment="Center"
@@ -458,12 +459,12 @@ https://www.gnu.org/licenses/.
                 Flare
             </TextBlock>
             <!-- TODO: why can't we use a static resource for foreground? -->
-            <local:F16CCMProgramCanvas Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
-                                       x:Name="uiCMPgmFlareCanvas"
-                                       Foreground="DarkGray"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Stretch">
-            </local:F16CCMProgramCanvas>
+            <ui_base:CMProgramCanvas Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
+                                     x:Name="uiCMPgmFlareCanvas"
+                                     Foreground="DarkGray"
+                                     VerticalAlignment="Center"
+                                     HorizontalAlignment="Stretch">
+            </ui_base:CMProgramCanvas>
         </Grid>
 
         <!--

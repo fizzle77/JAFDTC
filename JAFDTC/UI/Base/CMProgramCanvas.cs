@@ -27,7 +27,7 @@ using System.Diagnostics;
 using Windows.Foundation;
 using Windows.UI;
 
-namespace JAFDTC.UI.F16C
+namespace JAFDTC.UI.Base
 {
     /// <summary>
     /// canvas representation of a countermeasure program.
@@ -51,7 +51,7 @@ namespace JAFDTC.UI.F16C
     /// <summary>
     /// TODO: document
     /// </summary>
-    internal class F16CCMProgramCanvas : Canvas
+    internal class CMProgramCanvas : Canvas
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -62,7 +62,7 @@ namespace JAFDTC.UI.F16C
         DependencyProperty ForegroundProperty = DependencyProperty.Register(
                                                     nameof(Foreground),
                                                     typeof(Brush),
-                                                    typeof(F16CCMProgramCanvas),
+                                                    typeof(CMProgramCanvas),
                                                     new PropertyMetadata(default(Brush),
                                                                          new PropertyChangedCallback(OnForegroundChanged)));
         public Brush Foreground
@@ -109,7 +109,7 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F16CCMProgramCanvas()
+        public CMProgramCanvas()
         {
             Pgm = new();
 
@@ -137,7 +137,7 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private static void OnForegroundChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
-            F16CCMProgramCanvas canvas = obj as F16CCMProgramCanvas;
+            CMProgramCanvas canvas = obj as CMProgramCanvas;
             canvas.CLine.Stroke = canvas.Foreground;
             foreach (Line tick in canvas.ChLineSalvoTickList)
             {
@@ -229,23 +229,23 @@ namespace JAFDTC.UI.F16C
         public void SetProgram(CMProgramCanvasParams pgmCanvas, CMProgramCanvasParams pgmOther)
         {
             double durCanvas = 1;
-            if ((pgmCanvas.SQ * pgmCanvas.SI) > (pgmOther.SQ * pgmOther.SI))
+            if (pgmCanvas.SQ * pgmCanvas.SI > pgmOther.SQ * pgmOther.SI)
             {
                 durCanvas = pgmCanvas.SQ * pgmCanvas.SI;
             }
-            else if ((pgmOther.SQ * pgmOther.SI) > 0)
+            else if (pgmOther.SQ * pgmOther.SI > 0)
             {
                 durCanvas = pgmOther.SQ * pgmOther.SI;
             }
 
-            if ((Duration != durCanvas) ||
-                (pgmCanvas.BQ != Pgm.BQ) || (pgmCanvas.BI != Pgm.BI) ||
-                (pgmCanvas.SQ != Pgm.SQ) || (pgmCanvas.SI != Pgm.SI))
+            if (Duration != durCanvas ||
+                pgmCanvas.BQ != Pgm.BQ || pgmCanvas.BI != Pgm.BI ||
+                pgmCanvas.SQ != Pgm.SQ || pgmCanvas.SI != Pgm.SI)
             {
                 Duration = durCanvas;
                 Pgm = pgmCanvas;
 
-                int nRemove = ChLineSalvoTickList.Count - (((Pgm.SQ * Pgm.BQ) > 0) ? (Pgm.SQ + 1) : 0);
+                int nRemove = ChLineSalvoTickList.Count - (Pgm.SQ * Pgm.BQ > 0 ? Pgm.SQ + 1 : 0);
                 for (int i = 0; i < nRemove; i++)
                 {
                     Children.Remove(ChLineSalvoTickList[0]);
@@ -253,9 +253,9 @@ namespace JAFDTC.UI.F16C
                     Children.Remove(ChLineSalvoLabelList[0]);
                     ChLineSalvoLabelList.RemoveAt(0);
                 }
-                if ((Pgm.SQ * Pgm.BQ) > 0)
+                if (Pgm.SQ * Pgm.BQ > 0)
                 {
-                    for (int i = ChLineSalvoTickList.Count; i < (Pgm.SQ + 1); i++)
+                    for (int i = ChLineSalvoTickList.Count; i < Pgm.SQ + 1; i++)
                     {
                         ChLineSalvoLabelList.Add(AddLineSalvoLabel());
                         ChLineSalvoTickList.Add(AddLineSalvoTick());
@@ -266,13 +266,13 @@ namespace JAFDTC.UI.F16C
                     }
                 }
 
-                nRemove = ChCounterMarkList.Count - (Pgm.SQ * Pgm.BQ);
+                nRemove = ChCounterMarkList.Count - Pgm.SQ * Pgm.BQ;
                 for (int i = 0; i < nRemove; i++)
                 {
                     Children.Remove(ChCounterMarkList[0]);
                     ChCounterMarkList.RemoveAt(0);
                 }
-                for (int i = ChCounterMarkList.Count; i < (Pgm.SQ * Pgm.BQ); i++)
+                for (int i = ChCounterMarkList.Count; i < Pgm.SQ * Pgm.BQ; i++)
                 {
                     ChCounterMarkList.Add(AddCounterMarker(Pgm.IsChaff));
                 }
@@ -297,27 +297,27 @@ namespace JAFDTC.UI.F16C
             // TODO: space. may make sense to have a more intelligent calculation of the end point that places the
             // TODO: endpoint somewhere in the final salvo if there will be lots of whitespace.
 
-            CLine.X1 = 0;               CLine.Y1 = _layoLineY;
+            CLine.X1 = 0; CLine.Y1 = _layoLineY;
             CLine.X2 = finalSize.Width; CLine.Y2 = _layoLineY;
 
-            float dxMarker = (Pgm.IsChaff) ? 7.0f : 0.0f;
+            float dxMarker = Pgm.IsChaff ? 7.0f : 0.0f;
 
-            if ((Pgm.BQ * Pgm.SQ) > 0)
+            if (Pgm.BQ * Pgm.SQ > 0)
             {
-                double pixPerSec = (finalSize.Width - (_layoLineTickInset * 2)) / Duration;
+                double pixPerSec = (finalSize.Width - _layoLineTickInset * 2) / Duration;
                 for (int i = 0; i < Pgm.SQ + 1; i++)
                 {
                     Line tick = ChLineSalvoTickList[i];
-                    tick.X1 = ((i * Pgm.SI) * pixPerSec) + _layoLineTickInset; tick.Y1 = CLine.Y1;
-                    tick.X2 = ((i * Pgm.SI) * pixPerSec) + _layoLineTickInset; tick.Y2 = CLine.Y1 + _layoTickLength;
+                    tick.X1 = i * Pgm.SI * pixPerSec + _layoLineTickInset; tick.Y1 = CLine.Y1;
+                    tick.X2 = i * Pgm.SI * pixPerSec + _layoLineTickInset; tick.Y2 = CLine.Y1 + _layoTickLength;
 
                     TextBlock label = ChLineSalvoLabelList[i];
-                    double labelX = tick.X1 - (label.DesiredSize.Width / 2);
+                    double labelX = tick.X1 - label.DesiredSize.Width / 2;
                     if (labelX < CLine.X1)
                     {
                         labelX = CLine.X1;
                     }
-                    else if ((labelX + label.DesiredSize.Width) > CLine.X2)
+                    else if (labelX + label.DesiredSize.Width > CLine.X2)
                     {
                         labelX = CLine.X2 - label.DesiredSize.Width;
                     }
@@ -328,8 +328,8 @@ namespace JAFDTC.UI.F16C
                         double tBase = i * Pgm.SI;
                         for (int j = 0; j < Pgm.BQ; j++)
                         {
-                            Shape marker = ChCounterMarkList[(i * Pgm.BQ) + j];
-                            marker.Translation = new((float)((tBase + (j * Pgm.BI)) * pixPerSec) + dxMarker, 0, 1);
+                            Shape marker = ChCounterMarkList[i * Pgm.BQ + j];
+                            marker.Translation = new((float)((tBase + j * Pgm.BI) * pixPerSec) + dxMarker, 0, 1);
                         }
                     }
                 }
@@ -349,7 +349,7 @@ namespace JAFDTC.UI.F16C
             {
                 child.Measure(availableSize);
             }
-            double minHeight = _layoMarkerSize + (2 * _layoLabelTickDY) + 16;
+            double minHeight = _layoMarkerSize + 2 * _layoLabelTickDY + 16;
             return new Size(_layoMinWidth, minHeight);
         }
     }
