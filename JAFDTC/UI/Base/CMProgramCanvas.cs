@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// F16CCMProgramCanvas.cs : canvas to display viper countermeasure programs
+// CMProgramCanvas.cs : canvas to display countermeasure programs
 //
 // Copyright(C) 2023 ilominar/raven
 //
@@ -30,7 +30,9 @@ using Windows.UI;
 namespace JAFDTC.UI.Base
 {
     /// <summary>
-    /// canvas representation of a countermeasure program.
+    /// canvas representation of a countermeasure program. this is set up like the viper with salvos and bursts
+    /// (where you have N salvos where each salvo is a burst of chaff or flares), countermeasures for other
+    /// airframes should be mapped onto this abstraction.
     /// </summary>
     internal class CMProgramCanvasParams
     {
@@ -49,7 +51,8 @@ namespace JAFDTC.UI.Base
     }
 
     /// <summary>
-    /// TODO: document
+    /// canvas to draw a graphical representation of a counter measure program on a timeline showing when the
+    /// countermeasures are dispensed.
     /// </summary>
     internal class CMProgramCanvas : Canvas
     {
