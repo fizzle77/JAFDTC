@@ -4,6 +4,7 @@
 
 JAFDTC supports the following configuration in the Hornet,
 
+* CMS countermeasures system
 * WYPT waypoint system
 * COM1/COM2 radio presets and initial configuration
 
@@ -21,6 +22,10 @@ the
 Priort to uploading, you should ensure the relevant systems are powered up and functional.
 Typically, uploads should occur as one of the last steps prior to taxi once you have systems
 powered up, stores loaded, and so on.
+
+## Countermeasures (CMS)
+
+TODO
 
 ## Waypoints (WYPT)
 
