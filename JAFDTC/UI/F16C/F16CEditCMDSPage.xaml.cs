@@ -316,13 +316,16 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private CMProgramCanvasParams ConvertCfgCMDStoCMCanvas(CMDSProgramCore pgm, CMDSProgramCore pgmDflt, bool isChaff)
         {
-            int sq, bq;
-            double si, bi;
+            int sq = 0, bq = 0;
+            double si = 0.0, bi = 0.0;
 
-            sq = int.Parse((!string.IsNullOrEmpty(pgm.SQ)) ? pgm.SQ : pgmDflt.SQ);
-            bq = int.Parse((!string.IsNullOrEmpty(pgm.BQ)) ? pgm.BQ : pgmDflt.BQ);
-            si = double.Parse((!string.IsNullOrEmpty(pgm.SI)) ? pgm.SI : pgmDflt.SI);
-            bi = double.Parse((!string.IsNullOrEmpty(pgm.BI)) ? pgm.BI : pgmDflt.BI);
+            if (!pgm.HasErrors)
+            {
+                sq = int.Parse((!string.IsNullOrEmpty(pgm.SQ)) ? pgm.SQ : pgmDflt.SQ);
+                bq = int.Parse((!string.IsNullOrEmpty(pgm.BQ)) ? pgm.BQ : pgmDflt.BQ);
+                si = double.Parse((!string.IsNullOrEmpty(pgm.SI)) ? pgm.SI : pgmDflt.SI);
+                bi = double.Parse((!string.IsNullOrEmpty(pgm.BI)) ? pgm.BI : pgmDflt.BI);
+            }
             if ((sq == 0) || (bq == 0))
             {
                 sq = bq = 0;
