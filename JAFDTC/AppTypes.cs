@@ -65,8 +65,8 @@ namespace JAFDTC
 
         public static readonly JsonSerializerOptions JSONOptions = new() { WriteIndented = true };
 
-        public const string VersionJAFDTC = "v1.0.0-B.14";              // current version
+        public const string VersionJAFDTC = "v1.0.0-B.15";              // current version
 
-        public const string BuildJAFDTC = "version 1.0.0-B.14 of 8-DEC-23 (build 31415926)";
+        public const string BuildJAFDTC = "version 1.0.0-B.15 of 21-DEC-23 (build 667)";
     }
 }
