@@ -257,7 +257,7 @@ namespace JAFDTC.UI.FA18C
         /// <summary>
         /// TODO: document
         /// </summary>
-        private CMProgramCanvasParams ConvertCfgCMDStoCMCanvas(CMProgram pgm, CMProgram pgmDflt, bool isChaff)
+        private static CMProgramCanvasParams ConvertCfgCMDStoCMCanvas(CMProgram pgm, CMProgram pgmDflt, bool isChaff)
         {
             int sq = 0, bq = 0;
             double si = 0.0, bi = 0.0;
@@ -268,12 +268,12 @@ namespace JAFDTC.UI.FA18C
                 if (isChaff)
                 {
                     bq = int.Parse((!string.IsNullOrEmpty(pgm.ChaffQ)) ? pgm.ChaffQ : pgmDflt.ChaffQ);
-                    bi = 0.05;
+                    bi = 0.075;
                 }
                 else
                 {
                     bq = int.Parse((!string.IsNullOrEmpty(pgm.FlareQ)) ? pgm.FlareQ : pgmDflt.FlareQ);
-                    bi = 0.05;
+                    bi = 0.075;
                 }
             }
             if ((sq == 0) || (bq == 0))
