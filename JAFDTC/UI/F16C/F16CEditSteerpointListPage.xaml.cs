@@ -23,6 +23,8 @@ using JAFDTC.Models.F16C.STPT;
 using JAFDTC.Models.Import;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
+using JAFDTC.Utilities.Networking;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -39,10 +41,8 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
-using JAFDTC.Utilities.Networking;
+
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
-using Microsoft.UI.Dispatching;
-using JAFDTC.Models.A10C;
 
 namespace JAFDTC.UI.F16C
 {
