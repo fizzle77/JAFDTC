@@ -111,7 +111,13 @@ https://www.gnu.org/licenses/.
                     VerticalAlignment="Center"
                     Click="PoIBtnCapture_Click"
                     ToolTipService.ToolTip="Capture steerpoint LAT, LON, ALT from DCS">
-                Capture from DCS
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon Margin="0,0,6,0"
+                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE7B7;"/>
+                    <TextBlock VerticalAlignment="Center">
+                        DCS Capture
+                    </TextBlock>
+                </StackPanel>
             </Button>
         </Grid>
 
