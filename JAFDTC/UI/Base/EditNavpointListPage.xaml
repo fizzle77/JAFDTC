@@ -50,10 +50,10 @@ https://www.gnu.org/licenses/.
             <AppBarButton x:Name="uiBarEdit" Icon="Edit" Label="Edit"
                           Click="CmdOpen_Click"
                           ToolTipService.ToolTip="Edit selected navpoint"/>
-            <AppBarButton x:Name="uiBarCopy" Icon="Copy" Label="Delete"
+            <AppBarButton x:Name="uiBarCopy" Icon="Copy" Label="Copy"
                           Click="CmdCopy_Click"
                           ToolTipService.ToolTip="Copy selected navpoints"/>
-            <AppBarButton x:Name="uiBarPaste" Icon="Paste" Label="Delete"
+            <AppBarButton x:Name="uiBarPaste" Icon="Paste" Label="Paste"
                           Click="CmdPaste_Click"
                           ToolTipService.ToolTip="Paste navpoints from clipboard"/>
             <AppBarSeparator/>
