@@ -20,6 +20,7 @@
 using JAFDTC.Models.DCS;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.LsonLib;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -31,7 +32,11 @@ namespace JAFDTC.Models.Import
     /// </summary>
     public class ImportHelperMIZ : ImportHelper
     {
-        private const double M_TO_FT = 3.2808399;
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // properties
+        //
+        // ------------------------------------------------------------------------------------------------------------
 
         private AirframeTypes Airframe { get; set; }
 
@@ -43,6 +48,14 @@ namespace JAFDTC.Models.Import
 
         private Dictionary<string, LsonDict> MizRouteNodes { get; set; }
 
+        private const double M_TO_FT = 3.2808399;
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // construction
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
         public ImportHelperMIZ(AirframeTypes airframe, string path)
         {
             Airframe = airframe;
@@ -50,6 +63,12 @@ namespace JAFDTC.Models.Import
             Theater = FileManager.ReadFileFromZip(Path, "theatre");
             MizRouteNodes = new Dictionary<string, LsonDict>();
         }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // functions
+        //
+        // ------------------------------------------------------------------------------------------------------------
 
         private bool IsMatchingAirframe(string airframe)
         {
@@ -59,15 +78,18 @@ namespace JAFDTC.Models.Import
                 AirframeTypes.A10C => (airframe == "A-10C_2"),
                 AirframeTypes.AH64D => (airframe == "AH-64D_BLK_II"),
                 AirframeTypes.AV8B => (airframe == "AV8BNA"),
+                AirframeTypes.F14AB => (airframe == "F-14A-135-GR") || (airframe == "F-14B"),
                 AirframeTypes.F15E => (airframe == "F-15ESE"),
                 AirframeTypes.F16C => (airframe == "F-16C_50"),
                 AirframeTypes.FA18C => (airframe == "FA-18C_hornet"),
                 AirframeTypes.M2000C => (airframe == "M-2000C"),
-                AirframeTypes.F14AB => (airframe == "F-14A-135-GR") || (airframe == "F-14B"),
                 _ => false,
             };
         }
 
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         public override List<string> Flights()
         {
             MizRouteNodes.Clear();
@@ -81,15 +103,15 @@ namespace JAFDTC.Models.Import
 
                 foreach (string coalitionKey in coalitionDict.Keys.Select(v => (string)v))
                 {
-                    Debug.WriteLine("----");
-                    Debug.WriteLine("  coalition = " + coalitionKey);
+                    FileManager.Log("----");
+                    FileManager.Log($"  coalition = {coalitionKey}");
 
                     LsonDict countryDict = coalitionDict[coalitionKey].GetDict()["country"].GetDict();
                     foreach (LsonNumber countryKey in countryDict.Keys.Cast<LsonNumber>())
                     {
                         LsonDict countryInfoDict = countryDict[countryKey].GetDict();
 
-                        Debug.WriteLine("    country = " + countryKey.ToString());
+                        FileManager.Log($"    country = {countryKey}");
 
 #if NOT_YET_SUPPORTED
                         if (countryInfoDict.ContainsKey("helicopter") &&
@@ -119,7 +141,7 @@ namespace JAFDTC.Models.Import
                             countryInfoDict["plane"].GetDict().ContainsKey("group"))
                         {
                             LsonDict planeGroupArray = countryInfoDict["plane"].GetDict()["group"].GetDict();
-                            foreach (LsonNumber planeGroupKey in planeGroupArray.Keys)
+                            foreach (LsonNumber planeGroupKey in planeGroupArray.Keys.Cast<LsonNumber>())
                             {
                                 LsonDict planeGroupInfo = planeGroupArray[planeGroupKey].GetDict();
                                 string groupName = planeGroupInfo["name"].GetString();
@@ -133,7 +155,7 @@ namespace JAFDTC.Models.Import
                                         flights.Add(groupName);
                                         MizRouteNodes[groupName] = routeInfo;
 
-                                        Debug.WriteLine("      plane/group = " + planeGroupKey.ToString() + ", " + routeInfo.Keys.Count.ToString() + " --> " + groupName);
+                                        FileManager.Log($"      plane/group = {planeGroupKey}, {routeInfo.Keys.Count} --> {groupName}");
                                     }
                                 }
                             }
@@ -141,13 +163,17 @@ namespace JAFDTC.Models.Import
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                FileManager.Log($"ImportHelperMIZ:Flights exception {ex}");
             }
 
             return flights;
         }
 
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         public override List<Dictionary<string, string>> Waypoints(string flightName)
         {
             List<Dictionary<string, string>> waypoints = null;
@@ -158,7 +184,7 @@ namespace JAFDTC.Models.Import
                 // walk the points in the route dictionary, skipping the first point as it is the initial point of the
                 // unit on the ramp.
                 //
-                for (int i = 2; i < MizRouteNodes[flightName].Count; i++)
+                for (int i = 2; i <= MizRouteNodes[flightName].Count; i++)
                 {
                     LsonDict waypointInfo = MizRouteNodes[flightName][i].GetDict();
 
