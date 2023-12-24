@@ -56,6 +56,7 @@ namespace JAFDTC.Models.F15E
         public override void BuildSystems(StringBuilder sb)
         {
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
+            new MiscBuilder(_cfg, _dcsCmds, sb).Build();
         }
     }
 }

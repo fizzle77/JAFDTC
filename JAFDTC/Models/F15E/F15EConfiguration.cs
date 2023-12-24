@@ -18,14 +18,13 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.F15E;
+using JAFDTC.Models.F15E.Misc;
 using JAFDTC.Models.F15E.Radio;
 using JAFDTC.UI.F15E;
 using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -46,6 +45,8 @@ namespace JAFDTC.Models.F15E
 
         public RadioSystem Radio { get; set; }
 
+        public MiscSystem Misc { get; set; }
+
         [JsonIgnore]
         public override IUploadAgent UploadAgent => new F15EUploadAgent(this);
 
@@ -58,6 +59,7 @@ namespace JAFDTC.Models.F15E
         public F15EConfiguration(string uid, string name, Dictionary<string, string> linkedSysMap)
             : base(VersionCfgF15E, AirframeTypes.F15E, uid, name, linkedSysMap)
         {
+            Misc = new MiscSystem();
             Radio = new RadioSystem();
             ConfigurationUpdated();
         }
@@ -71,7 +73,8 @@ namespace JAFDTC.Models.F15E
             }
             F15EConfiguration clone = new("", Name, linkedSysMap)
             {
-                Radio = (RadioSystem)Radio.Clone(),
+                Misc = (MiscSystem)Misc.Clone(),
+                Radio = (RadioSystem)Radio.Clone()
             };
             clone.ResetUID();
             clone.ConfigurationUpdated();
@@ -80,10 +83,11 @@ namespace JAFDTC.Models.F15E
 
         public override void CloneSystemFrom(string systemTag, IConfiguration other)
         {
-            F15EConfiguration otherHornet = other as F15EConfiguration;
+            F15EConfiguration otherMudhen = other as F15EConfiguration;
             switch (systemTag)
             {
-                case RadioSystem.SystemTag: Radio = otherHornet.Radio.Clone() as RadioSystem; break;
+                case MiscSystem.SystemTag: Misc = otherMudhen.Misc.Clone() as MiscSystem; break;
+                case RadioSystem.SystemTag: Radio = otherMudhen.Radio.Clone() as RadioSystem; break;
                 default: break;
             }
         }
@@ -116,6 +120,7 @@ namespace JAFDTC.Models.F15E
             return systemTag switch
             {
                 null => JsonSerializer.Serialize(this, Configuration.JsonOptions),
+                MiscSystem.SystemTag => JsonSerializer.Serialize(Misc, Configuration.JsonOptions),
                 RadioSystem.SystemTag => JsonSerializer.Serialize(Radio, Configuration.JsonOptions),
                 _ => null
             };
@@ -123,6 +128,7 @@ namespace JAFDTC.Models.F15E
 
         public override void AfterLoadFromJSON()
         {
+            Misc ??= new MiscSystem();
             Radio ??= new RadioSystem();
 
             // TODO: if the version number is older than current, may need to update object
@@ -138,7 +144,8 @@ namespace JAFDTC.Models.F15E
         {
             return (!string.IsNullOrEmpty(cboardTag) &&
                     (((systemTag != null) && (cboardTag.StartsWith(systemTag))) ||
-                     ((systemTag == null) && ((cboardTag == RadioSystem.SystemTag)))));
+                     ((systemTag == null) && ((cboardTag == MiscSystem.SystemTag)) ||
+                     ((systemTag == null) && ((cboardTag == RadioSystem.SystemTag))))));
         }
 
         public override bool Deserialize(string systemTag, string json)
@@ -149,6 +156,7 @@ namespace JAFDTC.Models.F15E
             {
                 switch (systemTag)
                 {
+                    case MiscSystem.SystemTag: Misc = JsonSerializer.Deserialize<MiscSystem>(json); break;
                     case RadioSystem.SystemTag: Radio = JsonSerializer.Deserialize<RadioSystem>(json); break;
                     default: isHandled = false; break;
                 }

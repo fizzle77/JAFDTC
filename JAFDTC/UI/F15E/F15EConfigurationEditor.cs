@@ -19,10 +19,12 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.F15E;
+using JAFDTC.Models.F15E.Misc;
 using JAFDTC.Models.F15E.Radio;
 using JAFDTC.UI.App;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace JAFDTC.UI.F15E
 {
@@ -44,6 +46,7 @@ namespace JAFDTC.UI.F15E
         private static readonly ObservableCollection<ConfigEditorPageInfo> _configEditorPageInfo = new()
         {
                 F15EEditRadioPageHelper.PageInfo,
+                F15EEditMiscPage.PageInfo,
         };
 
         public F15EConfigurationEditor() { }
@@ -54,6 +57,7 @@ namespace JAFDTC.UI.F15E
         {
             ISystem system = tag switch
             {
+                MiscSystem.SystemTag => ((F15EConfiguration)config).Misc,
                 RadioSystem.SystemTag => ((F15EConfiguration)config).Radio,
                 _ => null,
             };
