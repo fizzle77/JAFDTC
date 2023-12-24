@@ -76,7 +76,7 @@ namespace JAFDTC.UI.Base
 
         public EditNavptPageNavArgs NavArgs { get; set; }
 
-        private IEditNavpointPageHelper NavHelper { get; set; }
+        private IEditNavpointPageHelper PageHelper { get; set; }
 
         // NOTE: changes to the Config object may only occur through the marshall methods. edits by the ui are usually
         // NOTE: directed at the EditNavpt/EditNavptIndex properties (exceptions occur when the edit requires changes
@@ -136,14 +136,14 @@ namespace JAFDTC.UI.Base
         //
         private void CopyConfigToEdit(int index)
         {
-            NavHelper.CopyConfigToEdit(index, Config, EditNavpt);
+            PageHelper.CopyConfigToEdit(index, Config, EditNavpt);
         }
 
         private void CopyEditToConfig(int index, bool isPersist = false)
         {
-            if (NavHelper.CopyEditToConfig(index, EditNavpt, Config) && isPersist)
+            if (PageHelper.CopyEditToConfig(index, EditNavpt, Config) && isPersist)
             {
-                Config.Save(this, NavHelper.SystemTag);
+                Config.Save(this, PageHelper.SystemTag);
             }
         }
 
@@ -181,11 +181,11 @@ namespace JAFDTC.UI.Base
         {
             if (args.PropertyName == null)
             {
-                ValidateAllFields(_curNavptFieldValueMap, NavHelper.GetErrors(EditNavpt, null));
+                ValidateAllFields(_curNavptFieldValueMap, PageHelper.GetErrors(EditNavpt, null));
             }
             else
             {
-                List<string> errors = NavHelper.GetErrors(EditNavpt, args.PropertyName);
+                List<string> errors = PageHelper.GetErrors(EditNavpt, args.PropertyName);
                 if (_curNavptFieldValueMap.ContainsKey(args.PropertyName))
                 {
                     SetFieldValidState(_curNavptFieldValueMap[args.PropertyName], (errors.Count == 0));
@@ -205,7 +205,7 @@ namespace JAFDTC.UI.Base
         //
         private bool CurStateHasErrors()
         {
-            return NavHelper.HasErrors(EditNavpt);
+            return PageHelper.HasErrors(EditNavpt);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -218,7 +218,7 @@ namespace JAFDTC.UI.Base
         //
         private void RebuildEnableState()
         {
-            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(NavHelper.SystemTag));
+            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(PageHelper.SystemTag));
             Utilities.SetEnableState(uiPoIComboSelect, isEditable);
             Utilities.SetEnableState(uiPoIBtnApply, isEditable);
             Utilities.SetEnableState(uiNavptValueName, isEditable);
@@ -233,7 +233,7 @@ namespace JAFDTC.UI.Base
             Utilities.SetEnableState(uiNavptBtnPrev, !CurStateHasErrors() && (EditNavptIndex > 0));
             Utilities.SetEnableState(uiNavptBtnAdd, isEditable && !CurStateHasErrors());
             Utilities.SetEnableState(uiNavptBtnNext, !CurStateHasErrors() &&
-                                                     (EditNavptIndex < (NavHelper.NavpointCount(Config) - 1)));
+                                                     (EditNavptIndex < (PageHelper.NavpointCount(Config) - 1)));
 
             Utilities.SetEnableState(uiAcceptBtnOK, isEditable && !CurStateHasErrors());
         }
@@ -248,8 +248,8 @@ namespace JAFDTC.UI.Base
                 IsRebuildPending = true;
                 DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
                 {
-                    uiPoITextTitle.Text = $"{NavHelper.NavptName} Initial Setup";
-                    uiNavptTextNum.Text = $"{NavHelper.NavptName} {EditNavpt.Number} Information";
+                    uiPoITextTitle.Text = $"{PageHelper.NavptName} Initial Setup";
+                    uiNavptTextNum.Text = $"{PageHelper.NavptName} {EditNavpt.Number} Information";
                     RebuildEnableState();
                     IsRebuildPending = false;
                 });
@@ -277,7 +277,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void AcceptBtnOK_Click(object sender, RoutedEventArgs args)
         {
-            if (NavHelper.HasErrors(EditNavpt))
+            if (PageHelper.HasErrors(EditNavpt))
             {
                 RebuildEnableState();
             }
@@ -303,7 +303,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void PoIBtnApply_Click(object sender, RoutedEventArgs args)
         {
-            NavHelper.ApplyPoI(EditNavpt, (PointOfInterest)uiPoIComboSelect.SelectedItem);
+            PageHelper.ApplyPoI(EditNavpt, (PointOfInterest)uiPoIComboSelect.SelectedItem);
             uiPoIComboSelect.SelectedIndex = 0;
             CopyEditToConfig(EditNavptIndex, true);
         }
@@ -314,7 +314,7 @@ namespace JAFDTC.UI.Base
         private async void PoIBtnCapture_Click(object sender, RoutedEventArgs args)
         {
             WyptCaptureDataRx.Instance.WyptCaptureDataReceived += PoIBtnCapture_WyptCaptureDataReceived;
-            await Utilities.CaptureSingleDialog(Content.XamlRoot, NavHelper.NavptName);
+            await Utilities.CaptureSingleDialog(Content.XamlRoot, PageHelper.NavptName);
             WyptCaptureDataRx.Instance.WyptCaptureDataReceived -= PoIBtnCapture_WyptCaptureDataReceived;
 
             CopyEditToConfig(EditNavptIndex, true);
@@ -330,7 +330,7 @@ namespace JAFDTC.UI.Base
             {
                 DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
-                    NavHelper.ApplyCapture(EditNavpt, wypts[0]);
+                    PageHelper.ApplyCapture(EditNavpt, wypts[0]);
                 });
             }
         }
@@ -365,7 +365,7 @@ namespace JAFDTC.UI.Base
         private void NavptBtnAdd_Click(object sender, RoutedEventArgs args)
         {
             CopyEditToConfig(EditNavptIndex, true);
-            EditNavptIndex = NavHelper.AddNavpoint(Config);
+            EditNavptIndex = PageHelper.AddNavpoint(Config);
             CopyConfigToEdit(EditNavptIndex);
             RebuildInterfaceState();
         }
@@ -414,18 +414,18 @@ namespace JAFDTC.UI.Base
         {
             NavArgs = (EditNavptPageNavArgs)args.Parameter;
 
-            NavHelper = (IEditNavpointPageHelper)Activator.CreateInstance(NavArgs.EditorHelperType);
-            UpdateLatLonTextBoxFormat(uiNavptValueLat, NavHelper.LatExtProperties);
-            UpdateLatLonTextBoxFormat(uiNavptValueLon, NavHelper.LonExtProperties);
+            PageHelper = (IEditNavpointPageHelper)Activator.CreateInstance(NavArgs.EditorHelperType);
+            UpdateLatLonTextBoxFormat(uiNavptValueLat, PageHelper.LatExtProperties);
+            UpdateLatLonTextBoxFormat(uiNavptValueLon, PageHelper.LonExtProperties);
 
-            EditNavpt ??= NavHelper.CreateEditNavpt(EditField_PropertyChanged, EditNavpt_DataValidationError);
+            EditNavpt ??= PageHelper.CreateEditNavpt(EditField_PropertyChanged, EditNavpt_DataValidationError);
 
             Config = NavArgs.Config;
 
             EditNavptIndex = NavArgs.IndexNavpt;
             CopyConfigToEdit(EditNavptIndex);
 
-            ValidateAllFields(_curNavptFieldValueMap, NavHelper.GetErrors(EditNavpt, null));
+            ValidateAllFields(_curNavptFieldValueMap, PageHelper.GetErrors(EditNavpt, null));
             RebuildInterfaceState();
 
             base.OnNavigatedTo(args);
