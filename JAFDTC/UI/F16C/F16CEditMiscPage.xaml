@@ -278,7 +278,7 @@ https://www.gnu.org/licenses/.
                            Style="{StaticResource EditorParamStaticTextBlockStyle}">
                     MHz,
                 </TextBlock>
-                <TextBox Width="72"
+                <TextBox Width="64"
                          x:Name="uiILSValueCourse"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditMisc.ILSCourse, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
