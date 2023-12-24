@@ -88,18 +88,18 @@ namespace JAFDTC.Models.F16C
 
         public override void BuildSystems(StringBuilder sb)
         {
+            new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new MiscBuilder(_cfg, _dcsCmds, sb).Build();
             new CMDSBuilder(_cfg, _dcsCmds, sb).Build();
-            new STPTBuilder(_cfg, _dcsCmds, sb).Build();
             //
-            // NOTE: hts must be done before mfd as mfd might set the man threat class which is only
-            // NOTE: available if the hts manual table has been set up.
+            // NOTE: hts must be done before mfd as mfd might set the man threat class which is only available if the
+            // NOTE: hts manual table has been set up.
             //
             new HTSBuilder(_cfg, _dcsCmds, sb).Build();
             new MFDBuilder(_cfg, _dcsCmds, sb).Build();
             new HARMBuilder(_cfg, _dcsCmds, sb).Build();
-            new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new DLNKBuilder(_cfg, _dcsCmds, sb).Build();
+            new STPTBuilder(_cfg, _dcsCmds, sb).Build();
         }
 
         public override IBuilder SetupBuilder(StringBuilder sb) => new F16CSetupBuilder(_dcsCmds, sb);
