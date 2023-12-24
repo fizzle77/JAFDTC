@@ -56,9 +56,9 @@ namespace JAFDTC.Models.FA18C
 
         public override void BuildSystems(StringBuilder sb)
         {
-            new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
-            new CMSBuilder(_cfg, _dcsCmds, sb).Build();
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
+            new CMSBuilder(_cfg, _dcsCmds, sb).Build();
+            new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
         }
     }
 }
