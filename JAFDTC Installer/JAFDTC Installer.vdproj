@@ -44,6 +44,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -68,6 +76,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
     }
@@ -176,25 +192,25 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:JAFDTC"
-        "ProductCode" = "8:{C6E02C23-770F-4952-A359-AB053FDB4E9A}"
-        "PackageCode" = "8:{26FA675D-3958-4E8C-BF3D-82446EEC8570}"
+        "ProductCode" = "8:{B94D6EEF-E80E-40A9-914B-FDA6AD4523DD}"
+        "PackageCode" = "8:{29F53D12-3C57-45DE-8315-12C9EB5752C6}"
         "UpgradeCode" = "8:{D978BA41-44A4-483B-B26B-8F2AC4897C51}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
+        "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
+        "ProductVersion" = "8:1.0.0015"
         "Manufacturer" = "8:51stVFW"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
         "Title" = "8:JAFDTC Installer"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:Raven"
+        "ARPCONTACT" = "8:Ilominar / \"Raven\""
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:Just Another DCS DTC"
         "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:"
+        "ARPPRODUCTICON" = "8:_E2453D771C3D4C6FA54C6C57A3E09FE8"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -740,7 +756,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2C362B37881F40EFACBD557EF069DEA5"
             {
-            "SourcePath" = "8:..\\JAFDTC\\JAFDTC\\obj\\x64\\Release\\net6.0-windows10.0.19041.0\\win10-x64\\apphost.exe"
+            "SourcePath" = "8:..\\JAFDTC\\obj\\x64\\Release\\net6.0-windows10.0.19041.0\\win10-x64\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_317C8FB995AB4638A7906463197DE148"
