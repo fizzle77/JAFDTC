@@ -101,6 +101,57 @@ namespace JAFDTC.UI
         }
 
         /// <summary>
+        /// return a ContentDialog with two buttons to request whether a dcs capture should append or update
+        /// navigation points. the primary button is "create", close is "update. the what parameter should be
+        /// capitalized and singular.
+        /// </summary>
+        public static IAsyncOperation<ContentDialogResult> CaptureActionDialog(XamlRoot root, string what)
+        {
+            return Message2BDialog(
+                root,
+                $"Capture {what}s from DCS",
+                $"Would you like to create new {what.ToLower()}s from the coordinates captured from DCS and append " +
+                $"them to the end of the {what.ToLower()} list or update coordinates in existing {what.ToLower()}s " +
+                $"starting from the current selection (adding new {what.ToLower()}s as necessary)?",
+                $"Create & Append",
+                $"Update");
+        }
+
+        /// <summary>
+        /// return a ContentDialog dialog with one button set up to tell the user a capture of a single navigation
+        /// point is in flight. the what parameter should be capitalized and singular.
+        /// </summary>
+        public static IAsyncOperation<ContentDialogResult> CaptureSingleDialog(XamlRoot root, string what)
+        {
+            return Message1BDialog(
+                root,
+                $"Capturing {what} from DCS",
+                $"The coordinates of this {what.ToLower()} will be set from the first captured location.\n\n" +
+                $"In DCS, type [CTRL]-[SHIFT]-J to show the coordinate capture dialog, move the F10 map until " +
+                $"the crosshair is over the desired point, click “Add”, and then click “Send”. Typing " +
+                $"[CTRL]-[SHIFT]-J again will dismiss the capture dialog.\n\n" +
+                $"Click “Done” below when finished capturing.",
+                "Done");
+        }
+
+        /// <summary>
+        /// return a ContentDialog dialog with one button set up to tell the user a capture of multiple navigation
+        /// points is in flight. the what parameter should be capitalized and singular.
+        /// </summary>
+        public static IAsyncOperation<ContentDialogResult> CaptureMultipleDialog(XamlRoot root, string what)
+        {
+            return Message1BDialog(
+                root,
+                $"Capturing {what}s from DCS",
+                $"The coordinates of the effected {what.ToLower()}s will be set from captured locations.\n\n" +
+                $"In DCS, type [CTRL]-[SHIFT]-J to show the coordinate capture dialog, move the F10 map until " +
+                $"the crosshair is over the desired point, click “Add”, repeat this process for other {what}s " +
+                $"and then click “Send”. Typing [CTRL]-[SHIFT]-J again will dismiss the capture dialog.\n\n" +
+                $"Click “Done” below when finished capturing.",
+                "Done");
+        }
+
+        /// <summary>
         /// search the visual tree for a child control of a particular type with a given tag. returns the control
         /// or null if not found.
         /// 

@@ -365,35 +365,20 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void CmdCapture_Click(object sender, RoutedEventArgs args)
         {
-            ContentDialogResult result = ContentDialogResult.Primary;
+            CaptureIndex = EditNavpt.Count;
             if (EditNavpt.Count > 0)
             {
-                result = await Utilities.Message2BDialog(
-                    Content.XamlRoot,
-                    $"Capture {PageHelper.NavptName} from DCS",
-                    $"Would you like to append coordiantes captured from DCS to the end of the " +
-                    $"{PageHelper.NavptName.ToLower()} list or replace starting from the current selection?",
-                    $"Append",
-                    $"Replace");
-            }
-            if (result == ContentDialogResult.Primary)
-            {
-                CaptureIndex = EditNavpt.Count;
-            }
-            else
-            {
-                CaptureIndex = (uiNavptListView.SelectedIndex >= 0) ? uiNavptListView.SelectedIndex : 0;
+                ContentDialogResult result = await Utilities.CaptureActionDialog(Content.XamlRoot, PageHelper.NavptName);
+                if (result != ContentDialogResult.Primary)
+                {
+                    CaptureIndex = (uiNavptListView.SelectedIndex >= 0) ? uiNavptListView.SelectedIndex : 0;
+                }
             }
 
             CopyEditToConfig(true);
 
             WyptCaptureDataRx.Instance.WyptCaptureDataReceived += CmdCapture_WyptCaptureDataReceived;
-            await Utilities.Message1BDialog(
-                Content.XamlRoot,
-                $"Capturing {PageHelper.NavptName} in DCS",
-                $"From DCS, type [CTRL]-[SHIFT]-J to show the coordinate selection dialog, then move the crosshair over " +
-                $"the desired point in the F10 map. Click “Done” below when finished.",
-                $"Done");
+            await Utilities.CaptureMultipleDialog(Content.XamlRoot, PageHelper.NavptName);
             WyptCaptureDataRx.Instance.WyptCaptureDataReceived -= CmdCapture_WyptCaptureDataReceived;
 
             CopyConfigToEdit();

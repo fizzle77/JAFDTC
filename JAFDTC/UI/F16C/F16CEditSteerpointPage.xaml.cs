@@ -514,12 +514,7 @@ namespace JAFDTC.UI.F16C
         private async void PoIBtnCapture_Click(object sender, RoutedEventArgs args)
         {
             WyptCaptureDataRx.Instance.WyptCaptureDataReceived += PoIBtnCapture_WyptCaptureDataReceived;
-            await Utilities.Message1BDialog(
-                Content.XamlRoot,
-                $"Capturing Steerpoint in DCS",
-                $"From DCS, type [CTRL]-[SHIFT]-J to show the coordinate selection dialog, then move the crosshair over " +
-                $"the desired point in the F10 map. Click “Done” below when finished.",
-                $"Done");
+            await Utilities.CaptureSingleDialog(Content.XamlRoot, "Steerpoint");
             WyptCaptureDataRx.Instance.WyptCaptureDataReceived -= PoIBtnCapture_WyptCaptureDataReceived;
 
             RebuildInterfaceState();
