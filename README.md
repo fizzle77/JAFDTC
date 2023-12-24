@@ -3,15 +3,16 @@
 Just Another #%*@^!% DTC (JAFDTC) is a native C# WinUI Windows application that allows you to
 upload data typically saved on a data cartridge, such as steerpoints/waypoints and other
 avionics setup, into a DCS model at the start of a flight. The application supports the
-following DCS airframes,
+following DCS airframes and systems,
 
-* A-10C Warthog
-* AV-8B Harrier
-* F-14A/B Tomcat
-* F-15E Strike Eagle
-* F-16C Viper
-* F/A-18C Hornet
-* Mirage M-2000C
+- *A-10C Warthog* &ndash; Waypoints
+- *AV-8B Harrier* &ndash; Waypoints
+- *F-14A/B Tomcat* &ndash; Waypoints
+- *F-15E Strike Eagle* &ndash; Radios, Miscellaneous Systems
+- *F-16C Viper* &ndash; Countermeasures, Datalink, HARM ALIC, HARM HTS, MFD Formats, Miscellaneous DED
+  Systems, Radios, Steerpoints
+- *F/A-18C Hornet* &ndash; Countermeasures, Radios, Waypoints
+- *Mirage M-2000C* &ndash; Waypoints
 
 This document describes how to get JAFDTC installed and running on your system. See the
 [user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
@@ -70,7 +71,8 @@ A detailed user's guide is availble
 
 JAFDTC fills a niche for now, but it's lifetime and usefulness is likely bounded by Eagle
 Dynamics. DCS will eventually acquire a native DTC solution for airframes that will likely
-be more capable than what the community can do with a separate application.
+be more capable and better integrated than what the community can do with a separate
+application.
 
 ## Shoutouts
 

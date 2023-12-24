@@ -4,7 +4,8 @@
 
 JAFDTC supports the following configuration in the Strike Eagle,
 
-* COM1/COM2 radio presets and initial configuration
+- COM1/COM2 radio presets and initial configuration
+- Miscellaneous systems such as TACAN, ILS, BINGO, and altitude warning
 
 Each of these areas is covered in more depth below. See the
 [user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
@@ -22,6 +23,10 @@ Typically, uploads should occur as one of the last steps prior to taxi once you 
 powered up, stores loaded, and so on.
 
 ## COM1/COM2: Radios
+
+TODO
+
+## Miscellaneous
 
 TODO
 
