@@ -53,7 +53,7 @@ namespace JAFDTC.Models.DCS
 
         public override string ToString()
         {
-            return ((Theater != null) && (Name != null)) ? $"{Theater} - {Name}" : "";
+            return (Name != null) ? $"{Name}" : "";
         }
 
         // ------------------------------------------------------------------------------------------------------------

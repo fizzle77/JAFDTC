@@ -21,8 +21,8 @@ using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.STPT;
-using JAFDTC.UI;
-using JAFDTC.Utilities;
+using JAFDTC.Utilities.Networking;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -32,18 +32,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using Microsoft.UI.Dispatching;
-using JAFDTC.Models.F16C.Misc;
-using Windows.Graphics.Printing.Workflow;
-using Microsoft.VisualBasic.FileIO;
-using JAFDTC.Utilities.Networking;
+
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.F16C
 {
     /// <summary>
-    /// navigation argument for pages that navigate to the steerpoint editor. this provides the configuration being
-    /// edited along with the specific steerpoint within the configuration that should be edited.
+    /// navigation argument to pass from pages that navigate to the steerpoint editor (F16CEditSteerpointPage). this
+    /// provides the configuration being edited along with the specific steerpoint within the configuration that
+    /// should be edited.
     /// </summary>
     public sealed class F16CEditStptPageNavArgs
     {
@@ -85,7 +82,7 @@ namespace JAFDTC.UI.F16C
 
         private bool IsRebuildPending { get; set; }
 
-        private List<PointOfInterest> CurPoIs { get; set; }
+        private List<string> CurPoITheaters { get; set; }
 
         // ---- read-only properties
 
@@ -123,8 +120,7 @@ namespace JAFDTC.UI.F16C
             EditStpt.VxP[0].ErrorsChanged += VxP0_DataValidationError;
             EditStpt.VxP[1].ErrorsChanged += VxP1_DataValidationError;
 
-            CurPoIs = PointOfInterestDbase.Instance.Find();
-            CurPoIs.Insert(0, new(PointOfInterestType.UNKNOWN, null, null, null, null, null));
+            CurPoITheaters = PointOfInterestDbase.KnownTheaters();
 
             IsRebuildPending = false;
 
@@ -145,7 +141,7 @@ namespace JAFDTC.UI.F16C
             };
             _oap0FieldValueMap = new Dictionary<string, TextBox>()
             {
-                ["Range"] = uiStptOAPValueRange0,  ["Brng"] = uiStptOAPValueBrng0, ["Elev"] = uiStptOAPValueElev0,
+                ["Range"] = uiStptOAPValueRange0, ["Brng"] = uiStptOAPValueBrng0, ["Elev"] = uiStptOAPValueElev0,
             };
             _oap1FieldValueMap = new Dictionary<string, TextBox>()
             {
@@ -173,10 +169,11 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // marshall data between our local steerpoint setting and the appropriate steerpoint in the stpt configuration.
-        // as we edit outside the config, we will make a deep copy. we cannot Clone() here as the UI is tied to the
-        // specific EditStpt instance we set up at load.
-        //
+        /// <summary>
+        /// marshall data to our local steerpoint setting from the appropriate steerpoint in the stpt configuration.
+        /// as we edit outside the config, we will make a deep copy. we cannot Clone() here as the UI is tied to the
+        /// specific EditStpt instance we set up at load.
+        /// </summary>
         private void CopyConfigToEdit(int index)
         {
             SteerpointInfo stptSrc = Config.STPT.Points[index];
@@ -201,6 +198,11 @@ namespace JAFDTC.UI.F16C
             }
         }
 
+        /// <summary>
+        /// marshall data from our local steerpoint setting to the appropriate steerpoint in the stpt configuration.
+        /// as we edit outside the config, we will make a deep copy. we cannot Clone() here as the UI is tied to the
+        /// specific EditStpt instance we set up at load.
+        /// </summary>
         private void CopyEditToConfig(int index, bool isPersist = false)
         {
             if (!EditStpt.HasErrors)
@@ -283,7 +285,9 @@ namespace JAFDTC.UI.F16C
             RebuildInterfaceState();
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void OAP0_DataValidationError(object sender, DataErrorsChangedEventArgs args)
         {
             CoreDataValidationError(EditStpt.OAP[0], args.PropertyName, _oap0FieldValueMap);
@@ -294,7 +298,9 @@ namespace JAFDTC.UI.F16C
             CoreDataValidationError(EditStpt.OAP[1], args.PropertyName, _oap1FieldValueMap);
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void VxP0_DataValidationError(object sender, DataErrorsChangedEventArgs args)
         {
             CoreDataValidationError(EditStpt.VxP[0], args.PropertyName, _vxp0FieldValueMap);
@@ -305,7 +311,9 @@ namespace JAFDTC.UI.F16C
             CoreDataValidationError(EditStpt.VxP[1], args.PropertyName, _vxp1FieldValueMap);
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void EditStpt_DataValidationError(object sender, DataErrorsChangedEventArgs args)
         {
             if ((args.PropertyName == "TOS") && (EditStpt.TOS == "––:––:––"))
@@ -323,15 +331,17 @@ namespace JAFDTC.UI.F16C
             }
         }
 
-        // property changed: rebuild interface state to account for configuration changes.
-        //
+        /// <summary>
+        /// property changed: rebuild interface state to account for configuration changes.
+        /// </summary>
         private void EditField_PropertyChanged(object sender, EventArgs args)
         {
             RebuildInterfaceState();
         }
 
-        // returns true if the current state has errors, false otherwise.
-        //
+        /// <summary>
+        /// returns true if the current state has errors, false otherwise.
+        /// </summary>
         private bool CurStateHasErrors()
         {
             bool hasErrors = EditStpt.HasErrors;
@@ -348,9 +358,81 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // rebuild the reference point interface state for the vxp reference point ui. enables for the text boxes
-        // are handled in RebuildEnableState().
-        //
+        /// <summary>
+        /// return true if the current edit steerpoint is a valid poi, false otherwise. a valid poi has a name,
+        /// latitude, and longitude. the name should be unique within the poi database.
+        /// </summary>
+        private bool IsEditCoordValidPoI()
+        {
+            if (string.IsNullOrEmpty(EditStpt.Name) || string.IsNullOrEmpty(EditStpt.Alt) ||
+                !double.TryParse(EditStpt.Lat, out double lat) || !double.TryParse(EditStpt.Lon, out double lon))
+            {
+                return false;
+            }
+            List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(PointOfInterestDbase.TheaterForCoords(lat, lon),
+                                                                            PointOfInterestMask.ANY, EditStpt.Name);
+            foreach (PointOfInterest poi in pois)
+            {
+                if (poi.Type != PointOfInterestType.USER)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void SelectMatchingPoI()
+        {
+            string theater = (string)uiPoIComboTheater.SelectedItem;
+            List<PointOfInterest> selPoI = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.ANY, EditStpt.Name);
+            if ((selPoI.Count == 1) &&
+                (selPoI[0].Latitude == EditStpt.Lat) &&
+                (selPoI[0].Longitude == EditStpt.Lon) &&
+                (selPoI[0].Elevation == EditStpt.Alt))
+            {
+                uiPoIComboSelect.SelectedItem = selPoI[0];
+            }
+            else
+            {
+                uiPoIComboSelect.SelectedIndex = -1;
+            }
+        }
+
+        /// <summary>
+        /// rebuild the point of interest select combo box. this only needs to be called when the theater changes or
+        /// when a poi is added to the current theater.
+        /// </summary>
+        private void RebuildPointsOfInterest()
+        {
+            string theater = (string)uiPoIComboTheater.SelectedItem;
+            List<PointOfInterest> dcsPoIs = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.DCS_AIRBASE);
+            dcsPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
+            List<PointOfInterest> usrPoIs = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.USER);
+            usrPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
+
+            uiPoIComboSelect.Items.Clear();
+            foreach (PointOfInterest poi in usrPoIs)
+            {
+                uiPoIComboSelect.Items.Add(poi);
+            }
+            if (usrPoIs.Count > 0)
+            {
+                uiPoIComboSelect.Items.Add(new NavigationViewItemSeparator());
+            }
+            foreach (PointOfInterest poi in dcsPoIs)
+            {
+                uiPoIComboSelect.Items.Add(poi);
+            }
+            SelectMatchingPoI();
+        }
+
+        /// <summary>
+        /// rebuild the reference point interface state for the vxp reference point ui. enables for the text boxes
+        /// are handled in RebuildEnableState().
+        /// </summary>
         private void RebuildRefPointState(RefPointTypes rpType, ComboBox combo, List<TextBlock> titles)
         {
             combo.SelectedIndex = rpType switch
@@ -385,14 +467,17 @@ namespace JAFDTC.UI.F16C
             }
         }
 
-        // rebuild the enable state of the buttons in the ui based on current configuration setup.
-        //
+        /// <summary>
+        /// rebuild the enable state of the buttons in the ui based on current configuration setup.
+        /// </summary>
         private void RebuildEnableState()
         {
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(STPTSystem.SystemTag));
 
-            Utilities.SetEnableState(uiPoIComboSelect, isEditable);
-            Utilities.SetEnableState(uiPoIBtnApply, isEditable);
+            Utilities.SetEnableState(uiPoIComboTheater, isEditable);
+            Utilities.SetEnableState(uiPoIComboSelect, isEditable && (uiPoIComboSelect.Items.Count > 0));
+            Utilities.SetEnableState(uiPoIBtnApply, isEditable && (uiPoIComboSelect.SelectedIndex > 0));
+            Utilities.SetEnableState(uiPoIBtnCapture, isEditable);
 
             Utilities.SetEnableState(uiStptValueName, isEditable);
             foreach (KeyValuePair<string, TextBox> kvp in _curStptFieldValueMap)
@@ -421,9 +506,7 @@ namespace JAFDTC.UI.F16C
                 Utilities.SetEnableState(kvp.Value, isEditable && (EditStpt.VxP[0].Type != RefPointTypes.NONE));
             }
 
-            Utilities.SetEnableState(uiPoIBtnApply, isEditable && (uiPoIComboSelect.SelectedIndex > 0));
-            Utilities.SetEnableState(uiPoIBtnCapture, isEditable);
-
+            Utilities.SetEnableState(uiStptBtnAddPoI, isEditable && IsEditCoordValidPoI());
             Utilities.SetEnableState(uiStptBtnPrev, !CurStateHasErrors() && (EditStptIndex > 0));
             Utilities.SetEnableState(uiStptBtnAdd, isEditable && !CurStateHasErrors());
             Utilities.SetEnableState(uiStptBtnNext, !CurStateHasErrors() && (EditStptIndex < (Config.STPT.Points.Count - 1)));
@@ -432,9 +515,10 @@ namespace JAFDTC.UI.F16C
             Utilities.SetEnableState(uiAcceptBtnOK, isEditable && !CurStateHasErrors());
         }
 
-        // rebuild the state of controls on the page in response to a change in the configuration. the configuration
-        // is saved if requested.
-        //
+        /// <summary>
+        /// rebuild the state of controls on the page in response to a change in the configuration. the configuration
+        /// is saved if requested.
+        /// </summary>
         private void RebuildInterfaceState()
         {
             if (!IsRebuildPending)
@@ -460,15 +544,17 @@ namespace JAFDTC.UI.F16C
 
         // ---- buttons -----------------------------------------------------------------------------------------------
 
-        // cancel click: unwind navigation without saving any changes to the configuration.
-        //
+        /// <summary>
+        /// cancel click: unwind navigation without saving any changes to the configuration.
+        /// </summary>
         private void AcceptBtnCancel_Click(object sender, RoutedEventArgs args)
         {
             Frame.GoBack();
         }
 
-        // ok click: save configuration and navigate back to previous page in nav stack.
-        //
+        /// <summary>
+        /// ok click: save configuration and navigate back to previous page in nav stack.
+        /// </summary>
         private void AcceptBtnOK_Click(object sender, RoutedEventArgs args)
         {
             if (CurStateHasErrors())
@@ -484,16 +570,27 @@ namespace JAFDTC.UI.F16C
 
         // ---- poi management ----------------------------------------------------------------------------------------
 
-        // poi combo selection changed: update enable state in the ui.
-        //
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void PoIComboTheater_SelectionChanged(object sender, RoutedEventArgs args)
+        {
+            RebuildPointsOfInterest();
+            RebuildEnableState();
+        }
+
+        /// <summary>
+        /// poi combo selection changed: update enable state in the ui.
+        /// </summary>
         private void PoIComboSelect_SelectionChanged(object sender, RoutedEventArgs args)
         {
             RebuildEnableState();
         }
 
-        // apply poi click: copy poi information into current steerpoint and reset poi selection to "none".
-        //
-        private void PoIBtnApply_Click(object sender, RoutedEventArgs args) 
+        /// <summary>
+        /// apply poi click: copy poi information into current steerpoint and reset poi selection to "none".
+        /// </summary>
+        private void PoIBtnApply_Click(object sender, RoutedEventArgs args)
         {
             PointOfInterest poi = (PointOfInterest)uiPoIComboSelect.SelectedItem;
             EditStpt.Name = poi.Name;
@@ -502,8 +599,6 @@ namespace JAFDTC.UI.F16C
             EditStpt.Alt = poi.Elevation;
             EditStpt.TOS = "";
             EditStpt.ClearErrors();
-
-            uiPoIComboSelect.SelectedIndex = 0;
 
             RebuildInterfaceState();
         }
@@ -541,28 +636,72 @@ namespace JAFDTC.UI.F16C
 
         // ---- steerpoint management ---------------------------------------------------------------------------------
 
-        // steerpoint previous click: save the current steerpoint and move to the previous steerpoint.
-        //
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private async void StptBtnAddPoI_Click(object sender, RoutedEventArgs args)
+        {
+            if (!string.IsNullOrEmpty(EditStpt.Name) && EditStpt.IsValid &&
+                double.TryParse(EditStpt.Lat, out double lat) && double.TryParse(EditStpt.Lon, out double lon))
+            {
+                string theater = PointOfInterestDbase.TheaterForCoords(lat, lon);
+                List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.USER,
+                                                                                EditStpt.Name);
+                if (pois.Count > 0)
+                {
+                    ContentDialogResult result = await Utilities.Message2BDialog(
+                        Content.XamlRoot,
+                        "Point of Interest Already Defined",
+                        $"The database already contains a point of interest for “{EditStpt.Name}”. Would you like to replace it?",
+                        "Replace");
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        pois[0].Name = EditStpt.Name;
+                        pois[0].Latitude = EditStpt.Lat;
+                        pois[0].Longitude = EditStpt.Lon;
+                        pois[0].Elevation = EditStpt.Alt;
+                        RebuildPointsOfInterest();
+                        RebuildInterfaceState();
+                    }
+                }
+                else
+                {
+                    PointOfInterest poi = new(PointOfInterestType.USER,
+                                              theater, EditStpt.Name, EditStpt.Lat, EditStpt.Lon, EditStpt.Alt);
+                    PointOfInterestDbase.Instance.Add(poi);
+                    RebuildPointsOfInterest();
+                    RebuildInterfaceState();
+                }
+            }
+        }
+
+        /// <summary>
+        /// steerpoint previous click: save the current steerpoint and move to the previous steerpoint.
+        /// </summary>
         private void StptBtnPrev_Click(object sender, RoutedEventArgs args)
         {
             CopyEditToConfig(EditStptIndex, true);
             EditStptIndex -= 1;
             CopyConfigToEdit(EditStptIndex);
+            SelectMatchingPoI();
             RebuildInterfaceState();
         }
 
-        // steerpoint previous click: save the current steerpoint and move to the next steerpoint.
-        //
+        /// <summary>
+        /// steerpoint previous click: save the current steerpoint and move to the next steerpoint.
+        /// </summary>
         private void StptBtnNext_Click(object sender, RoutedEventArgs args)
         {
             CopyEditToConfig(EditStptIndex, true);
             EditStptIndex += 1;
             CopyConfigToEdit(EditStptIndex);
+            SelectMatchingPoI();
             RebuildInterfaceState();
         }
 
-        // steerpoint add click: save the current steerpoint and add a new steerpoint to the end of the list.
-        //
+        /// <summary>
+        /// steerpoint add click: save the current steerpoint and add a new steerpoint to the end of the list.
+        /// </summary>
         private void StptBtnAdd_Click(object sender, RoutedEventArgs args)
         {
             CopyEditToConfig(EditStptIndex, true);
@@ -574,8 +713,9 @@ namespace JAFDTC.UI.F16C
 
         // ---- reference point type selection ------------------------------------------------------------------------
 
-        // oap combo click: update the selection and ui state for the oap point if the configuration has changed.
-        //
+        /// <summary>
+        /// oap combo click: update the selection and ui state for the oap point if the configuration has changed.
+        /// </summary>
         private void OAPCombo_SelectionChanged(object sender, RoutedEventArgs args)
         {
             ComboBox combo = (ComboBox)sender;
@@ -594,8 +734,9 @@ namespace JAFDTC.UI.F16C
             }
         }
 
-        // vxp combo click: update the selection and ui state for the vxp point if the configuration has changed.
-        //
+        /// <summary>
+        /// vxp combo click: update the selection and ui state for the vxp point if the configuration has changed.
+        /// </summary>
         private async void VizCombo_SelectionChanged(object sender, RoutedEventArgs args)
         {
             ComboBox combo = (ComboBox)sender;
@@ -662,7 +803,9 @@ namespace JAFDTC.UI.F16C
 
         // ---- text field changes ------------------------------------------------------------------------------------
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void StptTextBox_LostFocus(object sender, RoutedEventArgs args)
         {
             TextBox textBox = (TextBox)sender;
@@ -684,9 +827,9 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // on navigating to this page, set up and tear down our internal and ui state based on the configuration we
-        // are editing.
-        //
+        /// <summary>
+        /// on navigating to this page, set up our internal and ui state based on the configuration we are editing.
+        /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             NavArgs = (F16CEditStptPageNavArgs)args.Parameter;
@@ -695,6 +838,15 @@ namespace JAFDTC.UI.F16C
 
             EditStptIndex = NavArgs.IndexStpt;
             CopyConfigToEdit(EditStptIndex);
+
+            string theater = null;
+            if ((Config.STPT.Points.Count > 0) && Config.STPT.Points[0].IsValid)
+            {
+                theater = PointOfInterestDbase.TheaterForCoords(double.Parse(Config.STPT.Points[0].Lat),
+                                                                double.Parse(Config.STPT.Points[0].Lon));
+            }
+            theater = (string.IsNullOrEmpty(theater)) ? CurPoITheaters[0] : theater;
+            uiPoIComboTheater.SelectedItem = theater;
 
             ValidateAllFields(_curStptFieldValueMap, EditStpt.GetErrors(null));
             ValidateAllFields(_oap0FieldValueMap, EditStpt.OAP[0].GetErrors(null));

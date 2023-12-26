@@ -23,7 +23,8 @@ https://www.gnu.org/licenses/.
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:JAFDTC.UI.Base"
-    xmlns:ui="using:CommunityToolkit.WinUI.UI"
+    xmlns:ui_app="using:JAFDTC.UI.App"
+    xmlns:ui_ctk="using:CommunityToolkit.WinUI.UI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -48,6 +49,9 @@ https://www.gnu.org/licenses/.
         <!-- brush for error fields. -->
         <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
 
+        <!-- style for ComboBoxSeparated -->
+        <Style TargetType="ui_app:ComboBoxSeparated" BasedOn="{StaticResource DefaultComboBoxStyle}" />
+
     </Page.Resources>
 
     <Grid Margin="16,8,16,12">
@@ -70,6 +74,7 @@ https://www.gnu.org/licenses/.
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -89,24 +94,30 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Points of Interest
             </TextBlock>
-
-            <ComboBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,12"
+            <ComboBox Grid.Row="1" Grid.Column="1" Width="150" Margin="12,12,0,12"
+                      x:Name="uiPoIComboTheater"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Center"
+                      ItemsSource="{x:Bind CurPoITheaters}"
+                      SelectionChanged="PoIComboTheater_SelectionChanged"
+                      ToolTipService.ToolTip="Selects a point of interest theater">
+            </ComboBox>
+            <ui_app:ComboBoxSeparated Grid.Row="2" Grid.Column="2" Margin="12,12,0,12"
                       x:Name="uiPoIComboSelect"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Center"
-                      ItemsSource="{x:Bind CurPoIs}"
                       SelectionChanged="PoIComboSelect_SelectionChanged"
-                      ToolTipService.ToolTip="Selects a point of interest to use to fill in navpoint information">
-            </ComboBox>
-            <Button Grid.Row="1" Grid.Column="2" Margin="12,0,0,0"
+                      ToolTipService.ToolTip="Selects a point of interest within  selected theater to use to fill in steerpoint information">
+            </ui_app:ComboBoxSeparated>
+            <Button Grid.Row="1" Grid.Column="3" Margin="12,0,0,0"
                         x:Name="uiPoIBtnApply"
                         VerticalAlignment="Center"
                         Click="PoIBtnApply_Click"
-                        ToolTipService.ToolTip="Applies selected PoI to navpoint Information">
-                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
+                        ToolTipService.ToolTip="Paste selected point of interest to navpoint">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE77F;"/>
             </Button>
 
-            <Button Grid.Row="1" Grid.Column="3" Width="144" Margin="24,12,0,12"
+            <Button Grid.Row="1" Grid.Column="4" Width="144" Margin="24,12,0,12"
                     x:Name="uiPoIBtnCapture"
                     VerticalAlignment="Center"
                     Click="PoIBtnCapture_Click"
@@ -148,6 +159,7 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
@@ -155,25 +167,32 @@ https://www.gnu.org/licenses/.
                            Style="{StaticResource EditorTitleTextBlockStyle}">
                     FIXUP:Type FIXUP:Count Information
                 </TextBlock>
-                <Button Grid.Column="1" Margin="0,0,6,0"
+                <Button Grid.Column="1" Margin="0,0,24,0"
+                        x:Name="uiNavptBtnAddPoI"
+                        VerticalAlignment="Center"
+                        Click="StptBtnAddPoI_Click"
+                        ToolTipService.ToolTip="Create point of interest from navpoint">
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE718;"/>
+                </Button>
+                <Button Grid.Column="2" Margin="0,0,6,0"
                         x:Name="uiNavptBtnPrev"
                         VerticalAlignment="Center"
                         Click="NavptBtnPrev_Click"
-                        ToolTipService.ToolTip="Moves to previous navpoint for editing">
+                        ToolTipService.ToolTip="Move to previous navpoint for editing">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
                 </Button>
-                <Button Grid.Column="2" Margin="0,0,6,0"
+                <Button Grid.Column="3" Margin="0,0,6,0"
                         x:Name="uiNavptBtnAdd"
                         VerticalAlignment="Center"
                         Click="NavptBtnAdd_Click"
-                        ToolTipService.ToolTip="Adds new navpoint to end of list">
+                        ToolTipService.ToolTip="Add new navpoint to end of list">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
                 </Button>
-                <Button Grid.Column="3"
+                <Button Grid.Column="4"
                         x:Name="uiNavptBtnNext"
                         VerticalAlignment="Center"
                         Click="NavptBtnNext_Click"
-                        ToolTipService.ToolTip="Moves to next navpoint for editing">
+                        ToolTipService.ToolTip="Move to next navpoint for editing">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
                 </Button>
             </Grid>
@@ -212,20 +231,20 @@ https://www.gnu.org/licenses/.
                          x:Name="uiNavptValueLat"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditNavpt.LatUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         ui:TextBoxExtensions.MaskPlaceholder="–"
-                         ui:TextBoxExtensions.Regex="^[nNsS] [\d]{2}° [\d]{2}’ [\d]{2}’’$"
-                         ui:TextBoxExtensions.CustomMask="N:[nNsS]"
-                         ui:TextBoxExtensions.Mask="N 99° 99’ 99’’"
+                         ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
+                         ui_ctk:TextBoxExtensions.Regex="^[nNsS] [\d]{2}° [\d]{2}’ [\d]{2}’’$"
+                         ui_ctk:TextBoxExtensions.CustomMask="N:[nNsS]"
+                         ui_ctk:TextBoxExtensions.Mask="N 99° 99’ 99’’"
                          LostFocus="NavptTextBox_LostFocus"
                          ToolTipService.ToolTip="Latitude of navpoint"/>
                 <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
                          x:Name="uiNavptValueLon"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditNavpt.LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         ui:TextBoxExtensions.MaskPlaceholder="–"
-                         ui:TextBoxExtensions.Regex="^[nNsS] [\d]{3}° [\d]{2}’ [\d]{2}’’$"
-                         ui:TextBoxExtensions.CustomMask="E:[eEwW]"
-                         ui:TextBoxExtensions.Mask="E 999° 99’ 99’’"
+                         ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
+                         ui_ctk:TextBoxExtensions.Regex="^[nNsS] [\d]{3}° [\d]{2}’ [\d]{2}’’$"
+                         ui_ctk:TextBoxExtensions.CustomMask="E:[eEwW]"
+                         ui_ctk:TextBoxExtensions.Mask="E 999° 99’ 99’’"
                          LostFocus="NavptTextBox_LostFocus"
                          ToolTipService.ToolTip="Longitude of navpoint"/>
                 <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"

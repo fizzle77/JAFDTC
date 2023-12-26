@@ -90,7 +90,7 @@ namespace JAFDTC.UI.Base
 
         private bool IsRebuildPending { get; set; }
 
-        private List<PointOfInterest> CurPoIs { get; set; }
+        private List<string> CurPoITheaters { get; set; }
 
         // read-only properties
 
@@ -110,8 +110,7 @@ namespace JAFDTC.UI.Base
 
             EditNavpt = null;
 
-            CurPoIs = PointOfInterestDbase.Instance.Find();
-            CurPoIs.Insert(0, new(PointOfInterestType.UNKNOWN, null, null, null, null, null));
+            CurPoITheaters = PointOfInterestDbase.KnownTheaters();
 
             IsRebuildPending = false;
 
@@ -214,22 +213,96 @@ namespace JAFDTC.UI.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// return true if the current edit navpoint is a valid poi, false otherwise. a valid poi has a name,
+        /// latitude, and longitude. the name should be unique within the user part of the poi database.
+        /// </summary>
+        private bool IsEditCoordValidPoI()
+        {
+            if (string.IsNullOrEmpty(EditNavpt.Name) || string.IsNullOrEmpty(EditNavpt.Alt) ||
+                !double.TryParse(EditNavpt.Lat, out double lat) || !double.TryParse(EditNavpt.Lon, out double lon))
+            {
+                return false;
+            }
+            List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(PointOfInterestDbase.TheaterForCoords(lat, lon),
+                                                                            PointOfInterestMask.ANY, EditNavpt.Name);
+            foreach (PointOfInterest poi in pois)
+            {
+                if (poi.Type != PointOfInterestType.USER)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void SelectMatchingPoI()
+        {
+            string theater = (string)uiPoIComboTheater.SelectedItem;
+            List<PointOfInterest> selPoI = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.ANY, EditNavpt.Name);
+            if ((selPoI.Count == 1) &&
+                (selPoI[0].Latitude == EditNavpt.Lat) &&
+                (selPoI[0].Longitude == EditNavpt.Lon) &&
+                (selPoI[0].Elevation == EditNavpt.Alt))
+            {
+                uiPoIComboSelect.SelectedItem = selPoI[0];
+            }
+            else
+            {
+                uiPoIComboSelect.SelectedIndex = -1;
+            }
+        }
+
+        /// <summary>
+        /// rebuild the point of interest select combo box. this only needs to be called when the theater changes or
+        /// when a poi is added to the current theater.
+        /// </summary>
+        private void RebuildPointsOfInterest()
+        {
+            string theater = (string)uiPoIComboTheater.SelectedItem;
+            List<PointOfInterest> dcsPoIs = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.DCS_AIRBASE);
+            dcsPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
+            List<PointOfInterest> usrPoIs = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.USER);
+            usrPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
+
+            uiPoIComboSelect.Items.Clear();
+            foreach (PointOfInterest poi in usrPoIs)
+            {
+                uiPoIComboSelect.Items.Add(poi);
+            }
+            if (usrPoIs.Count > 0)
+            {
+                uiPoIComboSelect.Items.Add(new NavigationViewItemSeparator());
+            }
+            foreach (PointOfInterest poi in dcsPoIs)
+            {
+                uiPoIComboSelect.Items.Add(poi);
+            }
+            SelectMatchingPoI();
+        }
+
         // rebuild the enable state of the buttons in the ui based on current configuration setup.
         //
         private void RebuildEnableState()
         {
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(PageHelper.SystemTag));
-            Utilities.SetEnableState(uiPoIComboSelect, isEditable);
-            Utilities.SetEnableState(uiPoIBtnApply, isEditable);
+
+            Utilities.SetEnableState(uiPoIComboTheater, isEditable);
+            Utilities.SetEnableState(uiPoIComboSelect, isEditable && (uiPoIComboSelect.Items.Count > 0));
+            Utilities.SetEnableState(uiPoIBtnApply, isEditable && (uiPoIComboSelect.SelectedIndex > 0));
+            Utilities.SetEnableState(uiPoIBtnCapture, isEditable);
+
             Utilities.SetEnableState(uiNavptValueName, isEditable);
+
             foreach (KeyValuePair<string, TextBox> kvp in _curNavptFieldValueMap)
             {
                 Utilities.SetEnableState(kvp.Value, isEditable);
             }
 
-            Utilities.SetEnableState(uiPoIBtnApply, isEditable && (uiPoIComboSelect.SelectedIndex > 0));
-            Utilities.SetEnableState(uiPoIBtnCapture, isEditable);
-
+            Utilities.SetEnableState(uiNavptBtnAddPoI, isEditable && IsEditCoordValidPoI());
             Utilities.SetEnableState(uiNavptBtnPrev, !CurStateHasErrors() && (EditNavptIndex > 0));
             Utilities.SetEnableState(uiNavptBtnAdd, isEditable && !CurStateHasErrors());
             Utilities.SetEnableState(uiNavptBtnNext, !CurStateHasErrors() &&
@@ -291,6 +364,15 @@ namespace JAFDTC.UI.Base
         // ---- poi management ----------------------------------------------------------------------------------------
 
         /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void PoIComboTheater_SelectionChanged(object sender, RoutedEventArgs args)
+        {
+            RebuildPointsOfInterest();
+            RebuildEnableState();
+        }
+
+        /// <summary>
         /// poi combo selection changed: update enable state in the ui.
         /// </summary>
         private void PoIComboSelect_SelectionChanged(object sender, RoutedEventArgs args)
@@ -338,6 +420,45 @@ namespace JAFDTC.UI.Base
         // ---- steerpoint management ---------------------------------------------------------------------------------
 
         /// <summary>
+        /// TODO: document
+        /// </summary>
+        private async void StptBtnAddPoI_Click(object sender, RoutedEventArgs args)
+        {
+            if (!string.IsNullOrEmpty(EditNavpt.Name) && EditNavpt.IsValid &&
+                double.TryParse(EditNavpt.Lat, out double lat) && double.TryParse(EditNavpt.Lon, out double lon))
+            {
+                string theater = PointOfInterestDbase.TheaterForCoords(lat, lon);
+                List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.USER,
+                                                                                EditNavpt.Name);
+                if (pois.Count > 0)
+                {
+                    ContentDialogResult result = await Utilities.Message2BDialog(
+                        Content.XamlRoot,
+                        "Point of Interest Already Defined",
+                        $"The database already contains a point of interest for “{EditNavpt.Name}”. Would you like to replace it?",
+                        "Replace");
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        pois[0].Name = EditNavpt.Name;
+                        pois[0].Latitude = EditNavpt.Lat;
+                        pois[0].Longitude = EditNavpt.Lon;
+                        pois[0].Elevation = EditNavpt.Alt;
+                        RebuildPointsOfInterest();
+                        RebuildInterfaceState();
+                    }
+                }
+                else
+                {
+                    PointOfInterest poi = new(PointOfInterestType.USER,
+                                              theater, EditNavpt.Name, EditNavpt.Lat, EditNavpt.Lon, EditNavpt.Alt);
+                    PointOfInterestDbase.Instance.Add(poi);
+                    RebuildPointsOfInterest();
+                    RebuildInterfaceState();
+                }
+            }
+        }
+
+        /// <summary>
         /// steerpoint previous click: save the current steerpoint and move to the previous steerpoint.
         /// </summary>
         private void NavptBtnPrev_Click(object sender, RoutedEventArgs args)
@@ -345,6 +466,7 @@ namespace JAFDTC.UI.Base
             CopyEditToConfig(EditNavptIndex, true);
             EditNavptIndex -= 1;
             CopyConfigToEdit(EditNavptIndex);
+            SelectMatchingPoI();
             RebuildInterfaceState();
         }
 
@@ -356,6 +478,7 @@ namespace JAFDTC.UI.Base
             CopyEditToConfig(EditNavptIndex, true);
             EditNavptIndex += 1;
             CopyConfigToEdit(EditNavptIndex);
+            SelectMatchingPoI();
             RebuildInterfaceState();
         }
 
@@ -424,6 +547,14 @@ namespace JAFDTC.UI.Base
 
             EditNavptIndex = NavArgs.IndexNavpt;
             CopyConfigToEdit(EditNavptIndex);
+
+            string theater = null;
+            if ((PageHelper.NavpointCount(Config) > 0) && EditNavpt.IsValid)
+            {
+                theater = PointOfInterestDbase.TheaterForCoords(double.Parse(EditNavpt.Lat), double.Parse(EditNavpt.Lon));
+            }
+            theater = (string.IsNullOrEmpty(theater)) ? CurPoITheaters[0] : theater;
+            uiPoIComboTheater.SelectedItem = theater;
 
             ValidateAllFields(_curNavptFieldValueMap, PageHelper.GetErrors(EditNavpt, null));
             RebuildInterfaceState();
