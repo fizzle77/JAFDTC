@@ -63,7 +63,6 @@ namespace JAFDTC.Utilities
         /// pre-flight the file manager by checking paths and creating the settings folder if necessary. throws an
         /// exception on issues.
         /// </summary>
-        /// <exception cref="Exception"></exception>
         public static void Preflight()
         {
             Debug.Assert(Directory.Exists(_appDirPath));
@@ -89,7 +88,6 @@ namespace JAFDTC.Utilities
         /// <summary>
         /// return the path to the internal dcs data directory in the application package.
         /// </summary>
-        /// <returns></returns>
         public static string AppDCSDataDirPath()
         {
             return Path.Combine(_appDirPath, "DCS");
@@ -161,9 +159,10 @@ namespace JAFDTC.Utilities
             {
                 json = ReadFile(_settingsPath);
             }
-            catch
+            catch (Exception ex)
             {
                 json = null;
+                FileManager.Log($"Settings:ReadSettings settings missing, exception {ex}");
             }
             try
             {
@@ -178,9 +177,10 @@ namespace JAFDTC.Utilities
                     settings = JsonSerializer.Deserialize<SettingsData>(json);
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 settings = new SettingsData();
+                FileManager.Log($"Settings:ReadSettings create empty settings, exception {ex}");
             }
             return settings;
         }
@@ -217,11 +217,11 @@ namespace JAFDTC.Utilities
                 AirframeTypes.A10C => Path.Combine(_settingsDirPath, "Configs", "A10C"),
                 AirframeTypes.AH64D => Path.Combine(_settingsDirPath, "Configs", "AH64D"),
                 AirframeTypes.AV8B => Path.Combine(_settingsDirPath, "Configs", "AV8B"),
+                AirframeTypes.F14AB => Path.Combine(_settingsDirPath, "Configs", "F14AB"),
                 AirframeTypes.F15E => Path.Combine(_settingsDirPath, "Configs", "F15E"),
                 AirframeTypes.F16C => Path.Combine(_settingsDirPath, "Configs", "F16C"),
                 AirframeTypes.FA18C => Path.Combine(_settingsDirPath, "Configs", "FA18C"),
                 AirframeTypes.M2000C => Path.Combine(_settingsDirPath, "Configs", "M2000C"),
-                AirframeTypes.F14AB => Path.Combine(_settingsDirPath, "Configs", "F14AB"),
                 _ => Path.Combine(_settingsDirPath, "Configs"),
             };
         }
@@ -312,18 +312,16 @@ namespace JAFDTC.Utilities
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // user database
+        // databases
         //
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// load the database at the given path. here, a "database" is a List<T> of objects of type T that is
+        /// serialized to a .json file. return an empty list on error.
         /// </summary>
-        public static List<T> LoadUserDbase<T>(string name)
+        private static List<T> LoadDbaseCore<T>(string path)
         {
-            string path = Path.Combine(_settingsDirPath, "Dbase");
-            Directory.CreateDirectory(path);
-            path = Path.Combine(path, name);
             List<T> dbase = new();
             try
             {
@@ -332,13 +330,35 @@ namespace JAFDTC.Utilities
             }
             catch (Exception ex)
             {
-                FileManager.Log($"FileManager:LoadUserDbase exception {ex}");
+                FileManager.Log($"FileManager:LoadDbaseCore exception {ex}");
             }
             return dbase;
         }
 
         /// <summary>
-        /// TODO: document
+        /// load a system database (a .json serialized List<T>) from the "Data" directory in the app bundle.  system
+        /// databases are immutable and cannot be updated. returns an empty list on error.
+        /// </summary>
+        public static List<T> LoadSystemDbase<T>(string name)
+        {
+            string path = Path.Combine(_appDirPath, "Data", name);
+            return (File.Exists(path)) ? LoadDbaseCore<T>(path) : new List<T>();
+        }
+
+        /// <summary>
+        /// load the user database (a .json serialized List<T>) with the given name from the database area in the
+        /// jafdtc settings directory. user databases are mutable and may be updated. returns an empty list on error.
+        /// </summary>
+        public static List<T> LoadUserDbase<T>(string name)
+        {
+            string path = Path.Combine(_settingsDirPath, "Dbase");
+            Directory.CreateDirectory(path);
+            return LoadDbaseCore<T>(Path.Combine(path, name));
+        }
+
+        /// <summary>
+        /// save the user database (a .json serialized List<T>) with the given name to the database area in the jafdtc
+        /// settings directory (creating the file if necessary). returns true on success, false on failure
         /// </summary>
         public static bool SaveUserDbase<T>(string name, List<T> dbase)
         {
@@ -365,24 +385,23 @@ namespace JAFDTC.Utilities
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// return the point of interest database that provides coordinates on known points in the world. this database
+        /// is the combination of a system dbase that carries fixed dcs points along with a user dbase that holds
+        /// user-specified points.
         /// </summary>
-        public static Dictionary<string, List<PointOfInterest>> LoadPointsOfInterest()
+        public static List<PointOfInterest> LoadPointsOfInterest()
         {
-            try
-            {
-                string path = Path.Combine(_appDirPath, "Data", "db-poi-airbases.json");
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    return JsonSerializer.Deserialize<Dictionary<string, List<PointOfInterest>>>(json);
-                }
-            }
-            catch (Exception ex)
-            {
-                FileManager.Log($"FileManager:LoadPointsOfInterest exception {ex}");
-            }
-            return new Dictionary<string, List<PointOfInterest>>();
+            List<PointOfInterest> dbase = LoadSystemDbase<PointOfInterest>("db-poi-airbases.json");
+            dbase.AddRange(LoadUserDbase<PointOfInterest>("jafdtc-user-pois.json"));
+            return dbase;
+        }
+
+        /// <summary>
+        /// saves the user portion of the point of interest database. returns true on success, false otherwise.
+        /// </summary>
+        public static bool SaveUserPointsOfInterest(List<PointOfInterest> userPoIs)
+        {
+            return SaveUserDbase<PointOfInterest>("jafdtc-user-pois.json", userPoIs);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -392,24 +411,11 @@ namespace JAFDTC.Utilities
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// return the emitter database that provides information on known emitters for harm alic/hts systems.
         /// </summary>
-        public static Emitter[] LoadEmitters()
+        public static List<Emitter> LoadEmitters()
         {
-            try
-            {
-                string path = Path.Combine(_appDirPath, "Data", "db-emitters.json");
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    return JsonSerializer.Deserialize<Emitter[]>(json);
-                }
-            }
-            catch (Exception ex)
-            {
-                FileManager.Log($"FileManager:LoadEmitters exception {ex}");
-            }
-            return Array.Empty<Emitter>();
+            return LoadSystemDbase<Emitter>("db-emitters.json");
         }
     }
 }

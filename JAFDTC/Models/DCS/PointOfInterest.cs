@@ -23,7 +23,7 @@ namespace JAFDTC.Models.DCS
     public enum PointOfInterestType
     {
         UNKNOWN = -1,
-        AIRBASE = 0,
+        DCS_AIRBASE = 0,
         USER = 1
     }
 

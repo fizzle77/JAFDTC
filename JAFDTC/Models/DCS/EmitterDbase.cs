@@ -38,7 +38,7 @@ namespace JAFDTC.Models.DCS
         // TODO: may want to add ability to load other files?
         private EmitterDbase()
         {
-            Emitter[] emitters = FileManager.LoadEmitters();
+            List<Emitter> emitters = FileManager.LoadEmitters();
 
             Dbase = new Dictionary<int, List<Emitter>>();
             foreach (Emitter emitter in emitters)
