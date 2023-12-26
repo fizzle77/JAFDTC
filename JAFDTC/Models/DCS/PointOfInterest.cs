@@ -49,7 +49,7 @@ namespace JAFDTC.Models.DCS
         
         public string Longitude { get; set; }                   // longitude (decimal degrees)
         
-        public int Elevation { get; set; }                      // elevation (feet)
+        public string Elevation { get; set; }                   // elevation (feet)
 
         public override string ToString()
         {
@@ -63,9 +63,9 @@ namespace JAFDTC.Models.DCS
         // ------------------------------------------------------------------------------------------------------------
 
         public PointOfInterest()
-            => (Type, Theater, Name, Latitude, Longitude, Elevation) = (PointOfInterestType.UNKNOWN, "", "", "", "", 0);
+            => (Type, Theater, Name, Latitude, Longitude, Elevation) = (PointOfInterestType.UNKNOWN, "", "", "", "", "");
 
-        public PointOfInterest(PointOfInterestType type, string theater, string name, string lat, string lon, int elev)
+        public PointOfInterest(PointOfInterestType type, string theater, string name, string lat, string lon, string elev)
             => (Type, Theater, Name, Latitude, Longitude, Elevation) = (type, theater, name, lat, lon, elev);
     }
 }

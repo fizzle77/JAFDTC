@@ -5,7 +5,7 @@
     "Name": "Anapa-Vityazevo",
     "Latitude": "45.00493333",
     "Longitude": "37.34781667",
-    "Elevation": 141
+    "Elevation": "141"
   },
   {
     "Type": 0,
@@ -13,7 +13,7 @@
     "Name": "Batumi",
     "Latitude": "41.60958333",
     "Longitude": "41.60023333",
-    "Elevation": 33
+    "Elevation": "33"
   },
   {
     "Type": 0,
@@ -21,7 +21,7 @@
     "Name": "Beslan",
     "Latitude": "43.20570000",
     "Longitude": "44.60580000",
-    "Elevation": 1722
+    "Elevation": "1722"
   },
   {
     "Type": 0,
@@ -29,7 +29,7 @@
     "Name": "Gelendzhik",
     "Latitude": "44.57290000",
     "Longitude": "38.01160000",
-    "Elevation": 72
+    "Elevation": "72"
   },
   {
     "Type": 0,
@@ -37,7 +37,7 @@
     "Name": "Gudauta",
     "Latitude": "43.11431667",
     "Longitude": "40.56973333",
-    "Elevation": 69
+    "Elevation": "69"
   },
   {
     "Type": 0,
@@ -45,7 +45,7 @@
     "Name": "Kobuleti",
     "Latitude": "41.92991667",
     "Longitude": "41.86326667",
-    "Elevation": 59
+    "Elevation": "59"
   },
   {
     "Type": 0,
@@ -53,7 +53,7 @@
     "Name": "Krasnodar-Center",
     "Latitude": "45.08693333",
     "Longitude": "38.93998333",
-    "Elevation": 98
+    "Elevation": "98"
   },
   {
     "Type": 0,
@@ -61,7 +61,7 @@
     "Name": "Krasnodar-Pashkovsky",
     "Latitude": "45.03800000",
     "Longitude": "39.18813333",
-    "Elevation": 112
+    "Elevation": "112"
   },
   {
     "Type": 0,
@@ -69,7 +69,7 @@
     "Name": "Krymsk",
     "Latitude": "44.96793333",
     "Longitude": "37.99501667",
-    "Elevation": 66
+    "Elevation": "66"
   },
   {
     "Type": 0,
@@ -77,7 +77,7 @@
     "Name": "Kutaisi",
     "Latitude": "42.17760000",
     "Longitude": "42.48128333",
-    "Elevation": 148
+    "Elevation": "148"
   },
   {
     "Type": 0,
@@ -85,7 +85,7 @@
     "Name": "Maykop-Khanskaya",
     "Latitude": "44.68128333",
     "Longitude": "40.03525000",
-    "Elevation": 591
+    "Elevation": "591"
   },
   {
     "Type": 0,
@@ -93,7 +93,7 @@
     "Name": "Mineralnye Vody",
     "Latitude": "44.22785000",
     "Longitude": "43.08118333",
-    "Elevation": 1050
+    "Elevation": "1050"
   },
   {
     "Type": 0,
@@ -101,7 +101,7 @@
     "Name": "Mozdok",
     "Latitude": "43.79170000",
     "Longitude": "44.60583333",
-    "Elevation": 507
+    "Elevation": "507"
   },
   {
     "Type": 0,
@@ -109,7 +109,7 @@
     "Name": "Nalchik",
     "Latitude": "43.51400000",
     "Longitude": "43.63645000",
-    "Elevation": 1411
+    "Elevation": "1411"
   },
   {
     "Type": 0,
@@ -117,7 +117,7 @@
     "Name": "Novorossiysk",
     "Latitude": "44.66808333",
     "Longitude": "37.77825000",
-    "Elevation": 131
+    "Elevation": "131"
   },
   {
     "Type": 0,
@@ -125,7 +125,7 @@
     "Name": "Senaki-Kolkhi",
     "Latitude": "42.24083333",
     "Longitude": "42.04800000",
-    "Elevation": 43
+    "Elevation": "43"
   },
   {
     "Type": 0,
@@ -133,7 +133,7 @@
     "Name": "Sochi-Adler",
     "Latitude": "43.44435000",
     "Longitude": "39.94106667",
-    "Elevation": 98
+    "Elevation": "98"
   },
   {
     "Type": 0,
@@ -141,7 +141,7 @@
     "Name": "Soganlug",
     "Latitude": "41.64953333",
     "Longitude": "44.93835000",
-    "Elevation": 1483
+    "Elevation": "1483"
   },
   {
     "Type": 0,
@@ -149,7 +149,7 @@
     "Name": "Sukhumi-Babushara",
     "Latitude": "42.86108333",
     "Longitude": "41.12498333",
-    "Elevation": 43
+    "Elevation": "43"
   },
   {
     "Type": 0,
@@ -157,7 +157,7 @@
     "Name": "Tbilisi-Lochini",
     "Latitude": "41.66703333",
     "Longitude": "44.95628333",
-    "Elevation": 1574
+    "Elevation": "1574"
   },
   {
     "Type": 0,
@@ -165,7 +165,7 @@
     "Name": "Vaziani",
     "Latitude": "41.62901667",
     "Longitude": "45.02721667",
-    "Elevation": 1524
+    "Elevation": "1524"
   },
   {
     "Type": 0,
@@ -173,7 +173,7 @@
     "Name": "Rota Intl",
     "Latitude": "14.17436667",
     "Longitude": "145.24108333",
-    "Elevation": 569
+    "Elevation": "569"
   },
   {
     "Type": 0,
@@ -181,7 +181,7 @@
     "Name": "Saipan Intl",
     "Latitude": "15.11891667",
     "Longitude": "145.72911667",
-    "Elevation": 213
+    "Elevation": "213"
   },
   {
     "Type": 0,
@@ -189,7 +189,7 @@
     "Name": "Tinian Intl",
     "Latitude": "14.99918333",
     "Longitude": "145.61916667",
-    "Elevation": 260
+    "Elevation": "260"
   },
   {
     "Type": 0,
@@ -197,7 +197,7 @@
     "Name": "Antonio B. Won Pat Intl",
     "Latitude": "13.48476667",
     "Longitude": "144.79681667",
-    "Elevation": 255
+    "Elevation": "255"
   },
   {
     "Type": 0,
@@ -205,7 +205,7 @@
     "Name": "Andersen AFB",
     "Latitude": "13.58170000",
     "Longitude": "144.93105000",
-    "Elevation": 545
+    "Elevation": "545"
   },
   {
     "Type": 0,
@@ -213,7 +213,7 @@
     "Name": "Beatty",
     "Latitude": "36.86100000",
     "Longitude": "-116.78641667",
-    "Elevation": 3148
+    "Elevation": "3148"
   },
   {
     "Type": 0,
@@ -221,7 +221,7 @@
     "Name": "Boulder City",
     "Latitude": "35.94866667",
     "Longitude": "-114.86181667",
-    "Elevation": 2163
+    "Elevation": "2163"
   },
   {
     "Type": 0,
@@ -229,7 +229,7 @@
     "Name": "Creech",
     "Latitude": "36.58381667",
     "Longitude": "-115.67643333",
-    "Elevation": 3126
+    "Elevation": "3126"
   },
   {
     "Type": 0,
@@ -237,7 +237,7 @@
     "Name": "Echo Bay",
     "Latitude": "36.31105000",
     "Longitude": "-114.46388333",
-    "Elevation": 1526
+    "Elevation": "1526"
   },
   {
     "Type": 0,
@@ -245,7 +245,7 @@
     "Name": "Groom Lake",
     "Latitude": "37.23316667",
     "Longitude": "-115.79233333",
-    "Elevation": 4475
+    "Elevation": "4475"
   },
   {
     "Type": 0,
@@ -253,7 +253,7 @@
     "Name": "Henderson Executive",
     "Latitude": "35.97398333",
     "Longitude": "-115.13305000",
-    "Elevation": 2487
+    "Elevation": "2487"
   },
   {
     "Type": 0,
@@ -261,7 +261,7 @@
     "Name": "Jean",
     "Latitude": "35.76918333",
     "Longitude": "-115.32956667",
-    "Elevation": 2824
+    "Elevation": "2824"
   },
   {
     "Type": 0,
@@ -269,7 +269,7 @@
     "Name": "Laughlin",
     "Latitude": "35.15610000",
     "Longitude": "-114.55945000",
-    "Elevation": 656
+    "Elevation": "656"
   },
   {
     "Type": 0,
@@ -277,7 +277,7 @@
     "Name": "Lincoln County",
     "Latitude": "37.78735000",
     "Longitude": "-114.41990000",
-    "Elevation": 4815
+    "Elevation": "4815"
   },
   {
     "Type": 0,
@@ -285,7 +285,7 @@
     "Name": "McCarran International",
     "Latitude": "36.07640000",
     "Longitude": "-115.14461667",
-    "Elevation": 2104
+    "Elevation": "2104"
   },
   {
     "Type": 0,
@@ -293,7 +293,7 @@
     "Name": "Mesquite",
     "Latitude": "36.83311667",
     "Longitude": "-114.05590000",
-    "Elevation": 1859
+    "Elevation": "1859"
   },
   {
     "Type": 0,
@@ -301,7 +301,7 @@
     "Name": "Mina",
     "Latitude": "38.37978333",
     "Longitude": "-118.09666667",
-    "Elevation": 4559
+    "Elevation": "4559"
   },
   {
     "Type": 0,
@@ -309,7 +309,7 @@
     "Name": "Nellis",
     "Latitude": "36.23521667",
     "Longitude": "-115.03300000",
-    "Elevation": 1843
+    "Elevation": "1843"
   },
   {
     "Type": 0,
@@ -317,7 +317,7 @@
     "Name": "North Las Vegas",
     "Latitude": "36.21346667",
     "Longitude": "-115.19476667",
-    "Elevation": 2229
+    "Elevation": "2229"
   },
   {
     "Type": 0,
@@ -325,7 +325,7 @@
     "Name": "Pahute Mesa",
     "Latitude": "37.10198333",
     "Longitude": "-116.31283333",
-    "Elevation": 5058
+    "Elevation": "5058"
   },
   {
     "Type": 0,
@@ -333,7 +333,7 @@
     "Name": "Tonopah",
     "Latitude": "38.06241667",
     "Longitude": "-117.08328333",
-    "Elevation": 5391
+    "Elevation": "5391"
   },
   {
     "Type": 0,
@@ -341,7 +341,7 @@
     "Name": "Tonopah Test Range",
     "Latitude": "37.79886667",
     "Longitude": "-116.78078333",
-    "Elevation": 5534
+    "Elevation": "5534"
   },
   {
     "Type": 0,
@@ -349,7 +349,7 @@
     "Name": "Abu Dhabi Intl",
     "Latitude": "24.45370000",
     "Longitude": "54.65426667",
-    "Elevation": 92
+    "Elevation": "92"
   },
   {
     "Type": 0,
@@ -357,7 +357,7 @@
     "Name": "Abu Musa Island",
     "Latitude": "25.87598333",
     "Longitude": "55.03291667",
-    "Elevation": 16
+    "Elevation": "16"
   },
   {
     "Type": 0,
@@ -365,7 +365,7 @@
     "Name": "Al Ain Intl",
     "Latitude": "24.26141667",
     "Longitude": "55.60923333",
-    "Elevation": 814
+    "Elevation": "814"
   },
   {
     "Type": 0,
@@ -373,7 +373,7 @@
     "Name": "Al Dhafra AFB",
     "Latitude": "24.24828333",
     "Longitude": "54.54768333",
-    "Elevation": 52
+    "Elevation": "52"
   },
   {
     "Type": 0,
@@ -381,7 +381,7 @@
     "Name": "Al Maktoum Intl",
     "Latitude": "24.89705000",
     "Longitude": "55.16023333",
-    "Elevation": 123
+    "Elevation": "123"
   },
   {
     "Type": 0,
@@ -389,7 +389,7 @@
     "Name": "Al Minhad AFB",
     "Latitude": "25.02686667",
     "Longitude": "55.36575000",
-    "Elevation": 180
+    "Elevation": "180"
   },
   {
     "Type": 0,
@@ -397,7 +397,7 @@
     "Name": "Al-Bateen",
     "Latitude": "24.42806667",
     "Longitude": "54.45856667",
-    "Elevation": 12
+    "Elevation": "12"
   },
   {
     "Type": 0,
@@ -405,7 +405,7 @@
     "Name": "Bandar Abbas Intl",
     "Latitude": "27.21768333",
     "Longitude": "56.37895000",
-    "Elevation": 17
+    "Elevation": "17"
   },
   {
     "Type": 0,
@@ -413,7 +413,7 @@
     "Name": "Bandar Lengeh",
     "Latitude": "26.53225000",
     "Longitude": "54.82466667",
-    "Elevation": 76
+    "Elevation": "76"
   },
   {
     "Type": 0,
@@ -421,7 +421,7 @@
     "Name": "Bandar-e-Jask",
     "Latitude": "25.65466667",
     "Longitude": "57.80143333",
-    "Elevation": 26
+    "Elevation": "26"
   },
   {
     "Type": 0,
@@ -429,7 +429,7 @@
     "Name": "Dubai Intl",
     "Latitude": "25.25636667",
     "Longitude": "55.36525000",
-    "Elevation": 16
+    "Elevation": "16"
   },
   {
     "Type": 0,
@@ -437,7 +437,7 @@
     "Name": "Fujairah Intl",
     "Latitude": "25.11093333",
     "Longitude": "56.32735000",
-    "Elevation": 102
+    "Elevation": "102"
   },
   {
     "Type": 0,
@@ -445,7 +445,7 @@
     "Name": "Havadarya",
     "Latitude": "27.15821667",
     "Longitude": "56.17201667",
-    "Elevation": 51
+    "Elevation": "51"
   },
   {
     "Type": 0,
@@ -453,7 +453,7 @@
     "Name": "Jiroft",
     "Latitude": "28.72351667",
     "Longitude": "57.67508333",
-    "Elevation": 2664
+    "Elevation": "2664"
   },
   {
     "Type": 0,
@@ -461,7 +461,7 @@
     "Name": "Kerman",
     "Latitude": "30.27310000",
     "Longitude": "56.95155000",
-    "Elevation": 5746
+    "Elevation": "5746"
   },
   {
     "Type": 0,
@@ -469,7 +469,7 @@
     "Name": "Khasab",
     "Latitude": "26.16981667",
     "Longitude": "56.24016667",
-    "Elevation": 74
+    "Elevation": "74"
   },
   {
     "Type": 0,
@@ -477,7 +477,7 @@
     "Name": "Kish Intl",
     "Latitude": "26.52813333",
     "Longitude": "53.98103333",
-    "Elevation": 115
+    "Elevation": "115"
   },
   {
     "Type": 0,
@@ -485,7 +485,7 @@
     "Name": "Lar",
     "Latitude": "27.67471667",
     "Longitude": "54.38313333",
-    "Elevation": 2636
+    "Elevation": "2636"
   },
   {
     "Type": 0,
@@ -493,7 +493,7 @@
     "Name": "Lavan Island",
     "Latitude": "26.81110000",
     "Longitude": "53.35328333",
-    "Elevation": 75
+    "Elevation": "75"
   },
   {
     "Type": 0,
@@ -501,7 +501,7 @@
     "Name": "Liwa AFB",
     "Latitude": "23.65076667",
     "Longitude": "53.82441667",
-    "Elevation": 400
+    "Elevation": "400"
   },
   {
     "Type": 0,
@@ -509,7 +509,7 @@
     "Name": "Qeshm Island",
     "Latitude": "26.75466667",
     "Longitude": "55.90238333",
-    "Elevation": 17
+    "Elevation": "17"
   },
   {
     "Type": 0,
@@ -517,7 +517,7 @@
     "Name": "Ras Al Khaimah Intl",
     "Latitude": "25.61348333",
     "Longitude": "55.93878333",
-    "Elevation": 71
+    "Elevation": "71"
   },
   {
     "Type": 0,
@@ -525,7 +525,7 @@
     "Name": "Sas Al Nakheel",
     "Latitude": "24.44110000",
     "Longitude": "54.51701667",
-    "Elevation": 10
+    "Elevation": "10"
   },
   {
     "Type": 0,
@@ -533,7 +533,7 @@
     "Name": "Sharjah Intl",
     "Latitude": "25.33066667",
     "Longitude": "55.51825000",
-    "Elevation": 98
+    "Elevation": "98"
   },
   {
     "Type": 0,
@@ -541,7 +541,7 @@
     "Name": "Shiraz Intl",
     "Latitude": "29.54090000",
     "Longitude": "52.59106667",
-    "Elevation": 4879
+    "Elevation": "4879"
   },
   {
     "Type": 0,
@@ -549,7 +549,7 @@
     "Name": "Sir Abu Nuayr",
     "Latitude": "25.21686667",
     "Longitude": "54.23363333",
-    "Elevation": 25
+    "Elevation": "25"
   },
   {
     "Type": 0,
@@ -557,7 +557,7 @@
     "Name": "Sirri Island",
     "Latitude": "25.90960000",
     "Longitude": "54.53925000",
-    "Elevation": 14
+    "Elevation": "14"
   },
   {
     "Type": 0,
@@ -565,7 +565,7 @@
     "Name": "Tunb Island AFB",
     "Latitude": "26.25888333",
     "Longitude": "55.31576667",
-    "Elevation": 43
+    "Elevation": "43"
   },
   {
     "Type": 0,
@@ -573,7 +573,7 @@
     "Name": "Tunb Kochak",
     "Latitude": "26.24331667",
     "Longitude": "55.14556667",
-    "Elevation": 16
+    "Elevation": "16"
   },
   {
     "Type": 0,
@@ -581,7 +581,7 @@
     "Name": "Aerodromo De Tolhuin",
     "Latitude": "-54.49960000",
     "Longitude": "-67.17238333",
-    "Elevation": 355
+    "Elevation": "355"
   },
   {
     "Type": 0,
@@ -589,7 +589,7 @@
     "Name": "Aerodromo O\u0027Higgins",
     "Latitude": "-48.46900000",
     "Longitude": "-72.56331667",
-    "Elevation": 888
+    "Elevation": "888"
   },
   {
     "Type": 0,
@@ -597,7 +597,7 @@
     "Name": "Aeropuerto de Gobernador Gregores",
     "Latitude": "-48.78316667",
     "Longitude": "-70.14796667",
-    "Elevation": 1168
+    "Elevation": "1168"
   },
   {
     "Type": 0,
@@ -605,7 +605,7 @@
     "Name": "Almirante Schroeders",
     "Latitude": "-53.61306667",
     "Longitude": "-70.47521667",
-    "Elevation": 161
+    "Elevation": "161"
   },
   {
     "Type": 0,
@@ -613,7 +613,7 @@
     "Name": "CaletaTortel",
     "Latitude": "-47.78703333",
     "Longitude": "-73.53130000",
-    "Elevation": 3
+    "Elevation": "3"
   },
   {
     "Type": 0,
@@ -621,7 +621,7 @@
     "Name": "Comandante Luis Piedrabuena",
     "Latitude": "-49.99498333",
     "Longitude": "-68.95143333",
-    "Elevation": 70
+    "Elevation": "70"
   },
   {
     "Type": 0,
@@ -629,7 +629,7 @@
     "Name": "El Calafate",
     "Latitude": "-50.28023333",
     "Longitude": "-72.05273333",
-    "Elevation": 661
+    "Elevation": "661"
   },
   {
     "Type": 0,
@@ -637,7 +637,7 @@
     "Name": "Franco Bianco",
     "Latitude": "-52.73658333",
     "Longitude": "-69.33378333",
-    "Elevation": 105
+    "Elevation": "105"
   },
   {
     "Type": 0,
@@ -645,7 +645,7 @@
     "Name": "Mount Pleasant",
     "Latitude": "-51.82066667",
     "Longitude": "-58.45773333",
-    "Elevation": 243
+    "Elevation": "243"
   },
   {
     "Type": 0,
@@ -653,7 +653,7 @@
     "Name": "Pampa Guanaco",
     "Latitude": "-54.04996667",
     "Longitude": "-68.80898333",
-    "Elevation": 520
+    "Elevation": "520"
   },
   {
     "Type": 0,
@@ -661,7 +661,7 @@
     "Name": "Port Stanley",
     "Latitude": "-51.68590000",
     "Longitude": "-57.77783333",
-    "Elevation": 67
+    "Elevation": "67"
   },
   {
     "Type": 0,
@@ -669,7 +669,7 @@
     "Name": "Porvenir Airfield",
     "Latitude": "-53.25368333",
     "Longitude": "-70.31930000",
-    "Elevation": 94
+    "Elevation": "94"
   },
   {
     "Type": 0,
@@ -677,7 +677,7 @@
     "Name": "Puerto Natales",
     "Latitude": "-51.67070000",
     "Longitude": "-72.52818333",
-    "Elevation": 217
+    "Elevation": "217"
   },
   {
     "Type": 0,
@@ -685,7 +685,7 @@
     "Name": "Puerto Santa Cruz",
     "Latitude": "-50.01701667",
     "Longitude": "-68.57906667",
-    "Elevation": 364
+    "Elevation": "364"
   },
   {
     "Type": 0,
@@ -693,7 +693,7 @@
     "Name": "Puerto Williams",
     "Latitude": "-54.93098333",
     "Longitude": "-67.62621667",
-    "Elevation": 65
+    "Elevation": "65"
   },
   {
     "Type": 0,
@@ -701,7 +701,7 @@
     "Name": "Punta Arenas",
     "Latitude": "-53.00553333",
     "Longitude": "-70.85691667",
-    "Elevation": 125
+    "Elevation": "125"
   },
   {
     "Type": 0,
@@ -709,7 +709,7 @@
     "Name": "Rio Gallegos",
     "Latitude": "-51.60885000",
     "Longitude": "-69.31225000",
-    "Elevation": 51
+    "Elevation": "51"
   },
   {
     "Type": 0,
@@ -717,7 +717,7 @@
     "Name": "Rio Grande",
     "Latitude": "-53.77758333",
     "Longitude": "-67.74986667",
-    "Elevation": 61
+    "Elevation": "61"
   },
   {
     "Type": 0,
@@ -725,7 +725,7 @@
     "Name": "Rio Turbio",
     "Latitude": "-51.60505000",
     "Longitude": "-72.21981667",
-    "Elevation": 896
+    "Elevation": "896"
   },
   {
     "Type": 0,
@@ -733,7 +733,7 @@
     "Name": "San Julian",
     "Latitude": "-49.30668333",
     "Longitude": "-67.80271667",
-    "Elevation": 144
+    "Elevation": "144"
   },
   {
     "Type": 0,
@@ -741,7 +741,7 @@
     "Name": "Ushuaia",
     "Latitude": "-54.84330000",
     "Longitude": "-68.29583333",
-    "Elevation": 61
+    "Elevation": "61"
   },
   {
     "Type": 0,
@@ -749,7 +749,7 @@
     "Name": "Abu Rudeis",
     "Latitude": "28.89953333",
     "Longitude": "33.20233333",
-    "Elevation": 3
+    "Elevation": "3"
   },
   {
     "Type": 0,
@@ -757,7 +757,7 @@
     "Name": "Abu Suwayr",
     "Latitude": "30.57538333",
     "Longitude": "32.09626667",
-    "Elevation": 18
+    "Elevation": "18"
   },
   {
     "Type": 0,
@@ -765,7 +765,7 @@
     "Name": "Al Ismailiyah",
     "Latitude": "30.59880000",
     "Longitude": "32.23456667",
-    "Elevation": 6
+    "Elevation": "6"
   },
   {
     "Type": 0,
@@ -773,7 +773,7 @@
     "Name": "Al Mansurah",
     "Latitude": "30.96520000",
     "Longitude": "31.43150000",
-    "Elevation": 7
+    "Elevation": "7"
   },
   {
     "Type": 0,
@@ -781,7 +781,7 @@
     "Name": "As Salihiyah",
     "Latitude": "30.79510000",
     "Longitude": "32.04253333",
-    "Elevation": 7
+    "Elevation": "7"
   },
   {
     "Type": 0,
@@ -789,7 +789,7 @@
     "Name": "AzZaqaziq",
     "Latitude": "30.59481667",
     "Longitude": "31.66456667",
-    "Elevation": 7
+    "Elevation": "7"
   },
   {
     "Type": 0,
@@ -797,7 +797,7 @@
     "Name": "Baluza",
     "Latitude": "30.99976667",
     "Longitude": "32.55221667",
-    "Elevation": 118
+    "Elevation": "118"
   },
   {
     "Type": 0,
@@ -805,7 +805,7 @@
     "Name": "Ben-Gurion",
     "Latitude": "32.00701667",
     "Longitude": "34.89310000",
-    "Elevation": 99
+    "Elevation": "99"
   },
   {
     "Type": 0,
@@ -813,7 +813,7 @@
     "Name": "Bilbeis Air Base",
     "Latitude": "30.39866667",
     "Longitude": "31.60726667",
-    "Elevation": 92
+    "Elevation": "92"
   },
   {
     "Type": 0,
@@ -821,7 +821,7 @@
     "Name": "Bir Hasanah",
     "Latitude": "30.19463333",
     "Longitude": "33.41281667",
-    "Elevation": 1225
+    "Elevation": "1225"
   },
   {
     "Type": 0,
@@ -829,7 +829,7 @@
     "Name": "Cairo International Airport",
     "Latitude": "30.10898333",
     "Longitude": "31.43481667",
-    "Elevation": 394
+    "Elevation": "394"
   },
   {
     "Type": 0,
@@ -837,7 +837,7 @@
     "Name": "Cairo West",
     "Latitude": "30.10836667",
     "Longitude": "30.89565000",
-    "Elevation": 440
+    "Elevation": "440"
   },
   {
     "Type": 0,
@@ -845,7 +845,7 @@
     "Name": "Difarsuwar Airfield",
     "Latitude": "30.42573333",
     "Longitude": "32.33538333",
-    "Elevation": 7
+    "Elevation": "7"
   },
   {
     "Type": 0,
@@ -853,7 +853,7 @@
     "Name": "El Arish",
     "Latitude": "31.03786667",
     "Longitude": "33.81908333",
-    "Elevation": 311
+    "Elevation": "311"
   },
   {
     "Type": 0,
@@ -861,7 +861,7 @@
     "Name": "El Gora",
     "Latitude": "31.07300000",
     "Longitude": "34.14835000",
-    "Elevation": 423
+    "Elevation": "423"
   },
   {
     "Type": 0,
@@ -869,7 +869,7 @@
     "Name": "Fayed",
     "Latitude": "30.32906667",
     "Longitude": "32.26748333",
-    "Elevation": 21
+    "Elevation": "21"
   },
   {
     "Type": 0,
@@ -877,7 +877,7 @@
     "Name": "Hatzerim",
     "Latitude": "31.23860000",
     "Longitude": "34.65850000",
-    "Elevation": 674
+    "Elevation": "674"
   },
   {
     "Type": 0,
@@ -885,7 +885,7 @@
     "Name": "Hatzor",
     "Latitude": "31.76046667",
     "Longitude": "34.72531667",
-    "Elevation": 100
+    "Elevation": "100"
   },
   {
     "Type": 0,
@@ -893,7 +893,7 @@
     "Name": "Inshas Airbase",
     "Latitude": "30.32985000",
     "Longitude": "31.44778333",
-    "Elevation": 155
+    "Elevation": "155"
   },
   {
     "Type": 0,
@@ -901,7 +901,7 @@
     "Name": "Kedem",
     "Latitude": "31.26060000",
     "Longitude": "34.63993333",
-    "Elevation": 598
+    "Elevation": "598"
   },
   {
     "Type": 0,
@@ -909,7 +909,7 @@
     "Name": "Kibrit Air Base",
     "Latitude": "30.24353333",
     "Longitude": "32.49116667",
-    "Elevation": 7
+    "Elevation": "7"
   },
   {
     "Type": 0,
@@ -917,7 +917,7 @@
     "Name": "Melez",
     "Latitude": "30.40991667",
     "Longitude": "33.14973333",
-    "Elevation": 999
+    "Elevation": "999"
   },
   {
     "Type": 0,
@@ -925,7 +925,7 @@
     "Name": "Nevatim",
     "Latitude": "31.20833333",
     "Longitude": "35.01208333",
-    "Elevation": 1313
+    "Elevation": "1313"
   },
   {
     "Type": 0,
@@ -933,7 +933,7 @@
     "Name": "Ovda",
     "Latitude": "29.94081667",
     "Longitude": "34.93411667",
-    "Elevation": 1403
+    "Elevation": "1403"
   },
   {
     "Type": 0,
@@ -941,7 +941,7 @@
     "Name": "Palmahim",
     "Latitude": "31.90178333",
     "Longitude": "34.69288333",
-    "Elevation": 33
+    "Elevation": "33"
   },
   {
     "Type": 0,
@@ -949,7 +949,7 @@
     "Name": "Ramon Airbase",
     "Latitude": "30.77756667",
     "Longitude": "34.66613333",
-    "Elevation": 2024
+    "Elevation": "2024"
   },
   {
     "Type": 0,
@@ -957,7 +957,7 @@
     "Name": "Sde Dov",
     "Latitude": "32.11466667",
     "Longitude": "34.78226667",
-    "Elevation": 20
+    "Elevation": "20"
   },
   {
     "Type": 0,
@@ -965,7 +965,7 @@
     "Name": "St Catherine",
     "Latitude": "28.68515000",
     "Longitude": "34.06261667",
-    "Elevation": 4256
+    "Elevation": "4256"
   },
   {
     "Type": 0,
@@ -973,7 +973,7 @@
     "Name": "Tel Nof",
     "Latitude": "31.83601667",
     "Longitude": "34.81781667",
-    "Elevation": 142
+    "Elevation": "142"
   },
   {
     "Type": 0,
@@ -981,7 +981,7 @@
     "Name": "Wadi al Jandali",
     "Latitude": "30.07255000",
     "Longitude": "31.83328333",
-    "Elevation": 740
+    "Elevation": "740"
   },
   {
     "Type": 0,
@@ -989,7 +989,7 @@
     "Name": "Abu Al-Duhur",
     "Latitude": "35.73230000",
     "Longitude": "37.10411667",
-    "Elevation": 820
+    "Elevation": "820"
   },
   {
     "Type": 0,
@@ -997,7 +997,7 @@
     "Name": "Adana Sakirpasa",
     "Latitude": "36.98188333",
     "Longitude": "35.28000000",
-    "Elevation": 55
+    "Elevation": "55"
   },
   {
     "Type": 0,
@@ -1005,7 +1005,7 @@
     "Name": "Akrotiri",
     "Latitude": "34.59036667",
     "Longitude": "32.98776667",
-    "Elevation": 62
+    "Elevation": "62"
   },
   {
     "Type": 0,
@@ -1013,7 +1013,7 @@
     "Name": "Al Qusayr",
     "Latitude": "34.56926667",
     "Longitude": "36.57145000",
-    "Elevation": 1729
+    "Elevation": "1729"
   },
   {
     "Type": 0,
@@ -1021,7 +1021,7 @@
     "Name": "Al-Dumayr",
     "Latitude": "33.60970000",
     "Longitude": "36.74915000",
-    "Elevation": 2066
+    "Elevation": "2066"
   },
   {
     "Type": 0,
@@ -1029,7 +1029,7 @@
     "Name": "Aleppo",
     "Latitude": "36.18061667",
     "Longitude": "37.22436667",
-    "Elevation": 1253
+    "Elevation": "1253"
   },
   {
     "Type": 0,
@@ -1037,7 +1037,7 @@
     "Name": "An Nasiriyah",
     "Latitude": "33.91860000",
     "Longitude": "36.86583333",
-    "Elevation": 2731
+    "Elevation": "2731"
   },
   {
     "Type": 0,
@@ -1045,7 +1045,7 @@
     "Name": "Bassel Al-Assad",
     "Latitude": "35.40166667",
     "Longitude": "35.95038333",
-    "Elevation": 93
+    "Elevation": "93"
   },
   {
     "Type": 0,
@@ -1053,7 +1053,7 @@
     "Name": "Beirut-Rafic Hariri",
     "Latitude": "33.82726667",
     "Longitude": "35.48768333",
-    "Elevation": 39
+    "Elevation": "39"
   },
   {
     "Type": 0,
@@ -1061,7 +1061,7 @@
     "Name": "Damascus",
     "Latitude": "33.42550000",
     "Longitude": "36.51850000",
-    "Elevation": 2007
+    "Elevation": "2007"
   },
   {
     "Type": 0,
@@ -1069,7 +1069,7 @@
     "Name": "Deir ez-Zor",
     "Latitude": "35.28541667",
     "Longitude": "40.17605000",
-    "Elevation": 671
+    "Elevation": "671"
   },
   {
     "Type": 0,
@@ -1077,7 +1077,7 @@
     "Name": "Ercan",
     "Latitude": "35.15513333",
     "Longitude": "33.50168333",
-    "Elevation": 311
+    "Elevation": "311"
   },
   {
     "Type": 0,
@@ -1085,7 +1085,7 @@
     "Name": "Eyn Shemer",
     "Latitude": "32.44085000",
     "Longitude": "35.00756667",
-    "Elevation": 93
+    "Elevation": "93"
   },
   {
     "Type": 0,
@@ -1093,7 +1093,7 @@
     "Name": "Gaziantep",
     "Latitude": "36.94796667",
     "Longitude": "37.47908333",
-    "Elevation": 2287
+    "Elevation": "2287"
   },
   {
     "Type": 0,
@@ -1101,7 +1101,7 @@
     "Name": "Gazipasa",
     "Latitude": "36.29891667",
     "Longitude": "32.29761667",
-    "Elevation": 79
+    "Elevation": "79"
   },
   {
     "Type": 0,
@@ -1109,7 +1109,7 @@
     "Name": "Gecitkale",
     "Latitude": "35.23600000",
     "Longitude": "33.72088333",
-    "Elevation": 147
+    "Elevation": "147"
   },
   {
     "Type": 0,
@@ -1117,7 +1117,7 @@
     "Name": "H3",
     "Latitude": "32.93618333",
     "Longitude": "39.74580000",
-    "Elevation": 2549
+    "Elevation": "2549"
   },
   {
     "Type": 0,
@@ -1125,7 +1125,7 @@
     "Name": "H3 Northwest",
     "Latitude": "33.07595000",
     "Longitude": "39.59656667",
-    "Elevation": 2577
+    "Elevation": "2577"
   },
   {
     "Type": 0,
@@ -1133,7 +1133,7 @@
     "Name": "H3 Southwest",
     "Latitude": "32.74343333",
     "Longitude": "39.60220000",
-    "Elevation": 2670
+    "Elevation": "2670"
   },
   {
     "Type": 0,
@@ -1141,7 +1141,7 @@
     "Name": "H4",
     "Latitude": "32.53926667",
     "Longitude": "38.19506667",
-    "Elevation": 2257
+    "Elevation": "2257"
   },
   {
     "Type": 0,
@@ -1149,7 +1149,7 @@
     "Name": "Haifa",
     "Latitude": "32.81073333",
     "Longitude": "35.04501667",
-    "Elevation": 19
+    "Elevation": "19"
   },
   {
     "Type": 0,
@@ -1157,7 +1157,7 @@
     "Name": "Hama",
     "Latitude": "35.11803333",
     "Longitude": "36.71236667",
-    "Elevation": 984
+    "Elevation": "984"
   },
   {
     "Type": 0,
@@ -1165,7 +1165,7 @@
     "Name": "Hatay",
     "Latitude": "36.36231667",
     "Longitude": "36.28741667",
-    "Elevation": 253
+    "Elevation": "253"
   },
   {
     "Type": 0,
@@ -1173,7 +1173,7 @@
     "Name": "Incirlik",
     "Latitude": "37.00203333",
     "Longitude": "35.42608333",
-    "Elevation": 191
+    "Elevation": "191"
   },
   {
     "Type": 0,
@@ -1181,7 +1181,7 @@
     "Name": "Jirah",
     "Latitude": "36.09693333",
     "Longitude": "37.93598333",
-    "Elevation": 1170
+    "Elevation": "1170"
   },
   {
     "Type": 0,
@@ -1189,7 +1189,7 @@
     "Name": "Khalkhalah",
     "Latitude": "33.06618333",
     "Longitude": "36.57233333",
-    "Elevation": 2376
+    "Elevation": "2376"
   },
   {
     "Type": 0,
@@ -1197,7 +1197,7 @@
     "Name": "King Hussein A.C.",
     "Latitude": "32.35666667",
     "Longitude": "36.25985000",
-    "Elevation": 2204
+    "Elevation": "2204"
   },
   {
     "Type": 0,
@@ -1205,7 +1205,7 @@
     "Name": "Kingsfield",
     "Latitude": "35.01480000",
     "Longitude": "33.71701667",
-    "Elevation": 275
+    "Elevation": "275"
   },
   {
     "Type": 0,
@@ -1213,7 +1213,7 @@
     "Name": "Kiryat Shmona",
     "Latitude": "33.21580000",
     "Longitude": "35.59583333",
-    "Elevation": 306
+    "Elevation": "306"
   },
   {
     "Type": 0,
@@ -1221,7 +1221,7 @@
     "Name": "Kuweires",
     "Latitude": "36.18748333",
     "Longitude": "37.58148333",
-    "Elevation": 1200
+    "Elevation": "1200"
   },
   {
     "Type": 0,
@@ -1229,7 +1229,7 @@
     "Name": "Larnaca",
     "Latitude": "34.87316667",
     "Longitude": "33.62323333",
-    "Elevation": 16
+    "Elevation": "16"
   },
   {
     "Type": 0,
@@ -1237,7 +1237,7 @@
     "Name": "Marj Ruhayyil",
     "Latitude": "33.28378333",
     "Longitude": "36.45771667",
-    "Elevation": 2160
+    "Elevation": "2160"
   },
   {
     "Type": 0,
@@ -1245,7 +1245,7 @@
     "Name": "Megiddo",
     "Latitude": "32.59710000",
     "Longitude": "35.23006667",
-    "Elevation": 180
+    "Elevation": "180"
   },
   {
     "Type": 0,
@@ -1253,7 +1253,7 @@
     "Name": "Mezzeh",
     "Latitude": "33.47778333",
     "Longitude": "36.22420000",
-    "Elevation": 2363
+    "Elevation": "2363"
   },
   {
     "Type": 0,
@@ -1261,7 +1261,7 @@
     "Name": "Minakh",
     "Latitude": "36.52136667",
     "Longitude": "37.04133333",
-    "Elevation": 1614
+    "Elevation": "1614"
   },
   {
     "Type": 0,
@@ -1269,7 +1269,7 @@
     "Name": "Palmyra",
     "Latitude": "34.55728333",
     "Longitude": "38.31670000",
-    "Elevation": 1267
+    "Elevation": "1267"
   },
   {
     "Type": 0,
@@ -1277,7 +1277,7 @@
     "Name": "Paphos",
     "Latitude": "34.71815000",
     "Longitude": "32.48478333",
-    "Elevation": 40
+    "Elevation": "40"
   },
   {
     "Type": 0,
@@ -1285,7 +1285,7 @@
     "Name": "Pinarbashi",
     "Latitude": "35.27381667",
     "Longitude": "33.26823333",
-    "Elevation": 770
+    "Elevation": "770"
   },
   {
     "Type": 0,
@@ -1293,7 +1293,7 @@
     "Name": "Ramat David",
     "Latitude": "32.66635000",
     "Longitude": "35.17686667",
-    "Elevation": 119
+    "Elevation": "119"
   },
   {
     "Type": 0,
@@ -1301,7 +1301,7 @@
     "Name": "Rayak",
     "Latitude": "33.85111667",
     "Longitude": "35.98731667",
-    "Elevation": 2983
+    "Elevation": "2983"
   },
   {
     "Type": 0,
@@ -1309,7 +1309,7 @@
     "Name": "Rene Mouawad",
     "Latitude": "34.58928333",
     "Longitude": "36.01143333",
-    "Elevation": 16
+    "Elevation": "16"
   },
   {
     "Type": 0,
@@ -1317,7 +1317,7 @@
     "Name": "Rosh Pina",
     "Latitude": "32.98263333",
     "Longitude": "35.57073333",
-    "Elevation": 868
+    "Elevation": "868"
   },
   {
     "Type": 0,
@@ -1325,7 +1325,7 @@
     "Name": "Ruwayshid",
     "Latitude": "32.40496667",
     "Longitude": "39.13051667",
-    "Elevation": 2976
+    "Elevation": "2976"
   },
   {
     "Type": 0,
@@ -1333,7 +1333,7 @@
     "Name": "Sanliurfa",
     "Latitude": "37.44806667",
     "Longitude": "38.89836667",
-    "Elevation": 2703
+    "Elevation": "2703"
   },
   {
     "Type": 0,
@@ -1341,7 +1341,7 @@
     "Name": "Sayqal",
     "Latitude": "33.67983333",
     "Longitude": "37.21710000",
-    "Elevation": 2273
+    "Elevation": "2273"
   },
   {
     "Type": 0,
@@ -1349,7 +1349,7 @@
     "Name": "Shayrat",
     "Latitude": "34.49020000",
     "Longitude": "36.90760000",
-    "Elevation": 2637
+    "Elevation": "2637"
   },
   {
     "Type": 0,
@@ -1357,7 +1357,7 @@
     "Name": "Tabqa",
     "Latitude": "35.75471667",
     "Longitude": "38.56643333",
-    "Elevation": 1099
+    "Elevation": "1099"
   },
   {
     "Type": 0,
@@ -1365,7 +1365,7 @@
     "Name": "Tha\u0027lah",
     "Latitude": "32.70400000",
     "Longitude": "36.41376667",
-    "Elevation": 2381
+    "Elevation": "2381"
   },
   {
     "Type": 0,
@@ -1373,7 +1373,7 @@
     "Name": "Tiyas",
     "Latitude": "34.52261667",
     "Longitude": "37.63011667",
-    "Elevation": 1797
+    "Elevation": "1797"
   },
   {
     "Type": 0,
@@ -1381,6 +1381,6 @@
     "Name": "Wujah Al Hajar",
     "Latitude": "34.28133333",
     "Longitude": "35.68010000",
-    "Elevation": 650
+    "Elevation": "650"
   }
 ]

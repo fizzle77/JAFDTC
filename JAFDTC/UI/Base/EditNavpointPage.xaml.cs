@@ -111,7 +111,7 @@ namespace JAFDTC.UI.Base
             EditNavpt = null;
 
             CurPoIs = PointOfInterestDbase.Instance.Find();
-            CurPoIs.Insert(0, new(PointOfInterestType.UNKNOWN, null, null, null, null, 0));
+            CurPoIs.Insert(0, new(PointOfInterestType.UNKNOWN, null, null, null, null, null));
 
             IsRebuildPending = false;
 

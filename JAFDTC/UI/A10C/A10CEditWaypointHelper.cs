@@ -118,7 +118,7 @@ namespace JAFDTC.UI.A10C
                 wyptDst.Name = poi.Name;
                 wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(poi.Latitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
                 wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(poi.Longitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
-                wyptDst.Alt = poi.Elevation.ToString();
+                wyptDst.Alt = poi.Elevation;
                 wyptDst.ClearErrors();
             }
         }

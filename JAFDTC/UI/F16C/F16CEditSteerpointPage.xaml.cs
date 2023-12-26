@@ -124,7 +124,7 @@ namespace JAFDTC.UI.F16C
             EditStpt.VxP[1].ErrorsChanged += VxP1_DataValidationError;
 
             CurPoIs = PointOfInterestDbase.Instance.Find();
-            CurPoIs.Insert(0, new(PointOfInterestType.UNKNOWN, null, null, null, null, 0));
+            CurPoIs.Insert(0, new(PointOfInterestType.UNKNOWN, null, null, null, null, null));
 
             IsRebuildPending = false;
 
@@ -499,7 +499,7 @@ namespace JAFDTC.UI.F16C
             EditStpt.Name = poi.Name;
             EditStpt.LatUI = NavpointInfoBase.ConvertFromLatDD(poi.Latitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
             EditStpt.LonUI = NavpointInfoBase.ConvertFromLonDD(poi.Longitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
-            EditStpt.Alt = poi.Elevation.ToString();
+            EditStpt.Alt = poi.Elevation;
             EditStpt.TOS = "";
             EditStpt.ClearErrors();
 

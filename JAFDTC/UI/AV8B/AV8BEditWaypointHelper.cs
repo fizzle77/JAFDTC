@@ -105,7 +105,7 @@ namespace JAFDTC.UI.AV8B
                 wyptDst.Name = poi.Name;
                 wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(poi.Latitude, NavpointInfoBase.LLFormat.DMS);
                 wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(poi.Longitude, NavpointInfoBase.LLFormat.DMS);
-                wyptDst.Alt = poi.Elevation.ToString();
+                wyptDst.Alt = poi.Elevation;
                 wyptDst.ClearErrors();
             }
         }
