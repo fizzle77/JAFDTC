@@ -23,19 +23,16 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using Windows.UI;
 using WinRT.Interop;
 
 namespace JAFDTC.UI.App
@@ -336,7 +333,6 @@ namespace JAFDTC.UI.App
                     uiBarBtnDelete.IsEnabled = isEnabled;
                     uiBarBtnRename.IsEnabled = isEnabled;
                     uiBarBtnExport.IsEnabled = isEnabled;
-                    uiBarBtnPaste.IsEnabled = IsClipboardValid;
                     uiBarBtnLoadJet.IsEnabled = (isEnabled && CurApp.IsDCSAvailable && isJetMatched);
                     IsRebuildPending = false;
                 });
@@ -566,6 +562,20 @@ namespace JAFDTC.UI.App
         private void CmdLoadJet_Click(object sender, RoutedEventArgs argse)
         {
             CurApp.UploadConfigurationToJet((IConfiguration)uiCfgListView.SelectedItem);
+        }
+
+        /// <summary>
+        /// points of interest command: navigate to the points of interest editor page to edit pois.
+        /// </summary>
+        private void CmdPoI_Click(object sender, RoutedEventArgs args)
+        {
+            if (!IsNavPending)
+            {
+                IsNavPending = true;
+                MainWindow mainWindow = (MainWindow)(Application.Current as JAFDTC.App)?.Window;
+                mainWindow.SetConfigFilterBoxVisibility(Visibility.Collapsed);
+                Frame.Navigate(typeof(EditPointsOfInterestPage), null, new DrillInNavigationTransitionInfo());
+            }
         }
 
         /// <summary>

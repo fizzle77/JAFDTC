@@ -87,44 +87,45 @@ https://www.gnu.org/licenses/.
             <CommandBar Margin="12,0,0,0">
                 <AppBarButton x:Name="uiBarBtnAdd" Icon="Add" Label="Add"
                               Click="CmdAdd_Click"
-                              ToolTipService.ToolTip="Add New Configuration"/>
+                              ToolTipService.ToolTip="Add new configuration"/>
                 <AppBarButton x:Name="uiBarBtnEdit" Icon="Edit" Label="Edit"
                               Click="CmdOpen_Click"
-                              ToolTipService.ToolTip="Edit Selected Configuration"/>
+                              ToolTipService.ToolTip="Edit selected configuration"/>
                 <AppBarButton x:Name="uiBarBtnCopy" Label="Duplicate"
                               Click="CmdCopy_Click"
-                              ToolTipService.ToolTip="Duplicate Selected Configuration">
+                              ToolTipService.ToolTip="Duplicate selected configuration">
                     <AppBarButton.Icon>
                         <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7C4;"/>
                     </AppBarButton.Icon>
                 </AppBarButton>
-                <AppBarButton x:Name="uiBarBtnPaste" Icon="Paste" Label="Paste"
-                              Click="CmdPaste_Click"
-                              ToolTipService.ToolTip="Paste Information Into Selected Configuration"/>
                 <AppBarButton x:Name="uiBarBtnRename" Icon="Rename" Label="Rename"
                               Click="CmdRename_Click"
-                              ToolTipService.ToolTip="Rename Selected Configuration"/>
+                              ToolTipService.ToolTip="Rename selected configuration"/>
                 <AppBarSeparator/>
                 <AppBarButton x:Name="uiBarBtnDelete" Icon="Delete" Label="Delete"
                               Click="CmdDelete_Click"
-                              ToolTipService.ToolTip="Delete Selected Configuration"/>
+                              ToolTipService.ToolTip="Delete selected configuration"/>
                 <AppBarSeparator/>
                 <AppBarButton x:Name="uiBarBtnImport" Icon="Download" Label="Import"
                               Click="CmdImport_Click"
-                              ToolTipService.ToolTip="Create New Configuration from File"/>
+                              ToolTipService.ToolTip="Create new configuration from file"/>
                 <AppBarButton x:Name="uiBarBtnExport" Icon="Upload" Label="Export"
                               Click="CmdExport_Click"
-                              ToolTipService.ToolTip="Export Selected Configuration to File"/>
+                              ToolTipService.ToolTip="Export selected configuration to file"/>
                 <AppBarSeparator/>
                 <AppBarButton x:Name="uiBarBtnLoadJet" Label="Load to Jet"
                               Click="CmdLoadJet_Click"
-                              ToolTipService.ToolTip="Upload Selected Configuration to Jet">
+                              ToolTipService.ToolTip="Upload selected configuration to jet">
                     <AppBarButton.Icon>
                         <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE709;"/>
                     </AppBarButton.Icon>
                 </AppBarButton>
 
                 <CommandBar.SecondaryCommands>
+                    <AppBarButton Label="Points of Interest" Click="CmdPoI_Click">
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE718;"/>
+                    </AppBarButton>
+                    <AppBarSeparator/>
                     <AppBarButton Label="Settings" Icon="Setting" Click="CmdSettings_Click"/>
                     <AppBarSeparator/>
                     <AppBarButton Label="About" Click="CmdAbout_Click">
