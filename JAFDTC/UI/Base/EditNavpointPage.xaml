@@ -242,7 +242,7 @@ https://www.gnu.org/licenses/.
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditNavpt.LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
-                         ui_ctk:TextBoxExtensions.Regex="^[nNsS] [\d]{3}° [\d]{2}’ [\d]{2}’’$"
+                         ui_ctk:TextBoxExtensions.Regex="^[eEwW] [\d]{3}° [\d]{2}’ [\d]{2}’’$"
                          ui_ctk:TextBoxExtensions.CustomMask="E:[eEwW]"
                          ui_ctk:TextBoxExtensions.Mask="E 999° 99’ 99’’"
                          LostFocus="NavptTextBox_LostFocus"
