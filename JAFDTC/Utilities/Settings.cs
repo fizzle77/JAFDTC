@@ -18,9 +18,10 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
+
+using static JAFDTC.Models.Base.NavpointInfoBase;
 
 
 namespace JAFDTC.Utilities
@@ -48,6 +49,12 @@ namespace JAFDTC.Utilities
         public int LastAirframeSelection { get; set; }
 
         public int LastConfigSelection { get; set; }
+
+        public string LastPoITheaterSelection { get; set; }
+
+        public bool LastPoIUserModeSelection { get; set; }
+
+        public LLFormat LastPoICoordFmtSelection { get; set; }
 
         public string WingName { get; set; }
 
@@ -81,6 +88,10 @@ namespace JAFDTC.Utilities
 
             LastAirframeSelection = 0;
             LastConfigSelection = -1;
+            LastPoITheaterSelection = "";
+            LastPoIUserModeSelection = false;
+            LastPoICoordFmtSelection = LLFormat.DDM_P3ZF;
+
             WingName = "";
             Callsign = "";
             IsAlwaysOnTop = false;
@@ -260,6 +271,45 @@ namespace JAFDTC.Utilities
                 if (_currentSettings.LastConfigSelection != value)
                 {
                     _currentSettings.LastConfigSelection = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static string LastPoITheaterSelection
+        {
+            get => _currentSettings.LastPoITheaterSelection;
+            set
+            {
+                if (_currentSettings.LastPoITheaterSelection != value)
+                {
+                    _currentSettings.LastPoITheaterSelection = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static bool LastPoIUserModeSelection
+        {
+            get => _currentSettings.LastPoIUserModeSelection;
+            set
+            {
+                if (_currentSettings.LastPoIUserModeSelection != value)
+                {
+                    _currentSettings.LastPoIUserModeSelection = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static LLFormat LastPoICoordFmtSelection
+        {
+            get => _currentSettings.LastPoICoordFmtSelection;
+            set
+            {
+                if (_currentSettings.LastPoICoordFmtSelection != value)
+                {
+                    _currentSettings.LastPoICoordFmtSelection = value;
                     FileManager.WriteSettings(_currentSettings);
                 }
             }

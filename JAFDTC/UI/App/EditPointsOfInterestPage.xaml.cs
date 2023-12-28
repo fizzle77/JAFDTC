@@ -508,7 +508,7 @@ namespace JAFDTC.UI.App
         /// </summary>
         private void BarComboTheater_SelectionChanged(object sender, RoutedEventArgs args)
         {
-            // TODO: persist to settings?
+            Settings.LastPoITheaterSelection = (string)uiBarComboTheater.SelectedItem;
             RebuildPoIList();
             RebuildInterfaceState();
         }
@@ -639,7 +639,7 @@ namespace JAFDTC.UI.App
         /// </summary>
         private void CmdUser_Click(object sender, RoutedEventArgs args)
         {
-            // TODO: persist to settings?
+            Settings.LastPoIUserModeSelection = (bool)((AppBarToggleButton)sender).IsChecked;
             uiPoIListView.SelectedItems.Clear();
             RebuildPoIList();
             RebuildInterfaceState();
@@ -662,7 +662,7 @@ namespace JAFDTC.UI.App
             ContentDialogResult result = await coordList.ShowAsync(ContentDialogPlacement.Popup);
             if (result == ContentDialogResult.Primary)
             {
-                // TODO: persist to settings?
+                Settings.LastPoICoordFmtSelection = _llFmtTextToFmtMap[coordList.SelectedItem];
                 ChangeCoordFormat(_llFmtTextToFmtMap[coordList.SelectedItem]);
                 RebuildPoIList();
                 RebuildInterfaceState();
@@ -759,14 +759,15 @@ namespace JAFDTC.UI.App
             {
                 uiBarComboTheater.Items.Add(theater);
             }
-            // TODO: pull from settings?
-            uiBarComboTheater.SelectedIndex = 0;
+            if (!uiBarComboTheater.Items.Contains(Settings.LastPoITheaterSelection))
+            {
+                Settings.LastPoITheaterSelection = (string)uiBarComboTheater.Items[0];
+            }
+            uiBarComboTheater.SelectedItem = Settings.LastPoITheaterSelection;
 
-            // TODO: pull from settings?
-            uiBarBtnUser.IsChecked = true;
+            uiBarBtnUser.IsChecked = Settings.LastPoIUserModeSelection;
 
-            // TODO: pull from settings?
-            ChangeCoordFormat(LLDisplayFmt);
+            ChangeCoordFormat(Settings.LastPoICoordFmtSelection);
             EditPoI.ClearErrors();
             EditPoI.Reset();
 
