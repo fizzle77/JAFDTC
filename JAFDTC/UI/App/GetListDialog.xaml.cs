@@ -38,7 +38,7 @@ namespace JAFDTC.UI.App
 
         public string SelectedItem { get => (Items != null) ? (string)uiComboItems.SelectedItem : null; }
 
-        public GetListDialog(List<string> items = null, string prompt = null, int comboWidth = 0)
+        public GetListDialog(List<string> items = null, string prompt = null, int comboWidth = 0, int selIndex = 0)
         {
             InitializeComponent();
 
@@ -49,7 +49,7 @@ namespace JAFDTC.UI.App
             }
             if ((Items != null) && (Items.Count > 0))
             {
-                uiComboItems.SelectedIndex = 0;
+                uiComboItems.SelectedIndex = selIndex;
             }
             if (comboWidth > 0)
             {
