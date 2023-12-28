@@ -188,9 +188,13 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// TODO: document
         /// </summary>
-        public void Remove(PointOfInterest point)
+        public void Remove(PointOfInterest poi, bool isPersist = true)
         {
-            // TODO: implement
+            _dbase[poi.Theater].Remove(poi);
+            if (isPersist)
+            {
+                Save();
+            }
         }
 
         /// <summary>
