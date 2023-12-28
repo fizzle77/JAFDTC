@@ -472,12 +472,15 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void RebuildEnableState()
         {
+            JAFDTC.App curApp = Application.Current as JAFDTC.App;
+
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(STPTSystem.SystemTag));
+            bool isDCSListening = curApp.IsDCSAvailable && (curApp.DCSActiveAirframe == Config.Airframe);
 
             Utilities.SetEnableState(uiPoIComboTheater, isEditable);
             Utilities.SetEnableState(uiPoIComboSelect, isEditable && (uiPoIComboSelect.Items.Count > 0));
             Utilities.SetEnableState(uiPoIBtnApply, isEditable && (uiPoIComboSelect.SelectedIndex > 0));
-            Utilities.SetEnableState(uiPoIBtnCapture, isEditable);
+            Utilities.SetEnableState(uiPoIBtnCapture, isEditable && isDCSListening);
 
             Utilities.SetEnableState(uiStptValueName, isEditable);
             foreach (KeyValuePair<string, TextBox> kvp in _curStptFieldValueMap)
