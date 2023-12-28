@@ -12,6 +12,29 @@ function JAFDTC_F16CM_GetRightMFD()
 	return JAFDTC_ParseDisplay(5)
 end
 
+function JAFDTC_F16CM_CheckCondition_DebugDED()
+	JAFDTC_DebugDisplay(JAFDTC_F16CM_GetDED())
+	return true
+end
+
+function JAFDTC_F16CM_CheckCondition_TDOASet(slot)
+	local table = JAFDTC_F16CM_GetDED()
+	local value = table["STN TDOA value_" .. slot] or ""
+	if value == "T" then
+		return true
+	end
+	return false
+end
+
+function JAFDTC_F16CM_CheckCondition_TDOANotSet(slot)
+	local table = JAFDTC_F16CM_GetDED()
+	local value = table["STN TDOA value_" .. slot] or ""
+	if value ~= "T" then
+		return true
+	end
+	return false
+end
+
 function JAFDTC_F16CM_CheckCondition_LeftHdptNotOn()
 	local switch = GetDevice(0):get_argument_value(670)
 	if switch ~= 1 then

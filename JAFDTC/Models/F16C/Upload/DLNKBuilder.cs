@@ -77,14 +77,12 @@ namespace JAFDTC.Models.F16C.Upload
 
                 AppendCommand(ufc.GetCommand("SEQ"));
 
+                // set up TDOA, TNDL in two passes as hitting "ENTR" to commit TNDL clears TDOA.
+                // first pass will fill in all TNDL values, second pass will fill in all TDOA
+                // values. setup ownship between passes.
+
                 for (int i = 0; i < _cfg.DLNK.TeamMembers.Length; i++)
                 {
-                    // TODO: need to check state of tdoa in ded to do this right
-#if TODO
-                    if (_cfg.DLNK.TeamMembers[i].TDOA)
-                    {
-                    }
-#endif
                     AppendCommand(ufc.GetCommand("DOWN"));
 
                     if (!PredAppendDigitsWithEnter(ufc, _cfg.DLNK.TeamMembers[i].TNDL))
@@ -94,6 +92,27 @@ namespace JAFDTC.Models.F16C.Upload
                 }
 
                 PredAppendDigitsWithEnter(ufc, _cfg.DLNK.Ownship);
+                AppendCommand(ufc.GetCommand("DOWN"));
+
+                for (int i = 0; i < _cfg.DLNK.TeamMembers.Length; i++)
+                {
+                    if (_cfg.DLNK.TeamMembers[i].TDOA)
+                    {
+                        AppendCommand(StartCondition("TDOANotSet", (i + 1).ToString()));
+                        AppendCommand(ufc.GetCommand("7"));
+                        AppendCommand(EndCondition("TDOANotSet"));
+                    }
+                    else
+                    {
+                        AppendCommand(StartCondition("TDOASet", (i + 1).ToString()));
+                        AppendCommand(ufc.GetCommand("7"));
+                        AppendCommand(EndCondition("TDOASet"));
+                    }
+
+                    AppendCommand(Wait());
+                    AppendCommand(ufc.GetCommand("DOWN"));
+                    AppendCommand(ufc.GetCommand("DOWN"));
+                }
 
                 AppendCommand(ufc.GetCommand("RTN"));
             }
