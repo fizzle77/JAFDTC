@@ -7,10 +7,10 @@ into a DCS model at the start of a flight.
 
 This document covers the basic usage of the tool and describes general concepts applicable to
 all supported airframes. After reading through this overview, look over the airframe-specific
-documentation for the supported airframes.
+documentation for additional details.
 
-| Airframe | Configurable Systems |
-|:--------:|---------|
+| Airframe | Systems Configurable by JAFDTC |
+|:--------:|--------------------------------|
 | [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | Waypoints
 | [AV-8B Harrier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_AV8B.md) | Waypoints
 | [F-14A/B Tomcat](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F14AB.md) | Waypoints
@@ -57,33 +57,50 @@ components.
 Links are particularly useful when you have basic setups that you tend to reuse often. For
 example, you might want to always configure your MFDs one way for A2G and another way for
 A2A. Let's assume configurations for our airframe support an MFD system (MFD) that sets up
-cockpit displays and a navigation system (NAV) that sets up steerpoints.
-
-Once you setup your A2G and A2A MFD configurations, you can simply link to them from new
-configurations to avoid having to set the MFDs up again in the new configuration.
+cockpit displays and a navigation system (NAV) that sets up steerpoints. Once you setup your
+A2G and A2A MFD configurations, you can simply link to them from new configurations to avoid
+having to set the MFDs up again in the new configuration.
 
 ![](images/Core_Cfg_Links.png)
 
-Any change you make to the MFD system in "A2G Fav" or "A2A Fav" will be immediately
-reflected in the configurations that link to these system configurations; in this example,
-"A2G Mission", "A2A Mission", and "Range A2A". Once linked, only the original is editable.
-That is, the A2G MFD system will be read-only in "A2G Mission" but may be edited through
-"A2G Fav".
+Here, the arrow points to the source system configuration: the MFD system configuration in
+"A2G Mission" comes from (or, is linked to) the MFD system configuration in "A2G Fav".
 
-Links connect individual systems in two different configurations. Though "A2A Fav" and
+Any change you make to the MFD system in "A2G Fav" or "A2A Fav" is immediately reflected in
+the configurations that link to these system configurations; in this example, "A2G Mission",
+"A2A Mission", and "Range A2A". Once linked, only the original is editable. That is, the A2G
+MFD system will be read-only in "A2G Mission" but may be edited through "A2G Fav".
+
+Links connect *individual* systems in two different configurations. Though "A2A Fav" and
 "A2G Mission" have linked their MFD system configurations, they have completely independent
 NAV system configurations.
 
-Furhter, different systems can link to different configurations. In the above picutre,
+Further, different systems can link to different configurations. In the above picutre,
 "Range A2A" gets it's MFD setup from "A2A Fav" and its NAV setup from "KLAS STPTs". There
-is no limit to the number of systems that may link to a particular setup.
+is no limit to the number of systems that can link to a particular system configuration.
 
-> Linking system configurations is described further
+Links are not affected by changes to configuration names: renaming "A2G Fav" to "A2G Base",
+for example, will not break the link with "A2G Mission". In addition, settings are not lost
+when you delete a source configuration. For example, though deleting "A2G Fav" will break the
+link with "A2G Mission", the MFD settings in "A2G Mission" will match the MFD settings from
+"A2G Fav" when the configuration was deleted.
+
+> The mechanics of linking system configurations through the user interface is covered
 > [below](#system-editor-page).
+
+## Configuration Storage
+
+JAFDTC stores configuration and supporting files, such as settings, in the `Documents\JAFDTC`
+folder for the active profile. Configurations are found in the `Configs` folder. Generally, you
+should not need to access the files in the `JAFDTC` folder as JAFDTC provides import and export
+functions (see below) to allow the exchange of information.
+
+> As with all things, there are exceptions. A good general rule is if the JAFDTC UI can do
+> something, use the UI and don't try to work around it.
 
 ## Uploading Configurations to DCS
 
-Once built, a *Configuration* can be uploaded into the corresponding airframe in DCS through
+Once set up, a *Configuration* can be uploaded into the corresponding airframe in DCS through
 the scripting engine that DCS exposes to the local system. To upload, JAFDTC walks through the
 configuration, updating system parameters that differ from their defaults in the jet. For
 example, consider a BINGO warning system. If you change the BINGO value from the default for
@@ -93,16 +110,6 @@ not change the value, JAFDTC will not make any changes to that parameter in the 
 See the
 [discussion below](#interacting-with-dcs)
 for more details.
-
-# Configuration Storage
-
-JAFDTC stores configuration and supporting files, such as settings, in the `Documents\JAFDTC`
-folder. Configurations are found in the `Configs` folder. Generally, you should not need to
-access the files in the `JAFDTC` folder as JAFDTC provides import and export functions (see
-below) to allow the exchange of information.
-
-> As with all things, there are exceptions. A good general rule is if the JAFDTC UI can do
-> something, use the UI and don't try to work around it.
 
 # User Interface Overview
 
@@ -125,7 +132,7 @@ The primary components of this page include,
 - **Configuration List** &ndash; Lists the available configurations for the selected airframe.
 - **Status Area** &ndash; Shows information on the current DCS status and pilot.
 
-The reaminder of this section will discuss each of these elements in more detail.
+The reaminder of this section discusses each of these elements in more detail.
 
 ### Filter Search Box
 
@@ -186,7 +193,6 @@ The command bar includes the following commands,
   configuration by double-clicking on the configuration in the configuration list.
 - **Duplicate** &ndash; Creates a copy of the selected configuration after prompting for a name for the
   copy of the configuration.
-- **Paste** &ndash; Pastes information from the clipboard into the selected configuration.
 - **Rename** &ndash; Renames the selected configuration.
 - **Delete** &ndash; Removes the currently selected configuration from the database.
 - **Import** &ndash; Creates a new configuration from a file previously created with the *Export*
@@ -202,6 +208,7 @@ The command bar includes the following commands,
 
 The overflow menu (exposed by clicking on the "..." button) holds two commands,
 
+- **POI** &ndash; TODO
 - **Settings** &ndash; Opens up the
   [JAFDTC Settings](#settings)
   dialog to allow you to change JAFDTC settings.
@@ -226,7 +233,7 @@ For example,
 
 ![](images/Core_Cfg_DCS_Status.png)
 
-shows two different DCS statuses. On the left, DCS is not running but the Lua support is
+shows two different status areas. On the left, DCS is not running but the Lua support is
 installed. On the right, DCS is running a mission where the player is piloting an F-16C
 Viper.
 
@@ -235,9 +242,10 @@ The left side of the status area identifies the pilot and wing as specified thro
 
 ## System Editor Page
 
-The specific systems availble in a configuration vary from airframe to airframe. The system
-editor page provides a list of systems from which you can display per-system editors as the
-following figure illustrates.
+The specific systems availble in a configuration vary from airframe to airframe. However, the
+general structure of the page on which you edit system configurations is similar from airframe
+to airframe. The system editor page provides a list of systems from which you can display
+per-system editors as the following figure illustrates.
 
 ![](images/Core_Cfg_Edit_Page.png)
 
@@ -264,11 +272,12 @@ A small gold dot marks those systems that are linked to other configurations.
 Clicking on a row in this list changes the system editor to the right to edit the selected
 system.
 
-### System Configuration Editor
+### System Editor
 
 The bulk of the page is taken up by the system editor on the right. The content of this editor
-depends on which system seleted from the *System List* to the left. In the figure above, the
-editor is showing the steerpoint list associated with the selected steerpoints system. See the
+depends on which system is selected from the *System List* to the left. In the figure above,
+the editor is showing the steerpoint list associated with the selected steerpoints system. See
+the
 [airframe discussions](#airframe-specific-documentation)
 for further details on the specific system editors. Though largely specific to a particular
 airframe, many systems provide common *Reset* and *Link* buttons along the bottom of the
@@ -320,26 +329,35 @@ system is presently linked to. When unlinking, the system configuration does not
 will no longer receive updates from the source configuration. Icons for linked systems are
 badged with a small gold dot as described earlier.
 
-## System Editor Pages for Navigation Systems
+## System Editors for Navigation Systems
 
 Most aircraft in JAFDTC support a navigation system that allows _Navigation Points_ (i.e.,
 waypoints or steerpoints) to be input into the avionics as a part of a configuration. While
-the interface for managing navigation points does depend on the airframe, we will describe
-some typically common behaviors here.
+the interface for managing navigation points depends on the airframe, the general operation
+and layout of the interface is similar.
 
 > This is an overview of common functionality. Specific support may differ from airframe to
 > airframe. As usual, consult the airframe-specific documentation linked above for further
 > details on a particular airframe.
 
+Navigation systems typically follow a pattern where the system editor first shows a page that
+contains a list of navigation points in the system. From this page, you can jump to pages that
+allow you to edit the properties of a single navigation point. 
+
 ### Navigation Point List
-The first level of the interface presents a list of known navigation points,
+The first level of the interface presents a list of known navigation points. Generally, this
+is the
+[system editor](#system-editor)
+you will see when you select the navigation system from the
+[system list](#system-list).
 
 ![](images/Core_Base_Nav_List.png)
 
 The navigation point list that makes up the bulk of the editor lists the known navigation
-points, their coordinates, name, and other airframe-specific information. You can select one
-or more navigation points from the list using the usual Windows interactions. The command bar
-at the top of the editor allows you to manipulate selected items in the navigation point list.
+points, their coordinates, name, and other airframe-specific information. This information is
+formated per airframe conventions. You can select one or more navigation points from the list
+using the usual Windows interactions. The command bar at the top of the editor allows you to
+manipulate selected items in the navigation point list.
 
 ![](images/Core_Base_Nav_Cmd.png)
 
@@ -371,13 +389,18 @@ would also include reference points such as OAP1 and OAP2.
 The top section of the page allows you to set up the navigation point from a known
 *point of interest*, such as an airfield, or capture its coordinates from the F10 map in DCS as
 [discussed below](#capturing-coordinates). You can select a point of interest from the drop-
-down menu; pressing the `+` button to the right of the drop-down copies its parameters (such
-as latitude or longitude) into the navigation point.
+down menu; pressing the **Paste** button to the right of the drop-down copies its parameters
+(such as latitude or longitude) into the navigation point. Points of interest are grouped by
+theater (for example, Syria, Nevada) and point within the theater (for example, Ramat David,
+Nellis AFB).
 
 The row below that identifies the navigation point being edited and, on the right, provides
-three controls. The upward- and downward-pointing chevrons advance to the previous and next
-navigation point, respectively, in the list. The `+` button in between the chevrons adds a new
-navigation point to the end of the list.
+four controls.
+
+- The pin button creates a user point of interest from the current navigation parameters.
+- The upward- and downward-pointing chevrons advance to the previous and next navigation
+  point in the list, respectively.
+- The `+` button in between the chevrons adds a new navigation point to the end of the list.
 
 The bulk of the page is taken up by an area for the navigation point parameters. In this
 example, there are only four: name, latitude, longitude, and altitude. The specific format of
@@ -394,9 +417,13 @@ changes. Clicking either of these buttons will take you back to the navigation p
 ### Capturing Coordinates for Navpoints
 
 Both the navigation point list and navigation point editor pages allow you to capture
-coordinates for navigation points from the DCS F10 map. When capturing from the list page,
-you may capture multiple coordinates and either append new navigation points to the list or
-update existing navigation points in the list,
+coordinates for navigation points from the DCS F10 map.
+
+> Capturing coordinates in this fashion requires access to the F10 map. This implies a
+> mission is running with a pilot slotted in.
+
+When capturing from the list page, you may capture multiple coordinates and either append new
+navigation points to the list or update existing navigation points in the list,
 
 ![](images/Core_Base_Capture_C1.png)
 
@@ -412,6 +439,85 @@ Once capture begins, JAFDTC displays a dialog while you interact with DCS as
 JAFDTC will interact with the coordinate capture in DCS as long as this dialog is active. After
 you have completed the capture in DCS, you click “Done” in this dialog to incorporate the
 captured coordinates in the navigation system.
+
+## System Editors for Communications Systems
+
+Most aircraft in JAFDTC support a communication system that allows configuration of one or more
+radios in the airframe. Typical configuration includes information like preset frequencies,
+enabling guard monitoring, and so on.
+
+> This is an overview of common functionality. Specific support may differ from airframe to
+> airframe. As usual, consult the airframe-specific documentation linked above for further
+> details on a particular airframe.
+
+Communication systems typically follow a pattern where the system editor shows a list of
+presets along with other controls to specify other system configuration.
+
+![](images/Core_Base_Comm.png)
+
+The top row of the page provides controls to select one of the radios to edit from the
+communications system. A blue dot next to the name indicates the radio has been modified from
+default values. The upward- and downard-pointing chevrons step through the radios.
+
+To the right of these controls is a command bar with three commands:
+
+- **Add** &ndash; Adds a preset to the selected radio.
+- **Import** &ndash; Imports presets from a previously exported file.
+- **Export** &ndash; Exports presets to a file suitable for import later.
+
+The middle part of the page presents a list of defined presets, where each row corresponds to
+a single preset for the selected radio. Each preset includes a number, frequency, and
+description. The `X` button at the right of the row deletes the preset.
+
+The bottom portion of the page includes airframe-specific controls for airframe-specific
+parameters (see the
+[airframe-specific documentation](#jafdtc-users-guide)
+for further details) along with the common **Link** and **Reset** controls
+[discussed earlier](#common-editor-controls).
+
+## Point of Interest Database
+
+JAFDTC provides a *Points of Interest* (PoI) database that contains common locations throughout
+DCS theaters. This database consists of two types of entries,
+
+- *System Entries* are entries set by DCS and cover features such as airfields.
+- *User Entries* are entries defined by a user that cover features useful to a user.
+
+While *System Entries* are fixed and immutable, users can define and managed *User Entries* as
+they see fit. PoIs are applied using the **Paste PoI** command from a
+[navigation point editor](#navigation-point-editor)
+to copy the locations to a navigation point. User PoIs can also be created from a navigation
+point editor.
+
+The **Point of Interest** command in the
+[overflow menu](#command-bar)
+opens up an editor page to manage known PoIs.
+
+![](images/Core_Base_PoI.png)
+
+The top portion of this page contains a combo box that allows you to filter the PoIs by DCS
+theater along with a command bar. Below this row is a list of PoIs, one per row. The pin icon
+at the left of a row indicates that the PoI is a user PoI. At the bottom of the page is an area
+to edit the properties of a PoI including the name, latitude, longitude, and elevation.
+
+The command bar,
+
+![](images/Core_Base_PoI_Cmd.png)
+
+includes the following commands,
+
+- **Edit** &ndash; Copies the properties from the selected PoI to the PoI editor.
+- **Delete** &ndash; Deletes the selected *user* PoIs from the database.
+- **Import** &ndash; Imports new PoIs from a previously exported file.
+- **Export** &ndash; Exports selected *user* PoIs from the database to a file.
+- **User Only** &ndash; Toggles the PoI list between showing all PoIs and only showing
+  user PoIs.
+- **Coordiantes** &ndash; Selects the format to use for PoI coordiantes.
+
+After entering or updating properties for a PoI in the PoI editor, click the **Add** button
+to add a new PoI to the theater (the theater is automatically determined from the latitude
+and longitude). The **Add** button will be titled **Update** if the change would update an
+existing user PoI.
 
 ## Settings
 
