@@ -38,9 +38,6 @@ using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
 
-using static JAFDTC.Models.Base.NavpointInfoBase;
-using System.Reflection;
-
 namespace JAFDTC.UI.App
 {
     /// <summary>
@@ -53,9 +50,9 @@ namespace JAFDTC.UI.App
 
         public LLFormat LLDisplayFmt { get; set; }
 
-        public string LatUI => RemoveLLDegZeroFill(ConvertFromLatDD(PoI.Latitude, LLDisplayFmt));
+        public string LatUI => Coord.RemoveLLDegZeroFill(Coord.ConvertFromLatDD(PoI.Latitude, LLDisplayFmt));
 
-        public string LonUI => RemoveLLDegZeroFill(ConvertFromLonDD(PoI.Longitude, LLDisplayFmt));
+        public string LonUI => Coord.RemoveLLDegZeroFill(Coord.ConvertFromLonDD(PoI.Longitude, LLDisplayFmt));
 
         public string Glyph => (PoI.Type == PointOfInterestType.USER) ? "\xE718" : "";
 
@@ -78,16 +75,16 @@ namespace JAFDTC.UI.App
         private string _latUI;                      // string, format per property
         public string LatUI
         {
-            get => ConvertFromLatDD(Lat, Format);
+            get => Coord.ConvertFromLatDD(Lat, Format);
             set
             {
                 string error = "Invalid latitude format";
-                if (IsRegexFieldValid(value, LatRegexFor(Format), false))
+                if (IsRegexFieldValid(value, Coord.LatRegexFor(Format), false))
                 {
                     value = value.ToUpper();
                     error = null;
                 }
-                Lat = ConvertToLatDD(value, Format);
+                Lat = Coord.ConvertToLatDD(value, Format);
                 SetProperty(ref _latUI, value, error);
             }
         }
@@ -95,16 +92,16 @@ namespace JAFDTC.UI.App
         private string _lonUI;                      // string, format per property
         public string LonUI
         {
-            get => ConvertFromLonDD(Lon, Format);
+            get => Coord.ConvertFromLonDD(Lon, Format);
             set
             {
                 string error = "Invalid longitude format";
-                if (IsRegexFieldValid(value, LonRegexFor(Format), false))
+                if (IsRegexFieldValid(value, Coord.LonRegexFor(Format), false))
                 {
                     value = value.ToUpper();
                     error = null;
                 }
-                Lon = ConvertToLonDD(value, Format);
+                Lon = Coord.ConvertToLonDD(value, Format);
                 SetProperty(ref _lonUI, value, error);
             }
         }
@@ -526,8 +523,8 @@ namespace JAFDTC.UI.App
                 PoIListItem poiListItem = (PoIListItem)(uiPoIListView.SelectedItems[0]);
                 int index = _llFmtToIndexMap[LLDisplayFmt];
                 EditPoI.Name = poiListItem.PoI.Name;
-                EditPoI.LL[index].LatUI = ConvertFromLatDD(poiListItem.PoI.Latitude, LLDisplayFmt);
-                EditPoI.LL[index].LonUI = ConvertFromLonDD(poiListItem.PoI.Longitude, LLDisplayFmt);
+                EditPoI.LL[index].LatUI = Coord.ConvertFromLatDD(poiListItem.PoI.Latitude, LLDisplayFmt);
+                EditPoI.LL[index].LonUI = Coord.ConvertFromLonDD(poiListItem.PoI.Longitude, LLDisplayFmt);
                 EditPoI.Alt = poiListItem.PoI.Elevation;
                 RebuildInterfaceState();
             }

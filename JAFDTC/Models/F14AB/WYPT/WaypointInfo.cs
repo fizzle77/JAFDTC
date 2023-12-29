@@ -18,6 +18,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.Base;
+using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 
@@ -42,16 +43,16 @@ namespace JAFDTC.Models.F14AB.WYPT
         [JsonIgnore]
         public override string LatUI
         {
-            get => ConvertFromLatDD(Lat, LLFormat.DDM_P1);
+            get => Coord.ConvertFromLatDD(Lat, LLFormat.DDM_P1);
             set
             {
                 string error = "Invalid latitude DDM format";
-                if (IsRegexFieldValid(value, LatRegexFor(LLFormat.DDM_P1), false))
+                if (IsRegexFieldValid(value, Coord.LatRegexFor(LLFormat.DDM_P1), false))
                 {
                     value = value.ToUpper();
                     error = null;
                 }
-                Lat = ConvertToLatDD(value, LLFormat.DDM_P1);
+                Lat = Coord.ConvertToLatDD(value, LLFormat.DDM_P1);
                 SetProperty(ref _latUI, value, error);
             }
         }
@@ -62,16 +63,16 @@ namespace JAFDTC.Models.F14AB.WYPT
         [JsonIgnore]
         public override string LonUI
         {
-            get => ConvertFromLonDD(Lon, LLFormat.DDM_P1);
+            get => Coord.ConvertFromLonDD(Lon, LLFormat.DDM_P1);
             set
             {
                 string error = "Invalid longitude DDM format";
-                if (IsRegexFieldValid(value, LonRegexFor(LLFormat.DDM_P1), false))
+                if (IsRegexFieldValid(value, Coord.LonRegexFor(LLFormat.DDM_P1), false))
                 {
                     value = value.ToUpper();
                     error = null;
                 }
-                Lon = ConvertToLonDD(value, LLFormat.DDM_P1);
+                Lon = Coord.ConvertToLonDD(value, LLFormat.DDM_P1);
                 SetProperty(ref _lonUI, value, error);
             }
         }

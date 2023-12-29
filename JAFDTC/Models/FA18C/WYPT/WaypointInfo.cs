@@ -18,6 +18,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.Base;
+using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 
@@ -44,16 +45,16 @@ namespace JAFDTC.Models.FA18C.WYPT
             // NOTE: avionics are actually DDM_P2 (no zero-fill), but zero-fill is necessary to make the ui work
             // NOTE: correctly. upload will back out the zero-fill to address this.
 
-            get => ConvertFromLatDD(Lat, LLFormat.DDM_P2ZF);
+            get => Coord.ConvertFromLatDD(Lat, LLFormat.DDM_P2ZF);
             set
             {
                 string error = "Invalid latitude DMS format";
-                if (IsRegexFieldValid(value, LatRegexFor(LLFormat.DDM_P2ZF), false))
+                if (IsRegexFieldValid(value, Coord.LatRegexFor(LLFormat.DDM_P2ZF), false))
                 {
                     value = value.ToUpper();
                     error = null;
                 }
-                Lat = ConvertToLatDD(value, LLFormat.DDM_P2ZF);
+                Lat = Coord.ConvertToLatDD(value, LLFormat.DDM_P2ZF);
                 SetProperty(ref _latUI, value, error);
             }
         }
@@ -66,16 +67,16 @@ namespace JAFDTC.Models.FA18C.WYPT
             // NOTE: avionics are actually DDM_P2 (no zero-fill), but zero-fill is necessary to make the ui work
             // NOTE: correctly. upload will back out the zero-fill to address this.
 
-            get => ConvertFromLonDD(Lon, LLFormat.DDM_P2ZF);
+            get => Coord.ConvertFromLonDD(Lon, LLFormat.DDM_P2ZF);
             set
             {
                 string error = "Invalid longitude DMS format";
-                if (IsRegexFieldValid(value, LonRegexFor(LLFormat.DDM_P2ZF), false))
+                if (IsRegexFieldValid(value, Coord.LonRegexFor(LLFormat.DDM_P2ZF), false))
                 {
                     value = value.ToUpper();
                     error = null;
                 }
-                Lon = ConvertToLonDD(value, LLFormat.DDM_P2ZF);
+                Lon = Coord.ConvertToLonDD(value, LLFormat.DDM_P2ZF);
                 SetProperty(ref _lonUI, value, error);
             }
         }

@@ -21,6 +21,7 @@ using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.STPT;
+using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -179,8 +180,8 @@ namespace JAFDTC.UI.F16C
             SteerpointInfo stptSrc = Config.STPT.Points[index];
             EditStpt.Number = stptSrc.Number;
             EditStpt.Name = new(stptSrc.Name);
-            EditStpt.LatUI = NavpointInfoBase.ConvertFromLatDD(stptSrc.Lat, NavpointInfoBase.LLFormat.DDM_P3ZF);
-            EditStpt.LonUI = NavpointInfoBase.ConvertFromLonDD(stptSrc.Lon, NavpointInfoBase.LLFormat.DDM_P3ZF);
+            EditStpt.LatUI = Coord.ConvertFromLatDD(stptSrc.Lat, LLFormat.DDM_P3ZF);
+            EditStpt.LonUI = Coord.ConvertFromLonDD(stptSrc.Lon, LLFormat.DDM_P3ZF);
             EditStpt.Alt = new(stptSrc.Alt);
             EditStpt.TOS = new(stptSrc.TOS);
 
@@ -597,8 +598,8 @@ namespace JAFDTC.UI.F16C
         {
             PointOfInterest poi = (PointOfInterest)uiPoIComboSelect.SelectedItem;
             EditStpt.Name = poi.Name;
-            EditStpt.LatUI = NavpointInfoBase.ConvertFromLatDD(poi.Latitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
-            EditStpt.LonUI = NavpointInfoBase.ConvertFromLonDD(poi.Longitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
+            EditStpt.LatUI = Coord.ConvertFromLatDD(poi.Latitude, LLFormat.DDM_P3ZF);
+            EditStpt.LonUI = Coord.ConvertFromLonDD(poi.Longitude, LLFormat.DDM_P3ZF);
             EditStpt.Alt = poi.Elevation;
             EditStpt.TOS = "";
             EditStpt.ClearErrors();
@@ -628,8 +629,8 @@ namespace JAFDTC.UI.F16C
                 DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
                     EditStpt.Name = "DCS Capture";
-                    EditStpt.LatUI = NavpointInfoBase.ConvertFromLatDD(wypts[0].Latitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
-                    EditStpt.LonUI = NavpointInfoBase.ConvertFromLonDD(wypts[0].Longitude, NavpointInfoBase.LLFormat.DDM_P3ZF);
+                    EditStpt.LatUI = Coord.ConvertFromLatDD(wypts[0].Latitude, LLFormat.DDM_P3ZF);
+                    EditStpt.LonUI = Coord.ConvertFromLonDD(wypts[0].Longitude, LLFormat.DDM_P3ZF);
                     EditStpt.Alt = wypts[0].Elevation.ToString();
                     EditStpt.TOS = "";
                     EditStpt.ClearErrors();

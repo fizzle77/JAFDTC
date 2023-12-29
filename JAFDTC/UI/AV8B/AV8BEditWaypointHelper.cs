@@ -30,6 +30,7 @@ using System.ComponentModel;
 using System.Linq;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
+using JAFDTC.Utilities;
 
 namespace JAFDTC.UI.AV8B
 {
@@ -61,8 +62,8 @@ namespace JAFDTC.UI.AV8B
             WaypointInfo wyptDst = (WaypointInfo)edit;
             wyptDst.Number = wyptSrc.Number;
             wyptDst.Name = new(wyptSrc.Name);
-            wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(wyptSrc.Lat, NavpointInfoBase.LLFormat.DMS);
-            wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(wyptSrc.Lon, NavpointInfoBase.LLFormat.DMS);
+            wyptDst.LatUI = Coord.ConvertFromLatDD(wyptSrc.Lat, LLFormat.DMS);
+            wyptDst.LonUI = Coord.ConvertFromLonDD(wyptSrc.Lon, LLFormat.DMS);
             wyptDst.Alt = new(wyptSrc.Alt);
         }
 
@@ -103,8 +104,8 @@ namespace JAFDTC.UI.AV8B
             {
                 WaypointInfo wyptDst = (WaypointInfo)edit;
                 wyptDst.Name = poi.Name;
-                wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(poi.Latitude, NavpointInfoBase.LLFormat.DMS);
-                wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(poi.Longitude, NavpointInfoBase.LLFormat.DMS);
+                wyptDst.LatUI = Coord.ConvertFromLatDD(poi.Latitude, LLFormat.DMS);
+                wyptDst.LonUI = Coord.ConvertFromLonDD(poi.Longitude, LLFormat.DMS);
                 wyptDst.Alt = poi.Elevation;
                 wyptDst.ClearErrors();
             }
@@ -116,8 +117,8 @@ namespace JAFDTC.UI.AV8B
             {
                 WaypointInfo wyptDst = (WaypointInfo)edit;
                 wyptDst.Name = "DCS Capture";
-                wyptDst.LatUI = NavpointInfoBase.ConvertFromLatDD(wypt.Latitude, NavpointInfoBase.LLFormat.DMS);
-                wyptDst.LonUI = NavpointInfoBase.ConvertFromLonDD(wypt.Longitude, NavpointInfoBase.LLFormat.DMS);
+                wyptDst.LatUI = Coord.ConvertFromLatDD(wypt.Latitude, LLFormat.DMS);
+                wyptDst.LonUI = Coord.ConvertFromLonDD(wypt.Longitude, LLFormat.DMS);
                 wyptDst.Alt = wypt.Elevation.ToString();
                 wyptDst.ClearErrors();
             }

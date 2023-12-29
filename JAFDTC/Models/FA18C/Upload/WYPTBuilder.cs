@@ -21,6 +21,7 @@ using JAFDTC.Models.FA18C.WYPT;
 using JAFDTC.Models.DCS;
 using System.Text;
 using JAFDTC.Models.Base;
+using JAFDTC.Utilities;
 
 namespace JAFDTC.Models.FA18C.Upload
 {
@@ -77,11 +78,11 @@ namespace JAFDTC.Models.FA18C.Upload
                     {
                         AppendCommand(ufc.GetCommand("Opt1"));
                         AppendCommand(Wait());
-                        AppendCommand(Build2864Coordinate(ufc, NavpointInfoBase.RemoveLLDegZeroFill(wypt.LatUI)));    // DDM
+                        AppendCommand(Build2864Coordinate(ufc, Coord.RemoveLLDegZeroFill(wypt.LatUI)));    // DDM
                         AppendCommand(ufc.GetCommand("ENT"));
                         AppendCommand(WaitLong());
 
-                        AppendCommand(Build2864Coordinate(ufc, NavpointInfoBase.RemoveLLDegZeroFill(wypt.LonUI)));    // DDM
+                        AppendCommand(Build2864Coordinate(ufc, Coord.RemoveLLDegZeroFill(wypt.LonUI)));    // DDM
                         AppendCommand(ufc.GetCommand("ENT"));
                         AppendCommand(WaitLong());
 
