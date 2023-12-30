@@ -144,10 +144,7 @@ namespace JAFDTC.UI.F16C
         //
         private void RenumberSteerpoints()
         {
-            for (int i = 0; i < EditSTPT.Points.Count; i++)
-            {
-                EditSTPT.Points[i].Number = StartingStptNum + i;
-            }
+            EditSTPT.RenumberFrom(StartingStptNum);
             CopyEditToConfig(true);
         }
 
@@ -256,12 +253,7 @@ namespace JAFDTC.UI.F16C
         {
             Debug.Assert(uiStptListView.SelectedItems.Count > 0);
 
-            string title = (uiStptListView.SelectedItems.Count == 1) ? "Delete Steerpoint?" : "Delete Steerpoints?";
-            string content = (uiStptListView.SelectedItems.Count == 1)
-                ? "Are you sure you want to delete this steerpoint? This action cannot be undone."
-                : "Are you sure you want to delete these steerpoints? This action cannot be undone.";
-            ContentDialogResult result = await Utilities.Message2BDialog(Content.XamlRoot, title, content, "Delete");
-            if (result == ContentDialogResult.Primary)
+            if (await Utilities.NavpointDeleteDialog(Content.XamlRoot, "Steerpoint", uiStptListView.SelectedItems.Count))
             {
                 List<SteerpointInfo> deleteList = new();
                 foreach (SteerpointInfo item in uiStptListView.SelectedItems.Cast<SteerpointInfo>())
@@ -285,16 +277,10 @@ namespace JAFDTC.UI.F16C
         //
         private async void CmdRenumber_Click(object sender, RoutedEventArgs args)
         {
-            GetNumberDialog dialog = new(null, null, 1, 700)
+            int newStartNum = await Utilities.NavpointRenumberDialog(Content.XamlRoot, "Steerpoint");
+            if (newStartNum != -1)
             {
-                XamlRoot = Content.XamlRoot,
-                Title = "Select New Starting Steerpoint Number",
-                PrimaryButtonText = "Renumber",
-                CloseButtonText = "Cancel",
-            };
-            if (await dialog.ShowAsync(ContentDialogPlacement.Popup) == ContentDialogResult.Primary)
-            {
-                StartingStptNum = dialog.Value;
+                StartingStptNum = newStartNum;
                 RenumberSteerpoints();
                 RebuildInterfaceState();
             }
@@ -498,17 +484,7 @@ namespace JAFDTC.UI.F16C
         //
         private async void PageBtnResetAll_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new()
-            {
-                XamlRoot = this.Content.XamlRoot,
-                Title = "Reset Steerpoints?",
-                Content = "Are you sure you want to delete all steerpoints? This action cannot be undone.",
-                PrimaryButtonText = "Delete All",
-                CloseButtonText = "Cancel",
-                DefaultButton = ContentDialogButton.Primary
-            };
-            ContentDialogResult result = await dialog.ShowAsync(ContentDialogPlacement.Popup);
-            if (result == ContentDialogResult.Primary)
+            if (await Utilities.NavpointResetDialog(Content.XamlRoot, "Steerpoint"))
             {
                 Config.UnlinkSystem(STPTSystem.SystemTag);
                 Config.STPT.Reset();

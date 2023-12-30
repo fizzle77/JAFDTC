@@ -176,10 +176,11 @@ namespace JAFDTC.UI
             return await new ContentDialog()
             {
                 XamlRoot = root,
-                Title = $"Reset {what}?",
-                Content = $"Are you sure you want to delete all {what.ToLower()}? This action cannot be undone.",
+                Title = $"Reset {what}s?",
+                Content = $"Are you sure you want to delete all {what.ToLower()}s? This action cannot be undone.",
                 PrimaryButtonText = "Delete All",
-                CloseButtonText = "Cancel"
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Primary
             }.ShowAsync(ContentDialogPlacement.Popup) == ContentDialogResult.Primary;
         }
 
