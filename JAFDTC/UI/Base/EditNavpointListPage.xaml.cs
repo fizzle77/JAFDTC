@@ -173,8 +173,11 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void RebuildEnableState()
         {
+            JAFDTC.App curApp = Application.Current as JAFDTC.App;
+
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(PageHelper.SystemTag));
             bool isFull = EditNavpt.Count >= PageHelper.NavptMaxCount;
+            bool isDCSListening = curApp.IsDCSAvailable && (curApp.DCSActiveAirframe == Config.Airframe);
 
             Utilities.SetEnableState(uiBarAdd, isEditable && !isFull);
             Utilities.SetEnableState(uiBarEdit, isEditable && (uiNavptListView.SelectedItems.Count == 1));
@@ -182,7 +185,7 @@ namespace JAFDTC.UI.Base
             Utilities.SetEnableState(uiBarPaste, isEditable && IsClipboardValid);
             Utilities.SetEnableState(uiBarDelete, isEditable && (uiNavptListView.SelectedItems.Count > 0));
 
-            Utilities.SetEnableState(uiBarCapture, isEditable);
+            Utilities.SetEnableState(uiBarCapture, isEditable && isDCSListening);
             Utilities.SetEnableState(uiBarImport, isEditable);
             Utilities.SetEnableState(uiBarExport, isEditable && (EditNavpt.Count > 0));
             Utilities.SetEnableState(uiBarRenumber, isEditable && (EditNavpt.Count > 0));

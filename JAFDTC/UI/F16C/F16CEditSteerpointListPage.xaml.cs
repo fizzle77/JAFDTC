@@ -163,7 +163,10 @@ namespace JAFDTC.UI.F16C
         //
         private void RebuildEnableState()
         {
+            JAFDTC.App curApp = Application.Current as JAFDTC.App;
+
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(STPTSystem.SystemTag));
+            bool isDCSListening = curApp.IsDCSAvailable && (curApp.DCSActiveAirframe == Config.Airframe);
 
             Utilities.SetEnableState(uiBarAdd, isEditable);
             Utilities.SetEnableState(uiBarEdit, isEditable && (uiStptListView.SelectedItems.Count == 1));
@@ -171,7 +174,7 @@ namespace JAFDTC.UI.F16C
             Utilities.SetEnableState(uiBarPaste, isEditable && IsClipboardValid);
             Utilities.SetEnableState(uiBarDelete, isEditable && (uiStptListView.SelectedItems.Count > 0));
 
-            Utilities.SetEnableState(uiBarCapture, isEditable);
+            Utilities.SetEnableState(uiBarCapture, isEditable && isDCSListening);
             Utilities.SetEnableState(uiBarImport, isEditable);
             Utilities.SetEnableState(uiBarExport, isEditable && (EditSTPT.Count > 0));
             Utilities.SetEnableState(uiBarRenumber, isEditable && (EditSTPT.Count > 0));
