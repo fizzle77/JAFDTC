@@ -152,6 +152,51 @@ namespace JAFDTC.UI
         }
 
         /// <summary>
+        /// display a renumber navpoints dialog and return the result. the return value is the starting navpoint
+        /// number (if accepted) or -1 (if cancelled). the what parameter should be capitalized and singular.
+        /// </summary>
+        public static async Task<int> NavpointRenumberDialog(XamlRoot root, string what)
+        {
+            GetNumberDialog dlg = new(null, null, 1, 700)
+            {
+                XamlRoot = root,
+                Title = $"Select New Starting {what} Number",
+                PrimaryButtonText = "Renumber",
+                CloseButtonText = "Cancel",
+            };
+            return (await dlg.ShowAsync(ContentDialogPlacement.Popup) == ContentDialogResult.Primary) ? dlg.Value : -1;
+        }
+
+        /// <summary>
+        /// display a reset navpoints dialog and return the result. the return value is true if the user accepts
+        /// the reset, false if they cancel. the what parameter should be capitalized and singular.
+        /// </summary>
+        public static async Task<bool> NavpointResetDialog(XamlRoot root, string what)
+        {
+            return await new ContentDialog()
+            {
+                XamlRoot = root,
+                Title = $"Reset {what}?",
+                Content = $"Are you sure you want to delete all {what.ToLower()}? This action cannot be undone.",
+                PrimaryButtonText = "Delete All",
+                CloseButtonText = "Cancel"
+            }.ShowAsync(ContentDialogPlacement.Popup) == ContentDialogResult.Primary;
+        }
+
+        /// <summary>
+        /// display a delete navpoint dialog and return the result. the return value is true if the user accepts
+        /// the delete, false if they cancel. the what parameter should be capitalized and singular.
+        /// </summary>
+        public static async Task<bool> NavpointDeleteDialog(XamlRoot root, string what, int count)
+        {
+            string title = (count == 1) ? $"Delete {what}?" : $"Delete {what}s?";
+            string content = (count == 1)
+                ? $"Are you sure you want to delete this {what.ToLower()}? This action cannot be undone."
+                : $"Are you sure you want to delete these {what.ToLower()}?s? This action cannot be undone.";
+            return await Utilities.Message2BDialog(root, title, content, "Delete") == ContentDialogResult.Primary;
+        }
+
+        /// <summary>
         /// search the visual tree for a child control of a particular type with a given tag. returns the control
         /// or null if not found.
         /// 
