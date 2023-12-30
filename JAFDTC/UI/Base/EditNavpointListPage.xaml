@@ -46,7 +46,7 @@ https://www.gnu.org/licenses/.
                     HorizontalAlignment="Center">
             <AppBarButton x:Name="uiBarAdd" Icon="Add" Label="Add"
                           Click="CmdAdd_Click"
-                          ToolTipService.ToolTip="Add a new navpoint"/>
+                          ToolTipService.ToolTip="Add new navpoint"/>
             <AppBarButton x:Name="uiBarEdit" Icon="Edit" Label="Edit"
                           Click="CmdOpen_Click"
                           ToolTipService.ToolTip="Edit selected navpoint"/>
@@ -63,11 +63,11 @@ https://www.gnu.org/licenses/.
             <AppBarSeparator/>
             <AppBarButton x:Name="uiBarRenumber" Icon="AllApps" Label="Renumber"
                           Click="CmdRenumber_Click"
-                          ToolTipService.ToolTip="Renumber the list of navpoints"/>
+                          ToolTipService.ToolTip="Renumber navpoint list"/>
             <AppBarSeparator/>
             <AppBarButton x:Name="uiBarCapture" Label="Capture"
                           Click="CmdCapture_Click"
-                          ToolTipService.ToolTip="Capture navpoints from DCS">
+                          ToolTipService.ToolTip="Capture LAT, LON, ELEV for navpoints from DCS">
                 <AppBarButton.Icon>
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7B7;"/>
                 </AppBarButton.Icon>
@@ -113,7 +113,7 @@ https://www.gnu.org/licenses/.
                 <TextBlock Grid.Column="2" Margin="6,0,0,0"
                            HorizontalTextAlignment="Center"
                            Style="{StaticResource TableHeaderTextStyle}"
-                           Text="Latitude, Longitude, and Altitude"/>
+                           Text="Latitude, Longitude / Elevation"/>
             </Grid>
 
             <ListView Grid.Row="1"

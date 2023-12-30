@@ -107,7 +107,7 @@ https://www.gnu.org/licenses/.
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Center"
                       SelectionChanged="PoIComboSelect_SelectionChanged"
-                      ToolTipService.ToolTip="Selects a point of interest within  selected theater to use to fill in steerpoint information">
+                      ToolTipService.ToolTip="Selects a point of interest within selected theater to use to fill in steerpoint information">
             </ui_app:ComboBoxSeparated>
             <Button Grid.Row="1" Grid.Column="3" Margin="12,0,0,0"
                         x:Name="uiPoIBtnApply"
@@ -216,7 +216,7 @@ https://www.gnu.org/licenses/.
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0"
                        HorizontalTextAlignment="Right"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
-                LAT / LON / ALT / TOS
+                LAT / LON / ELEV / TOS
             </TextBlock>
             <Grid Grid.Row="2" Grid.Column="1" Margin="12,12,0,0"
                   VerticalAlignment="Center">
@@ -252,7 +252,7 @@ https://www.gnu.org/licenses/.
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.Alt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          LostFocus="StptTextBox_LostFocus"
-                         ToolTipService.ToolTip="Altitude of steerpoint in feet"/>
+                         ToolTipService.ToolTip="Elevation of steerpoint in feet"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
                            x:Name="uiStptAltitudeUnitsText"
                            Style="{StaticResource EditorParamStaticTextBlockStyle}">
@@ -359,7 +359,7 @@ https://www.gnu.org/licenses/.
                              PlaceholderText = "0"
                              MaxLength="8"
                              LostFocus="StptTextBox_LostFocus"
-                             ToolTipService.ToolTip="TODO"/>
+                             ToolTipService.ToolTip="Range from steerpoint to OAP"/>
                     <TextBox Grid.Row="1" Grid.Column="3" Margin="12,12,0,0"
                              x:Name="uiStptOAPValueBrng0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
@@ -367,7 +367,7 @@ https://www.gnu.org/licenses/.
                              PlaceholderText = "0.0"
                              MaxLength="5"
                              LostFocus="StptTextBox_LostFocus"
-                             ToolTipService.ToolTip="TODO"/>
+                             ToolTipService.ToolTip="Bearing from steerpoint to OAP"/>
                     <TextBox Grid.Row="1" Grid.Column="4" Margin="12,12,0,0"
                              x:Name="uiStptOAPValueElev0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
@@ -375,7 +375,7 @@ https://www.gnu.org/licenses/.
                              PlaceholderText = "0"
                              MaxLength="8"
                              LostFocus="StptTextBox_LostFocus"
-                             ToolTipService.ToolTip="TODO"/>
+                             ToolTipService.ToolTip="Elevation difference between steerpoint and OAP"/>
 
                     <!-- oap 2 parameters
                       -->
@@ -408,7 +408,7 @@ https://www.gnu.org/licenses/.
                              PlaceholderText = "0"
                              MaxLength="8"
                              LostFocus="StptTextBox_LostFocus"
-                             ToolTipService.ToolTip="TODO"/>
+                             ToolTipService.ToolTip="Range from steerpoint to OAP"/>
                     <TextBox Grid.Row="2" Grid.Column="3" Margin="12,12,0,0"
                              x:Name="uiStptOAPValueBrng1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
@@ -416,7 +416,7 @@ https://www.gnu.org/licenses/.
                              PlaceholderText = "0.0"
                              MaxLength="5"
                              LostFocus="StptTextBox_LostFocus"
-                             ToolTipService.ToolTip="TODO"/>
+                             ToolTipService.ToolTip="Bearing from steerpoint to OAP"/>
                     <TextBox Grid.Row="2" Grid.Column="4" Margin="12,12,0,0"
                              x:Name="uiStptOAPValueElev1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
@@ -424,7 +424,7 @@ https://www.gnu.org/licenses/.
                              PlaceholderText = "0"
                              MaxLength="8"
                              LostFocus="StptTextBox_LostFocus"
-                             ToolTipService.ToolTip="TODO"/>
+                             ToolTipService.ToolTip="Elevation difference between steerpoint and OAP"/>
 
                     <!-- vip/vrp header row
                       -->
@@ -449,7 +449,7 @@ https://www.gnu.org/licenses/.
                               VerticalAlignment="Center"
                               HorizontalAlignment="Stretch"
                               SelectionChanged="VizCombo_SelectionChanged"
-                              ToolTipService.ToolTip="TODO">
+                              ToolTipService.ToolTip="Enable or disable VIP or VRP for this steerpoint">
                         <StackPanel Orientation="Horizontal">
                             <FontIcon VerticalAlignment="Center" FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE738;"/>
                             <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">None</TextBlock>
@@ -476,7 +476,7 @@ https://www.gnu.org/licenses/.
                              PlaceholderText="0"
                              MaxLength="8"
                              LostFocus="StptTextBox_LostFocus"
-                             ToolTipService.ToolTip="TODO"/>
+                             ToolTipService.ToolTip="Range from steerpoint to VIP/VRP"/>
                     <TextBox Grid.Row="4" Grid.Column="3" Margin="12,12,0,0"
                              x:Name="uiStptVxPValueBrng0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
@@ -484,7 +484,7 @@ https://www.gnu.org/licenses/.
                              PlaceholderText="0.0"
                              MaxLength="5"
                              LostFocus="StptTextBox_LostFocus"
-                             ToolTipService.ToolTip="TODO"/>
+                             ToolTipService.ToolTip="Bearing from steerpoint to VIP/VRP"/>
                     <TextBox Grid.Row="4" Grid.Column="4" Margin="12,12,0,0"
                              x:Name="uiStptVxPValueElev0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
@@ -492,7 +492,7 @@ https://www.gnu.org/licenses/.
                              PlaceholderText="0"
                              MaxLength="8"
                              LostFocus="StptTextBox_LostFocus"
-                             ToolTipService.ToolTip="TODO"/>
+                             ToolTipService.ToolTip="Range between steerpoint and VIP/VRP"/>
 
                     <!-- vip/vrp 2 parameters
                       -->
@@ -509,7 +509,7 @@ https://www.gnu.org/licenses/.
                              PlaceholderText="0"
                              MaxLength="8"
                              LostFocus="StptTextBox_LostFocus"
-                             ToolTipService.ToolTip="TODO"/>
+                             ToolTipService.ToolTip="Range from steerpoint to VIP/VRP"/>
                     <TextBox Grid.Row="5" Grid.Column="3" Margin="12,12,0,0"
                              x:Name="uiStptVxPValueBrng1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
@@ -517,7 +517,7 @@ https://www.gnu.org/licenses/.
                              PlaceholderText="0.0"
                              MaxLength="5"
                              LostFocus="StptTextBox_LostFocus"
-                             ToolTipService.ToolTip="TODO"/>
+                             ToolTipService.ToolTip="Bearing from steerpoint to VIP/VRP"/>
                     <TextBox Grid.Row="5" Grid.Column="4" Margin="12,12,0,0"
                              x:Name="uiStptVxPValueElev1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
@@ -525,7 +525,7 @@ https://www.gnu.org/licenses/.
                              PlaceholderText="0"
                              MaxLength="8"
                              LostFocus="StptTextBox_LostFocus"
-                             ToolTipService.ToolTip="TODO"/>
+                             ToolTipService.ToolTip="Range between steerpoint and VIP/VRP"/>
 
                 </Grid>
             </Grid>
