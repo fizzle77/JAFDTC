@@ -30,7 +30,7 @@ namespace JAFDTC.Models.Base
     /// array of navigation points of type T (where T should be conform to INavpointInfo and is typically derived
     /// from the NavpointInfoBase abstract base class).
     /// </summary>
-    public abstract class NavpointSystemBase<T> : BindableObject, ISystem
+    public abstract class NavpointSystemBase<T> : BindableObject, ISystem where T : class, INavpointInfo
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -119,6 +119,17 @@ namespace JAFDTC.Models.Base
         public virtual int IndexOf(T navpt)
         {
             return Points.IndexOf(navpt);
+        }
+
+        /// <summary>
+        /// renumber the points in the system starting from the given starting number.
+        /// </summary>
+        public virtual void RenumberFrom(int startNumber)
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                Points[i].Number = startNumber + i;
+            }
         }
 
         /// <summary>
