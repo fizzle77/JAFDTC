@@ -19,13 +19,8 @@
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace JAFDTC.UI.App
 {
@@ -56,11 +51,13 @@ namespace JAFDTC.UI.App
                 uiComboItems.Width = comboWidth;
             }
             IsPrimaryButtonEnabled = ((Items != null) && (Items.Count > 0) && (uiComboItems.SelectedIndex >= 0));
+            IsSecondaryButtonEnabled = ((Items != null) && (Items.Count > 0) && (uiComboItems.SelectedIndex >= 0));
         }
 
         private void ComboItems_SelectionChanged(object sender, RoutedEventArgs args)
         {
             IsPrimaryButtonEnabled = ((Items != null) && (Items.Count > 0) && (uiComboItems.SelectedIndex >= 0));
+            IsSecondaryButtonEnabled = ((Items != null) && (Items.Count > 0) && (uiComboItems.SelectedIndex >= 0));
         }
     }
 }
