@@ -78,7 +78,7 @@ https://www.gnu.org/licenses/.
                           ToolTipService.ToolTip="Import steerpoints from a file"/>
             <AppBarButton x:Name="uiBarExport" Icon="Upload" Label="Export"
                           Click="CmdExport_Click"
-                          ToolTipService.ToolTip="Export steerpoints to a file"/>
+                          ToolTipService.ToolTip="Export all steerpoints to a file"/>
             <AppBarSeparator/>
         </CommandBar>
 
