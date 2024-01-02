@@ -18,8 +18,9 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.Base;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace JAFDTC.Models.A10C.WYPT
 {
@@ -45,14 +46,21 @@ namespace JAFDTC.Models.A10C.WYPT
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // waypoint management
+        // NavpointSystemBase overrides
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        /// <summary>
-        /// create a new waypoint or take an existing waypoint and add it to the end of the waypoint list. the
-        /// waypoint is numbered to follow the last waypoint in the list. returns the waypoint added, null on error.
-        /// </summary>
+        public override WaypointInfo NavpointFromInfo(Dictionary<string, string> navptInfo)
+        {
+            return new()
+            {
+                Name = (navptInfo.ContainsKey("name")) ? navptInfo["name"] : "",
+                Lat = (navptInfo.ContainsKey("lat")) ? navptInfo["lat"] : "",
+                Lon = (navptInfo.ContainsKey("lon")) ? navptInfo["lon"] : "",
+                Alt = (navptInfo.ContainsKey("alt")) ? navptInfo["alt"] : ""
+            };
+        }
+
         public override WaypointInfo Add(WaypointInfo wypt = null)
         {
             wypt ??= new();

@@ -22,13 +22,15 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace JAFDTC.Models.Base
 {
     /// <summary>
     /// abstract base class for a navigation point system (such as steerpoints or waypoints), system consists of an
-    /// array of navigation points of type T (where T should be conform to INavpointInfo and is typically derived
-    /// from the NavpointInfoBase abstract base class).
+    /// array of navigation points of type T (where T should be conform to INavpointInfo, provide new(), and is
+    /// typically derived from the NavpointInfoBase abstract base class).
     /// </summary>
     public abstract class NavpointSystemBase<T> : BindableObject, ISystem where T : class, INavpointInfo
     {
@@ -66,12 +68,12 @@ namespace JAFDTC.Models.Base
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // steerpoint management
+        // navpoint management
         //
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// returns the serialized form of the navpoint currently in the system, null on error.
+        /// returns the .json serialized form of the navpoints currently in the system, null on error.
         /// </summary>
         public virtual string SerializeNavpoints()
         {
@@ -79,22 +81,21 @@ namespace JAFDTC.Models.Base
         }
 
         /// <summary>
-        /// deserialize an array of navpoint and incorporate them into the navpoint list. the deserialized navpoints
-        /// can either replace the existing navpoints or be appended to the end of the navpoint list. returns true on
-        /// success, false on error.
+        /// deserialize an array of navpoints from .json and incorporate them into the navpoint list. the deserialized
+        /// navpoints can either replace the existing navpoints or be appended to the end of the navpoint list. returns
+        /// true on success, false on error (previous navpoints preserved on errors).
         /// </summary>
         public virtual bool DeserializeNavpoints(string json, bool isReplace = true)
         {
-            ObservableCollection<T> prevStpts = Points;
+            ObservableCollection<T> prevPoints = Points;
             try
             {
-                ObservableCollection<T> newStpts;
-                newStpts = JsonSerializer.Deserialize<ObservableCollection<T>>(json);
+                ObservableCollection<T> navpts = JsonSerializer.Deserialize<ObservableCollection<T>>(json);
                 if (isReplace)
                 {
                     Points.Clear();
                 }
-                foreach (T navpt in newStpts)
+                foreach (T navpt in navpts)
                 {
                     Add(navpt);
                 }
@@ -102,10 +103,50 @@ namespace JAFDTC.Models.Base
             }
             catch
             {
-                Points = prevStpts;
+                Points = prevPoints;
             }
             return false;
         }
+
+        /// <summary>
+        /// incorporate a list of navpoints specified by navpoint info dictionaries (see navptInfoList) into the
+        /// navpoint list. the new navpoints can either replace the existing navpoints or be appended to the end of
+        /// the navpoing list. returns true on success, false on error (previous navpoints preserved on errors).
+        /// </summary>
+        public virtual bool IncorpNavpointInfoList(List<Dictionary<string, string>> navptInfoList, bool isReplace = true)
+        {
+            ObservableCollection<T> prevPoints = Points;
+            try
+            {
+                if (isReplace)
+                {
+                    Points.Clear();
+                }
+                foreach (Dictionary<string, string> navptInfo in navptInfoList)
+                {
+                    Add((T)NavpointFromInfo(navptInfo));
+                }
+                return true;
+            }
+            catch
+            {
+                Points = prevPoints;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// return a navpoint set up according to the navpoint info dictionary. the info dictionary provides a
+        /// generic navpoint specification and includes the following key/value pairs:
+        ///
+        ///   ["name"]      (string) name of navpoint
+        ///   ["lat"]       (string) latitude of navpoint, decimal degrees with no units
+        ///   ["lon"]       (string) longitude of navpoint, decimal degrees with no units
+        ///   ["alt"]       (string) elevation of navpoint, feet
+        /// 
+        /// navpoint fields with missing keys are set to "".
+        /// </summary>
+        public abstract T NavpointFromInfo(Dictionary<string, string> navptInfo);
 
         /// <summary>
         /// returns the number of navpoints in the system.

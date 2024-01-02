@@ -18,9 +18,10 @@
 //
 // ********************************************************************************************************************
 
-using System.Diagnostics;
-using System.Collections.ObjectModel;
 using JAFDTC.Models.Base;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace JAFDTC.Models.F16C.STPT
 {
@@ -46,15 +47,22 @@ namespace JAFDTC.Models.F16C.STPT
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // steerpoint management
+        // NavpointSystemBase overrides
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        /// <summary>
-        /// create a new steerpoint or take an existing steerpoint and add it to the end of the steerpoint list. the
-        /// steerpoint is numbered to follow the last steerpoint in the list. returns the steerpoint added, null on
-        /// error.
-        /// </summary>
+        public override SteerpointInfo NavpointFromInfo(Dictionary<string, string> navptInfo)
+        {
+            return new()
+            {
+                // TODO: could include TOS too, if available in navptInfo
+                Name = (navptInfo.ContainsKey("name")) ? navptInfo["name"] : "",
+                Lat = (navptInfo.ContainsKey("lat")) ? navptInfo["lat"] : "",
+                Lon = (navptInfo.ContainsKey("lon")) ? navptInfo["lon"] : "",
+                Alt = (navptInfo.ContainsKey("alt")) ? navptInfo["alt"] : ""
+            };
+        }
+
         public override SteerpointInfo Add(SteerpointInfo stpt = null)
         {
             stpt ??= new();
