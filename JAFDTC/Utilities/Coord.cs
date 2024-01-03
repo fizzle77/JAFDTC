@@ -2,7 +2,7 @@
 //
 // Coord.cs : coordinate transformation and conversion functions
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -34,6 +34,7 @@ namespace JAFDTC.Utilities
         DMS,            // degrees, minutes, seconds
         DDM_P3ZF,       // degrees, decimal minutes (to 3-digit precision), zero-fill degrees
         DDM_P2ZF,       // degrees, decimal minutes (to 2-digit precision), zero-fill degrees
+        DDM_P1ZF,       // degrees, decimal minutes (to 1-digit precision), zero-fill degrees
         DDM_P2,         // degrees, decimal minutes (to 2-digit precision)
         DDM_P1,         // degrees, decimal minutes (to 1-digit precision)
     }
@@ -54,8 +55,9 @@ namespace JAFDTC.Utilities
             [LLFormat.DMS] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]’ [0-5][0-9]’’)|([NSns] 90° 00’ 00’’)$"),
             [LLFormat.DDM_P3ZF] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{3}’)|([NSns] 90° 00\.000’)$"),
             [LLFormat.DDM_P2ZF] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([NSns] 90° 00\.00’)$"),
+            [LLFormat.DDM_P1ZF] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{1}’)|([NSns] 90° 00\.00’)$"),
             [LLFormat.DDM_P2] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([NSns] 90° 00\.00’)$"),
-            [LLFormat.DDM_P1] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([NSns] 90° 00\.0’)$"),
+            [LLFormat.DDM_P1] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{1}’)|([NSns] 90° 00\.0’)$"),
         };
 
         private static readonly Dictionary<LLFormat, Regex> _regexFormatLon = new()
@@ -65,8 +67,9 @@ namespace JAFDTC.Utilities
             [LLFormat.DMS] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]’ [0-5][0-9]’’)|([EWew] 1[0-7][0-9]° [0-5][0-9]’ [0-5][0-9]’’)|([EWew] 180° 00’ 00’’)$"),
             [LLFormat.DDM_P3ZF] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{3}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{3}’)|([EWew] 180° 00\.000’)$"),
             [LLFormat.DDM_P2ZF] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{2}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{2}’)|([EWew] 180° 00\.00’)$"),
+            [LLFormat.DDM_P1ZF] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{1}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{1}’)|([EWew] 180° 00\.00’)$"),
             [LLFormat.DDM_P2] = new(@"^([EWew] [0-9]° [0-5][0-9]\.[0-9]{2}’)|([EWew] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([EWew] 180° 00\.00’)$"),
-            [LLFormat.DDM_P1] = new(@"^([EWew] [0-9]° [0-5][0-9]\.[0-9]’)|([EWew] [0-8][0-9]° [0-5][0-9]\.[0-9]’)|([EWew] 180° 00\.0’)$"),
+            [LLFormat.DDM_P1] = new(@"^([EWew] [0-9]° [0-5][0-9]\.[0-9]{1}’)|([EWew] [0-8][0-9]° [0-5][0-9]\.[0-9]’)|([EWew] 180° 00\.0’)$"),
         };
 
         // ------------------------------------------------------------------------------------------------------------
@@ -97,6 +100,7 @@ namespace JAFDTC.Utilities
                 LLFormat.DMS => CoreDDtoDMS(latDD, 90.0, "N", "S"),
                 LLFormat.DDM_P3ZF => CoreDDtoDDM(latDD, 90.0, "N", "S", 3, true),
                 LLFormat.DDM_P2ZF => CoreDDtoDDM(latDD, 90.0, "N", "S", 2, true),
+                LLFormat.DDM_P1ZF => CoreDDtoDDM(latDD, 90.0, "N", "S", 1, true),
                 LLFormat.DDM_P2 => CoreDDtoDDM(latDD, 90.0, "N", "S", 2, false),
                 LLFormat.DDM_P1 => CoreDDtoDDM(latDD, 90.0, "N", "S", 1, false),
                 _ => "",
@@ -114,6 +118,7 @@ namespace JAFDTC.Utilities
                 LLFormat.DMS => CoreDDtoDMS(lonDD, 180.0, "E", "W"),
                 LLFormat.DDM_P3ZF => CoreDDtoDDM(lonDD, 180.0, "E", "W", 3, true),
                 LLFormat.DDM_P2ZF => CoreDDtoDDM(lonDD, 180.0, "E", "W", 2, true),
+                LLFormat.DDM_P1ZF => CoreDDtoDDM(lonDD, 180.0, "E", "W", 1, true),
                 LLFormat.DDM_P2 => CoreDDtoDDM(lonDD, 180.0, "E", "W", 2, false),
                 LLFormat.DDM_P1 => CoreDDtoDDM(lonDD, 180.0, "E", "W", 1, false),
                 _ => "",
@@ -131,6 +136,7 @@ namespace JAFDTC.Utilities
                 LLFormat.DMS => CoreDMStoDD(latFmt, _regexFormatLat[fmt], "N"),
                 LLFormat.DDM_P3ZF => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
                 LLFormat.DDM_P2ZF => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
+                LLFormat.DDM_P1ZF => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
                 LLFormat.DDM_P2 => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
                 LLFormat.DDM_P1 => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
                 _ => "",
@@ -148,6 +154,7 @@ namespace JAFDTC.Utilities
                 LLFormat.DMS => CoreDMStoDD(lonFmt, _regexFormatLon[fmt], "E"),
                 LLFormat.DDM_P3ZF => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
                 LLFormat.DDM_P2ZF => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
+                LLFormat.DDM_P1ZF => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
                 LLFormat.DDM_P2 => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
                 LLFormat.DDM_P1 => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
                 _ => "",

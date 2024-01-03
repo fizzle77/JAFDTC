@@ -2,7 +2,7 @@
 //
 // F14ABEditWaypointHelper.cs : IEditNavpointPageHelper for the f-14a/b configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -77,8 +77,8 @@ namespace JAFDTC.UI.F14AB
             WaypointInfo wyptDst = (WaypointInfo)edit;
             wyptDst.Number = wyptSrc.Number;
             wyptDst.Name = new(wyptSrc.Name);
-            wyptDst.LatUI = Coord.ConvertFromLatDD(wyptSrc.Lat, LLFormat.DDM_P1);
-            wyptDst.LonUI = Coord.ConvertFromLonDD(wyptSrc.Lon, LLFormat.DDM_P1);
+            wyptDst.LatUI = Coord.ConvertFromLatDD(wyptSrc.Lat, LLFormat.DDM_P1ZF);
+            wyptDst.LonUI = Coord.ConvertFromLonDD(wyptSrc.Lon, LLFormat.DDM_P1ZF);
             wyptDst.Alt = new(wyptSrc.Alt);
         }
 
@@ -119,8 +119,8 @@ namespace JAFDTC.UI.F14AB
             {
                 WaypointInfo wyptDst = (WaypointInfo)edit;
                 wyptDst.Name = poi.Name;
-                wyptDst.LatUI = Coord.ConvertFromLatDD(poi.Latitude, LLFormat.DDM_P1);
-                wyptDst.LonUI = Coord.ConvertFromLonDD(poi.Longitude, LLFormat.DDM_P1);
+                wyptDst.LatUI = Coord.ConvertFromLatDD(poi.Latitude, LLFormat.DDM_P1ZF);
+                wyptDst.LonUI = Coord.ConvertFromLonDD(poi.Longitude, LLFormat.DDM_P1ZF);
                 wyptDst.Alt = poi.Elevation;
                 wyptDst.ClearErrors();
             }
@@ -132,8 +132,8 @@ namespace JAFDTC.UI.F14AB
             {
                 WaypointInfo wyptDst = (WaypointInfo)edit;
                 wyptDst.Name = "DCS Capture";
-                wyptDst.LatUI = Coord.ConvertFromLatDD(wypt.Latitude, LLFormat.DDM_P1);
-                wyptDst.LonUI = Coord.ConvertFromLonDD(wypt.Longitude, LLFormat.DDM_P1);
+                wyptDst.LatUI = Coord.ConvertFromLatDD(wypt.Latitude, LLFormat.DDM_P1ZF);
+                wyptDst.LonUI = Coord.ConvertFromLonDD(wypt.Longitude, LLFormat.DDM_P1ZF);
                 wyptDst.Alt = wypt.Elevation.ToString();
                 wyptDst.ClearErrors();
             }

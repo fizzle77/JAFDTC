@@ -2,7 +2,7 @@
 //
 // WaypointInfo.cs -- f-14a/b waypoint base information
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -43,16 +43,19 @@ namespace JAFDTC.Models.F14AB.WYPT
         [JsonIgnore]
         public override string LatUI
         {
-            get => Coord.ConvertFromLatDD(Lat, LLFormat.DDM_P1);
+            // NOTE: avionics are actually DDM_P1 (no zero-fill), but zero-fill is necessary to make the ui work
+            // NOTE: correctly. upload will back out the zero-fill to address this.
+
+            get => Coord.ConvertFromLatDD(Lat, LLFormat.DDM_P1ZF);
             set
             {
                 string error = "Invalid latitude DDM format";
-                if (IsRegexFieldValid(value, Coord.LatRegexFor(LLFormat.DDM_P1), false))
+                if (IsRegexFieldValid(value, Coord.LatRegexFor(LLFormat.DDM_P1ZF), false))
                 {
                     value = value.ToUpper();
                     error = null;
                 }
-                Lat = Coord.ConvertToLatDD(value, LLFormat.DDM_P1);
+                Lat = Coord.ConvertToLatDD(value, LLFormat.DDM_P1ZF);
                 SetProperty(ref _latUI, value, error);
             }
         }
@@ -63,16 +66,19 @@ namespace JAFDTC.Models.F14AB.WYPT
         [JsonIgnore]
         public override string LonUI
         {
-            get => Coord.ConvertFromLonDD(Lon, LLFormat.DDM_P1);
+            // NOTE: avionics are actually DDM_P1 (no zero-fill), but zero-fill is necessary to make the ui work
+            // NOTE: correctly. upload will back out the zero-fill to address this.
+
+            get => Coord.ConvertFromLonDD(Lon, LLFormat.DDM_P1ZF);
             set
             {
                 string error = "Invalid longitude DDM format";
-                if (IsRegexFieldValid(value, Coord.LonRegexFor(LLFormat.DDM_P1), false))
+                if (IsRegexFieldValid(value, Coord.LonRegexFor(LLFormat.DDM_P1ZF), false))
                 {
                     value = value.ToUpper();
                     error = null;
                 }
-                Lon = Coord.ConvertToLonDD(value, LLFormat.DDM_P1);
+                Lon = Coord.ConvertToLonDD(value, LLFormat.DDM_P1ZF);
                 SetProperty(ref _lonUI, value, error);
             }
         }

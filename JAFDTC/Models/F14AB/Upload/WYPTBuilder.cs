@@ -2,7 +2,7 @@
 //
 // WYPTBuilder.cs -- f-14a/b waypoint command builder
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -20,6 +20,7 @@
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F14AB;
 using JAFDTC.Models.F14AB.WYPT;
+using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -69,15 +70,17 @@ namespace JAFDTC.Models.F14AB.Upload
                 {
                     if (wypts[i].IsValid)
                     {
+                        // NOTE: coords are zero-filled in the ui, back that out here.
+
                         AppendCommand(cap.GetCommand($"RIO_CAP_BTN_{i+1}"));
                         AppendCommand(cap.GetCommand("RIO_CAP_CLEAR"));
 
                         AppendCommand(cap.GetCommand($"RIO_CAP_LAT_1"));
-                        AppendCommand(BuildCoordinate(cap, wypts[i].LatUI));
+                        AppendCommand(BuildCoordinate(cap, Coord.RemoveLLDegZeroFill(wypts[i].LatUI)));
                         AppendCommand(cap.GetCommand("RIO_CAP_ENTER"));
 
                         AppendCommand(cap.GetCommand($"RIO_CAP_LONG_6"));
-                        AppendCommand(BuildCoordinate(cap, wypts[i].LonUI));
+                        AppendCommand(BuildCoordinate(cap, Coord.RemoveLLDegZeroFill(wypts[i].LonUI)));
                         AppendCommand(cap.GetCommand("RIO_CAP_ENTER"));
 
                         AppendCommand(cap.GetCommand("RIO_CAP_CLEAR"));
