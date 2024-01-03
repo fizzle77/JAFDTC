@@ -254,7 +254,7 @@ namespace JAFDTC.UI.F16C
         {
             Debug.Assert(uiStptListView.SelectedItems.Count > 0);
 
-            if (await Utilities.NavpointDeleteDialog(Content.XamlRoot, "Steerpoint", uiStptListView.SelectedItems.Count))
+            if (await NavpointUIHelper.DeleteDialog(Content.XamlRoot, "Steerpoint", uiStptListView.SelectedItems.Count))
             {
                 List<SteerpointInfo> deleteList = new();
                 foreach (SteerpointInfo item in uiStptListView.SelectedItems.Cast<SteerpointInfo>())
@@ -278,7 +278,8 @@ namespace JAFDTC.UI.F16C
         //
         private async void CmdRenumber_Click(object sender, RoutedEventArgs args)
         {
-            int newStartNum = await Utilities.NavpointRenumberDialog(Content.XamlRoot, "Steerpoint");
+            // TODO: check navpoint min/max range
+            int newStartNum = await NavpointUIHelper.RenumberDialog(Content.XamlRoot, "Steerpoint", 1, 700);
             if (newStartNum != -1)
             {
                 StartingStptNum = newStartNum;
@@ -373,7 +374,7 @@ namespace JAFDTC.UI.F16C
         //
         private async void PageBtnResetAll_Click(object sender, RoutedEventArgs e)
         {
-            if (await Utilities.NavpointResetDialog(Content.XamlRoot, "Steerpoint"))
+            if (await NavpointUIHelper.ResetDialog(Content.XamlRoot, "Steerpoint"))
             {
                 Config.UnlinkSystem(STPTSystem.SystemTag);
                 Config.STPT.Reset();

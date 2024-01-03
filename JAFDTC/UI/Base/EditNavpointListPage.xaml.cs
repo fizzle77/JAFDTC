@@ -19,7 +19,6 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
-using JAFDTC.Models.Import;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
@@ -37,9 +36,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage.Pickers;
-using Windows.Storage;
-using WinRT.Interop;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
@@ -220,16 +216,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void PageBtnResetAll_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new()
-            {
-                XamlRoot = Content.XamlRoot,
-                Title = $"Reset {PageHelper.NavptName}?",
-                Content = $"Are you sure you want to delete all {PageHelper.NavptName.ToLower()}? This action cannot be undone.",
-                PrimaryButtonText = "Delete All",
-                CloseButtonText = "Cancel",
-                DefaultButton = ContentDialogButton.Primary
-            };
-            if (await dialog.ShowAsync(ContentDialogPlacement.Popup) == ContentDialogResult.Primary)
+            if (await NavpointUIHelper.ResetDialog(Content.XamlRoot, PageHelper.NavptName))
             {
                 Config.UnlinkSystem(PageHelper.SystemTag);
                 PageHelper.ResetSystem(Config);
@@ -318,12 +305,8 @@ namespace JAFDTC.UI.Base
         {
             Debug.Assert(uiNavptListView.SelectedItems.Count > 0);
 
-            string title = (uiNavptListView.SelectedItems.Count == 1) ? $"Delete {PageHelper.NavptName}?"
-                                                                      : $"Delete {PageHelper.NavptName}s?";
-            string content = (uiNavptListView.SelectedItems.Count == 1)
-                ? $"Are you sure you want to delete this {PageHelper.NavptName.ToLower()}? This action cannot be undone."
-                : $"Are you sure you want to delete these {PageHelper.NavptName.ToLower()}? This action cannot be undone.";
-            if (await Utilities.Message2BDialog(Content.XamlRoot, title, content, "Delete") == ContentDialogResult.Primary)
+            if (await NavpointUIHelper.DeleteDialog(Content.XamlRoot, PageHelper.NavptName,
+                                                    uiNavptListView.SelectedItems.Count))
             {
                 List<INavpointInfo> deleteList = new();
                 foreach (INavpointInfo navpt in uiNavptListView.SelectedItems.Cast<INavpointInfo>())
@@ -346,17 +329,11 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void CmdRenumber_Click(object sender, RoutedEventArgs args)
         {
-            GetNumberDialog dialog = new(null, null, 1, 700)
+            // TODO: check navpoint min/max range
+            int newStartNum = await NavpointUIHelper.RenumberDialog(Content.XamlRoot, "Steerpoint", 1, 700);
+            if (newStartNum != -1)
             {
-                XamlRoot = Content.XamlRoot,
-                Title = "Select New Starting Waypoint Number",
-                PrimaryButtonText = "Renumber",
-                CloseButtonText = "Cancel",
-            };
-            if (await dialog.ShowAsync(ContentDialogPlacement.Popup) == ContentDialogResult.Primary)
-            {
-                // TODO: need to check renumbering against maximum navpoint number
-                StartingNavptNum = dialog.Value;
+                StartingNavptNum = newStartNum;
                 RenumberWaypoints();
                 RebuildInterfaceState();
             }
