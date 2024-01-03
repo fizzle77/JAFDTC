@@ -390,8 +390,8 @@ namespace JAFDTC.UI.F16C
             string theater = (string)uiPoIComboTheater.SelectedItem;
             List<PointOfInterest> selPoI = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.ANY, EditStpt.Name);
             if ((selPoI.Count == 1) &&
-                (selPoI[0].Latitude == EditStpt.Lat) &&
-                (selPoI[0].Longitude == EditStpt.Lon) &&
+                (Coord.ConvertFromLatDD(selPoI[0].Latitude, LLFormat.DDM_P3ZF) == EditStpt.LatUI) &&
+                (Coord.ConvertFromLonDD(selPoI[0].Longitude, LLFormat.DDM_P3ZF) == EditStpt.LonUI) &&
                 (selPoI[0].Elevation == EditStpt.Alt))
             {
                 uiPoIComboSelect.SelectedItem = selPoI[0];

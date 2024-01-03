@@ -21,6 +21,7 @@ using CommunityToolkit.WinUI.UI;
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
+using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -244,8 +245,8 @@ namespace JAFDTC.UI.Base
             string theater = (string)uiPoIComboTheater.SelectedItem;
             List<PointOfInterest> selPoI = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.ANY, EditNavpt.Name);
             if ((selPoI.Count == 1) &&
-                (selPoI[0].Latitude == EditNavpt.Lat) &&
-                (selPoI[0].Longitude == EditNavpt.Lon) &&
+                (Coord.ConvertFromLatDD(selPoI[0].Latitude, PageHelper.NavptCoordFmt) == EditNavpt.LatUI) &&
+                (Coord.ConvertFromLonDD(selPoI[0].Longitude, PageHelper.NavptCoordFmt) == EditNavpt.LonUI) &&
                 (selPoI[0].Elevation == EditNavpt.Alt))
             {
                 uiPoIComboSelect.SelectedItem = selPoI[0];

@@ -43,6 +43,8 @@ namespace JAFDTC.UI.AV8B
 
         public string NavptName => "Waypoint";
 
+        public LLFormat NavptCoordFmt => LLFormat.DMS;
+
         public Dictionary<string, string> LatExtProperties => null;
 
         public Dictionary<string, string> LonExtProperties => null;

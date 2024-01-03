@@ -42,6 +42,8 @@ namespace JAFDTC.UI.FA18C
 
         public string NavptName => "Waypoint";
 
+        public LLFormat NavptCoordFmt => LLFormat.DDM_P2ZF;
+
         public Dictionary<string, string> LatExtProperties
             => new()
             {

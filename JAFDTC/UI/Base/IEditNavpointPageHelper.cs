@@ -20,6 +20,7 @@
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
+using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -43,6 +44,11 @@ namespace JAFDTC.UI.Base
         /// should be singular and capitalized.
         /// </summary>
         public string NavptName { get; }
+
+        /// <summary>
+        /// return the coordinate format used by navpoints in the navigation system.
+        /// </summary>
+        public LLFormat NavptCoordFmt { get; }
 
         /// <summary>
         /// returns a dictionary with the TextBoxExtensions to apply to the latitude field. the keys are property
