@@ -2,7 +2,7 @@
 //
 // EditNavpointListPage.cs : ui c# for general navigation point list editor page
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -66,7 +66,7 @@ namespace JAFDTC.UI.Base
         private IEditNavpointListPageHelper PageHelper { get; set; }
 
         // NOTE: changes to the Config object here may only occur through the marshall methods. bindings to and edits
-        // NOTE: by the ui are always directed at the EditWYPT property.
+        // NOTE: by the ui are always directed at the EditNavpt property.
         //
         private IConfiguration Config { get; set; }
 
@@ -333,7 +333,6 @@ namespace JAFDTC.UI.Base
                 uiNavptListView.SelectedItems.Clear();
                 foreach (INavpointInfo navpt in deleteList)
                 {
-                    int index = EditNavpt.IndexOf(navpt);
                     EditNavpt.Remove(navpt);
                 }
                 CopyEditToConfig(true);
@@ -404,93 +403,12 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void CmdImport_Click(object sender, RoutedEventArgs args)
         {
-            // TODO: need to check import against maximum navpoint count
-            try
+            if (await NavpointUIHelper.Import(Content.XamlRoot, PageHelper.AirframeType,
+                                              PageHelper.NavptSystem(Config), PageHelper.NavptName))
             {
-                // ---- pick file
-
-                FileOpenPicker picker = new()
-                {
-                    SuggestedStartLocation = PickerLocationId.Desktop
-                };
-                picker.FileTypeFilter.Add(".json");
-                picker.FileTypeFilter.Add(".cf");
-                picker.FileTypeFilter.Add(".miz");
-                var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-                InitializeWithWindow.Initialize(picker, hwnd);
-
-                StorageFile file = await picker.PickSingleFileAsync();
-
-                // ---- do the import
-
-                IImportHelper importer;
-                if ((file != null) && (file.FileType.ToLower() == ".json"))
-                {
-                    ContentDialogResult action = await Utilities.Message3BDialog(Content.XamlRoot,
-                        $"Import {PageHelper.NavptName}",
-                        $"Do you want to replace or append to the {PageHelper.NavptName} currently in the configuration?",
-                        $"Replace",
-                        $"Append",
-                        $"Cancel");
-                    if (action != ContentDialogResult.None)
-                    {
-                        string json = FileManager.ReadFile(file.Path);
-                        if ((json != null) && !PageHelper.PasteNavpoints(Config, json, (action == ContentDialogResult.Primary)))
-                        {
-                            await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed",
-                                                            $"Unable to read the {PageHelper.NavptName} from the JSON file.");
-                        }
-                        CopyEditToConfig(true);
-                    }
-                    return;
-                }
-                else if ((file != null) && (file.FileType.ToLower() == ".cf"))
-                {
-                    importer = new ImportHelperCF(PageHelper.AirframeType, file.Path);
-                }
-                else if ((file != null) && (file.FileType.ToLower() == ".miz"))
-                {
-                    importer = new ImportHelperMIZ(PageHelper.AirframeType, file.Path);
-                }
-                else
-                {
-                    return;
-                }
-
-                // ---- use the helper
-
-                GetListDialog flightList = new(importer.Flights())
-                {
-                    XamlRoot = Content.XamlRoot,
-                    Title = $"Select a Flight to Import {PageHelper.NavptName} From",
-                    PrimaryButtonText = "Replace",
-                    SecondaryButtonText = "Append",
-                    CloseButtonText = "Cancel"
-                };
-                ContentDialogResult result = await flightList.ShowAsync(ContentDialogPlacement.Popup);
-                bool isReplace = (result == ContentDialogResult.Primary);
-                if (result != ContentDialogResult.None)
-                {
-                    List<Dictionary<string, string>> importWypts = importer.Waypoints(flightList.SelectedItem);
-                    if ((importWypts != null) && (importWypts.Count > 0))
-                    {
-                        PageHelper.ImportNavpoints(Config, importWypts, isReplace);
-                        Config.Save(this, PageHelper.SystemTag);
-                        CopyConfigToEdit();
-                    }
-                    else
-                    {
-                        await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed",
-                                                        $"Unable to read the {PageHelper.NavptName} from the file.");
-                    }
-                    RebuildInterfaceState();
-                }
-            }
-            catch (Exception ex)
-            {
-                FileManager.Log($"EditNavpointListPAge:CmdImport_Click exception {ex}");
-                await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed",
-                                                $"Unable to import the {PageHelper.NavptName.ToLower()}s.");
+                Config.Save(this, PageHelper.SystemTag);
+                CopyConfigToEdit();
+                RebuildInterfaceState();
             }
         }
 
@@ -500,30 +418,8 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void CmdExport_Click(object sender, RoutedEventArgs args)
         {
-            try
-            {
-                string filename = ((Config.Name.Length > 0) ? Config.Name + " " : "") + PageHelper.NavptName;
-                FileSavePicker picker = new()
-                {
-                    SuggestedStartLocation = PickerLocationId.Desktop,
-                    SuggestedFileName = filename
-                };
-                picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
-                var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-                InitializeWithWindow.Initialize(picker, hwnd);
-
-                StorageFile file = await picker.PickSaveFileAsync();
-                if (file != null)
-                {
-                    FileManager.WriteFile(file.Path, PageHelper.ExportNavpoints(Config));
-                }
-            }
-            catch (Exception ex)
-            {
-                FileManager.Log($"EditNavpointListPage:CmdExport_Click exception {ex}");
-                await Utilities.Message1BDialog(Content.XamlRoot, "Export Failed",
-                                                $"Unable to export the {PageHelper.NavptName.ToLower()}s.");
-            }
+            await NavpointUIHelper.Export(Content.XamlRoot, Config.Name,
+                                          PageHelper.ExportNavpoints(Config), PageHelper.NavptName);
         }
 
         // ---- navigation point list ---------------------------------------------------------------------------------

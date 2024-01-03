@@ -1,8 +1,8 @@
 ﻿// ********************************************************************************************************************
 //
-// IImportHelper.cs -- interface for helper to import steerpoints
+// IImportHelper.cs -- interface for helper to import navpoints
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -17,25 +17,31 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.Base;
 using System.Collections.Generic;
 
 namespace JAFDTC.Models.Import
 {
     /// <summary>
-    /// interface for classes that help interface between jafdtc configruations an an import data source.
+    /// interface for classes that help interface between jafdtc navpoint system configruations an an import data
+    /// source to allow import of navpoints.
     /// </summary>
     public interface IImportHelper
     {
         /// <summary>
-        /// return a list of flights with waypoints that are present in the import file, null on error.
+        /// return true if the import data source has multiple flights, false otherwise
+        /// </summary>
+        public bool HasFlights { get; }
+
+        /// <summary>
+        /// return a list of flights with navpoints that are present in the import data source, null on error. data
+        /// sources that do not support multiple flights will return an empty list.
         /// </summary>
         public List<string> Flights();
 
         /// <summary>
-        /// return a list of waypoints for the flight with the given name. the flight name must match one of the
-        /// flights from Flights(). waypoints are represented by a string/string dictionary, key/value pairs are
-        /// determined by the specific implementation.
+        /// TODO: document
         /// </summary>
-        public List<Dictionary<string, string>> Waypoints(string flightName);
+        public bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true);
     }
 }

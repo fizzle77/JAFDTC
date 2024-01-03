@@ -2,7 +2,7 @@
 //
 // FA18CEditWaypointListHelper.cs : IEditNavpointListPageHelper for the fa-18c configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -32,6 +32,7 @@ using System.Diagnostics;
 using System.Linq;
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 using JAFDTC.Models.A10C;
+using JAFDTC.Models.F14AB;
 
 namespace JAFDTC.UI.FA18C
 {
@@ -95,6 +96,11 @@ namespace JAFDTC.UI.FA18C
             return true;
         }
 
+        public INavpointSystemImport NavptSystem(IConfiguration config)
+        {
+            return ((FA18CConfiguration)config).WYPT;
+        }
+
         public void ResetSystem(IConfiguration config)
         {
             ((FA18CConfiguration)config).WYPT.Reset();
@@ -107,26 +113,7 @@ namespace JAFDTC.UI.FA18C
 
         public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
         {
-            return ((FA18CConfiguration)config).WYPT.DeserializeNavpoints(cbData, isReplace);
-        }
-
-        public void ImportNavpoints(IConfiguration config, List<Dictionary<string, string>> importNavpts, bool isReplace)
-        {
-            if (isReplace)
-            {
-                ((FA18CConfiguration)config).WYPT.Points.Clear();
-            }
-            foreach (Dictionary<string, string> importStpt in importNavpts)
-            {
-                WaypointInfo wypt = new()
-                {
-                    Name = (importStpt.ContainsKey("name")) ? importStpt["name"] : "",
-                    Lat = (importStpt.ContainsKey("lat")) ? importStpt["lat"] : "",
-                    Lon = (importStpt.ContainsKey("lon")) ? importStpt["lon"] : "",
-                    Alt = (importStpt.ContainsKey("alt")) ? importStpt["alt"] : ""
-                };
-                ((FA18CConfiguration)config).WYPT.Add();
-            }
+            return ((FA18CConfiguration)config).WYPT.ImportSerializedNavpoints(cbData, isReplace);
         }
 
         public string ExportNavpoints(IConfiguration config)

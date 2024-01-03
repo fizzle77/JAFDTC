@@ -1,8 +1,8 @@
 ﻿// ********************************************************************************************************************
 //
-// ImportHelperMIZ.cs -- helper to import steerpoints from a .miz file
+// ImportHelperMIZ.cs -- helper to import navpoints from a .miz file
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -17,6 +17,7 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.LsonLib;
@@ -28,7 +29,8 @@ using System.Linq;
 namespace JAFDTC.Models.Import
 {
     /// <summary>
-    /// TODO: document
+    /// import helper class to extract navpoints from a flight in a dcs .miz file. flights from the .miz are only
+    /// considered if the airframe matches an airframe type provided at consturction.
     /// </summary>
     public class ImportHelperMIZ : ImportHelper
     {
@@ -74,6 +76,7 @@ namespace JAFDTC.Models.Import
         {
             return Airframe switch
             {
+                // TODO: should .None allow any airframe type to match?
                 AirframeTypes.None => false,
                 AirframeTypes.A10C => (airframe == "A-10C_2"),
                 AirframeTypes.AH64D => (airframe == "AH-64D_BLK_II"),
@@ -88,8 +91,60 @@ namespace JAFDTC.Models.Import
         }
 
         /// <summary>
-        /// TODO: document
+        /// return a list of navpoints from the import data source for the flight with the given name. for sources
+        /// where HasFlights is false, the flight name is ignored. for sources where HasFlights is true, the flight
+        /// name must match one of the flights from Flights(). navpoints are represented by a string/string
+        /// dictionary with the following key/value pairs:
+        /// 
+        ///   ["name"]      (string) name of navpoint
+        ///   ["lat"]       (string) latitude of navpoint, decimal degrees with no units
+        ///   ["lon"]       (string) longitude of navpoint, decimal degrees with no units
+        ///   ["alt"]       (string) elevation of navpoint, feet
         /// </summary>
+        private List<Dictionary<string, string>> Navpoints(string flightName)
+        {
+            List<Dictionary<string, string>> waypoints = null;
+            if (MizRouteNodes.ContainsKey(flightName))
+            {
+                waypoints = new List<Dictionary<string, string>>();
+
+                // walk the points in the route dictionary, skipping the first point as it is the initial point of the
+                // unit on the ramp.
+                //
+                for (int i = 2; i <= MizRouteNodes[flightName].Count; i++)
+                {
+                    LsonDict waypointInfo = MizRouteNodes[flightName][i].GetDict();
+
+                    double x = (double)waypointInfo["x"].GetDecimal();
+                    double z = (double)waypointInfo["y"].GetDecimal();
+                    CoordLL ll = CoordInterpolator.Instance.XZtoLL(Theater, x, z);
+
+                    double alt = (double)waypointInfo["alt"].GetDecimal() * M_TO_FT;
+
+                    Dictionary<string, string> waypoint = new()
+                    {
+                        ["name"] = (waypointInfo.ContainsKey("name")) ? waypointInfo["name"].GetString() : $"SP{i - 1}",
+                        ["lat"] = ll.Lat.ToString(),
+                        ["lon"] = ll.Lon.ToString(),
+                        ["alt"] = alt.ToString("0"),
+
+                        // TODO: consider pulling "TOS" node from waypoint...
+                        // TODO: put "ERROR" in dictionary if there were parse or conversion errors?
+                    };
+                    waypoints.Add(waypoint);
+                }
+            }
+            return waypoints;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // IImportHelper functions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        public override bool HasFlights => true;
+
         public override List<string> Flights()
         {
             MizRouteNodes.Clear();
@@ -171,43 +226,14 @@ namespace JAFDTC.Models.Import
             return flights;
         }
 
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        public override List<Dictionary<string, string>> Waypoints(string flightName)
+        public override bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true)
         {
-            List<Dictionary<string, string>> waypoints = null;
-            if (MizRouteNodes.ContainsKey(flightName))
+            List<Dictionary<string, string>> navptInfoList = Navpoints(flightName);
+            if (navptInfoList != null)
             {
-                waypoints = new List<Dictionary<string, string>>();
-
-                // walk the points in the route dictionary, skipping the first point as it is the initial point of the
-                // unit on the ramp.
-                //
-                for (int i = 2; i <= MizRouteNodes[flightName].Count; i++)
-                {
-                    LsonDict waypointInfo = MizRouteNodes[flightName][i].GetDict();
-
-                    double x = (double)waypointInfo["x"].GetDecimal();
-                    double z = (double)waypointInfo["y"].GetDecimal();
-                    CoordLL ll = CoordInterpolator.Instance.XZtoLL(Theater, x, z);
-
-                    double alt = (double)waypointInfo["alt"].GetDecimal() * M_TO_FT;
-
-                    Dictionary<string, string> waypoint = new()
-                    {
-                        ["name"] = (waypointInfo.ContainsKey("name")) ? waypointInfo["name"].GetString() : $"SP{i - 1}",
-                        ["lat"] = ll.Lat.ToString(),
-                        ["lon"] = ll.Lon.ToString(),
-                        ["alt"] = alt.ToString("0"),
-
-                        // TODO: consider pulling "TOT" node from waypoint...
-                        // TODO: put "ERROR" in dictionary if there were parse or conversion errors?
-                    };
-                    waypoints.Add(waypoint);
-                }
+                return navptSys.ImportNavpointInfoList(navptInfoList, isReplace);
             }
-            return waypoints;
+            return false;
         }
     }
 }

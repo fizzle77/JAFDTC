@@ -2,7 +2,7 @@
 //
 // F14ABEditWaypointListHelper.cs : IEditNavpointListPageHelper for the f-14a/b configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,6 +18,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
+using JAFDTC.Models.A10C;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.F14AB;
 using JAFDTC.Models.F14AB.WYPT;
@@ -92,6 +93,11 @@ namespace JAFDTC.UI.F14AB
             return true;
         }
 
+        public INavpointSystemImport NavptSystem(IConfiguration config)
+        {
+            return ((F14ABConfiguration)config).WYPT;
+        }
+
         public void ResetSystem(IConfiguration config)
         {
             ((F14ABConfiguration)config).WYPT.Reset();
@@ -104,26 +110,7 @@ namespace JAFDTC.UI.F14AB
 
         public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
         {
-            return ((F14ABConfiguration)config).WYPT.DeserializeNavpoints(cbData, isReplace);
-        }
-
-        public void ImportNavpoints(IConfiguration config, List<Dictionary<string, string>> importNavpts, bool isReplace)
-        {
-            if (isReplace)
-            {
-                ((F14ABConfiguration)config).WYPT.Points.Clear();
-            }
-            foreach (Dictionary<string, string> importStpt in importNavpts)
-            {
-                WaypointInfo wypt = new()
-                {
-                    Name = (importStpt.ContainsKey("name")) ? importStpt["name"] : "",
-                    Lat = (importStpt.ContainsKey("lat")) ? importStpt["lat"] : "",
-                    Lon = (importStpt.ContainsKey("lon")) ? importStpt["lon"] : "",
-                    Alt = (importStpt.ContainsKey("alt")) ? importStpt["alt"] : ""
-                };
-                ((F14ABConfiguration)config).WYPT.Add(wypt);
-            }
+            return ((F14ABConfiguration)config).WYPT.ImportSerializedNavpoints(cbData, isReplace);
         }
 
         public string ExportNavpoints(IConfiguration config)

@@ -2,7 +2,7 @@
 //
 // A10CEditWaypointListHelper.cs : IEditNavpointListPageHelper for the a-10c configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -93,6 +93,11 @@ namespace JAFDTC.UI.A10C
             return true;
         }
 
+        public INavpointSystemImport NavptSystem(IConfiguration config)
+        {
+            return ((A10CConfiguration)config).WYPT;
+        }
+
         public void ResetSystem(IConfiguration config)
         {
             ((A10CConfiguration)config).WYPT.Reset();
@@ -105,26 +110,7 @@ namespace JAFDTC.UI.A10C
 
         public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
         {
-            return ((A10CConfiguration)config).WYPT.DeserializeNavpoints(cbData, isReplace);
-        }
-
-        public void ImportNavpoints(IConfiguration config, List<Dictionary<string, string>> importNavpts, bool isReplace)
-        {
-            if (isReplace)
-            {
-                ((A10CConfiguration)config).WYPT.Points.Clear();
-            }
-            foreach (Dictionary<string, string> importStpt in importNavpts)
-            {
-                WaypointInfo wypt = new()
-                {
-                    Name = (importStpt.ContainsKey("name")) ? importStpt["name"] : "",
-                    Lat = (importStpt.ContainsKey("lat")) ? importStpt["lat"] : "",
-                    Lon = (importStpt.ContainsKey("lon")) ? importStpt["lon"] : "",
-                    Alt = (importStpt.ContainsKey("alt")) ? importStpt["alt"] : ""
-                };
-                ((A10CConfiguration)config).WYPT.Add(wypt);
-            }
+            return ((A10CConfiguration)config).WYPT.ImportSerializedNavpoints(cbData, isReplace);
         }
 
         public string ExportNavpoints(IConfiguration config)

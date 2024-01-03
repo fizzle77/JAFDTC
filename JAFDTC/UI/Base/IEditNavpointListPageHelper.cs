@@ -2,7 +2,7 @@
 //
 // IEditNavpointListHelper.cs : interface for EditNavPointListPage helper classes
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -21,8 +21,8 @@ using JAFDTC.Models;
 using JAFDTC.Models.Base;
 using Microsoft.UI.Xaml.Controls;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.Base
@@ -83,6 +83,11 @@ namespace JAFDTC.UI.Base
         /// <summary>
         /// TODO: document
         /// </summary>
+        public INavpointSystemImport NavptSystem(IConfiguration config);
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         public void ResetSystem(IConfiguration config);
 
         /// <summary>
@@ -94,11 +99,6 @@ namespace JAFDTC.UI.Base
         /// TODO: document
         /// </summary>
         public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false);
-
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        public void ImportNavpoints(IConfiguration config, List<Dictionary<string, string>> importNavpts, bool isReplace);
 
         /// <summary>
         /// TODO: document

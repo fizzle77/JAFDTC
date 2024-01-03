@@ -1,8 +1,8 @@
 ﻿// ********************************************************************************************************************
 //
-// ImportHelperCF.cs -- helper to import steerpoints from a .cf file
+// ImportHelperCF.cs -- helper to import navpoints from a .cf file
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -17,6 +17,7 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.Base;
 using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
@@ -26,15 +27,30 @@ using System.Xml;
 namespace JAFDTC.Models.Import
 {
     /// <summary>
-    /// TODO: document
+    /// import helper class to extract navpoints from a flight in a combatflite .cf file. flights from the .cf are only
+    /// considered if the airframe matches an airframe type provided at consturction.
     /// </summary>
     public class ImportHelperCF : ImportHelper
     {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // properties
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
         private AirframeTypes Airframe {  get; set; }
+
         private string Path { get; set; }
 
         private XmlDocument XmlDoc { get; set; }
+        
         private Dictionary<string, XmlNode> XmlWaypointNodes { get; set; }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // construction
+        //
+        // ------------------------------------------------------------------------------------------------------------
 
         public ImportHelperCF(AirframeTypes airframe, string path)
         {
@@ -44,10 +60,17 @@ namespace JAFDTC.Models.Import
             XmlWaypointNodes = new Dictionary<string, XmlNode>();
         }
 
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // functions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
         private bool IsMatchingAirframe(string airframe)
         {
             return Airframe switch
             {
+                // TODO: should .None allow any airframe type to match?
                 AirframeTypes.None => false,
                 AirframeTypes.A10C => (airframe == "A-10C_2"),
                 AirframeTypes.AH64D => (airframe == "AH-64D_BLK_II"),
@@ -60,6 +83,58 @@ namespace JAFDTC.Models.Import
                 _ => false,
             };
         }
+
+        /// <summary>
+        /// return a list of navpoints from the import data source for the flight with the given name. for sources
+        /// where HasFlights is false, the flight name is ignored. for sources where HasFlights is true, the flight
+        /// name must match one of the flights from Flights(). navpoints are represented by a string/string
+        /// dictionary with the following key/value pairs:
+        /// 
+        ///   ["name"]      (string) name of navpoint
+        ///   ["lat"]       (string) latitude of navpoint, decimal degrees with no units
+        ///   ["lon"]       (string) longitude of navpoint, decimal degrees with no units
+        ///   ["alt"]       (string) elevation of navpoint, feet
+        /// </summary>
+        private List<Dictionary<string, string>> Navpoints(string flightName)
+        {
+            List<Dictionary<string, string>> waypoints = null;
+            if (XmlWaypointNodes.ContainsKey(flightName))
+            {
+                waypoints = new List<Dictionary<string, string>>();
+
+                bool isSteerpoint = false;
+                foreach (XmlNode node in XmlWaypointNodes[flightName])
+                {
+                    // TODO: first steerpoint is usually take-off, too lazy right now to check Type node.
+                    if (isSteerpoint)
+                    {
+                        double alt = double.Parse(node.SelectSingleNode("Altitude").InnerText);
+
+                        Dictionary<string, string> steerpoint = new()
+                        {
+                            ["name"] = node.SelectSingleNode("Name").InnerText,
+                            ["lat"] = node.SelectSingleNode("Lat").InnerText,
+                            ["lon"] = node.SelectSingleNode("Lon").InnerText,
+                            ["alt"] = alt.ToString("0")
+
+                            // TODO: consider pulling "TOT" node from waypoint...
+                            // TODO: put "ERROR" in dictionary if there were errors in the stpt?
+                        };
+                        waypoints.Add(steerpoint);
+                    }
+                    isSteerpoint = true;
+                }
+            }
+            return waypoints;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // IImportHelper functions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        public override bool HasFlights => true;
 
         public override List<string> Flights()
         {
@@ -90,46 +165,22 @@ namespace JAFDTC.Models.Import
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                FileManager.Log($"ImportHelperCF:Flights exception {ex}");
                 return null;
             }
             return flights;
         }
 
-        public override List<Dictionary<string, string>> Waypoints(string flightName)
+        public override bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true)
         {
-            List<Dictionary<string, string>> waypoints = null;
-            if (XmlWaypointNodes.ContainsKey(flightName))
+            List<Dictionary<string, string>> navptInfoList = Navpoints(flightName);
+            if (navptInfoList != null)
             {
-                bool isSteerpoint = false;
-                waypoints = new List<Dictionary<string, string>>();
-                foreach (XmlNode node in XmlWaypointNodes[flightName])
-                {
-                    // TODO: first steerpoint is usually take-off, too lazy right now to check Type node.
-                    if (isSteerpoint)
-                    {
-                        double alt = double.Parse(node.SelectSingleNode("Altitude").InnerText);
-
-                        Dictionary<string, string> steerpoint = new()
-                        {
-                            ["name"] = node.SelectSingleNode("Name").InnerText,
-                            //["lat"] = ConvertDDtoDDM(node.SelectSingleNode("Lat").InnerText, true),
-                            //["lon"] = ConvertDDtoDDM(node.SelectSingleNode("Lon").InnerText, false),
-                            ["lat"] = node.SelectSingleNode("Lat").InnerText,
-                            ["lon"] = node.SelectSingleNode("Lon").InnerText,
-                            // ["alt"] = node.SelectSingleNode("Altitude").InnerText
-                            ["alt"] = alt.ToString("0")
-
-                            // TODO: consider pulling "TOT" node from waypoint...
-                            // TODO: put "ERROR" in dictionary if there were errors in the stpt?
-                        };
-                        waypoints.Add(steerpoint);
-                    }
-                    isSteerpoint = true;
-                }
+                return navptSys.ImportNavpointInfoList(navptInfoList, isReplace);
             }
-            return waypoints;
+            return false;
         }
     }
 }
