@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
+using JAFDTC.Models.DCS;
 
 namespace JAFDTC.UI.Base
 {
@@ -39,6 +40,55 @@ namespace JAFDTC.UI.Base
     /// </summary>
     public class NavpointUIHelper
     {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // navpoint poi functions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// return the point of interest that corresponds to the specified navpoint, null if no such navpoint exists.
+        /// to match, the lat, lon, elev, and name must match.
+        /// </summary>
+        public static PointOfInterest FindMatchingPoI(string theater, INavpointInfo navpt, LLFormat fmt)
+        {
+            List<PointOfInterest> selPoI = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.ANY, navpt.Name);
+            if ((selPoI.Count == 1) &&
+                (Coord.ConvertFromLatDD(selPoI[0].Latitude, fmt) == navpt.LatUI) &&
+                (Coord.ConvertFromLonDD(selPoI[0].Longitude, fmt) == navpt.LonUI) &&
+                (selPoI[0].Elevation == navpt.Alt))
+            {
+                return selPoI[0];
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// rebuild the contents of a combobox menu for the specified theater. the menu starts with user pois (if there
+        /// are any) followed by a separator (if there are user pois) followed by system pois.
+        /// </summary>
+        public static void RebuildPoICombo(string theater, ComboBoxSeparated comboBox)
+        {
+            List<PointOfInterest> dcsPoIs = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.DCS_AIRBASE);
+            dcsPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
+            List<PointOfInterest> usrPoIs = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.USER);
+            usrPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
+
+            comboBox.Items.Clear();
+            foreach (PointOfInterest poi in usrPoIs)
+            {
+                comboBox.Items.Add(poi);
+            }
+            if (usrPoIs.Count > 0)
+            {
+                comboBox.Items.Add(new NavigationViewItemSeparator());
+            }
+            foreach (PointOfInterest poi in dcsPoIs)
+            {
+                comboBox.Items.Add(poi);
+            }
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // navpoint command functions

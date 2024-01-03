@@ -242,19 +242,8 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void SelectMatchingPoI()
         {
-            string theater = (string)uiPoIComboTheater.SelectedItem;
-            List<PointOfInterest> selPoI = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.ANY, EditNavpt.Name);
-            if ((selPoI.Count == 1) &&
-                (Coord.ConvertFromLatDD(selPoI[0].Latitude, PageHelper.NavptCoordFmt) == EditNavpt.LatUI) &&
-                (Coord.ConvertFromLonDD(selPoI[0].Longitude, PageHelper.NavptCoordFmt) == EditNavpt.LonUI) &&
-                (selPoI[0].Elevation == EditNavpt.Alt))
-            {
-                uiPoIComboSelect.SelectedItem = selPoI[0];
-            }
-            else
-            {
-                uiPoIComboSelect.SelectedIndex = -1;
-            }
+            uiPoIComboSelect.SelectedItem = NavpointUIHelper.FindMatchingPoI((string)uiPoIComboTheater.SelectedItem,
+                                                                             EditNavpt, PageHelper.NavptCoordFmt);
         }
 
         /// <summary>
@@ -263,25 +252,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void RebuildPointsOfInterest()
         {
-            string theater = (string)uiPoIComboTheater.SelectedItem;
-            List<PointOfInterest> dcsPoIs = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.DCS_AIRBASE);
-            dcsPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
-            List<PointOfInterest> usrPoIs = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.USER);
-            usrPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
-
-            uiPoIComboSelect.Items.Clear();
-            foreach (PointOfInterest poi in usrPoIs)
-            {
-                uiPoIComboSelect.Items.Add(poi);
-            }
-            if (usrPoIs.Count > 0)
-            {
-                uiPoIComboSelect.Items.Add(new NavigationViewItemSeparator());
-            }
-            foreach (PointOfInterest poi in dcsPoIs)
-            {
-                uiPoIComboSelect.Items.Add(poi);
-            }
+            NavpointUIHelper.RebuildPoICombo((string)uiPoIComboTheater.SelectedItem, uiPoIComboSelect);
             SelectMatchingPoI();
         }
 

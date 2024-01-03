@@ -21,6 +21,7 @@ using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.STPT;
+using JAFDTC.UI.Base;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
@@ -387,19 +388,8 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void SelectMatchingPoI()
         {
-            string theater = (string)uiPoIComboTheater.SelectedItem;
-            List<PointOfInterest> selPoI = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.ANY, EditStpt.Name);
-            if ((selPoI.Count == 1) &&
-                (Coord.ConvertFromLatDD(selPoI[0].Latitude, LLFormat.DDM_P3ZF) == EditStpt.LatUI) &&
-                (Coord.ConvertFromLonDD(selPoI[0].Longitude, LLFormat.DDM_P3ZF) == EditStpt.LonUI) &&
-                (selPoI[0].Elevation == EditStpt.Alt))
-            {
-                uiPoIComboSelect.SelectedItem = selPoI[0];
-            }
-            else
-            {
-                uiPoIComboSelect.SelectedIndex = -1;
-            }
+            uiPoIComboSelect.SelectedItem = NavpointUIHelper.FindMatchingPoI((string)uiPoIComboTheater.SelectedItem,
+                                                                             EditStpt, LLFormat.DDM_P3ZF);
         }
 
         /// <summary>
@@ -408,25 +398,7 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void RebuildPointsOfInterest()
         {
-            string theater = (string)uiPoIComboTheater.SelectedItem;
-            List<PointOfInterest> dcsPoIs = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.DCS_AIRBASE);
-            dcsPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
-            List<PointOfInterest> usrPoIs = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.USER);
-            usrPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
-
-            uiPoIComboSelect.Items.Clear();
-            foreach (PointOfInterest poi in usrPoIs)
-            {
-                uiPoIComboSelect.Items.Add(poi);
-            }
-            if (usrPoIs.Count > 0)
-            {
-                uiPoIComboSelect.Items.Add(new NavigationViewItemSeparator());
-            }
-            foreach (PointOfInterest poi in dcsPoIs)
-            {
-                uiPoIComboSelect.Items.Add(poi);
-            }
+            NavpointUIHelper.RebuildPoICombo((string)uiPoIComboTheater.SelectedItem, uiPoIComboSelect);
             SelectMatchingPoI();
         }
 
