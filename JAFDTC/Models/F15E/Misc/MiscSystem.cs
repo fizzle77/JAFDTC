@@ -3,7 +3,7 @@
 // MiscSystem.cs -- f-15e miscellaneous system
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,7 +18,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.F16C.Misc;
 using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
@@ -26,14 +25,18 @@ using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.F15E.Misc
 {
-    // defines the bands for tacan.
-    //
+    /// <summary>
+    /// defines the bands for tacan.
+    /// </summary>
     public enum TACANBands
     {
         X = 0,
         Y = 1
     }
 
+    /// <summary>
+    /// TODO: document
+    /// </summary>
     public class MiscSystem : BindableObject, ISystem
     {
         public const string SystemTag = "JAFDTC:F15E:MISC";
@@ -44,11 +47,11 @@ namespace JAFDTC.Models.F15E.Misc
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // ---- following properties do not post change and validation events
+        // ---- private properties, static
 
         private static readonly Regex _ilsRegex = new(@"^(10[89]\.[13579]{1}[05]{1})|(11[01]\.[13579]{1}[05]{1})$");
 
-        // ---- following properties post change and validation events
+        // ---- public properties, posts change/validation events
 
         // TODO: validate valid range
         private string _bingo;                                  // integer [0, 99999]
@@ -128,13 +131,14 @@ namespace JAFDTC.Models.F15E.Misc
             }
         }
 
-        // ---- following properties are synthesized
+        // ---- public properties, computed
 
-        // returns a MFDSystem with the fields populated with the actual default values (note that usually the value
-        // "" implies default).
-        //
-        // defaults are as of DCS v2.9.0.47168.
-        //
+        /// <summary>
+        /// returns a MFDSystem with the fields populated with the actual default values (note that usually the value
+        /// "" implies default).
+        ///
+        /// defaults are as of DCS v2.9.0.47168.
+        /// </summary>
         public readonly static MiscSystem ExplicitDefaults = new()
         {
             Bingo = "4000",
@@ -144,9 +148,10 @@ namespace JAFDTC.Models.F15E.Misc
             ILSFrequency = "108.10",
         };
 
-        // returns true if the instance indicates a default setup (all fields are "") or the object is in explicit
-        // form, false otherwise.
-        //
+        /// <summary>
+        /// returns true if the instance indicates a default setup (all fields are "") or the object is in explicit
+        /// form, false otherwise.
+        /// </summary>
         [JsonIgnore]
         public bool IsDefault => (IsBINGODefault && IsLowAltDefault && IsTACANDefault && IsILSDefault);
 

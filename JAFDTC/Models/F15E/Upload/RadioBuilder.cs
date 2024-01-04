@@ -27,7 +27,7 @@ using System.Text;
 namespace JAFDTC.Models.F15E.Upload
 {
     /// <summary>
-    /// TODO: document
+    /// command stream builder for the mudhen radio system that covers COM1/COM2 presets and other settings.
     /// </summary>
     internal class RadioBuilder : F15EBuilderBase, IBuilder
     {
@@ -46,43 +46,43 @@ namespace JAFDTC.Models.F15E.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure radio system (com1/com2 uhf/vhf radios) via the icp/ded according to the non-default programming
+        /// configure radio system (com1/com2 uhf/vhf radios) via the ufc according to the non-default programming
         /// settings (this function is safe to call with a configuration with default settings: defaults are skipped as
         /// necessary).
         /// <summary>
         public override void Build()
         {
-            Device d = _aircraft.GetDevice("UFC_PILOT");
+            Device ufc = _aircraft.GetDevice("UFC_PILOT");
     
             if (!_cfg.Radio.IsDefault)
             {
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("MENU"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("MENU"));
 
-                BuildRadio(d, _cfg.Radio.Presets[(int)Radios.COMM1], "PB5", _cfg.Radio.IsCOMM1MonitorGuard,
+                BuildRadio(ufc, _cfg.Radio.Presets[(int)Radios.COMM1], "PB5", _cfg.Radio.IsCOMM1MonitorGuard,
                            _cfg.Radio.IsCOMM1PresetMode, _cfg.Radio.COMM1DefaultTuning);
 
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("MENU"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("MENU"));
 
-                BuildRadio(d, _cfg.Radio.Presets[(int)Radios.COMM2], "PB6", _cfg.Radio.IsCOMM2MonitorGuard,
+                BuildRadio(ufc, _cfg.Radio.Presets[(int)Radios.COMM2], "PB6", _cfg.Radio.IsCOMM2MonitorGuard,
                            _cfg.Radio.IsCOMM2PresetMode, _cfg.Radio.COMM2DefaultTuning);
 
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("MENU"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("MENU"));
             }
         }
 
-        private void BuildRadio(Device d, ObservableCollection<RadioPreset> presets, string pb, bool isMonGuard,
+        private void BuildRadio(Device ufc, ObservableCollection<RadioPreset> presets, string pb, bool isMonGuard,
                                 bool isPreMode, string dfltTuning)
         {
             var isRadio1 = (pb == "PB5");
@@ -90,69 +90,69 @@ namespace JAFDTC.Models.F15E.Upload
             if (isPreMode)
             {
                 AppendCommand(StartCondition("IsRadioPresetOrFreqSelected", isRadio1 ? "1" : "2", "freq"));
-                AppendCommand(d.GetCommand(isRadio1 ? "GCML" : "GCMR"));
+                AppendCommand(ufc.GetCommand(isRadio1 ? "GCML" : "GCMR"));
                 AppendCommand(EndCondition("IsRadioPresetOrFreqSelected"));
             }
             else
             {
                 AppendCommand(StartCondition("IsRadioPresetOrFreqSelected", isRadio1 ? "1" : "2", "preset"));
-                AppendCommand(d.GetCommand(isRadio1 ? "GCML" : "GCMR"));
+                AppendCommand(ufc.GetCommand(isRadio1 ? "GCML" : "GCMR"));
                 AppendCommand(EndCondition("IsRadioPresetOrFreqSelected"));
             }
 
-            AppendCommand(d.GetCommand(pb));
+            AppendCommand(ufc.GetCommand(pb));
 
-            BuildRadioPresets(d, presets);
+            BuildRadioPresets(ufc, presets);
 
             if (dfltTuning.ToUpper() == "G")
             {
-                AppendCommand(BuildDigits(d, "1"));
-                AppendCommand(d.GetCommand(isRadio1 ? "PRESL" : "PRESR"));
-                AppendCommand(d.GetCommand("CLR"));
+                AppendCommand(BuildDigits(ufc, "1"));
+                AppendCommand(ufc.GetCommand(isRadio1 ? "PRESL" : "PRESR"));
+                AppendCommand(ufc.GetCommand("CLR"));
 
-                AppendCommand(d.GetCommand(isRadio1 ? "PRESLCCW" : "PRESRCCW"));
+                AppendCommand(ufc.GetCommand(isRadio1 ? "PRESLCCW" : "PRESRCCW"));
                 if (!isRadio1)
                 {
-                    AppendCommand(d.GetCommand("PRESRCCW"));
+                    AppendCommand(ufc.GetCommand("PRESRCCW"));
                 }
             }
             else if (dfltTuning.ToUpper() == "GV")
             {
-                AppendCommand(BuildDigits(d, "1"));
-                AppendCommand(d.GetCommand("PRESR"));
-                AppendCommand(d.GetCommand("CLR"));
-                AppendCommand(d.GetCommand("PRESRCCW"));
+                AppendCommand(BuildDigits(ufc, "1"));
+                AppendCommand(ufc.GetCommand("PRESR"));
+                AppendCommand(ufc.GetCommand("CLR"));
+                AppendCommand(ufc.GetCommand("PRESRCCW"));
             }
             else if (int.TryParse(dfltTuning, out int dfltPreset) && (dfltPreset >= 1) && (dfltPreset <= 20))
             {
-                AppendCommand(BuildDigits(d, dfltTuning));
-                AppendCommand(d.GetCommand(isRadio1 ? "PRESL" : "PRESR"));
-                AppendCommand(d.GetCommand("CLR"));
+                AppendCommand(BuildDigits(ufc, dfltTuning));
+                AppendCommand(ufc.GetCommand(isRadio1 ? "PRESL" : "PRESR"));
+                AppendCommand(ufc.GetCommand("CLR"));
             }
             else if (!string.IsNullOrEmpty(dfltTuning))
             {
-                InputFrequency(d, dfltTuning);
-                AppendCommand(d.GetCommand(pb));
-                AppendCommand(d.GetCommand("CLR"));
+                InputFrequency(ufc, dfltTuning);
+                AppendCommand(ufc.GetCommand(pb));
+                AppendCommand(ufc.GetCommand("CLR"));
             }
 
             if (isMonGuard)
             {
                 AppendCommand(StartCondition("IsRadioGuardEnabledDisabled", isRadio1 ? "1" : "2", "disabled"));
-                AppendCommand(d.GetCommand("SHF"));
-                AppendCommand(d.GetCommand(isRadio1 ? "GCML" : "GCMR"));
+                AppendCommand(ufc.GetCommand("SHF"));
+                AppendCommand(ufc.GetCommand(isRadio1 ? "GCML" : "GCMR"));
                 AppendCommand(EndCondition("IsRadioGuardEnabledDisabled"));
             }
             else
             {
                 AppendCommand(StartCondition("IsRadioGuardEnabledDisabled", isRadio1 ? "1" : "2", "enabled"));
-                AppendCommand(d.GetCommand("SHF"));
-                AppendCommand(d.GetCommand(isRadio1 ? "GCML" : "GCMR"));
+                AppendCommand(ufc.GetCommand("SHF"));
+                AppendCommand(ufc.GetCommand(isRadio1 ? "GCML" : "GCMR"));
                 AppendCommand(EndCondition("IsRadioGuardEnabledDisabled"));
             }
         }
 
-        private void BuildRadioPresets(Device d, ObservableCollection<RadioPreset> presets)
+        private void BuildRadioPresets(Device ufc, ObservableCollection<RadioPreset> presets)
         {
             foreach (RadioPreset preset in presets)
             {
@@ -160,16 +160,16 @@ namespace JAFDTC.Models.F15E.Upload
                 if (!string.IsNullOrEmpty(freq))
                 {
                     string presetNum = preset.Preset.ToString();
-                    AppendCommand(BuildDigits(d, presetNum));
-                    AppendCommand(d.GetCommand("PB1"));
+                    AppendCommand(BuildDigits(ufc, presetNum));
+                    AppendCommand(ufc.GetCommand("PB1"));
 
-                    InputFrequency(d, freq);
-                    AppendCommand(d.GetCommand("PB10"));
+                    InputFrequency(ufc, freq);
+                    AppendCommand(ufc.GetCommand("PB10"));
                 }
             }
         }
 
-        private void InputFrequency(Device d, string freq)
+        private void InputFrequency(Device ufc, string freq)
         {
             if (freq.Length == 6)
             {
@@ -178,14 +178,14 @@ namespace JAFDTC.Models.F15E.Upload
                     freq = freq.Replace("000", "001");
                 }
                 var parts = freq.Split('.');
-                AppendCommand(BuildDigits(d, parts[0]));
-                AppendCommand(d.GetCommand("."));
-                AppendCommand(BuildDigits(d, parts[1]));
+                AppendCommand(BuildDigits(ufc, parts[0]));
+                AppendCommand(ufc.GetCommand("."));
+                AppendCommand(BuildDigits(ufc, parts[1]));
             }
             else
             {
                 freq = freq.Replace(".", "");
-                AppendCommand(BuildDigits(d, freq));
+                AppendCommand(BuildDigits(ufc, freq));
             }
         }
     }

@@ -2,7 +2,7 @@
 //
 // RadioPreset.cs -- f-15e radio system preset
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -28,7 +28,7 @@ namespace JAFDTC.Models.F15E.Radio
     /// </summary>
     public class RadioPreset : RadioPresetInfoBase
     {
-        // preset values for the G/GV presets
+        // preset values for the mudhen G/GV presets
         //
         public const int PRESET_G = -1;
         public const int PRESET_GV = -2;

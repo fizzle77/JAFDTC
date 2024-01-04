@@ -3,7 +3,7 @@
 // F15EUploadAgent.cs -- f-15e upload agent
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -57,6 +57,7 @@ namespace JAFDTC.Models.F15E
         {
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new MiscBuilder(_cfg, _dcsCmds, sb).Build();
+            new STPTBuilder(_cfg, _dcsCmds, sb).Build();
         }
     }
 }

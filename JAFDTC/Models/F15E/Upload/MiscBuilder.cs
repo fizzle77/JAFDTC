@@ -3,7 +3,7 @@
 // MiscBuilder.cs -- f-15e misc system command builder
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -26,7 +26,7 @@ using System.Text;
 namespace JAFDTC.Models.F15E.Upload
 {
     /// <summary>
-    /// TODO: document
+    /// command stream builder for the mudhen miscellaneous system that covers BINGO, CARA, TACAN, and ILS.
     /// </summary>
     internal class MiscBuilder : F15EBuilderBase, IBuilder
     {
@@ -45,35 +45,36 @@ namespace JAFDTC.Models.F15E.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure radio system (com1/com2 uhf/vhf radios) via the icp/ded according to the non-default programming
-        /// settings (this function is safe to call with a configuration with default settings: defaults are skipped as
-        /// necessary).
+        /// configure miscellaneous system (bingo, cara, tacan, ils) via the ufc according to the non-default
+        /// programming settings (this function is safe to call with a configuration with default settings: defaults
+        /// are skipped as necessary).
         /// <summary>
         public override void Build()
         {
-            BuildBingo();
-            BuildCARA();
-            BuildTACAN(); 
-            BuildILS();
+            Device ufc = _aircraft.GetDevice("UFC_PILOT");
+            Device fltInst = _aircraft.GetDevice("FLTINST");
+
+            BuildBingo(fltInst);
+            BuildCARA(ufc);
+            BuildTACAN(ufc); 
+            BuildILS(ufc);
         }
 
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void BuildBingo()
+        private void BuildBingo(Device fltInst)
         {
             if (!_cfg.Misc.IsBINGODefault)
             {
-                Device d = _aircraft.GetDevice("FLTINST");
                 int bingo = int.Parse(_cfg.Misc.Bingo);
-
                 for (int i = 0; i < 140; i++)
                 {
-                    AppendCommand(d.GetCommand("BingoDecrease"));
+                    AppendCommand(fltInst.GetCommand("BingoDecrease"));
                 }
                 for (int i = 0; i < bingo / 100; i++)
                 {
-                    AppendCommand(d.GetCommand("BingoIncrease"));
+                    AppendCommand(fltInst.GetCommand("BingoIncrease"));
                 }
             }
         }
@@ -81,11 +82,10 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void BuildCARA()
+        private void BuildCARA(Device ufc)
         {
             if (!_cfg.Misc.IsLowAltDefault)
             {
-                Device ufc = _aircraft.GetDevice("UFC_PILOT");
                 AppendCommand(ufc.GetCommand("CLR"));
                 AppendCommand(ufc.GetCommand("CLR"));
                 AppendCommand(ufc.GetCommand("MENU"));
@@ -98,12 +98,10 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void BuildTACAN()
+        private void BuildTACAN(Device ufc)
         {
             if (!_cfg.Misc.IsTACANDefault)
             {
-
-                Device ufc = _aircraft.GetDevice("UFC_PILOT");
                 AppendCommand(ufc.GetCommand("CLR"));
                 AppendCommand(ufc.GetCommand("CLR"));
                 AppendCommand(ufc.GetCommand("MENU"));
@@ -134,11 +132,10 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void BuildILS()
+        private void BuildILS(Device ufc)
         {
             if (!_cfg.Misc.IsILSDefault)
             {
-                Device ufc = _aircraft.GetDevice("UFC_PILOT");
                 AppendCommand(ufc.GetCommand("CLR"));
                 AppendCommand(ufc.GetCommand("CLR"));
                 AppendCommand(ufc.GetCommand("MENU"));

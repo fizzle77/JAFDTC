@@ -2,7 +2,7 @@
 //
 // F15EBuilderBase.cs -- f-15e abstract base command builder
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -24,8 +24,8 @@ using System.Text;
 namespace JAFDTC.Models.F15E.Upload
 {
     /// <summary>
-    /// abstract base class for the hornet upload functionality. provides functions to support building command
-    /// streams.
+    /// abstract base class for the mudhen upload functionality. provides functions to support building command
+    /// streams to setup avionics based on a system configuration.
     /// </summary>
     internal abstract class F15EBuilderBase : BuilderBase, IBuilder
     {

@@ -3,6 +3,7 @@
 // F15ECommands.cs -- f-15e commands
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -24,7 +25,7 @@ using System.Diagnostics;
 namespace JAFDTC.Models.F15E
 {
     /// <summary>
-    /// manages the set of dcs cockpit commands associated with devices in the mudhen.
+    /// manages and defines the set of dcs cockpit commands associated with devices in the mudhen.
     /// </summary>
     internal class F15ECommands : AirframeDeviceManagerBase, IAirframeDeviceManager
     {
@@ -38,7 +39,7 @@ namespace JAFDTC.Models.F15E
         {
             var delay = Settings.CommandDelaysMs[AirframeTypes.F15E];
 
-            Device ufc = new Device(56, "UFC_PILOT");
+            Device ufc = new(56, "UFC_PILOT");
             ufc.AddCommand(new Command(3001, "PB1", delay, 1));
             ufc.AddCommand(new Command(3002, "PB2", delay, 1));
             ufc.AddCommand(new Command(3003, "PB3", delay, 1));
@@ -73,26 +74,26 @@ namespace JAFDTC.Models.F15E
             AddDevice(ufc);
 
             Command[] mpdCommands = new Command[] {
-                new Command(3061, "PB01", delay, 1),
-                new Command(3062, "PB02", delay, 1),
-                new Command(3063, "PB03", delay, 1),
-                new Command(3064, "PB04", delay, 1),
-                new Command(3065, "PB05", delay, 1),
-                new Command(3066, "PB06", delay, 1),
-                new Command(3067, "PB07", delay, 1),
-                new Command(3068, "PB08", delay, 1),
-                new Command(3069, "PB09", delay, 1),
-                new Command(3070, "PB10", delay, 1),
-                new Command(3071, "PB11", delay, 1),
-                new Command(3072, "PB12", delay, 1),
-                new Command(3073, "PB13", delay, 1),
-                new Command(3074, "PB14", delay, 1),
-                new Command(3075, "PB15", delay, 1),
-                new Command(3076, "PB16", delay, 1),
-                new Command(3077, "PB17", delay, 1),
-                new Command(3078, "PB18", delay, 1),
-                new Command(3079, "PB19", delay, 1),
-                new Command(3080, "PB20", delay, 1)
+                new(3061, "PB01", delay, 1),
+                new(3062, "PB02", delay, 1),
+                new(3063, "PB03", delay, 1),
+                new(3064, "PB04", delay, 1),
+                new(3065, "PB05", delay, 1),
+                new(3066, "PB06", delay, 1),
+                new(3067, "PB07", delay, 1),
+                new(3068, "PB08", delay, 1),
+                new(3069, "PB09", delay, 1),
+                new(3070, "PB10", delay, 1),
+                new(3071, "PB11", delay, 1),
+                new(3072, "PB12", delay, 1),
+                new(3073, "PB13", delay, 1),
+                new(3074, "PB14", delay, 1),
+                new(3075, "PB15", delay, 1),
+                new(3076, "PB16", delay, 1),
+                new(3077, "PB17", delay, 1),
+                new(3078, "PB18", delay, 1),
+                new(3079, "PB19", delay, 1),
+                new(3080, "PB20", delay, 1)
             };
 
             Device frontLeftMPD = new(34, "FLMPD");

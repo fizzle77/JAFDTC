@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+F15EEditSteerpointListPage.xaml : ui xaml for mudhen steerpoint editor list page
+
+Copyright(C) 2023-2024 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<Page
+    x:Class="JAFDTC.UI.F15E.F15EEditSteerpointListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.Models.F15E.STPT"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+
+    <Grid Margin="16,8,16,8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0 : command bar
+        ===============================================================================================================
+        -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal"
+                    VerticalAlignment="Center">
+            <ComboBox x:Name="uiCmdComboSelRoute"
+                      VerticalAlignment="Center"
+                      SelectionChanged="CmdComboSelRoute_SelectionChanged">
+                <TextBlock>A</TextBlock>
+                <TextBlock>B</TextBlock>
+                <TextBlock>C</TextBlock>
+            </ComboBox>
+            <CommandBar Margin="6,0,0,0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+                <AppBarButton x:Name="uiBarAdd" Icon="Add" Label="Add"
+                              Click="CmdAdd_Click"
+                              ToolTipService.ToolTip="Add a new steerpoint"/>
+                <AppBarButton x:Name="uiBarEdit" Icon="Edit" Label="Edit"
+                              Click="CmdOpen_Click"
+                              ToolTipService.ToolTip="Edit selected steerpoint"/>
+                <AppBarButton x:Name="uiBarCopy" Icon="Copy" Label="Copy"
+                              Click="CmdCopy_Click"
+                              ToolTipService.ToolTip="Copy selected steerpoints"/>
+                <AppBarButton x:Name="uiBarPaste" Icon="Paste" Label="Paste"
+                              Click="CmdPaste_Click"
+                              ToolTipService.ToolTip="Paste steerpoints from clipboard"/>
+                <AppBarSeparator/>
+                <AppBarButton x:Name="uiBarDelete" Icon="Delete" Label="Delete"
+                              Click="CmdDelete_Click"
+                              ToolTipService.ToolTip="Delete selected steerpoints"/>
+                <AppBarSeparator/>
+                <AppBarButton x:Name="uiBarRenumber" Icon="AllApps" Label="Renumber"
+                              Click="CmdRenumber_Click"
+                              ToolTipService.ToolTip="Renumber the list of steerpoints"/>
+                <AppBarSeparator/>
+                <AppBarButton x:Name="uiBarCapture" Label="Capture"
+                              Click="CmdCapture_Click"
+                              ToolTipService.ToolTip="Capture steerpoints(s) from DCS">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7B7;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="uiBarImport" Icon="Download" Label="Import"
+                              Click="CmdImport_Click"
+                              ToolTipService.ToolTip="Import steerpoints from a file"/>
+                <AppBarButton x:Name="uiBarExport" Icon="Upload" Label="Export"
+                              Click="CmdExport_Click"
+                              ToolTipService.ToolTip="Export all steerpoints to a file"/>
+                <AppBarSeparator/>
+            </CommandBar>
+        </StackPanel>
+
+        <!--
+        ===============================================================================================================
+        row 1 : list view
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="1" Margin="0,12,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="0" Margin="16,0,12,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="48"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="266"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="56"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Margin="0,0,18,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}">
+                    Stpt
+                </TextBlock>
+                <TextBlock Grid.Column="1" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Left"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Name"/>
+                <TextBlock Grid.Column="2" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Latitude, Longitude / Elevation"/>
+                <TextBlock Grid.Column="3" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="TOS"/>
+                <TextBlock Grid.Column="4" Margin="6,0,6,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Rfpts"/>
+            </Grid>
+
+            <ListView Grid.Row="1"
+                      x:Name="uiStptListView"
+                      IsDoubleTapEnabled="True"
+                      AllowDrop="True"
+                      CanReorderItems="True"
+                      ReorderMode="Enabled"
+                      SelectionMode="Extended"
+                      SelectionChanged="StptList_SelectionChanged"
+                      RightTapped="StptList_RightTapped"
+                      DoubleTapped="StptList_DoubleTapped"
+                      ItemsSource="{x:Bind EditSTPT.Points}">
+                <ListView.Resources>
+                    <MenuFlyout x:Name="uiStptListCtxMenuFlyout">
+                        <MenuFlyout.Items>
+                            <MenuFlyoutItem Text="Edit" Icon="Edit" Click="CmdOpen_Click"/>
+                            <MenuFlyoutItem Text="Copy" Icon="Copy" Click="CmdCopy_Click"/>
+                            <MenuFlyoutItem Text="Paste" Icon="Paste" Click="CmdPaste_Click"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Text="Delete" Icon="Delete" Click="CmdDelete_Click"/>
+                        </MenuFlyout.Items>
+                    </MenuFlyout>
+                </ListView.Resources>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:SteerpointInfo">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="32"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="266"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="56"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Margin="0,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       FontFamily="Segoe Fluent Icons"
+                                       FontSize="14"
+                                       Text="{x:Bind StptGlyphUI, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Grid.Column="1" Margin="2,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Left"
+                                       Text="{x:Bind Number, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Grid.Column="2" Margin="6,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Left"
+                                       FontWeight="Medium"
+                                       FontSize="16"
+                                       Text="{x:Bind Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Grid.Column="3" Margin="6,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind Location}"/>
+                            <TextBlock Grid.Column="4" Margin="6,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind TOT, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Grid.Column="5" Margin="6,1,6,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind RefPtUI, Mode=OneWay}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 2 : link / reset
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="2" Margin="0,12,0,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button Width="140"
+                        x:Name="uiPageBtnLink"
+                        Click="PageBtnLink_Click"
+                        ToolTipService.ToolTip="Link or unlink this system to steerpoint system in another configuration">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE723;"/>
+                        <TextBlock VerticalAlignment="center"
+                                   x:Name="uiPageBtnTxtLink">
+                            FIXUP
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <TextBlock Margin="12,0,24,0"
+                           x:Name="uiPageTxtLink"
+                           VerticalAlignment="center">
+                    FIXUP
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button x:Name="uiPageBtnResetAll"
+                        Click="PageBtnResetAll_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                        <TextBlock VerticalAlignment="center">Reset System to Defaults</TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

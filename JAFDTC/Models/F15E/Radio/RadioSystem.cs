@@ -3,7 +3,7 @@
 // RadioSystem.cs -- f-15e radio system
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -24,14 +24,19 @@ using System.Collections.ObjectModel;
 
 namespace JAFDTC.Models.F15E.Radio
 {
+    /// <summary>
+    /// enum encoding radios in the mudhen.
+    /// </summary>
     public enum Radios
     {
-        COMM1 = 0,
-        COMM2 = 1,
+        COMM1 = 0,      // UHF AN/ARC-164
+        COMM2 = 1,      // UHF/VHF AN/ARC-210
     };
 
     /// <summary>
-    /// TODO: document
+    /// mudhen radio system configuration using a custom mudhen radio preset (RadioPreset) along with the base radio
+    /// system (RadioSystemBase). the modeled configuration includes guard monitoring, preset/frequency mode, and
+    /// default tuning.
     /// </summary>
     public class RadioSystem : RadioSystemBase<RadioPreset>, ISystem
     {
@@ -57,7 +62,7 @@ namespace JAFDTC.Models.F15E.Radio
 
         public string COMM2DefaultTuning { get; set; }
 
-        // ---- synthesized properties
+        // ---- public properties, computed
 
         public override bool IsDefault
         {

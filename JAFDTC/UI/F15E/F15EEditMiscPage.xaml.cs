@@ -2,7 +2,7 @@
 //
 // F15EEditMFDPage.xaml.cs : ui c# for mudhen misc setup editor page
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -35,7 +35,7 @@ using System.Diagnostics;
 namespace JAFDTC.UI.F15E
 {
     /// <summary>
-    /// TODO: document
+    /// user interface for the page that allows you to edit the mudhen miscellaneous system configuration.
     /// </summary>
     public sealed partial class F15EEditMiscPage : Page
     {
@@ -47,6 +47,8 @@ namespace JAFDTC.UI.F15E
         // properties
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        // ---- private properties
 
         private ConfigEditorPageNavArgs NavArgs { get; set; }
 
@@ -61,7 +63,7 @@ namespace JAFDTC.UI.F15E
 
         private bool IsRebuildingUI { get; set; }
 
-        // ---- read-only properties
+        // ---- private properties, read-only
 
         private readonly MiscSystem _miscSysDefault;
 
@@ -112,6 +114,7 @@ namespace JAFDTC.UI.F15E
             // wait for final setup of the ui until we navigate to the page (at which point we will have a
             // configuration to display).
         }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // data marshalling

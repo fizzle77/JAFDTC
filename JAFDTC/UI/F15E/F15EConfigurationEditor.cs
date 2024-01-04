@@ -2,7 +2,7 @@
 //
 // F15EConfigurationEditor.cs : supports editors for the f16c configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -21,15 +21,16 @@ using JAFDTC.Models;
 using JAFDTC.Models.F15E;
 using JAFDTC.Models.F15E.Misc;
 using JAFDTC.Models.F15E.Radio;
+using JAFDTC.Models.F15E.STPT;
 using JAFDTC.UI.App;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace JAFDTC.UI.F15E
 {
-    // defines the glyphs to use for each system editor page in the viper configuration.
-    //
+    /// <summary>
+    /// defines the glyphs to use for each system editor page in the viper configuration.
+    /// </summary>
     public class Glyphs
     {
         public const string MISC = "\xE8B7";
@@ -45,13 +46,14 @@ namespace JAFDTC.UI.F15E
     {
         private static readonly ObservableCollection<ConfigEditorPageInfo> _configEditorPageInfo = new()
         {
-                F15EEditRadioPageHelper.PageInfo,
-                F15EEditMiscPage.PageInfo,
+            F15EEditSteerpointListPage.PageInfo,
+            F15EEditRadioPageHelper.PageInfo,
+            F15EEditMiscPage.PageInfo,
         };
 
-        public F15EConfigurationEditor() { }
-
         public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo() => _configEditorPageInfo;
+
+        public F15EConfigurationEditor() { }
 
         public override ISystem SystemForConfig(IConfiguration config, string tag)
         {
@@ -59,6 +61,7 @@ namespace JAFDTC.UI.F15E
             {
                 MiscSystem.SystemTag => ((F15EConfiguration)config).Misc,
                 RadioSystem.SystemTag => ((F15EConfiguration)config).Radio,
+                STPTSystem.SystemTag => ((F15EConfiguration)config).STPT,
                 _ => null,
             };
             return system;
