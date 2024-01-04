@@ -1,6 +1,6 @@
-﻿dofile(lfs.writedir()..'Scripts/JAFDTC/CommonFunctions.lua')
+dofile(lfs.writedir()..'Scripts/JAFDTC/CommonFunctions.lua')
 
--- TODO: eventually implement setup/configuration checks
+-- TODO: eventually implement setup/configuration checks for tomcat
 
 function JAFDTC_F14AB_AfterNextFrame(params)
 --[[

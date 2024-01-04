@@ -1,6 +1,6 @@
 dofile(lfs.writedir()..'Scripts/JAFDTC/CommonFunctions.lua')
 
--- TODO: eventually implement setup/configuration checks
+-- TODO: eventually implement setup/configuration checks for warthog
 
 function JAFDTC_A10C_AfterNextFrame(params)
 --[[

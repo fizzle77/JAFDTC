@@ -11,9 +11,11 @@ JAFDTC_logFile = io.open(lfs.writedir() .. [[Logs\JAFDTC.log]], "w")
 dofile(lfs.writedir()..'Scripts/JAFDTC/CommonFunctions.lua')
 dofile(lfs.writedir()..'Scripts/JAFDTC/A10CFunctions.lua')
 dofile(lfs.writedir()..'Scripts/JAFDTC/AV8BFunctions.lua')
+dofile(lfs.writedir()..'Scripts/JAFDTC/F14ABFunctions.lua')
 dofile(lfs.writedir()..'Scripts/JAFDTC/F15EFunctions.lua')
 dofile(lfs.writedir()..'Scripts/JAFDTC/F16CFunctions.lua')
 dofile(lfs.writedir()..'Scripts/JAFDTC/FA18CFunctions.lua')
+dofile(lfs.writedir()..'Scripts/JAFDTC/M2000CFunctions.lua')
 
 local needDelay = false
 local keypressinprogress = false
@@ -107,6 +109,7 @@ function LuaExportBeforeNextFrame()
                     nextIndex = i+1
                 
                 elseif marker then
+                    log.write("JAFDTC", log.INFO, "Got MARKER " .. marker)
                     markerVal = marker
 
                 else
@@ -178,20 +181,20 @@ function LuaExportAfterNextFrame()
     params["hideJAFDTCCommand"] = "0";
     params["toggleJAFDTCCommand"] = "0";
 
-    if model == "AV8B" then
+    if model == "A10C" then
+        JAFDTC_A10C_AfterNextFrame(params)
+    elseif model == "AV8B" then
         JAFDTC_AV8B_AfterNextFrame(params)
-    end
-
-    if model ==	"F16CM" then
-        JAFDTC_F16CM_AfterNextFrame(params)
-    end
-
-    if model == "F15E" then
+    elseif model ==	"F14AB" then
+        JAFDTC_F14AB_AfterNextFrame(params)
+    elseif model == "F15E" then
         JAFDTC_F15E_AfterNextFrame(params)
-    end
-
-    if model == "FA18C" then
+    elseif model ==	"F16CM" then
+        JAFDTC_F16CM_AfterNextFrame(params)
+    elseif model == "FA18C" then
         JAFDTC_FA18C_AfterNextFrame(params)
+    elseif model == "M2000C" then
+        JAFDTC_M2KC_AfterNextFrame(params)
     end
 
     local toSend = "{"..
