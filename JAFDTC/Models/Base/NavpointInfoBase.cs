@@ -2,7 +2,7 @@
 //
 // NavpointInfoBase.cs -- navigation point information abstract base class
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -37,7 +37,7 @@ namespace JAFDTC.Models.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // ---- INotifyPropertyChanged, INotifyDataErrorInfo properties
+        // ---- public properties, posts change/validation events
 
         private int _number;                        // positive integer > 1
         public int Number
@@ -53,7 +53,7 @@ namespace JAFDTC.Models.Base
             set => SetProperty(ref _name, value, null);
         }
 
-        private string _lat;                        // string, decimal degrees
+        private string _lat;                        // string, decimal degrees (raw, no units)
         public string Lat
         {
             get => _lat;
@@ -69,13 +69,13 @@ namespace JAFDTC.Models.Base
             }
         }
 
-        public virtual string LatUI                 // string, decimal degrees
+        public virtual string LatUI                 // string, decimal degrees (raw, no units)
         {
             get => Lat;
             set => Lat = value;
         }
 
-        private string _lon;                        // string, decimal degrees
+        private string _lon;                        // string, decimal degrees (raw, no units)
         public string Lon
         {
             get => _lon;
@@ -97,14 +97,18 @@ namespace JAFDTC.Models.Base
             set => Lon = value;
         }
 
-        private string _alt;                        // positive integer, on [-1500, 80000]
-        public string Alt
+        // NOTE: to allow derived classes to override the default range check via the public Alt accessor, define the
+        // NOTE: backing store as protected. derived classes that want to check a different range need only override
+        // NOTE: the public accessor.
+
+        protected string _alt;                      // positive integer, on [-1500, 80000]
+        public virtual string Alt
         {
             get => _alt;
             set
             {
                 string error = "Invalid altitude format";
-                if (IsIntegerFieldValid(value, -1500, 80000, false))
+                if (IsIntegerFieldValid(value, -80000, 80000, false))
                 {
                     value = FixupIntegerField(value);
                     error = null;
@@ -113,10 +117,13 @@ namespace JAFDTC.Models.Base
             }
         }
 
-        // ---- synthesized properties
+        // ---- public properties, computed
+
+        // NOTE: IsValid provides checks for widest possible ranges, smaller ranges can still use this version of
+        // NOTE: the function as long as the set accessors guarantee any narrower range.
 
         [JsonIgnore]
-        public virtual bool IsValid => (IsIntegerFieldValid(_alt, -1500, 80000, false) &&
+        public virtual bool IsValid => (IsIntegerFieldValid(_alt, -80000, 80000, false) &&
                                         IsDecimalFieldValid(_lat, -90.0, 90.0, false) &&
                                         IsDecimalFieldValid(_lon, -180.0, 180.0, false));
 

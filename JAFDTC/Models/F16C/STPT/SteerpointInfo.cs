@@ -3,7 +3,7 @@
 // SteerpointInfo.cs -- f-16c steerpoint base information
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -27,25 +27,29 @@ using System.Text.RegularExpressions;
 namespace JAFDTC.Models.F16C.STPT
 {
     /// <summary>
-    /// TODO: document
+    /// viper steerpoint system steerpoint. this class extends the base navigation point (NavpointBase) with support
+    /// for viper lat/lon format, tos, and offset points. as in base navpoints, the ui views of the lat/lon
+    /// (LatUI/LonUI) are layered on top of the persisted DD format lat/lon (Lat/Lon).
     /// </summary>
     public class SteerpointInfo : NavpointInfoBase
     {
-        private static readonly Regex timeRegex = new(@"^([0-1][0-9]\:[0-5][0-9]\:[0-5][0-9])|(2[0-3]\:[0-5][0-9]\:[0-5][0-9])$");
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // ---- following properties do not post change and validation events.
+        // ---- private properties, static
+
+        private static readonly Regex _tosRegex = new(@"^([0-1][0-9]\:[0-5][0-9]\:[0-5][0-9])|(2[0-3]\:[0-5][0-9]\:[0-5][0-9])$");
+
+        // ---- public properties
 
         public SteerpointRefPoint[] OAP { get; set; }
 
         public SteerpointRefPoint[] VxP { get; set; }
 
-        // ---- following properties post change and validation events.
+        // ---- public properties, posts change/validation events
 
         [JsonIgnore]
         private string _latUI;                      // string, DDM "[N|S] 00° 00.000’"
@@ -85,6 +89,21 @@ namespace JAFDTC.Models.F16C.STPT
             }
         }
 
+        public override string Alt                  // positive integer, on [-1500, 80000]
+        {
+            get => _alt;
+            set
+            {
+                string error = "Invalid altitude format";
+                if (IsIntegerFieldValid(value, -1500, 80000, false))
+                {
+                    value = FixupIntegerField(value);
+                    error = null;
+                }
+                SetProperty(ref _alt, value, error);
+            }
+        }
+
         private string _tos;                        // "HH:MM:SS", HH = [00,24), MM on [00,59), SS on [00,59)
         public string TOS
         {
@@ -92,7 +111,7 @@ namespace JAFDTC.Models.F16C.STPT
             set
             {
                 string error = (string.IsNullOrEmpty(value)) ? null : "Invalid TOS format";
-                if (IsRegexFieldValid(value, timeRegex))
+                if (IsRegexFieldValid(value, _tosRegex))
                 {
                     error = null;
                 }
@@ -100,14 +119,7 @@ namespace JAFDTC.Models.F16C.STPT
             }
         }
 
-        // ---- following properties are synthesized from other properties
-
-#if NOPE
-        [JsonIgnore]
-        public override string Location => ((string.IsNullOrEmpty(Lat)) ? "Unknown" : LatUI) + ", " +
-                                           ((string.IsNullOrEmpty(Lon)) ? "Unknown" : LonUI) + ", " +
-                                           ((string.IsNullOrEmpty(Alt)) ? "Unknown" : Alt);
-#endif
+        // ---- public properties, computed
 
         [JsonIgnore]
         public string RefPtGlyph => (((OAP[0].Type == RefPointTypes.OAP) ||
@@ -159,8 +171,9 @@ namespace JAFDTC.Models.F16C.STPT
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // reset the steerpoint to default values. the Number field is not changed.
-        //
+        /// <summary>
+        /// reset the steerpoint to default values. the Number field is not changed.
+        /// </summary>
         public override void Reset()
         {
             base.Reset();
