@@ -3,7 +3,7 @@
 // TelemDataRx.cs : dcs telemetry data udp receiver
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -63,7 +63,7 @@ namespace JAFDTC.Utilities.Networking
 
         // ---- private properties
 
-        private readonly UDPSocket _socket;
+        private readonly UDPRxSocket _socket;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -71,7 +71,7 @@ namespace JAFDTC.Utilities.Networking
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public WyptCaptureDataRx() => (_socket) = (new UDPSocket());
+        public WyptCaptureDataRx() => (_socket) = (new UDPRxSocket());
 
         // ------------------------------------------------------------------------------------------------------------
         //

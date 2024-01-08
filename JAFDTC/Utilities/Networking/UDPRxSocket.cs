@@ -3,7 +3,7 @@
 // UDPSocket.cs : udp socket
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-24 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -29,7 +29,7 @@ namespace JAFDTC.Utilities.Networking
     /// <summary>
     /// TODO: document
     /// </summary>
-    internal sealed class UDPSocket
+    internal sealed class UDPRxSocket
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -62,7 +62,7 @@ namespace JAFDTC.Utilities.Networking
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public UDPSocket(int bufSize = 8 * 1024)
+        public UDPRxSocket(int bufSize = 8 * 1024)
         {
             IsRunning = false;
 

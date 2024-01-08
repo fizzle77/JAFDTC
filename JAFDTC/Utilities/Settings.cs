@@ -3,7 +3,7 @@
 // Settings.cs : jafdtc application settings
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -65,7 +65,9 @@ namespace JAFDTC.Utilities
         public bool IsNewVersCheckDisabled { get; set; }
 
         public int TCPPortCmdTx { get; }
-        
+
+        public int TCPPortCfgNameTx { get; }
+
         public int UDPPortTelRx { get; }
 
         public int UDPPortCapRx { get; }
@@ -103,6 +105,7 @@ namespace JAFDTC.Utilities
             TCPPortCmdTx = 42001;               // clickable cockpit commands to dcs
             UDPPortTelRx = 42002;               // telemetry from dcs
             UDPPortCapRx = 42003;               // waypoint capture from dcs
+            TCPPortCfgNameTx = 42004;           // configuration name to dcs
 
             CommandDelaysMs = new Dictionary<AirframeTypes, int>()
             {
@@ -316,8 +319,13 @@ namespace JAFDTC.Utilities
         }
 
         public static int TCPPortCmdTx
-		{
-			get => _currentSettings.TCPPortCmdTx;
+        {
+            get => _currentSettings.TCPPortCmdTx;
+        }
+
+        public static int TCPPortCfgNameTx
+        {
+            get => _currentSettings.TCPPortCfgNameTx;
         }
 
         public static int UDPPortTelRx

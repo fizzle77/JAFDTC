@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// CockpitCmdTx.cs -- cockpit command tcp tx path
+// TCPTxSocket.cs -- tcp tx socket
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
 // Copyright(C) 2023-2024 ilominar/raven
@@ -18,21 +18,40 @@
 //
 // ********************************************************************************************************************
 
+using System.IO;
+using System.Diagnostics;
+using System.Net.Sockets;
+
 namespace JAFDTC.Utilities.Networking
 {
     /// <summary>
-    /// supports sending command sequences to dcs to drive the cockpit controls necessary to set up the avionics on
-    /// the jet according to a configuration.
+    /// supports sending data to dcs via a tcp socket on localhost. the connection is torn down after the data
+    /// is sent.
     /// </summary>
-    internal sealed class CockpitCmdTx
+    internal class TCPTxSocket
     {
         /// <summary>
-        /// send a command string to dcs through a tcp connection to the lua export functionality. returns true on
-        /// success, false on failure.
+        /// send a string to dcs through a tcp connection to localhost on the specified port. returns true on success,
+        /// false on failure.
         /// </summary>
-        public static bool Send(string str)
+        public static bool SendToPort(string str, int port)
         {
-            return TCPTxSocket.SendToPort($"[ {str} ]", Settings.TCPPortCmdTx);
+            try
+            {
+                using TcpClient tcpClient = new("127.0.0.1", port);
+                using NetworkStream ns = tcpClient.GetStream();
+                using StreamWriter sw = new(ns);
+                //
+                // Debug.WriteLine(str);
+                //
+                sw.WriteLine(str);
+                sw.Flush();
+            }
+            catch (SocketException)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

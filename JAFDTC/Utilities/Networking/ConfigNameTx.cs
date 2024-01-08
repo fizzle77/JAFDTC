@@ -1,8 +1,7 @@
 ﻿// ********************************************************************************************************************
 //
-// CockpitCmdTx.cs -- cockpit command tcp tx path
+// ConfigNameTx.cs -- configuration name tcp tx path
 //
-// Copyright(C) 2021-2023 the-paid-actor & others
 // Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
@@ -24,15 +23,15 @@ namespace JAFDTC.Utilities.Networking
     /// supports sending command sequences to dcs to drive the cockpit controls necessary to set up the avionics on
     /// the jet according to a configuration.
     /// </summary>
-    internal sealed class CockpitCmdTx
+    internal class ConfigNameTx
     {
         /// <summary>
-        /// send a command string to dcs through a tcp connection to the lua export functionality. returns true on
+        /// send a config name string to dcs through a tcp connection to the lua config name hook. returns true on
         /// success, false on failure.
         /// </summary>
         public static bool Send(string str)
         {
-            return TCPTxSocket.SendToPort($"[ {str} ]", Settings.TCPPortCmdTx);
+            return TCPTxSocket.SendToPort(str, Settings.TCPPortCfgNameTx);
         }
     }
 }

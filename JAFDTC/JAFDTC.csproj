@@ -28,11 +28,13 @@
     <None Remove="Audio\ux_error.wav" />
     <None Remove="Data\db-emitters.json" />
     <None Remove="Data\db-poi-airbases.json" />
+    <None Remove="DCS\Hooks\JAFDTCCfgNameHook.lua" />
     <None Remove="DCS\Hooks\JAFDTCHook.lua" />
     <None Remove="DCS\JAFDTC.lua" />
     <None Remove="DCS\JAFDTC\A10CFunctions.lua" />
     <None Remove="DCS\JAFDTC\AV8BFunctions.lua" />
     <None Remove="DCS\JAFDTC\commonFunctions.lua" />
+    <None Remove="DCS\JAFDTC\ConfigName.dlg" />
     <None Remove="DCS\JAFDTC\F14ABFunctions.lua" />
     <None Remove="DCS\JAFDTC\f15EFunctions.lua" />
     <None Remove="DCS\JAFDTC\f16CFunctions.lua" />
@@ -69,9 +71,11 @@
     <Content Include="Audio\ux_error.wav" />
     <Content Include="Data\db-emitters.json" />
     <Content Include="Data\db-poi-airbases.json" />
+    <Content Include="DCS\Hooks\JAFDTCCfgNameHook.lua" />
     <Content Include="DCS\Hooks\JAFDTCHook.lua" />
     <Content Include="DCS\JAFDTC\A10CFunctions.lua" />
     <Content Include="DCS\JAFDTC\AV8BFunctions.lua" />
+    <Content Include="DCS\JAFDTC\ConfigName.dlg" />
     <Content Include="DCS\JAFDTC\F14ABFunctions.lua" />
     <Content Include="DCS\JAFDTC\JAFDTC.lua" />
     <Content Include="DCS\JAFDTC\CommonFunctions.lua" />

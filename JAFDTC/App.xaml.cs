@@ -2,7 +2,7 @@
 //
 // App.xaml.cs -- ui c# for main application
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -17,6 +17,7 @@
 //
 // ********************************************************************************************************************
 
+using ABI.System;
 using JAFDTC.Models;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
@@ -44,7 +45,7 @@ namespace JAFDTC
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // ---- following properties do not post change events.
+        // ---- public properties
 
         public MainWindow Window { get; private set; }
 
@@ -54,7 +55,7 @@ namespace JAFDTC
 
         private DispatcherTimer CheckDCSTimer { get; set; }
 
-        private DateTimeOffset LastDCSExportCheck { get; set; }
+        private System.DateTimeOffset LastDCSExportCheck { get; set; }
 
         private bool IsUploadInFlight { get; set; }
 
@@ -70,7 +71,9 @@ namespace JAFDTC
 
         private bool DecPressed { get; set; }
 
-        // ---- following properties post change events.
+        private long IncDecPressedTimestamp { get; set; }
+
+        // ---- public events, posts change/validation events
 
         // NOTE: these can be called from non-ui threads but may trigger ui actions. we will dispatch the handler
         // NOTE: invocations on a ui thread to avoid the chaos that will ensue.
@@ -98,9 +101,10 @@ namespace JAFDTC
             }
         }
 
-        // reading IsDCSRunning will implicitly first set the property to the correct current value based on the state
-        // of dcs. this property does not have an explict set handler and generates property change events.
-        //
+        /// <summary>
+        /// reading IsDCSRunning will implicitly first set the property to the correct current value based on the state
+        /// of dcs. this property does not have an explict set handler and generates property change events.
+        /// </summary>
         private bool _isDCSRunning;
         public bool IsDCSRunning
         {
@@ -120,15 +124,16 @@ namespace JAFDTC
             }
         }
 
-        // reading IsDCSExporting will implicitly first set the property to the correct current value based on the
-        // state of dcs. this property does not have an explict set handler and generates property change events.
-        //
+        /// <summary>
+        /// reading IsDCSExporting will implicitly first set the property to the correct current value based on the
+        /// state of dcs. this property does not have an explict set handler and generates property change events.
+        /// </summary>
         private bool _isDCSExporting;
         public bool IsDCSExporting
         {
             get
             {
-                if ((DateTimeOffset.Now - LastDCSExportCheck) > TimeSpan.FromSeconds(1.0))
+                if ((System.DateTimeOffset.Now - LastDCSExportCheck) > System.TimeSpan.FromSeconds(1.0))
                 {
                     if (_isDCSExporting && (TelemDataRx.Instance.NumPackets == LastDCSExportPacketCount))
                     {
@@ -143,14 +148,15 @@ namespace JAFDTC
                     }
                     LastDCSExportPacketCount = TelemDataRx.Instance.NumPackets;
                 }
-                LastDCSExportCheck = DateTimeOffset.Now;
+                LastDCSExportCheck = System.DateTimeOffset.Now;
                 return _isDCSExporting;
             }
         }
 
-        // reading IsDCSAvailable will implicitly first set the property to the correct current value based on the
-        // state of dcs. this property does not have an explict set handler and generates property change events.
-        //
+        /// <summary>
+        /// reading IsDCSAvailable will implicitly first set the property to the correct current value based on the
+        /// state of dcs. this property does not have an explict set handler and generates property change events.
+        /// </summary>
         private bool _isDCSAvailable;
         public bool IsDCSAvailable
         {
@@ -166,7 +172,7 @@ namespace JAFDTC
             }
         }
 
-        // ---- read-only fields
+        // ---- private properties, read-only
 
         private readonly Dictionary<string, AirframeTypes> _dcsToJAFDTCTypeMap;
 
@@ -185,20 +191,21 @@ namespace JAFDTC
         {
             InitializeComponent();
 
-            LastDCSExportCheck = DateTimeOffset.Now;
+            LastDCSExportCheck = System.DateTimeOffset.Now;
             LastDCSExportPacketCount = 0;
             UploadPressedTimestamp = 0;
+            IncDecPressedTimestamp = 0;
 
             _dcsToJAFDTCTypeMap = new Dictionary<string, AirframeTypes>()
             {
                 ["A10C"] = AirframeTypes.A10C,
                 ["AH64D"] = AirframeTypes.AH64D,
                 ["AV8B"] = AirframeTypes.AV8B,
+                ["F14AB"] = AirframeTypes.F14AB,
                 ["F15E"] = AirframeTypes.F15E,
                 ["F16CM"] = AirframeTypes.F16C,
                 ["FA18C"] = AirframeTypes.FA18C,
                 ["M2000C"] = AirframeTypes.M2000C,
-                ["F14AB"] = AirframeTypes.F14AB
             };
 
             try
@@ -218,11 +225,11 @@ namespace JAFDTC
 
                 CheckDCSTimer = new DispatcherTimer();
                 CheckDCSTimer.Tick += CheckDCSTimer_Tick;
-                CheckDCSTimer.Interval = new TimeSpan(0, 0, 10);
+                CheckDCSTimer.Interval = new System.TimeSpan(0, 0, 10);
 
                 IsAppStartupGood = true;
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 FileManager.Log($"App:App exception {ex}");
             }
@@ -305,7 +312,7 @@ namespace JAFDTC
 
                 UploadPressed = data.Upload == "1";
 
-                TimeSpan timespan = new(DateTime.Now.Ticks - UploadPressedTimestamp);
+                System.TimeSpan timespan = new(DateTime.Now.Ticks - UploadPressedTimestamp);
                 if ((UploadPressedTimestamp != 0) && UploadPressed && (timespan.TotalMilliseconds > 250))
                 { 
                     UploadPressedTimestamp = 0;
@@ -358,16 +365,20 @@ namespace JAFDTC
         /// </summary>
         private void ProcessIncrDecrCommands(TelemDataRx.TelemData data)
         {
+            long curTicks = DateTime.Now.Ticks;
+            System.TimeSpan timeSpan = new(curTicks - IncDecPressedTimestamp);
+
             if (!IncPressed && (data.Increment == "1"))
             {
                 IncPressed = true;
             }
             else if (IncPressed && (data.Increment == "0"))
             {
+                IncDecPressedTimestamp = curTicks;
                 IncPressed = false;
                 Window?.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
-                    Window.ConfigListPage?.PreviousConfiguration();
+                    Window.ConfigListPage?.PreviousConfiguration((timeSpan.TotalMilliseconds > 4000));
                 });
             }
 
@@ -377,10 +388,11 @@ namespace JAFDTC
             }
             else if (DecPressed && (data.Decrement == "0"))
             {
+                IncDecPressedTimestamp = curTicks;
                 DecPressed = false;
                 Window?.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
-                    Window.ConfigListPage?.NextConfiguration();
+                    Window.ConfigListPage?.NextConfiguration((timeSpan.TotalMilliseconds > 4000));
                 });
             }
         }

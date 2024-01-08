@@ -2,7 +2,7 @@
 //
 // ConfigurationListPage.xaml.cs -- ui c# for configuration list page that provides the top-level ui
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -19,6 +19,7 @@
 
 using JAFDTC.Models;
 using JAFDTC.Utilities;
+using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -241,33 +242,54 @@ namespace JAFDTC.UI.App
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // TODO: implement
-        public void NextConfiguration()
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public void NextConfiguration(bool isFirst)
         {
-            if ((uiCfgListView.SelectedIndex != -1) && (uiCfgListView.SelectedIndex == (ConfigList.ConfigsFiltered.Count - 1)))
+            if ((uiCfgListView.SelectedIndex == -1) && (ConfigList.ConfigsFiltered.Count > 0))
+            {
+                uiCfgListView.SelectedIndex = 0;
+            }
+            if ((uiCfgListView.SelectedIndex == -1) ||
+                (!isFirst && (uiCfgListView.SelectedIndex == (ConfigList.ConfigsFiltered.Count - 1))))
             {
                 General.PlayAudio("ux_error.wav");
             }
-            else if (uiCfgListView.SelectedIndex != -1)
+            else
             {
-                uiCfgListView.SelectedIndex += 1;
-                // TODO: speak new thing?
-                // TODO: see https://learn.microsoft.com/en-us/uwp/api/windows.media.speechsynthesis.speechsynthesizer?view=winrt-22621
+                if (!isFirst)
+                {
+                    uiCfgListView.SelectedIndex += 1;
+                }
+                string name = ((IConfiguration)uiCfgListView.SelectedItem).Name;
+                Debug.WriteLine($"NEXT {isFirst} {uiCfgListView.SelectedIndex} --> {name}");
+                ConfigNameTx.Send(name);
             }
         }
 
-        // TODO: implement
-        public void PreviousConfiguration()
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public void PreviousConfiguration(bool isFirst)
         {
-            if ((uiCfgListView.SelectedIndex != -1) && (uiCfgListView.SelectedIndex == 0))
+            if ((uiCfgListView.SelectedIndex == -1) && (ConfigList.ConfigsFiltered.Count > 0))
+            {
+                uiCfgListView.SelectedIndex = 0;
+            }
+            if ((uiCfgListView.SelectedIndex == -1) ||(!isFirst && (uiCfgListView.SelectedIndex == 0)))
             {
                 General.PlayAudio("ux_error.wav");
             }
-            else if (uiCfgListView.SelectedIndex != -1)
+            else
             {
-                uiCfgListView.SelectedIndex -= 1;
-                // TODO: speak new thing?
-                // TODO: see https://learn.microsoft.com/en-us/uwp/api/windows.media.speechsynthesis.speechsynthesizer?view=winrt-22621
+                if (!isFirst)
+                {
+                    uiCfgListView.SelectedIndex -= 1;
+                }
+                string name = ((IConfiguration)uiCfgListView.SelectedItem).Name;
+                Debug.WriteLine($"PREV {isFirst} {uiCfgListView.SelectedIndex} --> {name}");
+                ConfigNameTx.Send(name);
             }
         }
 
