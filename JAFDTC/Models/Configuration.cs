@@ -30,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -52,7 +51,7 @@ namespace JAFDTC.Models
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // ---- following properties do not post change or validation events.
+        // ---- public properties
 
         public string Version { get; set; }
 
@@ -66,7 +65,21 @@ namespace JAFDTC.Models
 
         public int LastSystemEdited { get; set; }
 
-        // ---- following properties post change or validation events.
+        private bool _isFavorite;
+        public bool IsFavorite
+        {
+            get => _isFavorite;
+            set
+            {
+                if (_isFavorite != value)
+                {
+                    _isFavorite = value;
+                    FavoriteGlyphUI = (_isFavorite) ? "\xE735" : "";
+                }
+            }
+        }
+
+        // ---- public properties, posts change/validation events
 
         private string _name;
         public string Name
@@ -83,54 +96,70 @@ namespace JAFDTC.Models
         }
 
         [JsonIgnore]
-        private string _updatesInfoText;
+        private string _favoriteGlyphUI;
         [JsonIgnore]
-        public string UpdatesInfoText
+        public string FavoriteGlyphUI
         {
-            get => _updatesInfoText;
+            get => _favoriteGlyphUI;
             set
             {
-                if (_updatesInfoText != value)
+                if (_favoriteGlyphUI != value)
                 {
-                    _updatesInfoText = value;
+                    _favoriteGlyphUI = value;
                     OnPropertyChanged();
                 }
             }
         }
 
         [JsonIgnore]
-        private string _updatesIcons;
+        private string _updatesInfoTextUI;
         [JsonIgnore]
-        public string UpdatesIcons
+        public string UpdatesInfoTextUI
         {
-            get => _updatesIcons;
+            get => _updatesInfoTextUI;
             set
             {
-                if (_updatesIcons != value)
+                if (_updatesInfoTextUI != value)
                 {
-                    _updatesIcons = value;
+                    _updatesInfoTextUI = value;
                     OnPropertyChanged();
                 }
             }
         }
 
         [JsonIgnore]
-        private string _updatesIconBadges;
+        private string _updatesIconsUI;
         [JsonIgnore]
-        public string UpdatesIconBadges
+        public string UpdatesIconsUI
         {
-            get => _updatesIconBadges;
+            get => _updatesIconsUI;
             set
             {
-                if (_updatesIconBadges != value)
+                if (_updatesIconsUI != value)
                 {
-                    _updatesIconBadges = value;
+                    _updatesIconsUI = value;
                     OnPropertyChanged();
                 }
             }
         }
 
-        // ---- following properties are synthesized.
+        [JsonIgnore]
+        private string _updatesIconBadgesUI;
+        [JsonIgnore]
+        public string UpdatesIconBadgesUI
+        {
+            get => _updatesIconBadgesUI;
+            set
+            {
+                if (_updatesIconBadgesUI != value)
+                {
+                    _updatesIconBadgesUI = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        // ---- properties, computed
 
         [JsonIgnore]
         public virtual IUploadAgent UploadAgent { get; }

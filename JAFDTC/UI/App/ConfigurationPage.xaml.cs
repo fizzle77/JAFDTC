@@ -357,6 +357,7 @@ namespace JAFDTC.UI.App
             EditorPages = ConfigEditor.ConfigEditorPageInfo();
             uiNavListEditors.SelectedIndex = Config.LastSystemEdited;
             uiHdrTxtConfigName.Text = Config.Name;
+            uiHdrTxtConfigIsFav.Visibility = (Config.IsFavorite) ? Visibility.Visible : Visibility.Collapsed;
             uiNavTxtAirframeName.Text = Globals.AirframeNames[Config.Airframe];
 
             // create a new frame to hold the editors and replace the split view content with the frame. setting

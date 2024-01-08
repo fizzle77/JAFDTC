@@ -64,7 +64,7 @@ namespace JAFDTC.UI.App
         {
             if (txtBlock != null)
             {
-                string badges = (config != null) ? config.UpdatesIconBadges : txtBlock.Text;
+                string badges = (config != null) ? config.UpdatesIconBadgesUI : txtBlock.Text;
                 txtBlock.TextHighlighters.Clear();
                 for (int index = 0; index < badges.Length; index++)
                 {

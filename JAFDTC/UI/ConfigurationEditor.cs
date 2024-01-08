@@ -102,9 +102,9 @@ namespace JAFDTC.UI
 
             return new Dictionary<string, string>()
             {
-                ["UpdatesInfoText"] = infoText,
-                ["UpdatesIcons"] = icons,
-                ["UpdatesIconBadges"] = iconBadges,
+                ["UpdatesInfoTextUI"] = infoText,
+                ["UpdatesIconsUI"] = icons,
+                ["UpdatesIconBadgesUI"] = iconBadges,
             };
         }
 

@@ -21,7 +21,6 @@ using JAFDTC.Utilities;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using Windows.UI.WebUI;
 
 namespace JAFDTC.Models
 {
@@ -132,7 +131,8 @@ namespace JAFDTC.Models
         private void SortConfigsFiltered()
         {
             var sortableList = new List<IConfiguration>(ConfigsFiltered);
-            sortableList.Sort((a, b) => a.Name.CompareTo(b.Name));
+            sortableList.Sort((a, b)
+                => (a.IsFavorite == b.IsFavorite) ? a.Name.CompareTo(b.Name) : ((a.IsFavorite) ? -1 : 1));
             for (int i = 0; i < sortableList.Count; i++)
             {
                 ConfigsFiltered.Move(ConfigsFiltered.IndexOf(sortableList[i]), i);
@@ -265,9 +265,9 @@ namespace JAFDTC.Models
         /// (comparison is case-insensitive). a filter of null forces the function to rebuild the filter list without
         /// updating the current filter text. filtered configurations are sorted by name.
         /// </summary>
-        public void FilterConfigs(string filter = "")
+        public void FilterConfigs(string filter = "", bool isForce = false)
         {
-            if ((filter == null) || (filter != CurFilterText))
+            if ((filter == null) || (filter != CurFilterText) || isForce)
             {
                 ConfigsFiltered.Clear();
                 foreach (IConfiguration config in Configs)

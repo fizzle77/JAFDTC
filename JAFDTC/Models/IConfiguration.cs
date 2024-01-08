@@ -92,6 +92,11 @@ namespace JAFDTC.Models
         public string Name { get; set; }
 
         /// <summary>
+        /// boolen indicating wheter or not the configuration is marked as a "favorite".
+        /// </summary>
+        public bool IsFavorite { get; set; }
+
+        /// <summary>
         /// provides a map from a system tag (string) to a uid (string) that establishes a link between a system on
         /// this configuration and a different source configuration. linked systems will always track the setup of the
         /// system in the source configuration.
@@ -104,32 +109,38 @@ namespace JAFDTC.Models
         public int LastSystemEdited { get; set; }
 
         /// <summary>
+        /// provides an instance of an upload agent object that implements IUploadAgent. this object handles creating
+        /// a command set that will set up the jet (according to the configuration) and uploading it to the jet.
+        /// </summary>
+        [JsonIgnore]
+        public IUploadAgent UploadAgent { get; }
+
+        /// <summary>
+        /// provides a Segoe Fluent Icon glyph to use to mark the favorite status of the configuration in the ui.
+        /// </summary>
+        [JsonIgnore]
+        public string FavoriteGlyphUI { get; set; }
+
+        /// <summary>
         /// provides a human-readable summary of which of the configuration's systems have been updated from their
         /// default setup for use in the ui.
         /// </summary>
         [JsonIgnore]
-        public string UpdatesInfoText { get; set; }
+        public string UpdatesInfoTextUI { get; set; }
 
         /// <summary>
         /// provides a string of Segoe Fluent Icon glyphs representing the systems that have been updated from their
         /// default setup for use in the ui.
         /// </summary>
         [JsonIgnore]
-        public string UpdatesIcons { get; set; }
+        public string UpdatesIconsUI { get; set; }
 
         /// <summary>
         /// provides a string of Segoe Fluent Icon glyphs representing the badges to apply to the icons from
         /// UpdatesIcons for use in the ui.
         /// </summary>
         [JsonIgnore]
-        public string UpdatesIconBadges { get; set; }
-
-        /// <summary>
-        /// provides an instance of an upload agent object that implements IUploadAgent. this object handles creating
-        /// a command set that will set up the jet (according to the configuration) and uploading it to the jet.
-        /// </summary>
-        [JsonIgnore]
-        public IUploadAgent UploadAgent { get; }
+        public string UpdatesIconBadgesUI { get; set; }
 
         // ------------------------------------------------------------------------------------------------------------
         //

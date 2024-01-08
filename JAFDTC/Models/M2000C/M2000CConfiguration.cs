@@ -80,9 +80,9 @@ namespace JAFDTC.Models.M2000C
             {
                 stpts = $" along with {WYPT.Count} waypoint" + ((WYPT.Count > 1) ? "s" : "");
             }
-            UpdatesInfoText = updatesStrings["UpdatesInfoText"] + stpts;
-            UpdatesIcons = updatesStrings["UpdatesIcons"];
-            UpdatesIconBadges = updatesStrings["UpdatesIconBadges"];
+            UpdatesInfoTextUI = updatesStrings["UpdatesInfoTextUI"] + stpts;
+            UpdatesIconsUI = updatesStrings["UpdatesIconsUI"];
+            UpdatesIconBadgesUI = updatesStrings["UpdatesIconBadgesUI"];
         }
 
         public override string Serialize(string systemTag = null)

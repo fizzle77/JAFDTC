@@ -161,6 +161,17 @@ https://www.gnu.org/licenses/.
                         <MenuFlyoutItem Text="Paste" Icon="Paste" Click="CmdPaste_Click"/>
                         <MenuFlyoutItem Text="Rename" Icon="Rename" Click="CmdRename_Click"/>
                         <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Text="Add to Favorites" Click="CmdFavorite_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE735;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Remove from Favorites" Click="CmdFavorite_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE734;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator/>
                         <MenuFlyoutItem Text="Export" Icon="Upload" Click="CmdExport_Click"/>
                         <MenuFlyoutItem Text="Load to Jet" Click="CmdLoadJet_Click">
                             <MenuFlyoutItem.Icon>
@@ -176,10 +187,16 @@ https://www.gnu.org/licenses/.
                 <DataTemplate x:DataType="local:IConfiguration">
                     <Grid Margin="7">
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="32"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0"
+                        <TextBlock VerticalAlignment="Center"
+                                   HorizontalAlignment="Left"
+                                   FontFamily="Segoe Fluent Icons"
+                                   FontSize="14"
+                                   Text="{x:Bind FavoriteGlyphUI}"/>
+                        <StackPanel Grid.Column="1"
                                     VerticalAlignment="Center">
                             <TextBlock Margin="0,0,0,1"
                                        FontSize="18"
@@ -188,9 +205,9 @@ https://www.gnu.org/licenses/.
                             <TextBlock FontSize="12"
                                        FontStyle="Italic"
                                        Foreground="{StaticResource TextFillColorTertiary}"
-                                       Text="{x:Bind UpdatesInfoText}"/>
+                                       Text="{x:Bind UpdatesInfoTextUI}"/>
                         </StackPanel>
-                        <Grid Grid.Column="1">
+                        <Grid Grid.Column="2">
                             <!--
                             these TextBlocks will overlay on top of each other, given all SFI glyphs are the same
                             width by design. we will use the Loaded event from the top-most TextBlock to show/hide
@@ -206,13 +223,13 @@ https://www.gnu.org/licenses/.
                                        Foreground="{ThemeResource SystemAccentColor}"
                                        FontFamily="Segoe Fluent Icons"
                                        FontSize="20"
-                                       Text="{x:Bind UpdatesIcons}"/>
+                                       Text="{x:Bind UpdatesIconsUI}"/>
                             <TextBlock VerticalAlignment="Center"
                                        HorizontalAlignment="Right"
                                        FontFamily="Segoe Fluent Icons"
                                        FontSize="20"
                                        Tag="uiCfgListViewItemBadges"
-                                       Text="{x:Bind UpdatesIconBadges}">
+                                       Text="{x:Bind UpdatesIconBadgesUI}">
                                 <TextBlock.Foreground>
                                     <SolidColorBrush Color="White" Opacity="0.0" />
                                 </TextBlock.Foreground>

@@ -97,6 +97,13 @@ https://www.gnu.org/licenses/.
                           ToolTipService.ToolTip="Return to Configuration List">
                 <SymbolIcon Symbol="Back"/>
             </AppBarButton>
+            <TextBlock Margin="0,0,8,0"
+                       x:Name="uiHdrTxtConfigIsFav"
+                       VerticalAlignment="Center"
+                       FontFamily="Segoe Fluent Icons" 
+                       FontSize="14">
+                &#xE735;
+            </TextBlock>
             <TextBlock Margin="4,0,0,4"
                        x:Name="uiHdrTxtConfigName"
                        VerticalAlignment="Center"

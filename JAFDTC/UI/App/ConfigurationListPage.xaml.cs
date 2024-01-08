@@ -79,15 +79,15 @@ namespace JAFDTC.UI.App
         private JAFDTC.App CurApp { get; set; }
 
         private ConfigurationList ConfigList { get; set; }
-        
+
         private AirframeTypes CurAirframe { get; set; }
 
         private IConfiguration CurConfigEditing { get; set; }
-        
+
         private bool IsRebuildPending { get; set; }
-        
+
         private bool IsNavPending { get; set; }
-        
+
         private bool IsClipboardValid { get; set; }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -495,6 +495,17 @@ namespace JAFDTC.UI.App
         }
 
         /// <summary>
+        /// favorite command: toggle favorite status of selected configuration.
+        /// </summary>
+        private void CmdFavorite_Click(object sender, RoutedEventArgs args)
+        {
+            IConfiguration config = (IConfiguration)uiCfgListView.SelectedItem;
+            config.IsFavorite = !config.IsFavorite;
+            config.Save();
+            ConfigList.FilterConfigs(ConfigFilterBox.Text, true);
+        }
+
+        /// <summary>
         /// import command: prompt for a configuration name and import file, deserialize a new configuration from the
         /// specified json.
         /// </summary>
@@ -652,7 +663,17 @@ namespace JAFDTC.UI.App
             }
             bool isJetMatched = (config != null) && (CurApp.DCSActiveAirframe == config.Airframe);
             uiCfgListCtxMenuFlyout.Items[2].IsEnabled = IsClipboardValid;                           // paste
-            uiCfgListCtxMenuFlyout.Items[6].IsEnabled = CurApp.IsDCSAvailable && isJetMatched;      // load to jet
+            if (config.IsFavorite)
+            {
+                uiCfgListCtxMenuFlyout.Items[5].Visibility = Visibility.Collapsed;                  // add favorite
+                uiCfgListCtxMenuFlyout.Items[6].Visibility = Visibility.Visible;                    // del favorite
+            }
+            else
+            {
+                uiCfgListCtxMenuFlyout.Items[5].Visibility = Visibility.Visible;                    // add favorite
+                uiCfgListCtxMenuFlyout.Items[6].Visibility = Visibility.Collapsed;                  // del favorite
+            }
+            uiCfgListCtxMenuFlyout.Items[9].IsEnabled = CurApp.IsDCSAvailable && isJetMatched;      // load to jet
             uiCfgListCtxMenuFlyout.ShowAt(listView, args.GetPosition(listView));
         }
 
