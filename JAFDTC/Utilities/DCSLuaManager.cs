@@ -152,7 +152,11 @@ namespace JAFDTC.Utilities
                     Directory.CreateDirectory(scriptsFolder);
                 }
 
-                if (CopyLuaFilesToDCS("JAFDTC", scriptsFolder) || CopyLuaFilesToDCS("Hooks", scriptsFolder))
+                if (CopyLuaFilesToDCS("JAFDTC", scriptsFolder))
+                {
+                    didUpdate = true;
+                }
+                if (CopyLuaFilesToDCS("Hooks", scriptsFolder))
                 {
                     didUpdate = true;
                 }
