@@ -54,7 +54,7 @@ https://www.gnu.org/licenses/.
                        VerticalAlignment="Center"
                        TextWrapping="NoWrap"
                        Style="{StaticResource CaptionTextBlockStyle}">
-                JAFDTC (Beta.17)
+                JAFDTC (Beta.18)
             </TextBlock>
             
             <!-- configuration filter AutoSuggestBox is managed by the ConfigurationListPage -->
