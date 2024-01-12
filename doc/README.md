@@ -1,5 +1,6 @@
 # JAFDTC: User's Guide
-*Version 1.0.0 of TODO*
+
+*Version 1.0.0-B.18 of 12-Jan-24*
 
 _Just Another #%*@^!% DTC_ (JAFDTC) is a Windows application that allows you to upload data
 typically saved on a data cartridge, such as steerpoints/waypoints and other avionics setup,
@@ -14,7 +15,7 @@ documentation for additional details.
 | [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | Waypoints
 | [AV-8B Harrier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_AV8B.md) | Waypoints
 | [F-14A/B Tomcat](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F14AB.md) | Waypoints
-| [F-15E Strike Eagle](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F15E.md) | Radios, Miscellaneous Systems
+| [F-15E Strike Eagle](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F15E.md) | Radios, Steerpoints, Miscellaneous Systems
 | [F-16C Viper](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F16C.md) | Countermeasures, Datalink, HARM (ALIC, HTS), MFD Formats, Radios, Steerpoints, Miscellaneous DED Systems
 | [F/A-18C Hornet](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_FA18C.md) | Countermeasures, Waypoints, Radios
 | [Mirage M-2000C](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_M2000C.md) | Waypoints
@@ -111,11 +112,14 @@ See the
 [discussion below](#interacting-with-dcs)
 for more details.
 
-# User Interface Overview
+# User Interface Basics
 
 The JAFDTC user interface is based around a single window that displays a list of configrations
 for an airframe and allows you to edit the specfic systems in a configuration. This section
-covers some of the user interface features that are common to multiple airframes.
+covers some of the user interface features that are common to multiple airframes. See the
+airframe-specific documentation linked
+[above](#jafdtc-users-guide)
+for discussion of the user interface concepts applicable to a specific airframe.
 
 ## Configuration List Page
 
@@ -124,12 +128,12 @@ a number of controls to manipulate configurations,
 
 ![](images/Core_Cfg_List_Page.png)
 
-The primary components of this page include,
+Working from top to bottom, the primary components of this page include,
 
 - **Filter Search Box** &ndash; Filters the configurations shown in the configuration list.
-- **Current Airframe** &ndash; Selects a supported airframe.
+- **Current Airframe** &ndash; Selects the current airframe to display configurations for.
 - **Command Bar** &ndash; Triggers commands to manipulate configurations.
-- **Configuration List** &ndash; Lists the available configurations for the selected airframe.
+- **Configuration List** &ndash; Lists the available configurations for the current airframe.
 - **Status Area** &ndash; Shows information on the current DCS status and pilot.
 
 The reaminder of this section discusses each of these elements in more detail.
@@ -164,22 +168,25 @@ it is launched.
 ### Configuration List
 
 The bulk of the page is taken up by a list of defined configurations for the selected airframe.
+Configurations in the list are sorted alphabetically, with favorites appearing first.
 Each row in this list corresponds to a configuration. On the left side of a row is the name of
-the configuration and a brief summary of what it changes in the avionics. On the right side of
-the row is a set of icons that also indicate which systems the configuration modifies. Systems
-that are linked to other systems are shown with a small gold dot in the lower right corner.
-this page only allows at most configuration to be selected at a time.
+the configuration, a favorite icon (if the configuration is marked as a favorite), and a brief
+summary of what changes to avionics the configuration includes. On the right side of the row is
+a set of icons that also indicate which specific systems the configuration modifies. Systems
+that are linked to other configurations are shown with a small gold dot in the lower right
+corner. This page allows at most configuration to be selected at a time.
 
 Double-clicking a row will open up the
 [System Editor Page](#system-editor-page)
 for the configuration that allows you to edit information in the configuration. Right-clicking
-on a row will bring up a context menu with additional options. 
+on a row will bring up a context menu with operations, such as **Rename** or **Delete**, that
+you can perform on the clicked configuration. 
 
 ### Command Bar
 
 The command bar at the top of the page provides quick access to the operations you can perform
 on Configurations. The following screen shot shows the command bar in its "open" state (accessed
-by clicking on the "..." button).
+by clicking on the "..." button at right).
 
 ![](images/Core_Command_Bar.png)
 
@@ -208,7 +215,9 @@ The command bar includes the following commands,
 
 The overflow menu (exposed by clicking on the "..." button) holds two commands,
 
-- **POI** &ndash; TODO
+- **POI** &ndash; Navigates to the
+  [POI Editor](#point-of-interest-database)
+  page to allow you to edit points of interest.
 - **Settings** &ndash; Opens up the
   [JAFDTC Settings](#settings)
   dialog to allow you to change JAFDTC settings.
@@ -243,9 +252,9 @@ The left side of the status area identifies the pilot and wing as specified thro
 ## System Editor Page
 
 The specific systems availble in a configuration vary from airframe to airframe. However, the
-general structure of the page on which you edit system configurations is similar from airframe
-to airframe. The system editor page provides a list of systems from which you can display
-per-system editors as the following figure illustrates.
+basic structure of the page on which you edit system configurations is similar. The *System
+Editor Page* provides a list of systems from which you can display per-system editors as the
+following figure illustrates.
 
 ![](images/Core_Cfg_Edit_Page.png)
 
@@ -257,7 +266,7 @@ page when clicked. Below these two items is text identifying the *Current Airfra
 ### System List
 
 The *System List* provides the systems that make up the configuration. Each system has an
-associated icon. The color of the icon indicates the state of the system: blue icons mark
+associated icon. The tint of the icon indicates the state of the system: blue icons mark
 systems whose configuration has changed from defaults, white icons mark systems that have not
 been changed.
 
@@ -269,19 +278,17 @@ A small gold dot marks those systems that are linked to other configurations.
 > A white icon with a gold dot indicates a system that is linked to another configuration
 > in which the system has not been changed from defaults.
 
-Clicking on a row in this list changes the system editor to the right to edit the selected
-system.
+Clicking on a row in this list changes the system editor panel to the right to a panel
+appropriate for editing the selected system.
 
 ### System Editor
 
-The bulk of the page is taken up by the system editor on the right. The content of this editor
-depends on which system is selected from the *System List* to the left. In the figure above,
+The bulk of the page is taken up by the system editor panel on the right. The content of this
+panel depends on the system selected from the *System List* to the left. In the figure above,
 the editor is showing the steerpoint list associated with the selected steerpoints system. See
 the
-[airframe discussions](#airframe-specific-documentation)
-for further details on the specific system editors. Though largely specific to a particular
-airframe, many systems provide common *Reset* and *Link* buttons along the bottom of the
-editor.
+[airframe discussions](#jafdtc-users-guide)
+for further details on system editors for a particular airframe.
 
 ### Common Editor Controls
 
@@ -337,12 +344,13 @@ the interface for managing navigation points depends on the airframe, the genera
 and layout of the interface is similar.
 
 > This is an overview of common functionality. Specific support may differ from airframe to
-> airframe. As usual, consult the airframe-specific documentation linked above for further
-> details on a particular airframe.
+> airframe. As usual, consult the
+> [airframe-specific documentation](#jafdtc-users-guide)
+> for further details on a particular airframe.
 
 Navigation systems typically follow a pattern where the system editor first shows a page that
-contains a list of navigation points in the system. From this page, you can jump to pages that
-allow you to edit the properties of a single navigation point. 
+contains a list of navigation points known to the system. From this page, you can jump to pages
+that allow you to edit the properties of a single navigation point. 
 
 ### Navigation Point List
 The first level of the interface presents a list of known navigation points. Generally, this
@@ -353,7 +361,7 @@ you will see when you select the navigation system from the
 
 ![](images/Core_Base_Nav_List.png)
 
-The navigation point list that makes up the bulk of the editor lists the known navigation
+The navigation point list that makes up the bulk of the editor lists the defined navigation
 points, their coordinates, name, and other airframe-specific information. This information is
 formated per airframe conventions. You can select one or more navigation points from the list
 using the usual Windows interactions. The command bar at the top of the editor allows you to
@@ -364,27 +372,32 @@ manipulate selected items in the navigation point list.
 The command bar includes the following commands,
 
 - **Add** &ndash; Adds a new navigation point and opens up the detail editor to set it up.
-- **Edit** &ndash; Opens the selected navigation point in the detail editor.
+- **Edit** &ndash; Opens the selected navigation point in the
+  [detail editor](#navigation-point-editor).
 - **Copy** &ndash; Copy the selected navigation points to the clipboard.
 - **Paste** &ndash; Paste navigation points from the clipboard into the system.
 - **Delete** &ndash; Deletes the currnetly selected navigation points from the configuration.
 - **Renumber** &ndash; Renumbers the navigation points starting from a specified number.
 - **Capture** &ndash; Capture navigation points from the DCS F10 view and add them to the
   system.
-- **Import** &ndash; Import navigation points from a file.
-- **Export** &ndash; Export navigation points to a file.
+- **Import** &ndash;
+  [Import](#importing-and-exporting-navigation-points)
+  navigation points from a file.
+- **Export** &ndash;
+  [Export](#importing-and-exporting-navigation-points)
+  navigation points to a file.
 
 All of these commands are typically available on all airframes.
 
 ### Navigation Point Editor
 
-Editing a navigation point brings up an editor page,
+Editing a navigation point in the navigation point list brings up an editor page,
 
 ![](images/Core_Base_Nav_Edit.png)
 
-The page can differ significantly from airframe to airframe to adapt to the capabilities of the
-navigation system in the airframe. For example, on the Viper, the navigation point editor page
-would also include reference points such as OAP1 and OAP2.
+The page may differ significantly from airframe to airframe to adapt to the capabilities of the
+airframe's navigation system. For example, for the Viper, the navigation point editor page
+allows specification of reference points such as OAP1 and OAP2.
 
 The top section of the page allows you to set up the navigation point from a known
 *point of interest*, such as an airfield, or capture its coordinates from the F10 map in DCS as
@@ -402,12 +415,10 @@ four controls.
   point in the list, respectively.
 - The `+` button in between the chevrons adds a new navigation point to the end of the list.
 
-The bulk of the page is taken up by an area for the navigation point parameters. In this
-example, there are only four: name, latitude, longitude, and altitude. The specific format of
-the information (for example, latitude in degrees-minutes-seconds versus degrees-decimal
-minutes) depends on the airframe. As mentioned earlier, airframes may have additional fields
-here depending on the capabilities of the system. These fields will turn red if they contain
-an illegal value.
+The page includes an area for the navigation point parameters. In this example, there are only
+four: name, latitude, longitude, and altitude. The specific format of the information (for
+example, latitude in degrees-minutes-seconds versus degrees-decimal minutes) depends on the
+airframe. Fields will turn red if they contain an illegal value.
 
 ![](images/Core_Base_Nav_Error.png)
 
@@ -440,15 +451,24 @@ JAFDTC will interact with the coordinate capture in DCS as long as this dialog i
 you have completed the capture in DCS, you click “Done” in this dialog to incorporate the
 captured coordinates in the navigation system.
 
+### Importing and Exporting Navigation Points
+
+TODO
+
+![](images/Core_Base_Import.png)
+
+TODO
+
 ## System Editors for Communications Systems
 
-Most aircraft in JAFDTC support a communication system that allows configuration of one or more
-radios in the airframe. Typical configuration includes information like preset frequencies,
-enabling guard monitoring, and so on.
+Several aircraft in JAFDTC support a communication system that allows configuration of one or
+more radios in the airframe. Typical configuration includes information like preset
+frequencies, enabling guard monitoring, and so on.
 
 > This is an overview of common functionality. Specific support may differ from airframe to
-> airframe. As usual, consult the airframe-specific documentation linked above for further
-> details on a particular airframe.
+> airframe. As usual, consult the
+> [airframe-specific documentation](#jafdtc-users-guide)
+> for further details on a particular airframe.
 
 Communication systems typically follow a pattern where the system editor shows a list of
 presets along with other controls to specify other system configuration.
@@ -553,32 +573,36 @@ changes in the dialog, while "Cancel" will discard any changes.
 # DCS Integration
 
 JAFDTC integrates with DCS to allow you to setup your jet according to a configuration and
-perform other operations with DCS.
+perform other operations with DCS. The availability of specific capabilities may vary from
+airframe to airframe.
 
 ## Applying Configurations
 
+> All airframes support this capability.
+
 The primary interaction between JAFDTC and DCS involves uploading configurations to the jet.
 Some airframes also support additional interactions with the JAFDTC UI as the
-[airframe-specific documentation](#airframe-specific-documentation)
+[airframe-specific documentation](#jafdtc-users-guide)
 describes.
 
 To be able to upload a configuration for a particular airframe, four conditions must hold,
 
-1. The DCS scripting support must be
+1. A configuration must be selected
+2. The DCS scripting support must be
    [installed](#support-scripts)
-2. A configuration must be selected
 3. DCS must be running
-4. A mission must be running with a pilot must be in pit in an airframe that matche the
+4. A mission must be running with a pilot must be in pit in an airframe that matches the
    airframe of the configuration selected in (1)
 
-The lower left corner of the main configuration list page indicates the status some of these
-conditions as
+The lower left corner of the main configuration list page indicates the status conditions 2-4
+as
 [discussed earlier](#status-area).
-In the earlier example, all three conditions hold with an F-16C Viper active. At this point, we
-can use the **Load to Jet** button from the
+Once these conditions are met, you can use the **Load to Jet** button from the
 [command bar](#command-bar)
 or context menu item, to load the currently selected configuration into the jet. Note that,
-generally, the upload should take place before any changes are made with the avionics.
+generally, the upload should take place before any changes are made with the avionics. Also,
+as JAFDTC works through the clickable cockpit, you should limit your interactions with cockpit
+switches while JAFDTC is loading a configuration.
 
 > In some cases, it is difficult to impossible for JAFDTC to get the jet in a known
 > configuration from a non-default starting point. In these situations, JAFDTC must rely on the
@@ -588,20 +612,25 @@ generally, the upload should take place before any changes are made with the avi
 > since mission start.
 >
 > For these reasons, it is generally advisable to perform uploads prior to manually changing
-> any avionics settings overlapping with the configuration.
+> any avionics settings that overlap with those in the configuration.
 
 Some airframes can also trigger JAFDTC operations through buttons in the cockpit. For example,
 in the Viper, JAFDTC allows you to use the **FLIR WX** button to trigger configuration upload
 
 > For further information on JAFDTC actions that can be triggered from within the cockpit in
 > DCS, see the
-> [airframe-specific documentation](#jafdtc-users-guide)
-> listed at the start of this user's guide.
+> [airframe-specific documentation](#jafdtc-users-guide).
 
 ## Capturing Coordinates
 
-JAFDTC can capture coordinates from the DCS F10 map to use in navigation points for the
-navigation system in a configuration.
+> All airframes support this capability, but its application may differ.
+
+JAFDTC can
+[capture coordinates](#capturing-coordinates-for-navpoints)
+from the DCS F10 map to use in navigation points for the navigation system in a configuration.
+
+> You must be in an in-mission slot viewing the F10 map in order to capture coordiantes.
+> Capture does not work from the DCS Mission Editor.
 
 > As always, consult the
 > [airframe-specific documentation](#jafdtc-users-guide)
@@ -610,11 +639,7 @@ navigation system in a configuration.
 The JAFDTC side of this interaction was
 [described earlier](#capturing-coordinates-for-navpoints).
 Once JAFDTC presents the “Capturing” dialog, the interaction switches to the DCS F10 map.
-
-> You must be in an in-mission slot viewing the F10 map in order to capture coordiantes.
-> Capture does not work from the DCS Mission Editor.
-
-Once in the F10 map, type `CTRL`-`SHIFT`-`J` to show the JAFDTC capture overlay on the F10
+From the F10 map, type `CTRL`-`SHIFT`-`J` to show the JAFDTC capture overlay on the F10
 map,
 
 ![](images/Core_Base_Capture.png)
@@ -643,20 +668,37 @@ depends on the specific airframe.
 After sending the navigation points to JAFDTC, you must dismissing the “Capturing” dialog as
 [discussed above](#capturing-coordinates-for-navpoints).
 
+## Changing the Selected Configuration
+
+> Some airframes support this capability.
+
+Some airframes can allow changes to the currently selected configuration through DCS rather
+than the JAFDTC Windows UI. This is helpful for VR and other uses where it may be difficult
+to interact with the Windows UI.
+
+With this capability, you can step sequentially through the configurations. As you change
+the configuration in this fashion, JAFDTC will display a small window in DCS with the name
+of the currently selected configuration,
+
+![](images/Core_Base_Cfg_Name.png)
+
+This window is only displayed briefly as you step through configurations.
+
 ## Support Scripts
 
 To interoperate with DCS, JAFDTC installs Lua within the `Scripts` hierarchy in the DCS
 installation(s) present in the `Saved Games` folder associated with your profile. JAFDTC can
-install this support in two places,
+install this support in up to two places,
 
 - `Saved Games\DCS\Scripts`
 - `Saved Games\DCS.openbeta\Scripts`
 
-JAFDTC will install in one or both of these directories based on which versions of DCS are
-installed on your system. Within these areas, JAFDTC makes three changes,
+depending which versions of DCS are installed on your system. Within these areas, JAFDTC makes
+three changes,
 
-- Adds scripts in the `Scripts\JAFDTC` folder that enable integration with supported airframes
-- Adds a `JAFDTCHooks.lua` script to the `Scripts\Hooks` folder that enables integration with DCS
+- Adds scripts in the `Scripts\JAFDTC` folder to enable integration with supported airframes
+- Adds `JAFDTCHook.lua` and `JAFDTCCfgNameHook.lua` script to the `Scripts\Hooks` folder to
+  enables integration with DCS
 - Adds a line to `Scripts\Export.lua` to load JAFDTC support into DCS at mission start
 
 JAFDTC will automatically update these files as needed, notifying you when an update is made.

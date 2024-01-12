@@ -1,10 +1,12 @@
 # JAFDTC: F-15E Strike Eagle Configurations
 
-*Version 1.0.0 of TODO*
+*Version 1.0.0-B.18 of 12-Jan-24*
+
 
 JAFDTC supports the following configuration in the Strike Eagle,
 
 - COM1/COM2 radio presets and initial configuration
+- Steerpoints system including routes, target points, and reference points
 - Miscellaneous systems such as TACAN, ILS, BINGO, and altitude warning
 
 Each of these areas is covered in more depth below. See the
@@ -13,9 +15,8 @@ for more on the aspects of JAFDTC that are common to multiple airframes.
 
 # Configurable Systems
 
-A Strike Eagle configuration supports settings spanning one system as described below. Each of
-these systems implements the link and reset functionality mentioned in the overview of
-the
+A Strike Eagle configuration supports settings spanning three systems as described below. Each
+of these systems implements the link and reset functionality mentioned in the overview of the
 [system editor page](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#system-editor-page).
 
 Priort to uploading, you should ensure the relevant systems are powered up and functional.
@@ -27,6 +28,10 @@ powered up, stores loaded, and so on.
 TODO
 
 ## Miscellaneous
+
+TODO
+
+## Steerpoints
 
 TODO
 

@@ -1,6 +1,6 @@
 # JAFDTC: F-16C Viper Configurations
 
-*Version 1.0.0 of TODO*
+*Version 1.0.0-B.18 of 12-Jan-24*
 
 JAFDTC supports the following configuration in the Viper,
 
@@ -17,6 +17,33 @@ JAFDTC supports the following configuration in the Viper,
 Each of these areas is covered in more depth below. See the
 [user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
 for more on the aspects of JAFDTC that are common to multiple airframes.
+
+# DCS Cockpit Interactions
+
+> This functiuonality requires installation of the DCS Lua support. 
+
+The Viper allows the user to operate JAFDTC from buttons in the cockpit without needing to go
+through the Windows UI. This is helpful for VR and other situations where you may not be able
+to interact with the window. To support this capabilty, JAFDTC reuses controls from the FLIR
+panel on the UFC that have no function in the the Block 50 Viper that DCS models,
+
+![](images/Viper_UFC_JAFDTC.png)
+
+JAFDTC currently supports four functions from the Viper cockpit,
+
+* Pressing and holding the FLIR `WX` button for about 0.25s causes JAFDTC to load the
+  currently selected configuration into the jet if it is compatible. JAFDTC provides audio
+  feedback for the start (single beep), end (two beeps), and status (error buzz) of this
+  operation.
+* Pressing the FLIR rocker switch moves changes the currently selected configuration. JAFDTC
+  briefly displays the name of the selected configuration in DCS as you step through the
+  configurations.
+* Setting the 3-position FLIR `GAIN/LVL/AUTO` switch to `GAIN` will keep the JAFDTC window
+  on top of the DCS window in the window stack, regardless of the "on top" setting.
+* Steeting the 3-position FLIR `GAIN/LVL/AUTO` switch to `LVL` will allow the JAFDTC window
+  to be below the DCS window in the window stack, regardless of the "on top" setting.
+
+Other functions may be implemented later.
 
 # Configurable Systems on the Viper
 
@@ -265,35 +292,13 @@ initial radio frequency and guard monitor.
 
 ![](images/Viper_Sys_COMM.png)
 
-The top row of page selects the radio to operate on and supports several commands while the
-lower section details the settings for the selected radio.  The common controls implement the
-link and reset functionality described
-[earlier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#common-editor-controls).
+This editor follows the common communication systems editor the
+[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#system-editors-for-communications-systems)
+describes with the common controls implementing the link and reset functionality described in
+the
+[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#common-editor-controls).
 
-### Radio Selection and Command Bar
-
-The top row allows you to select the radio to edit along and perform some common commands. On
-the left, the radio select menu, strangely enough, selects the radio to edit. As with other
-editors, a blue dot next to the radio in the radio select menu indicates the setup for the
-radio has been edited. Also, like other editors, the up and down chevrons step through the
-available radios.
-
-On the right of the row is a group of three commands. From left to right the commands are,
-
-* *Add* creates a new preset and adds it to the preset list.
-* *Import* imports presets from a previously exported radio setup file.
-* *Export* exports presets to a radio setup file suitible for import.
-
-Commands may be disabled. For example, add is disabled when there are no more preset slots
-available in the radio.
-
-### Preset List
-
-The preset list shows all of the defined presets. Each preset has a preset number, frequency,
-and brief description. When entring a preset or frequency, the background of the field will
-turn red when the value is invalid. On the right end of each row, there is a button to delete
-the preset.
-
+The Viper editor includes additional controls btween the preset list and common editor controls.
 Below the preset list is a field to set the initial frequency or preset to select after
 uploading the configuration to the jet. The background of this field will turn red if the
 value is invalid.
@@ -301,34 +306,9 @@ value is invalid.
 > Note that unless there is an initial frequency or preset specified, JAFDTC will not change
 > the frequency tuned on a radio from the default frequency.
 
-Also, the COM1 (UHF) radio can be set to monitor guard through the checkbox on the right
-under the preset list.
+Also, the COM1 (UHF) radio can be set to monitor guard through the "monitor guard" checkbox on
+the right under the preset list.
 
 ## STPT: Steerpoints
 
 TODO
-
-# DCS Cockpit Interactions
-
-The Viper allows the user to operate JAFDTC from buttons in the cockpit without needing to go
-through the Windows UI.
-
-> This capability requires installation of the DCS Lua support. 
-
-This capability reuses controls from the FLIR panel on the UFC as these controls are not used
-by the Block 50 Viper that DCS models as the following figure illustrates,
-
-![](images/Viper_UFC_JAFDTC.png)
-
-JAFDTC currently supports three functions from the Viper cockpit,
-
-* Pressing and holding the FLIR `WX` button for about 0.25s causes JAFDTC to start loading
-  the currently selected configuration into the jet if it is compatible. JAFDTC provides
-  audio feedback for the start (single beep), end (two beeps), and status (error buzz) of
-  this operation.
-* Flipping the 3-position FLIR `GAIN/LVL/AUTO` switch to `GAIN` will keep the JAFDTC window
-  on top of the DCS window in the window stack, regardless of the "on top" setting.
-* Flipping the 3-position FLIR `GAIN/LVL/AUTO` switch to `LVL` will allow the JAFDTC window
-  to be below the DCS window in the window stack, regardless of the "on top" setting.
-
-Other functions may be implemented later.

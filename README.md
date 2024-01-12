@@ -8,7 +8,7 @@ following DCS airframes and systems,
 - *A-10C Warthog* &ndash; Waypoints
 - *AV-8B Harrier* &ndash; Waypoints
 - *F-14A/B Tomcat* &ndash; Waypoints
-- *F-15E Strike Eagle* &ndash; Radios, Miscellaneous Systems
+- *F-15E Strike Eagle* &ndash; Radios, Steerpoints, Miscellaneous Systems
 - *F-16C Viper* &ndash; Countermeasures, Datalink, HARM ALIC, HARM HTS, MFD Formats, Miscellaneous DED
   Systems, Radios, Steerpoints
 - *F/A-18C Hornet* &ndash; Countermeasures, Radios, Waypoints

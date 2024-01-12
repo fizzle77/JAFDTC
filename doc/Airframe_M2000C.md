@@ -1,6 +1,6 @@
 # JAFDTC: Mirage M-2000C Configurations
 
-*Version 1.0.0 of TODO*
+*Version 1.0.0-B.18 of 12-Jan-24*
 
 JAFDTC supports the following configuration in the Mirage,
 
