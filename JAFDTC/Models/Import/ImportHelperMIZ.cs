@@ -226,7 +226,8 @@ namespace JAFDTC.Models.Import
             return flights;
         }
 
-        public override bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true)
+        public override bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true,
+                                    Dictionary<string, object> options = null)
         {
             List<Dictionary<string, string>> navptInfoList = Navpoints(flightName);
             if (navptInfoList != null)

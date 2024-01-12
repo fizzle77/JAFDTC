@@ -49,6 +49,7 @@
     <None Remove="Images\Wide310x150Logo.scale-200.png" />
     <None Remove="Package.appxmanifest" />
     <None Remove="UI\App\EditPointsOfInterestPage.xaml" />
+    <None Remove="UI\App\ImportParamsDialog.xaml" />
     <None Remove="UI\AV8B\AV8BEditWaypointListPage.xaml" />
     <None Remove="UI\Base\EditNavpointListPage.xaml" />
     <None Remove="UI\Base\EditNavpointPage.xaml" />
@@ -124,6 +125,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\App\ImportParamsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

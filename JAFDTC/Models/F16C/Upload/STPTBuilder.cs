@@ -20,10 +20,12 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C.STPT;
+using Microsoft.UI.Xaml;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
+using Windows.ApplicationModel.Activation;
 
 namespace JAFDTC.Models.F16C.Upload
 {
@@ -61,6 +63,8 @@ namespace JAFDTC.Models.F16C.Upload
                 AppendCommand(ufc.GetCommand("RTN"));
                 AppendCommand(ufc.GetCommand("RTN"));
 
+                int dZ = -GetZuluDelta(stpts[0]);       // negate to get offset from local to zulu
+
                 Dictionary<string, SteerpointInfo> jetStpts = new();
                 for (var i = 0; i < stpts.Count; i++)
                 {
@@ -68,7 +72,7 @@ namespace JAFDTC.Models.F16C.Upload
                     jetStpts.Add(stpt.Number.ToString(), stpt);
                 }
 
-                BuildWaypoints(ufc, jetStpts);
+                BuildWaypoints(ufc, jetStpts, dZ);
                 BuildVIP(ufc, jetStpts);
                 BuildVRP(ufc, jetStpts);
             }
@@ -79,7 +83,7 @@ namespace JAFDTC.Models.F16C.Upload
         /// set of navigation points using the ufc. this will enter both the steerpoint as well as any oap's tied
         /// to the steerpoint.
         /// <summary>
-        private void BuildWaypoints(Device ufc, Dictionary<string, SteerpointInfo> jetStpts)
+        private void BuildWaypoints(Device ufc, Dictionary<string, SteerpointInfo> jetStpts, int dZ)
         {
             AppendCommand(ufc.GetCommand("LIST"));
             AppendCommand(ufc.GetCommand("1"));
@@ -106,7 +110,7 @@ namespace JAFDTC.Models.F16C.Upload
                     PredAppendDigitsWithEnter(ufc, stpt.Alt, true);
                     AppendCommand(ufc.GetCommand("DOWN"));
 
-                    PredAppendDigitsNoSepWithEnter(ufc, stpt.TOS);
+                    PredAppendDigitsNoSepWithEnter(ufc, AdjustHMSTOSForZulu(stpt.TOS, dZ));
                     AppendCommand(ufc.GetCommand("DOWN"));
 
                     if ((stpt.OAP[0].Type == RefPointTypes.OAP) || (stpt.OAP[1].Type == RefPointTypes.OAP))
@@ -284,6 +288,29 @@ namespace JAFDTC.Models.F16C.Upload
 
             PredAppendDigitsNoSepWithEnter(ufc, elev, true);
             AppendCommand(ufc.GetCommand("DOWN"));
+        }
+
+        /// <summary>
+        /// return the zulu offset for the steerpoint, 0 if location is unknown. uses the poi database to determine
+        /// the theater and from there the proper offset. local_time = zulu + GetZuluDelta().
+        /// </summary>
+        private static int GetZuluDelta(SteerpointInfo stpt)
+        {
+            if (double.TryParse(stpt.Lat, out double lat) && double.TryParse(stpt.Lon, out double lon))
+            {
+                return PointOfInterestDbase.TheaterForCoords(lat, lon) switch
+                {
+                    "Marianas"          => 10,  // UTC +10
+                    "Caucasus"          => 4,   // UTC +4
+                    "Persian Gulf"      => 4,   // UTC +4
+                    "Sinai"             => 3,   // UTC +3
+                    "Syria"             => 3,   // UTC +3
+                    "South Atlantic"    => -3,  // UTC -3
+                    "Nevada"            => -8,  // UTC -8
+                    _                   => 0
+                };
+            }
+            return 0;
         }
     }
 }

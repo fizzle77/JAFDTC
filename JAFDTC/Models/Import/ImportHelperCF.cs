@@ -22,6 +22,7 @@ using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace JAFDTC.Models.Import
@@ -38,6 +39,8 @@ namespace JAFDTC.Models.Import
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        // ---- private properties
+
         private AirframeTypes Airframe {  get; set; }
 
         private string Path { get; set; }
@@ -45,6 +48,10 @@ namespace JAFDTC.Models.Import
         private XmlDocument XmlDoc { get; set; }
         
         private Dictionary<string, XmlNode> XmlWaypointNodes { get; set; }
+
+        private bool IsImportTakeOff { get; set; }
+
+        private bool IsImportTOS { get; set; }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -58,6 +65,9 @@ namespace JAFDTC.Models.Import
             Path = path;
             XmlDoc = new XmlDocument();
             XmlWaypointNodes = new Dictionary<string, XmlNode>();
+
+            IsImportTakeOff = false;
+            IsImportTOS = false;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -75,11 +85,11 @@ namespace JAFDTC.Models.Import
                 AirframeTypes.A10C => (airframe == "A-10C_2"),
                 AirframeTypes.AH64D => (airframe == "AH-64D_BLK_II"),
                 AirframeTypes.AV8B => (airframe == "AV8BNA"),
+                AirframeTypes.F14AB => (airframe == "F-14A-135-GR") || (airframe == "F-14B"),
                 AirframeTypes.F15E => (airframe == "F-15ESE"),
                 AirframeTypes.F16C => (airframe == "F-16C_50"),
                 AirframeTypes.FA18C => (airframe == "FA-18C_hornet"),
                 AirframeTypes.M2000C => (airframe == "M-2000C"),
-                AirframeTypes.F14AB => (airframe == "F-14A-135-GR") || (airframe == "F-14B"),
                 _ => false,
             };
         }
@@ -94,6 +104,7 @@ namespace JAFDTC.Models.Import
         ///   ["lat"]       (string) latitude of navpoint, decimal degrees with no units
         ///   ["lon"]       (string) longitude of navpoint, decimal degrees with no units
         ///   ["alt"]       (string) elevation of navpoint, feet
+        ///   ["ton"]       (string) time on navpoint, hh:mm:ss
         /// </summary>
         private List<Dictionary<string, string>> Navpoints(string flightName)
         {
@@ -101,28 +112,50 @@ namespace JAFDTC.Models.Import
             if (XmlWaypointNodes.ContainsKey(flightName))
             {
                 waypoints = new List<Dictionary<string, string>>();
-
-                bool isSteerpoint = false;
                 foreach (XmlNode node in XmlWaypointNodes[flightName])
                 {
-                    // TODO: first steerpoint is usually take-off, too lazy right now to check Type node.
-                    if (isSteerpoint)
-                    {
-                        double alt = double.Parse(node.SelectSingleNode("Altitude").InnerText);
+                    string type = node.SelectSingleNode("Type").InnerText;
+                    bool isTakeOffType = ((type != null) && Regex.Match(type.ToLower(), @"^take off").Success);
 
+                    if (IsImportTakeOff || !isTakeOffType)
+                    {
                         Dictionary<string, string> steerpoint = new()
                         {
                             ["name"] = node.SelectSingleNode("Name").InnerText,
                             ["lat"] = node.SelectSingleNode("Lat").InnerText,
                             ["lon"] = node.SelectSingleNode("Lon").InnerText,
-                            ["alt"] = alt.ToString("0")
-
-                            // TODO: consider pulling "TOT" node from waypoint...
-                            // TODO: put "ERROR" in dictionary if there were errors in the stpt?
                         };
+
+                        if (!double.TryParse(node.SelectSingleNode("Altitude").InnerText, out double alt))
+                        {
+                            alt = 0.0;
+                        }
+                        steerpoint["alt"] = $"{(int)alt:D}";
+
+                        string ton = node.SelectSingleNode("TOT").InnerText;
+                        if ((ton != null) && IsImportTOS)
+                        {
+                            string[] parts = ton.Split(' ');
+                            if (parts.Length == 3)
+                            {
+                                string[] hms = parts[1].Split(':');
+                                if ((hms.Length == 3) &&
+                                    (int.TryParse(hms[0], out int h) && (h >= 1) && (h < 13)) &&
+                                    (int.TryParse(hms[1], out int m) && (m >= 0) && (m < 60)) &&
+                                    (int.TryParse(hms[2], out int s) && (s >= 0) && (s < 60)))
+                                {
+                                    if ((parts[2].ToLower() == "pm") && (h < 12))
+                                    {
+                                        h += 12;
+                                    }
+                                    steerpoint["ton"] = $"{h:D2}:{m:D2}:{s:D2}";
+                                }
+                            }
+                        }
+
+                        // TODO: put "ERROR" in dictionary if there were errors in the stpt?
                         waypoints.Add(steerpoint);
                     }
-                    isSteerpoint = true;
                 }
             }
             return waypoints;
@@ -173,8 +206,26 @@ namespace JAFDTC.Models.Import
             return flights;
         }
 
-        public override bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true)
+        public override Dictionary<string, string> OptionTitles(string what = "Steerpoint")
+            => new()
+            {
+                ["A"] = $"Import Take Off {what}s",
+                ["B"] = $"Import Time on {what}",
+            };
+
+        public override Dictionary<string, object> OptionDefaults
+            => new()
+            {
+                ["A"] = false,
+                ["B"] = false,
+            };
+
+        public override bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true,
+                                    Dictionary<string, object> options = null)
         {
+            IsImportTakeOff = (bool)options["A"];
+            IsImportTOS = (bool)options["B"];
+
             List<Dictionary<string, string>> navptInfoList = Navpoints(flightName);
             if (navptInfoList != null)
             {

@@ -17,7 +17,6 @@
 //
 // ********************************************************************************************************************
 
-using ABI.System;
 using JAFDTC.Models;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
@@ -52,6 +51,14 @@ namespace JAFDTC
         public bool IsAppStartupGood { get; private set; }
 
         public IConfiguration CurrentConfig { get; set; }
+
+        public double DCSLastLat { get; private set; }
+
+        public double DCSLastLon { get; private set; }
+
+        public int DCSLastStartTime { get; private set; }
+
+        // ---- private properties
 
         private DispatcherTimer CheckDCSTimer { get; set; }
 
@@ -191,6 +198,10 @@ namespace JAFDTC
         {
             InitializeComponent();
 
+            DCSLastLat = 0.0;
+            DCSLastLon = 0.0;
+            DCSLastStartTime = 0;
+
             LastDCSExportCheck = System.DateTimeOffset.Now;
             LastDCSExportPacketCount = 0;
             UploadPressedTimestamp = 0;
@@ -301,16 +312,16 @@ namespace JAFDTC
             }
             else
             {
-                if (!UploadPressed && (data.Upload == "1") && (UploadPressedTimestamp == 0))
+                if (!UploadPressed && (data.CmdUpload == "1") && (UploadPressedTimestamp == 0))
                 {
                     UploadPressedTimestamp = DateTime.Now.Ticks;
                 }
-                if (data.Upload == "0")
+                if (data.CmdUpload == "0")
                 {
                     UploadPressedTimestamp = 0;
                 }
 
-                UploadPressed = data.Upload == "1";
+                UploadPressed = data.CmdUpload == "1";
 
                 System.TimeSpan timespan = new(DateTime.Now.Ticks - UploadPressedTimestamp);
                 if ((UploadPressedTimestamp != 0) && UploadPressed && (timespan.TotalMilliseconds > 250))
@@ -331,17 +342,17 @@ namespace JAFDTC
         private void ProcessWindowStackCommand(TelemDataRx.TelemData data)
         {
             bool isUpdateWindowLayer = false;
-            if (data.ToggleJAFDTC == "1")
+            if (data.CmdToggle == "1")
             {
                 IsJAFDTCPinnedToTop = !IsJAFDTCPinnedToTop;
                 isUpdateWindowLayer = true;
             }
-            else if (!IsJAFDTCPinnedToTop && (data.ShowJAFDTC == "1"))
+            else if (!IsJAFDTCPinnedToTop && (data.CmdShow == "1"))
             {
                 IsJAFDTCPinnedToTop = true;
                 isUpdateWindowLayer = true;
             }
-            else if (IsJAFDTCPinnedToTop && (data.HideJAFDTC == "1"))
+            else if (IsJAFDTCPinnedToTop && (data.CmdHide == "1"))
             {
                 IsJAFDTCPinnedToTop = false;
                 isUpdateWindowLayer = true;
@@ -368,11 +379,11 @@ namespace JAFDTC
             long curTicks = DateTime.Now.Ticks;
             System.TimeSpan timeSpan = new(curTicks - IncDecPressedTimestamp);
 
-            if (!IncPressed && (data.Increment == "1"))
+            if (!IncPressed && (data.CmdIncr == "1"))
             {
                 IncPressed = true;
             }
-            else if (IncPressed && (data.Increment == "0"))
+            else if (IncPressed && (data.CmdIncr == "0"))
             {
                 IncDecPressedTimestamp = curTicks;
                 IncPressed = false;
@@ -382,11 +393,11 @@ namespace JAFDTC
                 });
             }
 
-            if (!DecPressed && (data.Decrement == "1"))
+            if (!DecPressed && (data.CmdDecr == "1"))
             {
                 DecPressed = true;
             }
-            else if (DecPressed && (data.Decrement == "0"))
+            else if (DecPressed && (data.CmdDecr == "0"))
             {
                 IncDecPressedTimestamp = curTicks;
                 DecPressed = false;
@@ -407,6 +418,9 @@ namespace JAFDTC
             {
                 DCSActiveAirframe = (_dcsToJAFDTCTypeMap.ContainsKey(data.Model)) ? _dcsToJAFDTCTypeMap[data.Model]
                                                                                   : AirframeTypes.None;
+                DCSLastLat = (double.TryParse(data.Lat, out double lat)) ? lat : 0.0;
+                DCSLastLon = (double.TryParse(data.Lat, out double lon)) ? lon : 0.0;
+                DCSLastStartTime = (int.TryParse(data.StartTime, out int startTime)) ? startTime : 0;
 
                 ProcessMarker(data);
                 ProcessUploadCommand(data);

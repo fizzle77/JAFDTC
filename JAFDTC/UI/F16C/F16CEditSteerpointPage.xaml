@@ -262,7 +262,7 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.Regex="^[\d]{2}:[\d]{2}:[\d]{2}’$"
                          ui_ctk:TextBoxExtensions.Mask="99:99:99"
                          LostFocus="StptTextBox_LostFocus"
-                         ToolTipService.ToolTip="Time Over Steerpoint (TOS) of steerpoint in format: HH:MM:SS"/>
+                         ToolTipService.ToolTip="Time Over Steerpoint (TOS) of steerpoint in format: HH:MM:SS, local time"/>
             </Grid>
         </Grid>
 

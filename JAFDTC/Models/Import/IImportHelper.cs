@@ -40,8 +40,22 @@ namespace JAFDTC.Models.Import
         public List<string> Flights();
 
         /// <summary>
+        /// return a dictionary that maps option identifiers (see the ui) to titles suitable for use in the ui for
+        /// the options associated with the import helper, null if there are no options. the what parameter may be
+        /// used to customize titles.
+        /// </summary>
+        public Dictionary<string, string> OptionTitles(string what = "Steerpoint");
+
+        /// <summary>
+        /// return a dictionary that maps option identifiers (see the ui) to default values for the options
+        /// associated with the import helper, null if there are no options.
+        /// </summary>
+        public Dictionary<string, object> OptionDefaults { get; }
+
+        /// <summary>
         /// TODO: document
         /// </summary>
-        public bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true);
+        public bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true,
+                           Dictionary<string, object> options = null);
     }
 }

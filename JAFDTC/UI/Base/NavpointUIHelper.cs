@@ -205,6 +205,7 @@ namespace JAFDTC.UI.Base
 
                 ContentDialogResult result = ContentDialogResult.Primary;
                 string flightName = null;
+                Dictionary<string, object> options = null;
                 List<string> flights = importer.Flights();
                 if (importer.HasFlights && ((flights == null) || (flights.Count == 0)))
                 {
@@ -215,8 +216,7 @@ namespace JAFDTC.UI.Base
                 }
                 else if (importer.HasFlights)
                 {
-                    GetListDialog flightList = new(flights,
-                        $"Would you like to replace the existing {what.ToLower()}s or append to the current list?")
+                    ImportParamsDialog flightList = new(flights, importer.OptionTitles(what), importer.OptionDefaults)
                     {
                         XamlRoot = root,
                         Title = $"Select a Flight to Import {what}s From",
@@ -226,6 +226,7 @@ namespace JAFDTC.UI.Base
                     };
                     result = await flightList.ShowAsync(ContentDialogPlacement.Popup);
                     flightName = flightList.SelectedItem;
+                    options = flightList.Options;
                 }
                 else
                 {
@@ -239,7 +240,7 @@ namespace JAFDTC.UI.Base
                 {
                     return false;                                           // exit, flight selection cancelled
                 }
-                if (!importer.Import(navptSys, flightName, (result == ContentDialogResult.Primary)))
+                if (!importer.Import(navptSys, flightName, (result == ContentDialogResult.Primary), options))
                 {
                     throw new Exception();                                  // exit, import error
                 }

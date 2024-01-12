@@ -178,5 +178,26 @@ namespace JAFDTC.Models.DCS
             return s.Replace(",", "").Replace(".", "").Replace("°", "").Replace("’", "").Replace("”", "")
                     .Replace("\"", "").Replace("'","").Replace(":", "");
         }
+
+        /// <summary>
+        /// adjust a hh:mm:ss tos value by a zulu delta for entry into a navpoint system. the hour field is
+        /// adjusted by adding dZ, where dZ is the delta from local to zulu.
+        /// </summary>
+        protected static string AdjustHMSTOSForZulu(string tos, int dz)
+        {
+            string[] hms = tos.Split(':');
+            if ((hms.Length == 3) &&
+                int.TryParse(hms[0], out int h) && int.TryParse(hms[1], out int m) && int.TryParse(hms[2], out int s))
+            {
+                h += dz;
+                while (h < 0)
+                    h += 24;
+                h %= 24;
+                return $"{h:D2}{m:D2}{s:D2}";
+            }
+            return "";
+        }
+
+
     }
 }

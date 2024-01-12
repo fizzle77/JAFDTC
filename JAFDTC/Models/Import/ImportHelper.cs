@@ -31,8 +31,13 @@ namespace JAFDTC.Models.Import
     {
         public virtual bool HasFlights => false;
 
-        public virtual List<string> Flights() { return new(); }
+        public virtual List<string> Flights() => new();
 
-        public abstract bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true);
+        public virtual Dictionary<string, string> OptionTitles(string what = "Steerpoint") => null;
+
+        public virtual Dictionary<string, object> OptionDefaults => null;
+
+        public abstract bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true,
+                                    Dictionary<string, object> options = null);
     }
 }

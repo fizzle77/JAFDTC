@@ -61,7 +61,8 @@ namespace JAFDTC.Models.Import
 
         public override List<string> Flights() => new();
 
-        public override bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true)
+        public override bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true,
+                                    Dictionary<string, object> options = null)
         {
             string json = FileManager.ReadFile(Path);
             if (json != null)

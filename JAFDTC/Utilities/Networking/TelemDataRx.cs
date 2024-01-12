@@ -50,23 +50,25 @@ namespace JAFDTC.Utilities.Networking
 
 			public string Marker { get; set; }              // marker from command stream
 			
-			public string Latitude { get; set; }            // active airframe position, latitude (dd)
+			public string Lat { get; set; }                 // active airframe position, latitude (dd)
 			
-			public string Longitude { get; set; }           // active airframe position, longitude (dd)
+			public string Lon { get; set; }                 // active airframe position, longitude (dd)
 
-            public string Elevation { get; set; }           // active airframe position, elevation (m)
+            public string Elev { get; set; }                // active airframe position, elevation (m)
 
-			public string Upload { get; set; }				// cockpit control: upload configuration
+            public string StartTime { get; set; }           // mission start time, seconds (local)
+
+			public string CmdUpload { get; set; }   		// cockpit control: upload configuration
             
-			public string Increment { get; set; }           // cockpit control: increment command (WIP, unused)
+			public string CmdIncr { get; set; }             // cockpit control: increment command
 
-            public string Decrement { get; set; }           // cockpit control: decrement command (WIP, unused)
+            public string CmdDecr { get; set; }             // cockpit control: decrement command
 
-            public string ShowJAFDTC { get; set; }          // cockpit control: pin jafdtc window to top layer
+            public string CmdShow { get; set; }             // cockpit control: pin jafdtc window to top layer
 
-            public string HideJAFDTC { get; set; }          // cockpit control: unpin jafdtc window
+            public string CmdHide { get; set; }             // cockpit control: unpin jafdtc window
 
-            public string ToggleJAFDTC { get; set; }        // cockpit control: toggle jafdtc window layer pin
+            public string CmdToggle { get; set; }           // cockpit control: toggle jafdtc window layer pin
         }
 
         // ------------------------------------------------------------------------------------------------------------

@@ -1,8 +1,32 @@
+--[[
+********************************************************************************************************************
+
+JAFDTC.lua -- dcs export handlers for jafdtc
+
+Copyright(C) 2021-2023 the-paid-actor & others
+Copyright(C) 2023-2024 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+<https://www.gnu.org/licenses/>.
+
+********************************************************************************************************************
+--]]
+
 local tcpServer = nil
 local udpSpeaker = nil
+
 package.path  = package.path..";"..lfs.currentdir().."/LuaSocket/?.lua"
 package.cpath = package.cpath..";"..lfs.currentdir().."/LuaSocket/?.dll"
 package.path  = package.path..";"..lfs.currentdir().."/Scripts/?.lua"
+
 local socket = require("socket")
 local JSON = loadfile("Scripts\\JSON.lua")()
 
@@ -171,15 +195,16 @@ function LuaExportAfterNextFrame()
     local loZ = camPos['p']['z']
     local elevation = LoGetAltitude(loX, loZ)
     local coords = LoLoCoordinatesToGeoCoordinates(loX, loZ)
-    local model = JAFDTC_GetPlayerAircraftType();
+    local model = JAFDTC_GetPlayerAircraftType()
+    local startTime = tostring(math.floor(LoGetMissionStartTime()))
 
-    local params = {};
-    params["uploadCommand"] = "0";
-    params["incCommand"] = "0";
-    params["decCommand"] = "0";
-    params["showJAFDTCCommand"] = "0";
-    params["hideJAFDTCCommand"] = "0";
-    params["toggleJAFDTCCommand"] = "0";
+    local params = {}
+    params["uploadCommand"] = "0"
+    params["incCommand"] = "0"
+    params["decCommand"] = "0"
+    params["showJAFDTCCommand"] = "0"
+    params["hideJAFDTCCommand"] = "0"
+    params["toggleJAFDTCCommand"] = "0"
 
     if model == "A10C" then
         JAFDTC_A10C_AfterNextFrame(params)
@@ -200,17 +225,21 @@ function LuaExportAfterNextFrame()
     local toSend = "{"..
         "\"Model\": ".."\""..model.."\""..
         ", ".."\"Marker\": ".."\""..markerVal.."\""..
-        ", ".."\"Latitude\": ".."\""..coords.latitude.."\""..
-        ", ".."\"Longitude\": ".."\""..coords.longitude.."\""..
-        ", ".."\"Elevation\": ".."\""..elevation.."\""..
-        ", ".."\"Upload\": ".."\""..params["uploadCommand"].."\""..
-        ", ".."\"Increment\": ".."\""..params["incCommand"].."\""..
-        ", ".."\"Decrement\": ".."\""..params["decCommand"].."\""..
-        ", ".."\"ShowJAFDTC\": ".."\""..params["showJAFDTCCommand"].."\""..
-        ", ".."\"HideJAFDTC\": ".."\""..params["hideJAFDTCCommand"].."\""..
-        ", ".."\"ToggleJAFDTC\": ".."\""..params["toggleJAFDTCCommand"].."\""..
+        ", ".."\"Lat\": ".."\""..coords.latitude.."\""..
+        ", ".."\"Lon\": ".."\""..coords.longitude.."\""..
+        ", ".."\"Elev\": ".."\""..elevation.."\""..
+        ", ".."\"StartTime\": ".."\""..startTime.."\""..
+        ", ".."\"CmdUpload\": ".."\""..params["uploadCommand"].."\""..
+        ", ".."\"CmdIncr\": ".."\""..params["incCommand"].."\""..
+        ", ".."\"CmdDecr\": ".."\""..params["decCommand"].."\""..
+        ", ".."\"CmdShow\": ".."\""..params["showJAFDTCCommand"].."\""..
+        ", ".."\"CmdHide\": ".."\""..params["hideJAFDTCCommand"].."\""..
+        ", ".."\"CmdToggle\": ".."\""..params["toggleJAFDTCCommand"].."\""..
         "}"
 
+    if params["incCommand"] ~= "0" then
+        log.write("JAFDTC", log.INFO, "GOT INCR")
+    end
     if pcall(function()
         socket.try(udpSpeaker:sendto(toSend, "127.0.0.1", udpPort)) 
     end) then

@@ -120,7 +120,7 @@ https://www.gnu.org/licenses/.
                 <TextBlock Grid.Column="3" Margin="6,0,0,0"
                            HorizontalTextAlignment="Center"
                            Style="{StaticResource TableHeaderTextStyle}"
-                           Text="TOS"/>
+                           Text="TOS (L)"/>
                 <TextBlock Grid.Column="4" Margin="6,0,6,0"
                            HorizontalTextAlignment="Center"
                            Style="{StaticResource TableHeaderTextStyle}"

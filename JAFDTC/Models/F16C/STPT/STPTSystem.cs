@@ -55,11 +55,11 @@ namespace JAFDTC.Models.F16C.STPT
         {
             return new()
             {
-                // TODO: could include TOS too, if available in navptInfo
                 Name = (navptInfo.ContainsKey("name")) ? navptInfo["name"] : "",
                 Lat = (navptInfo.ContainsKey("lat")) ? navptInfo["lat"] : "",
                 Lon = (navptInfo.ContainsKey("lon")) ? navptInfo["lon"] : "",
-                Alt = (navptInfo.ContainsKey("alt")) ? navptInfo["alt"] : ""
+                Alt = (navptInfo.ContainsKey("alt")) ? navptInfo["alt"] : "",
+                TOS = (navptInfo.ContainsKey("ton")) ? navptInfo["ton"] : ""
             };
         }
 
