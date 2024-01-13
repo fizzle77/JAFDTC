@@ -52,8 +52,7 @@ https://www.gnu.org/licenses/.
             <TextBlock Grid.Column="1" Margin="16,0,0,0"
                        x:Name="AppTitleTextBlock"
                        VerticalAlignment="Center"
-                       TextWrapping="NoWrap"
-                       Style="{StaticResource CaptionTextBlockStyle}">
+                       TextWrapping="NoWrap">
                 JAFDTC (Beta.18)
             </TextBlock>
             
