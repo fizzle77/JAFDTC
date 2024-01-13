@@ -81,7 +81,7 @@ namespace JAFDTC.UI.Base
             }
             if (usrPoIs.Count > 0)
             {
-                comboBox.Items.Add(new NavigationViewItemSeparator());
+                comboBox.Items.Add(new ComboBoxViewItemSeparator());
             }
             foreach (PointOfInterest poi in dcsPoIs)
             {

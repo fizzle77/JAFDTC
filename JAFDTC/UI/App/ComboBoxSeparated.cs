@@ -2,7 +2,7 @@
 //
 // ComboBoxSeperated.cs -- custom ComboBox class for the combo boxes with disabled separators.
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -25,7 +25,7 @@ namespace JAFDTC.UI.App
 {
     /// <summary>
     /// custom ComboBox class for combo box lists with disabled separators. to include a separator, add a
-    /// NavigationViewItemSeparator item to the combo box's items. this item will be set disabled when the control
+    /// ComboBoxViewItemSeparator item to the combo box's items. this item will be set disabled when the control
     /// content is being built.
     /// 
     /// add <Style TargetType="ui:ComboBoxSeperated" BasedOn="{StaticResource DefaultComboBoxStyle}" /> to the
@@ -35,14 +35,14 @@ namespace JAFDTC.UI.App
     {
         /// <summary>
         /// prepare the item container for an item by updating the IsEnabled property of the element based on the type
-        /// of item we are building for. NavigationViewItemSeparator instances are always disabled, all others are
+        /// of item we are building for. ComboBoxViewItemSeparator instances are always disabled, all others are
         /// always enabled.
         /// </summary>
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
             base.PrepareContainerForItemOverride(element, item);
 
-            ((ComboBoxItem)element).IsEnabled = (item.GetType() == typeof(NavigationViewItemSeparator)) ? false : true;
+            ((ComboBoxItem)element).IsEnabled = (item.GetType() == typeof(ComboBoxViewItemSeparator)) ? false : true;
         }
     }
 }
