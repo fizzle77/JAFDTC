@@ -47,7 +47,7 @@ namespace JAFDTC.Models.Import
 
         private XmlDocument XmlDoc { get; set; }
         
-        private Dictionary<string, XmlNode> XmlWaypointNodes { get; set; }
+        private Dictionary<string, XmlNode> XmlNavpointNodes { get; set; }
 
         private bool IsImportTakeOff { get; set; }
 
@@ -64,7 +64,7 @@ namespace JAFDTC.Models.Import
             Airframe = airframe;
             Path = path;
             XmlDoc = new XmlDocument();
-            XmlWaypointNodes = new Dictionary<string, XmlNode>();
+            XmlNavpointNodes = new Dictionary<string, XmlNode>();
 
             IsImportTakeOff = false;
             IsImportTOS = false;
@@ -104,22 +104,22 @@ namespace JAFDTC.Models.Import
         ///   ["lat"]       (string) latitude of navpoint, decimal degrees with no units
         ///   ["lon"]       (string) longitude of navpoint, decimal degrees with no units
         ///   ["alt"]       (string) elevation of navpoint, feet
-        ///   ["ton"]       (string) time on navpoint, hh:mm:ss
+        ///   ["ton"]       (string) time on navpoint, hh:mm:ss local
         /// </summary>
         private List<Dictionary<string, string>> Navpoints(string flightName)
         {
-            List<Dictionary<string, string>> waypoints = null;
-            if (XmlWaypointNodes.ContainsKey(flightName))
+            List<Dictionary<string, string>> navpoints = null;
+            if (XmlNavpointNodes.ContainsKey(flightName))
             {
-                waypoints = new List<Dictionary<string, string>>();
-                foreach (XmlNode node in XmlWaypointNodes[flightName])
+                navpoints = new List<Dictionary<string, string>>();
+                foreach (XmlNode node in XmlNavpointNodes[flightName])
                 {
                     string type = node.SelectSingleNode("Type").InnerText;
                     bool isTakeOffType = ((type != null) && Regex.Match(type.ToLower(), @"^take off").Success);
 
                     if (IsImportTakeOff || !isTakeOffType)
                     {
-                        Dictionary<string, string> steerpoint = new()
+                        Dictionary<string, string> navpoint = new()
                         {
                             ["name"] = node.SelectSingleNode("Name").InnerText,
                             ["lat"] = node.SelectSingleNode("Lat").InnerText,
@@ -130,7 +130,7 @@ namespace JAFDTC.Models.Import
                         {
                             alt = 0.0;
                         }
-                        steerpoint["alt"] = $"{(int)alt:D}";
+                        navpoint["alt"] = $"{(int)alt:D}";
 
                         string ton = node.SelectSingleNode("TOT").InnerText;
                         if ((ton != null) && IsImportTOS)
@@ -148,17 +148,17 @@ namespace JAFDTC.Models.Import
                                     {
                                         h += 12;
                                     }
-                                    steerpoint["ton"] = $"{h:D2}:{m:D2}:{s:D2}";
+                                    navpoint["ton"] = $"{h:D2}:{m:D2}:{s:D2}";
                                 }
                             }
                         }
 
                         // TODO: put "ERROR" in dictionary if there were errors in the stpt?
-                        waypoints.Add(steerpoint);
+                        navpoints.Add(navpoint);
                     }
                 }
             }
-            return waypoints;
+            return navpoints;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -171,7 +171,7 @@ namespace JAFDTC.Models.Import
 
         public override List<string> Flights()
         {
-            XmlWaypointNodes.Clear();
+            XmlNavpointNodes.Clear();
 
             List<string> flights = new();
             try
@@ -189,12 +189,12 @@ namespace JAFDTC.Models.Import
                         string callsignNumber = route.SelectSingleNode("CallsignNumber").InnerText;
                         string flightName = callsignName + " " + callsignNumber;
 
-                        if (XmlWaypointNodes.ContainsKey(flightName))
+                        if (XmlNavpointNodes.ContainsKey(flightName))
                         {
                             throw new InvalidOperationException("Duplicate flight name in file.");
                         }
                         flights.Add(flightName);
-                        XmlWaypointNodes[flightName] = route.SelectSingleNode("Waypoints");
+                        XmlNavpointNodes[flightName] = route.SelectSingleNode("Waypoints");
                     }
                 }
             }
