@@ -1,19 +1,41 @@
-﻿using JAFDTC.Models.M2000C.WYPT;
+﻿// ********************************************************************************************************************
+//
+// M2000CConfiguration.cs -- m-2000c airframe configuration
+//
+// Copyright(C) 2023-2024 ilominar/raven
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+// for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.  If not, see
+// <https://www.gnu.org/licenses/>.
+//
+// ********************************************************************************************************************
+
+using JAFDTC.Models.M2000C.WYPT;
 using JAFDTC.UI.M2000C;
 using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace JAFDTC.Models.M2000C
 {
+    /// <summary>
+    /// configuration object for the mirage that encapsulates the configurations of each system that jafdtc can set
+    /// up. this object is serialized to/from json when persisting configurations. configuration supports navigation
+    /// system.
+    /// </summary>
     class M2000CConfiguration : Configuration
     {
-        private const string VersionCfgM2000C = "M2000C-1.0";   // current version
+        private const string _versionCfg = "M2000C-1.0";        // current version
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -33,7 +55,7 @@ namespace JAFDTC.Models.M2000C
         // ------------------------------------------------------------------------------------------------------------
 
         public M2000CConfiguration(string uid, string name, Dictionary<string, string> linkedSysMap)
-            : base(VersionCfgM2000C, AirframeTypes.M2000C, uid, name, linkedSysMap)
+            : base(_versionCfg, AirframeTypes.M2000C, uid, name, linkedSysMap)
         {
             WYPT = new WYPTSystem();
             ConfigurationUpdated();
@@ -100,12 +122,10 @@ namespace JAFDTC.Models.M2000C
             WYPT ??= new WYPTSystem();
 
             // TODO: if the version number is older than current, may need to update object
-
-            ConfigurationUpdated();
-
-            Version = VersionCfgM2000C;
+            Version = _versionCfg;
 
             Save(this);
+            ConfigurationUpdated();
         }
 
         public override bool CanAcceptPasteForSystem(string cboardTag, string systemTag = null)

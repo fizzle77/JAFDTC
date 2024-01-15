@@ -2,7 +2,7 @@
 //
 // F14ABConfiguration.cs -- f-14a/b airframe configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -19,25 +19,23 @@
 
 using JAFDTC.Models.F14AB.WYPT;
 using JAFDTC.UI.F14AB;
+using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using JAFDTC.Utilities;
 
 namespace JAFDTC.Models.F14AB
 {
     /// <summary>
-    /// TODO: document
+    /// configuration object for the tomcat that encapsulates the configurations of each system that jafdtc can set
+    /// up. this object is serialized to/from json when persisting configurations. configuration supports navigation
+    /// system.
     /// </summary>
     public class F14ABConfiguration : Configuration
     {
-        private const string VersionCfgF14AB = "F14AB-1.0";     // current version
+        private const string _versionCfg = "F14AB-1.0";         // current version
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -57,7 +55,7 @@ namespace JAFDTC.Models.F14AB
         // ------------------------------------------------------------------------------------------------------------
 
         public F14ABConfiguration(string uid, string name, Dictionary<string, string> linkedSysMap)
-            : base(VersionCfgF14AB, AirframeTypes.F14AB, uid, name, linkedSysMap)
+            : base(_versionCfg, AirframeTypes.F14AB, uid, name, linkedSysMap)
         {
             WYPT = new WYPTSystem();
             ConfigurationUpdated();
@@ -124,12 +122,10 @@ namespace JAFDTC.Models.F14AB
             WYPT ??= new WYPTSystem();
 
             // TODO: if the version number is older than current, may need to update object
-
-            ConfigurationUpdated();
-
-            Version = VersionCfgF14AB;
+            Version = _versionCfg;
 
             Save(this);
+            ConfigurationUpdated();
         }
 
         public override bool CanAcceptPasteForSystem(string cboardTag, string systemTag = null)

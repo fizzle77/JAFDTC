@@ -2,7 +2,7 @@
 //
 // A10CConfiguration.cs -- a-10c airframe configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -19,20 +19,23 @@
 
 using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.UI.A10C;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using JAFDTC.UI.F16C;
+using JAFDTC.Utilities;
 
 namespace JAFDTC.Models.A10C
 {
     /// <summary>
-    /// TODO: document
+    /// configuration object for the warthog that encapsulates the configurations of each system that jafdtc can set
+    /// up. this object is serialized to/from json when persisting configurations. configuration supports navigation
+    /// system.
     /// </summary>
     public class A10CConfiguration : Configuration
     {
-        private const string VersionCfgA10C = "A10C-1.0";       // current version
+        private const string _versionCfg = "A10C-1.0";          // current version
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -52,7 +55,7 @@ namespace JAFDTC.Models.A10C
         // ------------------------------------------------------------------------------------------------------------
 
         public A10CConfiguration(string uid, string name, Dictionary<string, string> linkedSysMap)
-            : base(VersionCfgA10C, AirframeTypes.A10C, uid, name, linkedSysMap)
+            : base(_versionCfg, AirframeTypes.A10C, uid, name, linkedSysMap)
         {
             WYPT = new WYPTSystem();
             ConfigurationUpdated();
@@ -119,12 +122,10 @@ namespace JAFDTC.Models.A10C
             WYPT ??= new WYPTSystem();
 
             // TODO: if the version number is older than current, may need to update object
-
-            ConfigurationUpdated();
-
-            Version = VersionCfgA10C;
+            Version = _versionCfg;
 
             Save(this);
+            ConfigurationUpdated();
         }
 
         public override bool CanAcceptPasteForSystem(string cboardTag, string systemTag = null)
@@ -152,8 +153,9 @@ namespace JAFDTC.Models.A10C
                     isSuccess = true;
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                FileManager.Log($"A10CConfiguration:Deserialize exception {ex}");
             }
             return isSuccess;
         }

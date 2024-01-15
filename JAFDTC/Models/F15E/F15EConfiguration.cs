@@ -32,11 +32,13 @@ using System.Text.Json.Serialization;
 namespace JAFDTC.Models.F15E
 {
     /// <summary>
-    /// top-level mudhen configuration that includes per-system configurations for the managed systems.
+    /// configuration object for the mudhen that encapsulates the configurations of each system that jafdtc can set
+    /// up. this object is serialized to/from json when persisting configurations. configuration supports navigation,
+    /// radio, and miscellaneous systems.
     /// </summary>
     public class F15EConfiguration : Configuration
     {
-        private const string VersionCfgF15E = "F15E-1.0";           // current configuration version
+        private const string _versionCfg = "F15E-1.0";          // current version
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -60,7 +62,7 @@ namespace JAFDTC.Models.F15E
         // ------------------------------------------------------------------------------------------------------------
 
         public F15EConfiguration(string uid, string name, Dictionary<string, string> linkedSysMap)
-            : base(VersionCfgF15E, AirframeTypes.F15E, uid, name, linkedSysMap)
+            : base(_versionCfg, AirframeTypes.F15E, uid, name, linkedSysMap)
         {
             Misc = new MiscSystem();
             Radio = new RadioSystem();
@@ -138,12 +140,10 @@ namespace JAFDTC.Models.F15E
             STPT ??= new STPTSystem();
 
             // TODO: if the version number is older than current, may need to update object
-
-            ConfigurationUpdated();
-
-            Version = VersionCfgF15E;
+            Version = _versionCfg;
 
             Save(this);
+            ConfigurationUpdated();
         }
 
         public override bool CanAcceptPasteForSystem(string cboardTag, string systemTag = null)

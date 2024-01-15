@@ -37,11 +37,13 @@ using System.Text.Json.Serialization;
 namespace JAFDTC.Models.F16C
 {
     /// <summary>
-    /// TODO: document
+    /// configuration object for the viper that encapsulates the configurations of each system that jafdtc can set
+    /// up. this object is serialized to/from json when persisting configurations. configuration supports navigation,
+    /// countermeasure, datalink, harm, hts, mfd, radio, and miscellaneous systems.
     /// </summary>
     public class F16CConfiguration : Configuration
     {
-        private const string VersionCfgF16C = "F16C-1.0";           // current version
+        private const string _versionCfg = "F16C-1.0";          // current version
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -75,7 +77,7 @@ namespace JAFDTC.Models.F16C
         // ------------------------------------------------------------------------------------------------------------
 
         public F16CConfiguration(string uid, string name, Dictionary<string, string> linkedSysMap)
-            : base(VersionCfgF16C, AirframeTypes.F16C, uid, name, linkedSysMap)
+            : base(_versionCfg, AirframeTypes.F16C, uid, name, linkedSysMap)
         {
             CMDS = new CMDSSystem();
             DLNK = new DLNKSystem();
@@ -178,12 +180,10 @@ namespace JAFDTC.Models.F16C
             STPT  ??= new STPTSystem();
 
             // TODO: if the version number is older than current, may need to update object
-
-            ConfigurationUpdated();
-
-            Version = VersionCfgF16C;
+            Version = _versionCfg;
 
             Save(this);
+            ConfigurationUpdated();
         }
 
         public override bool CanAcceptPasteForSystem(string cboardTag, string systemTag = null)

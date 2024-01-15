@@ -3,7 +3,7 @@
 // FA18CConfiguration.cs -- fa-18c airframe configuration
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -32,11 +32,13 @@ using System;
 namespace JAFDTC.Models.FA18C
 {
     /// <summary>
-    /// TODO: document
+    /// configuration object for the hornet that encapsulates the configurations of each system that jafdtc can set
+    /// up. this object is serialized to/from json when persisting configurations. configuration supports navigation,
+    /// countermeasure, and radio systems.
     /// </summary>
     public class FA18CConfiguration : Configuration
     {
-        private const string VersionCfgFA18C = "FA18C-1.0";         // current version
+        private const string _versionCfg = "FA18C-1.0";         // current version
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -60,7 +62,7 @@ namespace JAFDTC.Models.FA18C
         // ------------------------------------------------------------------------------------------------------------
 
         public FA18CConfiguration(string uid, string name, Dictionary<string, string> linkedSysMap)
-            : base(VersionCfgFA18C, AirframeTypes.FA18C, uid, name, linkedSysMap)
+            : base(_versionCfg, AirframeTypes.FA18C, uid, name, linkedSysMap)
         {
             CMS = new CMSSystem();
             Radio = new RadioSystem();
@@ -136,12 +138,10 @@ namespace JAFDTC.Models.FA18C
             WYPT ??= new WYPTSystem();
 
             // TODO: if the version number is older than current, may need to update object
-
-            ConfigurationUpdated();
-
-            Version = VersionCfgFA18C;
+            Version = _versionCfg;
 
             Save(this);
+            ConfigurationUpdated();
         }
 
         public override bool CanAcceptPasteForSystem(string cboardTag, string systemTag = null)

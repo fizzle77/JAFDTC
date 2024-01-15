@@ -2,7 +2,7 @@
 //
 // AV8BConfiguration.cs -- av-8b airframe configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -29,11 +29,13 @@ using System.Text.Json;
 namespace JAFDTC.Models.AV8B
 {
     /// <summary>
-    /// main configuration object for the harrier. the harrier supports a single configurable system: waypoints.
+    /// configuration object for the harrier that encapsulates the configurations of each system that jafdtc can set
+    /// up. this object is serialized to/from json when persisting configurations. configuration supports navigation
+    /// system.
     /// </summary>
     public class AV8BConfiguration : Configuration
     {
-        private const string VersionCfgAV8B = "AV8B-1.0";           // current version
+        private const string _versionCfg = "AV8B-1.0";          // current version
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -53,7 +55,7 @@ namespace JAFDTC.Models.AV8B
         // ------------------------------------------------------------------------------------------------------------
 
         public AV8BConfiguration(string uid, string name, Dictionary<string, string> linkedSysMap)
-            : base(VersionCfgAV8B, AirframeTypes.AV8B, uid, name, linkedSysMap)
+            : base(_versionCfg, AirframeTypes.AV8B, uid, name, linkedSysMap)
         {
             WYPT = new WYPTSystem();
             ConfigurationUpdated();
@@ -120,12 +122,10 @@ namespace JAFDTC.Models.AV8B
             WYPT ??= new WYPTSystem();
 
             // TODO: if the version number is older than current, may need to update object
-
-            ConfigurationUpdated();
-
-            Version = VersionCfgAV8B;
+            Version = _versionCfg;
 
             Save(this);
+            ConfigurationUpdated();
         }
 
         public override bool CanAcceptPasteForSystem(string cboardTag, string systemTag = null)
