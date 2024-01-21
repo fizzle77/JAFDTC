@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace JAFDTC
@@ -38,6 +39,23 @@ namespace JAFDTC
     /// </summary>
     public partial class App : Application
     {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // windoze interfaces & data structs
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ShowWindow(IntPtr hWnd, WindowShowStyle nCmdShow);
+
+        // Full enum def is at https://github.com/dotnet/pinvoke/blob/main/src/User32/User32+WindowShowStyle.cs
+        public enum WindowShowStyle : uint
+        {
+            SW_NORMAL = 1,
+            SW_MAXIMIZE = 3,
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -361,6 +379,12 @@ namespace JAFDTC
             {
                 Window?.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
+                    if (IsJAFDTCPinnedToTop)
+                    {
+                        var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(Window);
+                        ShowWindow(hWnd, WindowShowStyle.SW_NORMAL);
+                        Window.ConfigListPage.RebuildInterfaceState();
+                    }
                     (Window.AppWindow.Presenter as OverlappedPresenter).IsAlwaysOnTop = IsJAFDTCPinnedToTop;
                     if (!IsJAFDTCPinnedToTop)
                     {

@@ -31,6 +31,8 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Threading;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -43,6 +45,15 @@ namespace JAFDTC.UI.App
     /// </summary>
     public sealed partial class ConfigurationListPage : Page
     {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // windoze interfaces & data structs
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -356,6 +367,7 @@ namespace JAFDTC.UI.App
                     uiBarBtnRename.IsEnabled = isEnabled;
                     uiBarBtnExport.IsEnabled = isEnabled;
                     uiBarBtnLoadJet.IsEnabled = (isEnabled && CurApp.IsDCSAvailable && isJetMatched);
+                    uiBarBtnFocusDCS.IsEnabled = CurApp.IsDCSAvailable;
                     IsRebuildPending = false;
                 });
             }
@@ -592,9 +604,26 @@ namespace JAFDTC.UI.App
         /// <summary>
         /// upload command: send the selected configuration to the jet.
         /// </summary>
-        private void CmdLoadJet_Click(object sender, RoutedEventArgs argse)
+        private void CmdLoadJet_Click(object sender, RoutedEventArgs args)
         {
             CurApp.UploadConfigurationToJet((IConfiguration)uiCfgListView.SelectedItem);
+        }
+
+        /// <summary>
+        /// focus dcs command: bring dcs to the foreground and give it focus.
+        /// </summary>
+        private void CmdFocusDCS_Click(object sender, RoutedEventArgs args)
+        {
+            // TODO: reset cockpit "always on top" control to "not always on top" (eg, FLIR GAIN/LVL/AUTO in viper)?
+            CurApp.Window.AppWindow.MoveInZOrderAtBottom();
+            Process[] arrProcesses = Process.GetProcessesByName("DCS");
+            if (arrProcesses.Length > 0)
+            {
+
+                IntPtr ipHwnd = arrProcesses[0].MainWindowHandle;
+                Thread.Sleep(100);
+                SetForegroundWindow(ipHwnd);
+            }
         }
 
         /// <summary>

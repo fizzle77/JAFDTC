@@ -120,6 +120,13 @@ https://www.gnu.org/licenses/.
                         <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE709;"/>
                     </AppBarButton.Icon>
                 </AppBarButton>
+                <AppBarButton x:Name="uiBarBtnFocusDCS" Label="Focus DCS"
+                              Click="CmdFocusDCS_Click"
+                              ToolTipService.ToolTip="Bring DCS to foreground">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xF5ED;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
 
                 <CommandBar.SecondaryCommands>
                     <AppBarButton Label="Points of Interest" Click="CmdPoI_Click">
