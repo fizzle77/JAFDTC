@@ -74,8 +74,6 @@ namespace JAFDTC
 
         public double DCSLastLon { get; private set; }
 
-        public int DCSLastStartTime { get; private set; }
-
         // ---- private properties
 
         private DispatcherTimer CheckDCSTimer { get; set; }
@@ -218,7 +216,6 @@ namespace JAFDTC
 
             DCSLastLat = 0.0;
             DCSLastLon = 0.0;
-            DCSLastStartTime = 0;
 
             LastDCSExportCheck = System.DateTimeOffset.Now;
             LastDCSExportPacketCount = 0;
@@ -444,7 +441,6 @@ namespace JAFDTC
                                                                                   : AirframeTypes.None;
                 DCSLastLat = (double.TryParse(data.Lat, out double lat)) ? lat : 0.0;
                 DCSLastLon = (double.TryParse(data.Lat, out double lon)) ? lon : 0.0;
-                DCSLastStartTime = (int.TryParse(data.StartTime, out int startTime)) ? startTime : 0;
 
                 ProcessMarker(data);
                 ProcessUploadCommand(data);

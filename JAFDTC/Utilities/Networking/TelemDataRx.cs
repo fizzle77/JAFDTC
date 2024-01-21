@@ -56,8 +56,6 @@ namespace JAFDTC.Utilities.Networking
 
             public string Elev { get; set; }                // active airframe position, elevation (m)
 
-            public string StartTime { get; set; }           // mission start time, seconds (local)
-
 			public string CmdUpload { get; set; }   		// cockpit control: upload configuration
             
 			public string CmdIncr { get; set; }             // cockpit control: increment command

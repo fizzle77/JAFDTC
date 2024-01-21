@@ -281,7 +281,6 @@ function LuaExportAfterNextFrame()
     local elevation = LoGetAltitude(loX, loZ)
     local coords = LoLoCoordinatesToGeoCoordinates(loX, loZ)
     local model = JAFDTC_GetPlayerAircraftType()
-    local startTime = tostring(math.floor(LoGetMissionStartTime()))
 
     local funcName = "JAFDTC_" .. model .. "_AfterNextFrame";
     local params = {}
@@ -293,13 +292,13 @@ function LuaExportAfterNextFrame()
     params["toggleJAFDTCCommand"] = "0"
     pcall(_G[funcName], params)
 
+    -- TODO: consider pulling lat/lon/elev from telemetry?
     local txData = "{"..
         '"Model": "' .. model .. '",' ..
         '"Marker": "' .. markerVal .. '",' ..
         '"Lat": "' .. coords.latitude .. '",' ..
         '"Lon": "' .. coords.longitude .. '",' ..
         '"Elev": "' .. elevation .. '",' ..
-        '"StartTime": "' .. startTime .. '",' ..
         '"CmdUpload": "' .. params["uploadCommand"] .. '",' ..
         '"CmdIncr": "' .. params["incCommand"] .. '",' ..
         '"CmdDecr": "' .. params["decCommand"] .. '",' ..
