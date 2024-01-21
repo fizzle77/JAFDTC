@@ -56,7 +56,7 @@ function JAFDTCCfgNameHook:receiveData()
     local data = nil
     local err = nil
 
-    if self.tcpServer == nil then
+    if not self.tcpServer then
         self.tcpServer = socket.tcp()
         local successful, err = self.tcpServer:bind("127.0.0.1", self.tcpPort)
         self.tcpServer:listen(1)
@@ -73,11 +73,11 @@ function JAFDTCCfgNameHook:receiveData()
     -- it needs to update the name.
     --
     local client, err = self.tcpServer:accept()
-    if client ~= nil then
+    if client then
         client:settimeout(1)
         data, err = client:receive()
         if err then
-            self:log("Error during Rx: " .. err)
+            self:log("Error during Rx: " .. tostring(err))
             data = nil
         end
         client:shutdown()
@@ -108,16 +108,13 @@ end
 
 function JAFDTCCfgNameHook:updateTick(curTime)
     local data = self:receiveData()
-    if data ~= nil then
+    if data then
         if not self.visible then
             self:show()
         end
-        self.hideTime = curTime + 4
-        self.configLabel:setText(" " .. data)
-        -- self:log("DEBUG: showing dialog, setting hide time to " .. tostring(self.hideTime))
-        -- self:log("DEBUG: Update configuration name: " .. tostring(data))
+        self.hideTime = curTime + 2
+        self.configLabel:setText(data)
     elseif self.visible and curTime > self.hideTime then
-        -- self:log("DEBUG: hiding dialog at time " .. tostring(self.hideTime))
         self:hide()
     end
     self.lastTime = curTime

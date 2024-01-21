@@ -19,23 +19,23 @@ You should have received a copy of the GNU General Public License along with thi
 ********************************************************************************************************************
 --]]
 
-package.path  = package.path..";"..lfs.currentdir().."/LuaSocket/?.lua"
-package.cpath = package.cpath..";"..lfs.currentdir().."/LuaSocket/?.dll"
-package.path  = package.path..";"..lfs.currentdir().."/Scripts/?.lua"
+package.path  = package.path .. ";" .. lfs.currentdir() .. "/LuaSocket/?.lua"
+package.cpath = package.cpath .. ";" .. lfs.currentdir() .. "/LuaSocket/?.dll"
+package.path  = package.path .. ";" .. lfs.currentdir() .. "/Scripts/?.lua"
 
 JAFDTC_LogFile = io.open(lfs.writedir() .. [[Logs\JAFDTC.log]], "w")
 
 local socket = require("socket")
 local JSON = loadfile("Scripts\\JSON.lua")()
 
-dofile(lfs.writedir()..'Scripts/JAFDTC/CommonFunctions.lua')
-dofile(lfs.writedir()..'Scripts/JAFDTC/A10CFunctions.lua')
-dofile(lfs.writedir()..'Scripts/JAFDTC/AV8BFunctions.lua')
-dofile(lfs.writedir()..'Scripts/JAFDTC/F14ABFunctions.lua')
-dofile(lfs.writedir()..'Scripts/JAFDTC/F15EFunctions.lua')
-dofile(lfs.writedir()..'Scripts/JAFDTC/F16CFunctions.lua')
-dofile(lfs.writedir()..'Scripts/JAFDTC/FA18CFunctions.lua')
-dofile(lfs.writedir()..'Scripts/JAFDTC/M2000CFunctions.lua')
+dofile(lfs.writedir() .. 'Scripts/JAFDTC/CommonFunctions.lua')
+dofile(lfs.writedir() .. 'Scripts/JAFDTC/A10CFunctions.lua')
+dofile(lfs.writedir() .. 'Scripts/JAFDTC/AV8BFunctions.lua')
+dofile(lfs.writedir() .. 'Scripts/JAFDTC/F14ABFunctions.lua')
+dofile(lfs.writedir() .. 'Scripts/JAFDTC/F15EFunctions.lua')
+dofile(lfs.writedir() .. 'Scripts/JAFDTC/F16CFunctions.lua')
+dofile(lfs.writedir() .. 'Scripts/JAFDTC/FA18CFunctions.lua')
+dofile(lfs.writedir() .. 'Scripts/JAFDTC/M2000CFunctions.lua')
 
 local cmdResumeTime = 0.0
 local cmdList = nil
@@ -44,8 +44,8 @@ local cmdCurCort = nil
 
 local markerVal = ""
 
-local tcpCmdSockRx = nil
-local tcpCmdPortRx = 42001
+local tcpCmdServerSock = nil
+local tcpCmdServerPort = 42001
 
 local udpTelemSockTx = nil
 local udpTelemPortTx = 42002
@@ -57,10 +57,10 @@ local upstreamLuaExportBeforeNextFrame = LuaExportBeforeNextFrame
 -- ---- utility
 
 function JAFDTC_CallUpstream(fn, what)
-    if fn ~= nil then
+    if fn then
         local success, retVal = pcall(fn)
         if not success then
-            JAFDTC_Log("JAFDTC", log.ERROR, "ERROR: Upstream export "..what.." failed")
+            JAFDTC_Log("JAFDTC", log.ERROR, "ERROR: Upstream export " .. what .. " failed")
         end
     end
 end
@@ -68,7 +68,7 @@ end
 -- ---- sockets
 
 -- returns new tcp socket, use pcall() to catch any errors thrown on failures
-function JAFDTC_TCPSockOpen(port)
+function JAFDTC_TCPServerSockOpen(port)
     local sock, retVal, err = nil, nil, nil
 
     sock, err = socket.tcp()
@@ -85,17 +85,17 @@ function JAFDTC_TCPSockOpen(port)
     return sock
 end
 
-function JAFDTC_TCPSockRx(sock)
+function JAFDTC_TCPServerSockRx(sock)
     local client, data, err = nil, nil, nil
 
     client, err = sock:accept()
-    if client ~= nil then
+    if client then
         client:settimeout(10)
         data, err = client:receive()
         if not err then
             return data
         end
-        JAFDTC_Log("ERROR: TCP socket rx failed: "..err)
+        JAFDTC_Log("ERROR: TCP socket rx failed: " .. tostring(err))
     end
     return nil
 end
@@ -115,7 +115,7 @@ end
 function JAFDTC_UDPSockTx(sock, port, data)
     local retVal, err = sock:sendto(data, "127.0.0.1", port)
     if not retVal then
-        JAFDTC_Log("ERROR: UDP socket tx failed: "..err)
+        JAFDTC_Log("ERROR: UDP socket tx failed: " .. tostring(err))
     end
 end
 
@@ -148,7 +148,7 @@ function JAFDTC_Cmd_If(list, index)
     local cond = args["cond"]
     local di = 1
 
-    local funcName = 'JAFDTC_'..JAFDTC_GetPlayerAircraftType()..'_CheckCondition_'..cond;
+    local funcName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_CheckCondition_" .. cond;
     if not _G[funcName](args["prm0"], args["prm1"]) then
         for i = index + 1, #list do
             if list[i]["f"] == "EndIf" and list[i]["a"]["cond"] == cond then
@@ -172,14 +172,14 @@ function JAFDTC_Cmd_While(list, index)
     local cond = args["cond"]
     local di = 1
 
-    local funcName = 'JAFDTC_'..JAFDTC_GetPlayerAircraftType()..'_CheckCondition_'..cond;
+    local funcName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_CheckCondition_" .. cond;
     if not _G[funcName](args["prm0"], args["prm1"]) then
         for i = index + 1, #list do
             if list[i]["f"] == "EndWhile" and list[i]["a"]["cond"] == cond then
                 return i - index, 0
             end
         end
-        JAFDTC_Log("ERROR: Missing closing EndWhile for "..cond)
+        JAFDTC_Log("ERROR: Missing closing EndWhile for " .. cond)
         di = #list - index + 1
     end
     return di, 0
@@ -192,7 +192,7 @@ function JAFDTC_Cmd_EndWhile(list, index)
             return i - index, 0
         end
     end
-    JAFDTC_Log("ERROR: Missing opening While for "..cond)
+    JAFDTC_Log("ERROR: Missing opening While for " .. cond)
     di = #list - index + 1
     return 1, 0
 end
@@ -224,10 +224,10 @@ function LuaExportStart()
         JAFDTC_Log("ERROR: Unable to open UDP tx socket")
     end
 
-    status, tcpCmdSockRx = pcall(JAFDTC_TCPSockOpen, tcpCmdPortRx)
+    status, tcpCmdServerSock = pcall(JAFDTC_TCPServerSockOpen, tcpCmdServerPort)
     if not status then
         cmdResumeTime = socket.gettime() + 3600000
-        tcpCmdSockRx = nil
+        tcpCmdServerSock = nil
         JAFDTC_Log("ERROR: Unable to open TCP rx socket")
     end
 
@@ -240,8 +240,7 @@ function LuaExportBeforeNextFrame()
     local curTime = socket.gettime()
     if curTime >= cmdResumeTime then
         if not cmdList then
-            local data = JAFDTC_TCPSockRx(tcpCmdSockRx)
-            log.write("JAFDTC", log.INFO, data)
+            local data = JAFDTC_TCPServerSockRx(tcpCmdServerSock)
             cmdListIndex = 1
             cmdList = JSON:decode(data)
             if not cmdList and data then
@@ -253,7 +252,7 @@ function LuaExportBeforeNextFrame()
 
         if not cmdCurCort and cmdList then
             if cmdListIndex <= #cmdList then
-                local cmdName = "JAFDTC_Cmd_"..cmdList[cmdListIndex]["f"]
+                local cmdName = "JAFDTC_Cmd_" .. cmdList[cmdListIndex]["f"]
                 cmdCurCort = coroutine.create(_G[cmdName])
             else
                 cmdList = nil
@@ -284,6 +283,7 @@ function LuaExportAfterNextFrame()
     local model = JAFDTC_GetPlayerAircraftType()
     local startTime = tostring(math.floor(LoGetMissionStartTime()))
 
+    local funcName = "JAFDTC_" .. model .. "_AfterNextFrame";
     local params = {}
     params["uploadCommand"] = "0"
     params["incCommand"] = "0"
@@ -291,37 +291,21 @@ function LuaExportAfterNextFrame()
     params["showJAFDTCCommand"] = "0"
     params["hideJAFDTCCommand"] = "0"
     params["toggleJAFDTCCommand"] = "0"
-
-    -- TODO: build out the function name and call via _G
-    if model == "A10C" then
-        JAFDTC_A10C_AfterNextFrame(params)
-    elseif model == "AV8B" then
-        JAFDTC_AV8B_AfterNextFrame(params)
-    elseif model ==	"F14AB" then
-        JAFDTC_F14AB_AfterNextFrame(params)
-    elseif model == "F15E" then
-        JAFDTC_F15E_AfterNextFrame(params)
-    elseif model ==	"F16CM" then
-        JAFDTC_F16CM_AfterNextFrame(params)
-    elseif model == "FA18C" then
-        JAFDTC_FA18C_AfterNextFrame(params)
-    elseif model == "M2000C" then
-        JAFDTC_M2KC_AfterNextFrame(params)
-    end
+    pcall(_G[funcName], params)
 
     local txData = "{"..
-        "\"Model\": ".."\""..model.."\""..
-        ", ".."\"Marker\": ".."\""..markerVal.."\""..
-        ", ".."\"Lat\": ".."\""..coords.latitude.."\""..
-        ", ".."\"Lon\": ".."\""..coords.longitude.."\""..
-        ", ".."\"Elev\": ".."\""..elevation.."\""..
-        ", ".."\"StartTime\": ".."\""..startTime.."\""..
-        ", ".."\"CmdUpload\": ".."\""..params["uploadCommand"].."\""..
-        ", ".."\"CmdIncr\": ".."\""..params["incCommand"].."\""..
-        ", ".."\"CmdDecr\": ".."\""..params["decCommand"].."\""..
-        ", ".."\"CmdShow\": ".."\""..params["showJAFDTCCommand"].."\""..
-        ", ".."\"CmdHide\": ".."\""..params["hideJAFDTCCommand"].."\""..
-        ", ".."\"CmdToggle\": ".."\""..params["toggleJAFDTCCommand"].."\""..
-        "}"
+        '"Model": "' .. model .. '",' ..
+        '"Marker": "' .. markerVal .. '",' ..
+        '"Lat": "' .. coords.latitude .. '",' ..
+        '"Lon": "' .. coords.longitude .. '",' ..
+        '"Elev": "' .. elevation .. '",' ..
+        '"StartTime": "' .. startTime .. '",' ..
+        '"CmdUpload": "' .. params["uploadCommand"] .. '",' ..
+        '"CmdIncr": "' .. params["incCommand"] .. '",' ..
+        '"CmdDecr": "' .. params["decCommand"] .. '",' ..
+        '"CmdShow": "' .. params["showJAFDTCCommand"] .. '",' ..
+        '"CmdHide": "' .. params["hideJAFDTCCommand"] .. '",' ..
+        '"CmdToggle": "' .. params["toggleJAFDTCCommand"] .. '"' ..
+    "}"
     JAFDTC_UDPSockTx(udpTelemSockTx, udpTelemPortTx, txData)
 end
