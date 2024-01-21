@@ -109,12 +109,15 @@ namespace JAFDTC.UI.F15E
         {
             // TODO: implement support for routes b and c
             EditSTPT.Points.Clear();
-            for (int i = 0; i < Config.STPT.Count; i++)
+            foreach (SteerpointInfo stpt in Config.STPT.Points)
             {
-                EditSTPT.Add(new SteerpointInfo(Config.STPT.Points[i]));
-                if ((i > 0) && !Config.STPT.Points[i-1].IsTarget && Config.STPT.Points[i].IsTarget)
+                EditSTPT.Add(new SteerpointInfo(stpt));
+            }
+            for (int i = 1; i < Config.STPT.Count; i++)
+            {
+                if (!Config.STPT.Points[i - 1].IsTarget && Config.STPT.Points[i].IsTarget)
                 {
-                    EditSTPT.Points[i-1].IsInitialUI = true;
+                    EditSTPT.Points[i - 1].IsInitialUI = true;
                 }
             }
         }
