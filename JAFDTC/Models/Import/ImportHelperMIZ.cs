@@ -50,6 +50,10 @@ namespace JAFDTC.Models.Import
 
         private Dictionary<string, LsonDict> MizRouteNodes { get; set; }
 
+        private int StartTime { get; set; }
+
+        private bool IsImportTOS { get; set; }
+
         private const double M_TO_FT = 3.2808399;
 
         // ------------------------------------------------------------------------------------------------------------
@@ -64,6 +68,7 @@ namespace JAFDTC.Models.Import
             Path = path;
             Theater = FileManager.ReadFileFromZip(Path, "theatre");
             MizRouteNodes = new Dictionary<string, LsonDict>();
+            IsImportTOS = false;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -100,41 +105,51 @@ namespace JAFDTC.Models.Import
         ///   ["lat"]       (string) latitude of navpoint, decimal degrees with no units
         ///   ["lon"]       (string) longitude of navpoint, decimal degrees with no units
         ///   ["alt"]       (string) elevation of navpoint, feet
+        ///   ["ton"]       (string) time on navpoint, hh:mm:ss local
         /// </summary>
         private List<Dictionary<string, string>> Navpoints(string flightName)
         {
-            List<Dictionary<string, string>> waypoints = null;
+            List<Dictionary<string, string>> navpoints = null;
             if (MizRouteNodes.ContainsKey(flightName))
             {
-                waypoints = new List<Dictionary<string, string>>();
+                navpoints = new List<Dictionary<string, string>>();
 
                 // walk the points in the route dictionary, skipping the first point as it is the initial point of the
                 // unit on the ramp.
                 //
                 for (int i = 2; i <= MizRouteNodes[flightName].Count; i++)
                 {
-                    LsonDict waypointInfo = MizRouteNodes[flightName][i].GetDict();
+                    LsonDict navpointInfo = MizRouteNodes[flightName][i].GetDict();
 
-                    double x = (double)waypointInfo["x"].GetDecimal();
-                    double z = (double)waypointInfo["y"].GetDecimal();
+                    double x = (double)navpointInfo["x"].GetDecimal();
+                    double z = (double)navpointInfo["y"].GetDecimal();
                     CoordLL ll = CoordInterpolator.Instance.XZtoLL(Theater, x, z);
 
-                    double alt = (double)waypointInfo["alt"].GetDecimal() * M_TO_FT;
+                    double alt = (double)navpointInfo["alt"].GetDecimal() * M_TO_FT;
+                    double ton = (double)StartTime + (double)navpointInfo["ETA"].GetDecimal();
+                    Debug.WriteLine($"{ton}");
 
-                    Dictionary<string, string> waypoint = new()
+                    Dictionary<string, string> navpoint = new()
                     {
-                        ["name"] = (waypointInfo.ContainsKey("name")) ? waypointInfo["name"].GetString() : $"SP{i - 1}",
+                        ["name"] = (navpointInfo.ContainsKey("name")) ? navpointInfo["name"].GetString() : $"SP{i - 1}",
                         ["lat"] = ll.Lat.ToString(),
                         ["lon"] = ll.Lon.ToString(),
                         ["alt"] = alt.ToString("0"),
-
-                        // TODO: consider pulling "TOS" node from waypoint...
-                        // TODO: put "ERROR" in dictionary if there were parse or conversion errors?
                     };
-                    waypoints.Add(waypoint);
+
+                    if (IsImportTOS)
+                    {
+                        int h = (int)(ton / 60.0 / 60.0);
+                        int m = (int)((ton - (h * 60.0 * 60.0)) / 60.0);
+                        int s = (int)((ton - (h * 60.0 * 60.0) - (m * 60.0)));
+                        navpoint["ton"] = $"{h:D2}:{m:D2}:{s:D2}";
+                    }
+
+                    // TODO: put "ERROR" in dictionary if there were parse or conversion errors?
+                    navpoints.Add(navpoint);
                 }
             }
-            return waypoints;
+            return navpoints;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -155,6 +170,8 @@ namespace JAFDTC.Models.Import
                 string lua = FileManager.ReadFileFromZip(Path, "mission");
                 Parsed = LsonVars.Parse(lua);
                 LsonDict coalitionDict = Parsed["mission"].GetDict()["coalition"].GetDict();
+
+                StartTime = Parsed["mission"].GetDict()["start_time"].GetInt();
 
                 foreach (string coalitionKey in coalitionDict.Keys.Select(v => (string)v))
                 {
@@ -226,9 +243,23 @@ namespace JAFDTC.Models.Import
             return flights;
         }
 
+        public override Dictionary<string, string> OptionTitles(string what = "Steerpoint")
+            => new()
+            {
+                ["A"] = $"Import Time on {what}"
+            };
+
+        public override Dictionary<string, object> OptionDefaults
+            => new()
+            {
+                ["A"] = false
+            };
+
         public override bool Import(INavpointSystemImport navptSys, string flightName = "", bool isReplace = true,
                                     Dictionary<string, object> options = null)
         {
+            IsImportTOS = (bool)options["A"];
+
             List<Dictionary<string, string>> navptInfoList = Navpoints(flightName);
             if (navptInfoList != null)
             {
