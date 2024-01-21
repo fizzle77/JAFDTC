@@ -1,7 +1,7 @@
 --[[
 ********************************************************************************************************************
 
-ConfigName.lua -- config name dialog
+StatusMsg.lua -- status message dialog
 
 Copyright(C) 2023-2024 ilominar/raven
 
