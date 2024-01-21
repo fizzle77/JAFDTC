@@ -96,6 +96,8 @@ namespace JAFDTC
 
         private long IncDecPressedTimestamp { get; set; }
 
+        private string CurMarker { get; set; }
+
         // ---- public events, posts change/validation events
 
         // NOTE: these can be called from non-ui threads but may trigger ui actions. we will dispatch the handler
@@ -297,9 +299,18 @@ namespace JAFDTC
             if (!IsUploadInFlight && !string.IsNullOrEmpty(data.Marker))
             {
                 IsUploadInFlight = true;
+                CurMarker = "";
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
                     General.PlayAudio("ux_action.wav");
+                });
+            }
+            else if (IsUploadInFlight && !string.IsNullOrEmpty(data.Marker) && (data.Marker != CurMarker))
+            {
+                CurMarker = data.Marker;
+                Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                {
+                    ConfigNameTx.Send($"Setup {data.Marker}% Complete");
                 });
             }
             else if (IsUploadInFlight && string.IsNullOrEmpty(data.Marker))
@@ -307,6 +318,7 @@ namespace JAFDTC
                 IsUploadInFlight = false;
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, async () =>
                 {
+                    ConfigNameTx.Send("Avionics Setup Complete");
                     General.PlayAudio("ux_action.wav");
                     await Task.Delay(100);
                     General.PlayAudio("ux_action.wav");

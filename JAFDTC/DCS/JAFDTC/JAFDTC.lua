@@ -41,6 +41,7 @@ local cmdResumeTime = 0.0
 local cmdList = nil
 local cmdListIndex = 1
 local cmdCurCort = nil
+local cmdCurProgress = 0.0
 
 local markerVal = ""
 
@@ -266,6 +267,7 @@ function LuaExportBeforeNextFrame()
             end
             cmdListIndex = cmdListIndex + di
             cmdResumeTime = curTime + (dt / 1000.0)
+            cmdCurProgress = (cmdListIndex / #cmdList) * 100
         elseif cmdCurCort and coroutine.status(cmdCurCort) == 'dead' then
             cmdCurCort = nil
         end
@@ -282,6 +284,8 @@ function LuaExportAfterNextFrame()
     local coords = LoLoCoordinatesToGeoCoordinates(loX, loZ)
     local model = JAFDTC_GetPlayerAircraftType()
 
+    local markerTx = string.gsub(markerVal, "<upload_prog>", string.format("%d", cmdCurProgress))
+
     local funcName = "JAFDTC_" .. model .. "_AfterNextFrame";
     local params = {}
     params["uploadCommand"] = "0"
@@ -295,7 +299,7 @@ function LuaExportAfterNextFrame()
     -- TODO: consider pulling lat/lon/elev from telemetry?
     local txData = "{"..
         '"Model": "' .. model .. '",' ..
-        '"Marker": "' .. markerVal .. '",' ..
+        '"Marker": "' .. markerTx .. '",' ..
         '"Lat": "' .. coords.latitude .. '",' ..
         '"Lon": "' .. coords.longitude .. '",' ..
         '"Elev": "' .. elevation .. '",' ..
