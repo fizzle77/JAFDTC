@@ -2,8 +2,8 @@
 //
 // DCSLuaManager.cs : manages install/remove/update of lua files in dcs install to support jafdtc
 //
-// Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2021-2023 the-paid-actor & dcs-dtc contributors
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -51,16 +51,28 @@ namespace JAFDTC.Utilities
     /// </summary>
     public static class DCSLuaManager
     {
-        public enum DCSLuaVersion
-        {
-            NONE = -1,
-            CURRENT = 1
-        };
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // windoze interfaces & data structs
+        //
+        // ------------------------------------------------------------------------------------------------------------
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
         static extern string SHGetKnownFolderPath([MarshalAs(UnmanagedType.LPStruct)] Guid rfid,
                                                   uint dwFlags,
                                                   IntPtr hToken = default);
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // types & statics
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        public enum DCSLuaVersion
+        {
+            NONE = -1,
+            CURRENT = 1
+        };
 
         static readonly Guid _savedGamesFolderGuid = new("4C5C32FF-BB9D-43b0-B5B4-2D72E54EAAA4");
 #if USE_DCS_TEST_FOLDER
@@ -68,10 +80,25 @@ namespace JAFDTC.Utilities
 #else
         static readonly List<string> _installFolders = new() { "DCS", "DCS.openbeta" };
 #endif
-        static readonly string DCSExportMagic = "local JAFDTClfs=require('lfs'); dofile(JAFDTClfs.writedir()..'Scripts/JAFDTC/JAFDTC.lua')";
+        static readonly string _dcsExportMagic = "local JAFDTClfs=require('lfs'); dofile(JAFDTClfs.writedir()..'Scripts/JAFDTC/JAFDTC.lua')";
 
-        // returns true if (according to settings) there is at least one valid lua install, false otherwise.
+        static readonly List<string> _deprecatedFiles = new()
+        {
+            "Hooks\\JAFDTCCfgNameHook.lua",
+            "Hooks\\JAFDTCHook.lua",
+            "JAFDTC\\ConfigName.dlg",
+            "JAFDTC\\WaypointCapture.dlg"
+        };
+
+        // ------------------------------------------------------------------------------------------------------------
         //
+        // functions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// returns true if (according to settings) there is at least one valid lua install, false otherwise.
+        /// </summary>
         public static bool IsLuaInstalled()
         {
                 foreach (KeyValuePair<string, DCSLuaVersion> kvp in Settings.VersionDCSLua)
@@ -84,10 +111,11 @@ namespace JAFDTC.Utilities
 				return false;
         }
 
-        // check the status of any lua installations in the _installFolders to flag common errors and determine which
-        // folders need updates or fresh installs. return a DCSLuaManagerCheckResult with information on the situation
-        // that can be used to determine how to proceed.
-        //
+        /// <summary>
+        /// check the status of any lua installations in the _installFolders to flag common errors and determine which
+        /// folders need updates or fresh installs. return a DCSLuaManagerCheckResult with information on the situation
+        /// that can be used to determine how to proceed.
+        /// </summary>
         public static DCSLuaManagerCheckResult LuaCheck()
         {
             DCSLuaManagerCheckResult result = new();
@@ -139,18 +167,24 @@ namespace JAFDTC.Utilities
             return result;
         }
 
-        // TODO: document
-        //
+        /// <summary>
+        /// attempt to install or update lua at the given dcs path. this will copy/update files in both the scripts
+        /// and hooks locations, as well as update Export.lua. returns true on success, false on failure. didUpdate
+        /// is set to true if the lua install was updated (versus newly installed).
+        /// </summary>
         public static bool InstallOrUpdateLua(string path, out bool didUpdate)
         {
             didUpdate = false;
             try
             {
-                string scriptsFolder = Path.Combine(path, "Scripts");
+                string scriptsFolder = System.IO.Path.Combine(path, "Scripts");
                 if (!Directory.Exists(scriptsFolder))
                 {
+                    FileManager.Log($"DCSLuaManager: Creates directory: {scriptsFolder}");
                     Directory.CreateDirectory(scriptsFolder);
                 }
+
+                RemoveDeprecatedFiles(scriptsFolder, _deprecatedFiles);
 
                 if (CopyLuaFilesToDCS("JAFDTC", scriptsFolder))
                 {
@@ -164,12 +198,14 @@ namespace JAFDTC.Utilities
                 string exportLuaPath = Path.Combine(scriptsFolder, "Export.lua");
                 if (!File.Exists(exportLuaPath))
                 {
+                    FileManager.Log($"DCSLuaManager: Creates Export.lua");
                     File.WriteAllText(exportLuaPath, "");
                 }
                 string exportLuaContent = File.ReadAllText(exportLuaPath);
-                if (!exportLuaContent.Contains(DCSExportMagic))
+                if (!exportLuaContent.Contains(_dcsExportMagic))
                 {
-                    exportLuaContent += $"\n\n{DCSExportMagic}\n\n";
+                    FileManager.Log($"DCSLuaManager: Updates Export.lua");
+                    exportLuaContent += $"\n\n{_dcsExportMagic}\n\n";
                     File.WriteAllText(exportLuaPath, exportLuaContent);
                 }
 
@@ -177,29 +213,34 @@ namespace JAFDTC.Utilities
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
                 Settings.SetVersionDCSLua(path, DCSLuaVersion.NONE);
 
                 // TODO: should uninstall on error?
+
+                FileManager.Log($"DCSLuaManager:InstallOrUpdateLua fails, {ex}");
             }
             return false;
         }
 
-        // TODO: implement
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         public static bool UninstallLua(string path)
         {
             Settings.SetVersionDCSLua(path, DCSLuaVersion.NONE);
-
+            // TODO: implement
             return false;
         }
 
-        // return true if jafdtc appears to be installed at the given path, false otherwise. the installed check verifies
-        // that the scripts folder exists, scripts/JAFDTC folder exists, scripts/export.lua file exists, and
-        // scripts/export.lua contains the jafdtc magic at the given path.
-        //
-        // NOTE: this does not indicate if the installation is valid or complete.
-        //
+        /// <summary>
+        /// return true if jafdtc appears to be installed at the given path, false otherwise. the installed check verifies
+        /// that the scripts folder exists, scripts/JAFDTC folder exists, scripts/export.lua file exists, and
+        /// scripts/export.lua contains the jafdtc magic at the given path.
+        ///
+        /// NOTE: this does not indicate if the installation is valid or complete.
+        /// </summary>
         private static bool IsJAFDTCInstalled(string path)
         {
             bool isInstalled;
@@ -213,7 +254,7 @@ namespace JAFDTC.Utilities
             else
             {
                 string exportLuaContent = File.ReadAllText(exportLuaPath);
-                isInstalled = exportLuaContent.Contains(DCSExportMagic);
+                isInstalled = exportLuaContent.Contains(_dcsExportMagic);
             }
             if (!isInstalled && Settings.VersionDCSLua.ContainsKey(path))
             {
@@ -222,28 +263,48 @@ namespace JAFDTC.Utilities
             return isInstalled;
         }
 
-        // update or create a file. returns true if the destination file was updated (i.e., it existed but differed
-        // from the source), false if the destination file was created.
-        //
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private static void RemoveDeprecatedFiles(string scriptsFolder, List<string> files)
+        {
+            foreach (string file in files)
+            {
+                string path = Path.Combine(scriptsFolder, file);
+                if (File.Exists(path))
+                {
+                    FileManager.Log($"DCSLuaManager: Removes deprecated file: {path}");
+                    File.Delete(path);
+                }
+            }
+        }
+
+        /// <summary>
+        /// update or create a file. returns true if the destination file was updated (i.e., it existed but differed
+        /// from the source), false if the destination file was created.
+        /// </summary>
         private static bool UpdateOrCreateFile(string srcPath, string dstPath)
         {
             if (!File.Exists(dstPath))
             {
+                FileManager.Log($"DCSLuaManager: Creates file: {dstPath}");
                 File.Copy(srcPath, dstPath);
             }
             else if ((File.ReadAllText(srcPath) != File.ReadAllText(dstPath)))
             {
+                FileManager.Log($"DCSLuaManager: Updates file: {dstPath}");
                 File.Copy(srcPath, dstPath, true);
                 return true;
             }
             return false;
         }
 
-        // copy lua files from the DCS directory in the application package to the appropriate dcs installation in
-        // saved games. returns true if existing files were updated, false if the files were new copies.
-        //
-        // NOTE: this installation will not remove files that may be no longer relevant.
-        //
+        /// <summary>
+        /// copy lua files from the DCS directory in the application package to the appropriate dcs installation in
+        /// saved games. returns true if existing files were updated, false if the files were new copies.
+        ///
+        /// NOTE: this installation will not remove files that may be no longer relevant.
+        /// </summary>
         private static bool CopyLuaFilesToDCS(string folderToCopy, string scriptsFolder)
         {
             bool isUpdate = false;
@@ -252,6 +313,7 @@ namespace JAFDTC.Utilities
 
             if (!Directory.Exists(dstFolder))
             {
+                FileManager.Log($"DCSLuaManager: Creates directory: {dstFolder}");
                 Directory.CreateDirectory(dstFolder);
             }
             foreach (string srcFile in Directory.GetFiles(srcFolder))
