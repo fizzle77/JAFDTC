@@ -1,7 +1,7 @@
 --[[
 ********************************************************************************************************************
 
-JAFDTCHook.lua -- dcs hook for waypoint capture display
+JAFDTCWyptCaptureHook.lua -- dcs hook for waypoint capture display
 
 Copyright(C) 2021-2023 the-paid-actor & dcs-dtc contributors
 Copyright(C) 2023-2024 ilominar/raven
@@ -30,9 +30,9 @@ local Terrain = require('terrain')
 local lfs = require("lfs")
 local socket = require("socket")
 
-local JAFDTCHook =
+local JAFDTCWyptCaptureHook =
 {
-    logFile = io.open(lfs.writedir() .. [[Logs\JAFDTCHook.log]], "w"),
+    logFile = io.open(lfs.writedir() .. [[Logs\JAFDTCWyptCaptureHook.log]], "w"),
     inMission = false,
     visible = true,
 
@@ -54,12 +54,12 @@ local JAFDTCHook =
     udpPort = 42003
 }
 
-function JAFDTCHook:log(str)
+function JAFDTCWyptCaptureHook:log(str)
     self.logFile:write(str .. "\n");
     self.logFile:flush();
 end
 
-function JAFDTCHook:formatCoord(lat, lon, el)
+function JAFDTCWyptCaptureHook:formatCoord(lat, lon, el)
     local originaLat = lat
     local originalLon = lon
     local latH = 'N'
@@ -93,7 +93,7 @@ function JAFDTCHook:formatCoord(lat, lon, el)
     }
 end
 
-function JAFDTCHook:sendData(data)
+function JAFDTCWyptCaptureHook:sendData(data)
     if self.udpSocket == nil then
         self.udpSocket = socket.udp()
         self.udpSocket:settimeout(0)
@@ -105,7 +105,7 @@ function JAFDTCHook:sendData(data)
     end
 end
 
-function JAFDTCHook:updateCurrentCoord()
+function JAFDTCWyptCaptureHook:updateCurrentCoord()
     local pos = Export.LoGetCameraPosition().p
     local alt = Terrain.GetSurfaceHeightWithSeabed(pos.x, pos.z)
     local lat, lon = Terrain.convertMetersToLatLon(pos.x, pos.z)
@@ -114,7 +114,7 @@ function JAFDTCHook:updateCurrentCoord()
     self.coordLabel:setText(result.string)
 end
 
-function JAFDTCHook:updateCoordListBox()
+function JAFDTCWyptCaptureHook:updateCoordListBox()
     local text = ""
     for k,v in pairs(self.coordList) do
         local type = "STP"
@@ -124,7 +124,7 @@ function JAFDTCHook:updateCoordListBox()
     self.coordListBox:setText(text)
 end
 
-function JAFDTCHook:addCoord(tgt)
+function JAFDTCWyptCaptureHook:addCoord(tgt)
     if self.currentCoord ~= nil then
         self.currentCoord.target = tgt
         table.insert(self.coordList, self.currentCoord)
@@ -132,12 +132,12 @@ function JAFDTCHook:addCoord(tgt)
     end
 end
 
-function JAFDTCHook:clearCoords()
+function JAFDTCWyptCaptureHook:clearCoords()
     self.coordList = {}
     self:updateCoordListBox()
 end
 
-function JAFDTCHook:sendToJAFDTC()
+function JAFDTCWyptCaptureHook:sendToJAFDTC()
     local str = "["
     for k,v in pairs(self.coordList) do
         local json = '{"Latitude":"' .. v.latitude .. '", "Longitude":"' .. v.longitude .. '", "Elevation":"' .. v.elevation .. '", "IsTarget":' .. tostring(v.target) .. '}'
@@ -150,7 +150,7 @@ function JAFDTCHook:sendToJAFDTC()
     self:sendData(str)
 end
 
-function JAFDTCHook:createDialog()
+function JAFDTCWyptCaptureHook:createDialog()
     if self.dialog then
         self.dialog:destroy()
     end
@@ -159,7 +159,7 @@ function JAFDTCHook:createDialog()
     local x = (screenWidth / 2) - 19
     local y = (screenHeight / 2) - 19
 
-    self.dialog = DialogLoader.spawnDialogFromFile(lfs.writedir() .. "Scripts\\JAFDTC\\WaypointCapture.dlg")
+    self.dialog = DialogLoader.spawnDialogFromFile(lfs.writedir() .. "Scripts\\JAFDTC\\WyptCapture.dlg")
     self.dialog:setVisible(true)
     self.dialog:setBounds(math.floor(x), math.floor(y), self.dialogWidth, self.dialogHeight)
     self.dialog:addHotKeyCallback(
@@ -210,7 +210,7 @@ function JAFDTCHook:createDialog()
     self:hide()
 end
 
-function JAFDTCHook:toggle()
+function JAFDTCWyptCaptureHook:toggle()
     if self.visible then
         self:hide()
     else
@@ -218,13 +218,13 @@ function JAFDTCHook:toggle()
     end
 end
 
-function JAFDTCHook:hide()
+function JAFDTCWyptCaptureHook:hide()
     self.dialog:setHasCursor(false)
     self.dialog:setSize(0,0)
     self.visible = false
 end
 
-function JAFDTCHook:show()
+function JAFDTCWyptCaptureHook:show()
     if self.inMission == false then
         return
     end
@@ -233,30 +233,30 @@ function JAFDTCHook:show()
     self.visible = true
 end
 
-local function initJAFDTCHook()
+local function initJAFDTCWyptCaptureHook()
     local handler = {}
 
     function handler.onSimulationFrame()
-        if JAFDTCHook.inMission and JAFDTCHook.visible then
-            JAFDTCHook:updateCurrentCoord()
+        if JAFDTCWyptCaptureHook.inMission and JAFDTCWyptCaptureHook.visible then
+            JAFDTCWyptCaptureHook:updateCurrentCoord()
         end
     end
 
     function handler.onMissionLoadEnd()
-        JAFDTCHook:createDialog()
-        JAFDTCHook.inMission = true;
+        JAFDTCWyptCaptureHook:createDialog()
+        JAFDTCWyptCaptureHook.inMission = true;
     end
 
     function handler.onSimulationStop()
-        JAFDTCHook:clearCoords()
-        JAFDTCHook:hide()
-        JAFDTCHook.inMission = false;
+        JAFDTCWyptCaptureHook:clearCoords()
+        JAFDTCWyptCaptureHook:hide()
+        JAFDTCWyptCaptureHook.inMission = false;
     end
 
     DCS.setUserCallbacks(handler)
 end
 
-local status, err = pcall(initJAFDTCHook)
+local status, err = pcall(initJAFDTCWyptCaptureHook)
 if not status then
-    JAFDTCHook:log("Error: " .. err)
+    JAFDTCWyptCaptureHook:log("Error: " .. err)
 end

@@ -1,7 +1,7 @@
 --[[
 ********************************************************************************************************************
 
-JAFDTCCfgNameHook.lua -- dcs hook for configuration name display
+JAFDTCStatusMsgHook.lua -- dcs hook for configuration name display
 
 Copyright(C) 2023-2024 ilominar/raven
 
@@ -28,9 +28,9 @@ local DialogLoader = require("DialogLoader")
 local lfs = require("lfs")
 local socket = require("socket")
 
-local JAFDTCCfgNameHook =
+local JAFDTCStatusMsgHook =
 {
-    logFile = io.open(lfs.writedir() .. [[Logs\JAFDTCCfgNameHook.log]], "w"),
+    logFile = io.open(lfs.writedir() .. [[Logs\JAFDTCStatusMsgHook.log]], "w"),
     inMission = false,
     visible = true,
 
@@ -47,12 +47,12 @@ local JAFDTCCfgNameHook =
     tcpPort = 42004
 }
 
-function JAFDTCCfgNameHook:log(str)
+function JAFDTCStatusMsgHook:log(str)
     self.logFile:write(str .. "\n");
     self.logFile:flush();
 end
 
-function JAFDTCCfgNameHook:receiveData()
+function JAFDTCStatusMsgHook:receiveData()
     local data = nil
     local err = nil
 
@@ -86,7 +86,7 @@ function JAFDTCCfgNameHook:receiveData()
     return data
 end
 
-function JAFDTCCfgNameHook:createDialog()
+function JAFDTCStatusMsgHook:createDialog()
     if self.dialog then
         self.dialog:destroy()
     end
@@ -95,7 +95,7 @@ function JAFDTCCfgNameHook:createDialog()
     local x = ((screenWidth - self.dialogWidth) / 2)
     local y = ((screenHeight - self.dialogHeight) / 2)
 
-    self.dialog = DialogLoader.spawnDialogFromFile(lfs.writedir() .. "Scripts\\JAFDTC\\ConfigName.dlg")
+    self.dialog = DialogLoader.spawnDialogFromFile(lfs.writedir() .. "Scripts\\JAFDTC\\StatusMsg.dlg")
     self.dialog:setVisible(true)
     self.dialog:setBounds(math.floor(x), math.floor(y), self.dialogWidth, self.dialogHeight)
 
@@ -106,7 +106,7 @@ function JAFDTCCfgNameHook:createDialog()
     self:log("Dialog initialized & created")
 end
 
-function JAFDTCCfgNameHook:updateTick(curTime)
+function JAFDTCStatusMsgHook:updateTick(curTime)
     local data = self:receiveData()
     if data then
         if not self.visible then
@@ -120,7 +120,7 @@ function JAFDTCCfgNameHook:updateTick(curTime)
     self.lastTime = curTime
 end
 
-function JAFDTCCfgNameHook:hide()
+function JAFDTCStatusMsgHook:hide()
     if self.dialog then
         self.dialog:setHasCursor(false)
         self.dialog:setSize(0,0)
@@ -128,7 +128,7 @@ function JAFDTCCfgNameHook:hide()
     self.visible = false
 end
 
-function JAFDTCCfgNameHook:show()
+function JAFDTCStatusMsgHook:show()
     if self.inMission then
         if self.dialog then
             self.dialog:setHasCursor(true)
@@ -138,30 +138,30 @@ function JAFDTCCfgNameHook:show()
     end
 end
 
-local function initJAFDTCCfgNameHook()
+local function initJAFDTCStatusMsgHook()
     local handler = {}
 
     function handler.onSimulationFrame()
         local curTime = socket.gettime()
-        if curTime ~= JAFDTCCfgNameHook.lastTime and JAFDTCCfgNameHook.inMission then
-            JAFDTCCfgNameHook:updateTick(curTime)
+        if curTime ~= JAFDTCStatusMsgHook.lastTime and JAFDTCStatusMsgHook.inMission then
+            JAFDTCStatusMsgHook:updateTick(curTime)
         end
     end
 
     function handler.onMissionLoadEnd()
-        JAFDTCCfgNameHook:createDialog()
-        JAFDTCCfgNameHook.inMission = true;
+        JAFDTCStatusMsgHook:createDialog()
+        JAFDTCStatusMsgHook.inMission = true;
     end
 
     function handler.onSimulationStop()
-        JAFDTCCfgNameHook:hide()
-        JAFDTCCfgNameHook.inMission = false;
+        JAFDTCStatusMsgHook:hide()
+        JAFDTCStatusMsgHook.inMission = false;
     end
 
     DCS.setUserCallbacks(handler)
 end
 
-local status, err = pcall(initJAFDTCCfgNameHook)
+local status, err = pcall(initJAFDTCStatusMsgHook)
 if not status then
-    JAFDTCCfgNameHook:log("Initializtion failed: " .. err)
+    JAFDTCStatusMsgHook:log("Initializtion failed: " .. err)
 end

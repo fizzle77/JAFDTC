@@ -34,13 +34,13 @@
     <None Remove="DCS\JAFDTC\A10CFunctions.lua" />
     <None Remove="DCS\JAFDTC\AV8BFunctions.lua" />
     <None Remove="DCS\JAFDTC\commonFunctions.lua" />
-    <None Remove="DCS\JAFDTC\ConfigName.dlg" />
     <None Remove="DCS\JAFDTC\F14ABFunctions.lua" />
     <None Remove="DCS\JAFDTC\f15EFunctions.lua" />
     <None Remove="DCS\JAFDTC\f16CFunctions.lua" />
     <None Remove="DCS\JAFDTC\fa18CFunctions.lua" />
     <None Remove="DCS\JAFDTC\M2000CFunctions.lua" />
-    <None Remove="DCS\JAFDTC\waypointCapture.dlg" />
+    <None Remove="DCS\JAFDTC\StatusMsg.dlg" />
+    <None Remove="DCS\JAFDTC\WyptCapture.dlg" />
     <None Remove="Images\LockScreenLogo.scale-200.png" />
     <None Remove="Images\SplashScreen.scale-200.png" />
     <None Remove="Images\Square150x150Logo.scale-200.png" />
@@ -76,7 +76,7 @@
     <Content Include="DCS\Hooks\JAFDTCWyptCaptureHook.lua" />
     <Content Include="DCS\JAFDTC\A10CFunctions.lua" />
     <Content Include="DCS\JAFDTC\AV8BFunctions.lua" />
-    <Content Include="DCS\JAFDTC\ConfigName.dlg" />
+    <Content Include="DCS\JAFDTC\StatusMsg.dlg" />
     <Content Include="DCS\JAFDTC\F14ABFunctions.lua" />
     <Content Include="DCS\JAFDTC\JAFDTC.lua" />
     <Content Include="DCS\JAFDTC\CommonFunctions.lua" />
@@ -84,7 +84,7 @@
     <Content Include="DCS\JAFDTC\F16CFunctions.lua" />
     <Content Include="DCS\JAFDTC\FA18CFunctions.lua" />
     <Content Include="DCS\JAFDTC\M2000CFunctions.lua" />
-    <Content Include="DCS\JAFDTC\WaypointCapture.dlg" />
+    <Content Include="DCS\JAFDTC\WyptCapture.dlg" />
     <Content Include="Images\JAFDTC_Icon.ico" />
     <Content Include="Images\LockScreenLogo.scale-200.png" />
     <Content Include="Images\SplashScreen.scale-200.png" />
