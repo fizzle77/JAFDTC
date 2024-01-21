@@ -2,7 +2,7 @@
 //
 // UDPSocket.cs : udp socket
 //
-// Copyright(C) 2021-2023 the-paid-actor & others
+// Copyright(C) 2021-2023 the-paid-actor & dcs-dtc contributors
 // Copyright(C) 2023-24 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
@@ -27,7 +27,8 @@ using System.Text;
 namespace JAFDTC.Utilities.Networking
 {
     /// <summary>
-    /// TODO: document
+    /// socket that transports a data stream from dcs-side lua functionality to jafdtc. opens a udp connection and
+    /// invokes a callback when data arrives.
     /// </summary>
     internal sealed class UDPRxSocket
     {
@@ -82,7 +83,8 @@ namespace JAFDTC.Utilities.Networking
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// start receiving data from the specified address and port, routing it to the specified ReceiveCallback
+        /// function.
         /// </summary>
         public void StartReceiving(string address, int port, ReceiveCallback callback)
         {
@@ -96,6 +98,9 @@ namespace JAFDTC.Utilities.Networking
             }
         }
 
+        /// <summary>
+        /// stop receiving data from the other side.
+        /// </summary>
         public void Stop()
         {
             _stop = true;

@@ -2,7 +2,7 @@
 //
 // TCPTxSocket.cs -- tcp tx socket
 //
-// Copyright(C) 2021-2023 the-paid-actor & others
+// Copyright(C) 2021-2023 the-paid-actor & dcs-dtc contributors
 // Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
@@ -25,14 +25,15 @@ using System.Net.Sockets;
 namespace JAFDTC.Utilities.Networking
 {
     /// <summary>
-    /// supports sending data to dcs via a tcp socket on localhost. the connection is torn down after the data
-    /// is sent.
+    /// socket that transports a command stream from jafdtc to the dcs-side command processor in lua exports. opens a
+    /// connection to the tcp server jafdtc lua export implements, sends the command stream, and tears down the
+    /// connection.
     /// </summary>
     internal class TCPTxSocket
     {
         /// <summary>
-        /// send a string to dcs through a tcp connection to localhost on the specified port. returns true on success,
-        /// false on failure.
+        /// send a string to dcs through a tcp connection to a localhost tcp server listneing on the specified port.
+        /// connection is closed down after sending the message. returns true on success, false on failure.
         /// </summary>
         public static bool SendToPort(string str, int port)
         {

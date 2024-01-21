@@ -2,7 +2,7 @@
 //
 // TelemDataRx.cs : dcs telemetry data udp receiver
 //
-// Copyright(C) 2021-2023 the-paid-actor & others
+// Copyright(C) 2021-2023 the-paid-actor & dcs-dtc contributors
 // Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
@@ -25,7 +25,7 @@ using System.Text.Json;
 namespace JAFDTC.Utilities.Networking
 {
     /// <summary>
-    /// TODO: document
+    /// supports receiving data from the dcs lua waypoint/steerpoint capture interface.
     /// </summary>
     public sealed class WyptCaptureDataRx
     {

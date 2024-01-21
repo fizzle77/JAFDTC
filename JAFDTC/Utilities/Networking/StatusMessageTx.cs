@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// ConfigNameTx.cs -- configuration name tcp tx path
+// StatusMessageTx.cs -- status message tcp tx path
 //
 // Copyright(C) 2023-2024 ilominar/raven
 //
@@ -20,14 +20,14 @@
 namespace JAFDTC.Utilities.Networking
 {
     /// <summary>
-    /// supports sending command sequences to dcs to drive the cockpit controls necessary to set up the avionics on
-    /// the jet according to a configuration.
+    /// supports sending a string to dcs to be displayed on screen via the lua hook tcp status message server.
     /// </summary>
     internal class StatusMessageTx
     {
         /// <summary>
-        /// send a config name string to dcs through a tcp connection to the lua config name hook. returns true on
-        /// success, false on failure.
+        /// send a string to dcs through a tcp connection to the tcp status message server the lua hook functionality
+        /// sets up. the connection is torn down after the sequence is sent. the returns true on success, false on
+        /// failure.
         /// </summary>
         public static bool Send(string str)
         {
