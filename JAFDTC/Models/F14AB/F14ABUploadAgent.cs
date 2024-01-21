@@ -2,7 +2,7 @@
 //
 // F14ABUploadAgent.cs -- f-14a/b upload agent
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -36,7 +36,7 @@ namespace JAFDTC.Models.F14AB
         // ------------------------------------------------------------------------------------------------------------
 
         private readonly F14ABConfiguration _cfg;
-        private readonly F14ABCommands _dcsCmds;
+        private readonly F14ABDeviceManager _dcsCmds;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -44,7 +44,7 @@ namespace JAFDTC.Models.F14AB
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F14ABUploadAgent(F14ABConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new F14ABCommands());
+        public F14ABUploadAgent(F14ABConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new F14ABDeviceManager());
 
         // ------------------------------------------------------------------------------------------------------------
         //

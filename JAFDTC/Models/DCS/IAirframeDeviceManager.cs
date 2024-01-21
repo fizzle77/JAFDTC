@@ -19,14 +19,14 @@
 
 namespace JAFDTC.Models.DCS
 {
-	/// <summary>
-	/// interface for an airframe device manager.
-	/// </summary>
-	public interface IAirframeDeviceManager
-	{
+    /// <summary>
+    /// interface for an airframe device manager.
+    /// </summary>
+    public interface IAirframeDeviceManager
+    {
         /// <summary>
         /// returns the device associated with the specified device name.
         /// </summary>
-		Device GetDevice(string name);
-	}
+        AirframeDevice GetDevice(string name);
+    }
 }

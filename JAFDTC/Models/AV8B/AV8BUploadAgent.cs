@@ -2,7 +2,7 @@
 //
 // AV8BUploadAgent.cs -- av-8b upload agent
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -36,7 +36,7 @@ namespace JAFDTC.Models.AV8B
         // ------------------------------------------------------------------------------------------------------------
 
         private readonly AV8BConfiguration _cfg;
-        private readonly AV8BCommands _dcsCmds;
+        private readonly AV8BDeviceManager _dcsCmds;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -44,7 +44,7 @@ namespace JAFDTC.Models.AV8B
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public AV8BUploadAgent(AV8BConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new AV8BCommands());
+        public AV8BUploadAgent(AV8BConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new AV8BDeviceManager());
 
         // ------------------------------------------------------------------------------------------------------------
         //

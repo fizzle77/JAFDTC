@@ -3,7 +3,7 @@
 // RadioBuilder.cs -- f-16c radio command builder
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -39,7 +39,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public RadioBuilder(F16CConfiguration cfg, F16CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public RadioBuilder(F16CConfiguration cfg, F16DeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -54,16 +54,13 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         public override void Build()
         {
-            Device ufc = _aircraft.GetDevice("UFC");
+            AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
             if (!_cfg.Radio.IsDefault)
             {
-                AppendCommand(ufc.GetCommand("RTN"));
-                AppendCommand(ufc.GetCommand("RTN"));
-
+                AddActions(ufc, new() { "RTN", "RTN" });
                 BuildRadio(ufc, "COM1", _cfg.Radio.Presets[(int)Radios.COMM1], _cfg.Radio.COMM1DefaultTuning,
                            _cfg.Radio.IsCOMM1MonitorGuard);
-
                 BuildRadio(ufc, "COM2", _cfg.Radio.Presets[(int)Radios.COMM2], _cfg.Radio.COMM2DefaultTuning, false);
             }
         }
@@ -71,40 +68,34 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         /// configure presets for a single radio system according to the non-default programming settings.
         /// <summary>
-        private void BuildRadio(Device ufc, string radioCmd, ObservableCollection<RadioPreset> presets,
+        private void BuildRadio(AirframeDevice ufc, string radioCmd, ObservableCollection<RadioPreset> presets,
                                 string initialTuning, bool isGuardMonitor)
         {
-            AppendCommand(ufc.GetCommand(radioCmd));
+            AddAction(ufc, radioCmd);
 
             if (isGuardMonitor)
             {
                 // TODO: this should be conditional on guard not already set (ie MAIN, not BOTH).
-                AppendCommand(ufc.GetCommand("SEQ"));
+                AddAction(ufc, "SEQ");
             }
 
-            AppendCommand(ufc.GetCommand("DOWN"));
-            AppendCommand(ufc.GetCommand("DOWN"));
+            AddActions(ufc, new() { "DOWN", "DOWN" });
 
             foreach (RadioPresetInfoBase preset in presets)
             {
-                PredAppendDigitsWithEnter(ufc, preset.Preset.ToString());
-                AppendCommand(ufc.GetCommand("DOWN"));
-
-                PredAppendDigitsNoSepWithEnter(ufc, preset.Frequency.ToString());
-                AppendCommand(ufc.GetCommand("UP"));
+                AddActions(ufc, PredActionsForNumAndEnter(preset.Preset.ToString()), new() { "DOWN" });
+                AddActions(ufc, PredActionsForCleanNumAndEnter(preset.Frequency.ToString()), new() { "UP" });
             }
 
-            AppendCommand(ufc.GetCommand("1"));
-            AppendCommand(ufc.GetCommand("ENTR"));
+            AddActions(ufc, new() { "1", "ENTR" });
 
             if (!string.IsNullOrEmpty(initialTuning))
             {
-                AppendCommand(ufc.GetCommand("DOWN"));
-                AppendCommand(ufc.GetCommand("DOWN"));
-                PredAppendDigitsNoSepWithEnter(ufc, initialTuning);
+                AddActions(ufc, new() { "DOWN", "DOWN" });
+                AddActions(ufc, PredActionsForCleanNumAndEnter(initialTuning));
             }
 
-            AppendCommand(ufc.GetCommand("RTN"));
+            AddAction(ufc, "RTN");
         }
     }
 }

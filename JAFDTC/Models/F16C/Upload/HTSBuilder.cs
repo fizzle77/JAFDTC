@@ -3,7 +3,7 @@
 // HTSBuilder.cs -- f-16c hts threat command builder
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -19,6 +19,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.DCS;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
@@ -36,7 +37,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public HTSBuilder(F16CConfiguration cfg, F16CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public HTSBuilder(F16CConfiguration cfg, F16DeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -50,37 +51,21 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         public override void Build()
         {
-            Device ufc = _aircraft.GetDevice("UFC");
+            AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
             if (!_cfg.HTS.IsDefault)
             {
-                AppendCommand(ufc.GetCommand("RTN"));
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" });
+                AddWait(WAIT_BASE);
 
-                AppendCommand(ufc.GetCommand("LIST"));
-                AppendCommand(ufc.GetCommand("8"));
+                AddIfBlock("NotInAAMode", null, delegate ()
+                {
+                    AddAction(ufc, "SEQ");
+                    AddIfBlock("NotInAGMode", null, delegate () { BuildHTSManualTable(ufc); });
+                    AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
+                });
 
-                AppendCommand(Wait());
-
-                AppendCommand(StartCondition("NotInAAMode"));
-
-                AppendCommand(ufc.GetCommand("SEQ"));
-                AppendCommand(StartCondition("NotInAGMode"));
-
-                BuildHTSManualTable(ufc);
-
-                AppendCommand(EndCondition("NotInAGMode"));
-
-                AppendCommand(ufc.GetCommand("RTN"));
-                AppendCommand(ufc.GetCommand("RTN"));
-
-                AppendCommand(ufc.GetCommand("LIST"));
-                AppendCommand(ufc.GetCommand("8"));
-                AppendCommand(ufc.GetCommand("SEQ"));
-
-                AppendCommand(EndCondition("NotInAAMode"));
-
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddAction(ufc, "RTN");
             }
         }
 
@@ -88,33 +73,28 @@ namespace JAFDTC.Models.F16C.Upload
         /// configure hts manual table via the icp/ded according to the non-default programming settings. the manual
         /// table is only populated if it is non-default.
         /// <summary>
-        private void BuildHTSManualTable(Device ufc)
+        private void BuildHTSManualTable(AirframeDevice ufc)
         {
             if (_cfg.HTS.IsMANTablePopulated)
             {
-                AppendCommand(ufc.GetCommand("RTN"));
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddActions(ufc, new() { "RTN", "RTN", "LIST", "0" });
+                AddWait(WAIT_BASE);
 
-                AppendCommand(ufc.GetCommand("LIST"));
-                AppendCommand(ufc.GetCommand("0"));
-
-                AppendCommand(Wait());
-
-                AppendCommand(StartCondition("HTSOnDED"));
-
-                AppendCommand(ufc.GetCommand("ENTR"));
-
-                for (int row = 0; row < _cfg.HTS.MANTable.Count; row++)
+                AddIfBlock("HTSOnDED", null, delegate ()
                 {
-                    if (!PredAppendDigitsWithEnter(ufc, _cfg.HTS.MANTable[row].Code))
+                    AddAction(ufc, "ENTR");
+                    for (int row = 0; row < _cfg.HTS.MANTable.Count; row++)
                     {
-                        AppendCommand(ufc.GetCommand("DOWN"));
+                        List<string> actions = PredActionsForNumAndEnter(_cfg.HTS.MANTable[row].Code);
+                        AddActions(ufc, actions);
+                        if (actions.Count == 0)
+                        {
+                            AddAction(ufc, "DOWN");
+                        }
                     }
-                }
+                });
 
-                AppendCommand(EndCondition("HTSOnDED"));
-
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddAction(ufc, "RTN");
             }
         }
     }

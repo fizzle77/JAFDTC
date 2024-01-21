@@ -3,7 +3,7 @@
 // MiscBuilder.cs -- f-16c miscellaneous command builder
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -20,6 +20,7 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C.Misc;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
@@ -37,7 +38,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public MiscBuilder(F16CConfiguration cfg, F16CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public MiscBuilder(F16CConfiguration cfg, F16DeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -52,14 +53,13 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         public override void Build()
         {
-            Device ufc = _aircraft.GetDevice("UFC");
-            Device ehsi = _aircraft.GetDevice("EHSI");
-            Device hmcsInt = _aircraft.GetDevice("HMCS_INT");
+            AirframeDevice ufc = _aircraft.GetDevice("UFC");
+            AirframeDevice ehsi = _aircraft.GetDevice("EHSI");
+            AirframeDevice hmcsInt = _aircraft.GetDevice("HMCS_INT");
 
             if (!_cfg.Misc.IsDefault)
             {
-                AppendCommand(ufc.GetCommand("RTN"));
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddActions(ufc, new() { "RTN", "RTN" });
 
                 BuildTILS(ufc, ehsi);
                 BuildALOW(ufc);
@@ -67,8 +67,6 @@ namespace JAFDTC.Models.F16C.Upload
                 BuildLaserSettings(ufc);
                 BuildBullseye(ufc);
                 BuildHMCS(ufc, hmcsInt);
-
-                AppendCommand(ufc.GetCommand("RTN"));
             }
         }
 
@@ -77,9 +75,9 @@ namespace JAFDTC.Models.F16C.Upload
         /// non-default programming settings (this function is safe to call with a configuration with default settings:
         /// defaults are skipped as necessary).
         /// <summary>
-        private void BuildTILS(Device ufc, Device ehsi)
+        private void BuildTILS(AirframeDevice ufc, AirframeDevice ehsi)
         {
-            AppendCommand(ufc.GetCommand("1"));
+            AddAction(ufc, "1");
 
             // TODO: do a better job detecting defaults here to avoid just moving around ded.
 
@@ -88,49 +86,36 @@ namespace JAFDTC.Models.F16C.Upload
             if (_cfg.Misc.TACANIsYardstickValue)
             {
                 // TODO: ideally, want a start condition here on current mode, assume default rec here
-                AppendCommand(ufc.GetCommand("SEQ"));
-                AppendCommand(ufc.GetCommand("SEQ"));
+                AddActions(ufc, new() { "SEQ", "SEQ" });
             }
 
             // ---- tacan channel
 
-            PredAppendDigitsWithEnter(ufc, _cfg.Misc.TACANChannel);
+            AddActions(ufc, PredActionsForNumAndEnter(_cfg.Misc.TACANChannel));
 
             // ---- tacan channel
 
-            if (_cfg.Misc.TACANBandValue == TACANBands.X)
-            {
-                AppendCommand(StartCondition("TACANBandY"));
-                AppendCommand(ufc.GetCommand("0"));
-                AppendCommand(ufc.GetCommand("ENTR"));
-                AppendCommand(EndCondition("TACANBandY"));
-            }
-            else
-            {
-                AppendCommand(StartCondition("TACANBandX"));
-                AppendCommand(ufc.GetCommand("0"));
-                AppendCommand(ufc.GetCommand("ENTR"));
-                AppendCommand(EndCondition("TACANBandX"));
-            }
+            string cond = (_cfg.Misc.TACANBandValue == TACANBands.X) ? "TACANBandY" : "TACANBandX";
+            AddIfBlock(cond, null, delegate () { AddActions(ufc, new() { "0", "ENTR" }); });
 
             // ---- ehsi mode
 
             // TODO: ideally, want a start condition here on current ehsi mode, assume default nav here
-            AppendCommand(ehsi.GetCommand("MODE"));
-            AppendCommand(ehsi.GetCommand("MODE"));
+            AddActions(ehsi, new() { "MODE", "MODE" });
 
             // ---- ils
 
-            AppendCommand(ufc.GetCommand("DOWN"));
-            AppendCommand(ufc.GetCommand("DOWN"));
+            AddActions(ufc, new() { "DOWN", "DOWN" });
 
-            if (!PredAppendDigitsNoSepWithEnter(ufc, _cfg.Misc.ILSFrequency))
+            List<string> actions = PredActionsForCleanNumAndEnter(_cfg.Misc.ILSFrequency);
+            AddActions(ufc, actions);
+            if (actions.Count == 0)
             {
-                AppendCommand(ufc.GetCommand("DOWN"));
+                AddAction(ufc, "DOWN");
             }
-            PredAppendDigitsWithEnter(ufc, _cfg.Misc.ILSCourse);
+            AddActions(ufc, PredActionsForNumAndEnter(_cfg.Misc.ILSCourse));
 
-            AppendCommand(ufc.GetCommand("RTN"));
+            AddAction(ufc, "RTN");
         }
 
         /// <summary>
@@ -138,19 +123,14 @@ namespace JAFDTC.Models.F16C.Upload
         /// (this function is safe to call with a configuration with default settings: defaults are skipped as
         /// necessary).
         /// <summary>
-        private void BuildALOW(Device ufc)
+        private void BuildALOW(AirframeDevice ufc)
         {
             if (!_cfg.Misc.IsALOWDefault)
             {
-                AppendCommand(ufc.GetCommand("2"));
-
-                PredAppendDigitsWithEnter(ufc, _cfg.Misc.ALOWCARAALOW);
-                AppendCommand(ufc.GetCommand("DOWN"));
-
-                PredAppendDigitsWithEnter(ufc, _cfg.Misc.ALOWMSLFloor);
-                AppendCommand(ufc.GetCommand("DOWN"));
-
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddAction(ufc, "2");
+                AddActions(ufc, PredActionsForNumAndEnter(_cfg.Misc.ALOWCARAALOW), new() { "DOWN" });
+                AddActions(ufc, PredActionsForNumAndEnter(_cfg.Misc.ALOWMSLFloor), new() { "DOWN" });
+                AddAction(ufc, "RTN");
             }
         }
 
@@ -159,16 +139,13 @@ namespace JAFDTC.Models.F16C.Upload
         /// (this function is safe to call with a configuration with default settings: defaults are skipped as
         /// necessary).
         /// <summary>
-        private void BuildBingo(Device ufc)
+        private void BuildBingo(AirframeDevice ufc)
         {
             if (!_cfg.Misc.IsBINGODefault)
             {
-                AppendCommand(ufc.GetCommand("LIST"));
-                AppendCommand(ufc.GetCommand("2"));
-
-                PredAppendDigitsWithEnter(ufc, _cfg.Misc.Bingo);
-
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddActions(ufc, new() { "LIST", "2" });
+                AddActions(ufc, PredActionsForNumAndEnter(_cfg.Misc.Bingo));
+                AddAction(ufc, "RTN");
             }
         }
 
@@ -177,29 +154,25 @@ namespace JAFDTC.Models.F16C.Upload
         /// settings (this function is safe to call with a configuration with default settings: defaults are skipped
         /// as necessary).
         /// <summary>
-        private void BuildLaserSettings(Device ufc)
+        private void BuildLaserSettings(AirframeDevice ufc)
         {
             if (!_cfg.Misc.IsLaserDefault)
             {
-                AppendCommand(ufc.GetCommand("LIST"));
-                AppendCommand(ufc.GetCommand("0"));
-                AppendCommand(ufc.GetCommand("5"));
+                AddActions(ufc, new() { "LIST", "0", "5" });
 
                 // ---- tgp designator laser code
 
-                PredAppendDigitsWithEnter(ufc, _cfg.Misc.LaserTGPCode);
-                AppendCommand(ufc.GetCommand("DOWN"));
+                AddActions(ufc, PredActionsForNumAndEnter(_cfg.Misc.LaserTGPCode), new() { "DOWN" });
 
                 // ---- tgp lst laser code
 
-                PredAppendDigitsWithEnter(ufc, _cfg.Misc.LaserLSTCode);
-                AppendCommand(ufc.GetCommand("DOWN"));
+                AddActions(ufc, PredActionsForNumAndEnter(_cfg.Misc.LaserLSTCode), new() { "DOWN" });
 
                 // ---- tgp laser start time
 
-                PredAppendDigitsWithEnter(ufc, _cfg.Misc.LaserStartTime);
+                AddActions(ufc, PredActionsForNumAndEnter(_cfg.Misc.LaserStartTime));
 
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddAction(ufc, "RTN");
             }
         }
 
@@ -207,26 +180,21 @@ namespace JAFDTC.Models.F16C.Upload
         /// configure ded bull (list misc, 8) via the icp/ded according to the non-default programming settings (this
         /// function is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
-        private void BuildBullseye(Device ufc)
+        private void BuildBullseye(AirframeDevice ufc)
         {
             if (!_cfg.Misc.IsBULLDefault)
             {
-                AppendCommand(ufc.GetCommand("LIST"));
-                AppendCommand(ufc.GetCommand("0"));
-                AppendCommand(ufc.GetCommand("8"));
+                AddActions(ufc, new() { "LIST", "0", "8" });
 
-                AppendCommand(Wait());
+                AddWait(WAIT_BASE);
 
-                AppendCommand(StartCondition("BullseyeNotSelected"));
-                AppendCommand(ufc.GetCommand("0"));
-                AppendCommand(EndCondition("BullseyeNotSelected"));
+                // TODO: assumes bullseye state
+                AddIfBlock("BullseyeNotSelected", null, delegate () { AddAction(ufc, "0"); });
+                AddAction(ufc, "DOWN");
 
-                AppendCommand(ufc.GetCommand("DOWN"));
+                AddActions(ufc, PredActionsForCleanNumAndEnter(_cfg.Misc.BullseyeWP), new() { "DOWN" });
 
-                PredAppendDigitsDLZRSWithEnter(ufc, _cfg.Misc.BullseyeWP);
-                AppendCommand(ufc.GetCommand("DOWN"));
-
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddAction(ufc, "RTN");
             }
         }
 
@@ -235,61 +203,46 @@ namespace JAFDTC.Models.F16C.Upload
         /// settings (this function is safe to call with a configuration with default settings: defaults are skipped
         /// as necessary).
         /// <summary>
-        private void BuildHMCS(Device ufc, Device hmcsInt)
+        private void BuildHMCS(AirframeDevice ufc, AirframeDevice hmcsInt)
         {
             if (!_cfg.Misc.IsHMCSDefault)
             {
-                AppendCommand(ufc.GetCommand("LIST"));
-                AppendCommand(ufc.GetCommand("0"));
-                AppendCommand(ufc.GetCommand("RCL"));
+                AddActions(ufc, new() { "LIST", "0", "RCL" });
 
                 // TODO: check current state, assume enabled by default for now
-                if (!_cfg.Misc.HMCSBlankHUDValue)
-                {
-                    AppendCommand(ufc.GetCommand("0"));
-                }
-                else
-                {
-                    AppendCommand(ufc.GetCommand("DOWN"));
-                }
-                AppendCommand(Wait());
+                AddAction(ufc, (!_cfg.Misc.HMCSBlankHUDValue) ? "0" : "DOWN");
+                AddWait(WAIT_BASE);
 
                 // TODO: check current state, assume enabled by default for now
-                if (!_cfg.Misc.HMCSBlankCockpitValue)
-                {
-                    AppendCommand(ufc.GetCommand("0"));
-                }
-                else
-                {
-                    AppendCommand(ufc.GetCommand("DOWN"));
-                }
-                AppendCommand(Wait());
+                AddAction(ufc, (!_cfg.Misc.HMCSBlankCockpitValue) ? "0" : "DOWN");
+                AddWait(WAIT_BASE);
 
                 // TODO: check current state, assume lvl1 by default for now
                 if (_cfg.Misc.HMCSDeclutterLvlValue != HMCSDeclutterLevels.LVL1)
                 {
-                    AppendCommand(ufc.GetCommand("1"));
+                    AddAction(ufc, "1");
                 }
                 if (_cfg.Misc.HMCSDeclutterLvlValue == HMCSDeclutterLevels.LVL3)
                 {
-                    AppendCommand(ufc.GetCommand("1"));
+                    AddAction(ufc, "1");
                 }
-                AppendCommand(Wait());
-                AppendCommand(ufc.GetCommand("DOWN"));
+                AddWait(WAIT_BASE);
+                AddAction(ufc, "DOWN");
 
                 // TODO: check current state, assume enabled by default for now
                 if (!_cfg.Misc.HMCSDisplayRWRValue)
                 {
-                    AppendCommand(ufc.GetCommand("0"));
+                    AddAction(ufc, "0");
                 }
-                AppendCommand(Wait());
+                AddWait(WAIT_BASE);
 
                 if (!string.IsNullOrEmpty(_cfg.Misc.HMCSIntensity))
                 {
-                    AppendCommand(hmcsInt.GetCommand("INT", true, double.Parse(_cfg.Misc.HMCSIntensity)));
+                    double intensity = double.Parse(_cfg.Misc.HMCSIntensity);
+                    AddDynamicAction(hmcsInt, "INT", intensity, intensity);
                 }
 
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddAction(ufc, "RTN");
             }
         }
     }

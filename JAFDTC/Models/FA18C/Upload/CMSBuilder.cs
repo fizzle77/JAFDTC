@@ -3,7 +3,7 @@
 // CMSBuilder.cs -- fa-18c cms command builder
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -37,7 +37,7 @@ namespace JAFDTC.Models.FA18C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public CMSBuilder(FA18CConfiguration cfg, FA18CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public CMSBuilder(FA18CConfiguration cfg, FA18CDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -51,22 +51,21 @@ namespace JAFDTC.Models.FA18C.Upload
         /// <summary>
         public override void Build()
         {
-            Device lmfd = _aircraft.GetDevice("LMFD");
-            Device cmds = _aircraft.GetDevice("CMDS");
+            AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
+            AirframeDevice cmds = _aircraft.GetDevice("CMDS");
             CMSSystem defaultSys = CMSSystem.ExplicitDefaults;
 
             if (!_cfg.CMS.IsDefault)
             {
-                AppendCommand(lmfd.GetCommand("OSB-18")); // Menu
-                AppendCommand(lmfd.GetCommand("OSB-17")); // EW
+                AddActions(lmfd, new() { "OSB-18", "OSB-17" }); // Menu, EW
 
-                AppendCommand(StartCondition("DispenserOff"));
-                AppendCommand(cmds.GetCommand("ON"));
-                AppendCommand(WaitVeryLong());
-                AppendCommand(EndCondition("DispenserOff"));
+                AddIfBlock("DispenserOff", null, delegate ()
+                {
+                    AddAction(cmds, "ON");
+                    AddWait(WAIT_VERY_LONG);
+                });
 
-                AppendCommand(lmfd.GetCommand("OSB-08")); // ALE-47
-                AppendCommand(lmfd.GetCommand("OSB-09")); // ARM
+                AddActions(lmfd, new() { "OSB-08", "OSB-09" }); // ALE-47, ARM
 
                 for (var i = 0; i < _cfg.CMS.Programs.Length; i++)
                 {
@@ -76,62 +75,59 @@ namespace JAFDTC.Models.FA18C.Upload
                     {
                         if (!string.IsNullOrEmpty(pgm.ChaffQ))
                         {
-                            AppendCommand(lmfd.GetCommand("OSB-05")); // Chaff
-                            AppendCommand(Wait());
+                            AddAction(lmfd, "OSB-05"); // Chaff
+                            AddWait(WAIT_BASE);
                             AdjustQty(lmfd, int.Parse(pgm.ChaffQ), int.Parse(pgmDefault.ChaffQ));
-                            AppendCommand(lmfd.GetCommand("OSB-05"));
+                            AddAction(lmfd, "OSB-05");
                         }
 
                         if (!string.IsNullOrEmpty(pgm.FlareQ))
                         {
-                            AppendCommand(lmfd.GetCommand("OSB-04")); // Flare
-                            AppendCommand(Wait());
+                            AddAction(lmfd, "OSB-04"); // Flare
+                            AddWait(WAIT_BASE);
                             AdjustQty(lmfd, int.Parse(pgm.FlareQ), int.Parse(pgmDefault.FlareQ));
-                            AppendCommand(lmfd.GetCommand("OSB-04"));
+                            AddAction(lmfd, "OSB-04");
                         }
 
                         if (!string.IsNullOrEmpty(pgm.SQ))
                         {
-                            AppendCommand(lmfd.GetCommand("OSB-14")); // Rpt
-                            AppendCommand(Wait());
+                            AddAction(lmfd, "OSB-14"); // Rpt
+                            AddWait(WAIT_BASE);
                             AdjustQty(lmfd, int.Parse(pgm.SQ), int.Parse(pgmDefault.SQ));
-                            AppendCommand(lmfd.GetCommand("OSB-14"));
+                            AddAction(lmfd, "OSB-14");
                         }
 
                         if (!string.IsNullOrEmpty(pgm.SI))
                         {
-                            AppendCommand(lmfd.GetCommand("OSB-15")); // Interval
-                            AppendCommand(Wait());
+                            AddAction(lmfd, "OSB-15"); // Interval
+                            AddWait(WAIT_BASE);
                             AdjustInterval(lmfd, double.Parse(pgm.SI), double.Parse(pgmDefault.SI));
-                            AppendCommand(lmfd.GetCommand("OSB-15"));
+                            AddAction(lmfd, "OSB-15");
                         }
                     }
-                    AppendCommand(lmfd.GetCommand("OSB-19")); // Save
-                    AppendCommand(lmfd.GetCommand("OSB-20")); // Step
+                    AddActions(lmfd, new() { "OSB-19", "OSB-20" }); // Save, Step
                 }
-                AppendCommand(lmfd.GetCommand("OSB-09")); // RTN
-                AppendCommand(lmfd.GetCommand("OSB-18")); // MENU
-                AppendCommand(lmfd.GetCommand("OSB-03")); // HUD
+                AddActions(lmfd, new() { "OSB-09", "OSB-18", "OSB-03" }); // RTN, MENU, HUD
             }
         }
 
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void AdjustQty(Device lmfd, int target, int defaultValue)
+        private void AdjustQty(AirframeDevice lmfd, int target, int defaultValue)
         {
             if (target > defaultValue)
             {
                 for (var s = 0; s < target - defaultValue; s++)
                 {
-                    AppendCommand(lmfd.GetCommand("OSB-12")); // Up
+                    AddAction(lmfd, "OSB-12"); // Up
                 }
             }
             else if (target < defaultValue)
             {
                 for (var s = 0; s < defaultValue - target; s++)
                 {
-                    AppendCommand(lmfd.GetCommand("OSB-13")); // Down
+                    AddAction(lmfd, "OSB-13"); // Down
                 }
             }
         }
@@ -139,20 +135,20 @@ namespace JAFDTC.Models.FA18C.Upload
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void AdjustInterval(Device lmfd, double target, double defaultValue)
+        private void AdjustInterval(AirframeDevice lmfd, double target, double defaultValue)
         {
             if (target > defaultValue)
             {
                 for (var s = 0; s < (target - defaultValue) / (double)0.25; s++)
                 {
-                    AppendCommand(lmfd.GetCommand("OSB-12")); // Up
+                    AddAction(lmfd, "OSB-12"); // Up
                 }
             }
             else if(target < defaultValue)
             {
                 for (var s = 0; s < (defaultValue - target) / (double)0.25; s++)
                 {
-                    AppendCommand(lmfd.GetCommand("OSB-13")); // Down
+                    AddAction(lmfd, "OSB-13"); // Down
                 }
             }
         }

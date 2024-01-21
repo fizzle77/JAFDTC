@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// F15EUploadAgent.cs -- f-15e upload agent
+// Command.cs -- aircraft command
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
 // Copyright(C) 2023-2024 ilominar/raven
@@ -18,17 +18,17 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.F15E.Upload;
 using System.Diagnostics;
-using System.Text;
 
-namespace JAFDTC.Models.F15E
+namespace JAFDTC.Models.DCS
 {
     /// <summary>
-    /// upload agent responsible for building a stream of commands for use by dcs to set up mudhen avionics according
-    /// to a configuration.
+    /// models an action that an airframe device can take in response to a physical interaction such as turning a
+    /// knob, pushing a button, flipping a switch. an interaction involves setting dcs state to a "down" value,
+    /// waiting for a delay, then setting dcs state to an "up" value. actions are always associated with an
+    /// AirframeDevice.
     /// </summary>
-    public class F15EUploadAgent : UploadAgentBase, IUploadAgent
+    public class Action
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -36,28 +36,23 @@ namespace JAFDTC.Models.F15E
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private readonly F15EConfiguration _cfg;
-        private readonly F15EDeviceManager _dcsCmds;
+        public readonly string Name;                            // unique action name
+
+        public readonly int ID;                                 // dcs clickable cockpit id for action
+        
+        public readonly int Delay;                              // delay (ms) between "down" state and "up" state
+        
+        public readonly double ValueDn;                         // value on "down"
+        
+        public readonly double ValueUp;                         // value on "up"
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // construction
+        // Construction
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F15EUploadAgent(F15EConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new F15EDeviceManager());
-
-        // ------------------------------------------------------------------------------------------------------------
-        //
-        // methods
-        //
-        // ------------------------------------------------------------------------------------------------------------
-
-        public override void BuildSystems(StringBuilder sb)
-        {
-            new RadioBuilder(_cfg, _dcsCmds, sb).Build();
-            new MiscBuilder(_cfg, _dcsCmds, sb).Build();
-            new STPTBuilder(_cfg, _dcsCmds, sb).Build();
-        }
+        public Action(int id, string name, int delay, double valueDn, double valueUp = 0)
+            => (ID, Name, Delay, ValueDn, ValueUp) = (id, name, delay, valueDn, valueUp);
     }
 }

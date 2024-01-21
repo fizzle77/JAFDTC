@@ -1,8 +1,8 @@
 ﻿// ********************************************************************************************************************
 //
-// M2000CCommands.cs -- m-2000c commands
+// M2000CDeviceManager.cs -- m-2000c commands
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -24,9 +24,9 @@ using System.Diagnostics;
 namespace JAFDTC.Models.M2000C
 {
     /// <summary>
-	/// manages the set of dcs cockpit commands associated with devices in the mirage.
+    /// manages the set of dcs airframe devices and associated commands/actions for the mirage.
     /// </summary>
-    internal class M2000CCommands : AirframeDeviceManagerBase, IAirframeDeviceManager
+    internal class M2000CDeviceManager : AirframeDeviceManagerBase, IAirframeDeviceManager
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -34,27 +34,27 @@ namespace JAFDTC.Models.M2000C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public M2000CCommands()
+        public M2000CDeviceManager()
         {
             int delay = Settings.CommandDelaysMs[AirframeTypes.M2000C];
 
             int delayChar = delay / 2;
 
-            Device pcn = new(9, "PCN");
-            pcn.AddCommand(new Command(3570, "INS_PREP_SW", delayChar, 1));
-            pcn.AddCommand(new Command(3572, "INS_DEST_SW", delayChar, 1));
-            pcn.AddCommand(new Command(3584, "1", delayChar, 1));
-            pcn.AddCommand(new Command(3585, "2", delayChar, 1));
-            pcn.AddCommand(new Command(3586, "3", delayChar, 1));
-            pcn.AddCommand(new Command(3587, "4", delayChar, 1));
-            pcn.AddCommand(new Command(3588, "5", delayChar, 1));
-            pcn.AddCommand(new Command(3589, "6", delayChar, 1));
-            pcn.AddCommand(new Command(3590, "7", delayChar, 1));
-            pcn.AddCommand(new Command(3591, "8", delayChar, 1));
-            pcn.AddCommand(new Command(3592, "9", delayChar, 1));
-            pcn.AddCommand(new Command(3593, "0", delayChar, 1));
-            pcn.AddCommand(new Command(3594, "INS_CLR_BTN", delayChar, 1));
-            pcn.AddCommand(new Command(3595, "INS_ENTER_BTN", delayChar, 1));
+            AirframeDevice pcn = new(9, "PCN");
+            pcn.AddAction(3570, "INS_PREP_SW", delayChar, 1);
+            pcn.AddAction(3572, "INS_DEST_SW", delayChar, 1);
+            pcn.AddAction(3584, "1", delayChar, 1);
+            pcn.AddAction(3585, "2", delayChar, 1);
+            pcn.AddAction(3586, "3", delayChar, 1);
+            pcn.AddAction(3587, "4", delayChar, 1);
+            pcn.AddAction(3588, "5", delayChar, 1);
+            pcn.AddAction(3589, "6", delayChar, 1);
+            pcn.AddAction(3590, "7", delayChar, 1);
+            pcn.AddAction(3591, "8", delayChar, 1);
+            pcn.AddAction(3592, "9", delayChar, 1);
+            pcn.AddAction(3593, "0", delayChar, 1);
+            pcn.AddAction(3594, "INS_CLR_BTN", delayChar, 1);
+            pcn.AddAction(3595, "INS_ENTER_BTN", delayChar, 1);
             AddDevice(pcn);
         }
     }

@@ -2,7 +2,7 @@
 //
 // F14ABBuilderBase.cs -- f-14a/b abstract base command builder
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -24,8 +24,8 @@ using System.Text;
 namespace JAFDTC.Models.F14AB.Upload
 {
     /// <summary>
-    /// abstract base class for the tomcat upload functionality. provides functions to support building command
-    /// streams.
+    /// abstract base class for the tomcat command builder functionality. all system-specific tomcat command builders
+    /// derive from this class.
     /// </summary>
     internal abstract class F14ABBuilderBase : BuilderBase, IBuilder
     {
@@ -43,7 +43,7 @@ namespace JAFDTC.Models.F14AB.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F14ABBuilderBase(F14ABConfiguration cfg, F14ABCommands dcsCmds, StringBuilder sb)
+        public F14ABBuilderBase(F14ABConfiguration cfg, F14ABDeviceManager dcsCmds, StringBuilder sb)
             : base(dcsCmds, sb) => (_cfg) = (cfg);
     }
 }

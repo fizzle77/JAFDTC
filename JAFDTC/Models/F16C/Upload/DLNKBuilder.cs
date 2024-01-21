@@ -1,8 +1,8 @@
 ﻿// ********************************************************************************************************************
 //
-// DLNKBuilder.cs -- f-16c cmds command builder
+// DLNKBuilder.cs -- f-16c dlnk command builder
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,6 +18,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.DCS;
+using JAFDTC.Models.F16C.DLNK;
 using System.Diagnostics;
 using System.Text;
 
@@ -35,7 +36,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public DLNKBuilder(F16CConfiguration cfg, F16CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public DLNKBuilder(F16CConfiguration cfg, F16DeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -49,72 +50,36 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         public override void Build()
         {
-            Device ufc = _aircraft.GetDevice("UFC");
+            AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
             if (!_cfg.DLNK.IsDefault)
             {
-                AppendCommand(ufc.GetCommand("RTN"));
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddActions(ufc, new() { "RTN", "RTN", "LIST", "ENTR", "SEQ" });    // dlnk, tndl page
 
-                AppendCommand(ufc.GetCommand("LIST"));
-                AppendCommand(ufc.GetCommand("ENTR"));
+                // TODO: callsign, number, flight lead data on first tndl page
 
-                AppendCommand(ufc.GetCommand("SEQ"));
+                AddAction(ufc, "SEQ");
 
-                // TODO: need to check for ded state of flight lead to do this right
-#if TODO
-                AppendCommand(ufc.GetCommand("DOWN"));
-                AppendCommand(ufc.GetCommand("DOWN"));
-                AppendCommand(ufc.GetCommand("DOWN"));
-                AppendCommand(ufc.GetCommand("DOWN"));
-                AppendCommand(ufc.GetCommand("DOWN"));
-
-                // TODO: should wrap this in a check of flight lead
-                if (_cfg.DLNK.IsOwnshipLead)
-                {
-                }
-#endif
-
-                AppendCommand(ufc.GetCommand("SEQ"));
-
-                // set up TDOA, TNDL in two passes as hitting "ENTR" to commit TNDL clears TDOA.
-                // first pass will fill in all TNDL values, second pass will fill in all TDOA
-                // values. setup ownship between passes.
+                // set up TDOA, TNDL in two passes as hitting "ENTR" to commit TNDL clears TDOA. first pass will fill
+                // in all TNDL values, second pass will fill in all TDOA values. setup ownship between passes.
 
                 for (int i = 0; i < _cfg.DLNK.TeamMembers.Length; i++)
                 {
-                    AppendCommand(ufc.GetCommand("DOWN"));
-
-                    if (!PredAppendDigitsWithEnter(ufc, _cfg.DLNK.TeamMembers[i].TNDL))
-                    {
-                        PredAppendDigitsWithEnter(ufc, "00000");
-                    }
+                    TeamMember tm = _cfg.DLNK.TeamMembers[i];
+                    string tndl = (!string.IsNullOrEmpty(tm.TNDL)) ? tm.TNDL : "00000";
+                    AddActions(ufc, new() { "DOWN" }, PredActionsForNumAndEnter(tndl));
                 }
 
-                PredAppendDigitsWithEnter(ufc, _cfg.DLNK.Ownship);
-                AppendCommand(ufc.GetCommand("DOWN"));
+                AddActions(ufc, PredActionsForNumAndEnter(_cfg.DLNK.Ownship), new() { "DOWN" });
 
                 for (int i = 0; i < _cfg.DLNK.TeamMembers.Length; i++)
                 {
-                    if (_cfg.DLNK.TeamMembers[i].TDOA)
-                    {
-                        AppendCommand(StartCondition("TDOANotSet", (i + 1).ToString()));
-                        AppendCommand(ufc.GetCommand("7"));
-                        AppendCommand(EndCondition("TDOANotSet"));
-                    }
-                    else
-                    {
-                        AppendCommand(StartCondition("TDOASet", (i + 1).ToString()));
-                        AppendCommand(ufc.GetCommand("7"));
-                        AppendCommand(EndCondition("TDOASet"));
-                    }
-
-                    AppendCommand(Wait());
-                    AppendCommand(ufc.GetCommand("DOWN"));
-                    AppendCommand(ufc.GetCommand("DOWN"));
+                    string cond = (_cfg.DLNK.TeamMembers[i].TDOA) ? "TDOANotSet" : "TDOASet";
+                    AddIfBlock(cond, new() { (i + 1).ToString() }, delegate () { AddAction(ufc, "7"); });
+                    AddActions(ufc, new() { "DOWN", "DOWN" });
                 }
 
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddAction(ufc, "RTN");
             }
         }
     }

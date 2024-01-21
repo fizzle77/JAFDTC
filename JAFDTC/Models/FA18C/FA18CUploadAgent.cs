@@ -3,7 +3,7 @@
 // FA18CUploadAgent.cs -- fa-18c upload agent
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,7 +18,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.FA18C.CMS;
 using JAFDTC.Models.FA18C.Upload;
 using System.Diagnostics;
 using System.Text;
@@ -38,7 +37,7 @@ namespace JAFDTC.Models.FA18C
         // ------------------------------------------------------------------------------------------------------------
 
         private readonly FA18CConfiguration _cfg;
-        private readonly FA18CCommands _dcsCmds;
+        private readonly FA18CDeviceManager _dcsCmds;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -46,7 +45,7 @@ namespace JAFDTC.Models.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public FA18CUploadAgent(FA18CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new FA18CCommands());
+        public FA18CUploadAgent(FA18CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new FA18CDeviceManager());
 
         // ------------------------------------------------------------------------------------------------------------
         //

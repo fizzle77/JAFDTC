@@ -2,7 +2,7 @@
 //
 // M2000CUploadAgent.cs -- m-2000c upload agent
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -24,7 +24,7 @@ using System.Text;
 namespace JAFDTC.Models.M2000C
 {
     /// <summary>
-    /// upload agent responsible for building a stream of commands for use by dcs to set up warthog avionics according
+    /// upload agent responsible for building a stream of commands for use by dcs to set up mirage avionics according
     /// to a configuration.
     /// </summary>
     internal class M2000CUploadAgent : UploadAgentBase, IUploadAgent
@@ -36,7 +36,7 @@ namespace JAFDTC.Models.M2000C
         // ------------------------------------------------------------------------------------------------------------
 
         private readonly M2000CConfiguration _cfg;
-        private readonly M2000CCommands _dcsCmds;
+        private readonly M2000CDeviceManager _dcsCmds;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -44,7 +44,7 @@ namespace JAFDTC.Models.M2000C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public M2000CUploadAgent(M2000CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new M2000CCommands());
+        public M2000CUploadAgent(M2000CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new M2000CDeviceManager());
 
         // ------------------------------------------------------------------------------------------------------------
         //

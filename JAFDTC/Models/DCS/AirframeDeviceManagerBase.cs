@@ -2,7 +2,7 @@
 //
 // AirframeDeviceManagerBase.cs -- abstract base class for an airframe device manager
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -23,8 +23,8 @@ using System.Diagnostics;
 namespace JAFDTC.Models.DCS
 {
     /// <summary>
-    /// abstract base class for an airframe device manager. instances of this class manage Device objects that are
-    /// associated with a paricular airframe.
+    /// abstract base class for an airframe device manager. instances of this class manage AirframeDevice objects
+    /// that correspond to devices associated with a paricular airframe.
     /// </summary>
     public abstract class AirframeDeviceManagerBase : IAirframeDeviceManager
     {
@@ -34,7 +34,7 @@ namespace JAFDTC.Models.DCS
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private readonly Dictionary<string, Device> _devices = new();
+        private readonly Dictionary<string, AirframeDevice> _devices = new();
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -45,7 +45,7 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// add the specified device to the device list for the airframe.
         /// </summary>
-        protected void AddDevice(Device d)
+        protected void AddDevice(AirframeDevice d)
         {
             _devices.Add(d.Name, d);
         }
@@ -53,7 +53,7 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// returns the device associated with the specified device name.
         /// </summary>
-        public Device GetDevice(string name)
+        public AirframeDevice GetDevice(string name)
         {
             return _devices[name];
         }

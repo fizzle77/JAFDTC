@@ -18,21 +18,18 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.DCS;
-using JAFDTC.Models.F14AB;
 using JAFDTC.Models.F14AB.WYPT;
 using JAFDTC.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
-using System.Text.RegularExpressions;
-using Windows.Media.Devices;
 
 namespace JAFDTC.Models.F14AB.Upload
 {
     /// <summary>
-    /// TODO: document
+    /// command builder for the waypoint system in the tomcat. translates cmds setup in F14ABConfiguration into
+    /// commands that drive the dcs clickable cockpit.
     /// </summary>
     internal class WYPTBuilder : F14ABBuilderBase, IBuilder
     {
@@ -42,7 +39,7 @@ namespace JAFDTC.Models.F14AB.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public WYPTBuilder(F14ABConfiguration cfg, F14ABCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public WYPTBuilder(F14ABConfiguration cfg, F14ABDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -57,7 +54,7 @@ namespace JAFDTC.Models.F14AB.Upload
         public override void Build()
         {
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
-            Device cap = _aircraft.GetDevice("PCN");
+            AirframeDevice cap = _aircraft.GetDevice("PCN");
 
             // TODO: support for other navigation point types?
 
@@ -65,25 +62,24 @@ namespace JAFDTC.Models.F14AB.Upload
             {
                 // NOTE: should be at most 3 steerpoints, 1-3.
 
-                AppendCommand(cap.GetCommand("RIO_CAP_CATEGORY_TAC"));
+                AddAction(cap, "RIO_CAP_CATEGORY_TAC");
                 for (int i = 0; i < wypts.Count; i++)
                 {
                     if (wypts[i].IsValid)
                     {
                         // NOTE: coords are zero-filled in the ui, back that out here.
 
-                        AppendCommand(cap.GetCommand($"RIO_CAP_BTN_{i+1}"));
-                        AppendCommand(cap.GetCommand("RIO_CAP_CLEAR"));
+                        AddActions(cap, new() { $"RIO_CAP_BTN_{i + 1}", "RIO_CAP_CLEAR" });
 
-                        AppendCommand(cap.GetCommand($"RIO_CAP_LAT_1"));
-                        AppendCommand(BuildCoordinate(cap, Coord.RemoveLLDegZeroFill(wypts[i].LatUI)));
-                        AppendCommand(cap.GetCommand("RIO_CAP_ENTER"));
+                        AddAction(cap, "RIO_CAP_LAT_1");
+                        AddActions(cap, ActionsForCoordinateString(Coord.RemoveLLDegZeroFill(wypts[i].LatUI)));
+                        AddAction(cap, "RIO_CAP_ENTER");
 
-                        AppendCommand(cap.GetCommand($"RIO_CAP_LONG_6"));
-                        AppendCommand(BuildCoordinate(cap, Coord.RemoveLLDegZeroFill(wypts[i].LonUI)));
-                        AppendCommand(cap.GetCommand("RIO_CAP_ENTER"));
+                        AddAction(cap, "RIO_CAP_LONG_6");
+                        AddActions(cap, ActionsForCoordinateString(Coord.RemoveLLDegZeroFill(wypts[i].LonUI)));
+                        AddAction(cap, "RIO_CAP_ENTER");
 
-                        AppendCommand(cap.GetCommand("RIO_CAP_CLEAR"));
+                        AddAction(cap, "RIO_CAP_CLEAR");
                     }
                 }
             }
@@ -94,23 +90,23 @@ namespace JAFDTC.Models.F14AB.Upload
         /// separators and spaces are removed, the coordinate string should start with N/S/E/W followed by the
         /// digits and/or characters that should be typed in to the cap (so, zero-filled ddm format).
         /// <summary>
-        private static string BuildCoordinate(Device cap, string coord)
+        private static List<string> ActionsForCoordinateString(string coord)
         {
-            string coordStr = RemoveSeparators(coord.Replace(" ", ""));
+            coord = AdjustNoSeparators(coord.Replace(" ", ""));
 
-            StringBuilder sb = new();
-            foreach (char c in coordStr.ToUpper().ToCharArray())
+            List<string> actions = new();
+            foreach (char c in coord.ToUpper().ToCharArray())
             {
                 switch (c)
                 {
-                    case 'N': sb.Append(cap.GetCommand("RIO_CAP_NE")); break;
-                    case 'S': sb.Append(cap.GetCommand("RIO_CAP_SW")); break;
-                    case 'E': sb.Append(cap.GetCommand("RIO_CAP_NE")); break;
-                    case 'W': sb.Append(cap.GetCommand("RIO_CAP_SW")); break;
-                    default: sb.Append(cap.GetCommand(c.ToString())); break;
+                    case 'N': actions.Add("RIO_CAP_NE"); break;
+                    case 'S': actions.Add("RIO_CAP_SW"); break;
+                    case 'E': actions.Add("RIO_CAP_NE"); break;
+                    case 'W': actions.Add("RIO_CAP_SW"); break;
+                    default: actions.Add(c.ToString()); break;
                 }
             }
-            return sb.ToString();
+            return actions;
         }
     }
 }

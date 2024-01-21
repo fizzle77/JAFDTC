@@ -26,7 +26,8 @@ using System.Text;
 namespace JAFDTC.Models.F15E.Upload
 {
     /// <summary>
-    /// command stream builder for the mudhen miscellaneous system that covers BINGO, CARA, TACAN, and ILS.
+    /// command builder for the miscellaneous systems (BINGO, CARA, TACAN, ILS) in the mudhen. translates misc setup
+    /// in F15EConfiguration into commands that drive the dcs clickable cockpit.
     /// </summary>
     internal class MiscBuilder : F15EBuilderBase, IBuilder
     {
@@ -36,7 +37,7 @@ namespace JAFDTC.Models.F15E.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public MiscBuilder(F15EConfiguration cfg, F15ECommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public MiscBuilder(F15EConfiguration cfg, F15EDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -51,8 +52,8 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         public override void Build()
         {
-            Device ufc = _aircraft.GetDevice("UFC_PILOT");
-            Device fltInst = _aircraft.GetDevice("FLTINST");
+            AirframeDevice ufc = _aircraft.GetDevice("UFC_PILOT");
+            AirframeDevice fltInst = _aircraft.GetDevice("FLTINST");
 
             BuildBingo(fltInst);
             BuildCARA(ufc);
@@ -63,18 +64,19 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void BuildBingo(Device fltInst)
+        private void BuildBingo(AirframeDevice fltInst)
         {
             if (!_cfg.Misc.IsBINGODefault)
             {
                 int bingo = int.Parse(_cfg.Misc.Bingo);
+                // TODO: handle this through a dcs-side loop?
                 for (int i = 0; i < 140; i++)
                 {
-                    AppendCommand(fltInst.GetCommand("BingoDecrease"));
+                    AddAction(fltInst, "BingoDecrease");
                 }
                 for (int i = 0; i < bingo / 100; i++)
                 {
-                    AppendCommand(fltInst.GetCommand("BingoIncrease"));
+                    AddAction(fltInst, "BingoIncrease");
                 }
             }
         }
@@ -82,71 +84,45 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void BuildCARA(Device ufc)
+        private void BuildCARA(AirframeDevice ufc)
         {
             if (!_cfg.Misc.IsLowAltDefault)
             {
-                AppendCommand(ufc.GetCommand("CLR"));
-                AppendCommand(ufc.GetCommand("CLR"));
-                AppendCommand(ufc.GetCommand("MENU"));
-
-                AppendCommand(BuildDigits(ufc, _cfg.Misc.LowAltWarn));
-                AppendCommand(ufc.GetCommand("PB1"));
+                AddActions(ufc, new() { "CLR", "CLR", "MENU" });
+                AddActions(ufc, ActionsForString(_cfg.Misc.LowAltWarn), new() { "PB1" });
             }
         }
 
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void BuildTACAN(Device ufc)
+        private void BuildTACAN(AirframeDevice ufc)
         {
             if (!_cfg.Misc.IsTACANDefault)
             {
-                AppendCommand(ufc.GetCommand("CLR"));
-                AppendCommand(ufc.GetCommand("CLR"));
-                AppendCommand(ufc.GetCommand("MENU"));
+                AddActions(ufc, new() { "CLR", "CLR", "MENU", "PB2" });
 
-                AppendCommand(ufc.GetCommand("PB2"));
+                AddActions(ufc, ActionsForString(_cfg.Misc.TACANChannel.ToString()), new() { "PB1" });
 
-                AppendCommand(BuildDigits(ufc, _cfg.Misc.TACANChannel.ToString()));
-                AppendCommand(ufc.GetCommand("PB1"));
+                string band = (_cfg.Misc.TACANBandValue == TACANBands.X) ? "Y" : "X";
+                AddIfBlock("IsTACANBand", new() { band }, delegate () { AddAction(ufc, "PB1"); });
 
-                if (_cfg.Misc.TACANBandValue == TACANBands.X)
-                {
-                    AppendCommand(StartCondition("IsTACANBand", "Y"));
-                    AppendCommand(ufc.GetCommand("PB1"));
-                    AppendCommand(EndCondition("IsTACANBand"));
-                }
-                else
-                {
-                    AppendCommand(StartCondition("IsTACANBand", "X"));
-                    AppendCommand(ufc.GetCommand("PB1"));
-                    AppendCommand(EndCondition("IsTACANBand"));
-                }
-
-                AppendCommand(ufc.GetCommand("PB10"));
-                AppendCommand(ufc.GetCommand("MENU"));
+                AddActions(ufc, new() { "PB10", "MENU" });
             }
         }
 
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void BuildILS(Device ufc)
+        private void BuildILS(AirframeDevice ufc)
         {
             if (!_cfg.Misc.IsILSDefault)
             {
-                AppendCommand(ufc.GetCommand("CLR"));
-                AppendCommand(ufc.GetCommand("CLR"));
-                AppendCommand(ufc.GetCommand("MENU"));
-                AppendCommand(ufc.GetCommand("MENU"));
+                AddActions(ufc, new() { "CLR", "CLR", "MENU", "MENU", "PB3" });
 
-                AppendCommand(ufc.GetCommand("PB3"));
+                AddActions(ufc, ActionsForString(AdjustNoSeparators(_cfg.Misc.ILSFrequency)), new() { "PB3" });
 
-                AppendCommand(BuildDigits(ufc, RemoveSeparators(_cfg.Misc.ILSFrequency)));
-                AppendCommand(ufc.GetCommand("PB3"));
-
-                AppendCommand(ufc.GetCommand("MENU"));
+                AddAction(ufc, "MENU");
             }
         }
     }

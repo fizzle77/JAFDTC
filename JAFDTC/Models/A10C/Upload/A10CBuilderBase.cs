@@ -2,7 +2,7 @@
 //
 // A10CBuilderBase.cs -- a-10c abstract base command builder
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -24,8 +24,8 @@ using System.Text;
 namespace JAFDTC.Models.A10C.Upload
 {
     /// <summary>
-    /// abstract base class for the warthog upload functionality. provides functions to support building command
-    /// streams.
+    /// abstract base class for the warthog command builder functionality. all system-specific warthog command builders
+    /// derive from this class.
     /// </summary>
     internal abstract class A10CBuilderBase : BuilderBase, IBuilder
     {
@@ -43,7 +43,7 @@ namespace JAFDTC.Models.A10C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public A10CBuilderBase(A10CConfiguration cfg, A10CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb)
+        public A10CBuilderBase(A10CConfiguration cfg, A10CDeviceManager dcsCmds, StringBuilder sb) : base(dcsCmds, sb)
             => (_cfg) = (cfg);
     }
 }

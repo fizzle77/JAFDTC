@@ -2,7 +2,7 @@
 //
 // WYPTBuilder.cs -- a-10c waypoint command builder
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -39,7 +39,7 @@ namespace JAFDTC.Models.A10C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public WYPTBuilder(A10CConfiguration cfg, A10CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public WYPTBuilder(A10CConfiguration cfg, A10CDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -54,79 +54,49 @@ namespace JAFDTC.Models.A10C.Upload
         public override void Build()
         {
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
-            Device cdu = _aircraft.GetDevice("CDU");
+            AirframeDevice cdu = _aircraft.GetDevice("CDU");
 
             if (wypts.Count > 0)
             {
-                AppendCommand(cdu.GetCommand("WP"));
+                // TODO: set STEER_PT to MISSION
+                // TODO: set PAGE to OTHER
 
-                AppendCommand(cdu.GetCommand("LSK_3L"));
-                AppendCommand(Wait());
+                AddActions(cdu, new() { "WP", "LSK_3L" });
+                AddWait(WAIT_BASE);
 
-                AppendCommand(cdu.GetCommand("CLR"));
-                AppendCommand(cdu.GetCommand("CLR"));
-                AppendCommand(Wait());
+                AddActions(cdu, new() { "CLR", "CLR" });
+                AddWait(WAIT_BASE);
 
                 BuildWaypoints(cdu, wypts);
-
-#if TODO_IMPLEMENT
-                if (wypts.Count > 0)
-                {
-                    AppendCommand(BuildDigits(cdu, wypts[0].Number.ToString()));
-
-                    AppendCommand(cdu.GetCommand("LSK_3L"));
-                    AppendCommand(cdu.GetCommand("CLR"));
-                    AppendCommand(cdu.GetCommand("CLR"));
-                }
-
-                // TODO: sequence to set a waypoint as current
-                AppendCommand(cdu.GetCommand("CLR"));
-                AppendCommand(cdu.GetCommand("CLR"));
-                AppendCommand(cdu.GetCommand("CLR"));
-                // enter wypt number
-                AppendCommand(cdu.GetCommand("LSK_3L"));
-#endif
             }
         }
 
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void BuildWaypoints(Device cdu, ObservableCollection<WaypointInfo> jetWypts)
+        private void BuildWaypoints(AirframeDevice cdu, ObservableCollection<WaypointInfo> jetWypts)
         {
             for (var i = 0; i < jetWypts.Count; i++)
             {
                 string wyptID = jetWypts[i].Number.ToString();
                 WaypointInfo wypt = jetWypts[i];
 
-#if NOPE
-                AppendCommand(BuildDigits(cdu, wyptID));
-
-                AppendCommand(cdu.GetCommand("LSK_3L"));
-                AppendCommand(cdu.GetCommand("CLR"));
-                AppendCommand(cdu.GetCommand("CLR"));
-#endif
-
                 if (wypt.IsValid)
                 {
-                    AppendCommand(cdu.GetCommand("LSK_7R"));
-                    AppendCommand(Wait());
+                    // TODO: set waypoint id explicitly?
+                    // AddActions(cdu, ActionsForString(wyptID), new() { "LSK_3L", "CLR", "CLR" });
 
-                    AppendCommand(cdu.GetCommand("CLR"));
-                    AppendCommand(cdu.GetCommand("CLR"));
+                    AddAction(cdu, "LSK_7R");
+                    AddWait(WAIT_BASE);
+                    AddActions(cdu, new() { "CLR", "CLR" });
 
                     BuildWaypointName(cdu, wyptID, wypt.Name);
-
+                    
                     BuildWaypointCoords(cdu, wypt);
 
-                    int intAlt = Math.Max(int.Parse(wypt.Alt), 0);
-                    AppendCommand(BuildDigits(cdu, intAlt.ToString()));
-
-                    AppendCommand(cdu.GetCommand("LSK_5L"));
-                    AppendCommand(Wait());
-
-                    AppendCommand(cdu.GetCommand("CLR"));
-                    AppendCommand(cdu.GetCommand("CLR"));
+                    AddActions(cdu, ActionsForString(Math.Max(int.Parse(wypt.Alt), 0).ToString()), new() { "LSK_5L" });
+                    AddWait(WAIT_BASE);
+                    AddActions(cdu, new() { "CLR", "CLR" });
                 }
             }
         }
@@ -134,44 +104,35 @@ namespace JAFDTC.Models.A10C.Upload
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void BuildWaypointName(Device cdu, string wyptID, string waypointName)
+        private void BuildWaypointName(AirframeDevice cdu, string wyptID, string wyptName)
         {
-            waypointName = Regex.Replace(waypointName.ToUpper(), "^[^A-Z]+", "");
-            waypointName = Regex.Replace(waypointName, "[^A-Z0-9 ]", "");
-            if (string.IsNullOrEmpty(waypointName))
+            wyptName = Regex.Replace(wyptName.ToUpper(), "^[^A-Z]+", "");
+            wyptName = Regex.Replace(wyptName, "[^A-Z0-9 ]", "");
+            if (string.IsNullOrEmpty(wyptName))
             {
-                waypointName = $"WP{wyptID}";
+                wyptName = $"WP{wyptID}";
             }
-            else if (waypointName.Length > 12)
+            else if (wyptName.Length > 12)
             {
-                waypointName = waypointName[..12];
+                wyptName = wyptName[..12];
             }
-
-            AppendCommand(BuildAlphaNumString(cdu, waypointName));
-
-            AppendCommand(cdu.GetCommand("LSK_3R"));
-            AppendCommand(Wait());
-
-            AppendCommand(cdu.GetCommand("CLR"));
-            AppendCommand(cdu.GetCommand("CLR"));
+            AddActions(cdu, ActionsForString(wyptName), new(){ "LSK_3R" });
+            AddWait(WAIT_BASE);
+            AddActions(cdu, new() { "CLR", "CLR" });
         }
 
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void BuildWaypointCoords(Device cdu, WaypointInfo waypoint)
+        private void BuildWaypointCoords(AirframeDevice cdu, WaypointInfo wypt)
         {
-            AppendCommand(BuildAlphaNumString(cdu, RemoveSeparators(waypoint.LatUI.Replace(" ", ""))));     // DDM format
+            AddActions(cdu, ActionsForString(AdjustNoSeparators(wypt.LatUI.Replace(" ", ""))), new() { "LSK_7L" });
+            AddWait(WAIT_BASE);
+            AddActions(cdu, new() { "CLR", "CLR" });
 
-            AppendCommand(cdu.GetCommand("LSK_7L"));
-            AppendCommand(cdu.GetCommand("CLR"));
-            AppendCommand(cdu.GetCommand("CLR"));
-
-            AppendCommand(BuildAlphaNumString(cdu, RemoveSeparators(waypoint.LonUI.Replace(" ", ""))));     // DDM format
-
-            AppendCommand(cdu.GetCommand("LSK_9L"));
-            AppendCommand(cdu.GetCommand("CLR"));
-            AppendCommand(cdu.GetCommand("CLR"));
+            AddActions(cdu, ActionsForString(AdjustNoSeparators(wypt.LonUI.Replace(" ", ""))), new() { "LSK_9L" });
+            AddWait(WAIT_BASE);
+            AddActions(cdu, new() { "CLR", "CLR" });
         }
     }
 }

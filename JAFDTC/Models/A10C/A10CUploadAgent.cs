@@ -2,7 +2,7 @@
 //
 // A10CUploadAgent.cs -- a-10c upload agent
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -36,7 +36,7 @@ namespace JAFDTC.Models.A10C
         // ------------------------------------------------------------------------------------------------------------
 
         private readonly A10CConfiguration _cfg;
-        private readonly A10CCommands _dcsCmds;
+        private readonly A10CDeviceManager _dcsCmds;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -44,7 +44,7 @@ namespace JAFDTC.Models.A10C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public A10CUploadAgent(A10CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new A10CCommands());
+        public A10CUploadAgent(A10CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new A10CDeviceManager());
 
         // ------------------------------------------------------------------------------------------------------------
         //

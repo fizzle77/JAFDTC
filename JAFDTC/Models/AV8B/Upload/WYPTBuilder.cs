@@ -2,7 +2,7 @@
 //
 // WYPTBuilder.cs -- av-8b waypoint command builder
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -37,7 +37,7 @@ namespace JAFDTC.Models.AV8B.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public WYPTBuilder(AV8BConfiguration cfg, AV8BCommands _dcsCmds, StringBuilder sb) : base(cfg, _dcsCmds, sb) { }
+        public WYPTBuilder(AV8BConfiguration cfg, AV8BDeviceManager _dcsCmds, StringBuilder sb) : base(cfg, _dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -52,40 +52,34 @@ namespace JAFDTC.Models.AV8B.Upload
         public override void Build()
         {
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
-            Device lmpcd = _aircraft.GetDevice("LMPCD");
-            Device ufc = _aircraft.GetDevice("UFC");
-            Device odu = _aircraft.GetDevice("ODU");
+            AirframeDevice lmpcd = _aircraft.GetDevice("LMPCD");
+            AirframeDevice ufc = _aircraft.GetDevice("UFC");
+            AirframeDevice odu = _aircraft.GetDevice("ODU");
 
             if (wypts.Count > 0)
             {
-                AppendCommand(lmpcd.GetCommand("MPCD_L_2"));
+                AddAction(lmpcd, "MPCD_L_2");
                 for (int i = 0; i < wypts.Count; i++)
                 {
                     if (wypts[i].IsValid)
                     {
                         if (_cfg.WYPT.IsAppendMode)
                         {
-                            AppendCommand(ufc.GetCommand($"{wypts[i].Number - 1}"));
-                            AppendCommand(ufc.GetCommand($"{wypts[i].Number}"));
+                            AddActions(ufc, new() { $"{wypts[i].Number - 1}", $"{wypts[i].Number}" });
                         }
                         else
                         {
-                            AppendCommand(ufc.GetCommand("7"));
-                            AppendCommand(ufc.GetCommand("7"));
+                            AddActions(ufc, new() { "7", "7" });
                         }
-                        AppendCommand(ufc.GetCommand("UFC_ENTER"));
-                        AppendCommand(odu.GetCommand("ODU_OPT2"));
+                        AddActions(ufc, new() { "UFC_ENTER", "ODU_OPT2" });
 
-                        AppendCommand(Build2864Coordinate(ufc, wypts[i].LatUI));
-                        AppendCommand(ufc.GetCommand("UFC_ENTER"));
+                        AddActions(ufc, ActionsFor2864CoordinateString(wypts[i].LatUI), new() { "UFC_ENTER" });
+                        AddActions(ufc, ActionsFor2864CoordinateString(wypts[i].LonUI), new() { "UFC_ENTER" });
 
-                        AppendCommand(Build2864Coordinate(ufc, wypts[i].LonUI));
-                        AppendCommand(ufc.GetCommand("UFC_ENTER"));
-
-                        AppendCommand(odu.GetCommand("ODU_OPT1"));
+                        AddAction(odu, "ODU_OPT1");
                     }
                 }
-                AppendCommand(lmpcd.GetCommand("MPCD_L_2"));
+                AddAction(lmpcd, "MPCD_L_2");
             }
         }
     }

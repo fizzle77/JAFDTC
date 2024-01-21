@@ -1,14 +1,32 @@
+--[[
+********************************************************************************************************************
+
+CommonFunctions.lua -- jafdtc common functions
+
+Copyright(C) 2021-2023 the-paid-actor & others
+Copyright(C) 2023-2024 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+<https://www.gnu.org/licenses/>.
+
+********************************************************************************************************************
+--]]
+
 function JAFDTC_Log(str)
-	JAFDTC_logFile:write(str .. "\n");
-	JAFDTC_logFile:flush();
-end
-
-function JAFDTC_DCSLogInfo(str)
-	log.write("JAFDTC", log.INFO, str)
-end
-
-function JAFDTC_DCSLogError(str)
-	log.write("JAFDTC", log.ERROR, str)
+    if JAFDTC_LogFile then
+    	JAFDTC_LogFile:write(str .. "\n");
+	    JAFDTC_LogFile:flush();
+    else
+        log.write("JAFDTC", log.ERROR, str)
+    end
 end
 
 function JAFDTC_ParseDisplay(indicator_id)  -- Thanks to [FSF]Ian code
@@ -23,6 +41,7 @@ function JAFDTC_ParseDisplay(indicator_id)  -- Thanks to [FSF]Ian code
 	return t
 end
 
+-- TODO: do a table lookup here
 function JAFDTC_GetPlayerAircraftType()
     local data = LoGetSelfData();
     if data then

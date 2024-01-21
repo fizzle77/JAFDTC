@@ -2,7 +2,7 @@
 //
 // WYPTBuilder.cs -- m-2000c waypoint command builder
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -26,7 +26,8 @@ using System.Text;
 namespace JAFDTC.Models.M2000C.Upload
 {
     /// <summary>
-    /// TODO: document
+    /// command builder for the steerpoint system in the m2k. translates cmds setup in M2000CConfiguration into
+    /// commands that drive the dcs clickable cockpit.
     /// </summary>
     internal class WYPTBuilder : M2000CBuilderBase, IBuilder
     {
@@ -36,7 +37,7 @@ namespace JAFDTC.Models.M2000C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public WYPTBuilder(M2000CConfiguration cfg, M2000CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public WYPTBuilder(M2000CConfiguration cfg, M2000CDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -51,7 +52,7 @@ namespace JAFDTC.Models.M2000C.Upload
         public override void Build()
         {
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
-            Device pcn = _aircraft.GetDevice("PCN");
+            AirframeDevice pcn = _aircraft.GetDevice("PCN");
 
             if (wypts.Count > 0)
             {
@@ -63,17 +64,13 @@ namespace JAFDTC.Models.M2000C.Upload
                     {
                         // TODO: Set UNI Parameter Selector Switch to L/G
 
-                        AppendCommand(pcn.GetCommand("INS_PREP_SW"));
-                        AppendCommand(pcn.GetCommand("0"));
-                        AppendCommand(pcn.GetCommand($"{wypts[i].Number - 1}"));
+                        AddActions(pcn, new() { "INS_PREP_SW", "0", $"{wypts[i].Number - 1}" });
 
-                        AppendCommand(pcn.GetCommand("1"));
-                        AppendCommand(Build2864Coordinate(pcn, wypts[i].LatUI));
-                        AppendCommand(pcn.GetCommand("INS_ENTER_BTN"));
+                        AddAction(pcn, "1");
+                        AddActions(pcn, ActionsFor2864CoordinateString(wypts[i].LatUI), new() { "INS_ENTER_BTN" });
 
-                        AppendCommand(pcn.GetCommand("3"));
-                        AppendCommand(Build2864Coordinate(pcn, wypts[i].LonUI));
-                        AppendCommand(pcn.GetCommand("INS_ENTER_BTN"));
+                        AddAction(pcn, "3");
+                        AddActions(pcn, ActionsFor2864CoordinateString(wypts[i].LonUI), new() { "INS_ENTER_BTN" });
 
                         // TODO: Set UNI Parameter Selector Switch to ALT
                         // TODO: 1 to set feet, 3 to set m

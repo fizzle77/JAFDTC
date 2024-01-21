@@ -1,8 +1,8 @@
 ﻿// ********************************************************************************************************************
 //
-// AV8BCommands.cs -- av-8b commands
+// AV8BDeviceManager.cs -- av-8b airframe device manager
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -24,9 +24,9 @@ using System.Diagnostics;
 namespace JAFDTC.Models.AV8B
 {
     /// <summary>
-	/// manages the set of dcs cockpit commands associated with devices in the harrier.
+    /// manages the set of dcs airframe devices and associated commands/actions for the harrier.
     /// </summary>
-    internal class AV8BCommands : AirframeDeviceManagerBase, IAirframeDeviceManager
+    internal class AV8BDeviceManager : AirframeDeviceManagerBase, IAirframeDeviceManager
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -34,34 +34,34 @@ namespace JAFDTC.Models.AV8B
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public AV8BCommands()
+        public AV8BDeviceManager()
         {
             int delay = Settings.CommandDelaysMs[AirframeTypes.AV8B];
 
-            Device lmpcd = new(26, "LMPCD");
-            lmpcd.AddCommand(new Command(3201, "MPCD_L_2", delay, 1));
+            AirframeDevice lmpcd = new(26, "LMPCD");
+            lmpcd.AddAction(3201, "MPCD_L_2", delay, 1);
             AddDevice(lmpcd);
 
-            Device ufc = new(23, "UFC");
-            ufc.AddCommand(new Command(3302, "1", delay, 1));
-            ufc.AddCommand(new Command(3303, "2", delay, 1));
-            ufc.AddCommand(new Command(3304, "3", delay, 1));
-            ufc.AddCommand(new Command(3306, "4", delay, 1));
-            ufc.AddCommand(new Command(3307, "5", delay, 1));
-            ufc.AddCommand(new Command(3308, "6", delay, 1));
-            ufc.AddCommand(new Command(3310, "7", delay, 1));
-            ufc.AddCommand(new Command(3311, "8", delay, 1));
-            ufc.AddCommand(new Command(3312, "9", delay, 1));
-            ufc.AddCommand(new Command(3315, "0", delay, 1));
-            ufc.AddCommand(new Command(3314, "UFC_ENTER", delay, 1));
+            AirframeDevice ufc = new(23, "UFC");
+            ufc.AddAction(3302, "1", delay, 1);
+            ufc.AddAction(3303, "2", delay, 1);
+            ufc.AddAction(3304, "3", delay, 1);
+            ufc.AddAction(3306, "4", delay, 1);
+            ufc.AddAction(3307, "5", delay, 1);
+            ufc.AddAction(3308, "6", delay, 1);
+            ufc.AddAction(3310, "7", delay, 1);
+            ufc.AddAction(3311, "8", delay, 1);
+            ufc.AddAction(3312, "9", delay, 1);
+            ufc.AddAction(3315, "0", delay, 1);
+            ufc.AddAction(3314, "UFC_ENTER", delay, 1);
             AddDevice(ufc);
 
-            Device odu = new(24, "ODU");
-            odu.AddCommand(new Command(3250, "ODU_OPT1", delay, 1));
-            odu.AddCommand(new Command(3251, "ODU_OPT2", delay, 1));
-            odu.AddCommand(new Command(3252, "ODU_OPT3", delay, 1));
-            odu.AddCommand(new Command(3248, "ODU_OPT4", delay, 1));
-            odu.AddCommand(new Command(3249, "ODU_OPT5", delay, 1));
+            AirframeDevice odu = new(24, "ODU");
+            odu.AddAction(3250, "ODU_OPT1", delay, 1);
+            odu.AddAction(3251, "ODU_OPT2", delay, 1);
+            odu.AddAction(3252, "ODU_OPT3", delay, 1);
+            odu.AddAction(3248, "ODU_OPT4", delay, 1);
+            odu.AddAction(3249, "ODU_OPT5", delay, 1);
             AddDevice(odu);
         }
     }

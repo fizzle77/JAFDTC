@@ -2,7 +2,7 @@
 //
 // FA18CBuilderBase.cs -- fa-18c abstract base command builder
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -43,7 +43,7 @@ namespace JAFDTC.Models.FA18C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public FA18CBuilderBase(FA18CConfiguration cfg, FA18CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb)
+        public FA18CBuilderBase(FA18CConfiguration cfg, FA18CDeviceManager dcsCmds, StringBuilder sb) : base(dcsCmds, sb)
             => (_cfg) = (cfg);
     }
 }

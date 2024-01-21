@@ -2,7 +2,7 @@
 //
 // F16CBuilderBase.cs -- f-16c abstract base command builder
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,14 +18,16 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.DCS;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 namespace JAFDTC.Models.F16C.Upload
 {
     /// <summary>
-    /// abstract base class for the viper upload functionality. provides functions to support building command
-    /// streams.
+    /// abstract base class for the viper command builder functionality. all system-specific viper command builders
+    /// derive from this class.
     /// </summary>
     internal abstract class F16CBuilderBase : BuilderBase, IBuilder
     {
@@ -43,7 +45,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F16CBuilderBase(F16CConfiguration cfg, F16CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb)
+        public F16CBuilderBase(F16CConfiguration cfg, F16DeviceManager dcsCmds, StringBuilder sb) : base(dcsCmds, sb)
             => (_cfg) = (cfg);
 
         // ------------------------------------------------------------------------------------------------------------
@@ -53,66 +55,43 @@ namespace JAFDTC.Models.F16C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// appends a sequence of ufc commands to enter the value followed by the ENTR key. if negative values are
-        /// allowed, prepends "00" to the digits to enter the "-" sign.
+        /// returns a list of actions to enter the numeric value followed by the ENTR key. the list is predicated on
+        /// the value being non-null/non-empty (the list is only non-empty if the predicate is true). if negative
+        /// values are allowed, prepends "00" to the digits to enter the "-" sign. returns the list of actions (empty
+        /// if the value is null/empty).
         /// </summary>
-        private void AppendDigitsWithEnter(Device ufc, string value, bool isNegValOK = false)
+        public List<string> PredActionsForNumAndEnter(string value, bool isNegValOK = false, bool isNoSep = false)
         {
-            if (isNegValOK && int.TryParse(value, out int intValue) && (intValue < 0))
+            value = (isNoSep) ? AdjustNoSeparators(value) : value;
+
+            List<string> keys = new();
+            if (!string.IsNullOrEmpty(value) && int.TryParse(value, out int intValue))
             {
-                AppendCommand(ufc.GetCommand("0"));
-                AppendCommand(ufc.GetCommand("0"));
-                value = value[1..];
+                if (intValue < 0)
+                {
+                    value = value[1..];
+                    if (isNegValOK)
+                    {
+                        keys.Add("0");
+                        keys.Add("0");
+                    }
+                }
+                keys = keys.Concat(ActionsForString(value)).ToList();
+                keys.Add("ENTR");
             }
-            AppendCommand(BuildDigits(ufc, value));
-            AppendCommand(ufc.GetCommand("ENTR"));
+            return keys;
         }
 
         /// <summary>
-        /// appends a predicated sequence of ufc commands to enter the value followed by the ENTR key. the sequence
-        /// is predicated on the value being non-null/empty. if negative values are allowed, prepends "00" to the
-        /// digits to enter the "-" sign. returns the value of the predicate.
+        /// returns a list of actions to enter the numeric value (with leading zeros and separators removed) followed
+        /// by the ENTR key. the list is predicated on the value being non-null/non-empty (the list is only non-empty
+        /// if the predicate is true). if negative values are allowed, prepends "00" to the digits to enter the "-"
+        /// sign. returns the list of actions (empty if the value is null/empty).
         /// </summary>
-        protected bool PredAppendDigitsWithEnter(Device ufc, string value, bool isNegValOK = false)
+        public List<string> PredActionsForCleanNumAndEnter(string value, bool isNegValOK = false)
         {
-            if (!string.IsNullOrEmpty(value))
-            {
-                AppendDigitsWithEnter(ufc, value, isNegValOK);
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// appends a predicated sequence of ufc commands to enter the value (with separators removed via
-        /// RemoveSeparators method) followed by the ENTR key. the sequence is predicated on the value being
-        /// non-null/empty. if negative values are allowed, prepend "00" to the digits to enter the "-" sign.
-        /// returns the value of the predicate.
-        /// </summary>
-        protected bool PredAppendDigitsNoSepWithEnter(Device ufc, string value, bool isNegValOK = false)
-        {
-            if (!string.IsNullOrEmpty(value))
-            {
-                AppendDigitsWithEnter(ufc, RemoveSeparators(value), isNegValOK);
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// appends a predicated sequence of ufc commands to enter the value (with separators removed via
-        /// RemoveSeparators method and leading zeros removed via DeleteLeadingZeros method) followed by the ENTR key.
-        /// the sequence is predicated on the value being non-null/empty. if negative values are allowed, prepend "00"
-        /// to the digits to enter the "-" sign. returns the value of the predicate.
-        /// </summary>
-        protected bool PredAppendDigitsDLZRSWithEnter(Device ufc, string value, bool isNegValOK = false)
-        {
-            if (!string.IsNullOrEmpty(value))
-            {
-                AppendDigitsWithEnter(ufc, DeleteLeadingZeros(RemoveSeparators(value)), isNegValOK);
-                return true;
-            }
-            return false;
+            value = (!string.IsNullOrEmpty(value)) ? AdjustNoLeadZeros(value) : value;
+            return PredActionsForNumAndEnter(value, isNegValOK, true);
         }
     }
 }

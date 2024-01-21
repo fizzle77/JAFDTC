@@ -3,7 +3,7 @@
 // HARMBuilder.cs -- f-16c harm alic command builder
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -37,7 +37,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public HARMBuilder(F16CConfiguration cfg, F16CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public HARMBuilder(F16CConfiguration cfg, F16DeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -51,77 +51,47 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         public override void Build()
         {
-            Device ufc = _aircraft.GetDevice("UFC");
+            AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
             if (!_cfg.HARM.IsDefault)
             {
-                AppendCommand(ufc.GetCommand("RTN"));
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" });
 
-                AppendCommand(ufc.GetCommand("LIST"));
-                AppendCommand(ufc.GetCommand("8"));
+                AddWait(WAIT_BASE);
 
-                AppendCommand(Wait());
-
-                AppendCommand(StartCondition("NotInAAMode"));
-
-                AppendCommand(ufc.GetCommand("SEQ"));
-                AppendCommand(StartCondition("NotInAGMode"));
-
-                BuildHARM(ufc);
-
-                AppendCommand(EndCondition("NotInAGMode"));
-
-                AppendCommand(ufc.GetCommand("RTN"));
-                AppendCommand(ufc.GetCommand("RTN"));
-
-                AppendCommand(ufc.GetCommand("LIST"));
-                AppendCommand(ufc.GetCommand("8"));
-                AppendCommand(ufc.GetCommand("SEQ"));
-
-                AppendCommand(EndCondition("NotInAAMode"));
-
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddIfBlock("NotInAAMode", null, delegate ()
+                {
+                    AddAction(ufc, "SEQ");
+                    AddIfBlock("NotInAGMode", null, delegate () { BuildHARM(ufc); });
+                    AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
+                });
+                AddAction(ufc, "RTN");
             }
         }
 
         /// <summary>
-        /// configure harm alic tables via the icp/ded according to the non-default programming settings.
-        /// tables are only updated if they are non-default.
+        /// configure harm alic tables via the icp/ded according to the non-default programming settings. tables are
+        /// only updated if they are non-default.
         /// <summary>
-        private void BuildHARM(Device ufc)
+        private void BuildHARM(AirframeDevice ufc)
         {
-            AppendCommand(ufc.GetCommand("RTN"));
-            AppendCommand(ufc.GetCommand("RTN"));
-
-            AppendCommand(ufc.GetCommand("LIST"));
-            AppendCommand(ufc.GetCommand("0"));
-
-            //AppendCommand(StartCondition("NAV"));
-            AppendCommand(ufc.GetCommand("AG"));
-
-            //condition
-            AppendCommand(StartCondition("HARM"));
-            AppendCommand(ufc.GetCommand("0"));
-
-            foreach (ALICTable table in _cfg.HARM.Tables)
+            AddActions(ufc, new() { "RTN", "RTN", "LIST", "0", "AG" });
+            AddIfBlock("HARM", null, delegate ()
             {
-                if (!table.IsDefault)
+                AddAction(ufc, "0");
+                foreach (ALICTable table in _cfg.HARM.Tables)
                 {
-                    for (int i = 0; i < table.Table.Count; i++)
+                    if (!table.IsDefault)
                     {
-                        PredAppendDigitsWithEnter(ufc, table.Table[i].Code);
-                        AppendCommand(ufc.GetCommand("DOWN"));
+                        for (int i = 0; i < table.Table.Count; i++)
+                        {
+                            AddActions(ufc, PredActionsForNumAndEnter(table.Table[i].Code), new() { "DOWN" });
+                        }
                     }
+                    AddAction(ufc, "INC");
                 }
-                AppendCommand(ufc.GetCommand("INC"));
-            }
-
-            AppendCommand(EndCondition("HARM"));
-
-            AppendCommand(ufc.GetCommand("AG"));
-
-            AppendCommand(ufc.GetCommand("RTN"));
+            });
+            AddActions(ufc, new() { "AG", "RTN" });
         }
     }
 }

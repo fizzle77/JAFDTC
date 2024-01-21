@@ -24,8 +24,8 @@ using System.Text;
 namespace JAFDTC.Models.F15E.Upload
 {
     /// <summary>
-    /// abstract base class for the mudhen upload functionality. provides functions to support building command
-    /// streams to setup avionics based on a system configuration.
+    /// abstract base class for the mudhen command builder functionality. all system-specific mudhen command builders
+    /// derive from this class.
     /// </summary>
     internal abstract class F15EBuilderBase : BuilderBase, IBuilder
     {
@@ -43,7 +43,7 @@ namespace JAFDTC.Models.F15E.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F15EBuilderBase(F15EConfiguration cfg, F15ECommands cmds, StringBuilder sb) : base(cmds, sb)
+        public F15EBuilderBase(F15EConfiguration cfg, F15EDeviceManager cmds, StringBuilder sb) : base(cmds, sb)
             => (_cfg) = (cfg);
     }
 }

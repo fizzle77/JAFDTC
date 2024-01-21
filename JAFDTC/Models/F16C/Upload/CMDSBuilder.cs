@@ -3,7 +3,7 @@
 // CMDSBuilder.cs -- f-16c cmds command builder
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -30,14 +30,14 @@ namespace JAFDTC.Models.F16C.Upload
     /// that drive the dcs clickable cockpit.
     /// </summary>
     internal class CMDSBuilder : F16CBuilderBase, IBuilder
-	{
+    {
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public CMDSBuilder(F16CConfiguration cfg, F16CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public CMDSBuilder(F16CConfiguration cfg, F16DeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -51,70 +51,52 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         public override void Build()
         {
-            Device ufc = _aircraft.GetDevice("UFC");
+            AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
             if (!_cfg.CMDS.IsDefault)
             {
-                AppendCommand(ufc.GetCommand("RTN"));
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddActions(ufc, new() { "RTN", "RTN", "LIST", "7" });
 
-                AppendCommand(ufc.GetCommand("LIST"));
-                AppendCommand(ufc.GetCommand("7"));
+                // ---- chaff, flare bingo
 
-                // ---- chaff bingo
-
-                PredAppendDigitsWithEnter(ufc, _cfg.CMDS.BingoChaff);
-                AppendCommand(ufc.GetCommand("DOWN"));
-
-                // ---- flare bingo
-
-                PredAppendDigitsWithEnter(ufc, _cfg.CMDS.BingoFlare);
-                AppendCommand(ufc.GetCommand("UP"));
+                AddActions(ufc, PredActionsForNumAndEnter(_cfg.CMDS.BingoChaff), new() { "DOWN" });
+                AddActions(ufc, PredActionsForNumAndEnter(_cfg.CMDS.BingoFlare), new() { "UP" });
 
                 // ---- move to chaff program 1 and enter chaff programs 1-6
 
-                AppendCommand(ufc.GetCommand("SEQ"));
+                AddAction(ufc, "SEQ");
                 for (int i = 0; i < _cfg.CMDS.Programs.Length; i++)
                 {
-                    AppendProgramCommands(ufc, _cfg.CMDS.Programs[i].Chaff);
-                    AppendCommand(ufc.GetCommand("INC"));
-                    AppendCommand(Wait());
+                    BuildProgramCommands(ufc, _cfg.CMDS.Programs[i].Chaff);
                 }
 
                 // ---- move to flare program 1 and enter flare programs 1-6
 
-                AppendCommand(ufc.GetCommand("SEQ"));
+                AddAction(ufc, "SEQ");
                 for (int i = 0; i < _cfg.CMDS.Programs.Length; i++)
                 {
-                    AppendProgramCommands(ufc, _cfg.CMDS.Programs[i].Flare);
-                    AppendCommand(ufc.GetCommand("INC"));
-                    AppendCommand(Wait());
+                    BuildProgramCommands(ufc, _cfg.CMDS.Programs[i].Flare);
                 }
 
-                AppendCommand(ufc.GetCommand("RTN"));
+                AddAction(ufc, "RTN");
             }
         }
 
         /// <summary>
         /// add commands to update the bq/bi/sq/si fields of the current program. programs and fields are only
-        /// updated if they are non-default.
+        /// updated if they are non-default. advances to the next program after completion.
         /// </summary>
-        private void AppendProgramCommands(Device ufc, CMDSProgramCore pgm)
+        private void BuildProgramCommands(AirframeDevice ufc, CMDSProgramCore pgm)
         {
             if (!pgm.IsDefault)
             {
-                PredAppendDigitsDLZRSWithEnter(ufc, pgm.BQ);
-                AppendCommand(ufc.GetCommand("DOWN"));
-
-                PredAppendDigitsDLZRSWithEnter(ufc, pgm.BI);
-                AppendCommand(ufc.GetCommand("DOWN"));
-
-                PredAppendDigitsDLZRSWithEnter(ufc, pgm.SQ);
-                AppendCommand(ufc.GetCommand("DOWN"));
-
-                PredAppendDigitsDLZRSWithEnter(ufc, pgm.SI);
-                AppendCommand(ufc.GetCommand("DOWN"));
+                AddActions(ufc, PredActionsForCleanNumAndEnter(pgm.BQ), new() { "DOWN" });
+                AddActions(ufc, PredActionsForCleanNumAndEnter(pgm.BI), new() { "DOWN" });
+                AddActions(ufc, PredActionsForCleanNumAndEnter(pgm.SQ), new() { "DOWN" });
+                AddActions(ufc, PredActionsForCleanNumAndEnter(pgm.SI), new() { "DOWN" });
             }
+            AddAction(ufc, "INC");
+            AddWait(WAIT_BASE);
         }
     }
 }

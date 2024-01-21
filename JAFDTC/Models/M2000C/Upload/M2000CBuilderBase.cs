@@ -2,7 +2,7 @@
 //
 // M2000CBuilderBase.cs -- m-2000c abstract base command builder
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,7 +18,6 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.DCS;
-using JAFDTC.Models.F14AB;
 using System.Diagnostics;
 using System.Text;
 
@@ -44,7 +43,7 @@ namespace JAFDTC.Models.M2000C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public M2000CBuilderBase(M2000CConfiguration cfg, M2000CCommands dcsCmds, StringBuilder sb)
+        public M2000CBuilderBase(M2000CConfiguration cfg, M2000CDeviceManager dcsCmds, StringBuilder sb)
             : base(dcsCmds, sb) => (_cfg) = (cfg);
     }
 }

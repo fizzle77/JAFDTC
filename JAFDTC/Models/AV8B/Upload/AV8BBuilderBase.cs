@@ -2,7 +2,7 @@
 //
 // AV8BBuilderBase.cs -- av-8b abstract base command builder
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -24,8 +24,8 @@ using System.Text;
 namespace JAFDTC.Models.AV8B.Upload
 {
     /// <summary>
-    /// abstract base class for the harrier upload functionality. provides functions to support building command
-    /// streams for dcs clickable cockpit.
+    /// abstract base class for the harrier command builder functionality. all system-specific harrier command builders
+    /// derive from this class.
     /// </summary>
     internal abstract class AV8BBuilderBase : BuilderBase, IBuilder
     {
@@ -43,7 +43,7 @@ namespace JAFDTC.Models.AV8B.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public AV8BBuilderBase(AV8BConfiguration cfg, AV8BCommands _dcsCmds, StringBuilder sb) : base(_dcsCmds, sb)
+        public AV8BBuilderBase(AV8BConfiguration cfg, AV8BDeviceManager _dcsCmds, StringBuilder sb) : base(_dcsCmds, sb)
             => (_cfg) = (cfg);
     }
 }

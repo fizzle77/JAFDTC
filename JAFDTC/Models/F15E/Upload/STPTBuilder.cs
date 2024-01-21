@@ -20,6 +20,7 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F15E.STPT;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
@@ -27,8 +28,8 @@ using System.Text;
 namespace JAFDTC.Models.F15E.Upload
 {
     /// <summary>
-    /// command stream builder for the mudhen steerpoint system that covers steerpoints, target points, reference
-    /// points, and other navigation-related settings.
+    /// command builder for the steerpoint system (including target and referenced points) in the mudhen. translates
+    /// steerpoint setup in F15EConfiguration into commands that drive the dcs clickable cockpit.
     /// </summary>
     internal class STPTBuilder : F15EBuilderBase, IBuilder
     {
@@ -38,7 +39,7 @@ namespace JAFDTC.Models.F15E.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public STPTBuilder(F15EConfiguration cfg, F15ECommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public STPTBuilder(F15EConfiguration cfg, F15EDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -52,105 +53,105 @@ namespace JAFDTC.Models.F15E.Upload
         public override void Build()
         {
             ObservableCollection<SteerpointInfo> stpts = _cfg.STPT.Points;
-            Device ufc = _aircraft.GetDevice("UFC_PILOT");
+            AirframeDevice ufc = _aircraft.GetDevice("UFC_PILOT");
 
             if (!_cfg.STPT.IsDefault)
             {
-                AppendCommand(StartCondition("GoToFrontCockpit"));
-                AppendCommand(EndCondition("GoToFrontCockpit"));
+                // TODO: fix this...
+                AddIfBlock("GoToFrontCockpit", null, delegate() { });
 
-                AppendCommand(ufc.GetCommand("CLR"));
-                AppendCommand(ufc.GetCommand("CLR"));
-                AppendCommand(ufc.GetCommand("MENU"));
-                AppendCommand(ufc.GetCommand("SHF"));
-                AppendCommand(ufc.GetCommand("3"));         // B
-                AppendCommand(ufc.GetCommand("PB10"));
-                AppendCommand(ufc.GetCommand("PB10"));
+                // SHF+3 = B
+                AddActions(ufc, new() { "CLR", "CLR", "MENU", "SHF", "3", "PB10", "PB10" });
 
                 BuildSteerpoints(ufc, stpts);
 
-                AppendCommand(ufc.GetCommand("MENU"));
-                AppendCommand(ufc.GetCommand("1"));
-                AppendCommand(ufc.GetCommand("SHF"));
-                AppendCommand(ufc.GetCommand("1"));
-                AppendCommand(ufc.GetCommand("PB10"));
+                AddActions(ufc, new() { "CLR", "CLR", "MENU", "1", "SHF", "1", "PB10" });
             }
         }
 
         /// <summary>
         /// TODO: document
         /// <summary>
-        private void BuildSteerpoints(Device ufc, ObservableCollection<SteerpointInfo> stpts)
+        private void BuildSteerpoints(AirframeDevice ufc, ObservableCollection<SteerpointInfo> stpts)
         {
             foreach (SteerpointInfo stpt in stpts)
             {
                 if (stpt.IsValid)
                 {
                     string stptNum = stpt.Number.ToString();
-                    AppendCommand(BuildDigits(ufc, stptNum));
-                    AppendCommand(ufc.GetCommand("SHF"));               // TODO: SHF+1 => route a?
-                    AppendCommand(ufc.GetCommand("1"));
-                    AppendCommand(ufc.GetCommand("PB1"));
+                    // TODO: SHF+1 => sets route a, handle routes b/c
+                    AddActions(ufc, ActionsForString(stptNum), new() { "SHF", "1", "PB1" });
 
-                    AppendCommand(StartCondition("IsStrDifferent", $"STR {stptNum}{stpt.Route}"));
-                    AppendCommand(ufc.GetCommand("CLR"));
-                    AppendCommand(ufc.GetCommand("CLR"));
-                    AppendCommand(BuildDigits(ufc, stptNum));
-                    AppendCommand(ufc.GetCommand("."));
-                    AppendCommand(ufc.GetCommand("SHF"));               // TODO: SHF+1 => route a?
-                    AppendCommand(ufc.GetCommand("1"));
-                    AppendCommand(ufc.GetCommand("PB1"));
-                    AppendCommand(EndCondition("IsStrDifferent"));
-
-                    AppendCommand(StartCondition("IsStrDifferent", $"STR {stptNum}{stpt.Route}"));
-                    AppendCommand(BuildDigits(ufc, stptNum));
-                    AppendCommand(ufc.GetCommand("SHF"));               // TODO: SHF+1 => route a?
-                    AppendCommand(ufc.GetCommand("1"));
-                    AppendCommand(ufc.GetCommand("PB1"));
-                    AppendCommand(EndCondition("IsStrDifferent"));
+                    // TODO: check this...
+                    AddIfBlock("IsStrDifferent", new() { $"STR {stptNum}{stpt.Route}" }, delegate()
+                    {
+                        AddActions(ufc, new() { "CLR", "CLR" });
+                        // TODO: SHF+1 => route a, handle routes b/c
+                        AddActions(ufc, ActionsForString(stptNum), new() { ".", "SHF", "1", "PB1" });
+                    });
+                    // TODO: check this...
+                    AddIfBlock("IsStrDifferent", new() { $"STR {stptNum}{stpt.Route}" }, delegate()
+                    {
+                        // TODO: SHF+1 => route a, handle routes b/c
+                        AddActions(ufc, ActionsForString(stptNum), new() { "SHF", "1", "PB1" });
+                    });
 
                     if (stpt.IsTarget)
                     {
-                        AppendCommand(BuildDigits(ufc, stptNum));
-                        AppendCommand(ufc.GetCommand("."));
-                        AppendCommand(ufc.GetCommand("SHF"));           // TODO: SHF+1 => route a?
-                        AppendCommand(ufc.GetCommand("1"));
-                        AppendCommand(ufc.GetCommand("PB1"));
+                        // TODO: SHF+1 => route a, handle routes b/c
+                        AddActions(ufc, ActionsForString(stptNum), new() { ".", "SHF", "1", "PB1" });
                     }
 
-                    AppendCommand(Build2864Coordinate(ufc, stpt.LatUI));
-                    AppendCommand(ufc.GetCommand("PB2"));
-
-                    AppendCommand(Build2864Coordinate(ufc, stpt.LonUI));
-                    AppendCommand(ufc.GetCommand("PB3"));
-
-                    AppendCommand(BuildDigits(ufc, stpt.Alt));
-                    AppendCommand(ufc.GetCommand("PB7"));
+                    AddActions(ufc, ActionsForMudhen2864CoordinateString(stpt.LatUI), new() { "PB2" });
+                    AddActions(ufc, ActionsForMudhen2864CoordinateString(stpt.LonUI), new() { "PB3" });
+                    AddActions(ufc, ActionsForString(stpt.Alt), new() { "PB7" });
 
                     foreach (RefPointInfo rfpt in stpt.RefPoints)
                     {
-                        AppendCommand(BuildDigits(ufc, stptNum));
-                        AppendCommand(ufc.GetCommand("."));
-                        if (stpt.IsTarget)
+                        if (rfpt.IsValid)
                         {
-                            AppendCommand(BuildDigits(ufc, "0"));
+                            AddActions(ufc, ActionsForString(stptNum), new() { "." });
+                            if (stpt.IsTarget)
+                            {
+                                AddActions(ufc, ActionsForString("0"));
+                            }
+                            // TODO: SHF+1 => route a, handle routes b/c
+                            AddActions(ufc, ActionsForString(rfpt.Number.ToString()), new() { "SHF", "1", "PB1" });
+
+                            AddActions(ufc, ActionsForMudhen2864CoordinateString(rfpt.LatUI), new() { "PB2" });
+                            AddActions(ufc, ActionsForMudhen2864CoordinateString(rfpt.LonUI), new() { "PB3" });
+                            AddActions(ufc, ActionsForString(rfpt.Alt), new() { "PB7" });
                         }
-                        AppendCommand(BuildDigits(ufc, rfpt.Number.ToString()));
-                        AppendCommand(ufc.GetCommand("SHF"));           // TODO: SHF+1 => route a?
-                        AppendCommand(ufc.GetCommand("1"));
-                        AppendCommand(ufc.GetCommand("PB1"));
-
-                        AppendCommand(Build2864Coordinate(ufc, rfpt.LatUI));
-                        AppendCommand(ufc.GetCommand("PB2"));
-
-                        AppendCommand(Build2864Coordinate(ufc, rfpt.LonUI));
-                        AppendCommand(ufc.GetCommand("PB3"));
-
-                        AppendCommand(BuildDigits(ufc, rfpt.Alt));
-                        AppendCommand(ufc.GetCommand("PB7"));
                     }
                 }
             }
         }
+
+        /// <summary>
+        /// build the list of actions necessary to enter a lat/lon coordinate into a navpoint system that uses
+        /// the 2/8/6/4 buttons to enter N/S/E/W directions. coordinate is specified as a string. prior to processing,
+        /// all separators are removed. the coordinate string should start with N/S/E/W followed by the digits
+        /// and/or characters that should be typed in to the device. they device must have single-character actions
+        /// that map to the non-separator characters that may appear in the coordinate string.
+        /// <summary>
+        protected List<string> ActionsForMudhen2864CoordinateString(string coord)
+        {
+            coord = AdjustNoSeparators(coord.Replace(" ", ""));
+
+            List<string> actions = new();
+            foreach (char c in coord.ToUpper().ToCharArray())
+            {
+                switch (c)
+                {
+                    case 'N': actions.Add("SHF"); actions.Add("2"); break;
+                    case 'S': actions.Add("SHF"); actions.Add("8"); break;
+                    case 'E': actions.Add("SHF"); actions.Add("6"); break;
+                    case 'W': actions.Add("SHF"); actions.Add("4"); break;
+                    default: actions.Add(c.ToString()); break;
+                }
+            }
+            return actions;
+        }
+
     }
 }

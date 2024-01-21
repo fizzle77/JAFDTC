@@ -3,7 +3,7 @@
 // BuilderBase.cs -- base class for command builder
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,15 +18,50 @@
 //
 // ********************************************************************************************************************
 
+#define noDEBUG_CMD_FORMAT
+
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace JAFDTC.Models.DCS
 {
     /// <summary>
-    /// TODO: document
+    /// abstract base class for a command builder. command builders generate a list of commands to send to dcs that
+    /// effect actions on airframe devices within the clickable cockpit to arrive at a desired configuration.
+    /// derived classes may extend the base to handle airframe- or system-specific needs (for example, to generate
+    /// the correct set of actions to specify a negative number in an avionics system).
     /// </summary>
     public abstract class BuilderBase : IBuilder
     {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // types & constants
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// delegate to emit commands (using the "Add" methods the builder provides) for a block (eg, the body of an
+        /// if/for/while construct) to the command stream the builder is building.
+        /// </summary>
+        public delegate void AddBlockCommandsDelegate();
+
+        // common wait durations (ms) for AddWait().
+        //
+        protected const int WAIT_SHORT = 100;
+        protected const int WAIT_BASE = 200;
+        protected const int WAIT_LONG = 600;
+        protected const int WAIT_VERY_LONG = 17000;
+
+        // in debug command format, add a newline after every command to make it easier to read the command sequences
+        // that the builder generates.
+        //
+#if DEBUG_CMD_FORMAT
+        private const string CMD_EOL = "\n";
+#else
+        private const string CMD_EOL = "";
+#endif
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -34,6 +69,7 @@ namespace JAFDTC.Models.DCS
         // ------------------------------------------------------------------------------------------------------------
 
         protected readonly IAirframeDeviceManager _aircraft;
+
         private readonly StringBuilder _sb;
 
         // ------------------------------------------------------------------------------------------------------------
@@ -46,144 +82,224 @@ namespace JAFDTC.Models.DCS
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // methods
+        // IBuilder methods
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        /// <summary>
-        /// TODO: document
-        /// </summary>
         public abstract void Build();
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // protected methods
+        // private methods
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        protected void AppendCommand(string s)
+        /// <summary>
+        /// append a string to the command the builder is building.
+        /// </summary>
+        private void AddCommand(string s)
         {
-            _sb.Append(s);
+            _sb.Append(s + CMD_EOL);
         }
 
-        // TODO: deprecate
-        protected static string BuildDigits(Device d, string s)
-        {
-            StringBuilder sb = new();
-            foreach (var c in s.ToCharArray())
-            {
-                sb.Append(d.GetCommand(c.ToString()));
-            }
-            return sb.ToString();
-        }
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // command building methods
+        //
+        // ------------------------------------------------------------------------------------------------------------
 
-        protected static string BuildAlphaNumString(Device d, string s)
+        /// <summary>
+        /// add an action for the key to the command the builder is buidling.
+        /// </summary>
+        protected void AddAction(AirframeDevice keyPad, string key)
         {
-            StringBuilder sb = new();
-            foreach (var c in s.ToCharArray())
-            {
-                sb.Append(d.GetCommand(c.ToString()));
-            }
-            return sb.ToString();
+            AddCommand(keyPad[key]);
         }
 
         /// <summary>
-        /// build the set of commands necessary to enter a lat/lon coordinate into a navpoint system that uses
+        /// add a dyamic action for the key to the command the builder is buidling. a dynamic action has
+        /// caller-specified values for the up/down values.
+        /// </summary>
+        protected void AddDynamicAction(AirframeDevice keyPad, string key, double valueDn, double valueUp)
+        {
+            AddCommand(keyPad.CustomizedDCSActionCommand(key, valueDn, valueUp));
+        }
+
+        /// <summary>
+        /// add actions for the keys in the provided list followed by a post-list set of keys to the command the
+        /// builder is building. each key must be an action the key pad device supports
+        /// </summary>
+        protected void AddActions(AirframeDevice keyPad, List<string> keys, List<string> keysPost = null)
+        {
+            foreach (string key in keys)
+                AddAction(keyPad, key);
+            if (keysPost != null)
+            {
+                foreach (string key in keysPost)
+                    AddAction(keyPad, key);
+            }
+        }
+
+        /// <summary>
+        /// add a wait command to the command the builder is building.
+        /// </summary>
+        protected void AddWait(int dt)
+        {
+            string cmd = $"{{\"f\":\"Wait\",\"a\":{{\"dt\":{dt}}}}},";
+            AddCommand(cmd);
+        }
+
+        /// <summary>
+        /// add a marker command to the command the builder is building.
+        /// </summary>
+        protected void AddMarker(string marker)
+        {
+            string cmd = $"{{\"f\":\"Marker\",\"a\":{{\"mark\":\"{marker}\"}}}},";
+            AddCommand(cmd);
+        }
+
+        /// <summary>
+        /// add an if block to the command the builder is building. the block is delimited by "If" and "EndIf"
+        /// commands with the AddBlockCommandsDelegate emitting the commands within the block that are exectued
+        /// if the condition is true.
+        /// 
+        /// NOTE: nested if blocks are assumed to have unique cond values.
+        /// </summary>
+        protected void AddIfBlock(string cond, List<string> argsCond, AddBlockCommandsDelegate addBlockDelegate)
+        {
+            string cmd = $"{{\"f\":\"If\",\"a\":{{\"cond\":\"{cond}\"";
+            if (argsCond != null)
+            {
+                for (int i = 0; i < argsCond.Count; i++)
+                {
+                    cmd += $",\"prm{i}\":\"{argsCond[i]}\"";
+                }
+            }
+            cmd += $"}}}},";
+            AddCommand(cmd);
+
+            addBlockDelegate();
+
+            cmd = $"{{\"f\":\"EndIf\",\"a\":{{\"cond\":\"{cond}\"}}}},";
+            AddCommand(cmd);
+        }
+
+        /// <summary>
+        /// add a while block to the command the builder is building. the block is delimited by "While" and
+        /// "EndWhile" commands with the AddBlockCommandsDelegate emitting the commands within the block that
+        /// are exectued while the condition is true.
+        /// 
+        /// NOTE: nested while blocks are assumed to have unique cond values.
+        /// </summary>
+        protected void AddWhileBlock(string cond, List<string> argsCond, AddBlockCommandsDelegate addBlockDelegate)
+        {
+            string cmd = $"{{\"f\":\"While\",\"a\":{{\"cond\":\"{cond}\"";
+            if (argsCond != null)
+            {
+                for (int i = 0; i < argsCond.Count; i++)
+                {
+                    cmd += $",\"prm{i}\":\"{argsCond[i]}\"";
+                }
+            }
+            cmd += $"}}}},";
+            AddCommand(cmd);
+
+            addBlockDelegate();
+
+            cmd = $"{{\"f\":\"EndWhile\",\"a\":{{\"cond\":\"{cond}\"}}}},";
+            AddCommand(cmd);
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // action list methods
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// returns a list of actions to enter the string value. all characters that appear in the string must have
+        /// corresponding actions in the airframe device that the actions will target.
+        /// </summary>
+        protected List<string> ActionsForString(string value)
+        {
+            List<string> actions = new();
+            foreach (var c in value.ToCharArray())
+            {
+                actions.Add(c.ToString());
+            }
+            return actions;
+        }
+
+        /// <summary>
+        /// returns a list of actions to enter the numeric value (with leading zeros and separators removed). returns
+        /// the list of actions. all characters that appear in the string must have corresponding actions in the
+        /// airframe device that the actions will target.
+        /// </summary>
+        public List<string> ActionsForCleanNum(string value)
+        {
+            return ActionsForString(AdjustNoSeparators(AdjustNoLeadZeros(value)));
+        }
+
+        /// <summary>
+        /// build the list of actions necessary to enter a lat/lon coordinate into a navpoint system that uses
         /// the 2/8/6/4 buttons to enter N/S/E/W directions. coordinate is specified as a string. prior to processing,
         /// all separators are removed. the coordinate string should start with N/S/E/W followed by the digits
-        /// and/or characters that should be typed in to the keypad. they key pad device must have single-character
-        /// commands that map to the non-separator characters that may appear in the coordinate string.
+        /// and/or characters that should be typed in to the device. they device must have single-character actions
+        /// that map to the non-separator characters that may appear in the coordinate string.
         /// <summary>
-        protected static string Build2864Coordinate(Device kpad, string coord)
+        protected List<string> ActionsFor2864CoordinateString(string coord)
         {
-            string coordStr = RemoveSeparators(coord.Replace(" ", ""));
+            coord = AdjustNoSeparators(coord.Replace(" ", ""));
 
-            StringBuilder sb = new();
-            foreach (char c in coordStr.ToUpper().ToCharArray())
+            List<string> actions = new();
+            foreach (char c in coord.ToUpper().ToCharArray())
             {
                 switch (c)
                 {
-                    case 'N': sb.Append(kpad.GetCommand("2")); break;
-                    case 'S': sb.Append(kpad.GetCommand("8")); break;
-                    case 'E': sb.Append(kpad.GetCommand("6")); break;
-                    case 'W': sb.Append(kpad.GetCommand("4")); break;
-                    default: sb.Append(kpad.GetCommand(c.ToString())); break;
+                    case 'N': actions.Add("2"); break;
+                    case 'S': actions.Add("8"); break;
+                    case 'E': actions.Add("6"); break;
+                    case 'W': actions.Add("4"); break;
+                    default: actions.Add(c.ToString()); break;
                 }
             }
-            return sb.ToString();
+            return actions;
         }
 
-        protected static string Wait()
-        {
-            string str = "{'device':'wait', 'delay': 200},";
-            return str.Replace("'", "\"");
-        }
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // string adjustment methods
+        //
+        // ------------------------------------------------------------------------------------------------------------
 
-        protected static string WaitLong()
+        /// <summary>
+        /// adjust a numeric string by removing all leading zeros. returns adjusted value.
+        /// </summary>
+        protected static string AdjustNoLeadZeros(string s)
         {
-            string str = "{'device':'wait', 'delay': 600},";
-            return str.Replace("'", "\"");
-        }
-
-        protected static string WaitVeryLong()
-        {
-            string str = "{'device':'wait', 'delay': 17000},";
-            return str.Replace("'", "\"");
-        }
-
-        protected static string Marker(string mark)
-        {
-            string str = "{'marker': '" + mark + "'},";
-            return str.Replace("'", "\"");
-        }
-
-        protected static string StartUploadMarker()
-        {
-            string str = "{'start_upload': '1'},";
-            return str.Replace("'", "\"");
-        }
-
-        protected static string StartCondition(string condition, params string[] parameters)
-        {
-            string str = "{'start_condition': '" + condition + "'";
-            if (parameters.Length > 0)
-            {
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    str += ",'param" + (i + 1) + "': '" + parameters[i] + "'";
-                }
-            }
-            str += "},";
-            return str.Replace("'", "\"");
-        }
-
-        protected static string EndCondition(string condition)
-        {
-            string str = "{'end_condition': '" + condition + "'},";
-            return str.Replace("'", "\"");
-        }
-
-        protected static string DeleteLeadingZeros(string s)
-        {
+            bool isEmpty = string.IsNullOrEmpty(s);
             while (s.StartsWith("0"))
             {
                 s = s.Remove(0, 1);
             }
-            if (s == "") s = "0";
-            return s;
-        }
-
-        protected static string RemoveSeparators(string s)
-        {
-            return s.Replace(",", "").Replace(".", "").Replace("°", "").Replace("’", "").Replace("”", "")
-                    .Replace("\"", "").Replace("'","").Replace(":", "");
+            return (!isEmpty && (s == "")) ? "0" : s;
         }
 
         /// <summary>
-        /// adjust a hh:mm:ss tos value by a zulu delta for entry into a navpoint system. the hour field is
-        /// adjusted by adding dZ, where dZ is the delta from local to zulu.
+        /// adjust a string by removing all separator characters. returns adjusted value.
         /// </summary>
-        protected static string AdjustHMSTOSForZulu(string tos, int dz)
+        protected static string AdjustNoSeparators(string s)
+        {
+            return s.Replace(",", "").Replace(".", "").Replace("°", "").Replace("’", "").Replace("”", "")
+                    .Replace("\"", "").Replace("'", "").Replace(":", "");
+        }
+
+        /// <summary>
+        /// adjust a hh:mm:ss value by a zulu delta for entry into a navpoint system. the hour field is adjusted by
+        /// adding dZ, where dZ is the +/- delta from local to zulu. returns adjusted value, empty string if the
+        /// input is invalid.
+        /// </summary>
+        protected static string AdjustHMSForZulu(string tos, int dz)
         {
             string[] hms = tos.Split(':');
             if ((hms.Length == 3) &&
@@ -197,7 +313,5 @@ namespace JAFDTC.Models.DCS
             }
             return "";
         }
-
-
     }
 }

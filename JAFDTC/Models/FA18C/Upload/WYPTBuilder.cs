@@ -35,7 +35,7 @@ namespace JAFDTC.Models.FA18C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public WYPTBuilder(FA18CConfiguration cfg, FA18CCommands dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public WYPTBuilder(FA18CConfiguration cfg, FA18CDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -49,23 +49,18 @@ namespace JAFDTC.Models.FA18C.Upload
         /// <summary>
         public override void Build()
         {
-            Device ufc = _aircraft.GetDevice("UFC");
-            Device rmfd = _aircraft.GetDevice("RMFD");
+            AirframeDevice ufc = _aircraft.GetDevice("UFC");
+            AirframeDevice rmfd = _aircraft.GetDevice("RMFD");
 
             if (!_cfg.WYPT.IsDefault)
             {
-                AppendCommand(rmfd.GetCommand("OSB-18"));    // MENU
-                AppendCommand(rmfd.GetCommand("OSB-18"));    // MENU
-                AppendCommand(rmfd.GetCommand("OSB-02"));    // HSI
-
-                AppendCommand(rmfd.GetCommand("OSB-10"));    // DATA
-                AppendCommand(rmfd.GetCommand("OSB-07"));    // WYPT
-                AppendCommand(rmfd.GetCommand("OSB-05"));    // UFC
+                AddActions(rmfd, new() { "OSB-18", "OSB-18", "OSB-02" }); // MENU, MENU, HSI
+                AddActions(rmfd, new() { "OSB-10", "OSB-07", "OSB-05" }); // DATA, WYPT, UFC
 
                 SelectWp0(rmfd, 0);
                 for (int i = 0; i < _cfg.WYPT.Points[0].Number; i++)
                 {
-                    AppendCommand(rmfd.GetCommand("OSB-12"));
+                    AddAction(rmfd, "OSB-12");
                 }
 
                 for (int i = 0; i < _cfg.WYPT.Points.Count; i++)
@@ -76,46 +71,40 @@ namespace JAFDTC.Models.FA18C.Upload
                     {
                         // NOTE: coords are zero-filled in the ui, back that out here.
 
-                        AppendCommand(ufc.GetCommand("Opt1"));
-                        AppendCommand(Wait());
-                        AppendCommand(Build2864Coordinate(ufc, Coord.RemoveLLDegZeroFill(wypt.LatUI)));    // DDM
-                        AppendCommand(ufc.GetCommand("ENT"));
-                        AppendCommand(WaitLong());
+                        AddAction(ufc, "Opt1");
+                        AddWait(WAIT_BASE);
 
-                        AppendCommand(Build2864Coordinate(ufc, Coord.RemoveLLDegZeroFill(wypt.LonUI)));    // DDM
-                        AppendCommand(ufc.GetCommand("ENT"));
-                        AppendCommand(WaitLong());
+                        AddActions(ufc, ActionsFor2864CoordinateString(Coord.RemoveLLDegZeroFill(wypt.LatUI)),  // DDM
+                                   new() { "ENT" });
+                        AddWait(WAIT_LONG);
+                        AddActions(ufc, ActionsFor2864CoordinateString(Coord.RemoveLLDegZeroFill(wypt.LonUI)),  // DDM
+                                   new() { "ENT" });
+                        AddWait(WAIT_LONG);
 
-                        AppendCommand(ufc.GetCommand("Opt3"));
-                        AppendCommand(ufc.GetCommand("Opt1"));
-                        AppendCommand(BuildDigits(ufc, wypt.Alt));
-                        AppendCommand(ufc.GetCommand("ENT"));
-                        AppendCommand(Wait());
+                        AddActions(ufc, new() { "Opt3", "Opt1" });
+                        AddActions(ufc, ActionsForString(wypt.Alt), new() { "ENT" });
+                        AddWait(WAIT_BASE);
                     }
-                    AppendCommand(rmfd.GetCommand("OSB-12"));   // Next Waypoint
+                    AddAction(rmfd, "OSB-12");   // Next Waypoint
                 }
 
                 for (var i = 0; i < _cfg.WYPT.Points.Count; i++)
                 {
-                    AppendCommand(rmfd.GetCommand("OSB-13"));   // Prev Waypoint
+                    AddAction(rmfd, "OSB-13");   // Prev Waypoint
                 }
 
-                AppendCommand(rmfd.GetCommand("OSB-18"));
-                AppendCommand(rmfd.GetCommand("OSB-18"));
-                AppendCommand(rmfd.GetCommand("OSB-15"));
+                AddActions(rmfd, new() { "OSB-18", "OSB-18", "OSB-15" });
             }
         }
 
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void SelectWp0(Device rmfd, int i)
+        private void SelectWp0(AirframeDevice rmfd, int i)
         {
             if (i < 140) // It might not notice on the first pass, so we go around once more
             {
-                AppendCommand(StartCondition("NotAtWp0"));
-                AppendCommand(rmfd.GetCommand("OSB-13"));
-                AppendCommand(EndCondition("NotAtWp0"));
+                AddIfBlock("NotAtWp0", null, delegate () { AddAction(rmfd, "OSB-13"); });
                 SelectWp0(rmfd, i + 1);
             }
         }

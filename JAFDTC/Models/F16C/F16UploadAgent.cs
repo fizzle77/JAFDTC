@@ -3,7 +3,7 @@
 // F16CUploadAgent.cs -- f-16c upload agent
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -43,21 +43,16 @@ namespace JAFDTC.Models.F16C
         /// </summary>
         private class F16CSetupBuilder : CoreSetupBuilder, IBuilder
         {
-            public F16CSetupBuilder(F16CCommands dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
+            public F16CSetupBuilder(F16DeviceManager dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
 
             public override void Build()
             {
                 base.Build();
 
-                Device sms = _aircraft.GetDevice("SMS");
+                AirframeDevice sms = _aircraft.GetDevice("SMS");
 
-                AppendCommand(StartCondition("LeftHdptNotOn"));
-                AppendCommand(sms.GetCommand("LEFT_HDPT"));
-                AppendCommand(EndCondition("LeftHdptNotOn"));
-
-                AppendCommand(StartCondition("RightHdptNotOn"));
-                AppendCommand(sms.GetCommand("RIGHT_HDPT"));
-                AppendCommand(EndCondition("RightHdptNotOn"));
+                AddIfBlock("LeftHdptNotOn", null, delegate () { AddAction(sms, "LEFT_HDPT"); });
+                AddIfBlock("RightHdptNotOn", null, delegate () { AddAction(sms, "RIGHT_HDPT"); });
 
                 // TODO: ensure cmds is on?
             }
@@ -70,7 +65,7 @@ namespace JAFDTC.Models.F16C
         // ------------------------------------------------------------------------------------------------------------
 
         private readonly F16CConfiguration _cfg;
-        private readonly F16CCommands _dcsCmds;
+        private readonly F16DeviceManager _dcsCmds;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -78,7 +73,7 @@ namespace JAFDTC.Models.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F16CUploadAgent(F16CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new F16CCommands());
+        public F16CUploadAgent(F16CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new F16DeviceManager());
 
         // ------------------------------------------------------------------------------------------------------------
         //
