@@ -1,6 +1,6 @@
 # JAFDTC: A-10C Warthog Configurations
 
-*Version 1.0.0-B.18 of 12-Jan-24*
+*Version 1.0.0-B.19 of 21-Jan-24*
 
 JAFDTC supports the following configuration in the Warthog,
 

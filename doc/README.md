@@ -1,6 +1,6 @@
 # JAFDTC: User's Guide
 
-*Version 1.0.0-B.18 of 12-Jan-24*
+*Version 1.0.0-B.19 of 21-Jan-24*
 
 _Just Another #%*@^!% DTC_ (JAFDTC) is a Windows application that allows you to upload data
 typically saved on a data cartridge, such as steerpoints/waypoints and other avionics setup,
@@ -53,7 +53,7 @@ airframes.
 JAFDTC allows you to link *System Configurations* between different *Configurations* for the
 same airframe. When linked, changes to the source system configuration are automatically
 reflected in all linked systems. This allows you to "compose" configurations from shared
-components.
+setups.
 
 Links are particularly useful when you have basic setups that you tend to reuse often. For
 example, you might want to always configure your MFDs one way for A2G and another way for
@@ -130,28 +130,33 @@ a number of controls to manipulate configurations,
 
 Working from top to bottom, the primary components of this page include,
 
-- **Filter Search Box** &ndash; Filters the configurations shown in the configuration list.
-- **Current Airframe** &ndash; Selects the current airframe to display configurations for.
-- **Command Bar** &ndash; Triggers commands to manipulate configurations.
-- **Configuration List** &ndash; Lists the available configurations for the current airframe.
-- **Status Area** &ndash; Shows information on the current DCS status and pilot.
+- [**Filter Field**](#filter-field)
+  &ndash; Filters the configurations shown in the configuration list.
+- [**Current Airframe**](#current-airframe-selection)
+  &ndash; Selects the current airframe to display configurations for.
+- [**Command Bar**](#command-bar)
+  &ndash; Triggers commands to manipulate configurations.
+- [**Configuration List**](#configuration-list)
+  &ndash; Lists the available configurations for the current airframe.
+- [**Status Area**](#status-area)
+  &ndash; Shows information on the current DCS status and pilot.
 
 The reaminder of this section discusses each of these elements in more detail.
 
-### Filter Search Box
+### Filter Field
 
-The filter box controls which configurations the
+The filter field controls which configurations the
 [configuration list](#configuration-list)
-in the center of the page displays. To be displayed in the list, a configuration must match the
-filter by containing the specified text. For example, typing `test` will match configurations
-that contain "test" anywhere in their name (comparisons are always case-insensitive).
+in the center of the page displays. To be displayed in the configuration list, a configuration
+must match the filter by containing the specified text. For example, typing `test` will match
+configurations\ that contain "test" anywhere in their name (comparisons are case-insensitive).
 
 ![](images/Core_Cfg_List_Filter.png)
 
 As you type, the application will show a list of matching configurations. Typing `Return` or
-clicking on the *Accept Filter Icon* will select the filter. You can pick a specific
+clicking on the **Accept Filter** icon will select the filter. You can pick a specific
 configuration by clicking on its name in the matching configuration list. Clicking on the `X`
-icon will remove any filtering and display all configurations.
+**Clear Filter** icon will remove any filtering and display all configurations.
 
 ### Current Airframe Selection
 
@@ -164,6 +169,52 @@ selected airframe.
 
 JAFDTC remembers the last airframe you selected and will return to that airframe the next time
 it is launched.
+
+### Command Bar
+
+The command bar at the top of the page provides quick access to the operations you can perform
+on configurations. Clicking on the `...` button at the right of the bar displays the command bar
+in its "open" state.
+
+![](images/Core_Command_Bar.png)
+
+The command bar includes the following commands,
+
+- **Add** &ndash; Adds a new configuration to the database after prompting for a name for the new
+  configuration.
+- **Edit** &ndash; Navigates to the
+  [System Editor Page](#system-editor-page)
+  for the selected configuration to allow you to edit the configuration. You can also edit a
+  configuration by double-clicking on the configuration in the configuration list.
+- **Duplicate** &ndash; Creates a copy of the selected configuration after prompting for a name for the
+  copy of the configuration.
+- **Rename** &ndash; Renames the selected configuration.
+- **Delete** &ndash; Removes the currently selected configuration from the database.
+- **Import** &ndash; Creates a new configuration from a file previously created with the *Export*
+  command.
+- **Export** &ndash; Creates a file that contains the selected configuration suitable for import using
+  the *Import* command.
+- **Load to Jet** &ndash; Uploads the selected configuration to DCS, see
+  [here](#interacting-with-dcs)
+  for further details.
+- **Focus DCS** &ndash; Brings DCS to the foreground and makes it the active application.
+
+> Importing a configuration will implicitly clear all links to other configurations that may
+> have been in place at the time of export.
+
+The overflow menu (exposed by clicking on the "..." button) holds two commands,
+
+- **Points of Interest** &ndash; Navigates to the
+  [POI Editor](#point-of-interest-database)
+  page to allow you to edit points of interest.
+- **Settings** &ndash; Opens up the
+  [JAFDTC Settings](#settings)
+  dialog to allow you to change JAFDTC settings.
+- **About** &ndash; Opens a dialog box that identifies the JAFDTC version and similar information.
+
+Depending on the state of the system, commands may be disabled. For example, **Edit** is disabled
+when there is no configuration selected and **Load to Jet** is disabled if DCS is not running
+a mission with the appropriate airframe.
 
 ### Configuration List
 
@@ -182,51 +233,6 @@ for the configuration that allows you to edit information in the configuration. 
 on a row will bring up a context menu with operations, such as **Rename** or **Delete**, that
 you can perform on the clicked configuration. 
 
-### Command Bar
-
-The command bar at the top of the page provides quick access to the operations you can perform
-on Configurations. The following screen shot shows the command bar in its "open" state (accessed
-by clicking on the "..." button at right).
-
-![](images/Core_Command_Bar.png)
-
-The command bar includes the following commands,
-
-- **Add** &ndash; Adds a new configuration to the database after prompting for a name for the new
-  configuration.
-- **Edit** &ndash; Opens the
-  [System Editor Page](#system-editor-page)
-  for the selected configuration to allow you to edit the configuration. You can also edit a
-  configuration by double-clicking on the configuration in the configuration list.
-- **Duplicate** &ndash; Creates a copy of the selected configuration after prompting for a name for the
-  copy of the configuration.
-- **Rename** &ndash; Renames the selected configuration.
-- **Delete** &ndash; Removes the currently selected configuration from the database.
-- **Import** &ndash; Creates a new configuration from a file previously created with the *Export*
-  command.
-- **Export** &ndash; Creates a file that contains the selected configuration suitable for import using
-  the *Import* command.
-- **Load to Jet** &ndash; Uploads the selected configuration to DCS, see
-  [here](#interacting-with-dcs)
-  for further details.
-
-> Importing a configuration will implicitly clear all links to other configurations that may
-> have been in place at the time of export.
-
-The overflow menu (exposed by clicking on the "..." button) holds two commands,
-
-- **POI** &ndash; Navigates to the
-  [POI Editor](#point-of-interest-database)
-  page to allow you to edit points of interest.
-- **Settings** &ndash; Opens up the
-  [JAFDTC Settings](#settings)
-  dialog to allow you to change JAFDTC settings.
-- **About** &ndash; Opens a dialog box that identifies the JAFDTC version and similar information.
-
-Depending on the state of the system, commands may be disabled. For example, **Edit** is disabled
-when there is no configuration selected and **Load to Jet** is disabled if DCS is not running
-a mission with the appropriate airframe.
-
 ### Status Area
 
 The status area occupies the bottom part of the configuration list page. On the right side of
@@ -234,9 +240,10 @@ this region is information showing the current status of DCS. There are three pi
 status here, each marked with a red cross or green checkmark,
 
 - **Lua Installed** &ndash; Indicates that the Lua support is properly installed in DCS.
-- **Running** &ndash; Indicates that DCS is currently running (though not necessarily running a mission).
-- **Pilot in Pit** &ndash; Indicates that DCS is currently running a mission along with the type of
-  airframe currently in use.
+- **Running** &ndash; Indicates that DCS is currently running (though not necessarily running
+  a mission).
+- **Pilot in Pit** &ndash; Indicates that DCS is currently running a mission along with the
+  type of airframe currently in use.
 
 For example,
 
@@ -251,10 +258,9 @@ The left side of the status area identifies the pilot and wing as specified thro
 
 ## System Editor Page
 
-The specific systems availble in a configuration vary from airframe to airframe. However, the
-basic structure of the page on which you edit system configurations is similar. The *System
-Editor Page* provides a list of systems from which you can display per-system editors as the
-following figure illustrates.
+The *System Editor Page* provides a list of systems from which you can display per-system
+editors. The specific systems availble in a configuration vary from airframe to airframe.
+However, the basic structure of the page on which you edit system configurations is similar.
 
 ![](images/Core_Cfg_Edit_Page.png)
 
@@ -270,8 +276,8 @@ associated icon. The tint of the icon indicates the state of the system: blue ic
 systems whose configuration has changed from defaults, white icons mark systems that have not
 been changed.
 
-> JAFDTC uses the system highlight color; if you change it, the blue icons may be a different
-> color based on your choice.
+> JAFDTC uses the system highlight color; if you change it, the blue icons in the screenshots
+> may be a different color based on your choice.
 
 A small gold dot marks those systems that are linked to other configurations.
 
@@ -338,7 +344,7 @@ badged with a small gold dot as described earlier.
 
 ## System Editors for Navigation Systems
 
-Most aircraft in JAFDTC support a navigation system that allows _Navigation Points_ (i.e.,
+Most aircraft in JAFDTC support a navigation system that allows *Navigation Points* (i.e.,
 waypoints or steerpoints) to be input into the avionics as a part of a configuration. While
 the interface for managing navigation points depends on the airframe, the general operation
 and layout of the interface is similar.
@@ -404,10 +410,9 @@ The top section of the page allows you to set up the navigation point from a kno
 [discussed below](#capturing-coordinates). You can select a point of interest from the drop-
 down menu; pressing the **Paste** button to the right of the drop-down copies its parameters
 (such as latitude or longitude) into the navigation point. Points of interest are grouped by
-theater (for example, Syria, Nevada) and point within the theater (for example, Ramat David,
-Nellis AFB).
+theater (for example, Syria, Nevada).
 
-The row below that identifies the navigation point being edited and, on the right, provides
+The next row identifies the navigation point being edited and, on the right, provides
 four controls.
 
 - The pin button creates a user point of interest from the current navigation parameters.
@@ -453,11 +458,18 @@ captured coordinates in the navigation system.
 
 ### Importing and Exporting Navigation Points
 
-TODO
+In addition to its own `.json` format, JAFDTC can import navigation points from `.miz` and
+`.cf` files directly. When importing navigation points, they can either replace or be
+appended to the list of currently defined navigation points.
 
 ![](images/Core_Base_Import.png)
 
-TODO
+When importing from `.miz` or `.cf` files, you can select the flight within the file you wish
+to import from. The list will only show flights that match the airframe the configuration uses.
+
+Both dialogs allow you to enable or disable the import of *Time on Steerpoint* information from
+the imported file. In addition, for `.cf` files, you can choose to import the take-off
+steerpoints.
 
 ## System Editors for Communications Systems
 
@@ -591,8 +603,8 @@ To be able to upload a configuration for a particular airframe, four conditions 
 2. The DCS scripting support must be
    [installed](#support-scripts)
 3. DCS must be running
-4. A mission must be running with a pilot must be in pit in an airframe that matches the
-   airframe of the configuration selected in (1)
+4. A mission must be running with a pilot in pit in an airframe that matches the airframe of
+   the configuration selected in (1)
 
 The lower left corner of the main configuration list page indicates the status conditions 2-4
 as
@@ -697,8 +709,8 @@ depending which versions of DCS are installed on your system. Within these areas
 three changes,
 
 - Adds scripts in the `Scripts\JAFDTC` folder to enable integration with supported airframes
-- Adds `JAFDTCHook.lua` and `JAFDTCCfgNameHook.lua` script to the `Scripts\Hooks` folder to
-  enables integration with DCS
+- Adds `JAFDTCStatusMsgHook.lua` and `JAFDTCWyptCaptureHook.lua` script to the `Scripts\Hooks`
+  folder to enables integration with DCS
 - Adds a line to `Scripts\Export.lua` to load JAFDTC support into DCS at mission start
 
 JAFDTC will automatically update these files as needed, notifying you when an update is made.
