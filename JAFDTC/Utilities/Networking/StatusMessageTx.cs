@@ -23,7 +23,7 @@ namespace JAFDTC.Utilities.Networking
     /// supports sending command sequences to dcs to drive the cockpit controls necessary to set up the avionics on
     /// the jet according to a configuration.
     /// </summary>
-    internal class ConfigNameTx
+    internal class StatusMessageTx
     {
         /// <summary>
         /// send a config name string to dcs through a tcp connection to the lua config name hook. returns true on

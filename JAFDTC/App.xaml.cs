@@ -310,7 +310,7 @@ namespace JAFDTC
                 CurMarker = data.Marker;
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
-                    ConfigNameTx.Send($"Setup {data.Marker}% Complete");
+                    StatusMessageTx.Send($"Setup {data.Marker}% Complete");
                 });
             }
             else if (IsUploadInFlight && string.IsNullOrEmpty(data.Marker))
@@ -318,7 +318,7 @@ namespace JAFDTC
                 IsUploadInFlight = false;
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, async () =>
                 {
-                    ConfigNameTx.Send("Avionics Setup Complete");
+                    StatusMessageTx.Send("Avionics Setup Complete");
                     General.PlayAudio("ux_action.wav");
                     await Task.Delay(100);
                     General.PlayAudio("ux_action.wav");
