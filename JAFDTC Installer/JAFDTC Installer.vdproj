@@ -192,15 +192,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:JAFDTC"
-        "ProductCode" = "8:{A3E1647D-18D0-4C8F-884D-A40522E4D938}"
-        "PackageCode" = "8:{2862AEC2-B037-40F1-BAD0-A30AE6FE5EE6}"
+        "ProductCode" = "8:{D3982529-6707-421D-92C3-98C6B5152F1D}"
+        "PackageCode" = "8:{48A44ACF-1008-473C-9408-378AC20D58A2}"
         "UpgradeCode" = "8:{D978BA41-44A4-483B-B26B-8F2AC4897C51}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0018"
+        "ProductVersion" = "8:1.0.0019"
         "Manufacturer" = "8:51stVFW"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -726,34 +726,6 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_1316632EBC4746F091AC97AAF05A3EA1"
-            {
-            "SourcePath" = "8:"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_317C8FB995AB4638A7906463197DE148"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:ContentFiles"
-            "OutputProjectGuid" = "8:{627F214D-A5DB-4A71-8EAE-340B6B30DD37}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2C362B37881F40EFACBD557EF069DEA5"
             {
             "SourcePath" = "8:..\\JAFDTC\\obj\\x64\\Release\\net6.0-windows10.0.19041.0\\win10-x64\\apphost.exe"
@@ -779,6 +751,34 @@
             "OutputProjectGuid" = "8:{627F214D-A5DB-4A71-8EAE-340B6B30DD37}"
             "ShowKeyOutput" = "11:TRUE"
             "PublishProfilePath" = "8:Properties\\PublishProfiles\\win10-x64.pubxml"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_39EAD9AC46754631895B08E00FF34F87"
+            {
+            "SourcePath" = "8:"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_317C8FB995AB4638A7906463197DE148"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:Release|x64"
+            "OutputGroupCanonicalName" = "8:ContentFiles"
+            "OutputProjectGuid" = "8:{627F214D-A5DB-4A71-8EAE-340B6B30DD37}"
+            "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
                 }
