@@ -274,7 +274,6 @@ namespace JAFDTC.UI.App
                     uiCfgListView.SelectedIndex += 1;
                 }
                 string name = ((IConfiguration)uiCfgListView.SelectedItem).Name;
-                Debug.WriteLine($"NEXT {isFirst} {uiCfgListView.SelectedIndex} --> {name}");
                 StatusMessageTx.Send(name);
             }
         }
@@ -299,7 +298,6 @@ namespace JAFDTC.UI.App
                     uiCfgListView.SelectedIndex -= 1;
                 }
                 string name = ((IConfiguration)uiCfgListView.SelectedItem).Name;
-                Debug.WriteLine($"PREV {isFirst} {uiCfgListView.SelectedIndex} --> {name}");
                 StatusMessageTx.Send(name);
             }
         }
