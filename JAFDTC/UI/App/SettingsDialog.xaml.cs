@@ -2,7 +2,7 @@
 //
 // SettingsDialog.xaml.cs -- ui c# for settings dialog
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -20,18 +20,6 @@
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 namespace JAFDTC.UI.App
 {
@@ -40,9 +28,17 @@ namespace JAFDTC.UI.App
     /// </summary>
     public sealed partial class SettingsDialog : ContentDialog
     {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // properties
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
         public string WingName { get; set; }
 
         public string Callsign { get; set; }
+
+        public SettingsData.UploadFeedbackTypes UploadFeedback { get; set; }
 
         public bool IsAppOnTop { get; set; }
 
@@ -52,12 +48,19 @@ namespace JAFDTC.UI.App
         
         public bool ISLuaUninstallRequested { get; set; }
 
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // construction
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
         public SettingsDialog()
         {
             InitializeComponent();
 
             WingName = Settings.WingName;
             Callsign = Settings.Callsign;
+            UploadFeedback = Settings.UploadFeedback;
             IsAppOnTop = Settings.IsAlwaysOnTop;
             IsNewVersCheckDisabled = Settings.IsNewVersCheckDisabled;
             IsLuaInstallRequested = false;
@@ -65,6 +68,7 @@ namespace JAFDTC.UI.App
 
             uiSetValueWingName.Text = WingName;
             uiSetValueCallsign.Text = Callsign;
+            uiSetComboFeedback.SelectedIndex = (int)UploadFeedback;
             uiSetCkbxRemainOnTop.IsChecked = IsAppOnTop;
             uiSetCkbxVersionCheck.IsChecked = !IsNewVersCheckDisabled;
 
@@ -79,6 +83,12 @@ namespace JAFDTC.UI.App
                 uiSetBtnUninstall.IsEnabled = false;
             }
         }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // ui interactions
+        //
+        // ------------------------------------------------------------------------------------------------------------
 
         private void SetValueWingName_LostFocus(object sender, RoutedEventArgs e)
         {
@@ -95,6 +105,15 @@ namespace JAFDTC.UI.App
             if (tbox != null)
             {
                 Callsign = tbox.Text;
+            }
+        }
+
+        private void SetComboFeedback_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            ComboBox cbox = (ComboBox)sender;
+            if (cbox != null)
+            {
+                UploadFeedback = (SettingsData.UploadFeedbackTypes)cbox.SelectedIndex;
             }
         }
 

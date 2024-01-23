@@ -670,6 +670,7 @@ namespace JAFDTC.UI.App
             {
                 Settings.WingName = dialog.WingName;
                 Settings.Callsign = dialog.Callsign;
+                Settings.UploadFeedback = dialog.UploadFeedback;
                 Settings.IsAlwaysOnTop = dialog.IsAppOnTop;
                 ((OverlappedPresenter)CurApp.Window.AppWindow.Presenter).IsAlwaysOnTop = Settings.IsAlwaysOnTop;
                 Settings.IsNewVersCheckDisabled = dialog.IsNewVersCheckDisabled;

@@ -4,7 +4,7 @@
     
 SettingsDialog.xaml : ui xaml for settings dialog
 
-Copyright(C) 2023 ilominar/raven
+Copyright(C) 2023-2024 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -43,10 +43,11 @@ https://www.gnu.org/licenses/.
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Margin="0,12,0,0" Orientation="Horizontal"
                     HorizontalAlignment="Center">
-            <TextBlock Width="80" VerticalAlignment="Center" HorizontalTextAlignment="Right">
+            <TextBlock Width="120" VerticalAlignment="Center" HorizontalTextAlignment="Right">
                 Wing Name
             </TextBlock>
             <TextBox Width="220" Margin="12,0,0,0"
@@ -57,7 +58,7 @@ https://www.gnu.org/licenses/.
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0,12,0,0" Orientation="Horizontal"
                     HorizontalAlignment="Center">
-            <TextBlock Width="80" VerticalAlignment="Center" HorizontalTextAlignment="Right">
+            <TextBlock Width="120" VerticalAlignment="Center" HorizontalTextAlignment="Right">
                 Callsign
             </TextBlock>
             <TextBox Width="220" Margin="12,0,0,0"
@@ -66,25 +67,43 @@ https://www.gnu.org/licenses/.
                      LostFocus="SetValueCallsign_LostFocus">
             </TextBox>
         </StackPanel>
-        <CheckBox Grid.Row="2" Margin="0,24,0,0"
+        <StackPanel Grid.Row="2" Margin="0,24,0,0" Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+            <TextBlock Width="120" VerticalAlignment="Center" HorizontalTextAlignment="Right">
+                Upload Feedback
+            </TextBlock>
+            <ComboBox Width="220" Margin="12,0,0,0"
+                      x:Name="uiSetComboFeedback"
+                      VerticalAlignment="Center"
+                      SelectionChanged="SetComboFeedback_SelectionChanged">
+                <!-- tag is SettingsData.UploadFeedbackTypes enum -->
+                <ComboBox.Items>
+                    <TextBlock Text="Audio Only" Tag="0"/>
+                    <TextBlock Text="Audio, Done Message" Tag="1"/>
+                    <TextBlock Text="Audio, Progress Messages" Tag="2"/>
+                </ComboBox.Items>
+
+            </ComboBox>
+        </StackPanel>
+        <CheckBox Grid.Row="3" Margin="0,8,0,0"
                   x:Name="uiSetCkbxRemainOnTop"
                   HorizontalAlignment="Center"
                   Click="SetCkbxRemainOnTop_Click">
             JAFDTC Window Remains on Top
         </CheckBox>
-        <CheckBox Grid.Row="3" Margin="0,24,0,0"
+        <CheckBox Grid.Row="4" Margin="0,24,0,0"
                   x:Name="uiSetCkbxVersionCheck"
                   HorizontalAlignment="Center"
                   Click="SetCkbxVersionCheck_Click">
             Check for New Versions at Launch
         </CheckBox>
-        <Button Grid.Row="4" Margin="0,24,0,0"
+        <Button Grid.Row="5" Margin="0,24,0,0"
                 x:Name="uiSetBtnInstall"
                 HorizontalAlignment="Stretch"
                 Click="SetBtnInstall_Click">
             Install DCS Lua Support
         </Button>
-        <Button Grid.Row="5" Margin="0,12,0,0"
+        <Button Grid.Row="6" Margin="0,12,0,0"
                 x:Name="uiSetBtnUninstall"
                 HorizontalAlignment="Stretch"
                 Click="SetBtnUninstall_Click">

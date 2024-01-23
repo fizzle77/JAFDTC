@@ -32,6 +32,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using static JAFDTC.Utilities.SettingsData;
 
 namespace JAFDTC
 {
@@ -313,17 +314,20 @@ namespace JAFDTC
             else if (IsUploadInFlight && !string.IsNullOrEmpty(data.Marker) && (data.Marker != CurMarker))
             {
                 CurMarker = data.Marker;
-                Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                if (Settings.UploadFeedback == UploadFeedbackTypes.AUDIO_PROGRESS)
                 {
                     StatusMessageTx.Send($"Setup {data.Marker}% Complete");
-                });
+                }
             }
             else if (IsUploadInFlight && string.IsNullOrEmpty(data.Marker))
             {
                 IsUploadInFlight = false;
-                Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, async () =>
+                if (Settings.UploadFeedback != UploadFeedbackTypes.AUDIO)
                 {
                     StatusMessageTx.Send("Avionics Setup Complete");
+                }
+                Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, async () =>
+                {
                     General.PlayAudio("ux_action.wav");
                     await Task.Delay(100);
                     General.PlayAudio("ux_action.wav");

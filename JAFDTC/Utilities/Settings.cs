@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using static JAFDTC.Models.Base.NavpointInfoBase;
+using static JAFDTC.Utilities.SettingsData;
 
 
 namespace JAFDTC.Utilities
@@ -32,6 +33,16 @@ namespace JAFDTC.Utilities
     /// </summary>
     public sealed class SettingsData
     {
+        /// <summary>
+        /// types of upload feedback.
+        /// </summary>
+        public enum UploadFeedbackTypes
+        {
+            AUDIO = 0,
+            AUDIO_DONE = 1,
+            AUDIO_PROGRESS = 2
+        };
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -59,6 +70,8 @@ namespace JAFDTC.Utilities
         public string WingName { get; set; }
 
         public string Callsign { get; set; }
+
+        public UploadFeedbackTypes UploadFeedback { get; set; }
 
         public bool IsAlwaysOnTop { get; set; }
 
@@ -96,6 +109,7 @@ namespace JAFDTC.Utilities
 
             WingName = "";
             Callsign = "";
+            UploadFeedback = UploadFeedbackTypes.AUDIO;
             IsAlwaysOnTop = false;
             IsNewVersCheckDisabled = false;
 
@@ -112,11 +126,11 @@ namespace JAFDTC.Utilities
                 [AirframeTypes.A10C] = 200,
                 [AirframeTypes.AH64D] = 200,
                 [AirframeTypes.AV8B] = 200,
+                [AirframeTypes.F14AB] = 200,
                 [AirframeTypes.F15E] = 80,
                 [AirframeTypes.F16C] = 200,
                 [AirframeTypes.FA18C] = 200,
                 [AirframeTypes.M2000C] = 200,
-                [AirframeTypes.F14AB] = 200,
             };
         }
     }
@@ -222,6 +236,19 @@ namespace JAFDTC.Utilities
                 if (_currentSettings.Callsign != value)
                 {
                     _currentSettings.Callsign = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static UploadFeedbackTypes UploadFeedback
+        {
+            get => _currentSettings.UploadFeedback;
+            set
+            {
+                if (_currentSettings.UploadFeedback != value)
+                {
+                    _currentSettings.UploadFeedback = value;
                     FileManager.WriteSettings(_currentSettings);
                 }
             }
