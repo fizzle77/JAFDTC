@@ -619,7 +619,6 @@ namespace JAFDTC.UI.App
             Process[] arrProcesses = Process.GetProcessesByName("DCS");
             if (arrProcesses.Length > 0)
             {
-
                 IntPtr ipHwnd = arrProcesses[0].MainWindowHandle;
                 Thread.Sleep(100);
                 SetForegroundWindow(ipHwnd);

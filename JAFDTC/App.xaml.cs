@@ -30,6 +30,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JAFDTC
@@ -44,6 +45,9 @@ namespace JAFDTC
         // windoze interfaces & data structs
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -397,7 +401,15 @@ namespace JAFDTC
                     (Window.AppWindow.Presenter as OverlappedPresenter).IsAlwaysOnTop = IsJAFDTCPinnedToTop;
                     if (!IsJAFDTCPinnedToTop)
                     {
+                        // TODO: reset cockpit "always on top" control to "not always on top" (eg, FLIR GAIN/LVL/AUTO in viper)?
                         Window.AppWindow.MoveInZOrderAtBottom();
+                        Process[] arrProcesses = Process.GetProcessesByName("DCS");
+                        if (arrProcesses.Length > 0)
+                        {
+                            IntPtr ipHwnd = arrProcesses[0].MainWindowHandle;
+                            Thread.Sleep(100);
+                            SetForegroundWindow(ipHwnd);
+                        }
                     }
                 });
             }
