@@ -283,6 +283,7 @@ namespace JAFDTC
             {
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
+                    StatusMessageTx.Send("No Configuration Selected");
                     General.PlayAudio("ux_error.wav");
                 });
             }
