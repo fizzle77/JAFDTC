@@ -93,7 +93,7 @@ function JAFDTCStatusMsgHook:createDialog()
 
     local screenWidth, screenHeight = dxgui.GetScreenSize()
     local x = ((screenWidth - self.dialogWidth) / 2)
-    local y = ((screenHeight - self.dialogHeight) / 2)
+    local y = ((screenHeight - self.dialogHeight) / 5)
 
     self.dialog = DialogLoader.spawnDialogFromFile(lfs.writedir() .. "Scripts\\JAFDTC\\StatusMsg.dlg")
     self.dialog:setVisible(true)
