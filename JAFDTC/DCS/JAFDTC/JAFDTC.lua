@@ -177,7 +177,7 @@ function JAFDTC_Cmd_While(list, index)
     if not _G[funcName](args["prm0"], args["prm1"]) then
         for i = index + 1, #list do
             if list[i]["f"] == "EndWhile" and list[i]["a"]["cond"] == cond then
-                return i - index, 0
+                return (i + 1) - index, 0
             end
         end
         JAFDTC_Log("ERROR: Missing closing EndWhile for " .. cond)
@@ -188,13 +188,15 @@ end
 
 -- cmd_endwhile(string cond)
 function JAFDTC_Cmd_EndWhile(list, index)
+    local args = list[index]["a"]
+    local cond = args["cond"]
+
     for i = index - 1, 1, -1 do
         if list[i]["f"] == "While" and list[i]["a"]["cond"] == cond then
             return i - index, 0
         end
     end
     JAFDTC_Log("ERROR: Missing opening While for " .. cond)
-    di = #list - index + 1
     return 1, 0
 end
 
