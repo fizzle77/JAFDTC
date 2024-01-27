@@ -1,6 +1,6 @@
 # JAFDTC: User's Guide
 
-*Version 1.0.0-B.19 of 21-Jan-24*
+*Version 1.0.0-B.20 of 26-Jan-24*
 
 _Just Another #%*@^!% DTC_ (JAFDTC) is a Windows application that allows you to upload data
 typically saved on a data cartridge, such as steerpoints/waypoints and other avionics setup,
@@ -116,10 +116,12 @@ for more details.
 
 The JAFDTC user interface is based around a single window that displays a list of configrations
 for an airframe and allows you to edit the specfic systems in a configuration. This section
-covers some of the user interface features that are common to multiple airframes. See the
-airframe-specific documentation linked
-[above](#jafdtc-users-guide)
-for discussion of the user interface concepts applicable to a specific airframe.
+covers the basics of this user interface. Additional details on user interface elements that
+are common to many airframes can be found
+[here](#common-system-editor-user-interfaces)
+while the documentation linked
+[here](#jafdtc-users-guide)
+presents user interface concepts applicable to a specific airframe.
 
 ## Configuration List Page
 
@@ -342,7 +344,97 @@ system is presently linked to. When unlinking, the system configuration does not
 will no longer receive updates from the source configuration. Icons for linked systems are
 badged with a small gold dot as described earlier.
 
-## System Editors for Navigation Systems
+## Point of Interest Database
+
+JAFDTC provides a *Points of Interest* (PoI) database that contains common locations throughout
+DCS theaters. This database consists of two types of entries,
+
+- *System Entries* are entries set by DCS and cover features such as airfields.
+- *User Entries* are entries defined by a user that cover features useful to a user.
+
+While *System Entries* are fixed and immutable, users can define and managed *User Entries* as
+they see fit. PoIs are applied using the **Paste PoI** command from a
+[navigation point editor](#navigation-point-editor)
+to copy the locations to a navigation point. User PoIs can also be created from a navigation
+point editor.
+
+The **Point of Interest** command in the
+[overflow menu](#command-bar)
+opens up an editor page to manage known PoIs.
+
+![](images/Core_Base_PoI.png)
+
+The top portion of this page contains a combo box that allows you to filter the PoIs by DCS
+theater along with a command bar. Below this row is a list of PoIs, one per row. The pin icon
+at the left of a row indicates that the PoI is a user PoI. At the bottom of the page is an area
+to edit the properties of a PoI including the name, latitude, longitude, and elevation.
+
+The command bar,
+
+![](images/Core_Base_PoI_Cmd.png)
+
+includes the following commands,
+
+- **Edit** &ndash; Copies the properties from the selected PoI to the PoI editor.
+- **Delete** &ndash; Deletes the selected *user* PoIs from the database.
+- **Import** &ndash; Imports new PoIs from a previously exported file.
+- **Export** &ndash; Exports selected *user* PoIs from the database to a file.
+- **User Only** &ndash; Toggles the PoI list between showing all PoIs and only showing
+  user PoIs.
+- **Coordiantes** &ndash; Selects the format to use for PoI coordiantes.
+
+After entering or updating properties for a PoI in the PoI editor, click the **Add** button
+to add a new PoI to the theater (the theater is automatically determined from the latitude
+and longitude). The **Add** button will be titled **Update** if the change would update an
+existing user PoI.
+
+## Settings
+
+You can access the JAFDTC settings through the Settings button on the command bar overflow menu
+as
+[described earlier](#configuration-list-page). The settings dialog box appears as follows,
+
+![](images/Core_Settings.png)
+
+There are multiple controls in the settings,
+
+- **Wing Name**, **Callsign** &ndash; Specifies your wing and callsign. This information
+  appears in the
+  [status area](#status-area)
+  of the
+  [configuration list page](#configuration-list-page).
+  Some airframes also use this inforamtion for configuration.
+- **Upload Feedback** &ndash; Selects the type of feedback to provide during uploads,
+  - *Audio Only* &ndash; Audio cues at the start and completion of upload.
+  - *Audio, Done Message* &ndash; Audio cues and an on-screen message in DCS indicating the
+    upload has finished.
+  - *Audio, Progress Messages* &ndash; Audio cues and an on-screen message in DCS indicating
+    the progress of the upload.
+- **Navpoint Import Ignores Airframe** &ndash; When selected, importing navpoints from a
+  [file](#importing-and-exporting-navigation-points)
+  will not require the airframe in the file to match the airframe of the configuration.
+- **JAFDTC Window Remains on Top** &ndash; Selects whether JAFDTC will always remain on
+  top of the window stack, even while DCS has focus. This allows you to keep the DCS UI
+  visible in non-VR operation.
+- **Check for New Versions at Launch** &ndash; Selects whether JAFDTC will check if a new
+  version is available each time it is launched.
+- **Install DCS Lua Support** &ndash; Installs
+  [DCS Lua support](#support-scripts)
+  if the support is not currently installed (the button is disabled if support is in place).
+- **Uninstall DCS Lua Support** &ndash; Uninstalls
+  [DCS Lua support](#support-scripts)
+  if the support is currently installed (the button is disabled if support is not in place).
+
+JAFDTC saves its settings to a file in `Documents\JAFDTC`. Clicking "OK" will accept any
+changes in the dialog, while "Cancel" will discard any changes.
+
+# Common System Editor User Interfaces
+
+This section discusses navigation and communication system editors. Though there are often
+airframe-specific differences, the editors for these systems share many common features we
+will discuss.
+
+## Navigation System Editors
 
 Most aircraft in JAFDTC support a navigation system that allows *Navigation Points* (i.e.,
 waypoints or steerpoints) to be input into the avionics as a part of a configuration. While
@@ -459,19 +551,22 @@ captured coordinates in the navigation system.
 ### Importing and Exporting Navigation Points
 
 In addition to its own `.json` format, JAFDTC can import navigation points from `.miz` and
-`.cf` files directly. When importing navigation points, they can either replace or be
-appended to the list of currently defined navigation points.
+`.cf` files directly. When importing navigation points, the imported points can either replace
+or be appended to the list of currently defined navigation points.
 
 ![](images/Core_Base_Import.png)
 
 When importing from `.miz` or `.cf` files, you can select the flight within the file you wish
-to import from. The list will only show flights that match the airframe the configuration uses.
+to import from. Based on the **Navpoint Import Ignores Airframe**
+[setting](#settings),
+the available flights may include only those flights matching the current airframe or any flight
+from the file.
 
 Both dialogs allow you to enable or disable the import of *Time on Steerpoint* information from
 the imported file. In addition, for `.cf` files, you can choose to import the take-off
 steerpoints.
 
-## System Editors for Communications Systems
+## Communications System Editors
 
 Several aircraft in JAFDTC support a communication system that allows configuration of one or
 more radios in the airframe. Typical configuration includes information like preset
@@ -506,81 +601,6 @@ parameters (see the
 [airframe-specific documentation](#jafdtc-users-guide)
 for further details) along with the common **Link** and **Reset** controls
 [discussed earlier](#common-editor-controls).
-
-## Point of Interest Database
-
-JAFDTC provides a *Points of Interest* (PoI) database that contains common locations throughout
-DCS theaters. This database consists of two types of entries,
-
-- *System Entries* are entries set by DCS and cover features such as airfields.
-- *User Entries* are entries defined by a user that cover features useful to a user.
-
-While *System Entries* are fixed and immutable, users can define and managed *User Entries* as
-they see fit. PoIs are applied using the **Paste PoI** command from a
-[navigation point editor](#navigation-point-editor)
-to copy the locations to a navigation point. User PoIs can also be created from a navigation
-point editor.
-
-The **Point of Interest** command in the
-[overflow menu](#command-bar)
-opens up an editor page to manage known PoIs.
-
-![](images/Core_Base_PoI.png)
-
-The top portion of this page contains a combo box that allows you to filter the PoIs by DCS
-theater along with a command bar. Below this row is a list of PoIs, one per row. The pin icon
-at the left of a row indicates that the PoI is a user PoI. At the bottom of the page is an area
-to edit the properties of a PoI including the name, latitude, longitude, and elevation.
-
-The command bar,
-
-![](images/Core_Base_PoI_Cmd.png)
-
-includes the following commands,
-
-- **Edit** &ndash; Copies the properties from the selected PoI to the PoI editor.
-- **Delete** &ndash; Deletes the selected *user* PoIs from the database.
-- **Import** &ndash; Imports new PoIs from a previously exported file.
-- **Export** &ndash; Exports selected *user* PoIs from the database to a file.
-- **User Only** &ndash; Toggles the PoI list between showing all PoIs and only showing
-  user PoIs.
-- **Coordiantes** &ndash; Selects the format to use for PoI coordiantes.
-
-After entering or updating properties for a PoI in the PoI editor, click the **Add** button
-to add a new PoI to the theater (the theater is automatically determined from the latitude
-and longitude). The **Add** button will be titled **Update** if the change would update an
-existing user PoI.
-
-## Settings
-
-You can access the JAFDTC settings through the Settings button on the command bar overflow menu
-as
-[described earlier](#configuration-list-page). The settings dialog box appears as follows,
-
-![](images/Core_Settings.png)
-
-There are multiple controls in the settings,
-
-- **Wing Name**, **Callsign** &ndash; Specifies your wing and callsign. This information
-  appears in the
-  [status area](#status-area)
-  of the
-  [configuration list page](#configuration-list-page).
-  Some airframes also use this inforamtion for configuration.
-- **JAFDTC Window Remains on Top** &ndash; Selects whether JAFDTC will always remain on
-  top of the window stack, even while DCS has focus. This allows you to keep the DCS UI
-  visible in non-VR operation.
-- **Check for New Versions at Launch** &ndash; Selects whether JAFDTC will check if a new
-  version is available each time it is launched.
-- **Install DCS Lua Support** &ndash; Installs
-  [DCS Lua support](#support-scripts)
-  if the support is not currently installed (the button is disabled if support is in place).
-- **Uninstall DCS Lua Support** &ndash; Uninstalls
-  [DCS Lua support](#support-scripts)
-  if the support is currently installed (the button is disabled if support is not in place).
-
-JAFDTC saves its settings to a file in `Documents\JAFDTC`. Clicking "OK" will accept any
-changes in the dialog, while "Cancel" will discard any changes.
 
 # DCS Integration
 

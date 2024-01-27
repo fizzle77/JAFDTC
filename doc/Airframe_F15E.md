@@ -1,7 +1,6 @@
 # JAFDTC: F-15E Strike Eagle Configurations
 
-*Version 1.0.0-B.19 of 21-Jan-24*
-
+*Version 1.0.0-B.20 of 26-Jan-24*
 
 JAFDTC supports the following configuration in the Strike Eagle,
 

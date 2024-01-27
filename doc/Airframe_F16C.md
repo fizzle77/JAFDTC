@@ -1,6 +1,6 @@
 # JAFDTC: F-16C Viper Configurations
 
-*Version 1.0.0-B.19 of 21-Jan-24*
+*Version 1.0.0-B.20 of 26-Jan-24*
 
 JAFDTC supports the following configuration in the Viper,
 
@@ -118,21 +118,20 @@ The datalink system editor page looks like this (from Raven's perspective),
 
 ![](images/Viper_Sys_DLNK_Top.png)
 
-The top-most section of the page allows you to select the table entry for your ownship and
-whether or not you are a flight lead. As we shall discuss shortly, JAFDTC will automatically
-set the ownship table entry when it can determine which entry corresponds to the ownship. The
-common controls implement the link and reset functionality described
+The top-most section of the page allows you to select the table entry for your ownship, your
+callsign, and whether or not you are a flight lead. As we shall discuss shortly, JAFDTC will
+automatically set the ownship table entry when it can determine which entry corresponds to the
+ownship. The common controls implement the link and reset functionality described
 [earlier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#common-editor-controls).
-
-> JAFDTC does not currently handle callsigns through the DED DLNK page.
 
 The middle part of the page allows you to edit the entries in the table that specify the team
 members. For each table entry, there are three controls,
 
-* *TDOA* enables or disables sharing of HTS information within the team.
-* *TNDL* specifies the five-digit octal code assigned to the jet (that is, 5 digits where all
-  digits are between 0 and 7, inclusive).
-* *Callsign* allows you to select a pilot from the pilot database or a "generic" pilot.
+* **TDOA** &ndash; enables or disables sharing of HTS information within the team.
+* **TNDL** &ndash;  specifies the five-digit octal code assigned to the jet (that is, 5 digits
+  where all digits are between 0 and 7, inclusive).
+* **Callsign** &ndash;  allows you to select a pilot from the pilot database or a "generic"
+  pilot.
 
 The TNDL field is only editable if the callsign control does not select a pilot from the pilot
 database (in this case, the callsign control is blank as in entry 6 above). The background of
@@ -293,8 +292,7 @@ initial radio frequency and guard monitor.
 ![](images/Viper_Sys_COMM.png)
 
 This editor follows the common communication systems editor the
-[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#system-editors-for-communications-systems)
-describes with the common controls implementing the link and reset functionality described in
+[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#communications-system-editors) the link and reset functionality described in
 the
 [user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#common-editor-controls).
 
