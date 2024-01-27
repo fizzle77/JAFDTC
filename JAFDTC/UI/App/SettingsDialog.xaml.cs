@@ -40,6 +40,8 @@ namespace JAFDTC.UI.App
 
         public SettingsData.UploadFeedbackTypes UploadFeedback { get; set; }
 
+        public bool IsNavPtImportIgnoreAirframe { get; set; }
+
         public bool IsAppOnTop { get; set; }
 
         public bool IsNewVersCheckDisabled { get; set; }
@@ -61,6 +63,7 @@ namespace JAFDTC.UI.App
             WingName = Settings.WingName;
             Callsign = Settings.Callsign;
             UploadFeedback = Settings.UploadFeedback;
+            IsNavPtImportIgnoreAirframe = Settings.IsNavPtImportIgnoreAirframe;
             IsAppOnTop = Settings.IsAlwaysOnTop;
             IsNewVersCheckDisabled = Settings.IsNewVersCheckDisabled;
             IsLuaInstallRequested = false;
@@ -69,6 +72,7 @@ namespace JAFDTC.UI.App
             uiSetValueWingName.Text = WingName;
             uiSetValueCallsign.Text = Callsign;
             uiSetComboFeedback.SelectedIndex = (int)UploadFeedback;
+            uiSetCkbxNPIgnoresAirframe.IsChecked = IsNavPtImportIgnoreAirframe;
             uiSetCkbxRemainOnTop.IsChecked = IsAppOnTop;
             uiSetCkbxVersionCheck.IsChecked = !IsNewVersCheckDisabled;
 
@@ -114,6 +118,15 @@ namespace JAFDTC.UI.App
             if (cbox != null)
             {
                 UploadFeedback = (SettingsData.UploadFeedbackTypes)cbox.SelectedIndex;
+            }
+        }
+
+        private void SetCkbxNPIgnoresAirframe_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox ckbox = (CheckBox)sender;
+            if (ckbox != null)
+            {
+                IsNavPtImportIgnoreAirframe = (bool)ckbox.IsChecked;
             }
         }
 

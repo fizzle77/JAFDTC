@@ -44,6 +44,7 @@ https://www.gnu.org/licenses/.
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Margin="0,12,0,0" Orientation="Horizontal"
                     HorizontalAlignment="Center">
@@ -86,24 +87,30 @@ https://www.gnu.org/licenses/.
             </ComboBox>
         </StackPanel>
         <CheckBox Grid.Row="3" Margin="0,8,0,0"
+                  x:Name="uiSetCkbxNPIgnoresAirframe"
+                  HorizontalAlignment="Center"
+                  Click="SetCkbxNPIgnoresAirframe_Click">
+            Navpoint Import Ignores Airframe
+        </CheckBox>
+        <CheckBox Grid.Row="4" Margin="0,0,0,0"
                   x:Name="uiSetCkbxRemainOnTop"
                   HorizontalAlignment="Center"
                   Click="SetCkbxRemainOnTop_Click">
             JAFDTC Window Remains on Top
         </CheckBox>
-        <CheckBox Grid.Row="4" Margin="0,24,0,0"
+        <CheckBox Grid.Row="5" Margin="0,24,0,0"
                   x:Name="uiSetCkbxVersionCheck"
                   HorizontalAlignment="Center"
                   Click="SetCkbxVersionCheck_Click">
             Check for New Versions at Launch
         </CheckBox>
-        <Button Grid.Row="5" Margin="0,24,0,0"
+        <Button Grid.Row="6" Margin="0,24,0,0"
                 x:Name="uiSetBtnInstall"
                 HorizontalAlignment="Stretch"
                 Click="SetBtnInstall_Click">
             Install DCS Lua Support
         </Button>
-        <Button Grid.Row="6" Margin="0,12,0,0"
+        <Button Grid.Row="7" Margin="0,12,0,0"
                 x:Name="uiSetBtnUninstall"
                 HorizontalAlignment="Stretch"
                 Click="SetBtnUninstall_Click">

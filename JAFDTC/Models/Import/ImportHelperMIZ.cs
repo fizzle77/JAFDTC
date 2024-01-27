@@ -79,10 +79,8 @@ namespace JAFDTC.Models.Import
 
         private bool IsMatchingAirframe(string airframe)
         {
-            return Airframe switch
+            return Settings.IsNavPtImportIgnoreAirframe || Airframe switch
             {
-                // TODO: should .None allow any airframe type to match?
-                AirframeTypes.None => false,
                 AirframeTypes.A10C => (airframe == "A-10C_2"),
                 AirframeTypes.AH64D => (airframe == "AH-64D_BLK_II"),
                 AirframeTypes.AV8B => (airframe == "AV8BNA"),

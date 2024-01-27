@@ -73,6 +73,8 @@ namespace JAFDTC.Utilities
 
         public UploadFeedbackTypes UploadFeedback { get; set; }
 
+        public bool IsNavPtImportIgnoreAirframe { get; set; }
+
         public bool IsAlwaysOnTop { get; set; }
 
         public bool IsNewVersCheckDisabled { get; set; }
@@ -110,6 +112,7 @@ namespace JAFDTC.Utilities
             WingName = "";
             Callsign = "";
             UploadFeedback = UploadFeedbackTypes.AUDIO;
+            IsNavPtImportIgnoreAirframe = false;
             IsAlwaysOnTop = false;
             IsNewVersCheckDisabled = false;
 
@@ -249,6 +252,19 @@ namespace JAFDTC.Utilities
                 if (_currentSettings.UploadFeedback != value)
                 {
                     _currentSettings.UploadFeedback = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static bool IsNavPtImportIgnoreAirframe
+        {
+            get => _currentSettings.IsNavPtImportIgnoreAirframe;
+            set
+            {
+                if (_currentSettings.IsNavPtImportIgnoreAirframe != value)
+                {
+                    _currentSettings.IsNavPtImportIgnoreAirframe = value;
                     FileManager.WriteSettings(_currentSettings);
                 }
             }
