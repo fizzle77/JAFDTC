@@ -249,6 +249,7 @@ namespace JAFDTC.UI.Base
             {
                 FileManager.Log($"NavpointUIHdlper:Import exception {ex}");
                 ImportFailDialog(root, what);
+                return false;                                               // exit, import error
             }
             return true;
         }
