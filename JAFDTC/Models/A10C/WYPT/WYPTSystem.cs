@@ -50,15 +50,19 @@ namespace JAFDTC.Models.A10C.WYPT
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public override WaypointInfo NavpointFromInfo(Dictionary<string, string> navptInfo)
+        public override void AddNavpointsFromInfoList(List<Dictionary<string, string>> navptInfoList)
         {
-            return new()
+            foreach (Dictionary<string, string> navptInfo in navptInfoList)
             {
-                Name = (navptInfo.ContainsKey("name")) ? navptInfo["name"] : "",
-                Lat = (navptInfo.ContainsKey("lat")) ? navptInfo["lat"] : "",
-                Lon = (navptInfo.ContainsKey("lon")) ? navptInfo["lon"] : "",
-                Alt = (navptInfo.ContainsKey("alt")) ? navptInfo["alt"] : ""
-            };
+                WaypointInfo wypt = new()
+                {
+                    Name = (navptInfo.ContainsKey("name")) ? navptInfo["name"] : "",
+                    Lat = (navptInfo.ContainsKey("lat")) ? navptInfo["lat"] : "",
+                    Lon = (navptInfo.ContainsKey("lon")) ? navptInfo["lon"] : "",
+                    Alt = (navptInfo.ContainsKey("alt")) ? navptInfo["alt"] : ""
+                };
+                Add(wypt);
+            }
         }
 
         public override WaypointInfo Add(WaypointInfo wypt = null)

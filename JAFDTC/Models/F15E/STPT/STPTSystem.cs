@@ -52,18 +52,22 @@ namespace JAFDTC.Models.F15E.STPT
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public override SteerpointInfo NavpointFromInfo(Dictionary<string, string> navptInfo)
+        public override void AddNavpointsFromInfoList(List<Dictionary<string, string>> navptInfoList)
         {
-            string name = (navptInfo.ContainsKey("name")) ? navptInfo["name"] : "";
-            return new()
+            foreach (Dictionary<string, string> navptInfo in navptInfoList)
             {
-                // TODO: could include TOS too, if available in navptInfo
-                Name = name,
-                Lat = (navptInfo.ContainsKey("lat")) ? navptInfo["lat"] : "",
-                Lon = (navptInfo.ContainsKey("lon")) ? navptInfo["lon"] : "",
-                Alt = (navptInfo.ContainsKey("alt")) ? navptInfo["alt"] : "",
-                IsTarget = name.ToLower().Contains("#t")
-            };
+                string name = (navptInfo.ContainsKey("name")) ? navptInfo["name"] : "";
+                SteerpointInfo stpt = new()
+                {
+                    // TODO: could include TOS too, if available in navptInfo
+                    Name = name,
+                    Lat = (navptInfo.ContainsKey("lat")) ? navptInfo["lat"] : "",
+                    Lon = (navptInfo.ContainsKey("lon")) ? navptInfo["lon"] : "",
+                    Alt = (navptInfo.ContainsKey("alt")) ? navptInfo["alt"] : "",
+                    IsTarget = name.ToLower().Contains("#t")
+                };
+                Add(stpt);
+            }
         }
 
         public override SteerpointInfo Add(SteerpointInfo stpt = null)

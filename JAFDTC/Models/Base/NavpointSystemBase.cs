@@ -115,10 +115,7 @@ namespace JAFDTC.Models.Base
                 {
                     Points.Clear();
                 }
-                foreach (Dictionary<string, string> navptInfo in navptInfoList)
-                {
-                    Add((T)NavpointFromInfo(navptInfo));
-                }
+                AddNavpointsFromInfoList(navptInfoList);
                 return true;
             }
             catch
@@ -143,18 +140,19 @@ namespace JAFDTC.Models.Base
         }
 
         /// <summary>
-        /// return a navpoint set up according to the navpoint info dictionary. the info dictionary provides a
-        /// generic navpoint specification and includes the following key/value pairs:
+        /// add navpoints to the system according to the list of navpoint info dictionaries. the info dictionary
+        /// provides a generic navpoint specification and includes the following key/value pairs:
         ///
         ///   ["name"]      (string) name of navpoint
         ///   ["lat"]       (string) latitude of navpoint, decimal degrees with no units
         ///   ["lon"]       (string) longitude of navpoint, decimal degrees with no units
         ///   ["alt"]       (string) elevation of navpoint, feet
+        ///   ["ton"]       (string) time over navpoint, hh:mm:ss
         /// 
         /// navpoint fields with missing keys are set to "". note that not all fields in a navpoint may be able to
         /// be set with a navpoint info dictionary.
         /// </summary>
-        public abstract T NavpointFromInfo(Dictionary<string, string> navptInfo);
+        public abstract void AddNavpointsFromInfoList(List<Dictionary<string, string>> navptInfoList);
 
         /// <summary>
         /// returns the number of navpoints in the system.
