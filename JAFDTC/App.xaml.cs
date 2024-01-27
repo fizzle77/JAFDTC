@@ -280,11 +280,24 @@ namespace JAFDTC
         /// </summary>
         public void UploadConfigurationToJet(IConfiguration cfg)
         {
-            if (!IsDCSAvailable || (cfg == null) || (cfg.Airframe != DCSActiveAirframe) || !cfg.UploadAgent.Load())
+            string error = null;
+            if (cfg == null)
+            {
+                error = "No Configuration Selected";
+            }
+            else if (!IsDCSAvailable || (cfg.Airframe != DCSActiveAirframe))
+            {
+                error = "DCS or Airframe Unavailable";
+            }
+            else if (!cfg.UploadAgent.Load())
+            {
+                error = "Configuration Upload Failed";
+            }
+            if (error != null)
             {
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
-                    StatusMessageTx.Send("No Configuration Selected");
+                    StatusMessageTx.Send(error);
                     General.PlayAudio("ux_error.wav");
                 });
             }
