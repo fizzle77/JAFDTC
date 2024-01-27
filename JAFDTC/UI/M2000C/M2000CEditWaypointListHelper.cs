@@ -55,7 +55,7 @@ namespace JAFDTC.UI.M2000C
 
         public string NavptListTag => WYPTSystem.WYPTListTag;
 
-        public AirframeTypes AirframeType => AirframeTypes.F14AB;
+        public AirframeTypes AirframeType => AirframeTypes.M2000C;
 
         public string NavptName => "Waypoint";
 
