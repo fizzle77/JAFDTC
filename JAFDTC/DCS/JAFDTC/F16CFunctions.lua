@@ -39,6 +39,35 @@ function JAFDTC_F16CM_CheckCondition_DebugDED()
 	return true
 end
 
+function JAFDTC_F16CM_CheckCondition_CallSignChar1IsNot(letter)
+    local table = JAFDTC_F16CM_GetDED();
+    local value = table["CallSign Name char1_inv"] or "";
+    if value ~= letter or str == "" then
+        return true
+    end
+    return false
+end
+
+function JAFDTC_F16CM_CheckCondition_CallSignChar2IsNot(letter)
+    local table = JAFDTC_F16CM_GetDED();
+	JAFDTC_Log("callsign char 2")
+	JAFDTC_DebugDisplay(table)
+    local value = table["CallSign Name char2_inv"] or "";
+    if value ~= letter or str == "" then
+        return true
+    end
+    return false
+end
+
+function JAFDTC_F16CM_CheckCondition_FlightLead(status)
+    local table = JAFDTC_F16CM_GetDED();
+    local value = table["FL status"] or "";
+    if value == status or str == "" then
+        return true
+    end 
+    return false
+end
+
 function JAFDTC_F16CM_CheckCondition_TDOASet(slot)
 	local table = JAFDTC_F16CM_GetDED()
 	local value = table["STN TDOA value_" .. slot] or ""

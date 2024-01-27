@@ -1,3 +1,22 @@
+// ********************************************************************************************************************
+//
+// F16CEditDLNKPage.cs : ui c# for viper data link editor page
+//
+// Copyright(C) 2023-2024 ilominar/raven
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+// for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.  If not, see
+// <https://www.gnu.org/licenses/>.
+//
+// ********************************************************************************************************************
+
 using JAFDTC.Models;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.DLNK;
@@ -10,7 +29,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -60,6 +78,7 @@ namespace JAFDTC.UI.F16C
         private readonly Dictionary<string, string> _configNameToUID;
         private readonly List<string> _configNameList;
 
+        private readonly Dictionary<string, TextBox> _baseFieldValueMap;
         private readonly List<CheckBox> _tableTDOACkbxList;
         private readonly List<TextBox> _tableTNDLTextList;
         private readonly List<ComboBox> _tableCallsignComboList;
@@ -79,8 +98,9 @@ namespace JAFDTC.UI.F16C
             EditDLNK = new DLNKSystem();
             for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
             {
-                EditDLNK.TeamMembers[i].ErrorsChanged += BaseField_DataValidationError;
+                EditDLNK.TeamMembers[i].ErrorsChanged += TeamField_DataValidationError;
             }
+            EditDLNK.ErrorsChanged += BaseField_DataValidationError;
 
             IsRebuildPending = false;
             IsRebuildingUI = false;
@@ -91,6 +111,12 @@ namespace JAFDTC.UI.F16C
             _configNameToUID = new Dictionary<string, string>();
             _configNameList = new List<string>();
 
+            _baseFieldValueMap = new Dictionary<string, TextBox>()
+            {
+                ["OwnshipCallsign"] = uiOwnTextCallsign,
+                ["OwnshipFENumber"] = uiOwnTextFENum
+                
+            };
             _tableTDOACkbxList = new List<CheckBox>()
             {
                 uiTNDLCkbxTDOA1, uiTNDLCkbxTDOA2, uiTNDLCkbxTDOA3, uiTNDLCkbxTDOA4,
@@ -122,6 +148,8 @@ namespace JAFDTC.UI.F16C
         private void CopyConfigToEdit()
         {
             EditDLNK.Ownship = Config.DLNK.Ownship;
+            EditDLNK.OwnshipCallsign = Config.DLNK.OwnshipCallsign;
+            EditDLNK.OwnshipFENumber = Config.DLNK.OwnshipFENumber;
             EditDLNK.IsOwnshipLead = Config.DLNK.IsOwnshipLead;
             for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
             {
@@ -140,6 +168,12 @@ namespace JAFDTC.UI.F16C
             if (!CurStateHasErrors())
             {
                 Config.DLNK.Ownship = new(EditDLNK.Ownship);
+                //
+                // OwnshipCallsign, OwnshipFENumber fields use text masks and can come back as "--" when empty. this
+                // is really "" and, since that value is OK, remove the error.
+                //
+                Config.DLNK.OwnshipCallsign = (EditDLNK.OwnshipCallsign == "––") ? "" : EditDLNK.OwnshipCallsign;
+                Config.DLNK.OwnshipFENumber = (EditDLNK.OwnshipFENumber == "––") ? "" : EditDLNK.OwnshipFENumber;
                 Config.DLNK.IsOwnshipLead = EditDLNK.IsOwnshipLead;
                 for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
                 {
@@ -172,12 +206,12 @@ namespace JAFDTC.UI.F16C
         }
 
         /// <summary>
-        /// event handler for a validation error. check for errors and update the state of the ui element to
-        /// indicate error state.
+        /// event handler for a validation error. check for errors in the base EditDLNK.TeamMembers fields and update
+        /// the state of the ui element to indicate error state.
         /// 
         /// NOTE: of the properties we bind to the ui, only TeamMember.TNDL fields can raise an error.
         /// </summary>
-        private void BaseField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
+        private void TeamField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
         {
             if (args.PropertyName == null)
             {
@@ -201,6 +235,50 @@ namespace JAFDTC.UI.F16C
         }
 
         /// <summary>
+        /// event handler for a validation error. check for errors in the base EditDLNK fields and update the state of
+        /// the ui element to indicate error state.
+        /// 
+        /// NOTE: of the properties we bind to the ui, only TeamMember.TNDL fields can raise an error.
+        /// </summary>
+        private void BaseField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
+        {
+            if (args.PropertyName == null)
+            {
+                Dictionary<string, bool> map = new();
+                foreach (string error in EditDLNK.GetErrors(null))
+                {
+                    map[error] = true;
+                }
+                foreach (KeyValuePair<string, TextBox> kvp in _baseFieldValueMap)
+                {
+                    SetFieldValidState(kvp.Value, !map.ContainsKey(kvp.Key));
+                }
+            }
+            else if ((args.PropertyName == "OwnshipCallsign") && (EditDLNK.OwnshipCallsign == "––"))
+            {
+                // OwnshipCallsign field uses text mask and can come back as "--" when empty. this is really "" and,
+                // since that value is OK, remove the error.
+                //
+                EditDLNK.ClearErrors("OwnshipCallsign");
+                SetFieldValidState(_baseFieldValueMap[args.PropertyName], true);
+            }
+            else if ((args.PropertyName == "OwnshipFENumber") && (EditDLNK.OwnshipFENumber == "––"))
+            {
+                // OwnshipFENumber field uses text mask and can come back as "--" when empty. this is really "" and,
+                // since that value is OK, remove the error.
+                //
+                EditDLNK.ClearErrors("OwnshipFENumber");
+                SetFieldValidState(_baseFieldValueMap[args.PropertyName], true);
+            }
+            else
+            {
+                SetFieldValidState(_baseFieldValueMap[args.PropertyName],
+                                   (((List<string>)EditDLNK.GetErrors(args.PropertyName)).Count == 0));
+            }
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
         /// returns true if the current state in EditDLNK has errors, false otherwise.
         /// </summary>
         private bool CurStateHasErrors()
@@ -212,7 +290,7 @@ namespace JAFDTC.UI.F16C
                     return true;
                 }
             }
-            return false;
+            return EditDLNK.HasErrors;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -598,6 +676,34 @@ namespace JAFDTC.UI.F16C
                 }
                 CopyEditToConfig(true);
             }
+        }
+
+        /// <summary>
+        /// text box lost focus: copy the local backing values to the configuration (note this is predicated on error
+        /// status) and rebuild the interface state.
+        ///
+        /// NOTE: though the text box has lost focus, the update may not yet have propagated into state. use the
+        /// NOTE: dispatch queue to give in-flight state updates time to complete.
+        /// </summary>
+        private void OwnText_LostFocus(object sender, RoutedEventArgs args)
+        {
+            TextBox textBox = (TextBox)sender;
+            Debug.WriteLine("lost focus");
+            if (((textBox == uiOwnTextCallsign) || (textBox == uiOwnTextFENum)) && (textBox.Text == "––"))
+            {
+                // callsign and flight/element fields uses text mask and can come back as "--" when empty. this
+                // is really "" and, since that value is OK, remove the error. note that as we just lost focus,
+                // the bound property in EditDLNK.OwnshipCallsign or .OwnshipFENumber may not yet be set up.
+                //
+                EditDLNK.ClearErrors((textBox == uiOwnTextCallsign) ? "OwnshipCallsign" : "OwnshipFENumber");
+                SetFieldValidState(textBox, true);
+            }
+
+            // CONSIDER: may be better here to handle this in a property changed handler rather than here?
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+            {
+                CopyEditToConfig(true);
+            });
         }
 
         // ---- member interface elements -----------------------------------------------------------------------------

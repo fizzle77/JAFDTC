@@ -56,7 +56,31 @@ namespace JAFDTC.Models.F16C.Upload
             {
                 AddActions(ufc, new() { "RTN", "RTN", "LIST", "ENTR", "SEQ" });    // dlnk, tndl page
 
-                // TODO: callsign, number, flight lead data on first tndl page
+                AddActions(ufc, new() { "DOWN", "DOWN", "DOWN" });                  // flight/element number
+                if (!string.IsNullOrEmpty(_cfg.DLNK.OwnshipFENumber))
+                {
+                    AddActions(ufc, ActionsForString(_cfg.DLNK.OwnshipFENumber), new() { "ENTR" });
+                }
+                else
+                {
+                    AddAction(ufc, "DOWN");
+                }
+
+                string cs = _cfg.DLNK.OwnshipCallsign;
+                if (!string.IsNullOrEmpty(cs))
+                {
+                    AddWhileBlock("CallSignChar1IsNot", new() { $"{cs[0]}" }, delegate () { AddAction(ufc, "INC"); });
+                    AddAction(ufc, "ENTR");
+                    AddWhileBlock("CallSignChar2IsNot", new() { $"{cs[1]}" }, delegate () { AddAction(ufc, "INC"); });
+                    AddAction(ufc, "ENTR");
+                }
+                else
+                {
+                    AddAction(ufc, "DOWN");
+                }
+
+                string flParam = (_cfg.DLNK.IsOwnshipLead) ? "NO" : "YES";
+                AddIfBlock("FlightLead", new() { flParam }, delegate () { AddAction(ufc, "1"); });
 
                 AddAction(ufc, "SEQ");
 

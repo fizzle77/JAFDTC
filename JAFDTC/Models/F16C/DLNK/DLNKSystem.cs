@@ -2,7 +2,7 @@
 //
 // DLNKSystem.cs -- f-16c datalink system configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -20,11 +20,13 @@
 using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.F16C.DLNK
 {
     /// <summary>
-    /// TODO: document
+    /// class to capture the settings of the DLNK system. most DLNK fields are encoded as strings. a field value of
+    /// "" implies that the field is set to the default value in the avionics.
     /// </summary>
     public class DLNKSystem : BindableObject, ISystem
     {
@@ -36,7 +38,18 @@ namespace JAFDTC.Models.F16C.DLNK
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public string Ownship { get; set; }
+        // ---- private properties, static
+
+        private static readonly Regex _callRegex = new(@"^[a-zA-Z][a-zA-Z]$");
+        private static readonly Regex _numRegex = new(@"^[1-9][1-9]$");
+
+        // ---- public properties
+
+        public string Ownship { get; set; }                     // string, number 1-8
+
+        public TeamMember[] TeamMembers { get; set; }
+
+        // ---- public properties, posts change/validation events
 
         private bool _isOwnshipLead;
         public bool IsOwnshipLead
@@ -45,9 +58,40 @@ namespace JAFDTC.Models.F16C.DLNK
             set => SetProperty(ref _isOwnshipLead, value);
         }
 
-        public TeamMember[] TeamMembers { get; set; }
+        private string _ownshipCallsign;                        // string, two letter [A-Z][A-Z]
+        public string OwnshipCallsign
+        {
+            get => _ownshipCallsign;
+            set
+            {
+                string error = "Invalid callsign format";
+                if (IsRegexFieldValid(value, _callRegex))
+                {
+                    value = value.ToUpper();
+                    error = null;
+                }
+                SetProperty(ref _ownshipCallsign, value, error);
 
-        // ---- following properties are synthesized
+            }
+        }
+
+        private string _ownshipFENumber;                        // string, two digit [1-9][1-9]
+        public string OwnshipFENumber
+        {
+            get => _ownshipFENumber;
+            set
+            {
+                Debug.WriteLine($"set {value}");
+                string error = "Invalid callsign flight number format";
+                if (IsRegexFieldValid(value, _numRegex))
+                {
+                    error = null;
+                }
+                SetProperty(ref _ownshipFENumber, value, error);
+            }
+        }
+
+        // ---- public properties, computed
 
         [JsonIgnore]
         public bool IsDefault
@@ -61,7 +105,11 @@ namespace JAFDTC.Models.F16C.DLNK
                         return false;
                     }
                 }
-                return !IsOwnshipLead;
+                //
+                // NOTE: we don't include IsOwnshipLead here as default will depend on which slot the pilot is
+                // NOTE: sitting in.
+                //
+                return string.IsNullOrEmpty(OwnshipCallsign) && string.IsNullOrEmpty(OwnshipFENumber);
             }
         }
 
@@ -75,6 +123,8 @@ namespace JAFDTC.Models.F16C.DLNK
         {
             Ownship = "";
             IsOwnshipLead = false;
+            OwnshipCallsign = "";
+            OwnshipFENumber = "";
             TeamMembers = new TeamMember[8];
             for (int i = 0; i < TeamMembers.Length; i++)
             {
@@ -86,6 +136,8 @@ namespace JAFDTC.Models.F16C.DLNK
         {
             Ownship = new(other.Ownship);
             IsOwnshipLead = other.IsOwnshipLead;
+            OwnshipCallsign = "";
+            OwnshipFENumber = "";
             TeamMembers = new TeamMember[8];
             for (int i = 0; i < TeamMembers.Length; i++)
             {
@@ -107,6 +159,8 @@ namespace JAFDTC.Models.F16C.DLNK
         {
             Ownship = "";
             IsOwnshipLead = false;
+            OwnshipCallsign = "";
+            OwnshipFENumber = "";
             for (int i = 0; i < TeamMembers.Length; i++)
             {
                 TeamMembers[i].Reset();
