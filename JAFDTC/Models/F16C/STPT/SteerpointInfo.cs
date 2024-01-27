@@ -47,6 +47,9 @@ namespace JAFDTC.Models.F16C.STPT
 
         public SteerpointRefPoint[] OAP { get; set; }
 
+        // for VIP: [0] vip to target, [1] vip to pup
+        // for VRP: [0] target to vrp, [1] target to pup
+        //
         public SteerpointRefPoint[] VxP { get; set; }
 
         // ---- public properties, posts change/validation events
