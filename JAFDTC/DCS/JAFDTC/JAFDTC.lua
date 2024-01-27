@@ -254,6 +254,7 @@ function LuaExportBeforeNextFrame()
         if not cmdCurCort and cmdList then
             if cmdListIndex <= #cmdList then
                 local cmdName = "JAFDTC_Cmd_" .. cmdList[cmdListIndex]["f"]
+                -- JAFDTC_Log(string.format("[%.3f] Create [%d] %s", curTime, cmdListIndex, cmdName))
                 cmdCurCort = coroutine.create(_G[cmdName])
             else
                 cmdList = nil
@@ -263,11 +264,15 @@ function LuaExportBeforeNextFrame()
         if cmdCurCort and coroutine.status(cmdCurCort) == 'suspended' then
             local status, di, dt = coroutine.resume(cmdCurCort, cmdList, cmdListIndex)
             if not status then
-                JAFDTC_Log(string.format("[%.3f] ERROR: Resume cort [%d] failed", curTime, cmdListIndex, curTime))
+                local cmdName = "JAFDTC_Cmd_" .. cmdList[cmdListIndex]["f"]
+                JAFDTC_Log(string.format("[%.3f] ERROR: Resume [%d] %s failed", curTime, cmdListIndex, cmdName, curTime))
+                cmdList = nil
+                cmdCurCort = nil
+            else
+                cmdListIndex = cmdListIndex + di
+                cmdResumeTime = curTime + (dt / 1000.0)
+                cmdCurProgress = (cmdListIndex / #cmdList) * 100
             end
-            cmdListIndex = cmdListIndex + di
-            cmdResumeTime = curTime + (dt / 1000.0)
-            cmdCurProgress = (cmdListIndex / #cmdList) * 100
         elseif cmdCurCort and coroutine.status(cmdCurCort) == 'dead' then
             cmdCurCort = nil
         end
