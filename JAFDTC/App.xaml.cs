@@ -32,6 +32,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+
 using static JAFDTC.Utilities.SettingsData;
 
 namespace JAFDTC
@@ -101,7 +102,7 @@ namespace JAFDTC
 
         private long IncDecPressedTimestamp { get; set; }
 
-        private string CurMarker { get; set; }
+        private long MarkerUpdateTimestamp { get; set; }
 
         // ---- public events, posts change/validation events
 
@@ -228,6 +229,7 @@ namespace JAFDTC
             LastDCSExportPacketCount = 0;
             UploadPressedTimestamp = 0;
             IncDecPressedTimestamp = 0;
+            MarkerUpdateTimestamp = 0;
 
             _dcsToJAFDTCTypeMap = new Dictionary<string, AirframeTypes>()
             {
@@ -318,18 +320,21 @@ namespace JAFDTC
             if (!IsUploadInFlight && !string.IsNullOrEmpty(data.Marker))
             {
                 IsUploadInFlight = true;
-                CurMarker = "";
+                MarkerUpdateTimestamp = 0;
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
                     General.PlayAudio("ux_action.wav");
                 });
             }
-            else if (IsUploadInFlight && !string.IsNullOrEmpty(data.Marker) && (data.Marker != CurMarker))
+            else if (IsUploadInFlight &&
+                     !string.IsNullOrEmpty(data.Marker) &&
+                     (Settings.UploadFeedback == UploadFeedbackTypes.AUDIO_PROGRESS))
             {
-                CurMarker = data.Marker;
-                if (Settings.UploadFeedback == UploadFeedbackTypes.AUDIO_PROGRESS)
+                TimeSpan dt = new(DateTime.Now.Ticks - MarkerUpdateTimestamp);
+                if (dt.TotalMilliseconds > 1000)
                 {
                     StatusMessageTx.Send($"Setup {data.Marker}% Complete");
+                    MarkerUpdateTimestamp = DateTime.Now.Ticks;
                 }
             }
             else if (IsUploadInFlight && string.IsNullOrEmpty(data.Marker))
@@ -372,8 +377,8 @@ namespace JAFDTC
 
                 UploadPressed = data.CmdUpload == "1";
 
-                System.TimeSpan timespan = new(DateTime.Now.Ticks - UploadPressedTimestamp);
-                if ((UploadPressedTimestamp != 0) && UploadPressed && (timespan.TotalMilliseconds > 250))
+                TimeSpan dt = new(DateTime.Now.Ticks - UploadPressedTimestamp);
+                if ((UploadPressedTimestamp != 0) && UploadPressed && (dt.TotalMilliseconds > 250))
                 { 
                     UploadPressedTimestamp = 0;
                     Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>

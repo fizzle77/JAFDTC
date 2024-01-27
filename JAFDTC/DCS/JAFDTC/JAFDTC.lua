@@ -244,6 +244,7 @@ function LuaExportBeforeNextFrame()
     if curTime >= cmdResumeTime then
         if not cmdList then
             local data = JAFDTC_TCPServerSockRx(tcpCmdServerSock)
+            cmdCurProgress = 0
             cmdListIndex = 1
             cmdList = JSON:decode(data)
             if not cmdList and data then
@@ -273,7 +274,7 @@ function LuaExportBeforeNextFrame()
             else
                 cmdListIndex = cmdListIndex + di
                 cmdResumeTime = curTime + (dt / 1000.0)
-                cmdCurProgress = (cmdListIndex / #cmdList) * 100
+                cmdCurProgress = math.max(cmdCurProgress, (cmdListIndex / #cmdList) * 100)
             end
         elseif cmdCurCort and coroutine.status(cmdCurCort) == 'dead' then
             cmdCurCort = nil
