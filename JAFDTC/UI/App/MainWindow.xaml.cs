@@ -92,7 +92,7 @@ namespace JAFDTC.UI.App
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public ConfigurationListPage ConfigListPage => (ConfigurationListPage)uiAppContentFrame.Content;
+        public ConfigurationListPage ConfigListPage { get; private set; }
 
         // ---- internal properties
 
@@ -165,6 +165,7 @@ namespace JAFDTC.UI.App
             if ((Application.Current as JAFDTC.App).IsAppStartupGood)
             {
                 uiAppContentFrame.Navigate(typeof(ConfigurationListPage), null);
+                ConfigListPage = (ConfigurationListPage)uiAppContentFrame.Content;
             }
         }
 
