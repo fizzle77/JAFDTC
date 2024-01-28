@@ -21,6 +21,7 @@ using JAFDTC.Models.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.F15E.STPT
 {
@@ -33,6 +34,16 @@ namespace JAFDTC.Models.F15E.STPT
     {
         public const string SystemTag = "JAFDTC:F15E:STPT";
         public const string STPTListTag = $"{SystemTag}:LIST";
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // properties
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        // ---- private properties, static
+
+        private static readonly Regex _hashRefPtRegex = new(@"#\.([1-7])");
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -54,19 +65,40 @@ namespace JAFDTC.Models.F15E.STPT
 
         public override void AddNavpointsFromInfoList(List<Dictionary<string, string>> navptInfoList)
         {
+            // TODO: handle route
+            // TODO: handle nav table ref points per razbam
+            SteerpointInfo stptCur = null;
             foreach (Dictionary<string, string> navptInfo in navptInfoList)
             {
-                string name = (navptInfo.ContainsKey("name")) ? navptInfo["name"] : "";
                 SteerpointInfo stpt = new()
                 {
-                    // TODO: could include TOS too, if available in navptInfo
-                    Name = name,
+                    Name = (navptInfo.ContainsKey("name")) ? navptInfo["name"] : "",
                     Lat = (navptInfo.ContainsKey("lat")) ? navptInfo["lat"] : "",
                     Lon = (navptInfo.ContainsKey("lon")) ? navptInfo["lon"] : "",
                     Alt = (navptInfo.ContainsKey("alt")) ? navptInfo["alt"] : "",
-                    IsTarget = name.ToLower().Contains("#t")
+                    TOT = (navptInfo.ContainsKey("ton")) ? navptInfo["ton"] : "",
                 };
-                Add(stpt);
+                string name = stpt.Name.ToUpper();
+
+                stpt.IsTarget = (name.Contains("#T"));
+                if (stpt.IsTarget)
+                {
+                    stpt.Name = stpt.Name.Replace("#T", "").Replace("#t", "");
+                }
+                Match match = _hashRefPtRegex.Match(name);
+                if ((stptCur != null) && (match.Groups.Count >= 2))
+                {
+                    RefPointInfo rfpt = new(int.Parse(match.Groups[1].Value));
+                    rfpt.Lat = stpt.Lat;
+                    rfpt.Lon = stpt.Lon;
+                    rfpt.Alt = stpt.Alt;
+                    stptCur.RefPoints.Add(rfpt);
+                }
+                else if (!name.Contains("#"))
+                {
+                    Add(stpt);
+                    stptCur = stpt;
+                }
             }
         }
 
