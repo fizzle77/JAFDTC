@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// Command.cs -- aircraft command
+// Command.cs -- airframe device action
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
 // Copyright(C) 2023-2024 ilominar/raven
