@@ -147,7 +147,8 @@ namespace JAFDTC.Models.F16C.STPT
                     TOS = (navptInfo.ContainsKey("ton")) ? navptInfo["ton"] : ""
                 };
                 string name = stpt.Name.ToUpper();
-                if (name.Contains("#OAP.1") || name.Contains("#OAP.2"))
+
+                if ((stptCur != null) && (name.Contains("#OAP.1") || name.Contains("#OAP.2")))
                 {
                     int index = (name.Contains("#OAP.1")) ? 0 : 1;
                     stptCur.OAP[index].Type = RefPointTypes.OAP;
@@ -155,7 +156,7 @@ namespace JAFDTC.Models.F16C.STPT
                     stptCur.OAP[index].Brng = StptBearing(stptCur, stpt);
                     stptCur.OAP[index].Elev = stpt.Alt;
                 }
-                else if (name.Contains("#VIP.V2T") || name.Contains("#VIP.V2P"))
+                else if ((stptCur != null) && (name.Contains("#VIP.V2T") || name.Contains("#VIP.V2P")))
                 {
                     if ((stptVIP == null) || (stptVIP == stptCur))
                     {
@@ -167,7 +168,7 @@ namespace JAFDTC.Models.F16C.STPT
                         stptVIP = stptCur;
                     }
                 }
-                else if (name.Contains("#VRP.T2V") || name.Contains("#VRP.T2P"))
+                else if ((stptCur != null) && (name.Contains("#VRP.T2V") || name.Contains("#VRP.T2P")))
                 {
                     if ((stptVRP == null) || (stptVRP == stptCur))
                     {
