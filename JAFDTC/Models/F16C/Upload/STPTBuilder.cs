@@ -219,7 +219,7 @@ namespace JAFDTC.Models.F16C.Upload
         private void BuildVRPDetail(AirframeDevice ufc, string stptNum, string range, string brng, string elev)
         {
             AddAction(ufc, "DOWN");
-            AddActions(ufc, PredActionsForNumAndEnter(stptNum), new() { "ENTR", "DOWN" });
+            AddActions(ufc, PredActionsForNumAndEnter(stptNum), new() { "DOWN" });
             AddActions(ufc, PredActionsForNumAndEnter(brng, false, true), new() { "DOWN" });
             AddActions(ufc, PredActionsForNumAndEnter(range, false, true), new() { "DOWN" });
             AddActions(ufc, PredActionsForNumAndEnter(elev, true, true), new() { "DOWN" });
