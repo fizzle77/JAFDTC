@@ -316,7 +316,7 @@ https://www.gnu.org/licenses/.
                     </TextBlock>
                     <TextBlock Grid.Row="0" Grid.Column="3"
                                Style="{StaticResource TableHeaderTextStyle}">
-                        Bearing (° True)
+                        Bearing (° Magnetic)
                     </TextBlock>
                     <TextBlock Grid.Row="0" Grid.Column="4"
                                Style="{StaticResource TableHeaderTextStyle}">
