@@ -1,6 +1,6 @@
 # JAFDTC: User's Guide
 
-*Version 1.0.0-B.20 of 26-Jan-24*
+*Version 1.0.0-B.21 of 28-Jan-24*
 
 _Just Another #%*@^!% DTC_ (JAFDTC) is a Windows application that allows you to upload data
 typically saved on a data cartridge, such as steerpoints/waypoints and other avionics setup,

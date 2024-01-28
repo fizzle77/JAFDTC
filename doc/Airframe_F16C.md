@@ -1,6 +1,6 @@
 # JAFDTC: F-16C Viper Configurations
 
-*Version 1.0.0-B.20 of 26-Jan-24*
+*Version 1.0.0-B.21 of 28-Jan-24*
 
 JAFDTC supports configuration of the following systems in the Viper,
 
@@ -140,7 +140,8 @@ The datalink system editor page looks like this (from Raven's perspective),
 ![](images/Viper_Sys_DLNK_Top.png)
 
 The top-most section of the page allows you to select the table entry for your ownship, your
-callsign, and whether or not you are a flight lead. As we shall discuss shortly, JAFDTC will
+callsign, and whether or not you are a flight lead. The default callsign of dashes indicates
+JAFDTC will not change the callsign set up in the jet. As we shall discuss shortly, JAFDTC will
 automatically set the ownship table entry when it can determine which entry corresponds to the
 ownship. The common controls implement the link and reset functionality described
 [earlier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#common-editor-controls).
@@ -357,8 +358,7 @@ common controls implement the link and reset functionality described
 
 The steerpoint configuration allows you to update the navigation system on the Viper. This
 configuration includes steerpoints as well as OAP, VIP, and VRP points relative to a
-steerpoint.
-This editor extends the interface of the common navigation system editor the
+steerpoint. This editor extends the interface of the common navigation system editor the
 [user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#navigation-system-editors)
 describes.
 
@@ -426,19 +426,33 @@ support.
 JAFDTC looks for steerpoints that include a hashtag (that is, "`#`" followed by text) in their
 name to set up reference points,
 
-| Hashtag    |Purpose|
-|:----------:|:------|
-| `#OAP.1`   | Offset Aim Point #1 |
-| `#OAP.2`   | Offset Aim Point #2 |
-| `#VIP.V2T` | VIP Reference Point, VIP to Target |
-| `#VIP.V2P` | VIP Reference Point, VIP to PUP |
-| `#VRP.T2V` | VRP Reference Point, Target to VRP |
-| `#VRP.T2P` | VRP Reference Point, Target to PUP |
+| Hashtag            |Purpose|
+|:------------------:|:------|
+| `#OAP.1,Mag=<var>` | Offset Aim Point #1, magnetic variance is `<var>` |
+| `#OAP.2,Mag=<var>` | Offset Aim Point #2, magnetic variance is `<var>` |
+| `#VIP.V2T`         | VIP Reference Point, VIP to Target |
+| `#VIP.V2P`         | VIP Reference Point, VIP to PUP |
+| `#VRP.T2V`         | VRP Reference Point, Target to VRP |
+| `#VRP.T2P`         | VRP Reference Point, Target to PUP |
+
+Steerpoints whose name contains an unknown hashtag are always ignored.
+
+As the Viper specifies OAP using a magnetic bearing, the hashtag needs to provide the correct
+variance as a signed decimal numnber, for example "6.7" for a 6.7° variance. The DCS Mission
+Editor displays the current variance of the location under the mouse along the bottom of the
+screen next to the lat/lon and altitude. Here, the variance at N 36° 24' 48.49",
+W 117° 14' 22.06" is 12.4°. A steerpoint for an OAP at that location would be tagged with
+`#OAP.1,Mag=12.4`, for example.
+
+![](images/Viper_ME_MagVar.png)
 
 When JAFDTC encounters a steerpoint with one of these tags, it will compute the range, bearing,
 and elevation between the steerpoint and the most recent untagged steerpoint.
 
-> The conversion from latitude and longitude to range and bearing are approximate.
+> The conversion from latitude and longitude to range and bearing are approximate. These are
+> limited by the resolution of the range and bearing in the reference points as well as the
+> conversion from lat/lon to range/bearing and, for OAP, the accuracy of the magnetic
+> variation.
 
 For example, assume you have a `.miz` file with a Viper flight `VENOM1` with the following
 steerpoints,
@@ -447,25 +461,25 @@ steerpoints,
 |:-:|:--------:|------|
 | 1 |    P1    | `Ingress` |
 | 2 |    P2    | `Target_1` |
-| 3 |    P3    | `Target_1#OAP.1` |
+| 3 |    P3    | `Target_1#OAP.1,Mag=6.7` |
 | 4 |    P4    | `Enroute` |
 | 5 |    P5    | `Target_2` |
 | 6 |    P6    | `Target_2#VIP.V2T` |
 | 7 |    P7    | `Target_2#VIP.V2P` |
-| 8 |    P8    | `Target_2#OAP.1` |
+| 8 |    P8    | `Target_2#OAP.1,Mag=6.7` |
 | 9 |    P9    | `Homeplate` |
 
 In this table, each steerpoint has a number, a position (latitude, longitude, and elevation),
-and a name set through the appropriate fields in the DCS Mission Editor. Importing the
-steerpoints for `VENOM1` steerpoints and reference points being set up in the navigation
-system,
+and a name set through the appropriate fields in, for example, the DCS Mission Editor.
+Importing the steerpoints for `VENOM1` leads to the following steerpoints and reference
+points being set up in the navigation system,
 
-| # | Position | Name | OAP 1 | VIP |
-|:-:|:--------:|:----:|:-----:|:---:|
-| 1 |    P1    | `Ingress` | &ndash; | &ndash;
-| 2 |    P2    | `Target_1` | From P2 to P3 | &ndash;
-| 3 |    P4    | `Enroute` | &ndash; | &ndash;
-| 4 |    P5    | `Target_2` | From P5 to P8 | *VIP to Target* : From P5 to P6<br>*VIP to PUP* : From P5 to P7
+| # | Position | Name       | OAP 1 | VIP |
+|:-:|:--------:|:----------:|:-----:|:---:|
+| 1 |    P1    | `Ingress`  | &ndash; | &ndash;
+| 2 |    P2    | `Target_1` | From P2 to P3, Variance +6.7° | &ndash;
+| 3 |    P4    | `Enroute`  | &ndash; | &ndash;
+| 4 |    P5    | `Target_2` | From P5 to P8, Variance +6.7° | *VIP to Target* : From P5 to P6<br>*VIP to PUP* : From P5 to P7
 | 5 |    P9    | `Homeplate` | &ndash; | &ndash;
 
 For brevity, this table does not include OAP 2 and VRP as neither of those points are set in

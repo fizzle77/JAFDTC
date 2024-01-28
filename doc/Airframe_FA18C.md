@@ -1,6 +1,6 @@
 # JAFDTC: F/A-18C Hornet Configurations
 
-*Version 1.0.0-B.20 of 26-Jan-24*
+*Version 1.0.0-B.21 of 28-Jan-24*
 
 JAFDTC supports configuration of the following systems in the Hornet,
 
