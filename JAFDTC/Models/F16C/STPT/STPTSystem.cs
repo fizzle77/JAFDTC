@@ -194,7 +194,7 @@ namespace JAFDTC.Models.F16C.STPT
                         stptVRP = stptCur;
                     }
                 }
-                else
+                else if (!name.Contains("#"))
                 {
                     Add(stpt);
                     stptCur = stpt;
