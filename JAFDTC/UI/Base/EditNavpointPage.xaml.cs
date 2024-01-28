@@ -526,7 +526,7 @@ namespace JAFDTC.UI.Base
             string theater = null;
             if ((PageHelper.NavpointCount(Config) > 0) && EditNavpt.IsValid)
             {
-                theater = PointOfInterestDbase.TheaterForCoords(double.Parse(EditNavpt.Lat), double.Parse(EditNavpt.Lon));
+                theater = PointOfInterestDbase.TheaterForCoords(EditNavpt.Lat, EditNavpt.Lon);
             }
             theater = (string.IsNullOrEmpty(theater)) ? CurPoITheaters[0] : theater;
             uiPoIComboTheater.SelectedItem = theater;

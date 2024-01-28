@@ -787,8 +787,7 @@ namespace JAFDTC.UI.F15E
             string theater = null;
             if ((Config.STPT.Points.Count > 0) && Config.STPT.Points[0].IsValid)
             {
-                theater = PointOfInterestDbase.TheaterForCoords(double.Parse(Config.STPT.Points[0].Lat),
-                                                                double.Parse(Config.STPT.Points[0].Lon));
+                theater = PointOfInterestDbase.TheaterForCoords(Config.STPT.Points[0].Lat, Config.STPT.Points[0].Lon);
             }
             theater = (string.IsNullOrEmpty(theater)) ? CurPoITheaters[0] : theater;
             uiPoIComboTheater.SelectedItem = theater;

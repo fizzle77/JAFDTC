@@ -124,6 +124,13 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
+        /// return the name of the dcs theater that contains the given coordinate, null if no theater matches the
+        /// coordinates. the match is based on approximate lat/lon bounds of the theaters.
+        /// </summary>
+        public static string TheaterForCoords(string lat, string lon)
+            => TheaterForCoords(double.Parse(lat), double.Parse(lon));
+
+        /// <summary>
         /// return a list of strings for all of the theaters represented in the database.
         /// 
         /// TODO: consider allowing user-defined theaters.
