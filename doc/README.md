@@ -451,6 +451,7 @@ contains a list of navigation points known to the system. From this page, you ca
 that allow you to edit the properties of a single navigation point. 
 
 ### Navigation Point List
+
 The first level of the interface presents a list of known navigation points. Generally, this
 is the
 [system editor](#system-editor)

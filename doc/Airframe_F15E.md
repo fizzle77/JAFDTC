@@ -2,11 +2,11 @@
 
 *Version 1.0.0-B.20 of 26-Jan-24*
 
-JAFDTC supports the following configuration in the Strike Eagle,
+JAFDTC supports configuration of the following systems in the Strike Eagle,
 
-- COM1/COM2 radio presets and initial configuration
-- Steerpoints system including routes, target points, and reference points
+- Communications
 - Miscellaneous systems such as TACAN, ILS, BINGO, and altitude warning
+- Steerpoints including routes, target points, and reference points
 
 Each of these areas is covered in more depth below. See the
 [user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
@@ -22,7 +22,7 @@ Priort to uploading, you should ensure the relevant systems are powered up and f
 Typically, uploads should occur as one of the last steps prior to taxi once you have systems
 powered up, stores loaded, and so on.
 
-## COM1/COM2: Radios
+## Communications
 
 TODO
 
@@ -34,6 +34,6 @@ TODO
 
 TODO
 
-# DCS Cockpit Interactions
+# DCS Cockpit Integration
 
-TODO
+The Mudhen does not map any cockpit controls to JAFDTC functions.

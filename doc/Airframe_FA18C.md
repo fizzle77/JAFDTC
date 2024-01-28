@@ -2,11 +2,11 @@
 
 *Version 1.0.0-B.20 of 26-Jan-24*
 
-JAFDTC supports the following configuration in the Hornet,
+JAFDTC supports configuration of the following systems in the Hornet,
 
-* CMS countermeasures system
-* WYPT waypoint system
-* COM1/COM2 radio presets and initial configuration
+* Communications
+* Countermeasures
+* Waypoints
 
 Each of these areas is covered in more depth below. See the
 [user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
@@ -23,18 +23,18 @@ Priort to uploading, you should ensure the relevant systems are powered up and f
 Typically, uploads should occur as one of the last steps prior to taxi once you have systems
 powered up, stores loaded, and so on.
 
-## Countermeasures (CMS)
+## Communications
 
 TODO
 
-## Waypoints (WYPT)
+## Countermeasures
 
 TODO
 
-## COM1/COM2: Radios
+## Waypoints
 
 TODO
 
-# DCS Cockpit Interactions
+# DCS Cockpit Integration
 
-TODO
+The Hornet does not map any cockpit controls to JAFDTC functions.

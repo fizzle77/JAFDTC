@@ -2,17 +2,17 @@
 
 *Version 1.0.0-B.20 of 26-Jan-24*
 
-JAFDTC supports the following configuration in the Viper,
+JAFDTC supports configuration of the following systems in the Viper,
 
-* CMDS countermeasures sytem
-* DLNK datalink system
+* Communications
+* Countermeasures
+* Datalink
 * HARM ALIC threat tables
 * HARM HTS manual threat table and sensor threat classes
 * MFD formats across all master modes and initial format selections
 * Miscellaneous DED systems such as TACAN/ILS, ALOW, BNGO, BULL, LASR, and HMCS DED/UFC
   along with HMCS intensity
-* COM1/COM2 radio presets and initial configuration
-* STPT steerpoint system including OAP, VIP, and VRP reference points
+* Steerpoints including OAP, VIP, and VRP reference points
 
 Each of these areas is covered in more depth below. See the
 [user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
@@ -24,39 +24,60 @@ for more on the aspects of JAFDTC that are common to multiple airframes.
 
 The Viper allows the user to operate JAFDTC from buttons in the cockpit without needing to go
 through the Windows UI. This is helpful for VR and other situations where you may not be able
-to interact with the window. To support this capabilty, JAFDTC reuses controls from the FLIR
-panel on the UFC that have no function in the the Block 50 Viper that DCS models,
+to interact with the JAFDTC window. To support this capabilty, JAFDTC reuses controls from
+the FLIR panel on the UFC that have no function in the the Block 50 Viper that DCS models,
 
 ![](images/Viper_UFC_JAFDTC.png)
 
 JAFDTC currently supports four functions from the Viper cockpit,
 
-* Pressing and holding the FLIR `WX` button for about 0.25s causes JAFDTC to load the
-  currently selected configuration into the jet if it is compatible. JAFDTC provides audio
-  feedback for the start (single beep), end (two beeps), and status (error buzz) of this
-  operation.
-* Pressing the FLIR rocker switch moves changes the currently selected configuration. JAFDTC
-  briefly displays the name of the selected configuration in DCS as you step through the
-  configurations.
-* Setting the 3-position FLIR `GAIN/LVL/AUTO` switch to `GAIN` will keep the JAFDTC window
-  on top of the DCS window in the window stack, regardless of the "on top" setting.
-* Steeting the 3-position FLIR `GAIN/LVL/AUTO` switch to `LVL` will allow the JAFDTC window
-  to be below the DCS window in the window stack, regardless of the "on top" setting.
+* Pressing and briefly holding the **FLIR WX** button causes JAFDTC to load the currently
+  selected configuration into the jet. JAFDTC provides feedback during the upload according
+  to the **Upload Feedback**
+  [setting](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#settings).
+* Pressing the **FLIR Rocker Switch** moves changes the currently selected configuration. On
+  the first press, JAFDTC briefly displays the name of the currently selected configuration.
+  Subsequent presses step through the configuration list.
+* Setting the 3-position **FLIR GAIN/LVL/AUTO** switch to `GAIN` will keep the JAFDTC window
+  on top of the DCS window in the window stack.
+* Steeting the 3-position **FLIR GAIN/LVL/AUTO** switch to `LVL` will allow the JAFDTC window
+  to be below the DCS window in the window stack.
 
 Other functions may be implemented later.
 
 # Configurable Systems on the Viper
 
-A Viper configuration supports settings spanning eight different systems as described below.
-Each of these systems implements the link and reset functionality mentioned in the overview
-of the
+A Viper configuration supports settings spanning eight systems as described below. All systems
+implement the link and reset functionality mentioned in the overview of the
 [system editor page](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#system-editor-page).
 
 Priort to uploading, you should ensure the relevant systems are powered up and functional.
 Typically, uploads should occur as one of the last steps prior to taxi once you have systems
 powered up, stores loaded, and so on.
 
-## CMDS: Countermeasures
+## Communications
+
+The communications configuration allow you to update the presets and initial configuration of
+the COM1/COM1 radios in the Viper. This configuration includes the presets as well as the
+initial radio frequency and guard monitor.
+This editor extends the interface of the common communication system editor the
+[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#communications-system-editors)
+describes.
+
+![](images/Viper_Sys_COMM.png)
+
+The Viper editor includes additional controls btween the preset list and common editor controls.
+Below the preset list is a field to set the initial frequency or preset to select after
+uploading the configuration to the jet. The background of this field will turn red if the
+value is invalid.
+
+> Note that unless there is an initial frequency or preset specified, JAFDTC will not change
+> the frequency tuned on a radio from the default frequency.
+
+Also, the COM1 (UHF) radio can be set to monitor guard through the "monitor guard" checkbox on
+the right under the preset list.
+
+## Countermeasures
 
 The countermeasures system manages parameters set through the CMDS DED page. These parameters
 control the operation of the countermeasures and allow you to setup different programs for the
@@ -95,7 +116,7 @@ Below the programming table is a graphical representation of the countermeasure 
 shows the timing of the flare and chaff releases on a common timeline. Gold circles represent
 flares while teal diamonds represent chaff.
 
-## DLNK: Datalink
+## Datalink
 
 The datalink system manages parameters set through the DED DLNK page. These parameters control
 operation of the datalink system and allow you to assign aircraft to your "team" for the
@@ -204,8 +225,8 @@ that will let you specify a file to save the exported information to.
 ## HARM ALIC
 
 The HARM ALIC system manages parameters set through the HARM DED page. These parameters
-control the progarmming of the three ALIC tables that specify the threats the AGM-88
-HARM can target.
+control the progarmming of the three ALIC tables that specify the threats (i.e., radar
+emitters) an AGM-88 HARM can target.
 
 ![](images/Viper_Sys_ALIC.png)
 
@@ -221,9 +242,18 @@ the table select menu indicates the table has been changed from default values. 
 and downward-pointing chevrons to the right of the table selection menu step through the
 tables.
 
-### Table Programming
+### ALIC Table Programming
 
-Each ALIC table has five entries T1 through T5 that identify an emitter the HARM can target.
+Each ALIC table has five entries, T1 through T5, that identify an emitter the HARM can target.
+The columns in this table identify the information in each ALIC table entry,
+
+- **Entry** &ndash; Entry number for the table.
+- **Edit** &ndash; A blue dot in this column indicates that the entry has been changed from
+  its default vaule.
+- **Code** &ndash; An editable field for the ALIC code of the emitter to set the entry to.
+- **RWR** &ndash; RWR symbology for the emitter.
+- **Country**, **Type**, **Description** &ndash; Information on the emitter.
+
 You can change the targeted emitter by entering the appropirate code in the edit field. A
 blue dot to the left of the field indicates the table entry has changed form the default.
 Codes can be found in DCS documentation. In addition, clicking the emitter button on the
@@ -237,7 +267,47 @@ Clearing the code field in an entry will also reset that specific entry to its d
 
 ## HARM HTS
 
-TODO
+The HTS system for the Viper includes threat tables that serves a similar function to the
+[HARM ALIC](#harm-alic)
+table. It defines which emitters the HTS can recognize and target. The HTS system includes
+several pre-defined, fixed, tables and a manual table, MAN, that can be set by the pilot to
+tailor known threats.
+
+![](images/Viper_Sys_HTS.png)
+
+The structure of this editor is similar to the
+[HARM ALIC](#harm-alic).
+
+### HTS MAN Table Programming
+
+The HTS MAN table has eight entries that occupy the bulk of the page. Each row corresponds
+to an entry that can specify a known emitter and operates exactly as the ALIC table entries
+in the
+[HARM ALIC](#alic-table-programming)
+table. See the
+[earlier discussion](#harm-alic)
+for further details.
+
+The *Select Threat Classes* button opens up a page that lists the HTS threat tables and
+allows you to select which tables are active.
+
+### Selecting Active Threat Classes
+
+The HTS system supports 12 threat tables, 11 fixed and one MAN table that can be programmed.
+The *Select Threat Classes* button allows you to specify which tables are active in the HTS
+(the HTS will scan for emitters in the active tables). Active tables are selected with the
+following page,
+
+![](images/Viper_Sys_HTS_Threat.png)
+
+To enable or disable a table, click on the checkbox in the corresponding row. Generally,
+scan time increases with the number of tables selected so it is desirable to limit the
+number of active tables.
+
+The active tables are only set on the jet if you have the HTS format selected for one of
+your MFDs (see
+[MFD Formats](#mfd-formats)
+below).
 
 ## MFD Formats
 
@@ -259,9 +329,9 @@ initially-selected OSB for the MFD.
 
 For example, in the screen shot above, the right MFD is set up as follows:
 
-* OSB 14: SMS format, this OSB is selected initially
-* OSB 13: HSD format
-* OSB 12: TGP format
+* **OSB 14** &ndash; SMS format, this OSB is selected initially
+* **OSB 13** &ndash; HSD format
+* **OSB 12** &ndash; TGP format
 
 To change the initially selected format, simply click the OSB button below the formats for a
 display. You can change the format by clicking on the format menu above the particular OSB
@@ -283,30 +353,124 @@ The Symbology Intensity control will set the intensity knob to control the HMCS 
 common controls implement the link and reset functionality described
 [earlier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#common-editor-controls).
 
-## COM1/COM2: Radios
+## Steerpoints
 
-The communications configuration allow you to update the presets and initial configuration of
-the COM1/COM1 radios in the Viper. This configuration includes the presets as well as the
-initial radio frequency and guard monitor.
+The steerpoint configuration allows you to update the navigation system on the Viper. This
+configuration includes steerpoints as well as OAP, VIP, and VRP points relative to a
+steerpoint.
+This editor extends the interface of the common navigation system editor the
+[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#navigation-system-editors)
+describes.
 
-![](images/Viper_Sys_COMM.png)
+### Steerpoint List User Interface
 
-This editor follows the common communication systems editor the
-[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#communications-system-editors) the link and reset functionality described in
-the
-[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#common-editor-controls).
+The *Steerpoint List* editor lists the steerpoints currently known to the configuration.
+This editor extends the interface of the common *Navigation Point List* the
+[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#navigation-point-list)
+describes.
 
-The Viper editor includes additional controls btween the preset list and common editor controls.
-Below the preset list is a field to set the initial frequency or preset to select after
-uploading the configuration to the jet. The background of this field will turn red if the
-value is invalid.
+![](images/Viper_Sys_STPT_List.png)
 
-> Note that unless there is an initial frequency or preset specified, JAFDTC will not change
-> the frequency tuned on a radio from the default frequency.
+In addition to the steerpoint number, name, and position, the Viper steerpoint list includes two
+additional columns,
 
-Also, the COM1 (UHF) radio can be set to monitor guard through the "monitor guard" checkbox on
-the right under the preset list.
+- **TOS** &ndash; Lists the *Time Over Steerpoint* set for the associated steerpoint. This is a
+  local time in `HH:MM:SS` format.
+- **Refs** &ndash; Identifies any reference points associated with the steerpoint. Reference
+  points are identified by an icon,
+    - **Triangle** &ndash; Offset Aim Point (OAP), there may be up to two OAPs defined for each
+      steerpoint.
+    - **Circle** &ndash; Visual Initial Point (VIP), there may be at most one VIP defined
+      across all steerpoints.
+    - **Square** &ndash; Visual Reference Point (VRP), there may be at most one VIP defined
+      across all steerpoints.
 
-## STPT: Steerpoints
+Aside from the changes the the steerpoint list, the Viper steerpoint list otherwise operates
+the same as the common navigation point list.
 
-TODO
+### Steerpoint Editor User Interface
+
+The *Steerpoint* editor edits a steerpoint currently known to the configuration along with any
+associated referenced points. This editor extends the interface of the common
+*Navigation Point Editor* the
+[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#navigation-point-editor)
+describes.
+
+![](images/Viper_Sys_STPT.png)
+
+The Viper steerpoint editor adds several controls to the common editor,
+
+- **TOS** &ndash; Sets the time on steerpoint for the steerpoint.
+- **OAP Configuration** &ndash; Configures the two OAP reference points that can be associated
+  with the steerpoint.
+- **VxP Configuration** &ndash; Configures the VIP or VRP reference point that can be
+  associated with the steerpoint.
+
+The reference points are set up with a range, bearing, and elevation. To enable a particular
+refernece point, use the combo box at the left edge of the section to select an OAP, VIP,
+VRP, or no point.
+
+The remainder of the page, including the Steerpoint Initial Setup and Steerpoint Information
+operates as in the common navigation point editor.
+
+### Importing
+
+When importing steerpoints from `.miz` or `.cf` files, JAFDTC can set up offset, VIP, and VRP
+reference points based on the steerpoint names provided by the file. This allows imports to
+include information that the source tool (DCS Mission Editor, CombatFlite) may not directly
+support.
+
+> When importing from `.json`, these reference points are automatically handled without
+> requring any specific naming conventions.
+
+JAFDTC looks for steerpoints that include a hashtag (that is, "`#`" followed by text) in their
+name to set up reference points,
+
+| Hashtag    |Purpose|
+|:----------:|:------|
+| `#OAP.1`   | Offset Aim Point #1 |
+| `#OAP.2`   | Offset Aim Point #2 |
+| `#VIP.V2T` | VIP Reference Point, VIP to Target |
+| `#VIP.V2P` | VIP Reference Point, VIP to PUP |
+| `#VRP.T2V` | VRP Reference Point, Target to VRP |
+| `#VRP.T2P` | VRP Reference Point, Target to PUP |
+
+When JAFDTC encounters a steerpoint with one of these tags, it will compute the range, bearing,
+and elevation between the steerpoint and the most recent untagged steerpoint.
+
+> The conversion from latitude and longitude to range and bearing are approximate.
+
+For example, assume you have a `.miz` file with a Viper flight `VENOM1` with the following
+steerpoints,
+
+| # | Position | Name |
+|:-:|:--------:|------|
+| 1 |    P1    | `Ingress` |
+| 2 |    P2    | `Target_1` |
+| 3 |    P3    | `Target_1#OAP.1` |
+| 4 |    P4    | `Enroute` |
+| 5 |    P5    | `Target_2` |
+| 6 |    P6    | `Target_2#VIP.V2T` |
+| 7 |    P7    | `Target_2#VIP.V2P` |
+| 8 |    P8    | `Target_2#OAP.1` |
+| 9 |    P9    | `Homeplate` |
+
+In this table, each steerpoint has a number, a position (latitude, longitude, and elevation),
+and a name set through the appropriate fields in the DCS Mission Editor. Importing the
+steerpoints for `VENOM1` steerpoints and reference points being set up in the navigation
+system,
+
+| # | Position | Name | OAP 1 | VIP |
+|:-:|:--------:|:----:|:-----:|:---:|
+| 1 |    P1    | `Ingress` | &ndash; | &ndash;
+| 2 |    P2    | `Target_1` | From P2 to P3 | &ndash;
+| 3 |    P4    | `Enroute` | &ndash; | &ndash;
+| 4 |    P5    | `Target_2` | From P5 to P8 | *VIP to Target* : From P5 to P6<br>*VIP to PUP* : From P5 to P7
+| 5 |    P9    | `Homeplate` | &ndash; | &ndash;
+
+For brevity, this table does not include OAP 2 and VRP as neither of those points are set in
+this example. To set up the reference points, JAFDTC computes the range, bearing, and elevation
+changes between the relevant steerpoint positions. For example, the `Target_1` OAP is computed
+from position P2 (`Target_1`) to position P3 (`Target_1#OAP.1`). Hashtags always reference back
+to the most recent steerpoint without a hashtag. That is, 3 references 2, while 6, 7, and 8
+refernece 5.
