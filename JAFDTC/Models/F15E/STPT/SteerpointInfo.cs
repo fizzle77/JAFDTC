@@ -144,7 +144,7 @@ namespace JAFDTC.Models.F15E.STPT
             get => _tot;
             set
             {
-                string error = (string.IsNullOrEmpty(value)) ? null : "Invalid TOS format";
+                string error = (string.IsNullOrEmpty(value)) ? null : "Invalid TOT format";
                 if (IsRegexFieldValid(value, _totRegex))
                 {
                     error = null;
