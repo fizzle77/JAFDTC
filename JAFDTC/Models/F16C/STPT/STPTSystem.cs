@@ -25,6 +25,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.F16C.STPT
 {
@@ -48,6 +49,16 @@ namespace JAFDTC.Models.F16C.STPT
         private const double FT_TO_NM = 0.00016458;
 
         private const double R_EARTH = 6375585.50700497;                // nominal radius in m, from DCS larger sm axis
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // properties
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        // ---- private properties, static
+
+        private static readonly Regex _hashMagRegex = new(@"#OAP\.[12],MAG=([0-9]+[\.]{0,1}[0-9]*)");
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -99,7 +110,7 @@ namespace JAFDTC.Models.F16C.STPT
         /// 
         /// NOTE: this computation is not exact as it assumes a perfect sphere while dcs doesn't.
         /// </summary>
-        private string StptBearing(SteerpointInfo stptA, SteerpointInfo stptB)
+        private string StptBearing(SteerpointInfo stptA, SteerpointInfo stptB, double magVar)
         {
             double latA = double.Parse(stptA.Lat) * DEG_TO_RAD;
             double lonA = double.Parse(stptA.Lon) * DEG_TO_RAD;
@@ -110,7 +121,7 @@ namespace JAFDTC.Models.F16C.STPT
 
             double theta = Math.Atan2(Math.Sin(dLon) * Math.Cos(latB),
                                       Math.Cos(latA) * Math.Sin(latB) - Math.Sin(latA) * Math.Cos(latB) * Math.Cos(dLon));
-            double deg = ((theta * RAD_TO_DEG) + 360.0) % 360.0;
+            double deg = ((theta * RAD_TO_DEG) - magVar + 360.0) % 360.0;
 
             return $"{deg:F1}";
         }
@@ -151,9 +162,12 @@ namespace JAFDTC.Models.F16C.STPT
                 if ((stptCur != null) && (name.Contains("#OAP.1") || name.Contains("#OAP.2")))
                 {
                     int index = (name.Contains("#OAP.1")) ? 0 : 1;
+                    Match match = _hashMagRegex.Match(name);
+                    double magVar = (match.Groups.Count >= 2) ? double.Parse(match.Groups[1].Value) : 0.0;
+
                     stptCur.OAP[index].Type = RefPointTypes.OAP;
                     stptCur.OAP[index].Range = StptRange(stptCur, stpt, true);
-                    stptCur.OAP[index].Brng = StptBearing(stptCur, stpt);
+                    stptCur.OAP[index].Brng = StptBearing(stptCur, stpt, magVar);
                     stptCur.OAP[index].Elev = stpt.Alt;
                 }
                 else if ((stptCur != null) && (name.Contains("#VIP.V2T") || name.Contains("#VIP.V2P")))
@@ -163,7 +177,7 @@ namespace JAFDTC.Models.F16C.STPT
                         int index = (name.Contains("#VIP.V2T")) ? 0 : 1;
                         stptCur.VxP[index].Type = RefPointTypes.VIP;
                         stptCur.VxP[index].Range = StptRange(stptCur, stpt, true);
-                        stptCur.VxP[index].Brng = StptBearing(stptCur, stpt);
+                        stptCur.VxP[index].Brng = StptBearing(stptCur, stpt, 0.0);
                         stptCur.VxP[index].Elev = StptDeltaElev(stptCur, stpt);
                         stptVIP = stptCur;
                     }
@@ -175,7 +189,7 @@ namespace JAFDTC.Models.F16C.STPT
                         int index = (name.Contains("#VRP.T2V")) ? 0 : 1;
                         stptCur.VxP[index].Type = RefPointTypes.VRP;
                         stptCur.VxP[index].Range = StptRange(stptCur, stpt, false);
-                        stptCur.VxP[index].Brng = StptBearing(stptCur, stpt);
+                        stptCur.VxP[index].Brng = StptBearing(stptCur, stpt, 0.0);
                         stptCur.VxP[index].Elev = StptDeltaElev(stptCur, stpt);
                         stptVRP = stptCur;
                     }
