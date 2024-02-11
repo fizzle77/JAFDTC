@@ -223,7 +223,7 @@ https://www.gnu.org/licenses/.
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Margin="0,0,6,0"
                                   FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
-                        <TextBlock VerticalAlignment="center">Reset System to Defaults</TextBlock>
+                        <TextBlock VerticalAlignment="center">Reset Page to Defaults</TextBlock>
                     </StackPanel>
                 </Button>
             </StackPanel>

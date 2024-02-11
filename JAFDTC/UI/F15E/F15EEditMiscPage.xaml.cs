@@ -289,8 +289,8 @@ namespace JAFDTC.UI.F15E
         {
             ContentDialogResult result = await Utilities.Message2BDialog(
                 Content.XamlRoot,
-                "Reset System Configruation?",
-                "Are you sure you want to reset the entire miscellaneous configuration to avionics defaults? This action cannot be undone.",
+                "Reset Configruation?",
+                "Are you sure you want to reset the miscellaneous system configurations to avionics defaults? This action cannot be undone.",
                 "Reset"
             );
             if (result == ContentDialogResult.Primary)

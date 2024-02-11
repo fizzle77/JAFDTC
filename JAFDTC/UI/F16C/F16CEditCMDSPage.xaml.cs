@@ -457,8 +457,8 @@ namespace JAFDTC.UI.F16C
         {
             ContentDialogResult result = await Utilities.Message2BDialog(
                 Content.XamlRoot,
-                "Reset System Configruation?",
-                "Are you sure you want to reset the entire CMDS configuration to avionics defaults? This action cannot be undone.",
+                "Reset Configruation?",
+                "Are you sure you want to reset the CMDS configurations to avionics defaults? This action cannot be undone.",
                 "Reset"
             );
             if (result == ContentDialogResult.Primary)

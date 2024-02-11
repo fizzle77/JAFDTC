@@ -217,7 +217,7 @@ namespace JAFDTC.UI.App
             {
                 ContentDialogResult result = await Utilities.Message2BDialog(
                     Content.XamlRoot,
-                    "Reset System Configruation?",
+                    "Reset Configruation?",
                     "Are you sure you want to reset this to avionics defaults? This action cannot be undone.",
                     "Reset"
                 );
