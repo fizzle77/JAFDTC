@@ -371,8 +371,9 @@ namespace JAFDTC.UI.F16C
             {
                 return false;
             }
-            List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(PointOfInterestDbase.TheaterForCoords(lat, lon),
-                                                                            PointOfInterestMask.ANY, EditStpt.Name);
+            string theater = PointOfInterestDbase.TheaterForCoords(lat, lon);
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, EditStpt.Name);
+            List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
             foreach (PointOfInterest poi in pois)
             {
                 if (poi.Type != PointOfInterestType.USER)
@@ -621,8 +622,8 @@ namespace JAFDTC.UI.F16C
                 double.TryParse(EditStpt.Lat, out double lat) && double.TryParse(EditStpt.Lon, out double lon))
             {
                 string theater = PointOfInterestDbase.TheaterForCoords(lat, lon);
-                List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.USER,
-                                                                                EditStpt.Name);
+                PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, EditStpt.Name);
+                List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
                 if (pois.Count > 0)
                 {
                     ContentDialogResult result = await Utilities.Message2BDialog(
@@ -643,7 +644,7 @@ namespace JAFDTC.UI.F16C
                 else
                 {
                     PointOfInterest poi = new(PointOfInterestType.USER,
-                                              theater, EditStpt.Name, EditStpt.Lat, EditStpt.Lon, EditStpt.Alt);
+                                              theater, EditStpt.Name, "", EditStpt.Lat, EditStpt.Lon, EditStpt.Alt);
                     PointOfInterestDbase.Instance.Add(poi);
                     RebuildPointsOfInterest();
                     RebuildInterfaceState();

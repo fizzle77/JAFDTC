@@ -52,7 +52,8 @@ namespace JAFDTC.UI.Base
         /// </summary>
         public static PointOfInterest FindMatchingPoI(string theater, INavpointInfo navpt, LLFormat fmt)
         {
-            List<PointOfInterest> selPoI = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.ANY, navpt.Name);
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, navpt.Name);
+            List<PointOfInterest> selPoI = PointOfInterestDbase.Instance.Find(query);
             if ((selPoI.Count == 1) &&
                 (Coord.ConvertFromLatDD(selPoI[0].Latitude, fmt) == navpt.LatUI) &&
                 (Coord.ConvertFromLonDD(selPoI[0].Longitude, fmt) == navpt.LonUI) &&
@@ -69,9 +70,12 @@ namespace JAFDTC.UI.Base
         /// </summary>
         public static void RebuildPoICombo(string theater, ComboBoxSeparated comboBox)
         {
-            List<PointOfInterest> dcsPoIs = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.DCS_AIRBASE);
+            PointOfInterestDbQuery dcsQuery = new(PointOfInterestTypeMask.DCS_CORE, theater);
+            List<PointOfInterest> dcsPoIs = PointOfInterestDbase.Instance.Find(dcsQuery);
             dcsPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
-            List<PointOfInterest> usrPoIs = PointOfInterestDbase.Instance.Find(theater, PointOfInterestMask.USER);
+
+            PointOfInterestDbQuery usrQuery = new(PointOfInterestTypeMask.USER, theater);
+            List<PointOfInterest> usrPoIs = PointOfInterestDbase.Instance.Find(usrQuery);
             usrPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
 
             comboBox.Items.Clear();

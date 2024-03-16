@@ -3,6 +3,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Anapa-Vityazevo",
+    "Tags": "Airbase",
     "Latitude": "45.00493333",
     "Longitude": "37.34781667",
     "Elevation": "141"
@@ -11,6 +12,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Batumi",
+    "Tags": "Airbase",
     "Latitude": "41.60958333",
     "Longitude": "41.60023333",
     "Elevation": "33"
@@ -19,6 +21,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Beslan",
+    "Tags": "Airbase",
     "Latitude": "43.20570000",
     "Longitude": "44.60580000",
     "Elevation": "1722"
@@ -27,6 +30,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Gelendzhik",
+    "Tags": "Airbase",
     "Latitude": "44.57290000",
     "Longitude": "38.01160000",
     "Elevation": "72"
@@ -35,6 +39,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Gudauta",
+    "Tags": "Airbase",
     "Latitude": "43.11431667",
     "Longitude": "40.56973333",
     "Elevation": "69"
@@ -43,6 +48,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Kobuleti",
+    "Tags": "Airbase",
     "Latitude": "41.92991667",
     "Longitude": "41.86326667",
     "Elevation": "59"
@@ -51,6 +57,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Krasnodar-Center",
+    "Tags": "Airbase",
     "Latitude": "45.08693333",
     "Longitude": "38.93998333",
     "Elevation": "98"
@@ -59,6 +66,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Krasnodar-Pashkovsky",
+    "Tags": "Airbase",
     "Latitude": "45.03800000",
     "Longitude": "39.18813333",
     "Elevation": "112"
@@ -67,6 +75,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Krymsk",
+    "Tags": "Airbase",
     "Latitude": "44.96793333",
     "Longitude": "37.99501667",
     "Elevation": "66"
@@ -75,6 +84,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Kutaisi",
+    "Tags": "Airbase",
     "Latitude": "42.17760000",
     "Longitude": "42.48128333",
     "Elevation": "148"
@@ -83,6 +93,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Maykop-Khanskaya",
+    "Tags": "Airbase",
     "Latitude": "44.68128333",
     "Longitude": "40.03525000",
     "Elevation": "591"
@@ -91,6 +102,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Mineralnye Vody",
+    "Tags": "Airbase",
     "Latitude": "44.22785000",
     "Longitude": "43.08118333",
     "Elevation": "1050"
@@ -99,6 +111,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Mozdok",
+    "Tags": "Airbase",
     "Latitude": "43.79170000",
     "Longitude": "44.60583333",
     "Elevation": "507"
@@ -107,6 +120,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Nalchik",
+    "Tags": "Airbase",
     "Latitude": "43.51400000",
     "Longitude": "43.63645000",
     "Elevation": "1411"
@@ -115,6 +129,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Novorossiysk",
+    "Tags": "Airbase",
     "Latitude": "44.66808333",
     "Longitude": "37.77825000",
     "Elevation": "131"
@@ -123,6 +138,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Senaki-Kolkhi",
+    "Tags": "Airbase",
     "Latitude": "42.24083333",
     "Longitude": "42.04800000",
     "Elevation": "43"
@@ -131,6 +147,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Sochi-Adler",
+    "Tags": "Airbase",
     "Latitude": "43.44435000",
     "Longitude": "39.94106667",
     "Elevation": "98"
@@ -139,6 +156,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Soganlug",
+    "Tags": "Airbase",
     "Latitude": "41.64953333",
     "Longitude": "44.93835000",
     "Elevation": "1483"
@@ -147,6 +165,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Sukhumi-Babushara",
+    "Tags": "Airbase",
     "Latitude": "42.86108333",
     "Longitude": "41.12498333",
     "Elevation": "43"
@@ -155,6 +174,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Tbilisi-Lochini",
+    "Tags": "Airbase",
     "Latitude": "41.66703333",
     "Longitude": "44.95628333",
     "Elevation": "1574"
@@ -163,6 +183,7 @@
     "Type": 0,
     "Theater": "Caucasus",
     "Name": "Vaziani",
+    "Tags": "Airbase",
     "Latitude": "41.62901667",
     "Longitude": "45.02721667",
     "Elevation": "1524"
@@ -171,6 +192,7 @@
     "Type": 0,
     "Theater": "Marianas",
     "Name": "Rota Intl",
+    "Tags": "Airbase",
     "Latitude": "14.17436667",
     "Longitude": "145.24108333",
     "Elevation": "569"
@@ -179,6 +201,7 @@
     "Type": 0,
     "Theater": "Marianas",
     "Name": "Saipan Intl",
+    "Tags": "Airbase",
     "Latitude": "15.11891667",
     "Longitude": "145.72911667",
     "Elevation": "213"
@@ -187,6 +210,7 @@
     "Type": 0,
     "Theater": "Marianas",
     "Name": "Tinian Intl",
+    "Tags": "Airbase",
     "Latitude": "14.99918333",
     "Longitude": "145.61916667",
     "Elevation": "260"
@@ -195,6 +219,7 @@
     "Type": 0,
     "Theater": "Marianas",
     "Name": "Antonio B. Won Pat Intl",
+    "Tags": "Airbase",
     "Latitude": "13.48476667",
     "Longitude": "144.79681667",
     "Elevation": "255"
@@ -203,6 +228,7 @@
     "Type": 0,
     "Theater": "Marianas",
     "Name": "Andersen AFB",
+    "Tags": "Airbase",
     "Latitude": "13.58170000",
     "Longitude": "144.93105000",
     "Elevation": "545"
@@ -211,6 +237,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Beatty",
+    "Tags": "Airbase",
     "Latitude": "36.86100000",
     "Longitude": "-116.78641667",
     "Elevation": "3148"
@@ -219,6 +246,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Boulder City",
+    "Tags": "Airbase",
     "Latitude": "35.94866667",
     "Longitude": "-114.86181667",
     "Elevation": "2163"
@@ -227,6 +255,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Creech",
+    "Tags": "Airbase",
     "Latitude": "36.58381667",
     "Longitude": "-115.67643333",
     "Elevation": "3126"
@@ -235,6 +264,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Echo Bay",
+    "Tags": "Airbase",
     "Latitude": "36.31105000",
     "Longitude": "-114.46388333",
     "Elevation": "1526"
@@ -243,6 +273,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Groom Lake",
+    "Tags": "Airbase",
     "Latitude": "37.23316667",
     "Longitude": "-115.79233333",
     "Elevation": "4475"
@@ -251,6 +282,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Henderson Executive",
+    "Tags": "Airbase",
     "Latitude": "35.97398333",
     "Longitude": "-115.13305000",
     "Elevation": "2487"
@@ -259,6 +291,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Jean",
+    "Tags": "Airbase",
     "Latitude": "35.76918333",
     "Longitude": "-115.32956667",
     "Elevation": "2824"
@@ -267,6 +300,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Laughlin",
+    "Tags": "Airbase",
     "Latitude": "35.15610000",
     "Longitude": "-114.55945000",
     "Elevation": "656"
@@ -275,6 +309,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Lincoln County",
+    "Tags": "Airbase",
     "Latitude": "37.78735000",
     "Longitude": "-114.41990000",
     "Elevation": "4815"
@@ -283,6 +318,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "McCarran International",
+    "Tags": "Airbase",
     "Latitude": "36.07640000",
     "Longitude": "-115.14461667",
     "Elevation": "2104"
@@ -291,6 +327,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Mesquite",
+    "Tags": "Airbase",
     "Latitude": "36.83311667",
     "Longitude": "-114.05590000",
     "Elevation": "1859"
@@ -299,6 +336,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Mina",
+    "Tags": "Airbase",
     "Latitude": "38.37978333",
     "Longitude": "-118.09666667",
     "Elevation": "4559"
@@ -307,6 +345,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Nellis",
+    "Tags": "Airbase",
     "Latitude": "36.23521667",
     "Longitude": "-115.03300000",
     "Elevation": "1843"
@@ -315,6 +354,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "North Las Vegas",
+    "Tags": "Airbase",
     "Latitude": "36.21346667",
     "Longitude": "-115.19476667",
     "Elevation": "2229"
@@ -323,6 +363,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Pahute Mesa",
+    "Tags": "Airbase",
     "Latitude": "37.10198333",
     "Longitude": "-116.31283333",
     "Elevation": "5058"
@@ -331,6 +372,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Tonopah",
+    "Tags": "Airbase",
     "Latitude": "38.06241667",
     "Longitude": "-117.08328333",
     "Elevation": "5391"
@@ -339,6 +381,7 @@
     "Type": 0,
     "Theater": "Nevada",
     "Name": "Tonopah Test Range",
+    "Tags": "Airbase",
     "Latitude": "37.79886667",
     "Longitude": "-116.78078333",
     "Elevation": "5534"
@@ -347,6 +390,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Abu Dhabi Intl",
+    "Tags": "Airbase",
     "Latitude": "24.45370000",
     "Longitude": "54.65426667",
     "Elevation": "92"
@@ -355,6 +399,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Abu Musa Island",
+    "Tags": "Airbase",
     "Latitude": "25.87598333",
     "Longitude": "55.03291667",
     "Elevation": "16"
@@ -363,6 +408,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Al Ain Intl",
+    "Tags": "Airbase",
     "Latitude": "24.26141667",
     "Longitude": "55.60923333",
     "Elevation": "814"
@@ -371,6 +417,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Al Dhafra AFB",
+    "Tags": "Airbase",
     "Latitude": "24.24828333",
     "Longitude": "54.54768333",
     "Elevation": "52"
@@ -379,6 +426,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Al Maktoum Intl",
+    "Tags": "Airbase",
     "Latitude": "24.89705000",
     "Longitude": "55.16023333",
     "Elevation": "123"
@@ -387,6 +435,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Al Minhad AFB",
+    "Tags": "Airbase",
     "Latitude": "25.02686667",
     "Longitude": "55.36575000",
     "Elevation": "180"
@@ -395,6 +444,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Al-Bateen",
+    "Tags": "Airbase",
     "Latitude": "24.42806667",
     "Longitude": "54.45856667",
     "Elevation": "12"
@@ -403,6 +453,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Bandar Abbas Intl",
+    "Tags": "Airbase",
     "Latitude": "27.21768333",
     "Longitude": "56.37895000",
     "Elevation": "17"
@@ -411,6 +462,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Bandar Lengeh",
+    "Tags": "Airbase",
     "Latitude": "26.53225000",
     "Longitude": "54.82466667",
     "Elevation": "76"
@@ -419,6 +471,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Bandar-e-Jask",
+    "Tags": "Airbase",
     "Latitude": "25.65466667",
     "Longitude": "57.80143333",
     "Elevation": "26"
@@ -427,6 +480,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Dubai Intl",
+    "Tags": "Airbase",
     "Latitude": "25.25636667",
     "Longitude": "55.36525000",
     "Elevation": "16"
@@ -435,6 +489,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Fujairah Intl",
+    "Tags": "Airbase",
     "Latitude": "25.11093333",
     "Longitude": "56.32735000",
     "Elevation": "102"
@@ -443,6 +498,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Havadarya",
+    "Tags": "Airbase",
     "Latitude": "27.15821667",
     "Longitude": "56.17201667",
     "Elevation": "51"
@@ -451,6 +507,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Jiroft",
+    "Tags": "Airbase",
     "Latitude": "28.72351667",
     "Longitude": "57.67508333",
     "Elevation": "2664"
@@ -459,6 +516,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Kerman",
+    "Tags": "Airbase",
     "Latitude": "30.27310000",
     "Longitude": "56.95155000",
     "Elevation": "5746"
@@ -467,6 +525,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Khasab",
+    "Tags": "Airbase",
     "Latitude": "26.16981667",
     "Longitude": "56.24016667",
     "Elevation": "74"
@@ -475,6 +534,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Kish Intl",
+    "Tags": "Airbase",
     "Latitude": "26.52813333",
     "Longitude": "53.98103333",
     "Elevation": "115"
@@ -483,6 +543,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Lar",
+    "Tags": "Airbase",
     "Latitude": "27.67471667",
     "Longitude": "54.38313333",
     "Elevation": "2636"
@@ -491,6 +552,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Lavan Island",
+    "Tags": "Airbase",
     "Latitude": "26.81110000",
     "Longitude": "53.35328333",
     "Elevation": "75"
@@ -499,6 +561,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Liwa AFB",
+    "Tags": "Airbase",
     "Latitude": "23.65076667",
     "Longitude": "53.82441667",
     "Elevation": "400"
@@ -507,6 +570,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Qeshm Island",
+    "Tags": "Airbase",
     "Latitude": "26.75466667",
     "Longitude": "55.90238333",
     "Elevation": "17"
@@ -515,6 +579,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Ras Al Khaimah Intl",
+    "Tags": "Airbase",
     "Latitude": "25.61348333",
     "Longitude": "55.93878333",
     "Elevation": "71"
@@ -523,6 +588,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Sas Al Nakheel",
+    "Tags": "Airbase",
     "Latitude": "24.44110000",
     "Longitude": "54.51701667",
     "Elevation": "10"
@@ -531,6 +597,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Sharjah Intl",
+    "Tags": "Airbase",
     "Latitude": "25.33066667",
     "Longitude": "55.51825000",
     "Elevation": "98"
@@ -539,6 +606,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Shiraz Intl",
+    "Tags": "Airbase",
     "Latitude": "29.54090000",
     "Longitude": "52.59106667",
     "Elevation": "4879"
@@ -547,6 +615,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Sir Abu Nuayr",
+    "Tags": "Airbase",
     "Latitude": "25.21686667",
     "Longitude": "54.23363333",
     "Elevation": "25"
@@ -555,6 +624,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Sirri Island",
+    "Tags": "Airbase",
     "Latitude": "25.90960000",
     "Longitude": "54.53925000",
     "Elevation": "14"
@@ -563,6 +633,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Tunb Island AFB",
+    "Tags": "Airbase",
     "Latitude": "26.25888333",
     "Longitude": "55.31576667",
     "Elevation": "43"
@@ -571,6 +642,7 @@
     "Type": 0,
     "Theater": "Persian Gulf",
     "Name": "Tunb Kochak",
+    "Tags": "Airbase",
     "Latitude": "26.24331667",
     "Longitude": "55.14556667",
     "Elevation": "16"
@@ -579,6 +651,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Aerodromo De Tolhuin",
+    "Tags": "Airbase",
     "Latitude": "-54.49960000",
     "Longitude": "-67.17238333",
     "Elevation": "355"
@@ -587,6 +660,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Aerodromo O\u0027Higgins",
+    "Tags": "Airbase",
     "Latitude": "-48.46900000",
     "Longitude": "-72.56331667",
     "Elevation": "888"
@@ -595,6 +669,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Aeropuerto de Gobernador Gregores",
+    "Tags": "Airbase",
     "Latitude": "-48.78316667",
     "Longitude": "-70.14796667",
     "Elevation": "1168"
@@ -603,6 +678,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Almirante Schroeders",
+    "Tags": "Airbase",
     "Latitude": "-53.61306667",
     "Longitude": "-70.47521667",
     "Elevation": "161"
@@ -611,6 +687,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "CaletaTortel",
+    "Tags": "Airbase",
     "Latitude": "-47.78703333",
     "Longitude": "-73.53130000",
     "Elevation": "3"
@@ -619,6 +696,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Comandante Luis Piedrabuena",
+    "Tags": "Airbase",
     "Latitude": "-49.99498333",
     "Longitude": "-68.95143333",
     "Elevation": "70"
@@ -627,6 +705,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "El Calafate",
+    "Tags": "Airbase",
     "Latitude": "-50.28023333",
     "Longitude": "-72.05273333",
     "Elevation": "661"
@@ -635,6 +714,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Franco Bianco",
+    "Tags": "Airbase",
     "Latitude": "-52.73658333",
     "Longitude": "-69.33378333",
     "Elevation": "105"
@@ -643,6 +723,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Mount Pleasant",
+    "Tags": "Airbase",
     "Latitude": "-51.82066667",
     "Longitude": "-58.45773333",
     "Elevation": "243"
@@ -651,6 +732,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Pampa Guanaco",
+    "Tags": "Airbase",
     "Latitude": "-54.04996667",
     "Longitude": "-68.80898333",
     "Elevation": "520"
@@ -659,6 +741,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Port Stanley",
+    "Tags": "Airbase",
     "Latitude": "-51.68590000",
     "Longitude": "-57.77783333",
     "Elevation": "67"
@@ -667,6 +750,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Porvenir Airfield",
+    "Tags": "Airbase",
     "Latitude": "-53.25368333",
     "Longitude": "-70.31930000",
     "Elevation": "94"
@@ -675,6 +759,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Puerto Natales",
+    "Tags": "Airbase",
     "Latitude": "-51.67070000",
     "Longitude": "-72.52818333",
     "Elevation": "217"
@@ -683,6 +768,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Puerto Santa Cruz",
+    "Tags": "Airbase",
     "Latitude": "-50.01701667",
     "Longitude": "-68.57906667",
     "Elevation": "364"
@@ -691,6 +777,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Puerto Williams",
+    "Tags": "Airbase",
     "Latitude": "-54.93098333",
     "Longitude": "-67.62621667",
     "Elevation": "65"
@@ -699,6 +786,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Punta Arenas",
+    "Tags": "Airbase",
     "Latitude": "-53.00553333",
     "Longitude": "-70.85691667",
     "Elevation": "125"
@@ -707,6 +795,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Rio Gallegos",
+    "Tags": "Airbase",
     "Latitude": "-51.60885000",
     "Longitude": "-69.31225000",
     "Elevation": "51"
@@ -715,6 +804,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Rio Grande",
+    "Tags": "Airbase",
     "Latitude": "-53.77758333",
     "Longitude": "-67.74986667",
     "Elevation": "61"
@@ -723,6 +813,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Rio Turbio",
+    "Tags": "Airbase",
     "Latitude": "-51.60505000",
     "Longitude": "-72.21981667",
     "Elevation": "896"
@@ -731,6 +822,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "San Julian",
+    "Tags": "Airbase",
     "Latitude": "-49.30668333",
     "Longitude": "-67.80271667",
     "Elevation": "144"
@@ -739,6 +831,7 @@
     "Type": 0,
     "Theater": "South Atlantic",
     "Name": "Ushuaia",
+    "Tags": "Airbase",
     "Latitude": "-54.84330000",
     "Longitude": "-68.29583333",
     "Elevation": "61"
@@ -747,6 +840,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Abu Rudeis",
+    "Tags": "Airbase",
     "Latitude": "28.89953333",
     "Longitude": "33.20233333",
     "Elevation": "3"
@@ -755,6 +849,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Abu Suwayr",
+    "Tags": "Airbase",
     "Latitude": "30.57538333",
     "Longitude": "32.09626667",
     "Elevation": "18"
@@ -763,6 +858,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Al Ismailiyah",
+    "Tags": "Airbase",
     "Latitude": "30.59880000",
     "Longitude": "32.23456667",
     "Elevation": "6"
@@ -771,6 +867,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Al Mansurah",
+    "Tags": "Airbase",
     "Latitude": "30.96520000",
     "Longitude": "31.43150000",
     "Elevation": "7"
@@ -779,6 +876,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "As Salihiyah",
+    "Tags": "Airbase",
     "Latitude": "30.79510000",
     "Longitude": "32.04253333",
     "Elevation": "7"
@@ -787,6 +885,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "AzZaqaziq",
+    "Tags": "Airbase",
     "Latitude": "30.59481667",
     "Longitude": "31.66456667",
     "Elevation": "7"
@@ -795,6 +894,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Baluza",
+    "Tags": "Airbase",
     "Latitude": "30.99976667",
     "Longitude": "32.55221667",
     "Elevation": "118"
@@ -803,6 +903,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Ben-Gurion",
+    "Tags": "Airbase",
     "Latitude": "32.00701667",
     "Longitude": "34.89310000",
     "Elevation": "99"
@@ -811,6 +912,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Bilbeis Air Base",
+    "Tags": "Airbase",
     "Latitude": "30.39866667",
     "Longitude": "31.60726667",
     "Elevation": "92"
@@ -819,6 +921,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Bir Hasanah",
+    "Tags": "Airbase",
     "Latitude": "30.19463333",
     "Longitude": "33.41281667",
     "Elevation": "1225"
@@ -827,6 +930,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Cairo International Airport",
+    "Tags": "Airbase",
     "Latitude": "30.10898333",
     "Longitude": "31.43481667",
     "Elevation": "394"
@@ -835,6 +939,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Cairo West",
+    "Tags": "Airbase",
     "Latitude": "30.10836667",
     "Longitude": "30.89565000",
     "Elevation": "440"
@@ -843,6 +948,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Difarsuwar Airfield",
+    "Tags": "Airbase",
     "Latitude": "30.42573333",
     "Longitude": "32.33538333",
     "Elevation": "7"
@@ -851,6 +957,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "El Arish",
+    "Tags": "Airbase",
     "Latitude": "31.03786667",
     "Longitude": "33.81908333",
     "Elevation": "311"
@@ -859,6 +966,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "El Gora",
+    "Tags": "Airbase",
     "Latitude": "31.07300000",
     "Longitude": "34.14835000",
     "Elevation": "423"
@@ -867,6 +975,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Fayed",
+    "Tags": "Airbase",
     "Latitude": "30.32906667",
     "Longitude": "32.26748333",
     "Elevation": "21"
@@ -875,6 +984,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Hatzerim",
+    "Tags": "Airbase",
     "Latitude": "31.23860000",
     "Longitude": "34.65850000",
     "Elevation": "674"
@@ -883,6 +993,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Hatzor",
+    "Tags": "Airbase",
     "Latitude": "31.76046667",
     "Longitude": "34.72531667",
     "Elevation": "100"
@@ -891,6 +1002,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Inshas Airbase",
+    "Tags": "Airbase",
     "Latitude": "30.32985000",
     "Longitude": "31.44778333",
     "Elevation": "155"
@@ -899,6 +1011,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Kedem",
+    "Tags": "Airbase",
     "Latitude": "31.26060000",
     "Longitude": "34.63993333",
     "Elevation": "598"
@@ -907,6 +1020,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Kibrit Air Base",
+    "Tags": "Airbase",
     "Latitude": "30.24353333",
     "Longitude": "32.49116667",
     "Elevation": "7"
@@ -915,6 +1029,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Melez",
+    "Tags": "Airbase",
     "Latitude": "30.40991667",
     "Longitude": "33.14973333",
     "Elevation": "999"
@@ -923,6 +1038,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Nevatim",
+    "Tags": "Airbase",
     "Latitude": "31.20833333",
     "Longitude": "35.01208333",
     "Elevation": "1313"
@@ -931,6 +1047,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Ovda",
+    "Tags": "Airbase",
     "Latitude": "29.94081667",
     "Longitude": "34.93411667",
     "Elevation": "1403"
@@ -939,6 +1056,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Palmahim",
+    "Tags": "Airbase",
     "Latitude": "31.90178333",
     "Longitude": "34.69288333",
     "Elevation": "33"
@@ -947,6 +1065,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Ramon Airbase",
+    "Tags": "Airbase",
     "Latitude": "30.77756667",
     "Longitude": "34.66613333",
     "Elevation": "2024"
@@ -955,6 +1074,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Sde Dov",
+    "Tags": "Airbase",
     "Latitude": "32.11466667",
     "Longitude": "34.78226667",
     "Elevation": "20"
@@ -963,6 +1083,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "St Catherine",
+    "Tags": "Airbase",
     "Latitude": "28.68515000",
     "Longitude": "34.06261667",
     "Elevation": "4256"
@@ -971,6 +1092,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Tel Nof",
+    "Tags": "Airbase",
     "Latitude": "31.83601667",
     "Longitude": "34.81781667",
     "Elevation": "142"
@@ -979,6 +1101,7 @@
     "Type": 0,
     "Theater": "Sinai",
     "Name": "Wadi al Jandali",
+    "Tags": "Airbase",
     "Latitude": "30.07255000",
     "Longitude": "31.83328333",
     "Elevation": "740"
@@ -987,6 +1110,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Abu Al-Duhur",
+    "Tags": "Airbase",
     "Latitude": "35.73230000",
     "Longitude": "37.10411667",
     "Elevation": "820"
@@ -995,6 +1119,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Adana Sakirpasa",
+    "Tags": "Airbase",
     "Latitude": "36.98188333",
     "Longitude": "35.28000000",
     "Elevation": "55"
@@ -1003,6 +1128,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Akrotiri",
+    "Tags": "Airbase",
     "Latitude": "34.59036667",
     "Longitude": "32.98776667",
     "Elevation": "62"
@@ -1011,6 +1137,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Al Qusayr",
+    "Tags": "Airbase",
     "Latitude": "34.56926667",
     "Longitude": "36.57145000",
     "Elevation": "1729"
@@ -1019,6 +1146,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Al-Dumayr",
+    "Tags": "Airbase",
     "Latitude": "33.60970000",
     "Longitude": "36.74915000",
     "Elevation": "2066"
@@ -1027,6 +1155,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Aleppo",
+    "Tags": "Airbase",
     "Latitude": "36.18061667",
     "Longitude": "37.22436667",
     "Elevation": "1253"
@@ -1035,6 +1164,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "An Nasiriyah",
+    "Tags": "Airbase",
     "Latitude": "33.91860000",
     "Longitude": "36.86583333",
     "Elevation": "2731"
@@ -1043,6 +1173,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Bassel Al-Assad",
+    "Tags": "Airbase",
     "Latitude": "35.40166667",
     "Longitude": "35.95038333",
     "Elevation": "93"
@@ -1051,6 +1182,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Beirut-Rafic Hariri",
+    "Tags": "Airbase",
     "Latitude": "33.82726667",
     "Longitude": "35.48768333",
     "Elevation": "39"
@@ -1059,6 +1191,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Damascus",
+    "Tags": "Airbase",
     "Latitude": "33.42550000",
     "Longitude": "36.51850000",
     "Elevation": "2007"
@@ -1067,6 +1200,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Deir ez-Zor",
+    "Tags": "Airbase",
     "Latitude": "35.28541667",
     "Longitude": "40.17605000",
     "Elevation": "671"
@@ -1075,6 +1209,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Ercan",
+    "Tags": "Airbase",
     "Latitude": "35.15513333",
     "Longitude": "33.50168333",
     "Elevation": "311"
@@ -1083,6 +1218,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Eyn Shemer",
+    "Tags": "Airbase",
     "Latitude": "32.44085000",
     "Longitude": "35.00756667",
     "Elevation": "93"
@@ -1091,6 +1227,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Gaziantep",
+    "Tags": "Airbase",
     "Latitude": "36.94796667",
     "Longitude": "37.47908333",
     "Elevation": "2287"
@@ -1099,6 +1236,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Gazipasa",
+    "Tags": "Airbase",
     "Latitude": "36.29891667",
     "Longitude": "32.29761667",
     "Elevation": "79"
@@ -1107,6 +1245,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Gecitkale",
+    "Tags": "Airbase",
     "Latitude": "35.23600000",
     "Longitude": "33.72088333",
     "Elevation": "147"
@@ -1115,6 +1254,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "H3",
+    "Tags": "Airbase",
     "Latitude": "32.93618333",
     "Longitude": "39.74580000",
     "Elevation": "2549"
@@ -1123,6 +1263,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "H3 Northwest",
+    "Tags": "Airbase",
     "Latitude": "33.07595000",
     "Longitude": "39.59656667",
     "Elevation": "2577"
@@ -1131,6 +1272,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "H3 Southwest",
+    "Tags": "Airbase",
     "Latitude": "32.74343333",
     "Longitude": "39.60220000",
     "Elevation": "2670"
@@ -1139,6 +1281,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "H4",
+    "Tags": "Airbase",
     "Latitude": "32.53926667",
     "Longitude": "38.19506667",
     "Elevation": "2257"
@@ -1147,6 +1290,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Haifa",
+    "Tags": "Airbase",
     "Latitude": "32.81073333",
     "Longitude": "35.04501667",
     "Elevation": "19"
@@ -1155,6 +1299,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Hama",
+    "Tags": "Airbase",
     "Latitude": "35.11803333",
     "Longitude": "36.71236667",
     "Elevation": "984"
@@ -1163,6 +1308,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Hatay",
+    "Tags": "Airbase",
     "Latitude": "36.36231667",
     "Longitude": "36.28741667",
     "Elevation": "253"
@@ -1171,6 +1317,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Incirlik",
+    "Tags": "Airbase",
     "Latitude": "37.00203333",
     "Longitude": "35.42608333",
     "Elevation": "191"
@@ -1179,6 +1326,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Jirah",
+    "Tags": "Airbase",
     "Latitude": "36.09693333",
     "Longitude": "37.93598333",
     "Elevation": "1170"
@@ -1187,6 +1335,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Khalkhalah",
+    "Tags": "Airbase",
     "Latitude": "33.06618333",
     "Longitude": "36.57233333",
     "Elevation": "2376"
@@ -1195,6 +1344,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "King Hussein A.C.",
+    "Tags": "Airbase",
     "Latitude": "32.35666667",
     "Longitude": "36.25985000",
     "Elevation": "2204"
@@ -1203,6 +1353,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Kingsfield",
+    "Tags": "Airbase",
     "Latitude": "35.01480000",
     "Longitude": "33.71701667",
     "Elevation": "275"
@@ -1211,6 +1362,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Kiryat Shmona",
+    "Tags": "Airbase",
     "Latitude": "33.21580000",
     "Longitude": "35.59583333",
     "Elevation": "306"
@@ -1219,6 +1371,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Kuweires",
+    "Tags": "Airbase",
     "Latitude": "36.18748333",
     "Longitude": "37.58148333",
     "Elevation": "1200"
@@ -1227,6 +1380,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Larnaca",
+    "Tags": "Airbase",
     "Latitude": "34.87316667",
     "Longitude": "33.62323333",
     "Elevation": "16"
@@ -1235,6 +1389,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Marj Ruhayyil",
+    "Tags": "Airbase",
     "Latitude": "33.28378333",
     "Longitude": "36.45771667",
     "Elevation": "2160"
@@ -1243,6 +1398,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Megiddo",
+    "Tags": "Airbase",
     "Latitude": "32.59710000",
     "Longitude": "35.23006667",
     "Elevation": "180"
@@ -1251,6 +1407,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Mezzeh",
+    "Tags": "Airbase",
     "Latitude": "33.47778333",
     "Longitude": "36.22420000",
     "Elevation": "2363"
@@ -1259,6 +1416,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Minakh",
+    "Tags": "Airbase",
     "Latitude": "36.52136667",
     "Longitude": "37.04133333",
     "Elevation": "1614"
@@ -1267,6 +1425,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Palmyra",
+    "Tags": "Airbase",
     "Latitude": "34.55728333",
     "Longitude": "38.31670000",
     "Elevation": "1267"
@@ -1275,6 +1434,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Paphos",
+    "Tags": "Airbase",
     "Latitude": "34.71815000",
     "Longitude": "32.48478333",
     "Elevation": "40"
@@ -1283,6 +1443,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Pinarbashi",
+    "Tags": "Airbase",
     "Latitude": "35.27381667",
     "Longitude": "33.26823333",
     "Elevation": "770"
@@ -1291,6 +1452,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Ramat David",
+    "Tags": "Airbase",
     "Latitude": "32.66635000",
     "Longitude": "35.17686667",
     "Elevation": "119"
@@ -1299,6 +1461,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Rayak",
+    "Tags": "Airbase",
     "Latitude": "33.85111667",
     "Longitude": "35.98731667",
     "Elevation": "2983"
@@ -1307,6 +1470,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Rene Mouawad",
+    "Tags": "Airbase",
     "Latitude": "34.58928333",
     "Longitude": "36.01143333",
     "Elevation": "16"
@@ -1315,6 +1479,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Rosh Pina",
+    "Tags": "Airbase",
     "Latitude": "32.98263333",
     "Longitude": "35.57073333",
     "Elevation": "868"
@@ -1323,6 +1488,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Ruwayshid",
+    "Tags": "Airbase",
     "Latitude": "32.40496667",
     "Longitude": "39.13051667",
     "Elevation": "2976"
@@ -1331,6 +1497,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Sanliurfa",
+    "Tags": "Airbase",
     "Latitude": "37.44806667",
     "Longitude": "38.89836667",
     "Elevation": "2703"
@@ -1339,6 +1506,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Sayqal",
+    "Tags": "Airbase",
     "Latitude": "33.67983333",
     "Longitude": "37.21710000",
     "Elevation": "2273"
@@ -1347,6 +1515,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Shayrat",
+    "Tags": "Airbase",
     "Latitude": "34.49020000",
     "Longitude": "36.90760000",
     "Elevation": "2637"
@@ -1355,6 +1524,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Tabqa",
+    "Tags": "Airbase",
     "Latitude": "35.75471667",
     "Longitude": "38.56643333",
     "Elevation": "1099"
@@ -1363,6 +1533,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Tha\u0027lah",
+    "Tags": "Airbase",
     "Latitude": "32.70400000",
     "Longitude": "36.41376667",
     "Elevation": "2381"
@@ -1371,6 +1542,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Tiyas",
+    "Tags": "Airbase",
     "Latitude": "34.52261667",
     "Longitude": "37.63011667",
     "Elevation": "1797"
@@ -1379,6 +1551,7 @@
     "Type": 0,
     "Theater": "Syria",
     "Name": "Wujah Al Hajar",
+    "Tags": "Airbase",
     "Latitude": "34.28133333",
     "Longitude": "35.68010000",
     "Elevation": "650"

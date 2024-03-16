@@ -3,7 +3,7 @@
 // FileManager.cs : file management abstraction layer
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -386,13 +386,31 @@ namespace JAFDTC.Utilities
 
         /// <summary>
         /// return the point of interest database that provides coordinates on known points in the world. this database
-        /// is the combination of a system dbase that carries fixed dcs points along with a user dbase that holds
-        /// user-specified points.
+        /// is the combination of a system dbase that carries fixed dcs points, a user dbase that holds editable
+        /// user-specified points, and any number of read-only campaign databases.
         /// </summary>
         public static List<PointOfInterest> LoadPointsOfInterest()
         {
             List<PointOfInterest> dbase = LoadSystemDbase<PointOfInterest>("db-poi-airbases.json");
-            dbase.AddRange(LoadUserDbase<PointOfInterest>("jafdtc-user-pois.json"));
+            foreach (PointOfInterest point in dbase)
+            {
+                point.SourceFile = "db-poi-airbases.json";
+            }
+
+            string path = Path.Combine(_settingsDirPath, "Dbase");
+            foreach (string srcFile in Directory.GetFiles(path))
+            {
+                string fileName = Path.GetFileName(srcFile);
+                if (fileName.ToLower().StartsWith("jafdtc-pois-") && fileName.ToLower().EndsWith(".json"))
+                {
+                    List<PointOfInterest> points = LoadUserDbase<PointOfInterest>(fileName);
+                    foreach (PointOfInterest point in points)
+                    {
+                        point.SourceFile = fileName;
+                    }
+                    dbase.AddRange(points);
+                }
+            }
             return dbase;
         }
 
@@ -401,7 +419,7 @@ namespace JAFDTC.Utilities
         /// </summary>
         public static bool SaveUserPointsOfInterest(List<PointOfInterest> userPoIs)
         {
-            return SaveUserDbase<PointOfInterest>("jafdtc-user-pois.json", userPoIs);
+            return SaveUserDbase<PointOfInterest>("jafdtc-pois-user.json", userPoIs);
         }
 
         // ------------------------------------------------------------------------------------------------------------

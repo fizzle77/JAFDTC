@@ -3,7 +3,7 @@
 // PointOfInterestDbase.cs -- point of interest "database" model
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -22,17 +22,75 @@ using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace JAFDTC.Models.DCS
 {
+    /// <summary>
+    /// type mask for PointOfInterestType enum.
+    /// </summary>
     [Flags]
-    public enum PointOfInterestMask
+    public enum PointOfInterestTypeMask
     {
         NONE = 0,
         ANY = -1,
-        DCS_AIRBASE = 1 << PointOfInterestType.DCS_AIRBASE,
+        DCS_CORE = 1 << PointOfInterestType.DCS_CORE,
         USER = 1 << PointOfInterestType.USER,
+        CAMPAIGN = 1 << PointOfInterestType.CAMPAIGN,
     }
+
+    /// <summary>
+    /// flags to control paramters of a query in the point of interest database via Find().
+    /// </summary>
+    [Flags]
+    public enum PointOfInterestDbQueryFlags
+    {
+        NONE = 0,                                               // no flags
+        NAME_PARTIAL_MATCH = 1 << 0,                            // allow partial match of name
+        TAGS_ANY_MATCH = 1 << 1,                                // allow at least one tag match
+        TAG_PARTIAL_MATCH = 1 << 2,                             // allow partial match of a tag
+    }
+
+    // ================================================================================================================
+
+    /// <summary>
+    /// parameters for a query of the point of interest database via Find(). for a poi to match a query,
+    /// the following must hold:
+    /// 
+    ///     1) Types contains the point of interest Type
+    ///     2) Theater matches the point of interest Theater exactly
+    ///     3) Name matches the point of interest Name per Flags, given poi Name "abcdef"
+    ///             NAME_PARTIAL_MATCH => Name "bcd" matches
+    ///            !NAME_PARTIAL_MATCH => Name "bcd" does not match
+    ///     4) Tags matches the point of interest tags per Flags, given poi Tags "aa ; bb"
+    ///             TAGS_ANY_MATCH => to match, at least one tag in poi Tags must match a tag in poi Tags
+    ///            !TAGS_ANY_MATCH => to match, all tags in poi Tags must match a tag in poi Tags
+    ///             TAG_PARTIAL_MATCH => allows partial matches, "a" matches "aa"
+    ///            !TAG_PARTIAL_MATCH => disallows partial matches, "a" does not match "aa"
+    ///
+    /// string comparisons are always case-insensitive.
+    /// </summary>
+    internal class PointOfInterestDbQuery
+    {
+        public readonly PointOfInterestTypeMask Types;          // types of points of interest to search
+
+        public readonly string Theater;                         // theater (null => match any)
+
+        public readonly string Name;                            // name (null => match any)
+
+        public readonly string Tags;                            // tags (";"-separated list, null => match any)
+
+        public readonly PointOfInterestDbQueryFlags Flags;      // query flags
+
+        public PointOfInterestDbQuery(PointOfInterestTypeMask types = PointOfInterestTypeMask.ANY, string theater = null,
+                                      string name = null, string tags = null,
+                                      PointOfInterestDbQueryFlags flags = PointOfInterestDbQueryFlags.NONE)
+            => (Types, Theater, Name, Tags, Flags) = (types, theater, name, tags, flags);
+    }
+
+    // ================================================================================================================
 
     /// <summary>
     /// point of interest (poi) database holds information (PointOfInterest instances) known to jafdtc. the database
@@ -57,6 +115,9 @@ namespace JAFDTC.Models.DCS
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        // database is organized as a dictionary where keys are theater names and values are lists of PointOfInterest
+        // instances for points of interest in that theater.
+
         private readonly Dictionary<string, List<PointOfInterest>> _dbase;
 
         // ------------------------------------------------------------------------------------------------------------
@@ -67,12 +128,8 @@ namespace JAFDTC.Models.DCS
 
         private PointOfInterestDbase()
         {
-            List<PointOfInterest> pois = FileManager.LoadPointsOfInterest();
             _dbase = new();
-            foreach (PointOfInterest poi in pois)
-            {
-                Add(poi, false);
-            }
+            Reset();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -151,25 +208,99 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// return list of points of interest matching the specified criteria: theater name, type, and poi name. using
-        /// the default values for these parameters matches "any".
+        /// return list of points of interest matching the specified criteria in the query: theater name, tags,
+        /// type, and poi name. using the default values for these parameters matches "any". database seraches
+        /// are always case insensitive.
         /// </summary>
-        public List<PointOfInterest> Find(string theater = null, PointOfInterestMask types = PointOfInterestMask.ANY,
-                                          string name = null)
+        public List<PointOfInterest> Find(PointOfInterestDbQuery query)
         {
+            string theater = query.Theater?.ToLower();
+            string tags = query.Tags?.ToLower();
+            string name = query.Name?.ToLower();
+            PointOfInterestDbQueryFlags flags = query.Flags;
+            PointOfInterestTypeMask types = query.Types;
+
             List<PointOfInterest> results = new();
             foreach (KeyValuePair<string, List<PointOfInterest>> kvp in _dbase)
             {
-                if ((theater == null) || (theater == kvp.Key))
+                if (!string.IsNullOrEmpty(theater) && (theater != kvp.Key.ToLower()))
                 {
-                    foreach (PointOfInterest point in kvp.Value)
+                    continue;
+                }
+
+                foreach (PointOfInterest poi in kvp.Value)
+                {
+                    PointOfInterestTypeMask poiType = (PointOfInterestTypeMask)(1 << (int)poi.Type);
+                    if (!types.HasFlag(poiType))
                     {
-                        PointOfInterestMask mask = (PointOfInterestMask)(1 << (int)point.Type);
-                        if (((types == PointOfInterestMask.ANY) || ((mask & types) != 0)) &&
-                            ((name == null) || (name == point.Name)))
+                        continue;
+                    }
+
+                    string poiName = poi.Name.ToLower();
+                    if (!string.IsNullOrEmpty(name) &&
+                        ((!flags.HasFlag(PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH) && (name != poiName)) ||
+                         ( flags.HasFlag(PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH) && !poiName.Contains(name))))
+                    {
+                        continue;
+                    }
+
+                    bool isMatch = true;
+                    if (!string.IsNullOrEmpty(tags))
+                    {
+                        List<string> tagVals = (string.IsNullOrEmpty(tags))
+                            ? new() : tags.Split(';').ToList<string>();
+                        List<string> poiTagVals = (string.IsNullOrEmpty(poi.Tags))
+                            ? new() : poi.Tags.ToLower().Split(';').ToList<string>();
+
+                        if (flags.HasFlag(PointOfInterestDbQueryFlags.TAGS_ANY_MATCH))
                         {
-                            results.Add(point);
+                            isMatch = false;
+                            foreach (string tagVal in tagVals)
+                            {
+                                foreach (string poiTagVal in poiTagVals)
+                                {
+                                    if ((flags.HasFlag(PointOfInterestDbQueryFlags.TAG_PARTIAL_MATCH) &&
+                                         (tagVal.Trim().Contains(poiTagVal.Trim()))) ||
+                                        (tagVal.Trim() == poiTagVal.Trim()))
+                                    {
+                                        isMatch = true;
+                                        break;
+                                    }
+                                }
+                                if (isMatch)
+                                {
+                                    break;
+                                }
+                            }
                         }
+                        else
+                        {
+                            isMatch = true;
+                            foreach (string tagVal in tagVals)
+                            {
+                                bool isFound = false;
+                                foreach (string poiTagVal in poiTagVals)
+                                {
+                                    if ((flags.HasFlag(PointOfInterestDbQueryFlags.TAG_PARTIAL_MATCH) &&
+                                         (tagVal.Trim().Contains(poiTagVal.Trim()))) ||
+                                        (tagVal.Trim() == poiTagVal.Trim()))
+                                    {
+                                        isFound = true;
+                                        break;
+                                    }
+                                }
+                                if (!isFound)
+                                {
+                                    isMatch = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (isMatch)
+                    {
+                        results.Add(poi);
                     }
                 }
             }
@@ -177,7 +308,55 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// TODO: document
+        /// parse a multi-line tab-separated value string to build a list of points of interest. the format of each
+        /// line is as follows
+        ///
+        ///     [Name]\t[tags]\t[latitude]\t[longitude]\t[elevation]
+        ///
+        /// where "\t" is a tab character.
+        /// </summary>
+        public List<PointOfInterest> ParseTSV(string tsv)
+        {
+            List<PointOfInterest> pois = new();
+            string[] lines = (string.IsNullOrEmpty(tsv)) ? Array.Empty<string>() : tsv.Replace("\r", "").Split('\n');
+            foreach (string line in lines)
+            {
+                string[] cols = line.Split("\t");
+                if (cols.Length == 5)
+                {
+                    PointOfInterest poi = new()
+                    {
+                        Name = cols[0].Trim(),
+                        Tags = cols[1].Trim(),
+                        Latitude = cols[2].Trim(),
+                        Longitude = cols[3].Trim(),
+                        Elevation = cols[4].Trim()
+                    };
+                    poi.Theater = TheaterForCoords(poi.Latitude, poi.Longitude);
+                    if (poi.Theater != null )
+                    {
+                        pois.Add(poi);
+                    }
+                }
+            }
+            return pois;
+        }
+
+        /// <summary>
+        /// reset the database by clearing its current contents and reloading from storage.
+        /// </summary>
+        public void Reset()
+        {
+            List<PointOfInterest> pois = FileManager.LoadPointsOfInterest();
+            _dbase.Clear();
+            foreach (PointOfInterest poi in pois)
+            {
+                Add(poi, false);
+            }
+        }
+
+        /// <summary>
+        /// add a point of interest to the database, persisting the database to storage if requested.
         /// </summary>
         public void Add(PointOfInterest poi, bool isPersist = true)
         {
@@ -193,7 +372,7 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// TODO: document
+        /// remove a point of interest to the database, persisting the database to storage if requested.
         /// </summary>
         public void Remove(PointOfInterest poi, bool isPersist = true)
         {
@@ -205,11 +384,11 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// TODO: document
+        /// persist the user points of interest to storage.
         /// </summary>
         public bool Save()
         {
-            return FileManager.SaveUserPointsOfInterest(Find(null, PointOfInterestMask.USER, null));
+            return FileManager.SaveUserPointsOfInterest(Find(new PointOfInterestDbQuery(PointOfInterestTypeMask.USER)));
         }
     }
 }

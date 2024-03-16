@@ -3,7 +3,7 @@
 // PointOfInterest.cs -- point of interest model
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,18 +18,22 @@
 //
 // ********************************************************************************************************************
 
+using System.Text.Json.Serialization;
+
 namespace JAFDTC.Models.DCS
 {
     public enum PointOfInterestType
     {
         UNKNOWN = -1,
-        DCS_AIRBASE = 0,
-        USER = 1
+        DCS_CORE = 0,
+        USER = 1,
+        CAMPAIGN = 2
     }
 
     /// <summary>
     /// defines the properties of a point of interest (poi) known to jafdtc. these instances are managed by the poi
-    /// database (PointOfInterestDbase).
+    /// database (PointOfInterestDbase). pois include a theater (set based on lat/lon), name, comma-separated list
+    /// of tags, and a lat/lon/elev.
     /// </summary>
     public sealed class PointOfInterest
     {
@@ -44,12 +48,17 @@ namespace JAFDTC.Models.DCS
         public string Theater { get; set; }                     // theater (general geographic area)
         
         public string Name { get; set; }                        // name
-        
+
+        public string Tags { get; set; }                        // tags (";"-separated list)
+
         public string Latitude { get; set; }                    // latitude (decimal degrees)
         
         public string Longitude { get; set; }                   // longitude (decimal degrees)
         
         public string Elevation { get; set; }                   // elevation (feet)
+
+        [JsonIgnore]
+        public string SourceFile { get; set; }                  // source file name
 
         public override string ToString()
         {
@@ -63,9 +72,9 @@ namespace JAFDTC.Models.DCS
         // ------------------------------------------------------------------------------------------------------------
 
         public PointOfInterest()
-            => (Type, Theater, Name, Latitude, Longitude, Elevation) = (PointOfInterestType.UNKNOWN, "", "", "", "", "");
+            => (Type, Theater, Name, Tags, Latitude, Longitude, Elevation) = (PointOfInterestType.UNKNOWN, "", "", "", "", "", "");
 
-        public PointOfInterest(PointOfInterestType type, string theater, string name, string lat, string lon, string elev)
-            => (Type, Theater, Name, Latitude, Longitude, Elevation) = (type, theater, name, lat, lon, elev);
+        public PointOfInterest(PointOfInterestType type, string theater, string name, string tags, string lat, string lon, string elev)
+            => (Type, Theater, Name, Tags, Latitude, Longitude, Elevation) = (type, theater, name, tags, lat, lon, elev);
     }
 }
