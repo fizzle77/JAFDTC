@@ -391,10 +391,10 @@ namespace JAFDTC.Utilities
         /// </summary>
         public static List<PointOfInterest> LoadPointsOfInterest()
         {
-            List<PointOfInterest> dbase = LoadSystemDbase<PointOfInterest>("db-poi-airbases.json");
+            List<PointOfInterest> dbase = LoadSystemDbase<PointOfInterest>("db-pois-airbases.json");
             foreach (PointOfInterest point in dbase)
             {
-                point.SourceFile = "db-poi-airbases.json";
+                point.SourceFile = "db-pois-airbases.json";
             }
 
             string path = Path.Combine(_settingsDirPath, "Dbase");
