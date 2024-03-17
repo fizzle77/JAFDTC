@@ -3,7 +3,7 @@
 // MFDSystem.cs -- f-16c mfd system
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -132,11 +132,11 @@ namespace JAFDTC.Models.F16C.MFD
 		{
             ModeConfigs = new MFDModeConfiguration[(int)Modes.NUM_MODES]
             {
-                new MFDModeConfiguration(),
-                new MFDModeConfiguration(),
-                new MFDModeConfiguration(),
-                new MFDModeConfiguration(),
-                new MFDModeConfiguration()
+                new(),
+                new(),
+                new(),
+                new(),
+                new()
             };
 		}
 
@@ -144,11 +144,11 @@ namespace JAFDTC.Models.F16C.MFD
         {
             ModeConfigs = new MFDModeConfiguration[(int)Modes.NUM_MODES]
             {
-                new MFDModeConfiguration(other.ModeConfigs[(int)Modes.NAV]),
-                new MFDModeConfiguration(other.ModeConfigs[(int)Modes.ICP_AA]),
-                new MFDModeConfiguration(other.ModeConfigs[(int)Modes.ICP_AG]),
-                new MFDModeConfiguration(other.ModeConfigs[(int)Modes.DGFT_MSL]),
-                new MFDModeConfiguration(other.ModeConfigs[(int)Modes.DGFT_DGFT])
+                new(other.ModeConfigs[(int)Modes.NAV]),
+                new(other.ModeConfigs[(int)Modes.ICP_AG]),
+                new(other.ModeConfigs[(int)Modes.ICP_AA]),
+                new(other.ModeConfigs[(int)Modes.DGFT_MSL]),
+                new(other.ModeConfigs[(int)Modes.DGFT_DGFT])
             };
         }
 
