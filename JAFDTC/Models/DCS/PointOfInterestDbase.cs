@@ -210,9 +210,9 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// return list of points of interest matching the specified criteria in the query: theater name, tags,
         /// type, and poi name. using the default values for these parameters matches "any". database seraches
-        /// are always case insensitive.
+        /// are always case insensitive. results are optionally sorted.
         /// </summary>
-        public List<PointOfInterest> Find(PointOfInterestDbQuery query)
+        public List<PointOfInterest> Find(PointOfInterestDbQuery query, bool isSorted = false)
         {
             string theater = query.Theater?.ToLower();
             string tags = query.Tags?.ToLower();
@@ -304,7 +304,36 @@ namespace JAFDTC.Models.DCS
                     }
                 }
             }
-            return results;
+            return  (isSorted) ? SortPoIs(results) : results;
+        }
+
+        /// <summary>
+        /// sort the poi list by theater, type, then name. returns the sorted list.
+        /// </summary>
+        public static List<PointOfInterest> SortPoIs(List<PointOfInterest> pois)
+        {
+            pois.Sort((a, b) =>
+            {
+                int theaterCmp = a.Theater.CompareTo(b.Theater);
+                if ((theaterCmp == 0) && (a.Type == b.Type))
+                {
+                    return a.Name.CompareTo(b.Name);
+                }
+                else if ((theaterCmp == 0) && (a.Type == PointOfInterestType.USER))
+                {
+                    return -1;
+                }
+                else if ((theaterCmp == 0) && (a.Type == PointOfInterestType.CAMPAIGN))
+                {
+                    return (b.Type == PointOfInterestType.USER) ? 1 : -1;
+                }
+                else if ((theaterCmp == 0) && (a.Type == PointOfInterestType.DCS_CORE))
+                {
+                    return 1;
+                }
+                return theaterCmp;
+            });
+            return pois;
         }
 
         /// <summary>
