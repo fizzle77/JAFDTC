@@ -315,7 +315,7 @@ namespace JAFDTC.Models.DCS
         ///
         /// where "\t" is a tab character.
         /// </summary>
-        public List<PointOfInterest> ParseTSV(string tsv)
+        public static List<PointOfInterest> ParseTSV(string tsv)
         {
             List<PointOfInterest> pois = new();
             string[] lines = (string.IsNullOrEmpty(tsv)) ? Array.Empty<string>() : tsv.Replace("\r", "").Split('\n');
