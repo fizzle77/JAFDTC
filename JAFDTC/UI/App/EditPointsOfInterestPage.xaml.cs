@@ -718,14 +718,14 @@ namespace JAFDTC.UI.App
                     ContentDialog errDialog = new()
                     {
                         XamlRoot = Content.XamlRoot,
-                        Title = "Invalid Name",
-                        PrimaryButtonText = "OK",
+                        Title = "Campaign Already Defined",
+                        DefaultButton = ContentDialogButton.Close,
+                        PrimaryButtonText = "Replace",
+                        CloseButtonText = "Select Different Name"
                     };
-                    ContentDialogResult resultName;
                     while (true)
                     {
-                        resultName = await nameDialog.ShowAsync();
-                        if (resultName == ContentDialogResult.None)
+                        if (await nameDialog.ShowAsync() == ContentDialogResult.None)
                         {
                             return;                             // EXIT: cancelled campaign name...
                         }
@@ -734,8 +734,13 @@ namespace JAFDTC.UI.App
                             campaign = nameDialog.Value.Trim().Replace(';', ':');
                             break;
                         }
-                        errDialog.Content = $"The campaign name \"{nameDialog.Value}\" is not unique.";
-                        await errDialog.ShowAsync();
+                        errDialog.Content = $"The campaign name \"{nameDialog.Value}\" is already in use. Would you" +
+                                            $" like to replace it with the information from this import?";
+                        if (await errDialog.ShowAsync() == ContentDialogResult.Primary)
+                        {
+                            campaign = nameDialog.Value.Trim().Replace(';', ':');
+                            break;
+                        }
                     }
                 }
                 else
