@@ -4,7 +4,7 @@
     
 EditPointsOfInterestPage.xaml : ui xaml point of interest editor
 
-Copyright(C) 2023 ilominar/raven
+Copyright(C) 2023-2024 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -83,27 +83,38 @@ https://www.gnu.org/licenses/.
         row 1 : controls
         ===============================================================================================================
         -->
-        <StackPanel Grid.Row="1"
-                    Orientation="Horizontal"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center">
+        <Grid Grid.Row="1"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <!-- theater drop-down selection -->
-            <ComboBox Width="150"
-                      x:Name="uiBarComboTheater"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Stretch"
-                      SelectionChanged="BarComboTheater_SelectionChanged">
-            </ComboBox>
+            <!-- poi search box -->
+            <AutoSuggestBox Grid.Column="0" Width="375"
+                            x:Name="uiPoINameFilterBox"
+                            VerticalAlignment="Center"
+                            PlaceholderText="Filter Points of Interest by Name"
+                            QueryIcon="Find"
+                            TextChanged="PoINameFilterBox_TextChanged"
+                            QuerySubmitted="PoINameFilterBox_QuerySubmitted"/>
 
             <!-- command bar -->
-            <CommandBar Margin="12,0,0,0"
+            <CommandBar Grid.Column="1" Margin="6,0,0,0"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Left">
+                <AppBarToggleButton x:Name="uiBarBtnFilter" Label="Filter Points"
+                                    Click="CmdFilter_Click"
+                                    ToolTipService.ToolTip="Set filter to apply to points of interest">
+                    <AppBarToggleButton.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE71C;"/>
+                    </AppBarToggleButton.Icon>
+                </AppBarToggleButton>
+                <AppBarSeparator/>
                 <AppBarButton x:Name="uiBarBtnEdit" Icon="Edit" Label="Edit"
                               Click="CmdEdit_Click"
                               ToolTipService.ToolTip="Edit point of interest"/>
-                <AppBarSeparator/>
                 <AppBarButton x:Name="uiBarBtnDelete" Icon="Delete" Label="Delete"
                               Click="CmdDelete_Click"
                               ToolTipService.ToolTip="Delete selected point of interest"/>
@@ -115,13 +126,6 @@ https://www.gnu.org/licenses/.
                               Click="CmdExport_Click"
                               ToolTipService.ToolTip="Export points of interest to file"/>
                 <AppBarSeparator/>
-                <AppBarToggleButton x:Name="uiBarBtnUser" Label="User Only"
-                                    Click="CmdUser_Click"
-                                    ToolTipService.ToolTip="Limit list to user points of interest">
-                    <AppBarToggleButton.Icon>
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE718;"/>
-                    </AppBarToggleButton.Icon>
-                </AppBarToggleButton>
                 <AppBarButton x:Name="uiBarBtnCoords" Label="Coordinates"
                               Click="CmdCoords_Click"
                               ToolTipService.ToolTip="Select format for coordinates">
@@ -130,7 +134,7 @@ https://www.gnu.org/licenses/.
                     </AppBarButton.Icon>
                 </AppBarButton>
             </CommandBar>
-        </StackPanel>
+        </Grid>
 
         <!--
         ===============================================================================================================
@@ -163,7 +167,7 @@ https://www.gnu.org/licenses/.
                 <TextBlock Grid.Column="2" Margin="6,0,0,0"
                            HorizontalTextAlignment="Left"
                            Style="{StaticResource TableHeaderTextStyle}"
-                           Text="Point of Interest Name"/>
+                           Text="Point of Interest Name and Tags"/>
                 <TextBlock Grid.Column="3" Margin="6,0,0,0"
                            HorizontalTextAlignment="Center"
                            Style="{StaticResource TableHeaderTextStyle}"
@@ -183,6 +187,7 @@ https://www.gnu.org/licenses/.
                       SelectionMode="Extended"
                       SelectionChanged="PoIListView_SelectionChanged"
                       RightTapped="PoIListView_RightTapped"
+                      DoubleTapped="PoIListView_DoubleTapped"
                       ItemsSource="{x:Bind CurPoIItems}">
                 <ListView.Resources>
                     <MenuFlyout x:Name="uiPoiListCtxMenuFlyout">
@@ -196,7 +201,7 @@ https://www.gnu.org/licenses/.
                 </ListView.Resources>
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="local:PoIListItem">
-                        <Grid>
+                        <Grid Margin="6">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="32"/>
                                 <ColumnDefinition Width="120"/>
@@ -206,21 +211,28 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="140"/>
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Column="0" Margin="0,0,0,0"
+                            <TextBlock Grid.Column="0"
                                        VerticalAlignment="Center"
                                        HorizontalTextAlignment="Center"
                                        FontFamily="Segoe Fluent Icons"
                                        Text="{x:Bind Glyph}"/>
-                            <TextBlock Grid.Column="1" Margin="0,0,0,0"
+                            <TextBlock Grid.Column="1"
                                        VerticalAlignment="Center"
                                        HorizontalTextAlignment="Center"
                                        Text="{x:Bind PoI.Theater, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
-                            <TextBlock Grid.Column="2" Margin="6,0,0,0"
-                                       VerticalAlignment="Center"
-                                       HorizontalTextAlignment="Left"
-                                       FontWeight="Medium"
-                                       FontSize="16"
-                                       Text="{x:Bind PoI.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                            <StackPanel Grid.Column="2"
+                                        VerticalAlignment="Center">
+                                <TextBlock HorizontalTextAlignment="Left"
+                                           FontSize="16"
+                                           FontWeight="Medium"
+                                           Text="{x:Bind PoI.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                                <TextBlock HorizontalTextAlignment="Left"
+                                           FontSize="12"
+                                           FontStyle="Italic"
+                                           Foreground="{StaticResource TextFillColorTertiary}"
+                                           Text="{x:Bind TagsUI}">
+                                </TextBlock>
+                            </StackPanel>
                             <TextBlock Grid.Column="3" Margin="6,0,0,0"
                                        VerticalAlignment="Center"
                                        HorizontalTextAlignment="Center"
@@ -244,7 +256,7 @@ https://www.gnu.org/licenses/.
         row 3 : Editor
         ===============================================================================================================
         -->
-        <Grid Grid.Row="3" Margin="24,24,24,24">
+        <Grid Grid.Row="3" Margin="24,12,24,16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -255,24 +267,42 @@ https://www.gnu.org/licenses/.
                 <ColumnDefinition Width="125"/>
             </Grid.ColumnDefinitions>
 
-            <!-- theater / name fields
+            <!-- name / tags fields
               -->
             <TextBlock Grid.Row="0" Grid.Column="0" Margin="12,12,0,0"
                        VerticalAlignment="Center"
                        HorizontalTextAlignment="Right"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
-                Name
+                Name / Tags
             </TextBlock>
-            <TextBox Grid.Row="0" Grid.Column="1" Margin="12,12,0,0"
+            <Grid Grid.Row="0" Grid.Column="1" Margin="12,12,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Row="0" Grid.Column="0"
                      x:Name="uiPoIValueName"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Stretch"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      Text="{x:Bind EditPoI.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      MaxLength="48"
-                     TextChanged="PoIValueName_TextChanged"
+                     TextChanged="PoITextBox_TextChanged"
                      LostFocus="PoITextBox_LostFocus"
                      ToolTipService.ToolTip="Name of point of interest"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
+                     x:Name="uiPoIValueTags"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Stretch"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     Text="{x:Bind EditPoI.Tags, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     TextChanged="PoITextBox_TextChanged"
+                     LostFocus="PoITextBox_LostFocus"
+                     ToolTipService.ToolTip="Tags for point of interest"/>
+            </Grid>
             <Button Grid.Row="0" Grid.Column="2" Margin="24,12,0,0"
                     x:Name="uiPoIBtnAdd"
                     VerticalAlignment="Center"
@@ -296,8 +326,8 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="125"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="125"/>
                     <ColumnDefinition Width="125"/>
                 </Grid.ColumnDefinitions>
 
@@ -371,23 +401,32 @@ https://www.gnu.org/licenses/.
                          LostFocus="PoITextBox_LostFocus"
                          ToolTipService.ToolTip="Longitude of point of interest, DDM format"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="2" Margin="18,0,0,0"
-                           x:Name="uiPoITextTheater"
-                           VerticalAlignment="Center">
-                    FIXUP:THEATER
-                </TextBlock>
-                <TextBox Grid.Row="0" Grid.Column="3" Margin="24,0,0,0"
+                <TextBox Grid.Row="0" Grid.Column="2" Margin="12,0,0,0"
                          x:Name="uiPoIValueAlt"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditPoI.Alt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          LostFocus="PoITextBox_LostFocus"
                          ToolTipService.ToolTip="Elevation of point of interest (feet)"/>
-                <TextBlock Grid.Row="0" Grid.Column="4" Margin="6,0,4,0"
+
+                <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
                            x:Name="uiPoITextAltUnits"
                            Style="{StaticResource EditorParamStaticTextBlockStyle}">
                     ft
                 </TextBlock>
+
+                <TextBlock Grid.Row="0" Grid.Column="4" Margin="24,0,0,0"
+                           x:Name="uiPoITextTheater"
+                           VerticalAlignment="Center">
+                    FIXUP:THEATER
+                </TextBlock>
             </Grid>
+            <Button Grid.Row="1" Grid.Column="2" Margin="24,12,0,0"
+                    x:Name="uiPoIBtnClear"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Click="PoIBtnClear_Click">
+                Clear
+            </Button>
         </Grid>
     </Grid>
 </Page>

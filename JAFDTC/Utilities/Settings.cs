@@ -18,6 +18,7 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.DCS;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -61,9 +62,17 @@ namespace JAFDTC.Utilities
 
         public int LastConfigSelection { get; set; }
 
-        public string LastPoITheaterSelection { get; set; }
+        public string LastStptFilterTheater { get; set; }
 
-        public bool LastPoIUserModeSelection { get; set; }
+        public string LastStptFilterTags { get; set; }
+
+        public PointOfInterestTypeMask LastStptFilterIncludeTypes { get; set; }
+
+        public string LastPoIFilterTheater { get; set; }
+
+        public string LastPoIFilterTags { get; set; }
+
+        public PointOfInterestTypeMask LastPoIFilterIncludeTypes { get; set; }
 
         public LLFormat LastPoICoordFmtSelection { get; set; }
 
@@ -105,8 +114,12 @@ namespace JAFDTC.Utilities
 
             LastAirframeSelection = 0;
             LastConfigSelection = -1;
-            LastPoITheaterSelection = "";
-            LastPoIUserModeSelection = false;
+            LastStptFilterTheater = "";
+            LastStptFilterTags = "";
+            LastStptFilterIncludeTypes = PointOfInterestTypeMask.ANY;
+            LastPoIFilterTheater = "";
+            LastPoIFilterTags = "";
+            LastPoIFilterIncludeTypes = PointOfInterestTypeMask.ANY;
             LastPoICoordFmtSelection = LLFormat.DDM_P3ZF;
 
             WingName = "";
@@ -322,27 +335,80 @@ namespace JAFDTC.Utilities
             }
         }
 
-        public static string LastPoITheaterSelection
+
+        public static string LastStptFilterTheater
         {
-            get => _currentSettings.LastPoITheaterSelection;
+            get => _currentSettings.LastStptFilterTheater;
             set
             {
-                if (_currentSettings.LastPoITheaterSelection != value)
+                if (_currentSettings.LastStptFilterTheater != value)
                 {
-                    _currentSettings.LastPoITheaterSelection = value;
+                    _currentSettings.LastStptFilterTheater = value;
                     FileManager.WriteSettings(_currentSettings);
                 }
             }
         }
 
-        public static bool LastPoIUserModeSelection
+        public static string LastStptFilterTags
         {
-            get => _currentSettings.LastPoIUserModeSelection;
+            get => _currentSettings.LastStptFilterTags;
             set
             {
-                if (_currentSettings.LastPoIUserModeSelection != value)
+                if (_currentSettings.LastStptFilterTags != value)
                 {
-                    _currentSettings.LastPoIUserModeSelection = value;
+                    _currentSettings.LastStptFilterTags = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static PointOfInterestTypeMask LastStptFilterIncludeTypes
+        {
+            get => _currentSettings.LastStptFilterIncludeTypes;
+            set
+            {
+                if (_currentSettings.LastStptFilterIncludeTypes != value)
+                {
+                    _currentSettings.LastStptFilterIncludeTypes = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static string LastPoIFilterTheater
+        {
+            get => _currentSettings.LastPoIFilterTheater;
+            set
+            {
+                if (_currentSettings.LastPoIFilterTheater != value)
+                {
+                    _currentSettings.LastPoIFilterTheater = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static string LastPoIFilterTags
+        {
+            get => _currentSettings.LastPoIFilterTags;
+            set
+            {
+                if (_currentSettings.LastPoIFilterTags != value)
+                {
+                    _currentSettings.LastPoIFilterTags = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+}
+        }
+
+        public static PointOfInterestTypeMask LastPoIFilterIncludeTypes
+        {
+            get => _currentSettings.LastPoIFilterIncludeTypes;
+            set
+            {
+                if (_currentSettings.LastPoIFilterIncludeTypes != value)
+                {
+                    _currentSettings.LastPoIFilterIncludeTypes = value;
                     FileManager.WriteSettings(_currentSettings);
                 }
             }
