@@ -4,7 +4,7 @@
     
 EditNavpointListPage.cs : ui xaml for general navigation point editor page
 
-Copyright(C) 2023 ilominar/raven
+Copyright(C) 2023-2024 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -74,8 +74,8 @@ https://www.gnu.org/licenses/.
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
@@ -86,7 +86,7 @@ https://www.gnu.org/licenses/.
                        x:Name="uiPoITextTitle"
                        HorizontalAlignment="Left"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
-                FIXUP:Type Initial Setup
+                FIXUP:Navpoint Initial Setup
             </TextBlock>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,12"
@@ -94,26 +94,57 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Points of Interest
             </TextBlock>
-            <ComboBox Grid.Row="1" Grid.Column="1" Width="150" Margin="12,12,0,12"
-                      x:Name="uiPoIComboTheater"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Center"
-                      ItemsSource="{x:Bind CurPoITheaters}"
-                      SelectionChanged="PoIComboTheater_SelectionChanged"
-                      ToolTipService.ToolTip="Selects a point of interest theater">
-            </ComboBox>
-            <ui_app:ComboBoxSeparated Grid.Row="2" Grid.Column="2" Margin="12,12,0,12"
-                      x:Name="uiPoIComboSelect"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Center"
-                      SelectionChanged="PoIComboSelect_SelectionChanged"
-                      ToolTipService.ToolTip="Selects a point of interest within selected theater to use to fill in steerpoint information">
-            </ui_app:ComboBoxSeparated>
+            <AutoSuggestBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,12"
+                            x:Name="uiPoINameFilterBox"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Stretch"
+                            PlaceholderText="Select Point of Interest by Name"
+                            QueryIcon="Find"
+                            TextMemberPath="Name"
+                            GotFocus="PoINameFilterBox_GotFocus"
+                            TextChanged="PoINameFilterBox_TextChanged"
+                            QuerySubmitted="PoINameFilterBox_QuerySubmitted">
+                <AutoSuggestBox.ItemTemplate>
+                    <DataTemplate x:DataType="local:PoIListItem">
+                        <Grid Margin="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       FontFamily="Segoe Fluent Icons"
+                                       Text="{x:Bind Glyph}"/>
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0"
+                                        Orientation="Vertical"
+                                        VerticalAlignment="Center">
+                                <TextBlock HorizontalTextAlignment="Left"
+                                           FontSize="16"
+                                           FontWeight="Medium"
+                                           Text="{x:Bind Name}"/>
+                                <TextBlock Margin="0,0,8,0" VerticalAlignment="Center"
+                                           HorizontalTextAlignment="Left"
+                                           FontSize="12"
+                                           FontStyle="Italic"
+                                           Foreground="{StaticResource TextFillColorTertiary}"
+                                           Text="{x:Bind Info}"/>
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </AutoSuggestBox.ItemTemplate>
+            </AutoSuggestBox>
+            <ToggleButton Grid.Row="1" Grid.Column="2" Margin="12,0,0,0"
+                          x:Name="uiPoIBtnFilter"
+                          Click="PoIBtnFilter_Click"
+                          ToolTipService.ToolTip="Set filter to apply to points of interest">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE71C;"/>
+            </ToggleButton>
             <Button Grid.Row="1" Grid.Column="3" Margin="12,0,0,0"
-                        x:Name="uiPoIBtnApply"
-                        VerticalAlignment="Center"
-                        Click="PoIBtnApply_Click"
-                        ToolTipService.ToolTip="Paste selected point of interest to navpoint">
+                    x:Name="uiPoIBtnApply"
+                    VerticalAlignment="Center"
+                    Click="PoIBtnApply_Click"
+                    ToolTipService.ToolTip="Paste selected point of interest to navpoint">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE77F;"/>
             </Button>
 

@@ -31,9 +31,54 @@ using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
 using JAFDTC.Models.DCS;
+using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace JAFDTC.UI.Base
 {
+    /// <summary>
+    /// wrapper around the point of interest object to present the ui view of the point of interest in the selection
+    /// list from the poi filter box in navpoint editors.
+    /// </summary>
+    public sealed class PoIListItem
+    {
+        public PointOfInterest PoI { get; set; }
+
+        public string Name => PoI.Name;
+
+        public string Info => (string.IsNullOrEmpty(PoI.Tags)) ? PoI.Theater : $"{PoI.Theater} — {PoI.Tags}";
+
+        public string Glyph => (PoI.Type == PointOfInterestType.USER)
+                       ? "\xE718" : ((PoI.Type == PointOfInterestType.CAMPAIGN) ? "\xE7C1" : "");
+
+        public PoIListItem(PointOfInterest poi) => (PoI) = (poi);
+    }
+
+    // ================================================================================================================
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public sealed class PoIFilterSpec
+    {
+        public string Theater { get; set; }
+
+        public string Tags { get; set; }
+
+        public PointOfInterestTypeMask IncludeTypes { get; set; }
+
+        public bool IsFiltered => !(string.IsNullOrEmpty(Theater) &&
+                                    string.IsNullOrEmpty(Tags) &&
+                                    IncludeTypes.HasFlag(PointOfInterestTypeMask.DCS_CORE) &&
+                                    IncludeTypes.HasFlag(PointOfInterestTypeMask.USER) &&
+                                    IncludeTypes.HasFlag(PointOfInterestTypeMask.CAMPAIGN));
+
+        public PoIFilterSpec(string theater = null, string tags = null,
+                             PointOfInterestTypeMask types = PointOfInterestTypeMask.ANY)
+            => (Theater, Tags, IncludeTypes) = (theater, tags, types);
+    }
+
+    // ================================================================================================================
+
     /// <summary>
     /// helper class to provide a number of static support functions for use in the navpoint user interface. this
     /// includes things like common dialogs, import/export core operations, etc.
@@ -47,50 +92,59 @@ namespace JAFDTC.UI.Base
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// return the point of interest that corresponds to the specified navpoint, null if no such navpoint exists.
-        /// to match, the lat, lon, elev, and name must match.
+        /// TODO
         /// </summary>
-        public static PointOfInterest FindMatchingPoI(string theater, INavpointInfo navpt, LLFormat fmt)
+        public static async Task<PoIFilterSpec> FilterSpecDialog(XamlRoot root, PoIFilterSpec spec, ToggleButton button)
         {
-            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, navpt.Name);
-            List<PointOfInterest> selPoI = PointOfInterestDbase.Instance.Find(query);
-            if ((selPoI.Count == 1) &&
-                (Coord.ConvertFromLatDD(selPoI[0].Latitude, fmt) == navpt.LatUI) &&
-                (Coord.ConvertFromLonDD(selPoI[0].Longitude, fmt) == navpt.LonUI) &&
-                (selPoI[0].Elevation == navpt.Alt))
+            if (button.IsChecked != spec.IsFiltered)
             {
-                return selPoI[0];
+                button.IsChecked = spec.IsFiltered;
             }
-            return null;
+
+            GetPoIFilterDialog filterDialog = new(spec.Theater, true, spec.Tags, spec.IncludeTypes)
+            {
+                XamlRoot = root,
+                Title = $"Set a Filter for Points of Interest",
+                PrimaryButtonText = "Set",
+                SecondaryButtonText = "Clear Filters",
+                CloseButtonText = "Cancel",
+            };
+            ContentDialogResult result = await filterDialog.ShowAsync(ContentDialogPlacement.Popup);
+            if (result == ContentDialogResult.Primary)
+            {
+                spec.Theater = filterDialog.Theater;
+                spec.Tags = PointOfInterest.SanitizedTags(filterDialog.Tags);
+                spec.Tags = filterDialog.Tags;
+                spec.IncludeTypes = filterDialog.IncludeTypes;
+            }
+            else if (result == ContentDialogResult.Secondary)
+            {
+                spec.Theater = "";
+                spec.Tags = "";
+                spec.IncludeTypes = PointOfInterestTypeMask.ANY;
+            }
+            else
+            {
+                return null;                                    // EXIT: cancelled, no change...
+            }
+
+            button.IsChecked = spec.IsFiltered;
+            return spec;
         }
 
         /// <summary>
-        /// rebuild the contents of a combobox menu for the specified theater. the menu starts with user pois (if there
-        /// are any) followed by a separator (if there are user pois) followed by system pois.
+        /// return the point of interest list to display in the filter box candidates list.
         /// </summary>
-        public static void RebuildPoICombo(string theater, ComboBoxSeparated comboBox)
+        public static List<PoIListItem> RebuildPointsOfInterest(PoIFilterSpec spec, string name = null)
         {
-            PointOfInterestDbQuery dcsQuery = new(PointOfInterestTypeMask.DCS_CORE, theater);
-            List<PointOfInterest> dcsPoIs = PointOfInterestDbase.Instance.Find(dcsQuery);
-            dcsPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
-
-            PointOfInterestDbQuery usrQuery = new(PointOfInterestTypeMask.USER, theater);
-            List<PointOfInterest> usrPoIs = PointOfInterestDbase.Instance.Find(usrQuery);
-            usrPoIs.Sort((a, b) => a.Name.CompareTo(b.Name));
-
-            comboBox.Items.Clear();
-            foreach (PointOfInterest poi in usrPoIs)
+            List<PoIListItem> suitableItems = new();
+            PointOfInterestDbQuery query = new(spec.IncludeTypes, spec.Theater, name, spec.Tags,
+                                               PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH);
+            foreach (PointOfInterest poi in PointOfInterestDbase.Instance.Find(query, true))
             {
-                comboBox.Items.Add(poi);
+                suitableItems.Add(new PoIListItem(poi));
             }
-            if (usrPoIs.Count > 0)
-            {
-                comboBox.Items.Add(new ComboBoxViewItemSeparator());
-            }
-            foreach (PointOfInterest poi in dcsPoIs)
-            {
-                comboBox.Items.Add(poi);
-            }
+            return suitableItems;
         }
 
         // ------------------------------------------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 //
 // F16CEditSteerpointPage.xaml.cs : ui c# for viper steerpoint editor page
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -17,7 +17,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.STPT;
@@ -27,6 +26,7 @@ using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
@@ -59,6 +59,8 @@ namespace JAFDTC.UI.F16C
             => (ParentEditor, Config, IndexStpt, IsUnlinked) = (parentEditor, config, indexStpt, isUnlinked);
     }
 
+    // ================================================================================================================
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -84,7 +86,9 @@ namespace JAFDTC.UI.F16C
 
         private bool IsRebuildPending { get; set; }
 
-        private List<string> CurPoITheaters { get; set; }
+        private PointOfInterest CurSelectedPoI { get; set; }
+
+        private PoIFilterSpec FilterSpec { get; set; }
 
         // ---- read-only properties
 
@@ -122,9 +126,9 @@ namespace JAFDTC.UI.F16C
             EditStpt.VxP[0].ErrorsChanged += VxP0_DataValidationError;
             EditStpt.VxP[1].ErrorsChanged += VxP1_DataValidationError;
 
-            CurPoITheaters = PointOfInterestDbase.KnownTheaters();
-
             IsRebuildPending = false;
+
+            CurSelectedPoI = null;
 
             _curStptFieldValueMap = new Dictionary<string, TextBox>()
             {
@@ -385,22 +389,11 @@ namespace JAFDTC.UI.F16C
         }
 
         /// <summary>
-        /// TODO: document
-        /// </summary>
-        private void SelectMatchingPoI()
-        {
-            uiPoIComboSelect.SelectedItem = NavpointUIHelper.FindMatchingPoI((string)uiPoIComboTheater.SelectedItem,
-                                                                             EditStpt, LLFormat.DDM_P3ZF);
-        }
-
-        /// <summary>
-        /// rebuild the point of interest select combo box. this only needs to be called when the theater changes or
-        /// when a poi is added to the current theater.
+        /// rebuild the point of interest list in the filter box.
         /// </summary>
         private void RebuildPointsOfInterest()
         {
-            NavpointUIHelper.RebuildPoICombo((string)uiPoIComboTheater.SelectedItem, uiPoIComboSelect);
-            SelectMatchingPoI();
+            uiPoINameFilterBox.ItemsSource = NavpointUIHelper.RebuildPointsOfInterest(FilterSpec, uiPoINameFilterBox.Text);
         }
 
         /// <summary>
@@ -451,10 +444,10 @@ namespace JAFDTC.UI.F16C
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(STPTSystem.SystemTag));
             bool isDCSListening = curApp.IsDCSAvailable && (curApp.DCSActiveAirframe == Config.Airframe);
 
-            Utilities.SetEnableState(uiPoIComboTheater, isEditable);
-            Utilities.SetEnableState(uiPoIComboSelect, isEditable && (uiPoIComboSelect.Items.Count > 0));
-            Utilities.SetEnableState(uiPoIBtnApply, isEditable && (uiPoIComboSelect.SelectedIndex > 0));
+            Utilities.SetEnableState(uiPoIBtnApply, isEditable && (CurSelectedPoI != null));
             Utilities.SetEnableState(uiPoIBtnCapture, isEditable && isDCSListening);
+
+            uiPoIBtnFilter.IsChecked = FilterSpec.IsFiltered;
 
             Utilities.SetEnableState(uiStptValueName, isEditable);
             foreach (KeyValuePair<string, TextBox> kvp in _curStptFieldValueMap)
@@ -548,20 +541,70 @@ namespace JAFDTC.UI.F16C
         // ---- poi management ----------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// filter box focused: show the suggestion list when the control gains focus.
         /// </summary>
-        private void PoIComboTheater_SelectionChanged(object sender, RoutedEventArgs args)
+        private void PoINameFilterBox_GotFocus(object sender, RoutedEventArgs args)
         {
-            RebuildPointsOfInterest();
-            RebuildEnableState();
+            AutoSuggestBox box = (AutoSuggestBox)sender;
+            box.IsSuggestionListOpen = true;
         }
 
         /// <summary>
-        /// poi combo selection changed: update enable state in the ui.
+        /// filter box text changed: update the items in the search box based on the value in the field.
         /// </summary>
-        private void PoIComboSelect_SelectionChanged(object sender, RoutedEventArgs args)
+        private void PoINameFilterBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            RebuildEnableState();
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                CurSelectedPoI = null;
+                RebuildPointsOfInterest();
+                RebuildEnableState();
+            }
+        }
+
+        /// <summary>
+        /// filter box query submitted: apply the query text filter to the pois listed in the poi list.
+        /// </summary>
+        private void PoINameFilterBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            if (args.ChosenSuggestion != null)
+            {
+                CurSelectedPoI = (args.ChosenSuggestion as Base.PoIListItem).PoI;
+            }
+            else
+            {
+                CurSelectedPoI = null;
+                foreach (Base.PoIListItem poi in uiPoINameFilterBox.ItemsSource as IEnumerable<Base.PoIListItem>)
+                {
+                    if (poi.Name == args.QueryText)
+                    {
+                        CurSelectedPoI = poi.PoI;
+                        break;
+                    }
+                }
+            }
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// filter button click: setup the filter setup.
+        /// </summary>
+        private async void PoIBtnFilter_Click(object sender, RoutedEventArgs args)
+        {
+            ToggleButton button = (ToggleButton)sender;
+            PoIFilterSpec spec = await NavpointUIHelper.FilterSpecDialog(Content.XamlRoot, FilterSpec, button);
+            if (spec != null)
+            {
+                FilterSpec = spec;
+                button.IsChecked = FilterSpec.IsFiltered;
+
+                Settings.LastStptFilterTheater = FilterSpec.Theater;
+                Settings.LastStptFilterTags = FilterSpec.Tags;
+                Settings.LastStptFilterIncludeTypes = FilterSpec.IncludeTypes;
+
+                RebuildPointsOfInterest();
+                RebuildInterfaceState();
+            }
         }
 
         /// <summary>
@@ -569,14 +612,12 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void PoIBtnApply_Click(object sender, RoutedEventArgs args)
         {
-            PointOfInterest poi = (PointOfInterest)uiPoIComboSelect.SelectedItem;
-            EditStpt.Name = poi.Name;
-            EditStpt.LatUI = Coord.ConvertFromLatDD(poi.Latitude, LLFormat.DDM_P3ZF);
-            EditStpt.LonUI = Coord.ConvertFromLonDD(poi.Longitude, LLFormat.DDM_P3ZF);
-            EditStpt.Alt = poi.Elevation;
+            EditStpt.Name = CurSelectedPoI.Name;
+            EditStpt.LatUI = Coord.ConvertFromLatDD(CurSelectedPoI.Latitude, LLFormat.DDM_P3ZF);
+            EditStpt.LonUI = Coord.ConvertFromLonDD(CurSelectedPoI.Longitude, LLFormat.DDM_P3ZF);
+            EditStpt.Alt = CurSelectedPoI.Elevation;
             EditStpt.TOS = "";
             EditStpt.ClearErrors();
-
             RebuildInterfaceState();
         }
 
@@ -657,10 +698,11 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void StptBtnPrev_Click(object sender, RoutedEventArgs args)
         {
+            CurSelectedPoI = null;
+            uiPoINameFilterBox.Text = null;
             CopyEditToConfig(EditStptIndex, true);
             EditStptIndex -= 1;
             CopyConfigToEdit(EditStptIndex);
-            SelectMatchingPoI();
             RebuildInterfaceState();
         }
 
@@ -669,10 +711,11 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void StptBtnNext_Click(object sender, RoutedEventArgs args)
         {
+            CurSelectedPoI = null;
+            uiPoINameFilterBox.Text = null;
             CopyEditToConfig(EditStptIndex, true);
             EditStptIndex += 1;
             CopyConfigToEdit(EditStptIndex);
-            SelectMatchingPoI();
             RebuildInterfaceState();
         }
 
@@ -816,19 +859,15 @@ namespace JAFDTC.UI.F16C
             EditStptIndex = NavArgs.IndexStpt;
             CopyConfigToEdit(EditStptIndex);
 
-            string theater = null;
-            if ((Config.STPT.Points.Count > 0) && Config.STPT.Points[0].IsValid)
-            {
-                theater = PointOfInterestDbase.TheaterForCoords(Config.STPT.Points[0].Lat, Config.STPT.Points[0].Lon);
-            }
-            theater = (string.IsNullOrEmpty(theater)) ? CurPoITheaters[0] : theater;
-            uiPoIComboTheater.SelectedItem = theater;
+            FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterTags,
+                             Settings.LastStptFilterIncludeTypes);
 
             ValidateAllFields(_curStptFieldValueMap, EditStpt.GetErrors(null));
             ValidateAllFields(_oap0FieldValueMap, EditStpt.OAP[0].GetErrors(null));
             ValidateAllFields(_oap1FieldValueMap, EditStpt.OAP[1].GetErrors(null));
             ValidateAllFields(_vxp0FieldValueMap, EditStpt.VxP[0].GetErrors(null));
             ValidateAllFields(_vxp1FieldValueMap, EditStpt.VxP[1].GetErrors(null));
+            RebuildPointsOfInterest();
             RebuildInterfaceState();
 
             base.OnNavigatedTo(args);

@@ -35,6 +35,7 @@ using System.Diagnostics;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 using JAFDTC.UI.Base;
+using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace JAFDTC.UI.F15E
 {
@@ -90,7 +91,10 @@ namespace JAFDTC.UI.F15E
 
         private bool IsRebuildPending { get; set; }
 
-        private List<string> CurPoITheaters { get; set; }
+        private PointOfInterest CurSelectedPoI { get; set; }
+
+        private PoIFilterSpec FilterSpec { get; set; }
+
 
         // ---- read-only properties
 
@@ -122,9 +126,9 @@ namespace JAFDTC.UI.F15E
             EditRfpt.ErrorsChanged += EditRfpt_DataValidationError;
             EditRfpt.PropertyChanged += EditField_PropertyChanged;
 
-            CurPoITheaters = PointOfInterestDbase.KnownTheaters();
-
             IsRebuildPending = false;
+
+            CurSelectedPoI = null;
 
             _curStptFieldValueMap = new Dictionary<string, TextBox>()
             {
@@ -370,8 +374,10 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void SelectMatchingPoI()
         {
+#if NOPE
             uiPoIComboSelect.SelectedItem = NavpointUIHelper.FindMatchingPoI((string)uiPoIComboTheater.SelectedItem,
                                                                              EditStpt, LLFormat.DDM_P3ZF);
+#endif
         }
 
         /// <summary>
@@ -415,8 +421,7 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void RebuildPointsOfInterest()
         {
-            NavpointUIHelper.RebuildPoICombo((string)uiPoIComboTheater.SelectedItem, uiPoIComboSelect);
-            SelectMatchingPoI();
+            uiPoINameFilterBox.ItemsSource = NavpointUIHelper.RebuildPointsOfInterest(FilterSpec, uiPoINameFilterBox.Text);
         }
 
         /// <summary>
@@ -450,10 +455,10 @@ namespace JAFDTC.UI.F15E
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(STPTSystem.SystemTag));
             bool isDCSListening = curApp.IsDCSAvailable && (curApp.DCSActiveAirframe == Config.Airframe);
 
-            Utilities.SetEnableState(uiPoIComboTheater, isEditable);
-            Utilities.SetEnableState(uiPoIComboSelect, isEditable && (uiPoIComboSelect.Items.Count > 0));
-            Utilities.SetEnableState(uiPoIBtnApply, isEditable && (uiPoIComboSelect.SelectedIndex > 0));
+            Utilities.SetEnableState(uiPoIBtnApply, isEditable && (CurSelectedPoI != null));
             Utilities.SetEnableState(uiPoIBtnCapture, isEditable && isDCSListening);
+
+            uiPoIBtnFilter.IsChecked = FilterSpec.IsFiltered;
 
             Utilities.SetEnableState(uiStptValueName, isEditable);
             foreach (KeyValuePair<string, TextBox> kvp in _curStptFieldValueMap)
@@ -535,20 +540,70 @@ namespace JAFDTC.UI.F15E
         // ---- poi management ----------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// filter box focused: show the suggestion list when the control gains focus.
         /// </summary>
-        private void PoIComboTheater_SelectionChanged(object sender, RoutedEventArgs args)
+        private void PoINameFilterBox_GotFocus(object sender, RoutedEventArgs args)
         {
-            RebuildPointsOfInterest();
-            RebuildEnableState();
+            AutoSuggestBox box = (AutoSuggestBox)sender;
+            box.IsSuggestionListOpen = true;
         }
 
         /// <summary>
-        /// poi combo selection changed: update enable state in the ui.
+        /// filter box text changed: update the items in the search box based on the value in the field.
         /// </summary>
-        private void PoIComboSelect_SelectionChanged(object sender, RoutedEventArgs args)
+        private void PoINameFilterBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            RebuildEnableState();
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                CurSelectedPoI = null;
+                RebuildPointsOfInterest();
+                RebuildEnableState();
+            }
+        }
+
+        /// <summary>
+        /// filter box query submitted: apply the query text filter to the pois listed in the poi list.
+        /// </summary>
+        private void PoINameFilterBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            if (args.ChosenSuggestion != null)
+            {
+                CurSelectedPoI = (args.ChosenSuggestion as Base.PoIListItem).PoI;
+            }
+            else
+            {
+                CurSelectedPoI = null;
+                foreach (Base.PoIListItem poi in uiPoINameFilterBox.ItemsSource as IEnumerable<Base.PoIListItem>)
+                {
+                    if (poi.Name == args.QueryText)
+                    {
+                        CurSelectedPoI = poi.PoI;
+                        break;
+                    }
+                }
+            }
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// filter button click: setup the filter setup.
+        /// </summary>
+        private async void PoIBtnFilter_Click(object sender, RoutedEventArgs args)
+        {
+            ToggleButton button = (ToggleButton)sender;
+            PoIFilterSpec spec = await NavpointUIHelper.FilterSpecDialog(Content.XamlRoot, FilterSpec, button);
+            if (spec != null)
+            {
+                FilterSpec = spec;
+                button.IsChecked = FilterSpec.IsFiltered;
+
+                Settings.LastStptFilterTheater = FilterSpec.Theater;
+                Settings.LastStptFilterTags = FilterSpec.Tags;
+                Settings.LastStptFilterIncludeTypes = FilterSpec.IncludeTypes;
+
+                RebuildPointsOfInterest();
+                RebuildInterfaceState();
+            }
         }
 
         /// <summary>
@@ -556,11 +611,10 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void PoIBtnApply_Click(object sender, RoutedEventArgs args)
         {
-            PointOfInterest poi = (PointOfInterest)uiPoIComboSelect.SelectedItem;
-            EditStpt.Name = poi.Name;
-            EditStpt.LatUI = Coord.ConvertFromLatDD(poi.Latitude, LLFormat.DDM_P3ZF);
-            EditStpt.LonUI = Coord.ConvertFromLonDD(poi.Longitude, LLFormat.DDM_P3ZF);
-            EditStpt.Alt = poi.Elevation;
+            EditStpt.Name = CurSelectedPoI.Name;
+            EditStpt.LatUI = Coord.ConvertFromLatDD(CurSelectedPoI.Latitude, LLFormat.DDM_P3ZF);
+            EditStpt.LonUI = Coord.ConvertFromLonDD(CurSelectedPoI.Longitude, LLFormat.DDM_P3ZF);
+            EditStpt.Alt = CurSelectedPoI.Elevation;
             EditStpt.TOT = "";
             EditStpt.ClearErrors();
 
@@ -785,20 +839,16 @@ namespace JAFDTC.UI.F15E
             EditStptIndex = NavArgs.IndexStpt;
             CopyConfigToEdit(EditStptIndex);
 
-            string theater = null;
-            if ((Config.STPT.Points.Count > 0) && Config.STPT.Points[0].IsValid)
-            {
-                theater = PointOfInterestDbase.TheaterForCoords(Config.STPT.Points[0].Lat, Config.STPT.Points[0].Lon);
-            }
-            theater = (string.IsNullOrEmpty(theater)) ? CurPoITheaters[0] : theater;
-            uiPoIComboTheater.SelectedItem = theater;
-
             EditRfptNum = 1;
             uiRfptComboSelect.SelectedIndex = EditRfptNum - 1;
             LoadEditRfptFromPointNumber(EditRfptNum);
 
+            FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterTags,
+                             Settings.LastStptFilterIncludeTypes);
+
             ValidateAllFields(_curStptFieldValueMap, EditStpt.GetErrors(null));
             ValidateAllFields(_curRfptFieldValueMap, EditRfpt.GetErrors(null));
+            RebuildPointsOfInterest();
             RebuildInterfaceState();
 
             base.OnNavigatedTo(args);
