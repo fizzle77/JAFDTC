@@ -378,11 +378,35 @@ namespace JAFDTC.Utilities
             return false;
         }
 
+        /// <summary>
+        /// delete the user database (a .json serialized List<T>) with the given name from the database area in the
+        /// jafdtc settings directory.
+        /// </summary>
+        public static void DeleteUserDatabase(string name)
+        {
+            string path = Path.Combine(Path.Combine(_settingsDirPath, "Dbase"), name);
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // poi database
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// return a sanitized filename for a campaign point of interest database.
+        /// </summary>
+        private static string CampaignPoIFilename(string campaign)
+        {
+            campaign = campaign.ToLower().Replace(' ', '-');
+            char[] invalidChars = System.IO.Path.GetInvalidFileNameChars();
+            string cleanFilenameBase = new(campaign.Where(m => !invalidChars.Contains(m)).ToArray<char>());
+            return $"jafdtc-pois-campaign-{cleanFilenameBase}.json";
+        }
 
         /// <summary>
         /// return the point of interest database that provides coordinates on known points in the world. this database
@@ -415,11 +439,28 @@ namespace JAFDTC.Utilities
         }
 
         /// <summary>
-        /// saves the user portion of the point of interest database. returns true on success, false otherwise.
+        /// saves points of interest to the user point of interest database. returns true on success, false otherwise.
         /// </summary>
         public static bool SaveUserPointsOfInterest(List<PointOfInterest> userPoIs)
         {
             return SaveUserDbase<PointOfInterest>("jafdtc-pois-user.json", userPoIs);
+        }
+
+        /// <summary>
+        /// saves points of interest to the campaign point of interest database. returns true on success, false
+        /// otherwise.
+        /// </summary>
+        public static bool SaveCampaignPointsOfInterest(string campaign, List<PointOfInterest> userPoIs)
+        {
+            return SaveUserDbase<PointOfInterest>(CampaignPoIFilename(campaign), userPoIs);
+        }
+
+        /// <summary>
+        /// returns true if there is a point of interest database for the specified campaign, false otherwise.
+        /// </summary>
+        public static bool IsCampaignDatabase(string campaign)
+        {
+            return File.Exists(Path.Combine(Path.Combine(_settingsDirPath, "Dbase"), CampaignPoIFilename(campaign)));
         }
 
         // ------------------------------------------------------------------------------------------------------------
