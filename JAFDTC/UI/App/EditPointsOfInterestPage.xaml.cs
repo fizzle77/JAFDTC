@@ -397,54 +397,7 @@ namespace JAFDTC.UI.App
         {
             PointOfInterestDbQuery query = new(FilterIncludeTypes, FilterTheater, name, FilterTags,
                                                PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH);
-            List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
-            pois.Sort((a, b) =>
-            {
-                int theaterCmp = a.Theater.CompareTo(b.Theater);
-                if ((theaterCmp == 0) && (a.Type == b.Type))
-                {
-                    return a.Name.CompareTo(b.Name);
-                }
-                else if ((theaterCmp == 0) && (a.Type == PointOfInterestType.USER))
-                {
-                    return -1;
-                }
-                else if ((theaterCmp == 0) && (a.Type == PointOfInterestType.CAMPAIGN))
-                {
-                    return (b.Type == PointOfInterestType.USER) ? 1 : -1;
-                }
-                else if ((theaterCmp == 0) && (a.Type == PointOfInterestType.DCS_CORE))
-                {
-                    return 1;
-                }
-                return theaterCmp;
-            });
-            return pois;
-        }
-
-        /// <summary>
-        /// return sanitized tag string with empty tags removed, extra spaces removed, etc.
-        /// </summary>
-        private static string SanitizeTags(string tags)
-        {
-            string cleanTags = tags;
-            if (!string.IsNullOrEmpty(tags))
-            {
-                cleanTags = "";
-                foreach (string value in tags.Split(';').ToList<string>())
-                {
-                    string newValue = value.Trim();
-                    if (newValue.Length > 0)
-                    {
-                        cleanTags += $"; {newValue}";
-                    }
-                }
-                if (cleanTags.Length >= 3)
-                {
-                    cleanTags = cleanTags[2..];
-                }
-            }
-            return cleanTags;
+            return PointOfInterestDbase.Instance.Find(query, true);
         }
 
         /// <summary>
@@ -646,7 +599,7 @@ namespace JAFDTC.UI.App
                 string suffix = (poiListItem.PoI.Type == PointOfInterestType.USER) ? "" : " (User Copy)";
                 int index = _llFmtToIndexMap[LLDisplayFmt];
                 EditPoI.Name = $"{poiListItem.PoI.Name}{suffix}";
-                EditPoI.Tags = SanitizeTags(poiListItem.PoI.Tags);
+                EditPoI.Tags = PointOfInterest.SanitizedTags(poiListItem.PoI.Tags);
                 EditPoI.LL[index].LatUI = Coord.ConvertFromLatDD(poiListItem.PoI.Latitude, LLDisplayFmt);
                 EditPoI.LL[index].LonUI = Coord.ConvertFromLonDD(poiListItem.PoI.Longitude, LLDisplayFmt);
                 EditPoI.Alt = poiListItem.PoI.Elevation;
@@ -920,7 +873,7 @@ namespace JAFDTC.UI.App
             if (result == ContentDialogResult.Primary)
             {
                 FilterTheater = filterDialog.Theater;
-                FilterTags = SanitizeTags(filterDialog.Tags);
+                FilterTags = PointOfInterest.SanitizedTags(filterDialog.Tags);
                 FilterIncludeTypes = filterDialog.IncludeTypes;
             }
             else if (result == ContentDialogResult.Secondary)
@@ -1013,7 +966,7 @@ namespace JAFDTC.UI.App
                 {
                     Type = PointOfInterestType.USER,
                     Name = EditPoI.Name,
-                    Tags = SanitizeTags(EditPoI.Tags),
+                    Tags = PointOfInterest.SanitizedTags(EditPoI.Tags),
                     Theater = theater,
                     Latitude = EditPoI.LL[index].Lat,
                     Longitude = EditPoI.LL[index].Lon,
@@ -1024,7 +977,7 @@ namespace JAFDTC.UI.App
             }
             else
             {
-                pois[0].Tags = SanitizeTags(EditPoI.Tags);
+                pois[0].Tags = PointOfInterest.SanitizedTags(EditPoI.Tags);
                 pois[0].Elevation = EditPoI.Alt;
                 pois[0].Latitude = EditPoI.LL[index].Lat;
                 pois[0].Longitude = EditPoI.LL[index].Lon;
