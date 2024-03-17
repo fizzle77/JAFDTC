@@ -107,7 +107,15 @@ namespace JAFDTC.Models.F15E.Upload
                 string band = (_cfg.Misc.TACANBandValue == TACANBands.X) ? "Y" : "X";
                 AddIfBlock("IsTACANBand", new() { band }, delegate () { AddAction(ufc, "PB1"); });
 
-                AddActions(ufc, new() { "PB10", "MENU" });
+                string modeButton = _cfg.Misc.TACANModeValue switch
+                {
+                    TACANModes.A2A => "PB2",
+                    TACANModes.TR => "PB3",
+                    TACANModes.REC => "PB4",
+                    _ => "PB2"
+                };
+
+                AddActions(ufc, new() { modeButton, "PB10", "MENU" });
             }
         }
 

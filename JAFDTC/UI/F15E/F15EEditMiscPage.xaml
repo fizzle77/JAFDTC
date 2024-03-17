@@ -91,11 +91,23 @@ https://www.gnu.org/licenses/.
                           x:Name="uiTACANComboBand"
                           VerticalAlignment="Center"
                           SelectionChanged="TACANComboBand_SelectionChanged"
-                          ToolTipService.ToolTip="TACAN mode selection">
+                          ToolTipService.ToolTip="TACAN band mode selection">
                     <!-- Tag is enum TACANBands -->
                     <ComboBox.Items>
                         <TextBlock Text="X" Tag="0"/>
                         <TextBlock Text="Y" Tag="1"/>
+                    </ComboBox.Items>
+                </ComboBox>
+                <ComboBox Margin="12,0,0,0" Width="80"
+                          x:Name="uiTACANComboMode"
+                          VerticalAlignment="Center"
+                          SelectionChanged="TACANComboMode_SelectionChanged"
+                          ToolTipService.ToolTip="TACAN operating mode selection">
+                    <!-- Tag is enum TACANModes -->
+                    <ComboBox.Items>
+                        <TextBlock Text="A/A" Tag="0"/>
+                        <TextBlock Text="T/R" Tag="1"/>
+                        <TextBlock Text="REC" Tag="2"/>
                     </ComboBox.Items>
                 </ComboBox>
             </StackPanel>

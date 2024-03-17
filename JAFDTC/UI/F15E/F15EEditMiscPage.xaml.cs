@@ -131,6 +131,7 @@ namespace JAFDTC.UI.F15E
             EditMisc.LowAltWarn = Config.Misc.LowAltWarn;
             EditMisc.TACANChannel = Config.Misc.TACANChannel;
             EditMisc.TACANBand = Config.Misc.TACANBand;
+            EditMisc.TACANMode = Config.Misc.TACANMode;
         }
 
         /// <summary>
@@ -145,6 +146,7 @@ namespace JAFDTC.UI.F15E
                 Config.Misc.LowAltWarn = EditMisc.LowAltWarn;
                 Config.Misc.TACANChannel = EditMisc.TACANChannel;
                 Config.Misc.TACANBand = EditMisc.TACANBand;
+                Config.Misc.TACANMode = EditMisc.TACANMode;
 
                 if (isPersist)
                 {
@@ -215,7 +217,7 @@ namespace JAFDTC.UI.F15E
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// rebuild the setup of the tacan band according to the current settings. 
+        /// rebuild the setup of the tacan band and mode according to the current settings. 
         /// </summary>
         private void RebuildTACANSetup()
         {
@@ -224,6 +226,13 @@ namespace JAFDTC.UI.F15E
             if (uiTACANComboBand.SelectedIndex != band)
             {
                 uiTACANComboBand.SelectedIndex = band;
+            }
+
+            int mode = (string.IsNullOrEmpty(EditMisc.TACANMode)) ? int.Parse(_miscSysDefault.TACANMode)
+                                                                  : int.Parse(EditMisc.TACANMode);
+            if (uiTACANComboMode.SelectedIndex != mode)
+            {
+                uiTACANComboMode.SelectedIndex = mode;
             }
         }
 
@@ -248,6 +257,7 @@ namespace JAFDTC.UI.F15E
                 Utilities.SetEnableState(kvp.Value, isEditable);
             }
             Utilities.SetEnableState(uiTACANComboBand, isEditable);
+            Utilities.SetEnableState(uiTACANComboMode, isEditable);
 
             Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
 
@@ -327,7 +337,7 @@ namespace JAFDTC.UI.F15E
         // ---- tacan setup -------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// selection changed on tacan band: update band state.
         /// </summary>
         private void TACANComboBand_SelectionChanged(object sender, RoutedEventArgs args)
         {
@@ -335,6 +345,19 @@ namespace JAFDTC.UI.F15E
             if (!IsRebuildingUI && (item != null) && (item.Tag != null))
             {
                 EditMisc.TACANBand = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        /// <summary>
+        /// selection changed on tacan mode: update mode state.
+        /// </summary>
+        private void TACANComboMode_SelectionChanged(object sender, RoutedEventArgs args)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.TACANMode = (string)item.Tag;
                 CopyEditToConfig(true);
             }
         }

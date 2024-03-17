@@ -18,6 +18,7 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.F16C.Misc;
 using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
@@ -32,6 +33,16 @@ namespace JAFDTC.Models.F15E.Misc
     {
         X = 0,
         Y = 1
+    }
+
+    /// <summary>
+    /// defines the bands for tacan.
+    /// </summary>
+    public enum TACANModes
+    {
+        A2A = 0,
+        TR = 1,
+        REC = 2
     }
 
     /// <summary>
@@ -114,6 +125,17 @@ namespace JAFDTC.Models.F15E.Misc
             }
         }
 
+        private string _tacanMode;                              // integer [0, 2]
+        public string TACANMode
+        {
+            get => _tacanMode;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
+                SetProperty(ref _tacanMode, value, error);
+            }
+        }
+
         private string _ilsFrequency;                           // 000.00 decimal [108.10, 111.95] in 0.05 steps
         public string ILSFrequency
         {
@@ -145,6 +167,7 @@ namespace JAFDTC.Models.F15E.Misc
             LowAltWarn = "250",
             TACANChannel = "1",
             TACANBand = ((int)TACANBands.X).ToString(),
+            TACANMode = ((int)TACANModes.TR).ToString(),
             ILSFrequency = "108.10",
         };
 
@@ -165,7 +188,9 @@ namespace JAFDTC.Models.F15E.Misc
 
         // TODO: technically, could be default with non-empty values...
         [JsonIgnore]
-        public bool IsTACANDefault => (string.IsNullOrEmpty(TACANChannel) && string.IsNullOrEmpty(TACANBand));
+        public bool IsTACANDefault => (string.IsNullOrEmpty(TACANChannel) &&
+                                       string.IsNullOrEmpty(TACANBand) &&
+                                       string.IsNullOrEmpty(TACANMode));
 
         // TODO: technically, could be default with non-empty values...
         [JsonIgnore]
@@ -177,6 +202,12 @@ namespace JAFDTC.Models.F15E.Misc
         public TACANBands TACANBandValue
         {
             get => (TACANBands)int.Parse((string.IsNullOrEmpty(TACANBand)) ? ExplicitDefaults.TACANBand : TACANBand);
+        }
+
+        [JsonIgnore]
+        public TACANModes TACANModeValue
+        {
+            get => (TACANModes)int.Parse((string.IsNullOrEmpty(TACANMode)) ? ExplicitDefaults.TACANMode : TACANMode);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -196,6 +227,7 @@ namespace JAFDTC.Models.F15E.Misc
             LowAltWarn = new(other.LowAltWarn);
             TACANChannel = new(other.TACANChannel);
             TACANBand = new(other.TACANBand);
+            TACANMode = new(other.TACANMode);
             ILSFrequency = new(other.ILSFrequency);
         }
 
@@ -216,6 +248,7 @@ namespace JAFDTC.Models.F15E.Misc
             LowAltWarn = "";
             TACANChannel = "";
             TACANBand = "";
+            TACANMode = "";
             ILSFrequency = "";
         }
     }
