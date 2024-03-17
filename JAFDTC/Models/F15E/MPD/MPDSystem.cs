@@ -1,8 +1,7 @@
 ﻿// ********************************************************************************************************************
 //
-// F15EUploadAgent.cs -- f-15e upload agent
+// MPDSystem.cs -- f-15e mpd/mpcd system
 //
-// Copyright(C) 2021-2023 the-paid-actor & others
 // Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
@@ -18,26 +17,48 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.F15E.Upload;
+using JAFDTC.Models.F15E.Misc;
+using JAFDTC.Utilities;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
-namespace JAFDTC.Models.F15E
+namespace JAFDTC.Models.F15E.MPD
 {
-    /// <summary>
-    /// upload agent responsible for building a stream of commands for use by dcs to set up mudhen avionics according
-    /// to a configuration.
-    /// </summary>
-    public class F15EUploadAgent : UploadAgentBase, IUploadAgent
+    public class MPDSystem : BindableObject, ISystem
     {
+        public const string SystemTag = "JAFDTC:F15E:MPD";
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private readonly F15EConfiguration _cfg;
-        private readonly F15EDeviceManager _dcsCmds;
+        // ---- public properties, computed
+
+        /// <summary>
+        /// returns a MPDSystem with the fields populated with the actual default values (note that usually the value
+        /// "" implies default).
+        ///
+        /// defaults are as of DCS v2.9.0.47168.
+        /// </summary>
+        [JsonIgnore]
+        public readonly static MPDSystem ExplicitDefaults = new()
+        {
+        };
+
+        /// <summary>
+        /// returns true if the instance indicates a default setup (all fields are "") or the object is in explicit
+        /// form, false otherwise.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsDefault => true;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -45,20 +66,28 @@ namespace JAFDTC.Models.F15E
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F15EUploadAgent(F15EConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new F15EDeviceManager());
-
-        // ------------------------------------------------------------------------------------------------------------
-        //
-        // methods
-        //
-        // ------------------------------------------------------------------------------------------------------------
-
-        public override void BuildSystems(StringBuilder sb)
+        public MPDSystem()
         {
-            new RadioBuilder(_cfg, _dcsCmds, sb).Build();
-            new MPDBuilder(_cfg, _dcsCmds, sb).Build();
-            new MiscBuilder(_cfg, _dcsCmds, sb).Build();
-            new STPTBuilder(_cfg, _dcsCmds, sb).Build();
+            Reset();
+        }
+
+        public MPDSystem(MPDSystem other)
+        {
+        }
+
+        public virtual object Clone() => new MPDSystem(this);
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // Methods
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// reset the instance to defaults (by definition, field value of "" implies default).
+        /// </summary>
+        public void Reset()
+        {
         }
     }
 }

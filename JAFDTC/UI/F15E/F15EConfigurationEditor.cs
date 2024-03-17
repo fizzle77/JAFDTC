@@ -20,6 +20,7 @@
 using JAFDTC.Models;
 using JAFDTC.Models.F15E;
 using JAFDTC.Models.F15E.Misc;
+using JAFDTC.Models.F15E.MPD;
 using JAFDTC.Models.F15E.Radio;
 using JAFDTC.Models.F15E.STPT;
 using JAFDTC.UI.App;
@@ -34,6 +35,7 @@ namespace JAFDTC.UI.F15E
     public class Glyphs
     {
         public const string MISC = "\xE8B7";
+        public const string MPD = "\xE950";
         public const string RADIO = "\xE704";
         public const string STPT = "\xE707";
     }
@@ -47,6 +49,7 @@ namespace JAFDTC.UI.F15E
         private static readonly ObservableCollection<ConfigEditorPageInfo> _configEditorPageInfo = new()
         {
             F15EEditSteerpointListPage.PageInfo,
+            F15EEditMPDPage.PageInfo,
             F15EEditRadioPageHelper.PageInfo,
             F15EEditMiscPage.PageInfo,
         };
@@ -60,6 +63,7 @@ namespace JAFDTC.UI.F15E
             ISystem system = tag switch
             {
                 MiscSystem.SystemTag => ((F15EConfiguration)config).Misc,
+                MPDSystem.SystemTag => ((F15EConfiguration)config).MPD,
                 RadioSystem.SystemTag => ((F15EConfiguration)config).Radio,
                 STPTSystem.SystemTag => ((F15EConfiguration)config).STPT,
                 _ => null,

@@ -55,6 +55,7 @@
     <None Remove="UI\Base\EditNavpointPage.xaml" />
     <None Remove="UI\Base\EditRadioPage.xaml" />
     <None Remove="UI\F15E\F15EEditMiscPage.xaml" />
+    <None Remove="UI\F15E\F15EEditMPDPage.xaml" />
     <None Remove="UI\F15E\F15EEditSteerpointListPage.xaml" />
     <None Remove="UI\F15E\F15EEditSteerpointPage.xaml" />
     <None Remove="UI\F16C\F16CEditHTSThreatsPage.xaml" />
@@ -125,6 +126,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\F15E\F15EEditMPDPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

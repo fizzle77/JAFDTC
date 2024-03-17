@@ -19,6 +19,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.F15E.Misc;
+using JAFDTC.Models.F15E.MPD;
 using JAFDTC.Models.F15E.Radio;
 using JAFDTC.Models.F15E.STPT;
 using JAFDTC.UI.F15E;
@@ -48,6 +49,8 @@ namespace JAFDTC.Models.F15E
 
         public MiscSystem Misc { get; set; }
 
+        public MPDSystem MPD { get; set; }
+
         public RadioSystem Radio { get; set; }
 
         public STPTSystem STPT { get; set; }
@@ -65,6 +68,7 @@ namespace JAFDTC.Models.F15E
             : base(_versionCfg, AirframeTypes.F15E, uid, name, linkedSysMap)
         {
             Misc = new MiscSystem();
+            MPD = new MPDSystem();
             Radio = new RadioSystem();
             STPT = new STPTSystem();
             ConfigurationUpdated();
@@ -80,6 +84,7 @@ namespace JAFDTC.Models.F15E
             F15EConfiguration clone = new("", Name, linkedSysMap)
             {
                 Misc = (MiscSystem)Misc.Clone(),
+                MPD = (MPDSystem)MPD.Clone(),
                 Radio = (RadioSystem)Radio.Clone(),
                 STPT = (STPTSystem)STPT.Clone()
             };
@@ -94,6 +99,7 @@ namespace JAFDTC.Models.F15E
             switch (systemTag)
             {
                 case MiscSystem.SystemTag: Misc = otherMudhen.Misc.Clone() as MiscSystem; break;
+                case MPDSystem.SystemTag: MPD = otherMudhen.MPD.Clone() as MPDSystem; break;
                 case RadioSystem.SystemTag: Radio = otherMudhen.Radio.Clone() as RadioSystem; break;
                 case STPTSystem.SystemTag: STPT = otherMudhen.STPT.Clone() as STPTSystem; break;
                 default: break;
@@ -127,6 +133,7 @@ namespace JAFDTC.Models.F15E
             {
                 null => JsonSerializer.Serialize(this, Configuration.JsonOptions),
                 MiscSystem.SystemTag => JsonSerializer.Serialize(Misc, Configuration.JsonOptions),
+                MPDSystem.SystemTag => JsonSerializer.Serialize(MPD, Configuration.JsonOptions),
                 RadioSystem.SystemTag => JsonSerializer.Serialize(Radio, Configuration.JsonOptions),
                 STPTSystem.SystemTag => JsonSerializer.Serialize(STPT, Configuration.JsonOptions),
                 _ => null
@@ -136,6 +143,7 @@ namespace JAFDTC.Models.F15E
         public override void AfterLoadFromJSON()
         {
             Misc ??= new MiscSystem();
+            MPD ??= new MPDSystem();
             Radio ??= new RadioSystem();
             STPT ??= new STPTSystem();
 
@@ -151,6 +159,7 @@ namespace JAFDTC.Models.F15E
             return (!string.IsNullOrEmpty(cboardTag) &&
                     (((systemTag != null) && (cboardTag.StartsWith(systemTag))) ||
                      ((systemTag == null) && ((cboardTag == MiscSystem.SystemTag) ||
+                                              (cboardTag == MPDSystem.SystemTag) || 
                                               (cboardTag == RadioSystem.SystemTag) ||
                                               (cboardTag == STPTSystem.SystemTag) ||
                                               (cboardTag == STPTSystem.STPTListTag)))));
@@ -165,6 +174,7 @@ namespace JAFDTC.Models.F15E
                 switch (systemTag)
                 {
                     case MiscSystem.SystemTag: Misc = JsonSerializer.Deserialize<MiscSystem>(json); break;
+                    case MPDSystem.SystemTag: MPD = JsonSerializer.Deserialize<MPDSystem>(json); break;
                     case RadioSystem.SystemTag: Radio = JsonSerializer.Deserialize<RadioSystem>(json); break;
                     case STPTSystem.SystemTag: STPT = JsonSerializer.Deserialize<STPTSystem>(json); break;
                     case STPTSystem.STPTListTag: STPT.ImportSerializedNavpoints(json, false); break;

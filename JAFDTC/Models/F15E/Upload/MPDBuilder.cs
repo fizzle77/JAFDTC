@@ -1,8 +1,7 @@
 ﻿// ********************************************************************************************************************
 //
-// F15EUploadAgent.cs -- f-15e upload agent
+// MPDBuilder.cs -- f-15e mpd/mpcd system command builder
 //
-// Copyright(C) 2021-2023 the-paid-actor & others
 // Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
@@ -18,47 +17,39 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.F15E.Upload;
+using JAFDTC.Models.DCS;
+using JAFDTC.Models.F15E.MPD;
 using System.Diagnostics;
 using System.Text;
 
-namespace JAFDTC.Models.F15E
+namespace JAFDTC.Models.F15E.Upload
 {
     /// <summary>
-    /// upload agent responsible for building a stream of commands for use by dcs to set up mudhen avionics according
-    /// to a configuration.
+    /// command builder for the mpd/mpcd systems in the mudhen. translates mpd/mpcd setup in F15EConfiguration into
+    /// commands that drive the dcs clickable cockpit.
     /// </summary>
-    public class F15EUploadAgent : UploadAgentBase, IUploadAgent
+    internal class MPDBuilder : F15EBuilderBase, IBuilder
     {
-        // ------------------------------------------------------------------------------------------------------------
-        //
-        // properties
-        //
-        // ------------------------------------------------------------------------------------------------------------
-
-        private readonly F15EConfiguration _cfg;
-        private readonly F15EDeviceManager _dcsCmds;
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F15EUploadAgent(F15EConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new F15EDeviceManager());
+        public MPDBuilder(F15EConfiguration cfg, F15EDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // methods
+        // build methods
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public override void BuildSystems(StringBuilder sb)
+        /// <summary>
+        /// configure mpd/mpcd system via the ufc according to the non-default programming settings (this function is
+        /// safe to call with a configuration with default settings: defaults are skipped as necessary).
+        /// <summary>
+        public override void Build()
         {
-            new RadioBuilder(_cfg, _dcsCmds, sb).Build();
-            new MPDBuilder(_cfg, _dcsCmds, sb).Build();
-            new MiscBuilder(_cfg, _dcsCmds, sb).Build();
-            new STPTBuilder(_cfg, _dcsCmds, sb).Build();
         }
     }
 }
