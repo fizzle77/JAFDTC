@@ -18,6 +18,7 @@
 //
 // ********************************************************************************************************************
 
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace JAFDTC.Models.DCS
@@ -76,5 +77,36 @@ namespace JAFDTC.Models.DCS
 
         public PointOfInterest(PointOfInterestType type, string theater, string name, string tags, string lat, string lon, string elev)
             => (Type, Theater, Name, Tags, Latitude, Longitude, Elevation) = (type, theater, name, tags, lat, lon, elev);
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // functions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// return sanitized tag string with empty tags removed, extra spaces removed, etc.
+        /// </summary>
+        public static string SanitizedTags(string tags)
+        {
+            string cleanTags = tags;
+            if (!string.IsNullOrEmpty(tags))
+            {
+                cleanTags = "";
+                foreach (string value in tags.Split(';').ToList<string>())
+                {
+                    string newValue = value.Trim();
+                    if (newValue.Length > 0)
+                    {
+                        cleanTags += $"; {newValue}";
+                    }
+                }
+                if (cleanTags.Length >= 3)
+                {
+                    cleanTags = cleanTags[2..];
+                }
+            }
+            return cleanTags;
+        }
     }
 }
