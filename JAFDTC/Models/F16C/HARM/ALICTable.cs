@@ -109,6 +109,7 @@ namespace JAFDTC.Models.F16C.HARM
         //
         public void Reset()
         {
+            Table.Clear();
             for (int i = 0; i < NUM_ALICTABLE_ENTRIES; i++)
             {
                 Table.Add(new TableCode());
