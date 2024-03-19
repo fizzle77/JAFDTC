@@ -18,6 +18,9 @@
 //
 // ********************************************************************************************************************
 
+// define to enable the debug command format. this format includes additional information helpful for debug, but
+// CANNOT be processed by the lua export on dcs.
+//
 #define noDEBUG_CMD_FORMAT
 
 using System;
