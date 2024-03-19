@@ -17,16 +17,9 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.F15E.Misc;
 using JAFDTC.Utilities;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace JAFDTC.Models.F15E.MPD
 {
@@ -34,31 +27,81 @@ namespace JAFDTC.Models.F15E.MPD
     {
         public const string SystemTag = "JAFDTC:F15E:MPD";
 
+        // crew positions
+        //
+        public enum CrewPositions
+        {
+            PILOT = 0,
+            WSO = 1
+        }
+
+        // mpd/mpcd displays. this enum is used to index internal arrays and should be sequential.
+        //
+        public enum CockpitDisplays
+        {
+            PILOT_L_MPD = 0,
+            PILOT_MPCD = 1,
+            PILOT_R_MPD = 2,
+
+            WSO_L_MPCD = 3,
+            WSO_L_MPD = 4,
+            WSO_R_MPD = 5,
+            WSO_R_MPCD = 6,
+
+            NUM_DISPLAYS = 7
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        // ---- following properties do not post change and validation events.
+
+        public MPDConfiguration[] Displays { get; set; }
+
+        public string CurCrewPosition { get; set; }
+
         // ---- public properties, computed
 
         /// <summary>
-        /// returns a MPDSystem with the fields populated with the actual default values (note that usually the value
-        /// "" implies default).
-        ///
-        /// defaults are as of DCS v2.9.0.47168.
+        /// returns true if the instance indicates a default setup (all fields are ""), false otherwise.
         /// </summary>
         [JsonIgnore]
-        public readonly static MPDSystem ExplicitDefaults = new()
+        public bool IsDefault
         {
-        };
+            get
+            {
+                for (int i = 0; i < (int)CockpitDisplays.NUM_DISPLAYS; i++)
+                {
+                    if (!Displays[i].IsDefault)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
 
         /// <summary>
-        /// returns true if the instance indicates a default setup (all fields are "") or the object is in explicit
-        /// form, false otherwise.
+        /// returns true if the setup for the indicated crew member is default, false otherwise.
         /// </summary>
-        [JsonIgnore]
-        public bool IsDefault => true;
+        public bool IsCrewMemberDefault(CrewPositions member)
+        {
+            int min = (member == CrewPositions.PILOT) ? (int)CockpitDisplays.PILOT_L_MPD
+                                                      : (int)CockpitDisplays.WSO_L_MPCD;
+            int max = (member == CrewPositions.PILOT) ? (int)CockpitDisplays.PILOT_R_MPD
+                                                      : (int)CockpitDisplays.WSO_R_MPCD;
+            for (int i = min; i <= max; i++)
+            {
+                if (!Displays[i].IsDefault)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -68,11 +111,22 @@ namespace JAFDTC.Models.F15E.MPD
 
         public MPDSystem()
         {
-            Reset();
+            Displays = new MPDConfiguration[(int)CockpitDisplays.NUM_DISPLAYS];
+            for (int i = 0; i < (int)CockpitDisplays.NUM_DISPLAYS; i++)
+            {
+                Displays[i] = new MPDConfiguration();
+            }
+            CurCrewPosition = ((int)CrewPositions.PILOT).ToString();
         }
 
         public MPDSystem(MPDSystem other)
         {
+            Displays = new MPDConfiguration[(int)CockpitDisplays.NUM_DISPLAYS];
+            for (int i = 0; i < (int)CockpitDisplays.NUM_DISPLAYS; i++)
+            {
+                Displays[i] = new MPDConfiguration(other.Displays[i]);
+            }
+            CurCrewPosition = other.CurCrewPosition;
         }
 
         public virtual object Clone() => new MPDSystem(this);
@@ -88,6 +142,11 @@ namespace JAFDTC.Models.F15E.MPD
         /// </summary>
         public void Reset()
         {
+            for (int i = 0; i < (int)CockpitDisplays.NUM_DISPLAYS; i++)
+            {
+                Displays[i].Reset();
+            }
+            CurCrewPosition = ((int)CrewPositions.PILOT).ToString();
         }
     }
 }
