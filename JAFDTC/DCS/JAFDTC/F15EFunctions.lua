@@ -90,20 +90,18 @@ function JAFDTC_F15E_GetDisplay(disp)
 	return table
 end
 
-function JAFDTC_F15E_CheckCondition_GoToFrontCockpit()
+function JAFDTC_F15E_Func_GoToFrontCockpit()
 	LoSetCommand(7)
 	if JAFDTC_F15E_CheckCondition_IsInFrontCockpit() == false then
 		LoSetCommand(1602)
 	end
-	return true
 end
 
-function JAFDTC_F15E_CheckCondition_GoToRearCockpit()
+function JAFDTC_F15E_Func_GoToRearCockpit()
 	LoSetCommand(7)
 	if JAFDTC_F15E_CheckCondition_IsInRearCockpit() == false then
 		LoSetCommand(1602)
 	end
-	return true
 end
 
 function JAFDTC_F15E_CheckCondition_IsInFrontCockpit()
@@ -122,65 +120,14 @@ function JAFDTC_F15E_CheckCondition_IsInRearCockpit()
 	return true
 end
 
---[[
-function JAFDTC_ClickCockpit(device, cmd)
-	device:performClickableAction(cmd, 1)
-	device:performClickableAction(cmd, 0)
+function JAFDTC_F15E_CheckCondition_NoDisplaysProgrammed(disp)
+    local table = JAFDTC_F15E_GetDisplay(disp);
+    local str = table["PRG_Label_1"] or table["PRG_Label_2"] or table["PRG_Label_3"] or ""
+    if str == "" then
+        return true
+    end
+    return false
 end
-
-function JAFDTC_F15E_GetDisplayDevice(disp)
-	if disp == "FLMPD" then
-		return 34;
-	elseif disp == "FRMPD" then
-		return 36;
-	elseif disp	== "FMPCD" then
-		return 35;
-	end
-end
-
-function JAFDTC_F15E_CheckCondition_HasProgrammedDisplays(disp)
-	local table = JAFDTC_F15E_GetDisplay(disp);
-	local p1 = table["PRG_Label_1"] or ""
-	local p2 = table["PRG_Label_2"] or ""
-	local p3 = table["PRG_Label_3"] or ""
-
-	if p1 ~= "" then JAFDTC_F15E_ClearProgrammedDisplay(disp, p1) end
-	if p2 ~= "" then JAFDTC_F15E_ClearProgrammedDisplay(disp, p2) end
-	if p3 ~= "" then JAFDTC_F15E_ClearProgrammedDisplay(disp, p3) end
-
-	return true
-end
-
-function JAFDTC_F15E_ClearProgrammedDisplay(disp, page)
-	local d = GetDevice(JAFDTC_F15E_GetDisplayDevice(disp))
-	if page == "ADI" then
-		JAFDTC_ClickCockpit(d, 3061)
-	elseif page == "ARMT" then
-		JAFDTC_ClickCockpit(d, 3062)
-	elseif page == "HSI" then
-		JAFDTC_ClickCockpit(d, 3063)
-	elseif page == "TSD" then
-		JAFDTC_ClickCockpit(d, 3065)
-	elseif page == "TPOD" then
-		JAFDTC_ClickCockpit(d, 3072)
-	elseif page == "TEWS" then
-		JAFDTC_ClickCockpit(d, 3073)
-	elseif page == "A/G RDR" then
-		JAFDTC_ClickCockpit(d, 3074)
-	elseif page == "A/A RDR" then
-		JAFDTC_ClickCockpit(d, 3075)
-	elseif page == "HUD" then
-		JAFDTC_ClickCockpit(d, 3077)
-	elseif page == "ENG" then
-		JAFDTC_ClickCockpit(d, 3078)
-	elseif page == "A/G DLVRY" then
-		JAFDTC_ClickCockpit(d, 3071)
-		JAFDTC_ClickCockpit(d, 3062)
-		JAFDTC_ClickCockpit(d, 3071)
-		JAFDTC_ClickCockpit(d, 3071)
-	end
-end
---]]
 
 function JAFDTC_F15E_CheckCondition_IsRadioPresetOrFreqSelected(radio, mode)
 	local table = JAFDTC_F15E_GetUFC(disp);
@@ -265,7 +212,7 @@ function JAFDTC_F15E_CheckCondition_IsProgBoxed(disp)
 	return false
 end
 
-function JAFDTC_F15E_CheckCondition_DisplayNotInMainMenu(disp)
+function JAFDTC_F15E_CheckCondition_IsDisplayNotInMainMenu(disp)
 	local table = JAFDTC_F15E_GetDisplay(disp);
 	local pb06 = table["PB06"] or "";
 	local pb11 = table["PB11"] or "";
@@ -275,15 +222,35 @@ function JAFDTC_F15E_CheckCondition_DisplayNotInMainMenu(disp)
 	return true
 end
 
+local jafdtc_curNukeSwitchFront = 0
+local jafdtc_curNukeSwitchRear = 0
+
 function JAFDTC_F15E_AfterNextFrame(params)
 	local mainPanel = GetDevice(0);
-	local ipButtonFront = mainPanel:get_argument_value(297);
-	local ipButtonRear = mainPanel:get_argument_value(1322);
-	local emButtonFront = mainPanel:get_argument_value(287);
-	local emButtonRear = mainPanel:get_argument_value(1312);
+	local ipButtonFront = mainPanel:get_argument_value(297);		-- F_UFC_KEY_IP
+	local ipButtonRear = mainPanel:get_argument_value(1322);		-- R_UFC_KEY_IP
+	local emButtonFront = mainPanel:get_argument_value(287);		-- F_UFC_EMISL_BTN
+	local emButtonRear = mainPanel:get_argument_value(1312);		-- R_UFC_EMISL_BTN
+	local nucSwitchFront = mainPanel:get_argument_value(451);		-- F_NUC_N_CONS_CVR
+	local nucSwitchRear = mainPanel:get_argument_value(1402);		-- R_NUC_N_CONS_CVR
+
+	local isInc = 0
+	if (nucSwitchFront == 0 and jafdtc_curNukeSwitchFront == 1) or
+	   (nucSwitchRear == 0 and jafdtc_curNukeSwitchFront == 1) then
+		isInc = 1
+	end
+	local isDec = 0
+	if (nucSwitchFront == 0 and jafdtc_curNukeSwitchFront == -1) or
+	   (nucSwitchRear == 0 and jafdtc_curNukeSwitchFront == -1) then
+		isDec = 1
+	end
+	jafdtc_curNukeSwitchFront = nucSwitchFront
+	jafdtc_curNukeSwitchRear = nucSwitchRear
 
 	if ipButtonFront == 1 then params["uploadCommand"] = "1" end
 	if ipButtonRear == 1 then params["uploadCommand"] = "1" end
 	if emButtonFront == 1 then params["toggleJAFDTCCommand"] = "1" end
 	if emButtonRear == 1 then params["toggleJAFDTCCommand"] = "1" end
+	if isInc == 1 then params["incCommand"] = "1" end
+	if isDec == 1 then params["decCommand"] = "1" end
 end
