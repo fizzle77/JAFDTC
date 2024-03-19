@@ -18,7 +18,12 @@
 //
 // ********************************************************************************************************************
 
+// define this to enable dcs command stream logging to the log file.
+//
+#define noDEBUG_CMD_LOGGING
+
 using JAFDTC.Models.DCS;
+using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using System.Diagnostics;
 using System.Text;
@@ -103,7 +108,10 @@ namespace JAFDTC.Models
             string str = sb.ToString();
             if (str != "")
             {
-                Debug.WriteLine($"data size is {str.Length}");
+#if DEBUG_CMD_LOGGING
+                FileManager.Log($"CMD stream data size is {str.Length}");
+                FileManager.Log($"CMD stream:\n****************\n{str}\n****************");
+#endif
                 return CockpitCmdTx.Send(str);
             }
             return true;
