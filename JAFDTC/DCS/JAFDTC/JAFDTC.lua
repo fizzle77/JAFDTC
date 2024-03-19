@@ -143,6 +143,16 @@ function JAFDTC_Cmd_Actn(list, index)
     return 1, 0
 end
 
+-- cmd_runfunc(string fn)
+function JAFDTC_Cmd_RunFunc(list, index)
+    local args = list[index]["a"]
+    local fn = args["fn"]
+
+    local funcName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_Func_" .. fn;
+    _G[funcName]()
+    return 1, 0
+end
+
 -- cmd_if(string cond, string prm0 = nil, string prm1 = nil)
 function JAFDTC_Cmd_If(list, index)
     local args = list[index]["a"]
@@ -257,7 +267,7 @@ function LuaExportBeforeNextFrame()
         if not cmdCurCort and cmdList then
             if cmdListIndex <= #cmdList then
                 local cmdName = "JAFDTC_Cmd_" .. cmdList[cmdListIndex]["f"]
-                -- JAFDTC_Log(string.format("[%.3f] Create [%d] %s", curTime, cmdListIndex, cmdName))
+                JAFDTC_Log(string.format("[%.3f] Create [%d] %s", curTime, cmdListIndex, cmdName))
                 cmdCurCort = coroutine.create(_G[cmdName])
             else
                 cmdList = nil

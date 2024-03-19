@@ -111,32 +111,33 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// add an action for the key to the command the builder is buidling.
         /// </summary>
-        protected void AddAction(AirframeDevice keyPad, string key)
+        protected void AddAction(AirframeDevice device, string key)
         {
-            AddCommand(keyPad[key]);
+            AddCommand(device[key]);
         }
 
         /// <summary>
         /// add a dyamic action for the key to the command the builder is buidling. a dynamic action has
-        /// caller-specified values for the up/down values.
+        /// caller-specified values for the up/down values. this allows programatic switching of controls from
+        /// windows.
         /// </summary>
-        protected void AddDynamicAction(AirframeDevice keyPad, string key, double valueDn, double valueUp)
+        protected void AddDynamicAction(AirframeDevice device, string key, double valueDn, double valueUp)
         {
-            AddCommand(keyPad.CustomizedDCSActionCommand(key, valueDn, valueUp));
+            AddCommand(device.CustomizedDCSActionCommand(key, valueDn, valueUp));
         }
 
         /// <summary>
         /// add actions for the keys in the provided list followed by a post-list set of keys to the command the
         /// builder is building. each key must be an action the key pad device supports
         /// </summary>
-        protected void AddActions(AirframeDevice keyPad, List<string> keys, List<string> keysPost = null)
+        protected void AddActions(AirframeDevice device, List<string> keys, List<string> keysPost = null)
         {
             foreach (string key in keys)
-                AddAction(keyPad, key);
+                AddAction(device, key);
             if (keysPost != null)
             {
                 foreach (string key in keysPost)
-                    AddAction(keyPad, key);
+                    AddAction(device, key);
             }
         }
 
@@ -155,6 +156,15 @@ namespace JAFDTC.Models.DCS
         protected void AddMarker(string marker)
         {
             string cmd = $"{{\"f\":\"Marker\",\"a\":{{\"mark\":\"{marker}\"}}}},";
+            AddCommand(cmd);
+        }
+
+        /// <summary>
+        /// add a run function command to the command the builder is building.
+        /// </summary>
+        protected void AddRunFunction(string fn)
+        {
+            string cmd = $"{{\"f\":\"RunFunc\",\"a\":{{\"fn\":\"{fn}\"}}}},";
             AddCommand(cmd);
         }
 
