@@ -750,63 +750,80 @@ namespace JAFDTC.UI.App
 
                 // ---- read and deserialize/parse file
 
-                string successMsg = "";
+                string finalTitle = "Success!";
+                string finalMessage = "";
                 List<PointOfInterest> pois;
                 if (file.FileType.ToLower() == ".json")
                 {
                     string json = await FileIO.ReadTextAsync(file);
                     pois = JsonSerializer.Deserialize<List<PointOfInterest>>(json);
-                    foreach (PointOfInterest poi in pois)
-                    {
-                        poi.Type = PointOfInterestType.USER;
-                        PointOfInterestDbase.Instance.Add(poi, false);
-                    }
+
                     string what = (pois.Count > 1) ? "points" : "point";
-                    successMsg = $"Imported {pois.Count} user {what} of interest.";
+                    finalMessage = $"Imported {pois.Count} user {what} of interest.";
                 }
                 else
                 {
                     string text = await FileIO.ReadTextAsync(file);
                     pois = PointOfInterestDbase.ParseTSV(text);
+
+                    string what = (pois.Count > 1) ? "points" : "point";
+                    finalMessage = $"Imported {pois.Count} {what} of interest into a campaign named \"{campaign}\".";
+                }
+
+                // ---- process pois
+
+                if (pois.Count > 0)
+                {
                     foreach (PointOfInterest poi in pois)
                     {
-                        poi.Type = PointOfInterestType.CAMPAIGN;
-
-                        bool isFound = false;
-                        if (!string.IsNullOrEmpty(poi.Tags))
+                        if (string.IsNullOrEmpty(campaign))
                         {
-                            foreach (string tag in poi.Tags.ToLower().Split(';').ToList<string>())
+                            poi.Type = PointOfInterestType.USER;
+                            PointOfInterestDbase.Instance.Add(poi, false);
+                        }
+                        else
+                        {
+                            poi.Type = PointOfInterestType.CAMPAIGN;
+                            bool isFound = false;
+                            if (!string.IsNullOrEmpty(poi.Tags))
                             {
-                                if (tag.Trim() == campaign)
+                                foreach (string tag in poi.Tags.ToLower().Split(';').ToList<string>())
                                 {
-                                    isFound = true;
-                                    break;
+                                    if (tag.Trim() == campaign)
+                                    {
+                                        isFound = true;
+                                        break;
+                                    }
                                 }
                             }
+                            if (!isFound)
+                            {
+                                poi.Tags = (string.IsNullOrEmpty(poi.Tags)) ? $"{campaign}" : $"{campaign}; " + poi.Tags;
+                            }
                         }
-                        if (!isFound)
-                        {
-                            poi.Tags = (string.IsNullOrEmpty(poi.Tags)) ? $"{campaign}" : $"{campaign}; " + poi.Tags;
-                        }
-
-                        PointOfInterestDbase.Instance.Add(poi, false);
                     }
-                    if (pois.Count > 0)
+                    if (string.IsNullOrEmpty(campaign))
+                    {
+                        PointOfInterestDbase.Instance.Save();
+                    }
+                    else
                     {
                         FileManager.SaveCampaignPointsOfInterest(campaign, pois);
-                        string what = (pois.Count > 1) ? "points" : "point";
-                        successMsg = $"Imported {pois.Count} {what} of interest into a campaign named \"{campaign}\".";
+                        PointOfInterestDbase.Instance.Reset();
                     }
+                }
+                else
+                {
+                    finalTitle = "Missing Points of Interest";
+                    finalMessage = "This import file does not appear to contain any valid points of interest?";
                 }
 
                 // ---- wrap up
 
+                await Utilities.Message1BDialog(Content.XamlRoot, finalTitle, finalMessage);
+
                 if (pois.Count > 0)
-                {
-                    await Utilities.Message1BDialog(Content.XamlRoot, "Success!", successMsg);
-
-                    PointOfInterestDbase.Instance.Save();
-
+                { 
                     RebuildPoIList();
                     RebuildInterfaceState();
                 }

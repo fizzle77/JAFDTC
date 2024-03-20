@@ -356,7 +356,7 @@ namespace JAFDTC.Models.DCS
                     PointOfInterest poi = new()
                     {
                         Name = cols[0].Trim(),
-                        Tags = cols[1].Trim(),
+                        Tags = PointOfInterest.SanitizedTags(cols[1].Trim()),
                         Latitude = cols[2].Trim(),
                         Longitude = cols[3].Trim(),
                         Elevation = cols[4].Trim()
@@ -376,8 +376,9 @@ namespace JAFDTC.Models.DCS
         /// </summary>
         public void Reset()
         {
-            List<PointOfInterest> pois = FileManager.LoadPointsOfInterest();
             _dbase.Clear();
+
+            List<PointOfInterest> pois = FileManager.LoadPointsOfInterest();
             foreach (PointOfInterest poi in pois)
             {
                 Add(poi, false);
