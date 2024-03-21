@@ -78,8 +78,6 @@ https://www.gnu.org/licenses/.
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!-- select poi
@@ -141,27 +139,6 @@ https://www.gnu.org/licenses/.
                           ToolTipService.ToolTip="Set filter to apply to points of interest">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE71C;"/>
             </ToggleButton>
-            <Button Grid.Row="1" Grid.Column="3" Margin="12,0,0,0"
-                        x:Name="uiPoIBtnApply"
-                        VerticalAlignment="Center"
-                        Click="PoIBtnApply_Click"
-                        ToolTipService.ToolTip="Paste selected point of interest to steerpoint">
-                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE77F;"/>
-            </Button>
-
-            <Button Grid.Row="1" Grid.Column="4" Width="144" Margin="24,12,0,12"
-                    x:Name="uiPoIBtnCapture"
-                    VerticalAlignment="Center"
-                    Click="PoIBtnCapture_Click"
-                    ToolTipService.ToolTip="Capture steerpoint LAT, LON, ALT from DCS">
-                <StackPanel Orientation="Horizontal">
-                    <FontIcon Margin="0,0,6,0"
-                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE7B7;"/>
-                    <TextBlock VerticalAlignment="Center">
-                        DCS Capture
-                    </TextBlock>
-                </StackPanel>
-            </Button>
         </Grid>
 
         <!--
@@ -191,35 +168,56 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
                 <TextBlock Grid.Column="0"
                            x:Name="uiStptTextNum"
                            Style="{StaticResource EditorTitleTextBlockStyle}">
                     Steerpoint FIXUP Information
                 </TextBlock>
-                <Button Grid.Column="1" Margin="0,0,24,0"
+                <Button Grid.Column="1" Margin="12,0,0,0"
                         x:Name="uiStptBtnAddPoI"
                         VerticalAlignment="Center"
                         Click="StptBtnAddPoI_Click"
                         ToolTipService.ToolTip="Create point of interest from steerpoint">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xECAF;"/>
                 </Button>
-                <Button Grid.Column="2" Margin="0,0,6,0"
+                <Button Grid.Column="2" Margin="24,0,6,0"
+                        x:Name="uiPoIBtnApply"
+                        VerticalAlignment="Center"
+                        Click="PoIBtnApply_Click"
+                        ToolTipService.ToolTip="Paste selected point of interest to steerpoint">
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE77F;"/>
+                </Button>
+                <Button Grid.Column="3" Height="34" Margin="0,0,24,0"
+                    x:Name="uiPoIBtnCapture"
+                    VerticalAlignment="Center"
+                    Click="PoIBtnCapture_Click"
+                    ToolTipService.ToolTip="Capture steerpoint LAT, LON, ALT from DCS">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE7B7;"/>
+                        <TextBlock VerticalAlignment="Center">
+                            DCS
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="4" Margin="0,0,6,0"
                         x:Name="uiStptBtnPrev"
                         VerticalAlignment="Center"
                         Click="StptBtnPrev_Click"
                         ToolTipService.ToolTip="Move to previous steerpoint for editing">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
                 </Button>
-                <Button Grid.Column="3" Margin="0,0,6,0"
+                <Button Grid.Column="5" Margin="0,0,6,0"
                         x:Name="uiStptBtnAdd"
                         VerticalAlignment="Center"
                         Click="StptBtnAdd_Click"
                         ToolTipService.ToolTip="Add new steerpoint to end of list">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
                 </Button>
-                <Button Grid.Column="4"
+                <Button Grid.Column="6"
                         x:Name="uiStptBtnNext"
                         VerticalAlignment="Center"
                         Click="StptBtnNext_Click"
