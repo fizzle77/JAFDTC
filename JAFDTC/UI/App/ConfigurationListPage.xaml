@@ -130,7 +130,7 @@ https://www.gnu.org/licenses/.
 
                 <CommandBar.SecondaryCommands>
                     <AppBarButton Label="Points of Interest" Click="CmdPoI_Click">
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE718;"/>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xECAF;"/>
                     </AppBarButton>
                     <AppBarSeparator/>
                     <AppBarButton Label="Settings" Icon="Setting" Click="CmdSettings_Click"/>
