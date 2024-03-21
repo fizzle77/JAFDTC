@@ -92,7 +92,7 @@ namespace JAFDTC.UI.F16C
         {
             InitializeComponent();
 
-            EditMode = (int)Modes.NAV;
+            EditMode = (int)MFDSystem.MasterModes.NAV;
             EditMFDModeConfig = new();
 
             IsRebuildPending = false;
@@ -381,8 +381,8 @@ namespace JAFDTC.UI.F16C
 
             Utilities.SetEnableState(uiResetAllBtn, !Config.MFD.IsDefault || !IsEditMFDConfigDefault());
 
-            Utilities.SetEnableState(uiModePrevBtn, (EditMode != (int) Modes.NAV));
-            Utilities.SetEnableState(uiModeNextBtn, (EditMode != (int) Modes.DGFT_DGFT));
+            Utilities.SetEnableState(uiModePrevBtn, (EditMode != (int)MFDSystem.MasterModes.NAV));
+            Utilities.SetEnableState(uiModeNextBtn, (EditMode != (int)MFDSystem.MasterModes.DGFT_DGFT));
         }
 
         // rebuild the state of controls on the page in response to a change in the configuration.

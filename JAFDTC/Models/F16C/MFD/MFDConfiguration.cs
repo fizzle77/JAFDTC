@@ -29,6 +29,23 @@ namespace JAFDTC.Models.F16C.MFD
 	/// </summary>
 	public class MFDConfiguration : BindableObject
 	{
+        // avionics mfd formats. this enum is used to index ui menus. we do not include FLIR, RCCE, or TFR formats as
+        // these are not implemented.
+        //
+        public enum DisplayFormats
+        {
+            BLANK = 0,
+            DTE = 1,
+            FCR = 2,
+            FLCS = 3,
+            HAD = 4,
+            HSD = 5,
+            SMS = 6,
+            TEST = 7,
+            TGP = 8,
+            WPN = 9,
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -72,7 +89,7 @@ namespace JAFDTC.Models.F16C.MFD
             SelectedOSB = new(other.SelectedOSB);
         }
 
-        public MFDConfiguration(Formats osb14, Formats osb13, Formats osb12, int selectedPage)
+        public MFDConfiguration(DisplayFormats osb14, DisplayFormats osb13, DisplayFormats osb12, int selectedPage)
 		{
 			OSB14 = ((int)osb14).ToString();
 			OSB13 = ((int)osb13).ToString();

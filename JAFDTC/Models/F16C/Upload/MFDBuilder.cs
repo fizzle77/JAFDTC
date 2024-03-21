@@ -95,19 +95,19 @@ namespace JAFDTC.Models.F16C.Upload
                 if (config.IsDefault) 
                     continue;
 
-                if ((Modes)mode == Modes.ICP_AA)
+                if ((MFDSystem.MasterModes)mode == MFDSystem.MasterModes.ICP_AA)
                 {
                     AddAction(ufc, "AA");
                 }
-                else if ((Modes)mode == Modes.ICP_AG)
+                else if ((MFDSystem.MasterModes)mode == MFDSystem.MasterModes.ICP_AG)
                 {
                     AddAction(ufc, "AG");
                 }
-                else if ((Modes)mode == Modes.DGFT_DGFT)
+                else if ((MFDSystem.MasterModes)mode == MFDSystem.MasterModes.DGFT_DGFT)
                 {
                     AddAction(hotas, "DGFT");
                 }
-                else if ((Modes)mode == Modes.DGFT_MSL)
+                else if ((MFDSystem.MasterModes)mode == MFDSystem.MasterModes.DGFT_MSL)
                 {
                     AddAction(hotas, "MSL");
                 }
@@ -115,15 +115,16 @@ namespace JAFDTC.Models.F16C.Upload
                 BuildMFD(mode, true, leftMFD, config.LeftMFD);
                 BuildMFD(mode, false, rightMFD, config.RightMFD);
 
-                if ((Modes)mode == Modes.ICP_AA)
+                if ((MFDSystem.MasterModes)mode == MFDSystem.MasterModes.ICP_AA)
                 {
                     AddAction(ufc, "AA");
                 }
-                else if ((Modes)mode == Modes.ICP_AG)
+                else if ((MFDSystem.MasterModes)mode == MFDSystem.MasterModes.ICP_AG)
                 {
                     AddAction(ufc, "AG");
                 }
-                else if (((Modes)mode == Modes.DGFT_DGFT) || ((Modes)mode == Modes.DGFT_MSL))
+                else if (((MFDSystem.MasterModes)mode == MFDSystem.MasterModes.DGFT_DGFT) ||
+                         ((MFDSystem.MasterModes)mode == MFDSystem.MasterModes.DGFT_MSL))
                 {
                     AddAction(hotas, "CENTER");
                 }
@@ -170,38 +171,38 @@ namespace JAFDTC.Models.F16C.Upload
             {
                 AddAction(mfd, osb);
 
-                switch ((Formats)int.Parse(page))
+                switch ((MFDConfiguration.DisplayFormats)int.Parse(page))
                 {
-                    case Formats.BLANK:
+                    case MFDConfiguration.DisplayFormats.BLANK:
                         AddAction(mfd, "OSB-01-BLANK");
                         break;
-                    case Formats.DTE:
+                    case MFDConfiguration.DisplayFormats.DTE:
                         AddAction(mfd, "OSB-08-DTE");
                         break;
-                    case Formats.FCR:
+                    case MFDConfiguration.DisplayFormats.FCR:
                         AddAction(mfd, "OSB-20-FCR");
                         break;
-                    case Formats.FLCS:
+                    case MFDConfiguration.DisplayFormats.FLCS:
                         AddAction(mfd, "OSB-10-FLCS");
                         break;
-                    case Formats.HAD:
+                    case MFDConfiguration.DisplayFormats.HAD:
                         AddAction(mfd, "OSB-02-HAD");
                         AddIfBlock("HTSOnMFD", new() { mfdSide }, delegate () { BuildHTSOnMFDIfOn(mfd, isLeftMFD); });
                         break;
-                    case Formats.HSD:
+                    case MFDConfiguration.DisplayFormats.HSD:
                         AddAction(mfd, "OSB-07-HSD");
                         break;
-                    case Formats.SMS:
+                    case MFDConfiguration.DisplayFormats.SMS:
                         AddAction(mfd, "OSB-06-SMS");
                         AddAction(mfd, "OSB-04-RCCE");     // disable INV
                         break;
-                    case Formats.TEST:
+                    case MFDConfiguration.DisplayFormats.TEST:
                         AddAction(mfd, "OSB-09-TEST");
                         break;
-                    case Formats.TGP:
+                    case MFDConfiguration.DisplayFormats.TGP:
                         AddAction(mfd, "OSB-19-TGP");
                         break;
-                    case Formats.WPN:
+                    case MFDConfiguration.DisplayFormats.WPN:
                         AddAction(mfd, "OSB-18-WPN");
                         break;
                         //
