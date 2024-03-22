@@ -26,7 +26,8 @@ https://www.gnu.org/licenses/.
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
+    NavigationCacheMode="Enabled">
 
     <Grid Margin="16,8,16,8">
         <Grid.RowDefinitions>
@@ -48,9 +49,9 @@ https://www.gnu.org/licenses/.
             <ComboBox x:Name="uiCmdComboSelRoute"
                       VerticalAlignment="Center"
                       SelectionChanged="CmdComboSelRoute_SelectionChanged">
-                <TextBlock>A</TextBlock>
-                <TextBlock>B</TextBlock>
-                <TextBlock>C</TextBlock>
+                <TextBlock Tag="A">A</TextBlock>
+                <TextBlock Tag="B">B</TextBlock>
+                <TextBlock Tag="C">C</TextBlock>
             </ComboBox>
             <CommandBar Margin="6,0,0,0"
                         VerticalAlignment="Center"
