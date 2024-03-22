@@ -58,14 +58,16 @@ namespace JAFDTC.Models.F15E.Upload
             if (!_cfg.STPT.IsDefault)
             {
                 // TODO: fix this...
-                AddIfBlock("GoToFrontCockpit", null, delegate() { });
+                // AddIfBlock("GoToFrontCockpit", null, delegate() { });
 
-                // SHF+3 = B
                 AddActions(ufc, new() { "CLR", "CLR", "MENU", "SHF", "3", "PB10", "PB10" });
 
                 BuildSteerpoints(ufc, stpts);
 
-                AddActions(ufc, new() { "CLR", "CLR", "MENU", "1", "SHF", "1", "PB10" });
+                string number = _cfg.STPT.Points[0].Number.ToString();
+                string route = RouteToPB(_cfg.STPT.Points[0].Route);
+
+                AddActions(ufc, new() { "CLR", "CLR", "MENU", number, "SHF", route, "PB10" });
             }
         }
 
@@ -79,27 +81,24 @@ namespace JAFDTC.Models.F15E.Upload
                 if (stpt.IsValid)
                 {
                     string stptNum = stpt.Number.ToString();
-                    // TODO: SHF+1 => sets route a, handle routes b/c
-                    AddActions(ufc, ActionsForString(stptNum), new() { "SHF", "1", "PB1" });
+                    string routePB = RouteToPB(stpt.Route);
+                    AddActions(ufc, ActionsForString(stptNum), new() { "SHF", routePB, "PB1" });
 
                     // TODO: check this...
                     AddIfBlock("IsStrDifferent", new() { $"STR {stptNum}{stpt.Route}" }, delegate()
                     {
                         AddActions(ufc, new() { "CLR", "CLR" });
-                        // TODO: SHF+1 => route a, handle routes b/c
-                        AddActions(ufc, ActionsForString(stptNum), new() { ".", "SHF", "1", "PB1" });
+                        AddActions(ufc, ActionsForString(stptNum), new() { ".", "SHF", routePB, "PB1" });
                     });
                     // TODO: check this...
                     AddIfBlock("IsStrDifferent", new() { $"STR {stptNum}{stpt.Route}" }, delegate()
                     {
-                        // TODO: SHF+1 => route a, handle routes b/c
-                        AddActions(ufc, ActionsForString(stptNum), new() { "SHF", "1", "PB1" });
+                        AddActions(ufc, ActionsForString(stptNum), new() { "SHF", routePB, "PB1" });
                     });
 
                     if (stpt.IsTarget)
                     {
-                        // TODO: SHF+1 => route a, handle routes b/c
-                        AddActions(ufc, ActionsForString(stptNum), new() { ".", "SHF", "1", "PB1" });
+                        AddActions(ufc, ActionsForString(stptNum), new() { ".", "SHF", routePB, "PB1" });
                     }
 
                     AddActions(ufc, ActionsForMudhen2864CoordinateString(stpt.LatUI), new() { "PB2" });
@@ -115,8 +114,7 @@ namespace JAFDTC.Models.F15E.Upload
                             {
                                 AddActions(ufc, ActionsForString("0"));
                             }
-                            // TODO: SHF+1 => route a, handle routes b/c
-                            AddActions(ufc, ActionsForString(rfpt.Number.ToString()), new() { "SHF", "1", "PB1" });
+                            AddActions(ufc, ActionsForString(rfpt.Number.ToString()), new() { "SHF", routePB, "PB1" });
 
                             AddActions(ufc, ActionsForMudhen2864CoordinateString(rfpt.LatUI), new() { "PB2" });
                             AddActions(ufc, ActionsForMudhen2864CoordinateString(rfpt.LonUI), new() { "PB3" });
@@ -128,13 +126,26 @@ namespace JAFDTC.Models.F15E.Upload
         }
 
         /// <summary>
+        /// return button names corresponding to the given route (a/b/c), these are preceeded by a "SHF".
+        /// </summary>
+        private static string RouteToPB(string route)
+        {
+            return route switch
+            {
+                "B" => "3",
+                "C" => "9",
+                _ => "1"
+            };
+        }
+
+        /// <summary>
         /// build the list of actions necessary to enter a lat/lon coordinate into a navpoint system that uses
         /// the 2/8/6/4 buttons to enter N/S/E/W directions. coordinate is specified as a string. prior to processing,
         /// all separators are removed. the coordinate string should start with N/S/E/W followed by the digits
         /// and/or characters that should be typed in to the device. they device must have single-character actions
         /// that map to the non-separator characters that may appear in the coordinate string.
         /// <summary>
-        protected List<string> ActionsForMudhen2864CoordinateString(string coord)
+        private static List<string> ActionsForMudhen2864CoordinateString(string coord)
         {
             coord = AdjustNoSeparators(coord.Replace(" ", ""));
 
@@ -152,6 +163,5 @@ namespace JAFDTC.Models.F15E.Upload
             }
             return actions;
         }
-
     }
 }

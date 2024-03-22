@@ -21,6 +21,7 @@ using JAFDTC.Models.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.F15E.STPT
@@ -29,6 +30,10 @@ namespace JAFDTC.Models.F15E.STPT
     /// mudhen steerpoint system configuration using a custom mudhen steerpoint (SteerpointInfo) along with the base
     /// navigationpoint system (NavpointSystemBase). the modeled configuration includes both steerpoints along with
     /// reference points asociated with a steerpoint.
+    /// 
+    /// the f-15e avionics support three routes: a, b, and c. for compatibilty with other abstractions, we keep
+    /// navpoints for all three routes in Points, maintaing them in route than number order. this means that some
+    /// operations, such as Add or Renumber, will operate on the "active route" rather than all steerpoints in Points.
     /// </summary>
     public class STPTSystem : NavpointSystemBase<SteerpointInfo>
     {
@@ -41,6 +46,11 @@ namespace JAFDTC.Models.F15E.STPT
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        // ---- public properties
+
+        [JsonIgnore]
+        public string ActiveRoute { get; set; }
+
         // ---- private properties, static
 
         private static readonly Regex _hashRefPtRegex = new(@"#\.([1-7])");
@@ -51,9 +61,10 @@ namespace JAFDTC.Models.F15E.STPT
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public STPTSystem() => (Points) = (new ObservableCollection<SteerpointInfo>());
+        public STPTSystem() => (Points, ActiveRoute) = (new ObservableCollection<SteerpointInfo>(), "A");
 
-        public STPTSystem(STPTSystem other) => (Points) = (new ObservableCollection<SteerpointInfo>(other.Points));
+        public STPTSystem(STPTSystem other)
+            => (Points, ActiveRoute) = (new ObservableCollection<SteerpointInfo>(other.Points), other.ActiveRoute);
 
         public virtual object Clone() => new STPTSystem(this);
 
@@ -63,16 +74,19 @@ namespace JAFDTC.Models.F15E.STPT
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         public override void AddNavpointsFromInfoList(List<Dictionary<string, string>> navptInfoList)
         {
-            // TODO: handle route
-            // TODO: handle nav table ref points per razbam
+           // TODO: handle nav table ref points per razbam
             SteerpointInfo stptCur = null;
             foreach (Dictionary<string, string> navptInfo in navptInfoList)
             {
                 SteerpointInfo stpt = new()
                 {
                     Name = (navptInfo.ContainsKey("name")) ? navptInfo["name"] : "",
+                    Route = (navptInfo.ContainsKey("route")) ? navptInfo["route"] : "A",
                     Lat = (navptInfo.ContainsKey("lat")) ? navptInfo["lat"] : "",
                     Lon = (navptInfo.ContainsKey("lon")) ? navptInfo["lon"] : "",
                     Alt = (navptInfo.ContainsKey("alt")) ? navptInfo["alt"] : "",
@@ -88,13 +102,15 @@ namespace JAFDTC.Models.F15E.STPT
                 Match match = _hashRefPtRegex.Match(name);
                 if ((stptCur != null) && (match.Groups.Count >= 2))
                 {
-                    RefPointInfo rfpt = new(int.Parse(match.Groups[1].Value));
-                    rfpt.Lat = stpt.Lat;
-                    rfpt.Lon = stpt.Lon;
-                    rfpt.Alt = stpt.Alt;
+                    RefPointInfo rfpt = new(int.Parse(match.Groups[1].Value))
+                    {
+                        Lat = stpt.Lat,
+                        Lon = stpt.Lon,
+                        Alt = stpt.Alt
+                    };
                     stptCur.RefPoints.Add(rfpt);
                 }
-                else if (!name.Contains("#"))
+                else if (!name.Contains('#'))
                 {
                     Add(stpt);
                     stptCur = stpt;
@@ -102,12 +118,60 @@ namespace JAFDTC.Models.F15E.STPT
             }
         }
 
+        /// <summary>
+        /// RenumberFrom picks up the additional semantics in the f-15e of only renumbering those steerpoints on
+        /// the active route.
+        /// </summary>
+        public override void RenumberFrom(int startNumber)
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                if (Points[i].Route == ActiveRoute)
+                {
+                    Points[i].Number = startNumber++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Add picks up the additional semantics in the f-15e adding new (ie, stpt == null) steerpoints to the
+        /// active route; otherwise the route in the steerpoint is honored. when adding the steerpoint, it is
+        /// inserted into Points to maintain by route, by number ordering.
+        /// </summary>
         public override SteerpointInfo Add(SteerpointInfo stpt = null)
         {
+            string route = (stpt != null) ? stpt.Route : ActiveRoute;
+
+            int number = 0;
+            int iInsert = (Count > 0) ? -1 : 0;
+            for (int i = 0; i < Count; i++)
+            {
+                if ((Points[i].Route == route) && (Points[i].Number > number))
+                {
+                    number = Points[i].Number;
+                    iInsert = i + 1;
+                }
+            }
+            if ((iInsert == -1) && (route == "A"))
+            {
+                iInsert = 0;
+            }
+            else if ((iInsert == -1) && (route == "B"))
+            {
+                for (iInsert = 0; (iInsert < Count) && (Points[iInsert].Route != "B"); iInsert++)
+                    ;
+            }
+            else if ((iInsert == -1) && (route == "C"))
+            {
+                iInsert = Count;
+            }
+
             stpt ??= new();
-            stpt.Number = (Points.Count == 0) ? 1 : Points[^1].Number + 1;
-            stpt.Name = (string.IsNullOrEmpty(stpt.Name)) ? $"SP{stpt.Number}" : stpt.Name;
-            return base.Add(stpt);
+            stpt.Route = route;
+            stpt.Number = number + 1;
+            stpt.Name = (string.IsNullOrEmpty(stpt.Name)) ? $"SP{stpt.Number}{stpt.Route}" : stpt.Name;
+            Points.Insert(iInsert, stpt);
+            return stpt;
         }
     }
 }

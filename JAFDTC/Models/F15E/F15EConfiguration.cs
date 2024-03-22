@@ -120,7 +120,19 @@ namespace JAFDTC.Models.F15E
             string stpts = "";
             if (!STPT.IsDefault)
             {
-                stpts = $" along with {STPT.Count} steerpoint" + ((STPT.Count > 1) ? "s" : "");
+                string lastRoute = "";
+                int nRoutes = 0;
+                foreach (SteerpointInfo stpt in STPT.Points)
+                {
+                    if (stpt.Route != lastRoute)
+                    {
+                        lastRoute = stpt.Route;
+                        nRoutes++;
+                    }
+                }
+                string stptPlural = (STPT.Count > 1) ? "s" : "";
+                string routePlural = (nRoutes > 1) ? "s" : "";
+                stpts = $" along with {STPT.Count} steerpoint{stptPlural} on {nRoutes} route{routePlural}";
             }
             UpdatesInfoTextUI = updatesStrings["UpdatesInfoTextUI"] + stpts;
             UpdatesIconsUI = updatesStrings["UpdatesIconsUI"];

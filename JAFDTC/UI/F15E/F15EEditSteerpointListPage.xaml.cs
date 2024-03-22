@@ -24,6 +24,12 @@ using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
+using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -31,12 +37,6 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
-using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Navigation;
 using Windows.ApplicationModel.DataTransfer;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
@@ -71,6 +71,8 @@ namespace JAFDTC.UI.F15E
 
         private bool IsClipboardValid { get; set; }
 
+        private bool IsRebuildingUI { get; set; }
+
         private int CaptureIndex { get; set; }
 
         // ---- read-only properties
@@ -90,6 +92,10 @@ namespace JAFDTC.UI.F15E
 
             EditSTPT = new STPTSystem();
 
+            IsRebuildingUI = false;
+
+            uiCmdComboSelRoute.SelectedIndex = 0;
+
             _configNameToUID = new Dictionary<string, string>();
             _configNameList = new List<string>();
         }
@@ -107,15 +113,20 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void CopyConfigToEdit()
         {
-            // TODO: implement support for routes b and c
+            // NOTE: Copnfig.STPT contains steerpoints for *all* routes intermingled. when we marshall into the edit
+            // NOTE: mirror in EditSTPT, we will only grab those steerpoints that correspond to the current route.
+
             EditSTPT.Points.Clear();
             foreach (SteerpointInfo stpt in Config.STPT.Points)
             {
-                EditSTPT.Add(new SteerpointInfo(stpt));
+                if (stpt.Route == EditSTPT.ActiveRoute)
+                {
+                    EditSTPT.Add(new SteerpointInfo(stpt));
+                }
             }
-            for (int i = 1; i < Config.STPT.Count; i++)
+            for (int i = 1; i < EditSTPT.Count; i++)
             {
-                if (!Config.STPT.Points[i - 1].IsTarget && Config.STPT.Points[i].IsTarget)
+                if (!EditSTPT.Points[i - 1].IsTarget && EditSTPT.Points[i].IsTarget)
                 {
                     EditSTPT.Points[i - 1].IsInitialUI = true;
                 }
@@ -128,12 +139,44 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void CopyEditToConfig(bool isPersist = false)
         {
-            // TODO: implement support for routes b and c
-            Config.STPT = (STPTSystem)EditSTPT.Clone();
-
-            if (isPersist)
+            // the route a/b/c implementation can lead to this being called when looking at a linked system. we don't
+            // want to update the config in that case.
+            //
+            if (string.IsNullOrEmpty(Config.SystemLinkedTo(STPTSystem.SystemTag)))
             {
-                Config.Save(this, STPTSystem.SystemTag);
+                // NOTE: EditSTPT only contins the steerpoints from the current route, so we need to reassemble the
+                // NOTE: complete set of steerpoints from EditSTPT (for current route) and Config.STPT (for other
+                // NOTE: routes).
+
+                List<SteerpointInfo> stpts = new();
+                foreach (SteerpointInfo stpt in EditSTPT.Points)
+                {
+                    stpts.Add(stpt);
+                }
+                foreach (SteerpointInfo stpt in Config.STPT.Points)
+                {
+                    if (stpt.Route != EditSTPT.ActiveRoute)
+                    {
+                        stpts.Add(stpt);
+                    }
+                }
+                stpts.Sort((a, b) =>
+                {
+                    int routeCmp = a.Route.CompareTo(b.Route);
+                    return (routeCmp == 0) ? a.Number.CompareTo(b.Number) : routeCmp;
+                });
+
+                Config.STPT = (STPTSystem)EditSTPT.Clone();
+                Config.STPT.Points.Clear();
+                foreach (SteerpointInfo stpt in stpts)
+                {
+                    Config.STPT.Add(new SteerpointInfo(stpt));
+                }
+
+                if (isPersist)
+                {
+                    Config.Save(this, STPTSystem.SystemTag);
+                }
             }
         }
 
@@ -145,19 +188,32 @@ namespace JAFDTC.UI.F15E
 
         /// <summary>
         /// launch the F15EEditSteerpointPage to edit the specified steerpoint.
+        /// 
+        /// NOTE: the index we hand off in the page nav args is within the Config list of steerpoints that contains all
+        /// NOTE: routes. this index is given by the index of the route we are currently editing plus the index of the
+        /// NOTE: steerpoint we are editing within the route.
         /// </summary>
         private void EditSteerpoint(SteerpointInfo stpt)
         {
+            int iEditing = EditSTPT.IndexOf(stpt);
+            int iBase;
+            for (iBase = 0; (iBase < Config.STPT.Count) &&
+                            (EditSTPT.Points[iEditing].Route != Config.STPT.Points[iBase].Route);
+                 iBase++)
+                ;
             NavArgs.BackButton.IsEnabled = false;
             bool isUnlinked = string.IsNullOrEmpty(Config.SystemLinkedTo(STPTSystem.SystemTag));
             Frame.Navigate(typeof(F15EEditSteerpointPage),
-                           new F15EEditStptPageNavArgs(this, Config, EditSTPT.IndexOf(stpt), isUnlinked),
+                           new F15EEditStptPageNavArgs(this, Config, iBase + iEditing, isUnlinked),
                            new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
         }
 
         /// <summary>
         /// renumber steerpoints sequentially starting from StartingStptNum. update the initial state to attach the
         /// appropriate glyphs in the ui.
+        /// 
+        /// NOTE: for the f-15e, "renumber" has the semantics of only operating within the current route. steerpoints
+        /// NOTE: for other routes will not change.
         /// </summary>
         private void RenumberSteerpoints()
         {
@@ -171,7 +227,7 @@ namespace JAFDTC.UI.F15E
         }
 
         /// <summary>
-        /// TODO: document
+        /// rebuild the link controls on the page based on where the configuration is linked to.
         /// </summary>
         private void RebuildLinkControls()
         {
@@ -189,9 +245,6 @@ namespace JAFDTC.UI.F15E
 
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(STPTSystem.SystemTag));
             bool isDCSListening = curApp.IsDCSAvailable && (curApp.DCSActiveAirframe == Config.Airframe);
-
-            // TODO: implement support for routes b and c
-            Utilities.SetEnableState(uiCmdComboSelRoute, false);
 
             Utilities.SetEnableState(uiBarAdd, isEditable);
             Utilities.SetEnableState(uiBarEdit, isEditable && (uiStptListView.SelectedItems.Count == 1));
@@ -245,7 +298,6 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void CmdAdd_Click(object sender, RoutedEventArgs args)
         {
-            // TODO: implement support for routes b and c
             EditSTPT.Add();
             CopyEditToConfig(true);
             RebuildInterfaceState();
@@ -264,6 +316,10 @@ namespace JAFDTC.UI.F15E
         /// <summary>
         /// paste button: deserialize the steerpoints on the clipboard from json and append them to the end of the
         /// steerpoint list.
+        /// 
+        /// NOTE: for the f-15e, there is really no way in the ui to select steerpoints from different routes at
+        /// NOTE: the same time. for this reason, we'll always assume we're pasting whatever is on the clipboard into
+        /// NOTE: the currently active route.
         /// </summary>
         private async void CmdPaste_Click(object sender, RoutedEventArgs args)
         {
@@ -273,7 +329,7 @@ namespace JAFDTC.UI.F15E
                 List<SteerpointInfo> list = JsonSerializer.Deserialize<List<SteerpointInfo>>(cboard.Data);
                 foreach (SteerpointInfo stpt in list)
                 {
-                    // TODO: when pasting, route should be matched to current route regardless of source
+                    stpt.Route = EditSTPT.ActiveRoute;          // force paste to target current route
                     EditSTPT.Add(stpt);
                 }
                 CopyEditToConfig(true);
@@ -360,7 +416,6 @@ namespace JAFDTC.UI.F15E
                 {
                     if (CaptureIndex < EditSTPT.Count)
                     {
-                        // TODO: when capturing, route should be matched to current route regardless of source
                         EditSTPT.Points[CaptureIndex].Name = $"WP{i + 1} DCS Capture";
                         EditSTPT.Points[CaptureIndex].Lat = wypts[i].Latitude;
                         EditSTPT.Points[CaptureIndex].Lon = wypts[i].Longitude;
@@ -370,10 +425,10 @@ namespace JAFDTC.UI.F15E
                     }
                     else
                     {
-                        // TODO: when capturing, route should be matched to current route regardless of source
                         SteerpointInfo stpt = new()
                         {
                             Name = $"WP{i + 1} DCS Capture",
+                            Route = EditSTPT.ActiveRoute,
                             Lat = wypts[i].Latitude,
                             Lon = wypts[i].Longitude,
                             Alt = wypts[i].Elevation,
@@ -387,10 +442,12 @@ namespace JAFDTC.UI.F15E
         }
 
         /// <summary>
-        /// TODO: document
+        /// import button click: run the import ui to select file to import from and use the common import code with
+        /// appropriate helpers to actually do the import.
         /// </summary>
         private async void CmdImport_Click(object sender, RoutedEventArgs args)
         {
+            // TODO: should import operate on all steerpoints, or just current route?
             if (await NavpointUIHelper.Import(Content.XamlRoot, AirframeTypes.F15E, EditSTPT, "Steerpoint"))
             {
                 Config.Save(this, STPTSystem.SystemTag);
@@ -405,15 +462,28 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private async void CmdExport_Click(object sender, RoutedEventArgs args)
         {
+            // TODO: should export operate on all steerpoints, or just current route?
             await NavpointUIHelper.Export(Content.XamlRoot, Config.Name, EditSTPT.SerializeNavpoints(), "Steerpoint");
         }
 
         /// <summary>
-        /// TODO: document
+        /// route selection changed: if the route is really changing, update the user interface to only show the
+        /// steerpoints assigned to the selected route.
         /// </summary>
         public void CmdComboSelRoute_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
-            // TODO: implement support for routes b and c
+            ComboBox cbox = (ComboBox)sender;
+            TextBlock tblock = (TextBlock)cbox.SelectedItem;
+            if (!IsRebuildingUI && (tblock != null) && (EditSTPT.ActiveRoute != (string)tblock.Tag))
+            {
+                CopyEditToConfig(true);
+                
+                EditSTPT.ActiveRoute = (string)tblock.Tag;
+                Config.STPT.ActiveRoute = (string)tblock.Tag;
+
+                CopyConfigToEdit();
+                RebuildEnableState();
+            }
         }
 
         // ---- buttons -----------------------------------------------------------------------------------------------
@@ -425,6 +495,13 @@ namespace JAFDTC.UI.F15E
         {
             if (await NavpointUIHelper.ResetDialog(Content.XamlRoot, "Steerpoint"))
             {
+                EditSTPT.ActiveRoute = "A";
+                Config.STPT.ActiveRoute = "A";
+
+                IsRebuildingUI = true;
+                uiCmdComboSelRoute.SelectedIndex = 0;
+                IsRebuildingUI = false;
+
                 Config.UnlinkSystem(STPTSystem.SystemTag);
                 Config.STPT.Reset();
                 Config.Save(this, STPTSystem.SystemTag);
@@ -434,7 +511,7 @@ namespace JAFDTC.UI.F15E
         }
 
         /// <summary>
-        /// TODO: document
+        /// system link click: manage the ui to link this configuration to another steerpoint configuration.
         /// </summary>
         private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
         {
@@ -442,10 +519,8 @@ namespace JAFDTC.UI.F15E
                                                                     _configNameList);
             if (selectedItem == null)
             {
-                CopyEditToConfig(true);
                 Config.UnlinkSystem(STPTSystem.SystemTag);
                 Config.Save(this);
-                CopyConfigToEdit();
             }
             else if (selectedItem.Length > 0)
             {
@@ -591,8 +666,6 @@ namespace JAFDTC.UI.F15E
 
             Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, STPTSystem.SystemTag,
                                            _configNameList, _configNameToUID);
-
-            uiCmdComboSelRoute.SelectedIndex = 0;
 
             ClipboardChangedHandler(null, null);
             RebuildInterfaceState();

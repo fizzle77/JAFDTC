@@ -171,6 +171,7 @@ namespace JAFDTC.UI.F15E
         private void CopyConfigToEdit(int index)
         {
             SteerpointInfo stptSrc = Config.STPT.Points[index];
+            EditStpt.Route = stptSrc.Route;
             EditStpt.Number = stptSrc.Number;
             EditStpt.Name = new(stptSrc.Name);
             EditStpt.LatUI = Coord.ConvertFromLatDD(stptSrc.Lat, LLFormat.DDM_P3ZF);
@@ -202,6 +203,7 @@ namespace JAFDTC.UI.F15E
             if (!EditStpt.HasErrors)
             {
                 SteerpointInfo stptDst = Config.STPT.Points[index];
+                stptDst.Route = EditStpt.Route;
                 stptDst.Number = EditStpt.Number;
                 stptDst.Name = EditStpt.Name;
                 stptDst.Lat = EditStpt.Lat;
@@ -370,17 +372,6 @@ namespace JAFDTC.UI.F15E
         }
 
         /// <summary>
-        /// TODO: document
-        /// </summary>
-        private void SelectMatchingPoI()
-        {
-#if NOPE
-            uiPoIComboSelect.SelectedItem = NavpointUIHelper.FindMatchingPoI((string)uiPoIComboTheater.SelectedItem,
-                                                                             EditStpt, LLFormat.DDM_P3ZF);
-#endif
-        }
-
-        /// <summary>
         /// load the internal edit copy of the currently selected reference point from the edit copy of the current
         /// steerpoint, creating a new empty reference point if it does not yet exist.
         /// </summary>
@@ -429,7 +420,7 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void RebuildRefPointSelectMenu()
         {
-            string route = "A";
+            string route = EditStpt.Route;
             string zero = (EditStpt.IsTarget) ? "0" : "";
             for (int i = 0; i < _refptSelMenuText.Count; i++)
             {
@@ -702,7 +693,6 @@ namespace JAFDTC.UI.F15E
             ResetRefPointForSteerpointChange();
             EditStptIndex -= 1;
             CopyConfigToEdit(EditStptIndex);
-            SelectMatchingPoI();
             RebuildInterfaceState();
         }
 
@@ -715,7 +705,6 @@ namespace JAFDTC.UI.F15E
             ResetRefPointForSteerpointChange();
             EditStptIndex += 1;
             CopyConfigToEdit(EditStptIndex);
-            SelectMatchingPoI();
             RebuildInterfaceState();
         }
 
