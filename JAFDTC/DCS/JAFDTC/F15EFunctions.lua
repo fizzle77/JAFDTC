@@ -130,7 +130,7 @@ function JAFDTC_F15E_CheckCondition_NoDisplaysProgrammed(disp)
 end
 
 function JAFDTC_F15E_CheckCondition_IsRadioPresetOrFreqSelected(radio, mode)
-	local table = JAFDTC_F15E_GetUFC(disp);
+	local table = JAFDTC_F15E_GetUFC();
 	local radio1Preset = table["UFC_SC_06"] or "x";
 	local radio2Preset = table["UFC_SC_07"] or "x";
 	local radio1Freq = table["UFC_SC_05"] or "x";
@@ -154,7 +154,7 @@ function JAFDTC_F15E_CheckCondition_IsRadioPresetOrFreqSelected(radio, mode)
 end
 
 function JAFDTC_F15E_CheckCondition_IsRadioGuardEnabledDisabled(radio, mode)
-	local table = JAFDTC_F15E_GetUFC(disp);
+	local table = JAFDTC_F15E_GetUFC();
 	local radio1Freq = table["UFC_SC_05"] or "x";
 	local radio2Freq = table["UFC_SC_08"] or "x";
 	radio2Freq = radio2Freq:gsub("*", ""):gsub("%s+", "")
@@ -177,7 +177,7 @@ function JAFDTC_F15E_CheckCondition_IsRadioGuardEnabledDisabled(radio, mode)
 end
 
 function JAFDTC_F15E_CheckCondition_IsTACANBand(band)
-	local table = JAFDTC_F15E_GetUFC(disp);
+	local table = JAFDTC_F15E_GetUFC();
 	local str = table["UFC_SC_01"] or "";
 	if str ~= "" and str.sub(str, -1) == band then
 		return true
@@ -186,7 +186,7 @@ function JAFDTC_F15E_CheckCondition_IsTACANBand(band)
 end
 
 function JAFDTC_F15E_CheckCondition_IsStrDifferent(expected)
-	local table = JAFDTC_F15E_GetUFC(disp);
+	local table = JAFDTC_F15E_GetUFC();
 	local str = table["UFC_SC_01"] or "";
 	if str ~= expected then
 		return true
