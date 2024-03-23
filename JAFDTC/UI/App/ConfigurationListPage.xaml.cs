@@ -341,7 +341,8 @@ namespace JAFDTC.UI.App
                 {
                     DCSStatusIconSetup(uiStatsIconLua, DCSLuaManager.IsLuaInstalled());
                     DCSStatusIconSetup(uiStatsIconLaunch, CurApp.IsDCSRunning);
-                    DCSStatusIconSetup(uiStatsIconExport, CurApp.IsDCSAvailable);
+                    DCSStatusIconSetup(uiStatsIconExport,
+                                       CurApp.IsDCSAvailable && (CurAirframe == CurApp.DCSActiveAirframe));
 
                     uiStatsAirframe.Text = Globals.AirframeShortNames[CurApp.DCSActiveAirframe];
 
@@ -435,6 +436,7 @@ namespace JAFDTC.UI.App
                 CurAirframe = newAirframe;
                 ConfigList.LoadConfigurationsForAirframe(CurAirframe);
                 Settings.LastAirframeSelection = uiBarComboAirframe.SelectedIndex;
+                RebuildInterfaceState();
             }
         }
 
