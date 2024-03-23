@@ -123,7 +123,6 @@ namespace JAFDTC.UI.F15E
             EditStpt.PropertyChanged += EditField_PropertyChanged;
 
             EditRfpt = new();
-            EditRfpt.ErrorsChanged += EditRfpt_DataValidationError;
             EditRfpt.PropertyChanged += EditField_PropertyChanged;
 
             IsRebuildPending = false;
@@ -187,8 +186,10 @@ namespace JAFDTC.UI.F15E
                 if (info.Number == EditRfptNum)
                 {
                     EditRfpt.Number = info.Number;
+                    EditRfpt.Name = new(info.Name);
                     EditRfpt.LatUI = new(info.LatUI);
                     EditRfpt.LonUI = new(info.LonUI);
+                    EditRfpt.Alt = new(info.Alt);
                     break;
                 }
             }
@@ -200,7 +201,7 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void CopyEditToConfig(int index, bool isPersist = false)
         {
-            if (!EditStpt.HasErrors)
+            if (!CurStateHasErrors())
             {
                 SteerpointInfo stptDst = Config.STPT.Points[index];
                 stptDst.Route = EditStpt.Route;
@@ -224,8 +225,10 @@ namespace JAFDTC.UI.F15E
                 {
                     if (info.Number == EditRfptNum)
                     {
+                        info.Name = EditRfpt.Name;
                         info.LatUI = EditRfpt.LatUI;
                         info.LonUI = EditRfpt.LonUI;
+                        info.Alt = EditRfpt.Alt;
                         isNew = false;
                     }
                     if (info.IsEmpty)
@@ -318,17 +321,9 @@ namespace JAFDTC.UI.F15E
         }
 
         /// <summary>
-        /// TODO: document
+        /// steerpoint or reference point property changed: rebuild interface state to account for property changes.
         /// </summary>
-        private void EditRfpt_DataValidationError(object sender, DataErrorsChangedEventArgs args)
-        {
-            CoreDataValidationError(EditRfpt, args.PropertyName, _curRfptFieldValueMap);
-        }
-
-        /// <summary>
-        /// property changed: rebuild interface state to account for property changes.
-        /// </summary>
-        private void EditField_PropertyChanged(object sender, EventArgs args)
+        private void EditField_PropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             RebuildInterfaceState();
         }
@@ -338,7 +333,9 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private bool CurStateHasErrors()
         {
-            return EditStpt.HasErrors | EditRfpt.HasErrors;
+            return EditStpt.HasErrors | (!EditRfpt.IsEmpty && (string.IsNullOrEmpty(EditRfpt.Lat) ||
+                                                               string.IsNullOrEmpty(EditRfpt.Lon) ||
+                                                               string.IsNullOrEmpty(EditRfpt.Alt)));
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -382,16 +379,20 @@ namespace JAFDTC.UI.F15E
                 if (info.Number == number)
                 {
                     EditRfpt.Number = info.Number;
+                    EditRfpt.Name = info.Name;
                     EditRfpt.LatUI = info.LatUI;
                     EditRfpt.LonUI = info.LonUI;
+                    EditRfpt.Alt = info.Alt;
                     return;
                 }
             }
 
             EditStpt.RefPoints.Add(new RefPointInfo(number));
             EditRfpt.Number = number;
+            EditRfpt.Name = "";
             EditRfpt.LatUI = "";
             EditRfpt.LonUI = "";
+            EditRfpt.Alt = "";
         }
 
         /// <summary>
@@ -401,8 +402,10 @@ namespace JAFDTC.UI.F15E
         private void ResetRefPointForSteerpointChange()
         {
             EditRfpt.Number = 1;
+            EditRfpt.Name = "";
             EditRfpt.LatUI = "";
             EditRfpt.LonUI = "";
+            EditRfpt.Alt = "";
             uiRfptComboSelect.SelectedIndex = 0;
         }
 
@@ -413,6 +416,17 @@ namespace JAFDTC.UI.F15E
         private void RebuildPointsOfInterest()
         {
             uiPoINameFilterBox.ItemsSource = NavpointUIHelper.RebuildPointsOfInterest(FilterSpec, uiPoINameFilterBox.Text);
+        }
+
+        /// <summary>
+        /// rebuild the state of the reference point editor in response to a change in the configuration. even though
+        /// an empty refpoint is flagged as invalid, we treat it as valid here an indicating the refpoint is not in use.
+        /// </summary>
+        private void RebuildRefptErrorIndicators()
+        {
+            SetFieldValidState(uiRfptValueLat, EditRfpt.IsEmpty || !string.IsNullOrEmpty(EditRfpt.LatUI));
+            SetFieldValidState(uiRfptValueLon, EditRfpt.IsEmpty || !string.IsNullOrEmpty(EditRfpt.LonUI));
+            SetFieldValidState(uiRfptValueAlt, EditRfpt.IsEmpty || !string.IsNullOrEmpty(EditRfpt.Alt));
         }
 
         /// <summary>
@@ -429,7 +443,8 @@ namespace JAFDTC.UI.F15E
             }
             foreach (RefPointInfo info in EditStpt.RefPoints)
             {
-                if (info.IsValid)
+                if (((info.Number == EditRfpt.Number) && EditRfpt.IsValid) ||
+                    ((info.Number != EditRfpt.Number) && info.IsValid))
                 {
                     _refptSelMenuIcon[info.Number - 1].Visibility = Visibility.Visible;
                 }
@@ -466,9 +481,10 @@ namespace JAFDTC.UI.F15E
             Utilities.SetEnableState(uiStptBtnAdd, isEditable && !CurStateHasErrors());
             Utilities.SetEnableState(uiStptBtnNext, !CurStateHasErrors() && (EditStptIndex < (Config.STPT.Points.Count - 1)));
 
-            Utilities.SetEnableState(uiRfptBtnClear, isEditable && !EditRfpt.IsEmpty);
-            // TODO: implement capture for refpt
+            Utilities.SetEnableState(uiRfptBtnApply, isEditable && (CurSelectedPoI != null));
+            // TODO: allow enable when refpt capture is implemented
             Utilities.SetEnableState(uiRfptBtnCapture, isEditable && isDCSListening && false);
+            Utilities.SetEnableState(uiRfptBtnClear, isEditable && !EditRfpt.IsEmpty);
 
             // TODO: ok button should also enable if you have lat/lon/alt specified, if vrp/vip both points needed
             Utilities.SetEnableState(uiAcceptBtnOK, isEditable && !CurStateHasErrors());
@@ -489,6 +505,7 @@ namespace JAFDTC.UI.F15E
                                                              : $"Steerpoint {EditStpt.Number}{EditStpt.Route} Information";
                     uiRfptTextTitle.Text = (EditStpt.IsTarget) ? $"Aim Points for {EditStpt.Number}{EditStpt.Route}"
                                                                : $"Offset Points for {EditStpt.Number}{EditStpt.Route}";
+                    RebuildRefptErrorIndicators();
                     RebuildRefPointSelectMenu();
                     RebuildEnableState();
                     IsRebuildPending = false;
@@ -598,7 +615,7 @@ namespace JAFDTC.UI.F15E
         }
 
         /// <summary>
-        /// apply poi click: copy poi information into current steerpoint and reset poi selection to "none".
+        /// apply poi click: copy poi information into current steerpoint.
         /// </summary>
         private void PoIBtnApply_Click(object sender, RoutedEventArgs args)
         {
@@ -755,10 +772,25 @@ namespace JAFDTC.UI.F15E
         }
 
         /// <summary>
+        /// apply refpt click: copy poi information into current reference point.
+        /// </summary>
+        private void RfptBtnApply_Click(object sender, RoutedEventArgs args)
+        {
+            EditRfpt.Name = CurSelectedPoI.Name;
+            EditRfpt.LatUI = Coord.ConvertFromLatDD(CurSelectedPoI.Latitude, LLFormat.DDM_P3ZF);
+            EditRfpt.LonUI = Coord.ConvertFromLonDD(CurSelectedPoI.Longitude, LLFormat.DDM_P3ZF);
+            EditRfpt.Alt = CurSelectedPoI.Elevation;
+            EditRfpt.ClearErrors();
+
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
         /// TODO: document
         /// </summary>
         private void RfptBtnClear_Click(object obj, RoutedEventArgs args)
         {
+            EditRfpt.Name = "";
             EditRfpt.LatUI = "";
             EditRfpt.LonUI = "";
             EditRfpt.Alt = "";
@@ -772,21 +804,6 @@ namespace JAFDTC.UI.F15E
         private void RfptBtnCapture_Click(object obj, RoutedEventArgs args)
         {
             // TODO: implement
-        }
-
-        /// <summary>
-        /// TODO: document
-        ///
-        /// NOTE: though the text box has lost focus, the update may not yet have propagated into state. use the
-        /// NOTE: dispatch queue to give in-flight state updates time to complete.
-        /// </summary>
-        private void RfptTextBox_LostFocus(object obj, RoutedEventArgs args)
-        {
-            // CONSIDER: may be better here to handle this in a property changed handler rather than here?
-            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-            {
-                CopyEditToConfig(EditStptIndex, true);
-            });
         }
 
         // ---- text field changes ------------------------------------------------------------------------------------
@@ -810,6 +827,21 @@ namespace JAFDTC.UI.F15E
             RebuildEnableState();
         }
 
+        /// <summary>
+        /// TODO: document
+        ///
+        /// NOTE: though the text box has lost focus, the update may not yet have propagated into state. use the
+        /// NOTE: dispatch queue to give in-flight state updates time to complete.
+        /// </summary>
+        private void RfptTextBox_LostFocus(object obj, RoutedEventArgs args)
+        {
+            // CONSIDER: may be better here to handle this in a property changed handler rather than here?
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+            {
+//                CopyEditToConfig(EditStptIndex, true);
+            });
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // events
@@ -826,9 +858,10 @@ namespace JAFDTC.UI.F15E
             Config = NavArgs.Config;
 
             EditStptIndex = NavArgs.IndexStpt;
+            EditRfptNum = 1;
+
             CopyConfigToEdit(EditStptIndex);
 
-            EditRfptNum = 1;
             uiRfptComboSelect.SelectedIndex = EditRfptNum - 1;
             LoadEditRfptFromPointNumber(EditRfptNum);
 
@@ -836,7 +869,6 @@ namespace JAFDTC.UI.F15E
                              Settings.LastStptFilterIncludeTypes);
 
             ValidateAllFields(_curStptFieldValueMap, EditStpt.GetErrors(null));
-            ValidateAllFields(_curRfptFieldValueMap, EditRfpt.GetErrors(null));
             RebuildPointsOfInterest();
             RebuildInterfaceState();
 

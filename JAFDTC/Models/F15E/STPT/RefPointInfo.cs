@@ -51,6 +51,13 @@ namespace JAFDTC.Models.F15E.STPT
             set => SetProperty(ref _number, value);
         }
 
+        private string _name;                       // string
+        public string Name
+        {
+            get => _name;
+            set => SetProperty(ref _name, value, null);
+        }
+
         private string _lat;                        // string, decimal degrees (raw, no units)
         public string Lat
         {
@@ -128,7 +135,7 @@ namespace JAFDTC.Models.F15E.STPT
             set
             {
                 string error = "Invalid altitude format";
-                if (IsIntegerFieldValid(value, 1, 59999, false) || IsIntegerFieldValid(value, -59999, -1, false))
+                if (IsIntegerFieldValid(value, 1, 59999) || IsIntegerFieldValid(value, -59999, -1))
                 {
                     value = FixupIntegerField(value);
                     error = null;
@@ -140,10 +147,12 @@ namespace JAFDTC.Models.F15E.STPT
         // ---- public properties, computed
 
         [JsonIgnore]
-        public bool IsEmpty => string.IsNullOrEmpty(_lat) && string.IsNullOrEmpty(_lon) && string.IsNullOrEmpty(_alt);
+        public bool IsEmpty => string.IsNullOrEmpty(_name) && string.IsNullOrEmpty(_lat) &&
+                               string.IsNullOrEmpty(_lon) && string.IsNullOrEmpty(_alt);
 
         [JsonIgnore]
-        public virtual bool IsValid => (IsIntegerFieldValid(_alt, -80000, 80000, false) &&
+        public virtual bool IsValid => ((IsIntegerFieldValid(_alt, 1, 59999, false) ||
+                                         IsIntegerFieldValid(_alt, -59999, -1, false)) &&
                                         IsDecimalFieldValid(_lat, -90.0, 90.0, false) &&
                                         IsDecimalFieldValid(_lon, -180.0, 180.0, false));
 
@@ -160,6 +169,7 @@ namespace JAFDTC.Models.F15E.STPT
         public RefPointInfo(RefPointInfo other)
         {
             Number = other.Number;
+            Name = new(other.Name);
             Lat = new(other.Lat);
             Lon = new(other.Lon);
             Alt = new(other.Alt);
@@ -178,6 +188,7 @@ namespace JAFDTC.Models.F15E.STPT
         /// </summary>
         public void Reset()
         {
+            Name = "";
             Lat = "";
             Lon = "";
             Alt = "";

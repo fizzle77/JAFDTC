@@ -29,7 +29,7 @@ https://www.gnu.org/licenses/.
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
 
     <Page.Resources>
 
@@ -155,6 +155,7 @@ https://www.gnu.org/licenses/.
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -240,7 +241,7 @@ https://www.gnu.org/licenses/.
                      MaxLength="48"
                      ToolTipService.ToolTip="Name of steerpoint"/>
 
-            <!-- lat/lon/alt/tos field
+            <!-- lat/lon/elev/tos field
               -->
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0"
                        HorizontalTextAlignment="Right"
@@ -310,7 +311,6 @@ https://www.gnu.org/licenses/.
                       IsChecked="{x:Bind EditStpt.IsTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       Click="StptCkbxTarget_Click"/>
 
-
             <!-- reference point selection
               -->
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,24,0,0"
@@ -320,15 +320,19 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 FIXUP: Reference Points
             </TextBlock>
-            <Grid Grid.Row="4" Grid.Column="1" Margin="12,24,0,0"
-                  VerticalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="286"/>
-                </Grid.ColumnDefinitions>
 
-                <ComboBox Grid.Row="0" Grid.Column="0"
+            <Grid Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="12,24,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="15*"/>
+                    <ColumnDefinition Width="16*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox Grid.Column="0"
                           x:Name="uiRfptComboSelect"
                           VerticalAlignment="Center"
                           HorizontalAlignment="Stretch"
@@ -340,13 +344,13 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <FontIcon Grid.Column="0"
-                                          x:Name="uiRfptSelectItem1Icon"
-                                          VerticalAlignment="Center"
-                                          Foreground="{ThemeResource SystemAccentColor}"
-                                          FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                                      x:Name="uiRfptSelectItem1Icon"
+                                      VerticalAlignment="Center"
+                                      Foreground="{ThemeResource SystemAccentColor}"
+                                      FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
                             <TextBlock Grid.Column="1" Margin="8,0,0,0"
-                                           x:Name="uiRfptSelectItem1Text"
-                                           VerticalAlignment="Center"/>
+                                       x:Name="uiRfptSelectItem1Text"
+                                       VerticalAlignment="Center"/>
                         </Grid>
                         <Grid Tag="2">
                             <Grid.ColumnDefinitions>
@@ -354,13 +358,13 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <FontIcon Grid.Column="0"
-                                          x:Name="uiRfptSelectItem2Icon"
-                                          VerticalAlignment="Center"
-                                          Foreground="{ThemeResource SystemAccentColor}"
-                                          FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                                      x:Name="uiRfptSelectItem2Icon"
+                                      VerticalAlignment="Center"
+                                      Foreground="{ThemeResource SystemAccentColor}"
+                                      FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
                             <TextBlock Grid.Column="1" Margin="8,0,0,0"
-                                           x:Name="uiRfptSelectItem2Text"
-                                           VerticalAlignment="Center"/>
+                                       x:Name="uiRfptSelectItem2Text"
+                                       VerticalAlignment="Center"/>
                         </Grid>
                         <Grid Tag="3">
                             <Grid.ColumnDefinitions>
@@ -368,13 +372,13 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <FontIcon Grid.Column="0"
-                                          x:Name="uiRfptSelectItem3Icon"
-                                          VerticalAlignment="Center"
-                                          Foreground="{ThemeResource SystemAccentColor}"
-                                          FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                                      x:Name="uiRfptSelectItem3Icon"
+                                      VerticalAlignment="Center"
+                                      Foreground="{ThemeResource SystemAccentColor}"
+                                      FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
                             <TextBlock Grid.Column="1" Margin="8,0,0,0"
-                                           x:Name="uiRfptSelectItem3Text"
-                                           VerticalAlignment="Center"/>
+                                       x:Name="uiRfptSelectItem3Text"
+                                       VerticalAlignment="Center"/>
                         </Grid>
                         <Grid Tag="4">
                             <Grid.ColumnDefinitions>
@@ -382,13 +386,13 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <FontIcon Grid.Column="0"
-                                          x:Name="uiRfptSelectItem4Icon"
-                                          VerticalAlignment="Center"
-                                          Foreground="{ThemeResource SystemAccentColor}"
-                                          FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                                      x:Name="uiRfptSelectItem4Icon"
+                                      VerticalAlignment="Center"
+                                      Foreground="{ThemeResource SystemAccentColor}"
+                                      FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
                             <TextBlock Grid.Column="1" Margin="8,0,0,0"
-                                           x:Name="uiRfptSelectItem4Text"
-                                           VerticalAlignment="Center"/>
+                                       x:Name="uiRfptSelectItem4Text"
+                                       VerticalAlignment="Center"/>
                         </Grid>
                         <Grid Tag="5">
                             <Grid.ColumnDefinitions>
@@ -396,13 +400,13 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <FontIcon Grid.Column="0"
-                                          x:Name="uiRfptSelectItem5Icon"
-                                          VerticalAlignment="Center"
-                                          Foreground="{ThemeResource SystemAccentColor}"
-                                          FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                                      x:Name="uiRfptSelectItem5Icon"
+                                      VerticalAlignment="Center"
+                                      Foreground="{ThemeResource SystemAccentColor}"
+                                      FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
                             <TextBlock Grid.Column="1" Margin="8,0,0,0"
-                                           x:Name="uiRfptSelectItem5Text"
-                                           VerticalAlignment="Center"/>
+                                       x:Name="uiRfptSelectItem5Text"
+                                       VerticalAlignment="Center"/>
                         </Grid>
                         <Grid Tag="6">
                             <Grid.ColumnDefinitions>
@@ -410,13 +414,13 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <FontIcon Grid.Column="0"
-                                          x:Name="uiRfptSelectItem6Icon"
-                                          VerticalAlignment="Center"
-                                          Foreground="{ThemeResource SystemAccentColor}"
-                                          FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                                      x:Name="uiRfptSelectItem6Icon"
+                                      VerticalAlignment="Center"
+                                      Foreground="{ThemeResource SystemAccentColor}"
+                                      FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
                             <TextBlock Grid.Column="1" Margin="8,0,0,0"
-                                           x:Name="uiRfptSelectItem6Text"
-                                           VerticalAlignment="Center"/>
+                                       x:Name="uiRfptSelectItem6Text"
+                                       VerticalAlignment="Center"/>
                         </Grid>
                         <Grid Tag="7">
                             <Grid.ColumnDefinitions>
@@ -424,26 +428,65 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <FontIcon Grid.Column="0"
-                                          x:Name="uiRfptSelectItem7Icon"
-                                          VerticalAlignment="Center"
-                                          Foreground="{ThemeResource SystemAccentColor}"
-                                          FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                                      x:Name="uiRfptSelectItem7Icon"
+                                      VerticalAlignment="Center"
+                                      Foreground="{ThemeResource SystemAccentColor}"
+                                      FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
                             <TextBlock Grid.Column="1" Margin="8,0,0,0"
-                                           x:Name="uiRfptSelectItem7Text"
-                                           VerticalAlignment="Center"/>
+                                        x:Name="uiRfptSelectItem7Text"
+                                        VerticalAlignment="Center"/>
                         </Grid>
                     </ComboBox.Items>
                 </ComboBox>
+                <Button Grid.Column="2" Margin="12,0,6,0"
+                        x:Name="uiRfptBtnApply"
+                        VerticalAlignment="Center"
+                        Click="RfptBtnApply_Click"
+                        ToolTipService.ToolTip="Paste selected point of interest to reference point">
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE77F;"/>
+                </Button>
+                <Button Grid.Column="3" Height="34" Margin="0,0,24,0"
+                    x:Name="uiRfptBtnCapture"
+                    VerticalAlignment="Center"
+                    Click="RfptBtnCapture_Click"
+                    ToolTipService.ToolTip="Capture reference point LAT, LON, ELEV from DCS">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE7B7;"/>
+                        <TextBlock VerticalAlignment="Center">
+                            DCS
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="4" Margin="0,0,0,0"
+                        x:Name="uiRfptBtnClear"
+                        Click="RfptBtnClear_Click">
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE711;"/>
+                </Button>
             </Grid>
-
-            <!-- lat/lon field
+            
+            <!-- refernce point name field
               -->
             <TextBlock Grid.Row="5" Grid.Column="0" Margin="12,12,0,0"
                        HorizontalTextAlignment="Right"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
+                Name
+            </TextBlock>
+            <TextBox Grid.Row="5" Grid.Column="1" Margin="12,12,0,0"
+                     x:Name="uiRfptValueName"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     Text="{x:Bind EditRfpt.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     MaxLength="48"
+                     ToolTipService.ToolTip="Name of reference point"/>
+
+            <!-- lat/lon/elev fields
+              -->
+            <TextBlock Grid.Row="6" Grid.Column="0" Margin="12,12,0,0"
+                       HorizontalTextAlignment="Right"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 LAT / LON / ELEV
             </TextBlock>
-            <Grid Grid.Row="5" Grid.Column="1" Margin="0,12,0,0"
+            <Grid Grid.Row="6" Grid.Column="1" Margin="0,12,0,0"
                   VerticalAlignment="Center">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -454,7 +497,6 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="125"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="125"/>
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Row="0" Grid.Column="0" Margin="12,0,0,0"
                          x:Name="uiRfptValueLat"
@@ -489,25 +531,7 @@ https://www.gnu.org/licenses/.
                            Style="{StaticResource EditorParamStaticTextBlockStyle}">
                     ft
                 </TextBlock>
-                <Button Grid.Row="0" Grid.Column="4" Margin="24,0,0,0"
-                        x:Name="uiRfptBtnClear"
-                        Click="RfptBtnClear_Click">
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE711;"/>
-                </Button>
             </Grid>
-            <Button Grid.Row="6" Grid.Column="1" Margin="12,12,0,0"
-                        x:Name="uiRfptBtnCapture"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Stretch"
-                        Click="RfptBtnCapture_Click">
-                <StackPanel Orientation="Horizontal">
-                    <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE7B7;"/>
-                    <TextBlock VerticalAlignment="Center">
-                            DCS Capture
-                    </TextBlock>
-                </StackPanel>
-            </Button>
         </Grid>
 
         <!--
