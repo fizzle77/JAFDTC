@@ -48,6 +48,7 @@ namespace JAFDTC.Models.DCS
 
         // common wait durations (ms) for AddWait().
         //
+        protected const int WAIT_NONE = 0;
         protected const int WAIT_SHORT = 100;
         protected const int WAIT_BASE = 200;
         protected const int WAIT_LONG = 600;
@@ -111,9 +112,10 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// add an action for the key to the command the builder is buidling.
         /// </summary>
-        protected void AddAction(AirframeDevice device, string key)
+        protected void AddAction(AirframeDevice device, string key, int dtWaitPost = WAIT_NONE)
         {
             AddCommand(device[key]);
+            AddWait(dtWaitPost);
         }
 
         /// <summary>
@@ -130,7 +132,8 @@ namespace JAFDTC.Models.DCS
         /// add actions for the keys in the provided list followed by a post-list set of keys to the command the
         /// builder is building. each key must be an action the key pad device supports
         /// </summary>
-        protected void AddActions(AirframeDevice device, List<string> keys, List<string> keysPost = null)
+        protected void AddActions(AirframeDevice device, List<string> keys, List<string> keysPost = null,
+                                  int dtWaitPost = WAIT_NONE)
         {
             foreach (string key in keys)
                 AddAction(device, key);
@@ -139,6 +142,7 @@ namespace JAFDTC.Models.DCS
                 foreach (string key in keysPost)
                     AddAction(device, key);
             }
+            AddWait(dtWaitPost);
         }
 
         /// <summary>
@@ -146,8 +150,11 @@ namespace JAFDTC.Models.DCS
         /// </summary>
         protected void AddWait(int dt)
         {
-            string cmd = $"{{\"f\":\"Wait\",\"a\":{{\"dt\":{dt}}}}},";
-            AddCommand(cmd);
+            if (dt > 0)
+            {
+                string cmd = $"{{\"f\":\"Wait\",\"a\":{{\"dt\":{dt}}}}},";
+                AddCommand(cmd);
+            }
         }
 
         /// <summary>
