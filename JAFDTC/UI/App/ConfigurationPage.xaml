@@ -65,6 +65,13 @@ https://www.gnu.org/licenses/.
         <!-- brush for iconds for editors with changes -->
         <SolidColorBrush x:Key="EditorListIconHighlightBrush" Color="{ThemeResource SystemAccentColor}"/>
 
+        <!-- brush for icons for editors without changes -->
+        <SolidColorBrush x:Key="ItemEnabled" Color="{ThemeResource TextFillColorPrimary}"/>
+
+        <!-- brush for icons for editors without changes -->
+        <SolidColorBrush x:Key="ItemDisabled" Color="{ThemeResource TextFillColorTertiary}"/>
+
+
     </Page.Resources>
 
     <Grid>
@@ -72,24 +79,24 @@ https://www.gnu.org/licenses/.
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
 
         <!--
         ===============================================================================================================
         row 0 : header row
         ===============================================================================================================
         -->
-        <StackPanel Grid.Row="0" Grid.Column="0" Margin="8,4,8,4"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center">
+        <Grid Grid.Row="0" Margin="8,4,8,4"
+              VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
             <!-- Style="{StaticResource NavigationBackButtonSmallStyle}" -->
 
-            <AppBarButton Height="48" Margin="0,2,0,0"
+            <AppBarButton Grid.Column="0" Height="48" Margin="0,2,0,0"
                           x:Name="uiHdrBtnBack"
                           VerticalAlignment="Center"
                           IsEnabled="True"
@@ -97,28 +104,37 @@ https://www.gnu.org/licenses/.
                           ToolTipService.ToolTip="Return to Configuration List">
                 <SymbolIcon Symbol="Back"/>
             </AppBarButton>
-            <TextBlock Margin="0,0,8,0"
-                       x:Name="uiHdrTxtConfigIsFav"
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0">
+                <TextBlock Margin="0,0,4,0"
+                           x:Name="uiHdrTxtConfigIsFav"
+                           VerticalAlignment="Center"
+                           FontFamily="Segoe Fluent Icons" 
+                           FontSize="14">
+                    &#xE735;
+                </TextBlock>
+                <TextBlock Margin="4,0,0,4"
+                           x:Name="uiHdrTxtConfigName"
+                           VerticalAlignment="Center"
+                           FontSize="20"
+                           FontWeight="SemiBold">
+                    FIXUP: Config Name
+                </TextBlock>
+            </StackPanel>
+            <TextBlock Grid.Column="2" Margin="0,0,16,0"
+                       x:Name="uiNavTxtAirframeName"
+                       Style="{StaticResource TableHeaderTextStyle}"
                        VerticalAlignment="Center"
-                       FontFamily="Segoe Fluent Icons" 
-                       FontSize="14">
-                &#xE735;
+                       HorizontalAlignment="Right">
+                FIXUP - Airframe Name
             </TextBlock>
-            <TextBlock Margin="4,0,0,4"
-                       x:Name="uiHdrTxtConfigName"
-                       VerticalAlignment="Center"
-                       FontSize="20"
-                       FontWeight="SemiBold">
-                FIXUP: Config Name
-            </TextBlock>
-        </StackPanel>
+        </Grid>
 
         <!--
         ===============================================================================================================
         row 1 : navigation split view with editor types / editors
         ===============================================================================================================
         -->
-        <SplitView Grid.Row="1" Grid.ColumnSpan="2"
+        <SplitView Grid.Row="1"
                    x:Name="uiNavSplitView"
                    PaneBackground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
                    IsPaneOpen="True"
@@ -131,22 +147,11 @@ https://www.gnu.org/licenses/.
             <SplitView.Pane>
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,12,0,0"
-                               x:Name="uiNavTxtAirframeName"
-                               Style="{StaticResource TableHeaderTextStyle}"
-                               HorizontalAlignment="Center">
-                        FIXUP - Airframe Name
-                    </TextBlock>
-
-                    <ListView Grid.Row="1" Grid.Column="0" Margin="0,12,0,0"
+                    <ListView Grid.Row="0"
                               x:Name="uiNavListEditors"
                               VerticalAlignment="Stretch"
                               SelectionMode="Single"
@@ -171,8 +176,36 @@ https://www.gnu.org/licenses/.
                         </ListView.Resources>
                     </ListView>
 
-                    <!-- TODO: not sure if this is the right type of button -->
-                    <AppBarButton Grid.Row="2" Grid.Column="0" Height="48"
+                    <ListView Grid.Row="2"
+                              x:Name="uiNavListAux"
+                              VerticalAlignment="Bottom"
+                              SelectionMode="None"
+                              IsItemClickEnabled="True"
+                              IsEnabled="True"
+                              ItemClick="NavListAux_ItemClick">
+                        <ListView.Items>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <FontIcon Grid.Column="0"
+                                          x:Name="uiIconAuxToJet"
+                                          VerticalAlignment="Center"
+                                          FontFamily="Segoe Fluent Icons"
+                                          Glyph="&#xE709;"/>
+                                <TextBlock Grid.Column="1" Margin="24,0,0,0"
+                                           x:Name="uiTextAuxToJet"
+                                           VerticalAlignment="Center">
+                                    Load Tape to Jet
+                                </TextBlock>
+                            </Grid>
+                        </ListView.Items>
+                    </ListView>
+
+                    <!-- TODO: not sure if this is the right type of button
+                    <AppBarButton Grid.Row="3" Height="48"
                                   x:Name="uiNavBtnToJet"
                                   HorizontalAlignment="Stretch"
                                   VerticalAlignment="Center"
@@ -183,6 +216,7 @@ https://www.gnu.org/licenses/.
                         </AppBarButton.Icon>
                         TEST
                     </AppBarButton>
+                     -->
                 </Grid>
             </SplitView.Pane>
 

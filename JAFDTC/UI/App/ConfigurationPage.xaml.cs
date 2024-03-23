@@ -159,7 +159,19 @@ namespace JAFDTC.UI.App
             {
                 RebuildIconForeground(info);
             }
-            uiNavBtnToJet.IsEnabled = CurApp.IsDCSAvailable && (CurApp.DCSActiveAirframe == Config.Airframe);
+
+            if (CurApp.IsDCSAvailable && (CurApp.DCSActiveAirframe == Config.Airframe))
+            {
+                uiNavListAux.IsItemClickEnabled = true;
+                uiIconAuxToJet.Foreground = (SolidColorBrush)Resources["ItemEnabled"];
+                uiTextAuxToJet.Foreground = (SolidColorBrush)Resources["ItemEnabled"];
+            }
+            else
+            {
+                uiNavListAux.IsItemClickEnabled = false;
+                uiIconAuxToJet.Foreground = (SolidColorBrush)Resources["ItemDisabled"];
+                uiTextAuxToJet.Foreground = (SolidColorBrush)Resources["ItemDisabled"];
+            }
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -177,13 +189,6 @@ namespace JAFDTC.UI.App
             Frame.GoBack();
         }
         
-        // to jet button click: upload the current configuration to the jet.
-        //
-        private void NavBtnToJet_Click(object sender, RoutedEventArgs args)
-        {
-            CurApp.UploadConfigurationToJet(Config);
-        }
-
         // copy click: serialize the selected system and copy it to the clipboard.
         //
         private void CmdCopy_Click(object sender, RoutedEventArgs args)
@@ -287,6 +292,16 @@ namespace JAFDTC.UI.App
                 uiNavListEditorsCtxMenuFlyout.Items[3].IsEnabled = !isDefault;          // reset
             }
             uiNavListEditorsCtxMenuFlyout.ShowAt(listView, args.GetPosition(listView));
+        }
+
+        // ---- aux list ----------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// to jet button click: upload the current configuration to the jet.
+        /// </summary>
+        private void NavListAux_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            CurApp.UploadConfigurationToJet(Config);
         }
 
         // ------------------------------------------------------------------------------------------------------------
