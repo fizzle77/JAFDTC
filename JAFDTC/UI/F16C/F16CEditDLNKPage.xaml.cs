@@ -630,10 +630,8 @@ namespace JAFDTC.UI.F16C
                                                                     _configNameList);
             if (selectedItem == null)
             {
-                CopyEditToConfig(true);
                 Config.UnlinkSystem(DLNKSystem.SystemTag);
                 Config.Save(this);
-                CopyConfigToEdit();
             }
             else if (selectedItem.Length > 0)
             {

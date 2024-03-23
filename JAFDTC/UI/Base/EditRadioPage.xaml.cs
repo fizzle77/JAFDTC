@@ -595,10 +595,8 @@ namespace JAFDTC.UI.Base
                                                                     _configNameList);
             if (selectedItem == null)
             {
-                CopyEditToConfig(EditRadio, true);
                 Config.UnlinkSystem(NavHelper.SystemTag);
                 Config.Save(this);
-                CopyConfigToEdit(EditRadio);
             }
             else if (selectedItem.Length > 0)
             {

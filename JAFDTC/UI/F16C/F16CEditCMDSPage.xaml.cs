@@ -479,10 +479,8 @@ namespace JAFDTC.UI.F16C
                                                                     _configNameList);
             if (selectedItem == null)
             {
-                CopyEditToConfig(EditProgram, true);
                 Config.UnlinkSystem(CMDSSystem.SystemTag);
                 Config.Save(this);
-                CopyConfigToEdit(EditProgram);
             }
             else if (selectedItem.Length > 0)
             {

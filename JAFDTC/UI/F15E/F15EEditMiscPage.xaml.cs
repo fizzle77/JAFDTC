@@ -321,10 +321,8 @@ namespace JAFDTC.UI.F15E
                                                                     _configNameList);
             if (selectedItem == null)
             {
-                CopyEditToConfig(true);
                 Config.UnlinkSystem(MiscSystem.SystemTag);
                 Config.Save(this);
-                CopyConfigToEdit();
             }
             else if (selectedItem.Length > 0)
             {

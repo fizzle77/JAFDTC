@@ -412,10 +412,8 @@ namespace JAFDTC.UI.FA18C
                                                                     _configNameList);
             if (selectedItem == null)
             {
-                CopyEditToConfig(EditProgram, true);
                 Config.UnlinkSystem(CMSSystem.SystemTag);
                 Config.Save(this);
-                CopyConfigToEdit(EditProgram);
             }
             else if (selectedItem.Length > 0)
             {

@@ -473,10 +473,8 @@ namespace JAFDTC.UI.F16C
                                                                     _configNameList);
             if (selectedItem == null)
             {
-                CopyEditToConfig(EditTable, true);
                 Config.UnlinkSystem(HARMSystem.SystemTag);
                 Config.Save(this);
-                CopyConfigToEdit(EditTable);
             }
             else if (selectedItem.Length > 0)
             {

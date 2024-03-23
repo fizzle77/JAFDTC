@@ -230,10 +230,8 @@ namespace JAFDTC.UI.AV8B
             string selItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, PageHelper.SystemTag, _configNameList);
             if (selItem == null)
             {
-                CopyEditToConfig(true);
                 Config.UnlinkSystem(PageHelper.SystemTag);
                 Config.Save(this);
-                CopyConfigToEdit();
             }
             else if (selItem.Length > 0)
             {

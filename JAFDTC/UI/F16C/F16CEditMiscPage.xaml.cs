@@ -416,10 +416,8 @@ namespace JAFDTC.UI.F16C
                                                                     _configNameList);
             if (selectedItem == null)
             {
-                CopyEditToConfig(true);
                 Config.UnlinkSystem(MiscSystem.SystemTag);
                 Config.Save(this);
-                CopyConfigToEdit();
             }
             else if (selectedItem.Length > 0)
             {
