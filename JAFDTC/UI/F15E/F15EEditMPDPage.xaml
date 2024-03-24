@@ -812,10 +812,10 @@ https://www.gnu.org/licenses/.
                 <Button Width="140"
                         x:Name="uiPageBtnLink"
                         Click="PageBtnLink_Click"
-                        ToolTipService.ToolTip="Link or unlink this system to misc system in another configuration">
+                        ToolTipService.ToolTip="Link or unlink this system to/from another configuration">
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE723;"/>
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE718;"/>
                         <TextBlock VerticalAlignment="center"
                                    x:Name="uiPageBtnTxtLink">
                             FIXUP
@@ -833,7 +833,8 @@ https://www.gnu.org/licenses/.
                         VerticalAlignment="Bottom"
                         Orientation="Horizontal">
                 <Button x:Name="uiPageBtnReset"
-                        Click="PageBtnReset_Click">
+                        Click="PageBtnReset_Click"
+                        ToolTipService.ToolTip="Reset the configuration of this system to its defaults">
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Margin="0,0,6,0"
                                   FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>

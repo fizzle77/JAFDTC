@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+FA18CEditCMSPage.cs : ui xaml for hornet cms editor page
+
+Copyright(C) 2023-2024 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
 <Page
     x:Class="JAFDTC.UI.FA18C.FA18CEditCMSPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -294,10 +313,10 @@
                 <Button Width="140"
                         x:Name="uiPageBtnLink"
                         Click="PageBtnLink_Click"
-                        ToolTipService.ToolTip="Link or Unlink this Setup to CMS Setup from Another Configuration">
+                        ToolTipService.ToolTip="Link or unlink this system to/from another configuration">
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE723;"/>
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE718;"/>
                         <TextBlock VerticalAlignment="center"
                                    x:Name="uiPageBtnTxtLink">
                             FIXUP
@@ -316,7 +335,7 @@
                         Orientation="Horizontal">
                 <Button x:Name="uiPageBtnResetAll"
                         Click="PageBtnResetAll_Click"
-                        ToolTipService.ToolTip="TODO">
+                        ToolTipService.ToolTip="Reset the configuration of this system to its defaults">
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Margin="0,0,6,0"
                                   FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
