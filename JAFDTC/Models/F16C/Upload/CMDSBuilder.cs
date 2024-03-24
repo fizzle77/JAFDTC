@@ -55,16 +55,20 @@ namespace JAFDTC.Models.F16C.Upload
 
             if (!_cfg.CMDS.IsDefault)
             {
-                AddActions(ufc, new() { "RTN", "RTN", "LIST", "7" });
+                AddActions(ufc, new() { "RTN", "RTN", "LIST", "7" }, null, WAIT_SHORT);
 
                 // ---- chaff, flare bingo
 
-                AddActions(ufc, PredActionsForNumAndEnter(_cfg.CMDS.BingoChaff), new() { "DOWN" });
-                AddActions(ufc, PredActionsForNumAndEnter(_cfg.CMDS.BingoFlare), new() { "UP" });
+                if (!string.IsNullOrEmpty(_cfg.CMDS.BingoChaff) || !string.IsNullOrEmpty(_cfg.CMDS.BingoFlare))
+                {
+                    AddActions(ufc, PredActionsForNumAndEnter(_cfg.CMDS.BingoChaff), new() { "DOWN" }, WAIT_BASE);
+                    AddActions(ufc, PredActionsForNumAndEnter(_cfg.CMDS.BingoFlare), new() { "UP" }, WAIT_BASE);
+                }
 
                 // ---- move to chaff program 1 and enter chaff programs 1-6
 
-                AddAction(ufc, "SEQ");
+                AddAction(ufc, "SEQ", WAIT_BASE);
+
                 for (int i = 0; i < _cfg.CMDS.Programs.Length; i++)
                 {
                     BuildProgramCommands(ufc, _cfg.CMDS.Programs[i].Chaff);
@@ -72,7 +76,7 @@ namespace JAFDTC.Models.F16C.Upload
 
                 // ---- move to flare program 1 and enter flare programs 1-6
 
-                AddAction(ufc, "SEQ");
+                AddAction(ufc, "SEQ", WAIT_BASE);
                 for (int i = 0; i < _cfg.CMDS.Programs.Length; i++)
                 {
                     BuildProgramCommands(ufc, _cfg.CMDS.Programs[i].Flare);
@@ -90,13 +94,12 @@ namespace JAFDTC.Models.F16C.Upload
         {
             if (!pgm.IsDefault)
             {
-                AddActions(ufc, PredActionsForCleanNumAndEnter(pgm.BQ), new() { "DOWN" });
-                AddActions(ufc, PredActionsForCleanNumAndEnter(pgm.BI), new() { "DOWN" });
-                AddActions(ufc, PredActionsForCleanNumAndEnter(pgm.SQ), new() { "DOWN" });
-                AddActions(ufc, PredActionsForCleanNumAndEnter(pgm.SI), new() { "DOWN" });
+                AddActions(ufc, PredActionsForCleanNumAndEnter(pgm.BQ), new() { "DOWN" }, WAIT_SHORT);
+                AddActions(ufc, PredActionsForCleanNumAndEnter(pgm.BI), new() { "DOWN" }, WAIT_SHORT);
+                AddActions(ufc, PredActionsForCleanNumAndEnter(pgm.SQ), new() { "DOWN" }, WAIT_SHORT);
+                AddActions(ufc, PredActionsForCleanNumAndEnter(pgm.SI), new() { "DOWN" }, WAIT_SHORT);
             }
-            AddAction(ufc, "INC");
-            AddWait(WAIT_BASE);
+            AddAction(ufc, "INC", WAIT_BASE);
         }
     }
 }
