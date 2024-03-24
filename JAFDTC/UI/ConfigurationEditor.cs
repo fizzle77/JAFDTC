@@ -56,6 +56,8 @@ namespace JAFDTC.UI
 
         public virtual ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo() => new();
 
+        public virtual ObservableCollection<ConfigAuxCommandInfo> ConfigAuxCommandInfo() => new();
+
         public virtual ISystem SystemForConfig(IConfiguration config, string tag) => null;
 
         public virtual bool IsSystemDefault(IConfiguration config, string tag)
@@ -69,10 +71,7 @@ namespace JAFDTC.UI
             return !string.IsNullOrEmpty(config.SystemLinkedTo(tag));
         }
 
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        public Dictionary<string, string> BuildUpdatesStrings(IConfiguration config)
+        public virtual Dictionary<string, string> BuildUpdatesStrings(IConfiguration config)
         {
             List<string> sysList = new();
             string icons = "";
@@ -107,6 +106,8 @@ namespace JAFDTC.UI
                 ["UpdatesIconBadgesUI"] = iconBadges,
             };
         }
+
+        public virtual void HandleAuxCommand(ConfigurationPage configPage, ConfigAuxCommandInfo cmd) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //

@@ -37,6 +37,12 @@ namespace JAFDTC.UI
         public ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo();
 
         /// <summary>
+        /// returns a collection of ConfigAuxCommandInfo with information on the aux commands for the airframe
+        /// configuration.
+        /// </summary>
+        public ObservableCollection<ConfigAuxCommandInfo> ConfigAuxCommandInfo();
+
+        /// <summary>
         /// returns the system associated with the given tag in the given configuration. 
         /// </summary>
         public ISystem SystemForConfig(IConfiguration config, string tag);
@@ -53,8 +59,13 @@ namespace JAFDTC.UI
         public bool IsSystemLinked(IConfiguration config, string tag);
 
         /// <summary>
-        /// 
+        /// returns the string with a human-readable description of what avionics systems the configuration changes.
         /// </summary>
         public Dictionary<string, string> BuildUpdatesStrings(IConfiguration config);
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public void HandleAuxCommand(ConfigurationPage configPage, ConfigAuxCommandInfo cmd);
     }
 }

@@ -35,7 +35,7 @@ namespace JAFDTC.UI.App
 {
     /// <summary>
     /// holds information on the editor page for a section of an airframe configuration. ConfigurationPage
-    /// uses this data to dynamically build the content of the top configuration editor page.
+    /// uses this data to dynamically build the content of the configuration editor page navigation list.
     /// </summary>
     public sealed class ConfigEditorPageInfo : BindableObject
     {
@@ -44,9 +44,9 @@ namespace JAFDTC.UI.App
         public string Label { get; }
 
         public string ShortName { get; }
-        
+
         public string Glyph { get; }
-        
+
         public Type EditorPageType { get; }
 
         public Type EditorHelperType { get; }
@@ -77,6 +77,26 @@ namespace JAFDTC.UI.App
                 EditorPageIconFg, EditorPageBadgeFg) = (tag, label, name, glyph, pageType, helpType, null, null);
     }
 
+    // ================================================================================================================
+
+    /// <summary>
+    /// holds information on an auxiliary command from the aux list of an airframe configuration. ConfigurationPage
+    /// uses this data to dynamically build the content of the configuration editor page.
+    /// </summary>
+    public sealed class ConfigAuxCommandInfo : BindableObject
+    {
+        public string Tag { get; }
+
+        public string Label { get; }
+
+        public string Glyph { get; }
+
+        public ConfigAuxCommandInfo(string tag, string label, string glyph)
+            => (Tag, Label, Glyph) = (tag, label, glyph);
+    }
+
+    // ================================================================================================================
+
     /// <summary>
     /// class encapsulating arguments/parameters to pass in to a system editor page.
     /// </summary>
@@ -95,9 +115,11 @@ namespace JAFDTC.UI.App
             => (Config, EditorHelperType, UIDtoConfigMap, BackButton) = (config, type, map, backButton);
     }
 
+    // ================================================================================================================
+
     /// <summary>
-    /// top level airframe-independed naviagation page to edit sections of the configuration. the various
-    /// editors are dynamically defined through ConfigurationEditorPage instances.
+    /// top level airframe-independed naviagation page to edit sections of the configuration. the various editors are
+    /// dynamically defined through ConfigurationEditorPage instances.
     /// </summary>
     public sealed partial class ConfigurationPage : Page
     {
@@ -110,6 +132,8 @@ namespace JAFDTC.UI.App
         private JAFDTC.App CurApp { get; set; }
 
         private ObservableCollection<ConfigEditorPageInfo> EditorPages { get; set; }
+
+        private ObservableCollection<ConfigAuxCommandInfo> AuxCommands { get; set; }
         
         private IConfiguration Config { get; set; }
 
@@ -141,7 +165,9 @@ namespace JAFDTC.UI.App
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // TODO: document
+        /// <summary>
+        /// rebuild the editor icon foregrounds to implement the link/unlink badge on the editor icon.
+        /// </summary>
         private void RebuildIconForeground(ConfigEditorPageInfo info)
         {
             info.EditorPageIconFg = (ConfigEditor.IsSystemDefault(Config, info.Tag))
@@ -152,7 +178,9 @@ namespace JAFDTC.UI.App
                                     : new SolidColorBrush(Color.FromArgb(0x00, 0x00, 0x00, 0x00));      // Transparent
         }
 
-        // TODO: document
+        /// <summary>
+        /// rebuild the user interface state in response to a state change.
+        /// </summary>
         private void RebuildInterfaceState()
         {
             foreach (ConfigEditorPageInfo info in EditorPages)
@@ -162,15 +190,15 @@ namespace JAFDTC.UI.App
 
             if (CurApp.IsDCSAvailable && (CurApp.DCSActiveAirframe == Config.Airframe))
             {
-                uiNavListAux.IsItemClickEnabled = true;
-                uiIconAuxToJet.Foreground = (SolidColorBrush)Resources["ItemEnabled"];
-                uiTextAuxToJet.Foreground = (SolidColorBrush)Resources["ItemEnabled"];
+                uiNavListLoadToJet.IsItemClickEnabled = true;
+                uiIconLoadToJet.Foreground = (SolidColorBrush)Resources["ItemEnabled"];
+                uiTextLoadToJet.Foreground = (SolidColorBrush)Resources["ItemEnabled"];
             }
             else
             {
-                uiNavListAux.IsItemClickEnabled = false;
-                uiIconAuxToJet.Foreground = (SolidColorBrush)Resources["ItemDisabled"];
-                uiTextAuxToJet.Foreground = (SolidColorBrush)Resources["ItemDisabled"];
+                uiNavListLoadToJet.IsItemClickEnabled = false;
+                uiIconLoadToJet.Foreground = (SolidColorBrush)Resources["ItemDisabled"];
+                uiTextLoadToJet.Foreground = (SolidColorBrush)Resources["ItemDisabled"];
             }
         }
 
@@ -182,15 +210,17 @@ namespace JAFDTC.UI.App
 
         // ---- buttons -----------------------------------------------------------------------------------------------
 
-        // back button click: navigate back to the configuration list.
-        //
+        /// <summary>
+        /// back button click: navigate back to the configuration list.
+        /// </summary>
         private void HdrBtnBack_Click(object sender, RoutedEventArgs args)
         {
             Frame.GoBack();
         }
-        
-        // copy click: serialize the selected system and copy it to the clipboard.
-        //
+
+        /// <summary>
+        /// copy click: serialize the selected system and copy it to the clipboard.
+        /// </summary>
         private void CmdCopy_Click(object sender, RoutedEventArgs args)
         {
             if (uiNavListEditors.SelectedItem is ConfigEditorPageInfo info)
@@ -199,7 +229,9 @@ namespace JAFDTC.UI.App
             }
         }
 
-        // TODO: implement
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private async void CmdPaste_Click(object sender, RoutedEventArgs args)
         {
             if (uiNavListEditors.SelectedItem is ConfigEditorPageInfo info)
@@ -213,9 +245,10 @@ namespace JAFDTC.UI.App
             }
         }
 
-        // reset click: reset the avionics component to their default values if the user confirms. updates will be
-        // persisted to storage.
-        //
+        /// <summary>
+        /// reset click: reset the avionics component to their default values if the user confirms. updates will be
+        /// persisted to storage.
+        /// </summary>
         private async void CmdReset_Click(object sender, RoutedEventArgs args)
         {
             if (uiNavListEditors.SelectedItem is ConfigEditorPageInfo info)
@@ -240,10 +273,11 @@ namespace JAFDTC.UI.App
 
         // ---- editor list -------------------------------------------------------------------------------------------
 
-        // nav left panel selection change: navigate to the corresponding editor page.
-        //
-        // NavigationEventArgs.Parameter will be the configuaraiont object conforming to IConfiguration.
-        //
+        /// <summary>
+        /// nav left panel selection change: navigate to the corresponding editor page.
+        ///
+        /// NavigationEventArgs.Parameter will be the configuaraiont object conforming to IConfiguration.
+        /// </summary>
         private void NavListEditors_SelectionChanged(object sender, RoutedEventArgs args)
         {
             ConfigEditorPageInfo info = (ConfigEditorPageInfo)uiNavListEditors.SelectedItem;
@@ -255,7 +289,9 @@ namespace JAFDTC.UI.App
             }
         }
 
-        // TODO: document
+        /// <summary>
+        /// nav list right-click: pull up and handle the context menu for the editor list.
+        /// </summary>
         private async void NavListEditors_RightTapped(object sender, RightTappedRoutedEventArgs args)
         {
             ListView listView = (ListView)sender;
@@ -294,12 +330,22 @@ namespace JAFDTC.UI.App
             uiNavListEditorsCtxMenuFlyout.ShowAt(listView, args.GetPosition(listView));
         }
 
-        // ---- aux list ----------------------------------------------------------------------------------------------
+        // ---- aux command list --------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void NavListAuxCmd_ItemClick(object sender, ItemClickEventArgs args)
+        {
+            ConfigEditor.HandleAuxCommand(this, (ConfigAuxCommandInfo)args.ClickedItem);
+        }
+
+        // ---- load to jet command list ------------------------------------------------------------------------------
 
         /// <summary>
         /// to jet button click: upload the current configuration to the jet.
         /// </summary>
-        private void NavListAux_ItemClick(object sender, ItemClickEventArgs e)
+        private void NavListLoadToJet_ItemClick(object sender, ItemClickEventArgs args)
         {
             CurApp.UploadConfigurationToJet(Config);
         }
@@ -310,8 +356,9 @@ namespace JAFDTC.UI.App
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // when configuration is saved, rebuild the interface state to catch up with any changes.
-        //
+        /// <summary>
+        /// when configuration is saved, rebuild the interface state to catch up with any changes.
+        /// </summary>
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
         {
             ConfigEditorPageInfo modifiedInfo = null;
@@ -350,16 +397,18 @@ namespace JAFDTC.UI.App
             }
         }
 
-        // TODO: document
-        //
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void AppPropertyChangedHandler(object sender, object args)
         {
             RebuildInterfaceState();
         }
 
-        // on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
-        // we are editing.
-        //
+        /// <summary>
+        /// on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
+        /// we are editing.
+        /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             ConfigEditorPageNavArgs navArgs = (ConfigEditorPageNavArgs)args.Parameter;
@@ -370,13 +419,14 @@ namespace JAFDTC.UI.App
             Config.ConfigurationSaved += ConfigurationSavedHandler;
 
             EditorPages = ConfigEditor.ConfigEditorPageInfo();
+            AuxCommands = ConfigEditor.ConfigAuxCommandInfo();
             uiNavListEditors.SelectedIndex = Config.LastSystemEdited;
             uiHdrTxtConfigName.Text = Config.Name;
             uiHdrTxtConfigIsFav.Visibility = (Config.IsFavorite) ? Visibility.Visible : Visibility.Collapsed;
             uiNavTxtAirframeName.Text = Globals.AirframeNames[Config.Airframe];
 
             // create a new frame to hold the editors and replace the split view content with the frame. setting
-            // SelectedIndex above will trigger EditorList_SelectionChanged() and cause navigation to happen.
+            // SelectedIndex above will trigger NavListEditors_SelectionChanged() and cause navigation to happen.
             //
             uiNavSplitView.Content = new Frame();
 

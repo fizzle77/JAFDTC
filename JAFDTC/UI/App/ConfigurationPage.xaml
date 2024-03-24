@@ -36,13 +36,12 @@ https://www.gnu.org/licenses/.
     <Page.Resources>
 
         <!-- data template for editor list -->
-        <DataTemplate x:Key="NavLinkItemTemplate" x:DataType="local:ConfigEditorPageInfo">
+        <DataTemplate x:Key="NavListEditorsItemTemplate" x:DataType="local:ConfigEditorPageInfo">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
                 <FontIcon Grid.Column="0"
                           VerticalAlignment="Center"
                           Foreground="{x:Bind EditorPageIconFg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -53,6 +52,23 @@ https://www.gnu.org/licenses/.
                           Foreground="{x:Bind EditorPageBadgeFg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           FontFamily="Segoe Fluent Icons"
                           Glyph="&#xF0B6;"/>
+                <TextBlock Grid.Column="1" Margin="24,0,0,0"
+                           VerticalAlignment="Center"
+                           Text="{x:Bind Label}"/>
+            </Grid>
+        </DataTemplate>
+
+        <!-- data template for aux list -->
+        <DataTemplate x:Key="NavListAuxItemTemplate" x:DataType="local:ConfigAuxCommandInfo">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <FontIcon Grid.Column="0"
+                          VerticalAlignment="Center"
+                          FontFamily="Segoe Fluent Icons"
+                          Glyph="{x:Bind Glyph}"/>
                 <TextBlock Grid.Column="1" Margin="24,0,0,0"
                            VerticalAlignment="Center"
                            Text="{x:Bind Label}"/>
@@ -149,8 +165,11 @@ https://www.gnu.org/licenses/.
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
+                    <!-- configuration editor list
+                      -->
                     <ListView Grid.Row="0"
                               x:Name="uiNavListEditors"
                               VerticalAlignment="Stretch"
@@ -159,7 +178,7 @@ https://www.gnu.org/licenses/.
                               RightTapped="NavListEditors_RightTapped"
                               SelectionChanged="NavListEditors_SelectionChanged"
                               ItemsSource="{x:Bind EditorPages, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              ItemTemplate="{StaticResource NavLinkItemTemplate}">
+                              ItemTemplate="{StaticResource NavListEditorsItemTemplate}">
                         <ListView.Resources>
                             <MenuFlyout x:Name="uiNavListEditorsCtxMenuFlyout">
                                 <MenuFlyout.Items>
@@ -175,14 +194,28 @@ https://www.gnu.org/licenses/.
                             </MenuFlyout>
                         </ListView.Resources>
                     </ListView>
-
+                    
+                    <!-- auxiliary command list
+                      -->
+                    <ListView Grid.Row="1"
+                              x:Name="uiNavListAuxCmd"
+                              VerticalAlignment="Bottom"
+                              SelectionMode="None"
+                              IsItemClickEnabled="True"
+                              ItemClick="NavListAuxCmd_ItemClick"
+                              ItemsSource="{x:Bind AuxCommands, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              ItemTemplate="{StaticResource NavListAuxItemTemplate}">
+                    </ListView>
+                    
+                    <!-- load to jet button
+                      -->
                     <ListView Grid.Row="2"
-                              x:Name="uiNavListAux"
+                              x:Name="uiNavListLoadToJet"
                               VerticalAlignment="Bottom"
                               SelectionMode="None"
                               IsItemClickEnabled="True"
                               IsEnabled="True"
-                              ItemClick="NavListAux_ItemClick">
+                              ItemClick="NavListLoadToJet_ItemClick">
                         <ListView.Items>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -191,32 +224,18 @@ https://www.gnu.org/licenses/.
                                 </Grid.ColumnDefinitions>
 
                                 <FontIcon Grid.Column="0"
-                                          x:Name="uiIconAuxToJet"
+                                          x:Name="uiIconLoadToJet"
                                           VerticalAlignment="Center"
                                           FontFamily="Segoe Fluent Icons"
                                           Glyph="&#xE709;"/>
                                 <TextBlock Grid.Column="1" Margin="24,0,0,0"
-                                           x:Name="uiTextAuxToJet"
+                                           x:Name="uiTextLoadToJet"
                                            VerticalAlignment="Center">
                                     Load Tape to Jet
                                 </TextBlock>
                             </Grid>
                         </ListView.Items>
                     </ListView>
-
-                    <!-- TODO: not sure if this is the right type of button
-                    <AppBarButton Grid.Row="3" Height="48"
-                                  x:Name="uiNavBtnToJet"
-                                  HorizontalAlignment="Stretch"
-                                  VerticalAlignment="Center"
-                                  Click="NavBtnToJet_Click"
-                                  ToolTipService.ToolTip="Send Selected Configuration to DCS">
-                        <AppBarButton.Icon>
-                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE709;"/>
-                        </AppBarButton.Icon>
-                        TEST
-                    </AppBarButton>
-                     -->
                 </Grid>
             </SplitView.Pane>
 
