@@ -461,6 +461,8 @@ namespace JAFDTC.UI.F15E
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(STPTSystem.SystemTag));
             bool isDCSListening = curApp.IsDCSAvailable && (curApp.DCSActiveAirframe == Config.Airframe);
 
+            Utilities.SetEnableState(uiPoINameFilterBox, isEditable);
+            Utilities.SetEnableState(uiPoIBtnFilter, isEditable);
             Utilities.SetEnableState(uiPoIBtnApply, isEditable && (CurSelectedPoI != null));
             Utilities.SetEnableState(uiPoIBtnCapture, isEditable && isDCSListening);
 
