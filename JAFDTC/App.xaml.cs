@@ -243,6 +243,12 @@ namespace JAFDTC
                 ["M2000C"] = AirframeTypes.M2000C,
             };
 
+            this.UnhandledException += (sender, args) =>
+            {
+                FileManager.Log($"App:App Unhandled exception: {args.Exception.Message}\n");
+                FileManager.Log(args.Exception.StackTrace);
+            };
+
             try
             {
                 IsAppStartupGood = false;
@@ -266,7 +272,7 @@ namespace JAFDTC
             }
             catch (System.Exception ex)
             {
-                FileManager.Log($"App:App exception {ex}");
+                FileManager.Log($"App:App exception: {ex.Message}\n{ex.StackTrace}");
             }
         }
 
