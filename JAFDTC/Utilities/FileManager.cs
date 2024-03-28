@@ -51,7 +51,7 @@ namespace JAFDTC.Utilities
 
         private static string _logPath = null;
 
-        private static TextWriterTraceListener _logTraceListener = null;
+        private static StreamWriter _logStream = null;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -73,8 +73,13 @@ namespace JAFDTC.Utilities
                 _settingsPath = Path.Combine(_settingsDirPath, "jafdtc-settings.json");
 #if JAFDTC_LOG
                 _logPath = Path.Combine(_settingsDirPath, "jafdtc-log.txt");
-                FileStream traceLog = new(_logPath, FileMode.Create);
-                _logTraceListener = new TextWriterTraceListener(traceLog);
+                FileStream stream = new(_logPath, FileMode.OpenOrCreate);
+                if (stream.Seek(0, SeekOrigin.End) > 32768)
+                {
+                    stream.SetLength(0);
+                }
+                _logStream = new StreamWriter(stream);
+                FileManager.Log($"==== JAFDTC {Globals.BuildJAFDTC} launched");
 #endif
             }
             catch (Exception ex)
@@ -104,8 +109,8 @@ namespace JAFDTC.Utilities
         /// </summary>
         public static void Log(string msg)
         {
-            _logTraceListener?.WriteLine(msg);
-            _logTraceListener?.Flush();
+            _logStream?.WriteLine(msg);
+            _logStream?.Flush();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -159,10 +164,10 @@ namespace JAFDTC.Utilities
             {
                 json = ReadFile(_settingsPath);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 json = null;
-                FileManager.Log($"Settings:ReadSettings settings missing, exception {ex}");
+                FileManager.Log($"Settings:ReadSettings settings not found, attempting to create new file");
             }
             try
             {
@@ -171,16 +176,18 @@ namespace JAFDTC.Utilities
                     settings = new SettingsData();
                     WriteSettings(settings);
                     json = ReadFile(_settingsPath);
+                    FileManager.Log($"Created new settings");
                 }
                 if (json != null)
                 {
                     settings = JsonSerializer.Deserialize<SettingsData>(json);
                 }
+                FileManager.Log($"Loaded settings");
             }
             catch (Exception ex)
             {
                 settings = new SettingsData();
-                FileManager.Log($"Settings:ReadSettings create empty settings, exception {ex}");
+                FileManager.Log($"Settings:ReadSettings unable to create empty settings, exception {ex}");
             }
             return settings;
         }
@@ -197,7 +204,7 @@ namespace JAFDTC.Utilities
             }
             catch (Exception ex)
             {
-                FileManager.Log($"Settings:WriteSettings exception {ex}");
+                FileManager.Log($"Settings:WriteSettings failed, exception {ex}");
             }
         }
 
@@ -264,6 +271,7 @@ namespace JAFDTC.Utilities
                     var json = File.ReadAllText(file);
                     IConfiguration config = Configuration.FactoryJSON(airframe, json);
                     dict.Add(file, config);
+                    FileManager.Log($"Loaded {Globals.AirframeShortNames[config.Airframe]} {config.UID} '{config.Name}' from '{config.Filename}'");
                 }
             }
             return dict;
