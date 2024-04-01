@@ -8,9 +8,9 @@ following DCS airframes and systems,
 - *A-10C Warthog* &ndash; Waypoints
 - *AV-8B Harrier* &ndash; Waypoints
 - *F-14A/B Tomcat* &ndash; Waypoints
-- *F-15E Strike Eagle* &ndash; Radios, Steerpoints, Miscellaneous Systems
-- *F-16C Viper* &ndash; Countermeasures, Datalink, HARM ALIC, HARM HTS, MFD Formats, Miscellaneous DED
-  Systems, Radios, Steerpoints
+- *F-15E Strike Eagle* &ndash; MPD/MPCD Formats, Radios, Steerpoints, Miscellaneous Systems
+- *F-16C Viper* &ndash; Countermeasures, Datalink, HARM (ALIC, HTS), MFD Formats, Radios,
+  Steerpoints, Miscellaneous DED Systems
 - *F/A-18C Hornet* &ndash; Countermeasures, Radios, Waypoints
 - *Mirage M-2000C* &ndash; Waypoints
 
@@ -21,7 +21,7 @@ in the JAFDTC repository for detailed discussion of how to use JAFDTC and operat
 ## Installing
 
 A Windows `.msi` installation package for JAFDTC is available
-[here](TODO).
+[here](https://github.com/51st-Vfw/JAFDTC/releases).
 Installation is easy,
 
 1. Download the `.msi`
@@ -42,9 +42,18 @@ on the release build that packages the application into a `.msi` file.
 
 ## Uninstalling
 
-You can remove JAFDTC using the Add/Remove Programs function in Windows.
+The settings dialog in the JAFDTC program allows you to remove the DCS Lua support. The support
+can also be removed by hand by,
 
-TODO: uninstall DCS Lua support instructions here...
+1. Delete the `Scripts\JAFDTC` directory from your DCS installation in `Saved Games`
+2. Delete the `Scripts\Hooks\JAFDTCStatusMsgHook.lua` file from your DCS installation in
+   `Saved Games`
+3. Delete the `Scripts\Hooks\JAFDTCWyptCaptureHook.lua` file from your DCS installation in
+   `Saved Games`
+4. Edit the `Scripts\Export.lua` file with a text editor like `Notepad` and remove the line
+   that starts with "`local JAFDTClfs=require('lfs');`"
+
+You can remove JAFDTC itself using the Add/Remove Programs function in Windows.
 
 ## Quick Overview
 
