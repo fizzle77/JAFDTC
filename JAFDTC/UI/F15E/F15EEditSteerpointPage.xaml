@@ -215,7 +215,7 @@ https://www.gnu.org/licenses/.
                         x:Name="uiStptBtnAdd"
                         VerticalAlignment="Center"
                         Click="StptBtnAdd_Click"
-                        ToolTipService.ToolTip="Add new steerpoint to end of list">
+                        ToolTipService.ToolTip="Add new steerpoint to end of steerpoint list">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
                 </Button>
                 <Button Grid.Column="6"
@@ -259,29 +259,30 @@ https://www.gnu.org/licenses/.
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0"
                          x:Name="uiStptValueLat"
+                         Tag="LatUI"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.LatUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
-                         ui_ctk:TextBoxExtensions.Regex="^[nNsS] [\d]{2}° [\d]{2}\.[\d]{3}’$"
+                         ui_ctk:TextBoxExtensions.Regex="^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{3}’)|([NSns] 90° 00\.000’)$"
                          ui_ctk:TextBoxExtensions.CustomMask="N:[nNsS]"
                          ui_ctk:TextBoxExtensions.Mask="N 99° 99.999’"
-                         LostFocus="StptTextBox_LostFocus"
+                         TextChanged="StptTextBoxExt_TextChanged"
                          ToolTipService.ToolTip="Latitude of steerpoint in DDM format: [N|S] 00° 00.000’"/>
                 <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
                          x:Name="uiStptValueLon"
+                         Tag="LonUI"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
-                         ui_ctk:TextBoxExtensions.Regex="^[eEwW] [\d]{3}° [\d]{2}\.[\d]{3}’$"
+                         ui_ctk:TextBoxExtensions.Regex="^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{3}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{3}’)|([EWew] 180° 00\.000’)$"
                          ui_ctk:TextBoxExtensions.CustomMask="E:[eEwW]"
                          ui_ctk:TextBoxExtensions.Mask="E 999° 99.999’"
-                         LostFocus="StptTextBox_LostFocus"
+                         TextChanged="StptTextBoxExt_TextChanged"
                          ToolTipService.ToolTip="Longitude of steerpoint in DDM format: [E|W] 000° 00.000’"/>
                 <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"
                          x:Name="uiStptValueAlt"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
-                         Text="{x:Bind EditStpt.Alt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         LostFocus="StptTextBox_LostFocus"
+                         Text="{x:Bind EditStpt.Alt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          ToolTipService.ToolTip="Elevation of steerpoint in feet"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
                            x:Name="uiStptAltitudeUnitsText"
@@ -290,13 +291,14 @@ https://www.gnu.org/licenses/.
                 </TextBlock>
                 <TextBox Grid.Row="0" Grid.Column="4" Margin="24,0,0,0"
                          x:Name="uiStptValueTOT"
+                         Tag="TOT"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.TOT, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
-                         ui_ctk:TextBoxExtensions.Regex="^[\d]{2}:[\d]{2}:[\d]{2}’$"
+                         ui_ctk:TextBoxExtensions.Regex="^([0-1][0-9]\:[0-5][0-9]\:[0-5][0-9])|(2[0-3]\:[0-5][0-9]\:[0-5][0-9])$"
                          ui_ctk:TextBoxExtensions.Mask="99:99:99"
-                         LostFocus="StptTextBox_LostFocus"
-                         ToolTipService.ToolTip="Time on Target (TOT) of steerpoint in format: HH:MM:SS (TODO)"/>
+                         TextChanged="StptTextBoxExt_TextChanged"
+                         ToolTipService.ToolTip="Time on Target (TOT) of steerpoint in format: HH:MM:SS"/>
             </Grid>
 
             <!-- target field
@@ -460,7 +462,8 @@ https://www.gnu.org/licenses/.
                 </Button>
                 <Button Grid.Column="4" Margin="0,0,0,0"
                         x:Name="uiRfptBtnClear"
-                        Click="RfptBtnClear_Click">
+                        Click="RfptBtnClear_Click"
+                        ToolTipService.ToolTip="Clear reference point">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE711;"/>
                 </Button>
             </Grid>
@@ -475,7 +478,7 @@ https://www.gnu.org/licenses/.
             <TextBox Grid.Row="5" Grid.Column="1" Margin="12,12,0,0"
                      x:Name="uiRfptValueName"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditRfpt.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     Text="{x:Bind EditRfpt.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      MaxLength="48"
                      ToolTipService.ToolTip="Name of reference point"/>
 
@@ -500,31 +503,32 @@ https://www.gnu.org/licenses/.
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Row="0" Grid.Column="0" Margin="12,0,0,0"
                          x:Name="uiRfptValueLat"
+                         Tag="LatUI"
                          HorizontalAlignment="Stretch"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditRfpt.LatUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
-                         ui_ctk:TextBoxExtensions.Regex="^[nNsS] [\d]{2}° [\d]{2}\.[\d]{3}’$"
+                         ui_ctk:TextBoxExtensions.Regex="^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{3}’)|([NSns] 90° 00\.000’)$"
                          ui_ctk:TextBoxExtensions.CustomMask="N:[nNsS]"
                          ui_ctk:TextBoxExtensions.Mask="N 99° 99.999’"
-                         LostFocus="RfptTextBox_LostFocus"
+                         TextChanged="RfptTextBox_TextChanged"
                          ToolTipService.ToolTip="Latitude of reference point in DDM format: [N|S] 00° 00.000’"/>
                 <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
                          x:Name="uiRfptValueLon"
+                         Tag="LonUI"
                          HorizontalAlignment="Stretch"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditRfpt.LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
-                         ui_ctk:TextBoxExtensions.Regex="^[eEwW] [\d]{3}° [\d]{2}\.[\d]{3}’$"
+                         ui_ctk:TextBoxExtensions.Regex="^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{3}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{3}’)|([EWew] 180° 00\.000’)$"
                          ui_ctk:TextBoxExtensions.CustomMask="E:[eEwW]"
                          ui_ctk:TextBoxExtensions.Mask="E 999° 99.999’"
-                         LostFocus="RfptTextBox_LostFocus"
+                         TextChanged="RfptTextBox_TextChanged"
                          ToolTipService.ToolTip="Longitude of reference point in DDM format: [E|W] 000° 00.000’"/>
                 <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"
                          x:Name="uiRfptValueAlt"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
-                         Text="{x:Bind EditRfpt.Alt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         LostFocus="RfptTextBox_LostFocus"
+                         Text="{x:Bind EditRfpt.Alt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          ToolTipService.ToolTip="Elevation of reference point in feet"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
                            x:Name="uiRfptAltitudeUnitsText"
@@ -547,19 +551,22 @@ https://www.gnu.org/licenses/.
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-
             <Button Grid.Column="3" Margin="20,0,0,0"
+                    x:Name="uiAcceptBtnCancel"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    GettingFocus="AcceptBtnCancel_GettingFocus"
+                    Click="AcceptBtnCancel_Click"
+                    ToolTipService.ToolTip="Discard any changes to steerpoint">
+                Cancel
+            </Button>
+            <Button Grid.Column="4" Margin="20,0,0,0"
                     x:Name="uiAcceptBtnOK"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Click="AcceptBtnOK_Click">
+                    Click="AcceptBtnOk_Click"
+                    ToolTipService.ToolTip="Accept changes to steerpoint and update configuration">
                 OK
-            </Button>
-            <Button Grid.Column="4" Margin="12,0,0,0"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Center"
-                    Click="AcceptBtnCancel_Click">
-                Cancel
             </Button>
         </Grid>
     </Grid>

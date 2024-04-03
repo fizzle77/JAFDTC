@@ -17,6 +17,7 @@
 //
 // ********************************************************************************************************************
 
+using CommunityToolkit.WinUI.UI;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.STPT;
@@ -84,6 +85,8 @@ namespace JAFDTC.UI.F16C
 
         private int EditStptIndex { get; set; }
 
+        private bool IsCancelInFlight { get; set; }
+
         private bool IsRebuildPending { get; set; }
 
         private PointOfInterest CurSelectedPoI { get; set; }
@@ -93,6 +96,7 @@ namespace JAFDTC.UI.F16C
         // ---- read-only properties
 
         private readonly Dictionary<string, TextBox> _curStptFieldValueMap;
+        private readonly Dictionary<string, TextBox> _curStptTxtBoxExtMap;
         private readonly List<TextBlock> _oap0FieldTitles;
         private readonly List<TextBlock> _oap1FieldTitles;
         private readonly Dictionary<string, TextBox> _oap0FieldValueMap;
@@ -135,6 +139,12 @@ namespace JAFDTC.UI.F16C
                 ["Lat"] = uiStptValueLat,
                 ["Lon"] = uiStptValueLon,
                 ["Alt"] = uiStptValueAlt,
+                ["TOS"] = uiStptValueTOS
+            };
+            _curStptTxtBoxExtMap = new Dictionary<string, TextBox>()
+            {
+                ["LatUI"] = uiStptValueLat,
+                ["LonUI"] = uiStptValueLon,
                 ["TOS"] = uiStptValueTOS
             };
             _oap0FieldTitles = new List<TextBlock>()
@@ -257,8 +267,11 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void SetFieldValidState(TextBox field, bool isValid)
         {
-            field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
-            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+            if (!IsCancelInFlight)
+            {
+                field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+                field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+            }
         }
 
         private void ValidateAllFields(Dictionary<string, TextBox> fields, IEnumerable errors)
@@ -350,6 +363,15 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private bool CurStateHasErrors()
         {
+            foreach (KeyValuePair<string, TextBox> kvp in _curStptTxtBoxExtMap)
+            {
+                TextBox tbox = kvp.Value;
+                if (!TextBoxExtensions.GetIsValid(tbox) && (((string)tbox.Tag != "TOS") || (tbox.Text != "––:––:––")))
+                {
+                    return true;
+                }
+            }
+
             bool hasErrors = EditStpt.HasErrors;
             for (int i = 0; i < EditStpt.OAP.Length; i++)
             {
@@ -443,13 +465,14 @@ namespace JAFDTC.UI.F16C
 
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(STPTSystem.SystemTag));
             bool isDCSListening = curApp.IsDCSAvailable && (curApp.DCSActiveAirframe == Config.Airframe);
+            bool isErrorsInUI = CurStateHasErrors();
 
             Utilities.SetEnableState(uiPoINameFilterBox, isEditable);
             Utilities.SetEnableState(uiPoIBtnFilter, isEditable);
             Utilities.SetEnableState(uiPoIBtnApply, isEditable && (CurSelectedPoI != null));
             Utilities.SetEnableState(uiPoIBtnCapture, isEditable && isDCSListening);
 
-            uiPoIBtnFilter.IsChecked = FilterSpec.IsFiltered;
+            uiPoIBtnFilter.IsChecked = (FilterSpec.IsFiltered && isEditable);
 
             Utilities.SetEnableState(uiStptValueName, isEditable);
             foreach (KeyValuePair<string, TextBox> kvp in _curStptFieldValueMap)
@@ -479,12 +502,13 @@ namespace JAFDTC.UI.F16C
             }
 
             Utilities.SetEnableState(uiStptBtnAddPoI, isEditable && IsEditCoordValidPoI());
-            Utilities.SetEnableState(uiStptBtnPrev, !CurStateHasErrors() && (EditStptIndex > 0));
-            Utilities.SetEnableState(uiStptBtnAdd, isEditable && !CurStateHasErrors());
-            Utilities.SetEnableState(uiStptBtnNext, !CurStateHasErrors() && (EditStptIndex < (Config.STPT.Points.Count - 1)));
+            Utilities.SetEnableState(uiStptBtnPrev, !isErrorsInUI && (EditStptIndex > 0));
+            Utilities.SetEnableState(uiStptBtnAdd, isEditable && !isErrorsInUI);
+            Utilities.SetEnableState(uiStptBtnNext, !isErrorsInUI && (EditStptIndex < (Config.STPT.Points.Count - 1)));
 
+            uiAcceptBtnCancel.Visibility = (isEditable) ? Visibility.Visible : Visibility.Collapsed;
             // TODO: ok button should also enable if you have lat/lon/alt specified, if vrp/vip both points needed
-            Utilities.SetEnableState(uiAcceptBtnOK, isEditable && !CurStateHasErrors());
+            Utilities.SetEnableState(uiAcceptBtnOK, !isEditable || !isErrorsInUI);
         }
 
         /// <summary>
@@ -517,28 +541,35 @@ namespace JAFDTC.UI.F16C
         // ---- buttons -----------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// cancel click: unwind navigation without saving any changes to the configuration.
+        /// accept click: save configuration and navigate back to previous page in nav stack.
         /// </summary>
-        private void AcceptBtnCancel_Click(object sender, RoutedEventArgs args)
+        private void AcceptBtnOk_Click(object sender, RoutedEventArgs args)
         {
+            if (!CurStateHasErrors() && string.IsNullOrEmpty(Config.SystemLinkedTo(STPTSystem.SystemTag)))
+            {
+                CopyEditToConfig(EditStptIndex, true);
+            }
             Frame.GoBack();
         }
 
         /// <summary>
-        /// ok click: save configuration and navigate back to previous page in nav stack.
+        /// accept cancel click: return to the navpoint list without making any changes to the navpoint.
         /// </summary>
-        private void AcceptBtnOK_Click(object sender, RoutedEventArgs args)
+        private void AcceptBtnCancel_Click(object sender, RoutedEventArgs args)
         {
-            if (CurStateHasErrors())
-            {
-                RebuildEnableState();
-            }
-            else
-            {
-                CopyEditToConfig(EditStptIndex, true);
-                Frame.GoBack();
-            }
+            IsCancelInFlight = false;
+            Frame.GoBack();
         }
+
+        /// <summary>
+        /// accept cancel gettting focus: cancel button is getting focus, note cancel is in flight so we can avoid
+        /// some ui visual artifacts if we're cancelling with an error on the page.
+        /// </summary>
+        private void AcceptBtnCancel_GettingFocus(object sender, RoutedEventArgs args)
+        {
+            IsCancelInFlight = true;
+        }
+
 
         // ---- poi management ----------------------------------------------------------------------------------------
 
@@ -826,21 +857,11 @@ namespace JAFDTC.UI.F16C
         // ---- text field changes ------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// steerpoint text box text changed: rebuild interface state to align with text field value.
         /// </summary>
-        private void StptTextBox_LostFocus(object sender, RoutedEventArgs args)
+        private void StptTextBox_TextChanged(object sender, TextChangedEventArgs args)
         {
-            TextBox textBox = (TextBox)sender;
-            if ((textBox == uiStptValueTOS) && (textBox.Text == "––:––:––"))
-            {
-                // TOS field uses text mask and can come back as "--:--:--" when empty. this is really "" and, since
-                // that value is OK, remove the error. note that as we just lost focus, the bound property in
-                // EditStpt.TOS may not yet be set up.
-                //
-                EditStpt.ClearErrors("TOS");
-                SetFieldValidState(uiStptValueTOS, true);
-            }
-            RebuildEnableState();
+            RebuildInterfaceState();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -860,6 +881,8 @@ namespace JAFDTC.UI.F16C
 
             EditStptIndex = NavArgs.IndexStpt;
             CopyConfigToEdit(EditStptIndex);
+
+            IsCancelInFlight = false;
 
             FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterTags,
                              Settings.LastStptFilterIncludeTypes);

@@ -256,29 +256,30 @@ https://www.gnu.org/licenses/.
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0"
                          x:Name="uiStptValueLat"
+                         Tag="LatUI"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.LatUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
-                         ui_ctk:TextBoxExtensions.Regex="^[nNsS] [\d]{2}° [\d]{2}\.[\d]{3}’$"
+                         ui_ctk:TextBoxExtensions.Regex="^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{3}’)|([NSns] 90° 00\.000’)$"
                          ui_ctk:TextBoxExtensions.CustomMask="N:[nNsS]"
                          ui_ctk:TextBoxExtensions.Mask="N 99° 99.999’"
-                         LostFocus="StptTextBox_LostFocus"
+                         TextChanged="StptTextBox_TextChanged"
                          ToolTipService.ToolTip="Latitude of steerpoint in DDM format: [N|S] 00° 00.000’"/>
                 <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
                          x:Name="uiStptValueLon"
+                         Tag="LonUI"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
-                         ui_ctk:TextBoxExtensions.Regex="^[eEwW] [\d]{3}° [\d]{2}\.[\d]{3}’$"
+                         ui_ctk:TextBoxExtensions.Regex="^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{3}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{3}’)|([EWew] 180° 00\.000’)$"
                          ui_ctk:TextBoxExtensions.CustomMask="E:[eEwW]"
                          ui_ctk:TextBoxExtensions.Mask="E 999° 99.999’"
-                         LostFocus="StptTextBox_LostFocus"
+                         TextChanged="StptTextBox_TextChanged"
                          ToolTipService.ToolTip="Longitude of steerpoint in DDM format: [E|W] 000° 00.000’"/>
                 <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"
                          x:Name="uiStptValueAlt"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
-                         Text="{x:Bind EditStpt.Alt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         LostFocus="StptTextBox_LostFocus"
+                         Text="{x:Bind EditStpt.Alt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          ToolTipService.ToolTip="Elevation of steerpoint in feet"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
                            x:Name="uiStptAltitudeUnitsText"
@@ -287,12 +288,13 @@ https://www.gnu.org/licenses/.
                 </TextBlock>
                 <TextBox Grid.Row="0" Grid.Column="4" Margin="24,0,0,0"
                          x:Name="uiStptValueTOS"
+                         Tag="TOS"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.TOS, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
-                         ui_ctk:TextBoxExtensions.Regex="^[\d]{2}:[\d]{2}:[\d]{2}’$"
+                         ui_ctk:TextBoxExtensions.Regex="^([0-1][0-9]\:[0-5][0-9]\:[0-5][0-9])|(2[0-3]\:[0-5][0-9]\:[0-5][0-9])$"
                          ui_ctk:TextBoxExtensions.Mask="99:99:99"
-                         LostFocus="StptTextBox_LostFocus"
+                         TextChanged="StptTextBox_TextChanged"
                          ToolTipService.ToolTip="Time Over Steerpoint (TOS) of steerpoint in format: HH:MM:SS, local time"/>
             </Grid>
         </Grid>
@@ -382,26 +384,23 @@ https://www.gnu.org/licenses/.
                     <TextBox Grid.Row="1" Grid.Column="2" Margin="12,6,0,0"
                              x:Name="uiStptOAPValueRange0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
-                             Text="{x:Bind EditStpt.OAP[0].Range, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Text="{x:Bind EditStpt.OAP[0].Range, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText = "0"
                              MaxLength="8"
-                             LostFocus="StptTextBox_LostFocus"
                              ToolTipService.ToolTip="Range from steerpoint to OAP"/>
                     <TextBox Grid.Row="1" Grid.Column="3" Margin="12,6,0,0"
                              x:Name="uiStptOAPValueBrng0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
-                             Text="{x:Bind EditStpt.OAP[0].Brng, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Text="{x:Bind EditStpt.OAP[0].Brng, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText = "0.0"
                              MaxLength="5"
-                             LostFocus="StptTextBox_LostFocus"
                              ToolTipService.ToolTip="Bearing from steerpoint to OAP"/>
                     <TextBox Grid.Row="1" Grid.Column="4" Margin="12,6,0,0"
                              x:Name="uiStptOAPValueElev0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
-                             Text="{x:Bind EditStpt.OAP[0].Elev, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Text="{x:Bind EditStpt.OAP[0].Elev, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText = "0"
                              MaxLength="8"
-                             LostFocus="StptTextBox_LostFocus"
                              ToolTipService.ToolTip="Elevation difference between steerpoint and OAP"/>
 
                     <!-- oap 2 parameters
@@ -431,26 +430,23 @@ https://www.gnu.org/licenses/.
                     <TextBox Grid.Row="2" Grid.Column="2" Margin="12,12,0,0"
                              x:Name="uiStptOAPValueRange1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
-                             Text="{x:Bind EditStpt.OAP[1].Range, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Text="{x:Bind EditStpt.OAP[1].Range, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText = "0"
                              MaxLength="8"
-                             LostFocus="StptTextBox_LostFocus"
                              ToolTipService.ToolTip="Range from steerpoint to OAP"/>
                     <TextBox Grid.Row="2" Grid.Column="3" Margin="12,12,0,0"
                              x:Name="uiStptOAPValueBrng1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
-                             Text="{x:Bind EditStpt.OAP[1].Brng, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Text="{x:Bind EditStpt.OAP[1].Brng, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText = "0.0"
                              MaxLength="5"
-                             LostFocus="StptTextBox_LostFocus"
                              ToolTipService.ToolTip="Bearing from steerpoint to OAP"/>
                     <TextBox Grid.Row="2" Grid.Column="4" Margin="12,12,0,0"
                              x:Name="uiStptOAPValueElev1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
-                             Text="{x:Bind EditStpt.OAP[1].Elev, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Text="{x:Bind EditStpt.OAP[1].Elev, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText = "0"
                              MaxLength="8"
-                             LostFocus="StptTextBox_LostFocus"
                              ToolTipService.ToolTip="Elevation difference between steerpoint and OAP"/>
 
                     <!-- vip/vrp header row
@@ -499,26 +495,23 @@ https://www.gnu.org/licenses/.
                     <TextBox Grid.Row="4" Grid.Column="2" Margin="12,6,0,0"
                              x:Name="uiStptVxPValueRange0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
-                             Text="{x:Bind EditStpt.VxP[0].Range, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Text="{x:Bind EditStpt.VxP[0].Range, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText="0"
                              MaxLength="8"
-                             LostFocus="StptTextBox_LostFocus"
                              ToolTipService.ToolTip="Range from steerpoint to VIP/VRP"/>
                     <TextBox Grid.Row="4" Grid.Column="3" Margin="12,6,0,0"
                              x:Name="uiStptVxPValueBrng0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
-                             Text="{x:Bind EditStpt.VxP[0].Brng, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Text="{x:Bind EditStpt.VxP[0].Brng, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText="0.0"
                              MaxLength="5"
-                             LostFocus="StptTextBox_LostFocus"
                              ToolTipService.ToolTip="Bearing from steerpoint to VIP/VRP"/>
                     <TextBox Grid.Row="4" Grid.Column="4" Margin="12,6,0,0"
                              x:Name="uiStptVxPValueElev0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
-                             Text="{x:Bind EditStpt.VxP[0].Elev, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Text="{x:Bind EditStpt.VxP[0].Elev, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText="0"
                              MaxLength="8"
-                             LostFocus="StptTextBox_LostFocus"
                              ToolTipService.ToolTip="Range between steerpoint and VIP/VRP"/>
 
                     <!-- vip/vrp 2 parameters
@@ -532,26 +525,23 @@ https://www.gnu.org/licenses/.
                     <TextBox Grid.Row="5" Grid.Column="2" Margin="12,12,0,0"
                              x:Name="uiStptVxPValueRange1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
-                             Text="{x:Bind EditStpt.VxP[1].Range, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Text="{x:Bind EditStpt.VxP[1].Range, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText="0"
                              MaxLength="8"
-                             LostFocus="StptTextBox_LostFocus"
                              ToolTipService.ToolTip="Range from steerpoint to VIP/VRP"/>
                     <TextBox Grid.Row="5" Grid.Column="3" Margin="12,12,0,0"
                              x:Name="uiStptVxPValueBrng1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
-                             Text="{x:Bind EditStpt.VxP[1].Brng, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Text="{x:Bind EditStpt.VxP[1].Brng, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText="0.0"
                              MaxLength="5"
-                             LostFocus="StptTextBox_LostFocus"
                              ToolTipService.ToolTip="Bearing from steerpoint to VIP/VRP"/>
                     <TextBox Grid.Row="5" Grid.Column="4" Margin="12,12,0,0"
                              x:Name="uiStptVxPValueElev1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
-                             Text="{x:Bind EditStpt.VxP[1].Elev, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Text="{x:Bind EditStpt.VxP[1].Elev, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText="0"
                              MaxLength="8"
-                             LostFocus="StptTextBox_LostFocus"
                              ToolTipService.ToolTip="Range between steerpoint and VIP/VRP"/>
 
                 </Grid>
@@ -572,21 +562,23 @@ https://www.gnu.org/licenses/.
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-
             <Button Grid.Column="3" Margin="20,0,0,0"
+                    x:Name="uiAcceptBtnCancel"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    GettingFocus="AcceptBtnCancel_GettingFocus"
+                    Click="AcceptBtnCancel_Click"
+                    ToolTipService.ToolTip="Discard any changes to steerpoint">
+                Cancel
+            </Button>
+            <Button Grid.Column="4" Margin="20,0,0,0"
                     x:Name="uiAcceptBtnOK"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Click="AcceptBtnOK_Click">
+                    Click="AcceptBtnOk_Click"
+                    ToolTipService.ToolTip="Accept changes to steerpoint and update configuration">
                 OK
             </Button>
-            <Button Grid.Column="4" Margin="12,0,0,0"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Center"
-                    Click="AcceptBtnCancel_Click">
-                Cancel
-            </Button>
         </Grid>
-
     </Grid>
 </Page>

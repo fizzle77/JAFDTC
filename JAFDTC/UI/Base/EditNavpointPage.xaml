@@ -215,7 +215,7 @@ https://www.gnu.org/licenses/.
                         x:Name="uiNavptBtnAdd"
                         VerticalAlignment="Center"
                         Click="NavptBtnAdd_Click"
-                        ToolTipService.ToolTip="Add new navpoint to end of list">
+                        ToolTipService.ToolTip="Add new navpoint to end of navpoint list">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
                 </Button>
                 <Button Grid.Column="6"
@@ -259,30 +259,32 @@ https://www.gnu.org/licenses/.
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0"
                          x:Name="uiNavptValueLat"
+                         Tag="LatUI"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditNavpt.LatUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
                          ui_ctk:TextBoxExtensions.Regex="^[nNsS] [\d]{2}° [\d]{2}’ [\d]{2}’’$"
                          ui_ctk:TextBoxExtensions.CustomMask="N:[nNsS]"
                          ui_ctk:TextBoxExtensions.Mask="N 99° 99’ 99’’"
-                         LostFocus="NavptTextBox_LostFocus"
+                         TextChanged="NavptTextBoxExt_TextChanged"
                          ToolTipService.ToolTip="Latitude of navpoint"/>
                 <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
                          x:Name="uiNavptValueLon"
+                         Tag="LonUI"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditNavpt.LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
                          ui_ctk:TextBoxExtensions.Regex="^[eEwW] [\d]{3}° [\d]{2}’ [\d]{2}’’$"
                          ui_ctk:TextBoxExtensions.CustomMask="E:[eEwW]"
                          ui_ctk:TextBoxExtensions.Mask="E 999° 99’ 99’’"
-                         LostFocus="NavptTextBox_LostFocus"
+                         TextChanged="NavptTextBoxExt_TextChanged"
                          ToolTipService.ToolTip="Longitude of navpoint"/>
                 <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"
                          x:Name="uiNavptValueAlt"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
-                         Text="{x:Bind EditNavpt.Alt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         Text="{x:Bind EditNavpt.Alt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          PlaceholderText="0"
-                         LostFocus="NavptTextBox_LostFocus"
+                         MaxLength="8"
                          ToolTipService.ToolTip="Elevation of navpoint in feet"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
                            x:Name="uiNavptAltitudeUnitsText"
@@ -305,21 +307,23 @@ https://www.gnu.org/licenses/.
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-
             <Button Grid.Column="3" Margin="20,0,0,0"
+                    x:Name="uiAcceptBtnCancel"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    GettingFocus="AcceptBtnCancel_GettingFocus"
+                    Click="AcceptBtnCancel_Click"
+                    ToolTipService.ToolTip="Discard any changes to navpoint">
+                Cancel
+            </Button>
+            <Button Grid.Column="4" Margin="20,0,0,0"
                     x:Name="uiAcceptBtnOK"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Click="AcceptBtnOK_Click">
+                    Click="AcceptBtnOk_Click"
+                    ToolTipService.ToolTip="Accept changes to steerpoint and update configuration">
                 OK
             </Button>
-            <Button Grid.Column="4" Margin="12,0,0,0"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Center"
-                    Click="AcceptBtnCancel_Click">
-                Cancel
-            </Button>
         </Grid>
-
     </Grid>
 </Page>

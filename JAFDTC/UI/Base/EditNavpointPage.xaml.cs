@@ -21,7 +21,6 @@ using CommunityToolkit.WinUI.UI;
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
-using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
@@ -91,7 +90,11 @@ namespace JAFDTC.UI.Base
 
         private NavpointInfoBase EditNavpt { get; set; }
 
+        private NavpointInfoBase ValidateNavpt { get; set; }
+
         private int EditNavptIndex { get; set; }
+
+        private bool IsCancelInFlight { get; set; }
 
         private bool IsRebuildPending { get; set; }
 
@@ -102,6 +105,7 @@ namespace JAFDTC.UI.Base
         // read-only properties
 
         private readonly Dictionary<string, TextBox> _curNavptFieldValueMap;
+        private readonly Dictionary<string, TextBox> _curNavptTxtBoxExtMap;
         private readonly Brush _defaultBorderBrush;
         private readonly Brush _defaultBkgndBrush;
 
@@ -124,7 +128,12 @@ namespace JAFDTC.UI.Base
             {
                 ["Lat"] = uiNavptValueLat,
                 ["Lon"] = uiNavptValueLon,
-                ["Alt"] = uiNavptValueAlt,
+                ["Alt"] = uiNavptValueAlt
+            };
+            _curNavptTxtBoxExtMap = new Dictionary<string, TextBox>()
+            {
+                ["LatUI"] = uiNavptValueLat,
+                ["LonUI"] = uiNavptValueLon
             };
             _defaultBorderBrush = uiNavptValueLat.BorderBrush;
             _defaultBkgndBrush = uiNavptValueLat.Background;
@@ -136,14 +145,19 @@ namespace JAFDTC.UI.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // marshall data between our local navpoint setting and the appropriate navpoint in the navigation system
-        // configuration.
-        //
+        /// <summary>
+        /// marshall data between our local navpoint setting and the appropriate navpoint in the navigation system
+        /// configuration using PageHelper.CopyConfigToEdit.
+        /// </summary>
         private void CopyConfigToEdit(int index)
         {
             PageHelper.CopyConfigToEdit(index, Config, EditNavpt);
         }
 
+        /// <summary>
+        /// marshall data between our local navpoint setting and the appropriate navpoint in the navigation system
+        /// configuration using PageHelper.CopyEditToConfig and save if persistance is required.
+        /// </summary>
         private void CopyEditToConfig(int index, bool isPersist = false)
         {
             if (PageHelper.CopyEditToConfig(index, EditNavpt, Config) && isPersist)
@@ -164,8 +178,11 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void SetFieldValidState(TextBox field, bool isValid)
         {
-            field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
-            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+            if (!IsCancelInFlight)
+            {
+                field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+                field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+            }
         }
 
         private void ValidateAllFields(Dictionary<string, TextBox> fields, IEnumerable errors)
@@ -181,7 +198,9 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void EditNavpt_DataValidationError(object sender, DataErrorsChangedEventArgs args)
         {
             if (args.PropertyName == null)
@@ -199,17 +218,26 @@ namespace JAFDTC.UI.Base
             RebuildInterfaceState();
         }
 
-        // property changed: rebuild interface state to account for configuration changes.
-        //
+        /// <summary>
+        /// property changed: rebuild interface state to account for configuration changes.
+        /// </summary>
         private void EditField_PropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             RebuildInterfaceState();
         }
 
-        // returns true if the current state has errors, false otherwise.
-        //
+        /// <summary>
+        /// returns true if the current state has errors, false otherwise.
+        /// </summary>
         private bool CurStateHasErrors()
         {
+            foreach (KeyValuePair<string, TextBox> kvp in _curNavptTxtBoxExtMap)
+            {
+                if (!TextBoxExtensions.GetIsValid(kvp.Value))
+                {
+                    return true;
+                }
+            }
             return PageHelper.HasErrors(EditNavpt);
         }
 
@@ -251,21 +279,23 @@ namespace JAFDTC.UI.Base
             uiPoINameFilterBox.ItemsSource = NavpointUIHelper.RebuildPointsOfInterest(FilterSpec, uiPoINameFilterBox.Text);
         }
 
-        // rebuild the enable state of the buttons in the ui based on current configuration setup.
-        //
+        /// <summary>
+        /// rebuild the enable state of the buttons in the ui based on current configuration setup.
+        /// </summary>
         private void RebuildEnableState()
         {
             JAFDTC.App curApp = Application.Current as JAFDTC.App;
 
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(PageHelper.SystemTag));
             bool isDCSListening = curApp.IsDCSAvailable && (curApp.DCSActiveAirframe == Config.Airframe);
+            bool isErrorsInUI = CurStateHasErrors();
 
             Utilities.SetEnableState(uiPoINameFilterBox, isEditable);
             Utilities.SetEnableState(uiPoIBtnFilter, isEditable);
             Utilities.SetEnableState(uiPoIBtnApply, isEditable && (CurSelectedPoI != null));
             Utilities.SetEnableState(uiPoIBtnCapture, isEditable && isDCSListening);
 
-            uiPoIBtnFilter.IsChecked = FilterSpec.IsFiltered;
+            uiPoIBtnFilter.IsChecked = (FilterSpec.IsFiltered && isEditable);
 
             Utilities.SetEnableState(uiNavptValueName, isEditable);
 
@@ -275,17 +305,19 @@ namespace JAFDTC.UI.Base
             }
 
             Utilities.SetEnableState(uiNavptBtnAddPoI, isEditable && IsEditCoordValidPoI());
-            Utilities.SetEnableState(uiNavptBtnPrev, !CurStateHasErrors() && (EditNavptIndex > 0));
-            Utilities.SetEnableState(uiNavptBtnAdd, isEditable && !CurStateHasErrors());
-            Utilities.SetEnableState(uiNavptBtnNext, !CurStateHasErrors() &&
+            Utilities.SetEnableState(uiNavptBtnPrev, !isErrorsInUI && (EditNavptIndex > 0));
+            Utilities.SetEnableState(uiNavptBtnAdd, isEditable && !isErrorsInUI);
+            Utilities.SetEnableState(uiNavptBtnNext, !isErrorsInUI &&
                                                      (EditNavptIndex < (PageHelper.NavpointCount(Config) - 1)));
 
-            Utilities.SetEnableState(uiAcceptBtnOK, isEditable && !CurStateHasErrors());
+            uiAcceptBtnCancel.Visibility = (isEditable) ? Visibility.Visible : Visibility.Collapsed;
+            Utilities.SetEnableState(uiAcceptBtnOK, !isEditable || !isErrorsInUI);
         }
 
-        // rebuild the state of controls on the page in response to a change in the configuration. the configuration
-        // is saved if requested.
-        //
+        /// <summary>
+        /// rebuild the state of controls on the page in response to a change in the configuration. the configuration
+        /// is saved if requested.
+        /// </summary>
         private void RebuildInterfaceState()
         {
             if (!IsRebuildPending)
@@ -310,27 +342,34 @@ namespace JAFDTC.UI.Base
         // ---- buttons -----------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// cancel click: unwind navigation without saving any changes to the configuration.
+        /// accept click: if page has errors and we aren't linked, update the configuration state before returning to
+        /// the navpoint list.
         /// </summary>
-        private void AcceptBtnCancel_Click(object sender, RoutedEventArgs args)
+        private void AcceptBtnOk_Click(object sender, RoutedEventArgs args)
         {
+            if (!CurStateHasErrors() && string.IsNullOrEmpty(Config.SystemLinkedTo(PageHelper.SystemTag)))
+            {
+                CopyEditToConfig(EditNavptIndex, true);
+            }
             Frame.GoBack();
         }
 
         /// <summary>
-        /// ok click: save configuration and navigate back to previous page in nav stack.
+        /// accept cancel click: return to the navpoint list without making any changes to the navpoint.
         /// </summary>
-        private void AcceptBtnOK_Click(object sender, RoutedEventArgs args)
+        private void AcceptBtnCancel_Click(object sender, RoutedEventArgs args)
         {
-            if (PageHelper.HasErrors(EditNavpt))
-            {
-                RebuildEnableState();
-            }
-            else
-            {
-                CopyEditToConfig(EditNavptIndex, true);
-                Frame.GoBack();
-            }
+            IsCancelInFlight = false;
+            Frame.GoBack();
+        }
+
+        /// <summary>
+        /// accept cancel gettting focus: cancel button is getting focus, note cancel is in flight so we can avoid
+        /// some ui visual artifacts if we're cancelling with an error on the page.
+        /// </summary>
+        private void AcceptBtnCancel_GettingFocus(object sender, RoutedEventArgs args)
+        {
+            IsCancelInFlight = true;
         }
 
         // ---- poi management ----------------------------------------------------------------------------------------
@@ -524,11 +563,11 @@ namespace JAFDTC.UI.Base
         // ---- text field changes ------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// navpoint text box text changed: rebuild the interface state to update based on current valid/invalid stae.
         /// </summary>
-        private void NavptTextBox_LostFocus(object sender, RoutedEventArgs args)
+        private void NavptTextBoxExt_TextChanged(object sender, TextChangedEventArgs args)
         {
-            RebuildEnableState();
+            RebuildInterfaceState();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -538,7 +577,8 @@ namespace JAFDTC.UI.Base
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// update the text box format fields (mask placeholder, regex, custom mask, and mask) for lat/lon based on
+        /// the specific airframe format the page helper provides.
         /// </summary>
         private static void UpdateLatLonTextBoxFormat(TextBox textBox, Dictionary<string, string> format)
         {
@@ -570,8 +610,11 @@ namespace JAFDTC.UI.Base
             UpdateLatLonTextBoxFormat(uiNavptValueLon, PageHelper.LonExtProperties);
 
             EditNavpt ??= PageHelper.CreateEditNavpt(EditField_PropertyChanged, EditNavpt_DataValidationError);
+            ValidateNavpt ??= PageHelper.CreateEditNavpt(null, null);
 
             Config = NavArgs.Config;
+
+            IsCancelInFlight = false;
 
             EditNavptIndex = NavArgs.IndexNavpt;
             CopyConfigToEdit(EditNavptIndex);
