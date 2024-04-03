@@ -1,9 +1,9 @@
 # JAFDTC: Just Another #%*@^!& DTC
 
-Just Another #%*@^!% DTC (JAFDTC) is a native C# WinUI Windows application that allows you to
-upload data typically saved on a data cartridge, such as steerpoints/waypoints and other
-avionics setup, into a DCS model at the start of a flight. The application supports the
-following DCS airframes and systems,
+Just Another #%*@^!% DTC (JAFDTC) is a native C# WinUI Windows application for Windows 10 and
+Windows 11 that allows you to upload data typically saved on a data cartridge, such as
+steerpoints/waypoints and other avionics setup, into a DCS module at the start of a flight. The
+application supports the following DCS airframes and systems,
 
 - *A-10C Warthog* &ndash; Waypoints
 - *AV-8B Harrier* &ndash; Waypoints
@@ -75,6 +75,13 @@ allows JAFDTC to interact with DCS.
 
 A detailed user's guide is availble
 [here](https://github.com/51st-Vfw/JAFDTC/tree/master/doc).
+
+## Troubleshooting
+
+Sometimes stuff goes wrong. One thing to try is uninstalling JAFDTC and then re-installing from
+a fresh `.msi`. After uninstalling from **Add/Remove Programs** in Windows, make sure the
+`51stVFW` directory in `Program Files` is empty before you re-install. If it is not empty, you
+can safely delete the `51stVFW` directory before re-installing.
 
 ## JAFDTC and DCS
 
