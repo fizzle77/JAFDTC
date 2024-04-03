@@ -48,7 +48,7 @@ namespace JAFDTC.UI.FA18C
             => new()
             {
                 ["MaskPlaceholder"] = "–",
-                ["Regex"] = "^[nNsS] [\\d]{2}° [\\d]{2}\\.[\\d]{2}’$",
+                ["Regex"] = "^([NSns] [0-8][0-9]° [0-5][0-9]\\.[0-9]{2}’)|([NSns] 90° 00\\.00’)$",
                 ["CustomMask"] = "N:[nNsS]",
                 ["Mask"] = "N 99° 99.99’",
             };
@@ -57,7 +57,7 @@ namespace JAFDTC.UI.FA18C
             => new()
             {
                 ["MaskPlaceholder"] = "–",
-                ["Regex"] = "^[eEwW] [\\d]{3}° [\\d]{2}\\.[\\d]{2}’$",
+                ["Regex"] = "^([EWew] 0[0-9]{2}° [0-5][0-9]\\.[0-9]{2}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\\.[0-9]{2}’)|([EWew] 180° 00\\.00’)$",
                 ["CustomMask"] = "E:[eEwW]",
                 ["Mask"] = "E 999° 99.99’",
             };

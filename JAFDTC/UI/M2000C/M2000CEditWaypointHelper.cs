@@ -50,7 +50,7 @@ namespace JAFDTC.UI.M2000C
             => new()
             {
                 ["MaskPlaceholder"] = "–",
-                ["Regex"] = "^[nNsS] [\\d]{2}° [\\d]{2}\\.[\\d]{3}’$",
+                ["Regex"] = "^([NSns] [0-8][0-9]° [0-5][0-9]\\.[0-9]{3}’)|([NSns] 90° 00\\.000’)$",
                 ["CustomMask"] = "N:[nNsS]",
                 ["Mask"] = "N 99° 99.999’",
             };
@@ -59,7 +59,7 @@ namespace JAFDTC.UI.M2000C
             => new()
             {
                 ["MaskPlaceholder"] = "–",
-                ["Regex"] = "^[eEwW] [\\d]{3}° [\\d]{2}\\.[\\d]{3}’$",
+                ["Regex"] = "^([EWew] 0[0-9]{2}° [0-5][0-9]\\.[0-9]{3}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\\.[0-9]{3}’)|([EWew] 180° 00\\.000’)$",
                 ["CustomMask"] = "E:[eEwW]",
                 ["Mask"] = "E 999° 99.999’",
             };

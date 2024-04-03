@@ -2,7 +2,7 @@
 //
 // A10CEditWaypointHelper.cs : IEditNavpointPageHelper for the a-10c configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -22,14 +22,14 @@ using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models;
+using JAFDTC.UI.Base;
+using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using JAFDTC.UI.Base;
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
-using JAFDTC.Utilities;
 
 namespace JAFDTC.UI.A10C
 {
@@ -48,7 +48,7 @@ namespace JAFDTC.UI.A10C
             => new()
             {
                 ["MaskPlaceholder"] = "–",
-                ["Regex"] = "^[nNsS] [\\d]{2}° [\\d]{2}\\.[\\d]{3}’$",
+                ["Regex"] = "^([NSns] [0-8][0-9]° [0-5][0-9]\\.[0-9]{3}’)|([NSns] 90° 00\\.000’)$",
                 ["CustomMask"] = "N:[nNsS]",
                 ["Mask"] = "N 99° 99.999’",
             };
@@ -57,7 +57,7 @@ namespace JAFDTC.UI.A10C
             => new()
             {
                 ["MaskPlaceholder"] = "–",
-                ["Regex"] = "^[eEwW] [\\d]{3}° [\\d]{2}\\.[\\d]{3}’$",
+                ["Regex"] = "^([EWew] 0[0-9]{2}° [0-5][0-9]\\.[0-9]{3}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\\.[0-9]{3}’)|([EWew] 180° 00\\.000’)$",
                 ["CustomMask"] = "E:[eEwW]",
                 ["Mask"] = "E 999° 99.999’",
             };
