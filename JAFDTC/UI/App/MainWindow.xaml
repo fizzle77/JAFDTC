@@ -53,7 +53,7 @@ https://www.gnu.org/licenses/.
                        x:Name="AppTitleTextBlock"
                        VerticalAlignment="Center"
                        TextWrapping="NoWrap">
-                JAFDTC (Beta.24)
+                JAFDTC (Beta.25-DEV)
             </TextBlock>
             
             <!-- configuration filter AutoSuggestBox is managed by the ConfigurationListPage -->
