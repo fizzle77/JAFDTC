@@ -206,7 +206,6 @@ namespace JAFDTC.UI.F15E
                     EditRfpt.LatUI = new(info.LatUI);
                     EditRfpt.LonUI = new(info.LonUI);
                     EditRfpt.Alt = new(info.Alt);
-                    break;
                 }
             }
         }
