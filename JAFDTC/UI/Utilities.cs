@@ -136,9 +136,9 @@ namespace JAFDTC.UI
                 root,
                 $"Capturing {what} from DCS",
                 $"The coordinates of this {what.ToLower()} will be set from the first captured location.\n\n" +
-                $"In DCS, type [CTRL]-[SHIFT]-J to show the coordinate capture dialog, move the F10 map until " +
-                $"the crosshair is over the desired point, click “Add”, and then click “Send”. Typing " +
-                $"[CTRL]-[SHIFT]-J again will dismiss the capture dialog.\n\n" +
+                $"In DCS, type [CTRL]-[SHIFT]-J on the F10 map to show the coordinate capture dialog, move " +
+                $"the F10 map until the crosshair is over the desired point, click “Add”, and then click “Send”. " +
+                $"Typing [CTRL]-[SHIFT]-J again will dismiss the capture dialog.\n\n" +
                 $"Click “Done” below when finished capturing.",
                 "Done");
         }
@@ -153,9 +153,10 @@ namespace JAFDTC.UI
                 root,
                 $"Capturing {what}s from DCS",
                 $"The coordinates of the effected {what.ToLower()}s will be set from captured locations.\n\n" +
-                $"In DCS, type [CTRL]-[SHIFT]-J to show the coordinate capture dialog, move the F10 map until " +
-                $"the crosshair is over the desired point, click “Add”, repeat this process for other {what}s " +
-                $"and then click “Send”. Typing [CTRL]-[SHIFT]-J again will dismiss the capture dialog.\n\n" +
+                $"In DCS, type [CTRL]-[SHIFT]-J on the F10 map to show the coordinate capture dialog, move " +
+                $"the F10 map until the crosshair is over the desired point, click “Add”, repeat this process " +
+                $"for other {what}s and then click “Send”. Typing [CTRL]-[SHIFT]-J again will dismiss the " +
+                $"capture dialog.\n\n" +
                 $"Click “Done” below when finished capturing.",
                 "Done");
         }
