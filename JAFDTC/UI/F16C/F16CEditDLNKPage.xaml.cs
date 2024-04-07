@@ -686,7 +686,6 @@ namespace JAFDTC.UI.F16C
         private void OwnText_LostFocus(object sender, RoutedEventArgs args)
         {
             TextBox textBox = (TextBox)sender;
-            Debug.WriteLine("lost focus");
             if (((textBox == uiOwnTextCallsign) || (textBox == uiOwnTextFENum)) && (textBox.Text == "––"))
             {
                 // callsign and flight/element fields uses text mask and can come back as "--" when empty. this

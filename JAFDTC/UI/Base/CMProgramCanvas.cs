@@ -346,8 +346,6 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected override Size MeasureOverride(Size availableSize)
         {
-            Debug.WriteLine($"MEASURE {availableSize.Width}, {availableSize.Height}");
-
             foreach (UIElement child in Children)
             {
                 child.Measure(availableSize);

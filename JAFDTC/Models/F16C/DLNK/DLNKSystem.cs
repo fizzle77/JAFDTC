@@ -81,7 +81,6 @@ namespace JAFDTC.Models.F16C.DLNK
             get => _ownshipFENumber;
             set
             {
-                Debug.WriteLine($"set {value}");
                 string error = "Invalid callsign flight number format";
                 if (IsRegexFieldValid(value, _numRegex))
                 {
