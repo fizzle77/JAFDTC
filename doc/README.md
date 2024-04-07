@@ -1,6 +1,6 @@
 # JAFDTC: User’s Guide
 
-*Version 1.0.0-B.25 of 2-Apr-24*
+*Version 1.0.0-B.26 of 2-Apr-24*
 
 _Just Another #%*@^!% DTC_ (JAFDTC) is a Windows application that allows you to upload data
 typically saved on a data cartridge, such as steerpoints/waypoints and other avionics setup,
@@ -413,23 +413,24 @@ badged with a small gold dot as described earlier.
 
 JAFDTC provides a *Points of Interest* (PoI) database that contains common locations throughout
 DCS theaters. This database consists of three types of entries as
-[described earlier](#points-of-interest).
-PoIs are applied using the **Paste PoI** command from a
-[navigation point editor](#navigation-point-editor)
-to copy the locations to a navigation point. User PoIs can also be created from a navigation
-point editor while campaign PoIs are generally created from a shared import file.
-
-The **Point of Interest** command in the
+[described earlier](#points-of-interest) and is generally used by
+[navigation system editors](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md#navigation-system-editors)
+to simplify specifying locations to the avionics. The **Point of Interest** command in the
 [overflow menu](#command-bar)
 opens up an editor page to manage known points of interest.
 
 ![](images/Core_Base_PoI.png)
 
-The top portion of this page contains a combo box that allows you to filter the PoIs by DCS
-theater along with a command bar. Below this row is a list of PoIs, one per row. The pin icon
-at the left of a row indicates that the PoI is a user PoI. At the bottom of the page is an area
-to edit the properties of a PoI including the name, latitude, longitude, and elevation.
+The top portion of this page contains controls to filter the PoIs listed in the PoI list along
+with a command bar control. Below these controls is a list of PoIs, one per row. The bottom of
+the page provides controls to add and update *user* points of interest.
 
+### Commands
+
+The filter controls consist of a search box and filter control that limits the PoIs listed on
+the page to those that meet some criteria. Additional details on how these controls work can
+be found
+[here](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md#selecting--filtering-points-of-interest).
 The command bar,
 
 ![](images/Core_Base_PoI_Cmd.png)
@@ -437,17 +438,43 @@ The command bar,
 includes the following commands,
 
 - **Edit** &ndash; Copies the properties from the selected PoI to the PoI editor.
-- **Delete** &ndash; Deletes the selected *user* PoIs from the database.
+- **Delete** &ndash; Deletes the selected PoIs from the database. Note that DCS PoIs cannot
+  be deleted and deleting a campaign PoI implicitly deletes all PoIs in that campaign.
 - **Import** &ndash; Imports new PoIs from a previously exported file.
 - **Export** &ndash; Exports selected *user* PoIs from the database to a file.
-- **User Only** &ndash; Toggles the PoI list between showing all PoIs and only showing
-  user PoIs.
-- **Coordiantes** &ndash; Selects the format to use for PoI coordiantes.
+- **Coordiantes** &ndash; Selects the format to use for PoI coordiantes (e.g., DMS, DDM).
 
-After entering or updating properties for a PoI in the PoI editor, click the **Add** button
-to add a new PoI to the theater (the theater is automatically determined from the latitude
-and longitude). The **Add** button will be titled **Update** if the change would update an
-existing user PoI.
+TODO
+
+### Point of Interst List
+
+Each row in the **Point of Interest List** corresponds to a single PoI in the database and
+provides information such as name and position (latitude, longitude, elevation). The icon at
+the left of each row in this list indicates the PoI type:
+
+- **Pin** &ndash; A user PoI.
+- **Flag** &ndash; A campaign PoI, by convention the first tag is the campaign name (in the
+  screenshot, the campaign PoIs belong to the "NTTR Training Range" campaign)
+- **No Icon** &ndash; A DCS system PoI.
+
+TODO
+
+### Editing Points of Interest
+
+The controls at the bottom of the page allow you to add or update user PoIs. Double-clicking on
+a PoI in the list, or selecting a PoI and clicking on the **Edit** command will populate the
+fields (Name, Tags, Latitude, etc.) with the values from the PoI.
+
+> DCS and Campaign PoIs are read-only and cannot be edited. When editing a PoI of these types,
+> JAFDTC creates a User PoI copy of the point of interest and edits that.
+
+Based on context, the **Add** button may also appear as **Update**. This button adds a new user
+PoI to the database (if the PoI is new) or updates an existing user PoI in the database. The
+**Clear** button clears the editor fields.
+
+### Importing and Exporting Points of Interest
+
+TODO
 
 ## Settings
 

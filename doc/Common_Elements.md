@@ -1,6 +1,6 @@
 # JAFDTC: Common Elements
 
-*Version 1.0.0-B.25 of 2-Apr-24*
+*Version 1.0.0-B.26 of 2-Apr-24*
 
 Though systems differ from airframe to airframe, based on the preculariites of the airframe,
 there are many concepts and tasks in the JAFDTC user interface that share general similarities
@@ -17,12 +17,13 @@ The user interface has tasks that can be used in multiple contexts within an air
 as tasks that may share some common features between different airframes. This section
 discusses some of these common tasks.
 
-## Selecting Points of Interest
+## Selecting & Filtering Points of Interest
 
-JAFDTC uses a common set of UI widgets to allow you to select points of interest for use as a
-navigation point, for example. The widgets include a search box with a filter button. The
-filter button allows you to limit the points of interest to those that meet certain criteria.
-When a filter is applied, the filter button will be blue.
+JAFDTC uses a common set of UI widgets to allow you to select points of interest to provide the
+coordinates for a navigation point, for example, or to filter a list of points of interest. The
+widgets include a search box with a filter button to its right. The filter button allows you to
+limit the points of interest to those that meet certain criteria. When a filter is applied, the
+filter button will be blue as shown here,
 
 ![](images/Core_Base_PoI_Filter.png)
 
@@ -30,16 +31,27 @@ Clicking the filter button brings up a dialog that lets you specify filter crite
 
 ![](images/Core_Base_PoI_Filter_Dlog.png)
 
-The fields in this dialog control filtering as follows,
+The three buttons at the bottom of the dialog make changes to the current filter and dismiss
+the dialog. The **Set** button sets the filter to match the fields in the dialog, the
+**Clear Filters** button removes the current filter, and **Cancel** leaves the current filter
+unchanged. The other fields in the dialog specify the filter,
 
 - **Theater** &ndash; Limits the points of interest to a particular DCS map or theater.
-- **Tags** &ndash; Limits the points of interst to those that contain the specified tags. For
-  eaxmple, setting tags to "foo; bar" matches any point of interst with "foo" and "bar" in its
-  tags (comparisons are case-insensitive).
-- **Include...** &ndash; Inclues only DCS, user, or campaign points of interest as selected.
+- **Tags** &ndash; Limits the points of interest to those that contain the specified tags. For
+  eaxmple, setting this field to `foo; bar` matches any point of interest with `foo` and `bar`
+  in its tags (comparisons are case-insensitive).
+- **Include...** &ndash; Inclues only DCS, User, or Campaign points of interest as selected.
 
-The **Clear Filters** button will reset the filters to the default "show all" state. Once you have set the filter, typing in the search box will show a list of points of interest with
-names that match the typed text.
+Once you have set the filter, typing in the search box will show a list of points of interest
+with names that match the typed text and properties (for example, theater) that match the
+current filter.
+
+![](images/Core_Base_PoI_Select.png)
+
+As you type, the list of matching points of interest updates to include the PoIs that match.
+Typing `RETURN` or clicking on the **Accept Filter** button sets the filter on names. Clicking
+on **Clear Filter** removes the filter on names. Clicking on an item in the matching points of
+interest list selects a single PoI.
 
 ## Capturing Coordinates from DCS
 
@@ -214,7 +226,7 @@ clicking on the navigation point in the navigation point list brings up an edito
 
 At minimum, the page will contain an interface to the PoI system to allow you to select a PoI
 to use for the navigation point (see the
-[earlier discussion](#selecting-points-of-interest)
+[earlier discussion](#selecting--filtering-points-of-interest)
 on selecting points of interest) and a section to edit the key parameters of the navigation
 point such as name, latitude, longitude, and elevation. The remainder of the page may differ
 significantly from airframe to airframe to adapt to the capabilities of the airframe's
@@ -223,7 +235,7 @@ to specify a OAP reference points.
 
 The top section of the page allows you to select points of interest, such as an airbase or
 a DPI that is part of a campaign, from the Point of Interest database as
-[described above](#selecting-points-of-interest).
+[described above](#selecting--filtering-points-of-interest).
 
 The *Navigation Point Title* identifies the navigation point being edited and, on the right
 end of the row, provides five controls. From left to right the buttons are,
