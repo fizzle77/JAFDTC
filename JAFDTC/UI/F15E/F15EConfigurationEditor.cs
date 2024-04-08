@@ -23,6 +23,7 @@ using JAFDTC.Models.F15E.Misc;
 using JAFDTC.Models.F15E.MPD;
 using JAFDTC.Models.F15E.Radio;
 using JAFDTC.Models.F15E.STPT;
+using JAFDTC.Models.F15E.UFC;
 using JAFDTC.UI.App;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -38,6 +39,7 @@ namespace JAFDTC.UI.F15E
         public const string MPD = "\xE950";
         public const string RADIO = "\xE704";
         public const string STPT = "\xE707";
+        public const string UFC = "\xF261";
     }
 
     /// <summary>
@@ -51,6 +53,7 @@ namespace JAFDTC.UI.F15E
             F15EEditSteerpointListPage.PageInfo,
             F15EEditMPDPage.PageInfo,
             F15EEditRadioPageHelper.PageInfo,
+            F15EEditUFCPage.PageInfo,
             F15EEditMiscPage.PageInfo,
         };
 
@@ -66,6 +69,7 @@ namespace JAFDTC.UI.F15E
                 MPDSystem.SystemTag => ((F15EConfiguration)config).MPD,
                 RadioSystem.SystemTag => ((F15EConfiguration)config).Radio,
                 STPTSystem.SystemTag => ((F15EConfiguration)config).STPT,
+                UFCSystem.SystemTag => ((F15EConfiguration)config).UFC,
                 _ => null,
             };
             return system;

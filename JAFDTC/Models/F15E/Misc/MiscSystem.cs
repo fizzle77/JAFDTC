@@ -18,7 +18,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.F16C.Misc;
 using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
@@ -26,25 +25,6 @@ using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.F15E.Misc
 {
-    /// <summary>
-    /// defines the bands for tacan.
-    /// </summary>
-    public enum TACANBands
-    {
-        X = 0,
-        Y = 1
-    }
-
-    /// <summary>
-    /// defines the bands for tacan.
-    /// </summary>
-    public enum TACANModes
-    {
-        A2A = 0,
-        TR = 1,
-        REC = 2
-    }
-
     /// <summary>
     /// TODO: document
     /// </summary>
@@ -57,10 +37,6 @@ namespace JAFDTC.Models.F15E.Misc
         // properties
         //
         // ------------------------------------------------------------------------------------------------------------
-
-        // ---- private properties, static
-
-        private static readonly Regex _ilsRegex = new(@"^(10[89]\.[13579]{1}[05]{1})|(11[01]\.[13579]{1}[05]{1})$");
 
         // ---- public properties, posts change/validation events
 
@@ -81,78 +57,6 @@ namespace JAFDTC.Models.F15E.Misc
             }
         }
 
-        // TODO: validate valid range
-        private string _lowAltWarn;                             // integer [0, 50000]
-        public string LowAltWarn
-        {
-            get => _lowAltWarn;
-            set
-            {
-                string error = (string.IsNullOrEmpty(value)) ? null : "Invalid format";
-                if (IsIntegerFieldValid(value, 0, 50000))
-                {
-                    value = FixupIntegerField(value);
-                    error = null;
-                }
-                SetProperty(ref _lowAltWarn, value, error);
-            }
-        }
-
-        private string _tacanChannel;                           // integer [1, 126]
-        public string TACANChannel
-        {
-            get => _tacanChannel;
-            set
-            {
-                string error = (string.IsNullOrEmpty(value)) ? null : "Invalid format";
-                if (IsIntegerFieldValid(value, 1, 126))
-                {
-                    value = FixupIntegerField(value);
-                    error = null;
-                }
-                SetProperty(ref _tacanChannel, value, error);
-            }
-        }
-
-        private string _tacanBand;                              // integer [0, 1]
-        public string TACANBand
-        {
-            get => _tacanBand;
-            set
-            {
-                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 1)) ? null : "Invalid format";
-                SetProperty(ref _tacanBand, value, error);
-            }
-        }
-
-        private string _tacanMode;                              // integer [0, 2]
-        public string TACANMode
-        {
-            get => _tacanMode;
-            set
-            {
-                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
-                SetProperty(ref _tacanMode, value, error);
-            }
-        }
-
-        private string _ilsFrequency;                           // 000.00 decimal [108.10, 111.95] in 0.05 steps
-        public string ILSFrequency
-        {
-            get => _ilsFrequency;
-            set
-            {
-                string error = (string.IsNullOrEmpty(value)) ? null : "Invalid format";
-                if (IsRegexFieldValid(value, _ilsRegex))
-                {
-                    // TODO: need to fix value fixup...
-                    value = FixupDecimalField(value, "F2");
-                    error = null;
-                }
-                SetProperty(ref _ilsFrequency, value, error);
-            }
-        }
-
         // ---- public properties, computed
 
         /// <summary>
@@ -163,12 +67,7 @@ namespace JAFDTC.Models.F15E.Misc
         /// </summary>
         public readonly static MiscSystem ExplicitDefaults = new()
         {
-            Bingo = "4000",
-            LowAltWarn = "250",
-            TACANChannel = "1",
-            TACANBand = ((int)TACANBands.X).ToString(),
-            TACANMode = ((int)TACANModes.TR).ToString(),
-            ILSFrequency = "108.10",
+            Bingo = "4000"
         };
 
         /// <summary>
@@ -176,39 +75,11 @@ namespace JAFDTC.Models.F15E.Misc
         /// form, false otherwise.
         /// </summary>
         [JsonIgnore]
-        public bool IsDefault => (IsBINGODefault && IsLowAltDefault && IsTACANDefault && IsILSDefault);
+        public bool IsDefault => (IsBINGODefault);
 
         // TODO: technically, could be default with non-empty values...
         [JsonIgnore]
         public bool IsBINGODefault => string.IsNullOrEmpty(Bingo);
-
-        // TODO: technically, could be default with non-empty values...
-        [JsonIgnore]
-        public bool IsLowAltDefault => string.IsNullOrEmpty(LowAltWarn);
-
-        // TODO: technically, could be default with non-empty values...
-        [JsonIgnore]
-        public bool IsTACANDefault => (string.IsNullOrEmpty(TACANChannel) &&
-                                       string.IsNullOrEmpty(TACANBand) &&
-                                       string.IsNullOrEmpty(TACANMode));
-
-        // TODO: technically, could be default with non-empty values...
-        [JsonIgnore]
-        public bool IsILSDefault => string.IsNullOrEmpty(ILSFrequency);
-
-        // ---- following accessors get the current value (default or non-default) for various properties
-
-        [JsonIgnore]
-        public TACANBands TACANBandValue
-        {
-            get => (TACANBands)int.Parse((string.IsNullOrEmpty(TACANBand)) ? ExplicitDefaults.TACANBand : TACANBand);
-        }
-
-        [JsonIgnore]
-        public TACANModes TACANModeValue
-        {
-            get => (TACANModes)int.Parse((string.IsNullOrEmpty(TACANMode)) ? ExplicitDefaults.TACANMode : TACANMode);
-        }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -224,11 +95,6 @@ namespace JAFDTC.Models.F15E.Misc
         public MiscSystem(MiscSystem other)
         {
             Bingo = new(other.Bingo);
-            LowAltWarn = new(other.LowAltWarn);
-            TACANChannel = new(other.TACANChannel);
-            TACANBand = new(other.TACANBand);
-            TACANMode = new(other.TACANMode);
-            ILSFrequency = new(other.ILSFrequency);
         }
 
         public virtual object Clone() => new MiscSystem(this);
@@ -245,11 +111,6 @@ namespace JAFDTC.Models.F15E.Misc
         public void Reset()
         {
             Bingo = "";
-            LowAltWarn = "";
-            TACANChannel = "";
-            TACANBand = "";
-            TACANMode = "";
-            ILSFrequency = "";
         }
     }
 }

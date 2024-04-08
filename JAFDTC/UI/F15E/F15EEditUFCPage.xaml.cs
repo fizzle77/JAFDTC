@@ -1,6 +1,6 @@
 // ********************************************************************************************************************
 //
-// F15EEditMFDPage.xaml.cs : ui c# for mudhen misc setup editor page
+// F15EEditUFCPage.xaml.cs : ui c# for mudhen ufc setup editor page
 //
 // Copyright(C) 2023-2024 ilominar/raven
 //
@@ -19,7 +19,7 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.F15E;
-using JAFDTC.Models.F15E.Misc;
+using JAFDTC.Models.F15E.UFC;
 using JAFDTC.UI.App;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -35,12 +35,12 @@ using System.Diagnostics;
 namespace JAFDTC.UI.F15E
 {
     /// <summary>
-    /// user interface for the page that allows you to edit the mudhen miscellaneous system configuration.
+    /// user interface for the page that allows you to edit the mudhen ufc system configuration.
     /// </summary>
-    public sealed partial class F15EEditMiscPage : Page
+    public sealed partial class F15EEditUFCPage : Page
     {
         public static ConfigEditorPageInfo PageInfo
-            => new(MiscSystem.SystemTag, "Miscellaneous", "Miscellaneous", Glyphs.MISC, typeof(F15EEditMiscPage));
+            => new(UFCSystem.SystemTag, "Up-Front Controls", "UFC", Glyphs.UFC, typeof(F15EEditUFCPage));
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -53,11 +53,11 @@ namespace JAFDTC.UI.F15E
         private ConfigEditorPageNavArgs NavArgs { get; set; }
 
         // NOTE: changes to the Config object may only occur through the marshall methods. bindings to and edits by
-        // NOTE: the ui are always directed at the EditMisc property.
+        // NOTE: the ui are always directed at the EditUFC property.
         //
         private F15EConfiguration Config { get; set; }
 
-        private MiscSystem EditMisc { get; set; }
+        private UFCSystem EditUFC { get; set; }
 
         private bool IsRebuildPending { get; set; }
 
@@ -65,7 +65,7 @@ namespace JAFDTC.UI.F15E
 
         // ---- private properties, read-only
 
-        private readonly MiscSystem _miscSysDefault;
+        private readonly UFCSystem _ufcSysDefault;
 
         private readonly Dictionary<string, string> _configNameToUID;
         private readonly List<string> _configNameList;
@@ -80,30 +80,34 @@ namespace JAFDTC.UI.F15E
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F15EEditMiscPage()
+        public F15EEditUFCPage()
         {
             InitializeComponent();
 
-            EditMisc = new MiscSystem();
-            EditMisc.ErrorsChanged += BaseField_DataValidationError;
-            EditMisc.PropertyChanged += BaseField_PropertyChanged;
+            EditUFC = new UFCSystem();
+            EditUFC.ErrorsChanged += BaseField_DataValidationError;
+            EditUFC.PropertyChanged += BaseField_PropertyChanged;
 
             IsRebuildPending = false;
             IsRebuildingUI = false;
 
-            _miscSysDefault = MiscSystem.ExplicitDefaults;
+            _ufcSysDefault = UFCSystem.ExplicitDefaults;
 
             _configNameToUID = new Dictionary<string, string>();
             _configNameList = new List<string>();
 
             _baseFieldValueMap = new Dictionary<string, TextBox>()
             {
-                ["Bingo"] = uiBINGOValueBINGO
+                ["LowAltWarn"] = uiLaltValueWarn,
+                ["TACANChannel"] = uiTACANValueChan,
+                ["ILSFrequency"] = uiILSValueFreq,
             };
-            _defaultBorderBrush = uiBINGOValueBINGO.BorderBrush;
-            _defaultBkgndBrush = uiBINGOValueBINGO.Background;
+            _defaultBorderBrush = uiTACANValueChan.BorderBrush;
+            _defaultBkgndBrush = uiTACANValueChan.Background;
 
-            uiBINGOValueBINGO.PlaceholderText = _miscSysDefault.Bingo;
+            uiLaltValueWarn.PlaceholderText = _ufcSysDefault.LowAltWarn;
+            uiTACANValueChan.PlaceholderText = _ufcSysDefault.TACANChannel;
+            uiILSValueFreq.PlaceholderText = _ufcSysDefault.ILSFrequency;
 
             // wait for final setup of the ui until we navigate to the page (at which point we will have a
             // configuration to display).
@@ -120,7 +124,11 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void CopyConfigToEdit()
         {
-            EditMisc.Bingo = Config.Misc.Bingo;
+            EditUFC.ILSFrequency = Config.UFC.ILSFrequency;
+            EditUFC.LowAltWarn = Config.UFC.LowAltWarn;
+            EditUFC.TACANChannel = Config.UFC.TACANChannel;
+            EditUFC.TACANBand = Config.UFC.TACANBand;
+            EditUFC.TACANMode = Config.UFC.TACANMode;
         }
 
         /// <summary>
@@ -128,13 +136,17 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void CopyEditToConfig(bool isPersist = false)
         {
-            if (!EditMisc.HasErrors)
+            if (!EditUFC.HasErrors)
             {
-                Config.Misc.Bingo = EditMisc.Bingo;
+                Config.UFC.ILSFrequency = EditUFC.ILSFrequency;
+                Config.UFC.LowAltWarn = EditUFC.LowAltWarn;
+                Config.UFC.TACANChannel = EditUFC.TACANChannel;
+                Config.UFC.TACANBand = EditUFC.TACANBand;
+                Config.UFC.TACANMode = EditUFC.TACANMode;
 
                 if (isPersist)
                 {
-                    Config.Save(this, MiscSystem.SystemTag);
+                    Config.Save(this, UFCSystem.SystemTag);
                 }
             }
         }
@@ -175,12 +187,12 @@ namespace JAFDTC.UI.F15E
         {
             if (args.PropertyName == null)
             {
-                ValidateAllFields(_baseFieldValueMap, EditMisc.GetErrors(null));
+                ValidateAllFields(_baseFieldValueMap, EditUFC.GetErrors(null));
             }
             else
             {
                 // Debug.WriteLine("== DataValErr (b): " + args.PropertyName);
-                List<string> errors = (List<string>)EditMisc.GetErrors(args.PropertyName);
+                List<string> errors = (List<string>)EditUFC.GetErrors(args.PropertyName);
                 SetFieldValidState(_baseFieldValueMap[args.PropertyName], (errors.Count == 0));
             }
             RebuildInterfaceState();
@@ -201,11 +213,31 @@ namespace JAFDTC.UI.F15E
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// rebuild the setup of the tacan band and mode according to the current settings. 
+        /// </summary>
+        private void RebuildTACANSetup()
+        {
+            int band = (string.IsNullOrEmpty(EditUFC.TACANBand)) ? int.Parse(_ufcSysDefault.TACANBand)
+                                                                  : int.Parse(EditUFC.TACANBand);
+            if (uiTACANComboBand.SelectedIndex != band)
+            {
+                uiTACANComboBand.SelectedIndex = band;
+            }
+
+            int mode = (string.IsNullOrEmpty(EditUFC.TACANMode)) ? int.Parse(_ufcSysDefault.TACANMode)
+                                                                  : int.Parse(EditUFC.TACANMode);
+            if (uiTACANComboMode.SelectedIndex != mode)
+            {
+                uiTACANComboMode.SelectedIndex = mode;
+            }
+        }
+
+        /// <summary>
         /// TODO: document
         /// </summary>
         private void RebuildLinkControls()
         {
-            Utilities.RebuildLinkControls(Config, MiscSystem.SystemTag, NavArgs.UIDtoConfigMap,
+            Utilities.RebuildLinkControls(Config, UFCSystem.SystemTag, NavArgs.UIDtoConfigMap,
                                           uiPageBtnTxtLink, uiPageTxtLink);
         }
 
@@ -215,15 +247,17 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void RebuildEnableState()
         {
-            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(MiscSystem.SystemTag));
+            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(UFCSystem.SystemTag));
             foreach (KeyValuePair<string, TextBox> kvp in _baseFieldValueMap)
             {
                 Utilities.SetEnableState(kvp.Value, isEditable);
             }
+            Utilities.SetEnableState(uiTACANComboBand, isEditable);
+            Utilities.SetEnableState(uiTACANComboMode, isEditable);
 
             Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
 
-            Utilities.SetEnableState(uiPageBtnReset, !EditMisc.IsDefault);
+            Utilities.SetEnableState(uiPageBtnReset, !EditUFC.IsDefault);
         }
 
         /// <summary>
@@ -237,6 +271,7 @@ namespace JAFDTC.UI.F15E
                 DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
                 {
                     IsRebuildingUI = true;
+                    RebuildTACANSetup();
                     RebuildLinkControls();
                     RebuildEnableState();
                     IsRebuildingUI = false;
@@ -266,9 +301,9 @@ namespace JAFDTC.UI.F15E
             );
             if (result == ContentDialogResult.Primary)
             {
-                Config.UnlinkSystem(MiscSystem.SystemTag);
-                Config.Misc.Reset();
-                Config.Save(this, MiscSystem.SystemTag);
+                Config.UnlinkSystem(UFCSystem.SystemTag);
+                Config.UFC.Reset();
+                Config.Save(this, UFCSystem.SystemTag);
                 CopyConfigToEdit();
             }
         }
@@ -278,18 +313,46 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
         {
-            string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, MiscSystem.SystemTag,
+            string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, UFCSystem.SystemTag,
                                                                     _configNameList);
             if (selectedItem == null)
             {
-                Config.UnlinkSystem(MiscSystem.SystemTag);
+                Config.UnlinkSystem(UFCSystem.SystemTag);
                 Config.Save(this);
             }
             else if (selectedItem.Length > 0)
             {
-                Config.LinkSystemTo(MiscSystem.SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selectedItem]]);
+                Config.LinkSystemTo(UFCSystem.SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selectedItem]]);
                 Config.Save(this);
                 CopyConfigToEdit();
+            }
+        }
+
+        // ---- tacan setup -------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// selection changed on tacan band: update band state.
+        /// </summary>
+        private void TACANComboBand_SelectionChanged(object sender, RoutedEventArgs args)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditUFC.TACANBand = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        /// <summary>
+        /// selection changed on tacan mode: update mode state.
+        /// </summary>
+        private void TACANComboMode_SelectionChanged(object sender, RoutedEventArgs args)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditUFC.TACANMode = (string)item.Tag;
+                CopyEditToConfig(true);
             }
         }
 
@@ -336,12 +399,12 @@ namespace JAFDTC.UI.F15E
 
             Config.ConfigurationSaved += ConfigurationSavedHandler;
 
-            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, MiscSystem.SystemTag,
+            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, UFCSystem.SystemTag,
                                            _configNameList, _configNameToUID);
 
             CopyConfigToEdit();
 
-            ValidateAllFields(_baseFieldValueMap, EditMisc.GetErrors(null));
+            ValidateAllFields(_baseFieldValueMap, EditUFC.GetErrors(null));
             RebuildInterfaceState();
 
             base.OnNavigatedTo(args);

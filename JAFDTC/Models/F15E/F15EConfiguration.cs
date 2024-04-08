@@ -22,6 +22,7 @@ using JAFDTC.Models.F15E.Misc;
 using JAFDTC.Models.F15E.MPD;
 using JAFDTC.Models.F15E.Radio;
 using JAFDTC.Models.F15E.STPT;
+using JAFDTC.Models.F15E.UFC;
 using JAFDTC.UI.F15E;
 using JAFDTC.Utilities;
 using System;
@@ -55,6 +56,8 @@ namespace JAFDTC.Models.F15E
 
         public STPTSystem STPT { get; set; }
 
+        public UFCSystem UFC { get; set; }
+
         [JsonIgnore]
         public override IUploadAgent UploadAgent => new F15EUploadAgent(this);
 
@@ -71,6 +74,7 @@ namespace JAFDTC.Models.F15E
             MPD = new MPDSystem();
             Radio = new RadioSystem();
             STPT = new STPTSystem();
+            UFC = new UFCSystem();
             ConfigurationUpdated();
         }
 
@@ -86,7 +90,8 @@ namespace JAFDTC.Models.F15E
                 Misc = (MiscSystem)Misc.Clone(),
                 MPD = (MPDSystem)MPD.Clone(),
                 Radio = (RadioSystem)Radio.Clone(),
-                STPT = (STPTSystem)STPT.Clone()
+                STPT = (STPTSystem)STPT.Clone(),
+                UFC = (UFCSystem)UFC.Clone()
             };
             clone.ResetUID();
             clone.ConfigurationUpdated();
@@ -102,6 +107,7 @@ namespace JAFDTC.Models.F15E
                 case MPDSystem.SystemTag: MPD = otherMudhen.MPD.Clone() as MPDSystem; break;
                 case RadioSystem.SystemTag: Radio = otherMudhen.Radio.Clone() as RadioSystem; break;
                 case STPTSystem.SystemTag: STPT = otherMudhen.STPT.Clone() as STPTSystem; break;
+                case UFCSystem.SystemTag: UFC = otherMudhen.UFC.Clone() as UFCSystem; break;
                 default: break;
             }
         }
@@ -148,6 +154,7 @@ namespace JAFDTC.Models.F15E
                 MPDSystem.SystemTag => JsonSerializer.Serialize(MPD, Configuration.JsonOptions),
                 RadioSystem.SystemTag => JsonSerializer.Serialize(Radio, Configuration.JsonOptions),
                 STPTSystem.SystemTag => JsonSerializer.Serialize(STPT, Configuration.JsonOptions),
+                UFCSystem.SystemTag => JsonSerializer.Serialize(UFC, Configuration.JsonOptions),
                 _ => null
             };
         }
@@ -158,6 +165,7 @@ namespace JAFDTC.Models.F15E
             MPD ??= new MPDSystem();
             Radio ??= new RadioSystem();
             STPT ??= new STPTSystem();
+            UFC ??= new UFCSystem();
 
             // TODO: if the version number is older than current, may need to update object
             Version = _versionCfg;
@@ -174,7 +182,8 @@ namespace JAFDTC.Models.F15E
                                               (cboardTag == MPDSystem.SystemTag) || 
                                               (cboardTag == RadioSystem.SystemTag) ||
                                               (cboardTag == STPTSystem.SystemTag) ||
-                                              (cboardTag == STPTSystem.STPTListTag)))));
+                                              (cboardTag == STPTSystem.STPTListTag) ||
+                                              (cboardTag == UFCSystem.SystemTag)))));
         }
 
         public override bool Deserialize(string systemTag, string json)
@@ -190,6 +199,7 @@ namespace JAFDTC.Models.F15E
                     case RadioSystem.SystemTag: Radio = JsonSerializer.Deserialize<RadioSystem>(json); break;
                     case STPTSystem.SystemTag: STPT = JsonSerializer.Deserialize<STPTSystem>(json); break;
                     case STPTSystem.STPTListTag: STPT.ImportSerializedNavpoints(json, false); break;
+                    case UFCSystem.SystemTag: JsonSerializer.Deserialize<UFCSystem>(json); break;
                     default: isHandled = false; break;
                 }
                 if (isHandled)
