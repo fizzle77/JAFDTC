@@ -118,6 +118,11 @@ namespace JAFDTC.Models.F15E.Upload
             AddIfBlock("IsRadioGuardEnabledDisabled", new() { (isRadio1 ? "1" : "2"), state }, delegate () {
                 AddActions(ufc, new() { "SHF", (isRadio1 ? "GCML" : "GCMR") });
             });
+
+            if ((presets.Count > 0) && (pb == "PB6"))
+            {
+                AddAction(ufc, "PB9");
+            }
         }
 
         private void BuildRadioPresets(AirframeDevice ufc, ObservableCollection<RadioPreset> presets)
