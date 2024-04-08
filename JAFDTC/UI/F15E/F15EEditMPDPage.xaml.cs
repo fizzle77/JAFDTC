@@ -1,6 +1,6 @@
 // ********************************************************************************************************************
 //
-// F15EEditMFDPage.xaml.cs : ui c# for mudhen mpd/mpcd setup editor page
+// F15EEditMPDPage.xaml.cs : ui c# for mudhen mpd/mpcd setup editor page
 //
 // Copyright(C) 2023-2024 ilominar/raven
 //
@@ -69,6 +69,7 @@ namespace JAFDTC.UI.F15E
         private readonly Dictionary<string, string> _configNameToUID;
         private readonly List<string> _configNameList;
 
+        private readonly Dictionary<string, string> _formatMap;
         private readonly Dictionary<string, Dictionary<string, ComboBox>> _formatComboMap;
         private readonly Dictionary<string, Dictionary<string, ComboBox>> _modeComboMap;
         private readonly Dictionary<string, Button> _resetDisplayMap;
@@ -91,6 +92,23 @@ namespace JAFDTC.UI.F15E
             _configNameToUID = new Dictionary<string, string>();
             _configNameList = new List<string>();
 
+            _formatMap = new()
+            {
+                [""] = ((int)MPDConfiguration.DisplayFormats.NONE).ToString(),
+                ["A/A RDR"] = ((int)MPDConfiguration.DisplayFormats.AA_RDR).ToString(),
+                ["A/G RDR"] = ((int)MPDConfiguration.DisplayFormats.AG_RDR).ToString(),
+                ["A/G DLVRY"] = ((int)MPDConfiguration.DisplayFormats.AG_DLVRY).ToString(),
+                ["ADI"] = ((int)MPDConfiguration.DisplayFormats.ADI).ToString(),
+                ["ARMT"] = ((int)MPDConfiguration.DisplayFormats.ARMT).ToString(),
+                ["ENG"] = ((int)MPDConfiguration.DisplayFormats.ENG).ToString(),
+                ["HSI"] = ((int)MPDConfiguration.DisplayFormats.HSI).ToString(),
+                ["HUD"] = ((int)MPDConfiguration.DisplayFormats.HUD).ToString(),
+                ["SMRT WPNS"] = ((int)MPDConfiguration.DisplayFormats.SMRT_WPNS).ToString(),
+                ["TEWS"] = ((int)MPDConfiguration.DisplayFormats.TEWS).ToString(),
+                ["TF"] = ((int)MPDConfiguration.DisplayFormats.TF).ToString(),
+                ["TPOD"] = ((int)MPDConfiguration.DisplayFormats.TPOD).ToString(),
+                ["TSD"] = ((int)MPDConfiguration.DisplayFormats.TSD).ToString()
+            };
             _formatComboMap = new()
             {
                 [((int)MPDSystem.CockpitDisplays.PILOT_L_MPD).ToString()] = new Dictionary<string, ComboBox>()
@@ -378,9 +396,38 @@ namespace JAFDTC.UI.F15E
                 int displayNum = int.Parse(display.Key);
                 foreach (KeyValuePair<string, ComboBox> sequence in display.Value)
                 {
+                    IList<TextBlock> items = BuildMPDFormatComboItems();
+                    foreach (KeyValuePair<string, ComboBox> itemsBuild in display.Value)
+                    {
+                        string buildFormatStr = EditMPD.Displays[displayNum].Formats[int.Parse(itemsBuild.Key)];
+                        buildFormatStr = (string.IsNullOrEmpty(buildFormatStr)) ? "0" : buildFormatStr;
+                        if ((itemsBuild.Key != sequence.Key) && (buildFormatStr != "0"))
+                        {
+                            for (int i = 0; i < items.Count; i++)
+                            {
+                                if ((string)items[i].Tag == buildFormatStr)
+                                {
+                                    items.RemoveAt(i);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    sequence.Value.ItemsSource = items;
+
                     int sequenceNum = int.Parse(sequence.Key);
                     string formatStr = EditMPD.Displays[displayNum].Formats[sequenceNum];
-                    sequence.Value.SelectedIndex = (string.IsNullOrEmpty(formatStr)) ? 0 : int.Parse(formatStr);
+                    formatStr = (string.IsNullOrEmpty(formatStr)) ? "0" : formatStr;
+                    int selIndex = 0;
+                    for (int i = 0; i < sequence.Value.Items.Count; i++)
+                    {
+                        if ((string)((TextBlock)sequence.Value.Items[i]).Tag == formatStr)
+                        {
+                            selIndex = i;
+                            break;
+                        }
+                    }
+                    sequence.Value.SelectedIndex = selIndex;
                 }
             }
             IsRebuildingUI = false;
@@ -589,7 +636,7 @@ namespace JAFDTC.UI.F15E
                 string[] fields = combo.Tag.ToString().Split(',');
                 int display = int.Parse(fields[0]);
                 int sequence = int.Parse(fields[1]);
-                EditMPD.Displays[display].Formats[sequence] = combo.SelectedIndex.ToString();
+                EditMPD.Displays[display].Formats[sequence] = _formatMap[((TextBlock)combo.SelectedItem).Text];
                 if (combo.SelectedIndex == (int)MPDConfiguration.DisplayFormats.NONE)
                 {
                     EditMPD.Displays[display].Modes[sequence] = ((int)MPDConfiguration.MasterModes.NONE).ToString();
