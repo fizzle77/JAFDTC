@@ -1,8 +1,8 @@
 ﻿// ********************************************************************************************************************
 //
-// FA18CEditRadioPageHelper.xaml.cs : hornet specialization for EditRadioPage
+// FA18CEditRadioPageHelper.cs : hornet specialization for EditRadioPage
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -27,6 +27,7 @@ using JAFDTC.Utilities;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Microsoft.UI.Xaml.Controls;
 
 namespace JAFDTC.UI.FA18C
 {
@@ -106,6 +107,7 @@ namespace JAFDTC.UI.FA18C
                     Preset = int.Parse(item.Preset),
                     Frequency = new(item.Frequency),
                     Description = new(item.Description),
+                    Modulation = ""
                 };
                 cfgPresetList.Add(preset);
             }
@@ -117,13 +119,10 @@ namespace JAFDTC.UI.FA18C
         }
 
         public bool RadioSysIsDefault(IConfiguration config)
-        {
-            return ((FA18CConfiguration)config).Radio.IsDefault;
-        }
+            => ((FA18CConfiguration)config).Radio.IsDefault;
 
         public bool RadioModuleIsDefault(IConfiguration config, int radio)
-        {
-            return radio switch
+            => radio switch
             {
                 (int)Radios.COMM1 => ((((FA18CConfiguration)config).Radio.Presets[(int)Radios.COMM1].Count == 0) &&
                                       string.IsNullOrEmpty(((FA18CConfiguration)config).Radio.COMM1DefaultTuning)),
@@ -131,43 +130,35 @@ namespace JAFDTC.UI.FA18C
                                       string.IsNullOrEmpty(((FA18CConfiguration)config).Radio.COMM2DefaultTuning)),
                 _ => false
             };
-        }
 
         public string RadioAux1Title(int radio)
-        {
-            return null;
-        }
+            => null;
 
         public string RadioAux2Title(int radio)
-        {
-            return null;
-        }
+            => null;
+
+        public bool RadioCanProgramModulation(int radio)
+            => false;
+
+        public List<TextBlock> RadioModulationItems(int radio)
+            => null;
 
         public int RadioMaxPresets(int radio)
-        {
-            return 20;
-        }
+            => 20;
 
         public string RadioDefaultFrequency(int radio)
-        {
-            return "225.00";
-        }
+            => "225.00";
 
         public int RadioPresetCount(int radio, IConfiguration config)
-        {
-            return ((FA18CConfiguration)config).Radio.Presets[radio].Count;
-        }
+            => ((FA18CConfiguration)config).Radio.Presets[radio].Count;
 
         public bool ValidatePreset(int radio, string preset, bool isNoEValid = true)
-        {
-            return BindableObject.IsIntegerFieldValid(preset, 1, 20, isNoEValid);
-        }
+            => BindableObject.IsIntegerFieldValid(preset, 1, 20, isNoEValid);
 
         public bool ValidateFrequency(int radio, string freq, bool isNoEValid = true)
-        {
-            // TODO: valid freqs are discrete, not continuous, need to check that as well
-            return radio switch
+            => radio switch
             {
+                // TODO: valid freqs are discrete, not continuous, need to check that as well
                 (int)Radios.COMM1 => BindableObject.IsDecimalFieldValid(freq, 30.0, 87.975, isNoEValid) ||
                                      BindableObject.IsDecimalFieldValid(freq, 108.0, 115.975, isNoEValid) ||
                                      BindableObject.IsDecimalFieldValid(freq, 118.0, 173.975, isNoEValid) ||
@@ -178,7 +169,6 @@ namespace JAFDTC.UI.FA18C
                                      BindableObject.IsDecimalFieldValid(freq, 225.0, 399.975, isNoEValid),
                 _ => false,
             };
-        }
 
         public string ValidateDefaultTuning(int radio, string value, bool isNoEValid = true)
         {
@@ -194,13 +184,9 @@ namespace JAFDTC.UI.FA18C
         }
 
         public string FixupPreset(int radio, string preset)
-        {
-            return BindableObject.FixupIntegerField(preset);
-        }
+            => BindableObject.FixupIntegerField(preset);
 
         public string FixupFrequency(int radio, string freq)
-        {
-            return BindableObject.FixupDecimalField(freq, "F3");
-        }
+            => BindableObject.FixupDecimalField(freq, "F3");
     }
 }

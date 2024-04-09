@@ -18,6 +18,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
+using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -81,6 +82,17 @@ namespace JAFDTC.UI.Base
         /// "aux 2" miscellaneous checkbox control, null if no such control is desired.
         /// </summary>
         public string RadioAux2Title(int radio);
+
+        /// <summary>
+        /// returns true if the radio has programmable per-preset modulation, false otherwise.
+        /// </summary>
+        public bool RadioCanProgramModulation(int radio);
+
+        /// <summary>
+        /// returns an List of TextBlock instances for the items in the modulation menu for the radio, null if there
+        /// is no modulation menu. the TextBlock Tag specifies the value for the Modulation property in the preset.
+        /// </summary>
+        public List<TextBlock> RadioModulationItems(int radio);
 
         /// <summary>
         /// returns the number of presets available to the indicated radio (specified by index within RadioNames).

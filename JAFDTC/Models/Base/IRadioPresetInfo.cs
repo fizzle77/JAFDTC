@@ -2,7 +2,7 @@
 //
 // IRadioPresetInfo.cs -- interface for a radio preset
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -20,7 +20,7 @@
 namespace JAFDTC.Models.Base
 {
     /// <summary>
-    /// interface for a basic radio preset that consists of a preset number, description, and frequency.
+    /// interface for a basic radio preset that consists of a preset number, description, frequency, and modulation.
     /// </summary>
     public interface IRadioPresetInfo
     {
@@ -33,6 +33,11 @@ namespace JAFDTC.Models.Base
         /// preset frequency
         /// </summary>
         public string Frequency { get; set; }
+
+        /// <summary>
+        /// preset modulation, if programmable
+        /// </summary>
+        public string Modulation { get; set; }
 
         /// <summary>
         /// preset description or name

@@ -2,7 +2,7 @@
 //
 // RadioPresetBase.cs : radio preset abstract base class
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,11 +18,12 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Utilities;
+using Windows.Devices.Input;
 
 namespace JAFDTC.Models.Base
 {
     /// <summary>
-    /// abstract base class for a radio preset with basic preset number, frequency, and description fields.
+    /// abstract base class for a radio preset with basic preset number, frequency, modulation, and description fields.
     /// </summary>
     public abstract class RadioPresetInfoBase : BindableObject, IRadioPresetInfo
     {
@@ -48,6 +49,13 @@ namespace JAFDTC.Models.Base
             set => SetProperty(ref _frequency, value, null);
         }
 
+        private string _modulation;
+        public string Modulation
+        {
+            get => _modulation;
+            set => SetProperty(ref _modulation, value, null);
+        }
+
         private string _description;
         public string Description
         {
@@ -61,7 +69,7 @@ namespace JAFDTC.Models.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public RadioPresetInfoBase() => (Preset, Frequency, Description) = (1, "", "");
+        public RadioPresetInfoBase() => (Preset, Frequency, Description, Modulation) = (1, "", "", "");
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -72,6 +80,6 @@ namespace JAFDTC.Models.Base
         /// <summary>
         /// reset the preset to default values. the preset number field is set to 1.
         /// </summary>
-        public virtual void Reset() => (Preset, Frequency, Description) = (1, "", "");
+        public virtual void Reset() => (Preset, Frequency, Description, Modulation) = (1, "", "", "");
     }
 }

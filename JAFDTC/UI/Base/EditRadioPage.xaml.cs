@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using Microsoft.UI.Dispatching;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -45,6 +46,12 @@ namespace JAFDTC.UI.Base
         public object Tag { get; set; }
 
         public int Radio { get; set; }
+
+        public Visibility ModulationVisibility
+            => NavHelper.RadioCanProgramModulation(Radio) ? Visibility.Visible : Visibility.Collapsed;
+
+        public List<TextBlock> ModulationItems
+            => NavHelper.RadioModulationItems(Radio);
 
         private string _description;
         public string Description
@@ -78,6 +85,13 @@ namespace JAFDTC.UI.Base
                 }
                 SetProperty(ref _frequency, value, error);
             }
+        }
+
+        private int _modulation;
+        public int Modulation
+        {
+            get => _modulation;
+            set => SetProperty(ref _modulation, value, null);
         }
 
         private bool _isEnabled;
