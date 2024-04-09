@@ -59,6 +59,7 @@ namespace JAFDTC.Models.F15E
             new MPDBuilder(_cfg, _dcsCmds, sb).Build();
             new MiscBuilder(_cfg, _dcsCmds, sb).Build();
             new STPTBuilder(_cfg, _dcsCmds, sb).Build();
+            new UFCBuilder(_cfg, _dcsCmds, sb).Build();
         }
     }
 }
