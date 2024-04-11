@@ -218,9 +218,11 @@ https://www.gnu.org/licenses/.
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      Text="{x:Bind Frequency, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                             <ComboBox Grid.Column="2" Width="72" Margin="6,1,0,0"
+                                      Tag="Modulation"
                                       Visibility="{x:Bind ModulationVisibility, Mode=OneWay}"
                                       ItemsSource="{x:Bind ModulationItems, Mode=OneWay}"
-                                      SelectedIndex="{x:Bind Modulation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                      SelectedIndex="{x:Bind ModulationIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectionChanged="PageModCombo_SelectionChanged"/>
                             <TextBox Grid.Column="3" Margin="6,0,0,0"
                                      VerticalAlignment="Center"
                                      HorizontalTextAlignment="Center"
@@ -254,21 +256,20 @@ https://www.gnu.org/licenses/.
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="56"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
-                           x:Name="uiMiscTextDefaultTitle"
                            VerticalAlignment="Center">
-                    FIXUP Initial Frequency/Preset
+                    Initial Freq./Preset
                 </TextBlock>
                 <TextBox Grid.Column="1" Margin="12,0,0,0"
                          x:Name="uiMiscValueDefaultFreq"
                          VerticalAlignment="Center"
+                         PlaceholderText="None Set"
                          MaxLength="7"
                          LostFocus="PageTextBox_LostFocus"
                          Text="{x:Bind EditMisc.DefaultTuning, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
@@ -277,7 +278,7 @@ https://www.gnu.org/licenses/.
                            VerticalAlignment="Center">
                     FIXUP
                 </TextBlock>
-                <CheckBox Grid.Column="4" Margin="24,0,8,0"
+                <CheckBox Grid.Column="3" Margin="24,0,0,0"
                           x:Name="uiMiscCkbxAux1"
                           IsChecked="{x:Bind EditMisc.IsAux1Enabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                           VerticalAlignment="Center"
@@ -287,7 +288,7 @@ https://www.gnu.org/licenses/.
                         FIXUP Aux1
                     </TextBlock>
                 </CheckBox>
-                <CheckBox Grid.Column="6" Margin="24,0,8,0"
+                <CheckBox Grid.Column="4" Margin="24,0,0,0"
                           x:Name="uiMiscCkbxAux2"
                           IsChecked="{x:Bind EditMisc.IsAux2Enabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                           VerticalAlignment="Center"
@@ -295,6 +296,16 @@ https://www.gnu.org/licenses/.
                     <TextBlock x:Name="uiMiscTextAux2"
                                VerticalAlignment="Center">
                         FIXUP Aux2
+                    </TextBlock>
+                </CheckBox>
+                <CheckBox Grid.Column="5" Margin="24,0,0,0"
+                          x:Name="uiMiscCkbxAux3"
+                          IsChecked="{x:Bind EditMisc.IsAux3Enabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                          VerticalAlignment="Center"
+                          Click="MiscCkbxAux3_Click">
+                    <TextBlock x:Name="uiMiscTextAux3"
+                               VerticalAlignment="Center">
+                        FIXUP Aux3
                     </TextBlock>
                 </CheckBox>
             </Grid>

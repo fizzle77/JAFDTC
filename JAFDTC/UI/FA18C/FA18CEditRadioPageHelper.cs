@@ -136,11 +136,13 @@ namespace JAFDTC.UI.FA18C
 
         public string RadioAux2Title(int radio)
             => null;
+        public string RadioAux3Title(int radio)
+            => null;
 
         public bool RadioCanProgramModulation(int radio)
             => false;
 
-        public List<TextBlock> RadioModulationItems(int radio)
+        public List<TextBlock> RadioModulationItems(int radio, string freq)
             => null;
 
         public int RadioMaxPresets(int radio)

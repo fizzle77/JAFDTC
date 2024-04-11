@@ -137,12 +137,15 @@ namespace JAFDTC.UI.F16C
             => null;
 
         public string RadioAux2Title(int radio)
-            => (radio == (int)Radios.COMM1) ? "Monitor Guard (243.0MHz)" : null;
+            => (radio == (int)Radios.COMM1) ? "Monitor Guard" : null;
+
+        public string RadioAux3Title(int radio)
+            => null;
 
         public bool RadioCanProgramModulation(int radio)
             => false;
 
-        public List<TextBlock> RadioModulationItems(int radio)
+        public List<TextBlock> RadioModulationItems(int radio, string freq)
             => null;
 
         public int RadioMaxPresets(int radio)

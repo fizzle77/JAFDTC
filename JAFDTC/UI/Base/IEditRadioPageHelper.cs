@@ -84,15 +84,22 @@ namespace JAFDTC.UI.Base
         public string RadioAux2Title(int radio);
 
         /// <summary>
+        /// retruns the string title to use on the indicated radio (specified by index within RadioNames) can for the
+        /// "aux 2" miscellaneous checkbox control, null if no such control is desired.
+        /// </summary>
+        public string RadioAux3Title(int radio);
+
+        /// <summary>
         /// returns true if the radio has programmable per-preset modulation, false otherwise.
         /// </summary>
         public bool RadioCanProgramModulation(int radio);
 
         /// <summary>
-        /// returns an List of TextBlock instances for the items in the modulation menu for the radio, null if there
-        /// is no modulation menu. the TextBlock Tag specifies the value for the Modulation property in the preset.
+        /// returns an List of TextBlock instances for the items in the modulation menu for a radio preset at the
+        /// given frequency, null if there is no modulation menu. the Tag for each TextBlock in the list specifies
+        /// the value for the Modulation property in the preset.
         /// </summary>
-        public List<TextBlock> RadioModulationItems(int radio);
+        public List<TextBlock> RadioModulationItems(int radio, string freq);
 
         /// <summary>
         /// returns the number of presets available to the indicated radio (specified by index within RadioNames).

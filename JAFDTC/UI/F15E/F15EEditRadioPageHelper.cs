@@ -145,7 +145,10 @@ namespace JAFDTC.UI.F15E
             => "Preset Mode";
 
         public string RadioAux2Title(int radio)
-            => "Monitor Guard (243.0MHz)";
+            => "Monitor Guard";
+
+        public string RadioAux3Title(int radio)
+            => null;
 
         public static bool RadioCanMonitorGuard(int radio)
             => true;
@@ -153,7 +156,7 @@ namespace JAFDTC.UI.F15E
         public bool RadioCanProgramModulation(int radio)
             => false;
 
-        public List<TextBlock> RadioModulationItems(int radio)
+        public List<TextBlock> RadioModulationItems(int radio, string freq)
             => null;
 
         public int RadioMaxPresets(int radio)
