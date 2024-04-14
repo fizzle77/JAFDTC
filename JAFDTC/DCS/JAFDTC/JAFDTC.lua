@@ -43,6 +43,8 @@ local cmdListIndex = 1
 local cmdCurCort = nil
 local cmdCurProgress = 0.0
 
+local whileTout = { }
+
 local markerVal = ""
 
 local tcpCmdServerSock = nil
@@ -123,10 +125,34 @@ end
 -- ---- command processing
 
 -- command processing functions take an array of commands (table) and index within the array of the current command.
--- each command array element has a "fn" key with the processor name (string) and an "arg" key with a table of
+-- each command array element has a "f" key with the processor name (string) and an "a" key with a table of
 -- arguments to the processor. processors return a (di, dt) tuple indicating the amount to advance the index to
 -- reach the next command and an optional duration (in ms) to pause before the next command. a di of 0 incidates the
 -- processor is not finished.
+
+function JAFDTC_Debug_Cmd_Args(list, index)
+    local args = list[index]["a"]
+    local output = "( "
+    local separator = ""
+    for k, v in pairs(args) do
+        if type(k) == "number" then
+            output = output .. separator .. "[" .. k .. "] = "
+        elseif type(k) == "string" then
+            output = output .. separator .. k .. " = "
+        else
+            output = output .. separator .. "???"
+        end
+        if type(v) == "number" then
+            output = output .. v
+        elseif type(v) == "string" then
+            output = output .. "\"" .. v .. "\""
+        else
+            output = output .. "<???>"
+        end
+        separator = ", "
+    end
+    return output .. " )"
+end
 
 -- cmd_actn(number dev, number code, number dn, number up = 0, number dt = 0)
 function JAFDTC_Cmd_Actn(list, index)
@@ -177,14 +203,24 @@ function JAFDTC_Cmd_EndIf(list, index)
     return 1, 0
 end
 
--- cmd_While(string cond, string prm0 = nil, string prm1 = nil)
+-- cmd_While(string cond, number tout = 0, string prm0 = nil, string prm1 = nil)
 function JAFDTC_Cmd_While(list, index)
     local args = list[index]["a"]
     local cond = args["cond"]
+    local tout = args["tout"] or 50
     local di = 1
 
+    if whileTout[index] == nil then
+        whileTout[index] = tout
+    else
+        whileTout[index] = whileTout[index] - 1
+    end
+
     local funcName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_CheckCondition_" .. cond;
-    if not _G[funcName](args["prm0"], args["prm1"]) then
+    if not _G[funcName](args["prm0"], args["prm1"]) or whileTout[index] == 0 then
+        if whileTout[index] == 0 then
+            JAFDTC_Log("ERROR: Timeout skips to EndWhile of While for " .. cond)
+        end
         for i = index + 1, #list do
             if list[i]["f"] == "EndWhile" and list[i]["a"]["cond"] == cond then
                 return (i + 1) - index, 0
@@ -267,7 +303,8 @@ function LuaExportBeforeNextFrame()
         if not cmdCurCort and cmdList then
             if cmdListIndex <= #cmdList then
                 local cmdName = "JAFDTC_Cmd_" .. cmdList[cmdListIndex]["f"]
-                JAFDTC_Log(string.format("[%.3f] Create [%d] %s", curTime, cmdListIndex, cmdName))
+                local cmdArgs = JAFDTC_Debug_Cmd_Args(cmdList, cmdListIndex)
+                JAFDTC_Log(string.format("[%.3f] Create [%d] %s%s", curTime, cmdListIndex, cmdName, cmdArgs))
                 cmdCurCort = coroutine.create(_G[cmdName])
             else
                 cmdList = nil
