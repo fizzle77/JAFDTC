@@ -23,6 +23,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.DCS
 {
@@ -288,6 +289,14 @@ namespace JAFDTC.Models.DCS
         // string adjustment methods
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// adjust a string by removing all non-alphanumeric characters. returns adjusted value.
+        /// </summary>
+        protected static string AdjustOnlyAlphaNum(string s)
+        {
+            return (string.IsNullOrEmpty(s)) ? s : Regex.Replace(s, "[^a-zA-Z0-9 ]", "");
+        }
 
         /// <summary>
         /// adjust a numeric string by removing all leading zeros. returns adjusted value.
