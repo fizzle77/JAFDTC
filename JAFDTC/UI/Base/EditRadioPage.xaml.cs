@@ -515,26 +515,27 @@ namespace JAFDTC.UI.Base
             if (item != null)
             {
                 List<TextBlock> newItems = NavHelper.RadioModulationItems(EditRadio, item.Frequency);
-                int newIndex = 0;
-                for (int i = 0; i < newItems.Count; i++)
+                if ((newItems != null) && (newItems.Count > 0)) 
                 {
-                    if (item.Modulation == (string)newItems[i].Tag)
+                    int newIndex = 0;
+                    for (int i = 0; i < newItems.Count; i++)
                     {
-                        Debug.WriteLine($"FOUND {i}");
-                        newIndex = i;
-                        break;
+                        if (item.Modulation == (string)newItems[i].Tag)
+                        {
+                            newIndex = i;
+                            break;
+                        }
                     }
-                }
 
-                item.ModulationItems = newItems;
-                ComboBox combo = FindComboForPresetItem(item);
-                if (combo != null)
-                {
-                    DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+                    item.ModulationItems = newItems;
+                    ComboBox combo = FindComboForPresetItem(item);
+                    if (combo != null)
                     {
-                        Debug.WriteLine($"{item.Frequency} : {item.ModulationIndex} --> {newIndex}");
-                        combo.SelectedIndex = newIndex;
-                    });
+                        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+                        {
+                            combo.SelectedIndex = newIndex;
+                        });
+                    }
                 }
             }
         }
