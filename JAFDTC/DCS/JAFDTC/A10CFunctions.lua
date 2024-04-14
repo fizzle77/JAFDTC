@@ -21,15 +21,49 @@ You should have received a copy of the GNU General Public License along with thi
 
 dofile(lfs.writedir() .. 'Scripts/JAFDTC/CommonFunctions.lua')
 
--- TODO: implement clickable cockpit and setup/configuration checks for warthog
+--[[
+local vhf_lut1 = {
+    ["0.0"] = "3",
+    ["0.15"] = "3",
+    ["0.20"] = "4",
+    ["0.25"] = "5",
+    ["0.30"] = "6",
+    ["0.35"] = "7",
+    ["0.40"] = "8",
+    ["0.45"] = "9",
+    ["0.50"] = "10",
+    ["0.55"] = "11",
+    ["0.60"] = "12",
+    ["0.65"] = "13",
+    ["0.70"] = "14",
+    ["0.75"] = "15"
+}
+
+local function getVhfFmFreqency()
+    local freq1 = vhf_lut1[string.format("%.2f",GetDevice(0):get_argument_value(157))]
+	if freq1 == nil then freq1 = " " end
+    local freq2 = string.format("%1.1f", GetDevice(0):get_argument_value(158)):sub(3)
+	if freq2 == nil then freq2 = " " end
+    local freq3 = string.format("%1.1f", GetDevice(0):get_argument_value(159)):sub(3)
+	if freq3 == nil then freq3 = " " end
+    local freq4 = string.format("%1.2f", GetDevice(0):get_argument_value(160)):sub(3)
+	if freq4 == nil then freq4 = "  " end
+
+    return freq1 .. freq2 .. "." .. freq3 .. freq4
+end
+--]]
 
 function JAFDTC_A10C_AfterNextFrame(params)
---[[
-    params["uploadCommand"] = "0"
-    params["incCommand"] = "0"
-    params["decCommand"] = "0"
-    params["showJAFDTCCommand"] = "0"
-    params["hideJAFDTCCommand"] = "0"
-    params["toggleJAFDTCCommand"] = "0"
-]]
+    local mainPanel = GetDevice(0);
+    local comSec = mainPanel:get_argument_value(532);           -- UFC_COM_SEC
+    local eccm = mainPanel:get_argument_value(535);             -- UFC_ECCM
+    local iff = mainPanel:get_argument_value(533);              -- UFC_IFF
+    local idmrt = mainPanel:get_argument_value(536);            -- UFC_IDM
+
+    -- for some reason, UFC_COM_SEC pushbutton activated state is -1, not 1 like the other buttons. dcs works in
+    -- strange and mysterious ways...
+    if iff == 1 then params["uploadCommand"] = "1" end
+    if comSec == -1 then params["incCommand"] = "1" end
+    if eccm == 1 then params["decCommand"] = "1" end
+    if idmrt == 1 then params["toggleJAFDTCCommand"] = "1" end
 end
