@@ -50,8 +50,6 @@ end
 
 function JAFDTC_F16CM_CheckCondition_CallSignChar2IsNot(letter)
     local table = JAFDTC_F16CM_GetDED();
-	JAFDTC_Log("callsign char 2")
-	JAFDTC_DebugDisplay(table)
     local value = table["CallSign Name char2_inv"] or "";
     if value ~= letter or str == "" then
         return true
