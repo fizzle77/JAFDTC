@@ -54,6 +54,7 @@ namespace JAFDTC.Models.A10C
 
         public override void BuildSystems(StringBuilder sb)
         {
+            new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
         }
     }
