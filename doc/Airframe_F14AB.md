@@ -1,4 +1,4 @@
-# JAFDTC: F-14A/B Tomcat Configurations
+# JAFDTC: Configuring F-14A/B Tomcat Airframes
 
 *Version 1.0.0-B.21 of 28-Jan-24*
 

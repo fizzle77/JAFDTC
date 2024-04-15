@@ -1,4 +1,4 @@
-# JAFDTC: F-15E Strike Eagle Configurations
+# JAFDTC: Configuring F-15E Strike Eagle Airframes
 
 *Version 1.0.0-B.21 of 28-Jan-24*
 

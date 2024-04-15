@@ -1,4 +1,4 @@
-# JAFDTC: Common Elements
+# JAFDTC: Common Elements Guide
 
 *Version 1.0.0-B.26 of 2-Apr-24*
 

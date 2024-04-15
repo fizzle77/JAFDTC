@@ -1,4 +1,4 @@
-# JAFDTC: Mirage M-2000C Configurations
+# JAFDTC: Configuring Mirage M-2000C Airframes
 
 *Version 1.0.0-B.21 of 28-Jan-24*
 

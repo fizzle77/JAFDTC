@@ -1,4 +1,4 @@
-# JAFDTC: F/A-18C Hornet Configurations
+# JAFDTC: Configuring F/A-18C Hornet Airframes
 
 *Version 1.0.0-B.21 of 28-Jan-24*
 

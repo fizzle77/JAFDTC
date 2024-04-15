@@ -1,10 +1,9 @@
-# JAFDTC: F-16C Viper Configurations
+# JAFDTC: Configuring F-16C Viper Airframes
 
 *Version 1.0.0-B.21 of 28-Jan-24*
 
 JAFDTC supports configuration of the following systems in the Viper,
 
-* Communications
 * Countermeasures
 * Datalink
 * HARM ALIC threat tables
@@ -12,10 +11,13 @@ JAFDTC supports configuration of the following systems in the Viper,
 * MFD formats across all master modes and initial format selections
 * Miscellaneous DED systems such as TACAN/ILS, ALOW, BNGO, BULL, LASR, and HMCS DED/UFC
   along with HMCS intensity
+* Radios
 * Steerpoints including OAP, VIP, and VRP reference points
 
 Each of these areas is covered in more depth below. See the
 [user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
+and the
+[common elements guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
 for more on the aspects of JAFDTC that are common to multiple airframes.
 
 # DCS Cockpit Interactions
@@ -25,23 +27,25 @@ for more on the aspects of JAFDTC that are common to multiple airframes.
 The Viper allows the user to operate JAFDTC from buttons in the cockpit without needing to go
 through the Windows UI. This is helpful for VR and other situations where you may not be able
 to interact with the JAFDTC window. To support this capabilty, JAFDTC reuses controls from
-the FLIR panel on the UFC that have no function in the the Block 50 Viper that DCS models,
+the FLIR panel on the UFC that have no function in the the Block 50 Viper that the module
+models.
 
 ![](images/Viper_UFC_JAFDTC.png)
 
 JAFDTC currently supports four functions from the Viper cockpit,
 
-* Pressing and briefly holding the **FLIR WX** button causes JAFDTC to load the currently
-  selected configuration into the jet. JAFDTC provides feedback during the upload according
-  to the **Upload Feedback**
+* **FLIR WX** &ndash; pressing and briefly holding this button causes JAFDTC to load the
+  currently selected F-16C configuration into the jet. JAFDTC provides feedback during
+  the upload according to the **Upload Feedback**
   [setting](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#settings).
-* Pressing the **FLIR Rocker Switch** moves changes the currently selected configuration. On
-  the first press, JAFDTC briefly displays the name of the currently selected configuration.
-  Subsequent presses step through the configuration list.
-* Setting the 3-position **FLIR GAIN/LVL/AUTO** switch to `GAIN` will keep the JAFDTC window
-  on top of the DCS window in the window stack.
-* Steeting the 3-position **FLIR GAIN/LVL/AUTO** switch to `LVL` will allow the JAFDTC window
-  to be below the DCS window in the window stack.
+* **FLIR Rocker Switch** &ndash; pressing the `UP` and `DOWN` sides of the rocker moves to the
+  previous and next configurations, respectively. On the first press, JAFDTC briefly displays
+  the name of the currently selected configuration. Subsequent presses step up or down through
+  the configuration list.
+* **FLIR GAIN/LVL/AUTO** to `GAIN` &ndash; keeps the JAFDTC window on top of the DCS
+  window in the window stack.
+* **FLIR GAIN/LVL/AUTO** to `LVL` &ndash; allows the JAFDTC window to be below the DCS
+  window in the window stack and does not force any particular ordering.
 
 Other functions may be implemented later.
 

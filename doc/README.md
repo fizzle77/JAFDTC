@@ -1,19 +1,18 @@
 # JAFDTC: User’s Guide
 
-*Version 1.0.0-B.26 of 2-Apr-24*
+*Version 1.0.0-B.29 of 15-Apr-24*
 
 _Just Another #%*@^!% DTC_ (JAFDTC) is a Windows application that allows you to upload data
 typically saved on a data cartridge, such as steerpoints/waypoints and other avionics setup,
 into a DCS model at the start of a flight.
 
-After reading through this overview and the
-[common elements](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
-document, the airframe-specific documentation provides additional details on the systems
+After reading through this user’s guide and the
+[common elements guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md), the airframe-specific documentation provides additional details on the systems
 JAFDTC can configuration for each supported airframe.
 
 | Airframe | Systems JAFDTC Can Configure |
 |:--------:|------------------------------|
-| [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | Waypoints
+| [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | Radios, Waypoints
 | [AV-8B Harrier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_AV8B.md) | Waypoints
 | [F-14A/B Tomcat](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F14AB.md) | Waypoints
 | [F-15E Strike Eagle](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F15E.md) | MPD/MPCD Formats, Radios, Steerpoints, Miscellaneous Systems
@@ -126,7 +125,7 @@ for more details.
 ## DCS Integration
 
 As a DTC, JAFDTC integrates with DCS. See
-[common elements](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
+[common elements guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
 for more details.
 
 ### Uploading Configurations to DCS
@@ -520,9 +519,9 @@ changes in the dialog, while “**Cancel**” will discard any changes.
 # What Now?
 
 Now that you have a basic familiarity with JAFDTC, you can take a look at the
-[common elements](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
-documentation that provides the next level of detail on JAFDTC, its operation, and its
-user interface. Following that documentation, reading the airframe-specific
+[common elements guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
+that provides the next level of detail on JAFDTC, its operation, and its user interface.
+Following that documentation, reading the airframe-specific
 [document](#jafdtc-users-guide)
 for the airframes you want to use JAFDTC with will cover any specifics related to the
 airframe.

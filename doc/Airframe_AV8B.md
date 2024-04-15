@@ -1,4 +1,4 @@
-# JAFDTC: AV-8B Harrier Configurations
+# JAFDTC: Configuring AV-8B Harrier Airframes
 
 *Version 1.0.0-B.21 of 28-Jan-24*
 
