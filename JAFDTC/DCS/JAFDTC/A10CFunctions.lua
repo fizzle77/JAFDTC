@@ -21,6 +21,29 @@ You should have received a copy of the GNU General Public License along with thi
 
 dofile(lfs.writedir() .. 'Scripts/JAFDTC/CommonFunctions.lua')
 
+function JAFDTC_A10C_GetCDU()
+	return JAFDTC_ParseDisplay(3)
+end
+
+function JAFDTC_A10C_CheckCondition_IsCoordFmtLL()
+    local table = JAFDTC_A10C_GetCDU();
+    local value = table["WAYPTCoordFormat"] or "---";
+    if string.sub(value, 1, 3) == "L/L" then
+        return true
+    end
+    return false
+end
+
+function JAFDTC_A10C_CheckCondition_IsCoordFmtNotLL()
+    local table = JAFDTC_A10C_GetCDU();
+    local value = table["WAYPTCoordFormat"] or "---";
+    if string.sub(value, 1, 3) ~= "L/L" then
+        JAFDTC_DebugDisplay(table)
+        return true
+    end
+    return false
+end
+
 --[[
 local vhf_lut1 = {
     ["0.0"] = "3",
