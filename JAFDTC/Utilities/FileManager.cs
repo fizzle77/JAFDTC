@@ -430,6 +430,7 @@ namespace JAFDTC.Utilities
             }
 
             string path = Path.Combine(_settingsDirPath, "Dbase");
+            Directory.CreateDirectory(path);
             foreach (string srcFile in Directory.GetFiles(path))
             {
                 string fileName = Path.GetFileName(srcFile);
