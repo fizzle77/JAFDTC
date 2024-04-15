@@ -63,6 +63,18 @@ and building the application using Microsoft
 The JAFDTC solution includes a project for the application itself along with a project based
 on the release build that packages the application into a `.msi` file.
 
+## Updating
+
+Generally, the safest way to update JAFDTC is to uninstall and reinstall. To do so,
+
+1. Uninstall JAFDTC via Windows `Add/Remove Programs`
+2. Check that there is no `51stVFW` directory in your `Program Files` directory or, if that
+   directory exists, it is empty. If not, delete the `51stVFW` directory
+3. Install the new version of JAFDTC by double-clicking on the `.msi` as described earlier.
+
+Technically, JAFDTC should support in-place updates; however, there have been reports of
+people having issues updating.
+
 ## Uninstalling
 
 The settings dialog in the JAFDTC program allows you to remove the DCS Lua support. The support
@@ -110,4 +122,6 @@ application.
 JAFDTC is based on code from
 [DCS-DTC](https://github.com/the-paid-actor/dcs-dtc),
 [DCSWE](https://github.com/51st-Vfw/DCSWaypointEditor),
+[DCSWaypointEditor](https://github.com/Santi871/DCSWaypointEditor),
+[DCS-BIOS](https://github.com/DCS-Skunkworks/dcs-bios)
 and a long line of similar tools that have been developed by the community over the years.
