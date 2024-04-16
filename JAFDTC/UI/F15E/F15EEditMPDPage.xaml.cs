@@ -20,7 +20,6 @@
 using JAFDTC.Models;
 using JAFDTC.Models.F15E;
 using JAFDTC.Models.F15E.MPD;
-using JAFDTC.Models.F16C.MFD;
 using JAFDTC.UI.App;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -457,7 +456,7 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void RebuildLinkControls()
         {
-            Utilities.RebuildLinkControls(Config, MFDSystem.SystemTag, NavArgs.UIDtoConfigMap,
+            Utilities.RebuildLinkControls(Config, MPDSystem.SystemTag, NavArgs.UIDtoConfigMap,
                                           uiPageBtnTxtLink, uiPageTxtLink);
         }
 
@@ -467,7 +466,7 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void RebuildEnableState()
         {
-            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(MFDSystem.SystemTag));
+            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(MPDSystem.SystemTag));
             foreach (KeyValuePair<string, Dictionary<string, ComboBox>> display in _formatComboMap)
             {
                 foreach (KeyValuePair<string, ComboBox> sequence in display.Value)
