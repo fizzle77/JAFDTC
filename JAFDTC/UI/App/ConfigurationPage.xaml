@@ -177,7 +177,7 @@ https://www.gnu.org/licenses/.
                               IsItemClickEnabled="True"
                               RightTapped="NavListEditors_RightTapped"
                               SelectionChanged="NavListEditors_SelectionChanged"
-                              ItemsSource="{x:Bind EditorPages, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              ItemsSource="{x:Bind EditorPages}"
                               ItemTemplate="{StaticResource NavListEditorsItemTemplate}">
                         <ListView.Resources>
                             <MenuFlyout x:Name="uiNavListEditorsCtxMenuFlyout">
@@ -203,7 +203,7 @@ https://www.gnu.org/licenses/.
                               SelectionMode="None"
                               IsItemClickEnabled="True"
                               ItemClick="NavListAuxCmd_ItemClick"
-                              ItemsSource="{x:Bind AuxCommands, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              ItemsSource="{x:Bind AuxCommands}"
                               ItemTemplate="{StaticResource NavListAuxItemTemplate}">
                     </ListView>
                     

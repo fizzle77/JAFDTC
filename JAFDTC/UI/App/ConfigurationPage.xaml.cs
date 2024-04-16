@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Windows.Devices.Bluetooth.Advertisement;
 using Windows.UI;
 
 namespace JAFDTC.UI.App
@@ -102,6 +103,8 @@ namespace JAFDTC.UI.App
     /// </summary>
     internal sealed class ConfigEditorPageNavArgs
     {
+        public ConfigurationPage ConfigPage {  get; }
+
         public IConfiguration Config { get; }
 
         public Dictionary<string, IConfiguration> UIDtoConfigMap { get; }
@@ -110,9 +113,9 @@ namespace JAFDTC.UI.App
 
         public AppBarButton BackButton { get; }
 
-        public ConfigEditorPageNavArgs(IConfiguration config, Type type, Dictionary<string, IConfiguration> map,
-                                       AppBarButton backButton)
-            => (Config, EditorHelperType, UIDtoConfigMap, BackButton) = (config, type, map, backButton);
+        public ConfigEditorPageNavArgs(ConfigurationPage cfgPage, IConfiguration cfg, Type type, Dictionary<string,
+                                       IConfiguration> map, AppBarButton backButton)
+            => (ConfigPage, Config, EditorHelperType, UIDtoConfigMap, BackButton) = (cfgPage, cfg, type, map, backButton);
     }
 
     // ================================================================================================================
@@ -128,6 +131,12 @@ namespace JAFDTC.UI.App
         // properties
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// AuxCommandInvoked event is raised when an aux command is invoked. the handler has a ConfigAuxCommandInfo
+        /// argument that describes the command invoked.
+        /// </summary>
+        public event EventHandler<ConfigAuxCommandInfo> AuxCommandInvoked;
 
         private JAFDTC.App CurApp { get; set; }
 
@@ -283,7 +292,7 @@ namespace JAFDTC.UI.App
             ConfigEditorPageInfo info = (ConfigEditorPageInfo)uiNavListEditors.SelectedItem;
             if (!IsRefreshingNavList && (info != null))
             {
-                ConfigEditorPageNavArgs navArgs = new(Config, info.EditorHelperType, UIDtoConfigMap, uiHdrBtnBack);
+                ConfigEditorPageNavArgs navArgs = new(this, Config, info.EditorHelperType, UIDtoConfigMap, uiHdrBtnBack);
                 ((Frame)uiNavSplitView.Content).Navigate(info.EditorPageType, navArgs);
                 Config.LastSystemEdited = uiNavListEditors.SelectedIndex;
             }
@@ -333,11 +342,17 @@ namespace JAFDTC.UI.App
         // ---- aux command list --------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// handle an auxilliary command by invoking the editor's HandleAuxCommand method. rebuild the contents of
+        /// the aux command list if requested. raises an AuxCommandInvoked event.
         /// </summary>
         private void NavListAuxCmd_ItemClick(object sender, ItemClickEventArgs args)
         {
-            ConfigEditor.HandleAuxCommand(this, (ConfigAuxCommandInfo)args.ClickedItem);
+            if (ConfigEditor.HandleAuxCommand(this, (ConfigAuxCommandInfo)args.ClickedItem))
+            {
+                AuxCommands = ConfigEditor.ConfigAuxCommandInfo();
+                uiNavListAuxCmd.ItemsSource = AuxCommands;
+            }
+            AuxCommandInvoked?.Invoke(this, (ConfigAuxCommandInfo)args.ClickedItem);
         }
 
         // ---- load to jet command list ------------------------------------------------------------------------------

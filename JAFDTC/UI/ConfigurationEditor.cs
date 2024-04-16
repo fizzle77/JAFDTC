@@ -108,7 +108,7 @@ namespace JAFDTC.UI
             };
         }
 
-        public virtual void HandleAuxCommand(ConfigurationPage configPage, ConfigAuxCommandInfo cmd) { }
+        public virtual bool HandleAuxCommand(ConfigurationPage configPage, ConfigAuxCommandInfo cmd) => false;
 
         // ------------------------------------------------------------------------------------------------------------
         //

@@ -315,7 +315,7 @@ namespace JAFDTC.UI.App
                 CurConfigEditing = config;
                 MainWindow mainWindow = (MainWindow)(Application.Current as JAFDTC.App)?.Window;
                 mainWindow.SetConfigFilterBoxVisibility(Visibility.Collapsed);
-                ConfigEditorPageNavArgs navArgs = new(config, null, ConfigList.UIDtoConfigMap, null);
+                ConfigEditorPageNavArgs navArgs = new(null, config, null, ConfigList.UIDtoConfigMap, null);
                 Frame.Navigate(typeof(ConfigurationPage), navArgs, new DrillInNavigationTransitionInfo());
             }
         }
