@@ -94,7 +94,7 @@ namespace JAFDTC.Models.M2000C
 
         public override void ConfigurationUpdated()
         {
-            M2000CConfigurationEditor editor = new();
+            M2000CConfigurationEditor editor = new(this);
             Dictionary<string, string> updatesStrings = editor.BuildUpdatesStrings(this);
 
             string stpts = "";

@@ -94,7 +94,7 @@ namespace JAFDTC.Models.F14AB
 
         public override void ConfigurationUpdated()
         {
-            F14ABConfigurationEditor editor = new();
+            F14ABConfigurationEditor editor = new(this);
             Dictionary<string, string> updatesStrings = editor.BuildUpdatesStrings(this);
 
             string stpts = "";

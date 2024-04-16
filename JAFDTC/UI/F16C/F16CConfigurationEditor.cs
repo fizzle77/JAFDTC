@@ -65,7 +65,7 @@ namespace JAFDTC.UI.F16C
                 F16CEditMiscPage.PageInfo
         };
 
-        public F16CConfigurationEditor() { }
+        public F16CConfigurationEditor(IConfiguration config) => (Config) = (config);
 
         public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo() => _configEditorPageInfo;
 

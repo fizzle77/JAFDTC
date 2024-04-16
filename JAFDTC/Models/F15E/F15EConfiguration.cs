@@ -120,7 +120,7 @@ namespace JAFDTC.Models.F15E
 
         public override void ConfigurationUpdated()
         {
-            F15EConfigurationEditor editor = new();
+            F15EConfigurationEditor editor = new(this);
             Dictionary<string, string> updatesStrings = editor.BuildUpdatesStrings(this);
 
             string stpts = "";

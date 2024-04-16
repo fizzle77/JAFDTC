@@ -138,7 +138,7 @@ namespace JAFDTC.Models.F16C
 
         public override void ConfigurationUpdated()
         {
-            F16CConfigurationEditor editor = new();
+            F16CConfigurationEditor editor = new(this);
             Dictionary<string, string> updatesStrings = editor.BuildUpdatesStrings(this);
 
             string stpts = "";

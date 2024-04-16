@@ -100,7 +100,7 @@ namespace JAFDTC.Models.A10C
 
         public override void ConfigurationUpdated()
         {
-            A10CConfigurationEditor editor = new();
+            A10CConfigurationEditor editor = new(this);
             Dictionary<string, string> updatesStrings = editor.BuildUpdatesStrings(this);
 
             string stpts = "";

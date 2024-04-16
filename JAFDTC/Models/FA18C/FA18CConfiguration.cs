@@ -106,7 +106,7 @@ namespace JAFDTC.Models.FA18C
 
         public override void ConfigurationUpdated()
         {
-            FA18CConfigurationEditor editor = new();
+            FA18CConfigurationEditor editor = new(this);
             Dictionary<string, string> updatesStrings = editor.BuildUpdatesStrings(this);
 
             string stpts = "";

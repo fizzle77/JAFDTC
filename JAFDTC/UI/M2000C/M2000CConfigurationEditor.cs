@@ -39,7 +39,7 @@ namespace JAFDTC.UI.M2000C
     /// </summary>
     public class M2000CConfigurationEditor : ConfigurationEditor
     {
-        public M2000CConfigurationEditor() { }
+        public M2000CConfigurationEditor(IConfiguration config) => (Config) = (config);
 
         public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo()
             => new()

@@ -53,7 +53,7 @@ namespace JAFDTC.UI.FA18C
             FA18CEditCMSPage.PageInfo,
         };
 
-        public FA18CConfigurationEditor() { }
+        public FA18CConfigurationEditor(IConfiguration config) => (Config) = (config);
 
         public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo() => _configEditorPageInfo;
 

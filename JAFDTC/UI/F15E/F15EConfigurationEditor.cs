@@ -59,7 +59,7 @@ namespace JAFDTC.UI.F15E
 
         public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo() => _configEditorPageInfo;
 
-        public F15EConfigurationEditor() { }
+        public F15EConfigurationEditor(IConfiguration config) => (Config) = (config);
 
         public override ISystem SystemForConfig(IConfiguration config, string tag)
         {

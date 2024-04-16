@@ -94,7 +94,7 @@ namespace JAFDTC.Models.AV8B
 
         public override void ConfigurationUpdated()
         {
-            AV8BConfigurationEditor editor = new();
+            AV8BConfigurationEditor editor = new(this);
             Dictionary<string, string> updatesStrings = editor.BuildUpdatesStrings(this);
 
             string stpts = "";

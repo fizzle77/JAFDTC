@@ -24,6 +24,7 @@ using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media;
 using System.Diagnostics;
 using Windows.UI;
+using static JAFDTC.UI.ConfigurationEditor;
 
 namespace JAFDTC.UI.App
 {
@@ -68,7 +69,7 @@ namespace JAFDTC.UI.App
                 txtBlock.TextHighlighters.Clear();
                 for (int index = 0; index < badges.Length; index++)
                 {
-                    if (badges[index] == JAFDTC.UI.Glyphs.Badge[0])
+                    if (badges[index] == CfgEditorGlyphs.Badge[0])
                     {
                         TextHighlighter highlighter = new()
                         {

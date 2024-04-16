@@ -39,7 +39,7 @@ namespace JAFDTC.UI.F14AB
     /// </summary>
     public class F14ABConfigurationEditor : ConfigurationEditor
     {
-        public F14ABConfigurationEditor() { }
+        public F14ABConfigurationEditor(IConfiguration config) => (Config) = (config);
 
         public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo()
             => new()

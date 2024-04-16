@@ -414,7 +414,7 @@ namespace JAFDTC.UI.App
             ConfigEditorPageNavArgs navArgs = (ConfigEditorPageNavArgs)args.Parameter;
             Config = navArgs.Config;
             UIDtoConfigMap = navArgs.UIDtoConfigMap;
-            ConfigEditor = ConfigurationEditor.Factory(Config.Airframe);
+            ConfigEditor = ConfigurationEditor.Factory(Config);
 
             Config.ConfigurationSaved += ConfigurationSavedHandler;
 

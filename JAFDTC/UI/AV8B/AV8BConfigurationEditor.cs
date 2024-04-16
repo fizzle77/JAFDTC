@@ -40,7 +40,7 @@ namespace JAFDTC.UI.AV8B
     /// </summary>
     public class AV8BConfigurationEditor : ConfigurationEditor
     {
-        public AV8BConfigurationEditor() { }
+        public AV8BConfigurationEditor(IConfiguration config) => (Config) = (config);
 
         public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo()
         {

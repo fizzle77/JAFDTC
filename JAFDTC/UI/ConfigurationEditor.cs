@@ -30,29 +30,30 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using JAFDTC.Utilities;
-using Windows.Devices.Radios;
-using Windows.ApplicationModel.Contacts;
 
 namespace JAFDTC.UI
 {
-    // defines the glyphs common to the ui for configuration editors.
-    //
-    public class Glyphs
-    {
-        public const string Badge = "\xF0B6";
-    }
-
     /// <summary>
     /// abstract base class for a configuration editor that implements IConfigurationEditor. the abstract base
     /// class provides a factory method to build concrete instances based on airframe.
     /// </summary>
     public abstract class ConfigurationEditor : IConfigurationEditor
     {
+        /// <summary>
+        /// defines the glyphs common to the ui for configuration editors.
+        /// </summary>
+        public class CfgEditorGlyphs
+        {
+            public const string Badge = "\xF0B6";
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // IConfigurationEditor
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        public IConfiguration Config { get; set; }
 
         public virtual ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo() => new();
 
@@ -84,7 +85,7 @@ namespace JAFDTC.UI
                     icons += $" {info.Glyph}";
                     if (config.SystemLinkedTo(info.Tag) != null)
                     {
-                        iconBadges += $" {Glyphs.Badge}";
+                        iconBadges += $" {CfgEditorGlyphs.Badge}";
                     }
                     else
                     {
@@ -116,22 +117,22 @@ namespace JAFDTC.UI
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// returns an instance of the configuration editor to use for a particular airframe. null if the airframe is
-        /// invalid or not supported.
+        /// returns an instance of the configuration editor to use for a particular configuration. null if the
+        /// configuration is invalid or for an unsupported airframe.
         /// </summary>
-        public static IConfigurationEditor Factory(AirframeTypes airframe)
+        public static IConfigurationEditor Factory(IConfiguration config)
         {
-            return airframe switch
+            return config.Airframe switch
             {
                 AirframeTypes.None => null,
-                AirframeTypes.A10C => new A10CConfigurationEditor(),
+                AirframeTypes.A10C => new A10CConfigurationEditor(config),
                 AirframeTypes.AH64D => null,
-                AirframeTypes.AV8B => new AV8BConfigurationEditor(),
-                AirframeTypes.F14AB => new F14ABConfigurationEditor(),
-                AirframeTypes.F16C => new F16CConfigurationEditor(),
-                AirframeTypes.F15E => new F15EConfigurationEditor(),
-                AirframeTypes.FA18C => new FA18CConfigurationEditor(),
-                AirframeTypes.M2000C => new M2000CConfigurationEditor(),
+                AirframeTypes.AV8B => new AV8BConfigurationEditor(config),
+                AirframeTypes.F14AB => new F14ABConfigurationEditor(config),
+                AirframeTypes.F16C => new F16CConfigurationEditor(config),
+                AirframeTypes.F15E => new F15EConfigurationEditor(config),
+                AirframeTypes.FA18C => new FA18CConfigurationEditor(config),
+                AirframeTypes.M2000C => new M2000CConfigurationEditor(config),
                 _ => null,
             };
         }

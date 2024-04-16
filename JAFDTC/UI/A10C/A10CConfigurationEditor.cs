@@ -42,7 +42,7 @@ namespace JAFDTC.UI.A10C
     /// </summary>
     public class A10CConfigurationEditor : ConfigurationEditor
     {
-        public A10CConfigurationEditor() { }
+        public A10CConfigurationEditor(IConfiguration config) => (Config) = (config);
 
         public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo()
             => new()
