@@ -154,6 +154,14 @@ function JAFDTC_Debug_Cmd_Args(list, index)
     return output .. " )"
 end
 
+-- cmd_abort(string msg)
+function JAFDTC_Cmd_Abort(list, index)
+    local args = list[index]["a"]
+
+    markerVal = args["msg"]
+    return (#list - index + 1), 0
+end
+
 -- cmd_actn(number dev, number code, number dn, number up = 0, number dt = 0)
 function JAFDTC_Cmd_Actn(list, index)
     local args = list[index]["a"]
@@ -308,6 +316,7 @@ function LuaExportBeforeNextFrame()
                 cmdCurCort = coroutine.create(_G[cmdName])
             else
                 cmdList = nil
+                JAFDTC_Log(string.format("[%.3f] Reached end of cmdList", curTime))
             end
         end
 
@@ -318,6 +327,7 @@ function LuaExportBeforeNextFrame()
                 JAFDTC_Log(string.format("[%.3f] ERROR: Resume [%d] %s failed", curTime, cmdListIndex, cmdName, curTime))
                 cmdList = nil
                 cmdCurCort = nil
+                markerVal = "ERROR: Command Failed"
             else
                 cmdListIndex = cmdListIndex + di
                 cmdResumeTime = curTime + (dt / 1000.0)
@@ -368,4 +378,9 @@ function LuaExportAfterNextFrame()
         '"CmdToggle": "' .. params["toggleJAFDTCCommand"] .. '"' ..
     "}"
     JAFDTC_UDPSockTx(udpTelemSockTx, udpTelemPortTx, txData)
+
+    if string.sub(markerVal, 1, #"ERROR:") == "ERROR:" then
+        JAFDTC_Log("Marker forced to empty after reporting " .. markerVal)
+        markerVal = ""
+    end
 end

@@ -111,6 +111,15 @@ namespace JAFDTC.Models.DCS
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// add an abort command to the command the builder is building.
+        /// </summary>
+        protected void AddAbort(string message)
+        {
+            string cmd = $"{{\"f\":\"Abort\",\"a\":{{\"msg\":\"{message}\"}}}},";
+            AddCommand(cmd);
+        }
+
+        /// <summary>
         /// add an action for the key to the command the builder is buidling.
         /// </summary>
         protected void AddAction(AirframeDevice device, string key, int dtWaitPost = WAIT_NONE)
