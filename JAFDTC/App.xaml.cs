@@ -100,6 +100,8 @@ namespace JAFDTC
 
         private bool DecPressed { get; set; }
 
+        private bool TogglePressed { get; set; }
+
         private long IncDecPressedTimestamp { get; set; }
 
         private long MarkerUpdateTimestamp { get; set; }
@@ -227,6 +229,7 @@ namespace JAFDTC
 
             LastDCSExportCheck = System.DateTimeOffset.Now;
             LastDCSExportPacketCount = 0;
+            TogglePressed = false;
             UploadPressedTimestamp = 0;
             IncDecPressedTimestamp = 0;
             MarkerUpdateTimestamp = 0;
@@ -402,10 +405,15 @@ namespace JAFDTC
         private void ProcessWindowStackCommand(TelemDataRx.TelemData data)
         {
             bool isUpdateWindowLayer = false;
-            if (data.CmdToggle == "1")
+            if (!TogglePressed && (data.CmdToggle == "1"))
             {
                 IsJAFDTCPinnedToTop = !IsJAFDTCPinnedToTop;
+                TogglePressed = true;
                 isUpdateWindowLayer = true;
+            }
+            else if (data.CmdToggle == "0")
+            {
+                TogglePressed = false;
             }
             else if (!IsJAFDTCPinnedToTop && (data.CmdShow == "1"))
             {
