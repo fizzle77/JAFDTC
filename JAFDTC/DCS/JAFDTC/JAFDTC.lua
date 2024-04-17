@@ -179,14 +179,14 @@ function JAFDTC_Cmd_RunFunc(list, index)
     return 1, 0
 end
 
--- cmd_if(string cond, string prm0 = nil, string prm1 = nil)
+-- cmd_if(string cond, string prm0 = nil, string prm1 = nil, string prm2 = nil)
 function JAFDTC_Cmd_If(list, index)
     local args = list[index]["a"]
     local cond = args["cond"]
     local di = 1
 
     local funcName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_CheckCondition_" .. cond;
-    if not _G[funcName](args["prm0"], args["prm1"]) then
+    if not _G[funcName](args["prm0"], args["prm1"], args["prm2"]) then
         for i = index + 1, #list do
             if list[i]["f"] == "EndIf" and list[i]["a"]["cond"] == cond then
                 return i - index, 0
@@ -203,7 +203,7 @@ function JAFDTC_Cmd_EndIf(list, index)
     return 1, 0
 end
 
--- cmd_While(string cond, number tout = 0, string prm0 = nil, string prm1 = nil)
+-- cmd_While(string cond, number tout = 0, string prm0 = nil, string prm1 = nil, string prm2 = nil)
 function JAFDTC_Cmd_While(list, index)
     local args = list[index]["a"]
     local cond = args["cond"]
@@ -217,7 +217,7 @@ function JAFDTC_Cmd_While(list, index)
     end
 
     local funcName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_CheckCondition_" .. cond;
-    if not _G[funcName](args["prm0"], args["prm1"]) or whileTout[index] == 0 then
+    if not _G[funcName](args["prm0"], args["prm1"], args["prm2"]) or whileTout[index] == 0 then
         if whileTout[index] == 0 then
             JAFDTC_Log("ERROR: Timeout skips to EndWhile of While for " .. cond)
         end
