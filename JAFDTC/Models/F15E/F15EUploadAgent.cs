@@ -53,8 +53,9 @@ namespace JAFDTC.Models.F15E
 
             public override void Build()
             {
-                // TODO: consider putting this back in. not clear we want to force cockpit changes if someone starts
-                // TODO: a wso configuration from the pilot seat
+                base.Build();
+
+                // TODO: not clear what the best way to handle this is? for now, abort on cockpit mismatches
 #if ENABLE_FORCE_COCKPIT_CHANGE
                 if (_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT)
                 {
@@ -65,6 +66,21 @@ namespace JAFDTC.Models.F15E
                     AddRunFunction("GoToRearCockpit");
                 }
                 AddWait(2 * WAIT_LONG);
+#else
+                if (_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT)
+                {
+                    AddIfBlock("IsInRearCockpit", null, delegate ()
+                    {
+                        AddAbort("ERROR: Configuration is for Pilot Seat");
+                    });
+                }
+                else if (_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO)
+                {
+                    AddIfBlock("IsInFrontCockpit", null, delegate ()
+                    {
+                        AddAbort("ERROR: Configuration is for WSO Seat");
+                    });
+                }
 #endif
             }
         }

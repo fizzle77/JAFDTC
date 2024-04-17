@@ -338,6 +338,18 @@ namespace JAFDTC
                 {
                     General.PlayAudio("ux_action.wav");
                 });
+                FileManager.Log($"Upload starts");
+            }
+            else if (IsUploadInFlight && data.Marker.StartsWith("ERROR: "))
+            {
+                Debug.WriteLine("  error");
+                IsUploadInFlight = false;
+                StatusMessageTx.Send(data.Marker.Remove(0, "ERROR: ".Length));
+                Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                {
+                    General.PlayAudio("ux_error.wav");
+                });
+                FileManager.Log($"Upload fails, reporting '{data.Marker}'");
             }
             else if (IsUploadInFlight &&
                      !string.IsNullOrEmpty(data.Marker) &&
@@ -363,6 +375,7 @@ namespace JAFDTC
                     await Task.Delay(100);
                     General.PlayAudio("ux_action.wav");
                 });
+                FileManager.Log($"Upload completes");
             }
         }
 
