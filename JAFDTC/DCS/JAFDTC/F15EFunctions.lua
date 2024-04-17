@@ -226,8 +226,8 @@ function JAFDTC_F15E_CheckCondition_IsDisplayNotInMainMenu(disp)
 	return true
 end
 
-local jafdtc_curNukeSwitchFront = 0
-local jafdtc_curNukeSwitchRear = 0
+local jafdtc_prevNucSwitchFront = "0"
+local jafdtc_prevNucSwitchRear = "0"
 
 function JAFDTC_F15E_AfterNextFrame(params)
 	local mainPanel = GetDevice(0);
@@ -238,23 +238,25 @@ function JAFDTC_F15E_AfterNextFrame(params)
 	local nucSwitchFront = mainPanel:get_argument_value(451);		-- F_NUC_N_CONS_CVR
 	local nucSwitchRear = mainPanel:get_argument_value(1402);		-- R_NUC_N_CONS_CVR
 
-	local isInc = 0
-	if (nucSwitchFront == 0 and jafdtc_curNukeSwitchFront == 1) or
-	   (nucSwitchRear == 0 and jafdtc_curNukeSwitchFront == 1) then
-		isInc = 1
-	end
-	local isDec = 0
-	if (nucSwitchFront == 0 and jafdtc_curNukeSwitchFront == -1) or
-	   (nucSwitchRear == 0 and jafdtc_curNukeSwitchFront == -1) then
-		isDec = 1
-	end
-	jafdtc_curNukeSwitchFront = nucSwitchFront
-	jafdtc_curNukeSwitchRear = nucSwitchRear
-
 	if ipButtonFront == 1 then params["uploadCommand"] = "1" end
 	if ipButtonRear == 1 then params["uploadCommand"] = "1" end
 	if emButtonFront == 1 then params["toggleJAFDTCCommand"] = "1" end
 	if emButtonRear == 1 then params["toggleJAFDTCCommand"] = "1" end
-	if isInc == 1 then params["incCommand"] = "1" end
-	if isDec == 1 then params["decCommand"] = "1" end
+	if jafdtc_prevNucSwitchFront == "0" then
+		if nucSwitchFront == 1  then
+			params["incCommand"] = "1"
+		elseif nucSwitchFront == -1 then
+			params["decCommand"] = "1"
+		end
+	end
+	if jafdtc_prevNucSwitchRear == "0" then
+		if nucSwitchRear == 1  then
+			params["incCommand"] = "1"
+		elseif nucSwitchRear == -1 then
+			params["decCommand"] = "1"
+		end
+	end
+
+	jafdtc_prevNucSwitchFront = string.format("%d", nucSwitchFront)
+	jafdtc_prevNucSwitchRear = string.format("%d", nucSwitchRear)
 end
