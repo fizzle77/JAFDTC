@@ -351,13 +351,15 @@ function LuaExportAfterNextFrame()
     params["toggleJAFDTCCommand"] = "0"
     pcall(_G[funcName], params)
 
-    -- TODO: consider pulling lat/lon/elev from telemetry?
     local txData = "{"..
         '"Model": "' .. model .. '",' ..
         '"Marker": "' .. markerTx .. '",' ..
+-- NOTE: exclude lat/lon/elev for now as its unused on the jafdtc side
+--[[
         '"Lat": "' .. coords.latitude .. '",' ..
         '"Lon": "' .. coords.longitude .. '",' ..
         '"Elev": "' .. elevation .. '",' ..
+--]]
         '"CmdUpload": "' .. params["uploadCommand"] .. '",' ..
         '"CmdIncr": "' .. params["incCommand"] .. '",' ..
         '"CmdDecr": "' .. params["decCommand"] .. '",' ..

@@ -76,9 +76,11 @@ namespace JAFDTC
 
         public IConfiguration CurrentConfig { get; set; }
 
+#if DCS_TELEM_INCLUDES_LAT_LON
         public double DCSLastLat { get; private set; }
 
         public double DCSLastLon { get; private set; }
+#endif
 
         // ---- private properties
 
@@ -224,8 +226,10 @@ namespace JAFDTC
         {
             InitializeComponent();
 
+#if DCS_TELEM_INCLUDES_LAT_LON
             DCSLastLat = 0.0;
             DCSLastLon = 0.0;
+#endif
 
             LastDCSExportCheck = System.DateTimeOffset.Now;
             LastDCSExportPacketCount = 0;
@@ -500,8 +504,11 @@ namespace JAFDTC
             {
                 DCSActiveAirframe = (_dcsToJAFDTCTypeMap.ContainsKey(data.Model)) ? _dcsToJAFDTCTypeMap[data.Model]
                                                                                   : AirframeTypes.None;
+
+#if DCS_TELEM_INCLUDES_LAT_LON
                 DCSLastLat = (double.TryParse(data.Lat, out double lat)) ? lat : 0.0;
                 DCSLastLon = (double.TryParse(data.Lat, out double lon)) ? lon : 0.0;
+#endif
 
                 ProcessMarker(data);
                 ProcessUploadCommand(data);

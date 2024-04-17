@@ -49,12 +49,14 @@ namespace JAFDTC.Utilities.Networking
 			public string Model { get; set; }               // active airframe
 
 			public string Marker { get; set; }              // marker from command stream
-			
-			public string Lat { get; set; }                 // active airframe position, latitude (dd)
+
+#if DCS_TELEM_INCLUDES_LAT_LON
+            public string Lat { get; set; }                 // active airframe position, latitude (dd)
 			
 			public string Lon { get; set; }                 // active airframe position, longitude (dd)
 
             public string Elev { get; set; }                // active airframe position, elevation (m)
+#endif
 
 			public string CmdUpload { get; set; }   		// cockpit control: upload configuration
             
