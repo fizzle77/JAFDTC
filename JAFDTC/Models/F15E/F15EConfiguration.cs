@@ -42,6 +42,15 @@ namespace JAFDTC.Models.F15E
     {
         private const string _versionCfg = "F15E-1.0";          // current version
 
+        /// <summary>
+        /// crew positions.
+        /// </summary>
+        public enum CrewPositions
+        {
+            PILOT = 0,
+            WSO = 1
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -57,6 +66,8 @@ namespace JAFDTC.Models.F15E
         public STPTSystem STPT { get; set; }
 
         public UFCSystem UFC { get; set; }
+
+        public CrewPositions CrewMember { get; set; }
 
         [JsonIgnore]
         public override IUploadAgent UploadAgent => new F15EUploadAgent(this);
@@ -75,6 +86,7 @@ namespace JAFDTC.Models.F15E
             Radio = new RadioSystem();
             STPT = new STPTSystem();
             UFC = new UFCSystem();
+            CrewMember = CrewPositions.PILOT;
             ConfigurationUpdated();
         }
 
@@ -93,6 +105,7 @@ namespace JAFDTC.Models.F15E
                 STPT = (STPTSystem)STPT.Clone(),
                 UFC = (UFCSystem)UFC.Clone()
             };
+            clone.CrewMember = CrewMember;
             clone.ResetUID();
             clone.ConfigurationUpdated();
             return clone;
@@ -123,6 +136,7 @@ namespace JAFDTC.Models.F15E
             F15EConfigurationEditor editor = new(this);
             Dictionary<string, string> updatesStrings = editor.BuildUpdatesStrings(this);
 
+            string seat = (CrewMember == CrewPositions.PILOT) ? "Pilot Seat: " : "WSO Seat: ";
             string stpts = "";
             if (!STPT.IsDefault)
             {
@@ -140,7 +154,7 @@ namespace JAFDTC.Models.F15E
                 string routePlural = (nRoutes > 1) ? "s" : "";
                 stpts = $" along with {STPT.Count} steerpoint{stptPlural} on {nRoutes} route{routePlural}";
             }
-            UpdatesInfoTextUI = updatesStrings["UpdatesInfoTextUI"] + stpts;
+            UpdatesInfoTextUI = seat + updatesStrings["UpdatesInfoTextUI"] + stpts;
             UpdatesIconsUI = updatesStrings["UpdatesIconsUI"];
             UpdatesIconBadgesUI = updatesStrings["UpdatesIconBadgesUI"];
         }

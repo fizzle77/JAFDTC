@@ -40,6 +40,8 @@ namespace JAFDTC.UI.F15E
         public const string RADIO = "\xE704";
         public const string STPT = "\xE707";
         public const string UFC = "\xF261";
+        public const string PILOT = "\xE806";
+        public const string WSO = "\xF272";
     }
 
     /// <summary>
@@ -57,7 +59,21 @@ namespace JAFDTC.UI.F15E
             F15EEditMiscPage.PageInfo,
         };
 
+        private static readonly ObservableCollection<ConfigAuxCommandInfo> _configAuxCmdPilot = new()
+        {
+            new("Pilot", "Pilot Seat", Glyphs.PILOT)
+        };
+
+        private static readonly ObservableCollection<ConfigAuxCommandInfo> _configAuxCmdWSO = new()
+        {
+            new("WSO", "WSO Seat", Glyphs.WSO)
+        };
+
         public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo() => _configEditorPageInfo;
+
+        public override ObservableCollection<ConfigAuxCommandInfo> ConfigAuxCommandInfo()
+            => (((F15EConfiguration)Config).CrewMember == F15EConfiguration.CrewPositions.PILOT) ? _configAuxCmdPilot
+                                                                                                 : _configAuxCmdWSO;
 
         public F15EConfigurationEditor(IConfiguration config) => (Config) = (config);
 
@@ -73,6 +89,15 @@ namespace JAFDTC.UI.F15E
                 _ => null,
             };
             return system;
+        }
+
+        public override bool HandleAuxCommand(ConfigurationPage configPage, ConfigAuxCommandInfo cmd)
+        {
+            F15EConfiguration cfgEagle = (F15EConfiguration)Config;
+            cfgEagle.CrewMember = (cfgEagle.CrewMember == F15EConfiguration.CrewPositions.PILOT)
+                ? F15EConfiguration.CrewPositions.WSO : F15EConfiguration.CrewPositions.PILOT;
+            // TODO: save?
+            return true;
         }
     }
 }

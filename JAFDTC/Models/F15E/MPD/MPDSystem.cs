@@ -27,14 +27,6 @@ namespace JAFDTC.Models.F15E.MPD
     {
         public const string SystemTag = "JAFDTC:F15E:MPD";
 
-        // crew positions
-        //
-        public enum CrewPositions
-        {
-            PILOT = 0,
-            WSO = 1
-        }
-
         // mpd/mpcd displays. this enum is used to index internal arrays and should be sequential.
         //
         public enum CockpitDisplays
@@ -61,8 +53,6 @@ namespace JAFDTC.Models.F15E.MPD
 
         public MPDConfiguration[] Displays { get; set; }
 
-        public string CurCrewPosition { get; set; }
-
         // ---- public properties, computed
 
         /// <summary>
@@ -87,12 +77,12 @@ namespace JAFDTC.Models.F15E.MPD
         /// <summary>
         /// returns true if the setup for the indicated crew member is default, false otherwise.
         /// </summary>
-        public bool IsCrewMemberDefault(CrewPositions member)
+        public bool IsCrewMemberDefault(F15EConfiguration.CrewPositions member)
         {
-            int min = (member == CrewPositions.PILOT) ? (int)CockpitDisplays.PILOT_L_MPD
-                                                      : (int)CockpitDisplays.WSO_L_MPCD;
-            int max = (member == CrewPositions.PILOT) ? (int)CockpitDisplays.PILOT_R_MPD
-                                                      : (int)CockpitDisplays.WSO_R_MPCD;
+            int min = (member == F15EConfiguration.CrewPositions.PILOT) ? (int)CockpitDisplays.PILOT_L_MPD
+                                                                        : (int)CockpitDisplays.WSO_L_MPCD;
+            int max = (member == F15EConfiguration.CrewPositions.PILOT) ? (int)CockpitDisplays.PILOT_R_MPD
+                                                                        : (int)CockpitDisplays.WSO_R_MPCD;
             for (int i = min; i <= max; i++)
             {
                 if (!Displays[i].IsDefault)
@@ -116,7 +106,6 @@ namespace JAFDTC.Models.F15E.MPD
             {
                 Displays[i] = new MPDConfiguration();
             }
-            CurCrewPosition = ((int)CrewPositions.PILOT).ToString();
         }
 
         public MPDSystem(MPDSystem other)
@@ -126,7 +115,6 @@ namespace JAFDTC.Models.F15E.MPD
             {
                 Displays[i] = new MPDConfiguration(other.Displays[i]);
             }
-            CurCrewPosition = other.CurCrewPosition;
         }
 
         public virtual object Clone() => new MPDSystem(this);
@@ -146,7 +134,6 @@ namespace JAFDTC.Models.F15E.MPD
             {
                 Displays[i].Reset();
             }
-            CurCrewPosition = ((int)CrewPositions.PILOT).ToString();
         }
     }
 }

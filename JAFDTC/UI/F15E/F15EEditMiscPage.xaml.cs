@@ -20,6 +20,7 @@
 using JAFDTC.Models;
 using JAFDTC.Models.F15E;
 using JAFDTC.Models.F15E.Misc;
+using JAFDTC.Models.F15E.MPD;
 using JAFDTC.UI.App;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -58,6 +59,8 @@ namespace JAFDTC.UI.F15E
         private F15EConfiguration Config { get; set; }
 
         private MiscSystem EditMisc { get; set; }
+
+        private F15EConfiguration.CrewPositions EditCrewMember { get; set; }
 
         private bool IsRebuildPending { get; set; }
 
@@ -120,6 +123,7 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void CopyConfigToEdit()
         {
+            EditCrewMember = Config.CrewMember;
             EditMisc.Bingo = Config.Misc.Bingo;
         }
 
@@ -201,7 +205,27 @@ namespace JAFDTC.UI.F15E
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// change the selected crew member and update various ui and model state.
+        /// </summary>
+        private void SelectCrewMember(F15EConfiguration.CrewPositions member)
+        {
+            if (member == (int)F15EConfiguration.CrewPositions.PILOT)
+            {
+                uiGridPilotRow.Visibility = Visibility.Visible;
+                uiGridWizzoRow.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                uiGridPilotRow.Visibility = Visibility.Collapsed;
+                uiGridWizzoRow.Visibility = Visibility.Visible;
+            }
+            EditCrewMember = member;
+            CopyEditToConfig(true);
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// rebuild the link controls on the page based on where the configuration is linked to.
         /// </summary>
         private void RebuildLinkControls()
         {
@@ -327,6 +351,15 @@ namespace JAFDTC.UI.F15E
         }
 
         /// <summary>
+        /// on aux command invoked, update the state of the editor based on the command.
+        /// </summary>
+        private void AuxCommandInvokedHandler(object sender, ConfigAuxCommandInfo args)
+        {
+            Config.Save(this, MPDSystem.SystemTag);
+            SelectCrewMember(Config.CrewMember);
+        }
+
+        /// <summary>
         /// on navigating to this page, set up our internal and ui state based on the configuration we are editing.
         /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
@@ -334,12 +367,15 @@ namespace JAFDTC.UI.F15E
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
             Config = (F15EConfiguration)NavArgs.Config;
 
+            NavArgs.ConfigPage.AuxCommandInvoked += AuxCommandInvokedHandler;
             Config.ConfigurationSaved += ConfigurationSavedHandler;
 
             Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, MiscSystem.SystemTag,
                                            _configNameList, _configNameToUID);
 
             CopyConfigToEdit();
+
+            SelectCrewMember(EditCrewMember);
 
             ValidateAllFields(_baseFieldValueMap, EditMisc.GetErrors(null));
             RebuildInterfaceState();
@@ -352,6 +388,7 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         protected override void OnNavigatedFrom(NavigationEventArgs args)
         {
+            NavArgs.ConfigPage.AuxCommandInvoked -= AuxCommandInvokedHandler;
             Config.ConfigurationSaved -= ConfigurationSavedHandler;
 
             base.OnNavigatedFrom(args);

@@ -32,11 +32,12 @@ dofile(lfs.writedir() .. 'Scripts/JAFDTC/commonFunctions.lua')
 -- 6 - ??
 -- 7 - Right MPD
 -- 8 - ??
--- 9 - UFC
+-- 9 - Front UFC
 -- 10 - RLMPCD
 -- 12 - RLMPD
 -- 14 - RRMPD
 -- 16 - RRMPCD
+-- 18 - Rear UFC
 
 function JAFDTC_F15E_GetFrontLeftMPD()
 	return JAFDTC_ParseDisplay(3)
@@ -66,8 +67,11 @@ function JAFDTC_F15E_GetRearRightMPCD()
 	return JAFDTC_ParseDisplay(16)
 end
 
-function JAFDTC_F15E_GetUFC()
-	return JAFDTC_ParseDisplay(9)
+function JAFDTC_F15E_GetUFC(disp)
+	if disp == "UFC_PILOT" then
+		return JAFDTC_ParseDisplay(9)		-- front ufc
+	end
+		return JAFDTC_ParseDisplay(18)		-- rear ufc
 end
 
 function JAFDTC_F15E_GetDisplay(disp)
@@ -129,8 +133,8 @@ function JAFDTC_F15E_CheckCondition_NoDisplaysProgrammed(disp)
     return false
 end
 
-function JAFDTC_F15E_CheckCondition_IsRadioPresetOrFreqSelected(radio, mode)
-	local table = JAFDTC_F15E_GetUFC();
+function JAFDTC_F15E_CheckCondition_IsRadioPresetOrFreqSelected(ufc, radio, mode)
+	local table = JAFDTC_F15E_GetUFC(ufc);
 	local radio1Preset = table["UFC_SC_06"] or "x";
 	local radio2Preset = table["UFC_SC_07"] or "x";
 	local radio1Freq = table["UFC_SC_05"] or "x";
@@ -153,8 +157,8 @@ function JAFDTC_F15E_CheckCondition_IsRadioPresetOrFreqSelected(radio, mode)
 	return false
 end
 
-function JAFDTC_F15E_CheckCondition_IsRadioGuardEnabledDisabled(radio, mode)
-	local table = JAFDTC_F15E_GetUFC();
+function JAFDTC_F15E_CheckCondition_IsRadioGuardEnabledDisabled(ufc, radio, mode)
+	local table = JAFDTC_F15E_GetUFC(ufc);
 	local radio1Freq = table["UFC_SC_05"] or "x";
 	local radio2Freq = table["UFC_SC_08"] or "x";
 	radio2Freq = radio2Freq:gsub("*", ""):gsub("%s+", "")
@@ -176,8 +180,8 @@ function JAFDTC_F15E_CheckCondition_IsRadioGuardEnabledDisabled(radio, mode)
 	return false
 end
 
-function JAFDTC_F15E_CheckCondition_IsTACANBand(band)
-	local table = JAFDTC_F15E_GetUFC();
+function JAFDTC_F15E_CheckCondition_IsTACANBand(ufc, band)
+	local table = JAFDTC_F15E_GetUFC(ufc);
 	local str = table["UFC_SC_01"] or "";
 	if str ~= "" and str.sub(str, -1) == band then
 		return true
@@ -185,8 +189,8 @@ function JAFDTC_F15E_CheckCondition_IsTACANBand(band)
 	return false
 end
 
-function JAFDTC_F15E_CheckCondition_IsStrDifferent(expected)
-	local table = JAFDTC_F15E_GetUFC();
+function JAFDTC_F15E_CheckCondition_IsStrDifferent(ufc, expected)
+	local table = JAFDTC_F15E_GetUFC(ufc);
 	local str = table["UFC_SC_01"] or "";
 	if str ~= expected then
 		return true

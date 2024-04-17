@@ -20,6 +20,7 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F15E.UFC;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
 
@@ -52,8 +53,30 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         public override void Build()
         {
-            AirframeDevice ufc = _aircraft.GetDevice("UFC_PILOT");
+            AirframeDevice ufcPilot = _aircraft.GetDevice("UFC_PILOT");
+            AirframeDevice ufcWizzo = _aircraft.GetDevice("UFC_WSO");
 
+            if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT) && !_cfg.UFC.IsDefault)
+            {
+                AddIfBlock("IsInFrontCockpit", null, delegate ()
+                {
+                    BuildUFCCore(ufcPilot);
+                });
+            }
+            if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO) && !_cfg.UFC.IsDefault)
+            {
+                AddIfBlock("IsInRearCockpit", null, delegate ()
+                {
+                    BuildUFCCore(ufcWizzo);
+                });
+            }
+        }
+
+        /// <summary>
+        /// core cockpit independent steerpoint setup.
+        /// </summary>
+        private void BuildUFCCore(AirframeDevice ufc)
+        {
             BuildCARA(ufc);
             BuildTACAN(ufc);
             BuildILS(ufc);
@@ -83,7 +106,7 @@ namespace JAFDTC.Models.F15E.Upload
                 AddActions(ufc, ActionsForString(_cfg.UFC.TACANChannel.ToString()), new() { "PB1" });
 
                 string band = (_cfg.UFC.TACANBandValue == UFCSystem.TACANBands.X) ? "Y" : "X";
-                AddIfBlock("IsTACANBand", new() { band }, delegate () { AddAction(ufc, "PB1"); });
+                AddIfBlock("IsTACANBand", new() { ufc.Name, band }, delegate () { AddAction(ufc, "PB1"); });
 
                 string modeButton = _cfg.UFC.TACANModeValue switch
                 {

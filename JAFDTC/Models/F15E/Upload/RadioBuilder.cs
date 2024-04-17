@@ -19,6 +19,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.DCS;
+using JAFDTC.Models.F15E.MPD;
 using JAFDTC.Models.F15E.Radio;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -53,36 +54,55 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         public override void Build()
         {
-            AirframeDevice ufc = _aircraft.GetDevice("UFC_PILOT");
-    
-            if (!_cfg.Radio.IsDefault)
+            AirframeDevice ufcPilot = _aircraft.GetDevice("UFC_PILOT");
+            AirframeDevice ufcWizzo = _aircraft.GetDevice("UFC_WSO");
+
+            if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT) && !_cfg.Radio.IsDefault)
             {
-                AddActions(ufc, new() { "CLR", "CLR", "CLR", "CLR", "MENU" });
-                BuildRadio(ufc, _cfg.Radio.Presets[(int)Radios.COMM1], "PB5", _cfg.Radio.IsCOMM1MonitorGuard,
-                           _cfg.Radio.IsCOMM1PresetMode, _cfg.Radio.COMM1DefaultTuning);
-
-                AddActions(ufc, new() { "CLR", "CLR", "CLR", "CLR", "MENU" });
-                BuildRadio(ufc, _cfg.Radio.Presets[(int)Radios.COMM2], "PB6", _cfg.Radio.IsCOMM2MonitorGuard,
-                           _cfg.Radio.IsCOMM2PresetMode, _cfg.Radio.COMM2DefaultTuning);
-
-                AddActions(ufc, new() { "CLR", "CLR", "CLR", "CLR", "MENU" });
+                AddIfBlock("IsInFrontCockpit", null, delegate ()
+                {
+                    BuildRadioCore(ufcPilot);
+                });
             }
+            if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO) && !_cfg.Radio.IsDefault)
+            {
+                AddIfBlock("IsInRearCockpit", null, delegate ()
+                {
+                    BuildRadioCore(ufcWizzo);
+                });
+            }
+        }
+
+        /// <summary>
+        /// core cockpit independent radio setup.
+        /// </summary>
+        private void BuildRadioCore(AirframeDevice ufc)
+        {
+            AddActions(ufc, new() { "CLR", "CLR", "CLR", "CLR", "MENU" });
+            BuildRadio(ufc, _cfg.Radio.Presets[(int)Radios.COMM1], "PB5", _cfg.Radio.IsCOMM1MonitorGuard,
+                       _cfg.Radio.IsCOMM1PresetMode, _cfg.Radio.COMM1DefaultTuning);
+
+            AddActions(ufc, new() { "CLR", "CLR", "CLR", "CLR", "MENU" });
+            BuildRadio(ufc, _cfg.Radio.Presets[(int)Radios.COMM2], "PB6", _cfg.Radio.IsCOMM2MonitorGuard,
+                       _cfg.Radio.IsCOMM2PresetMode, _cfg.Radio.COMM2DefaultTuning);
+
+            AddActions(ufc, new() { "CLR", "CLR", "CLR", "CLR", "MENU" });
         }
 
         private void BuildRadio(AirframeDevice ufc, ObservableCollection<RadioPreset> presets, string pb, bool isMonGuard,
                                 bool isPreMode, string dfltTuning)
         {
-            var isRadio1 = (pb == "PB5");
+            bool isRadio1 = (pb == "PB5");
 
             if (isPreMode)
             {
-                AddIfBlock("IsRadioPresetOrFreqSelected", new() { (isRadio1 ? "1" : "2"), "freq" }, delegate () {
+                AddIfBlock("IsRadioPresetOrFreqSelected", new() { ufc.Name, (isRadio1 ? "1" : "2"), "freq" }, delegate () {
                     AddAction(ufc, isRadio1 ? "GCML" : "GCMR");
                 });
             }
             else
             {
-                AddIfBlock("IsRadioPresetOrFreqSelected", new() { (isRadio1 ? "1" : "2"), "preset" }, delegate () {
+                AddIfBlock("IsRadioPresetOrFreqSelected", new() { ufc.Name, (isRadio1 ? "1" : "2"), "preset" }, delegate () {
                     AddAction(ufc, isRadio1 ? "GCML" : "GCMR");
                 });
             }
@@ -115,7 +135,7 @@ namespace JAFDTC.Models.F15E.Upload
             }
 
             string state = (isMonGuard) ? "disabled" : "enabled";
-            AddIfBlock("IsRadioGuardEnabledDisabled", new() { (isRadio1 ? "1" : "2"), state }, delegate () {
+            AddIfBlock("IsRadioGuardEnabledDisabled", new() { ufc.Name, (isRadio1 ? "1" : "2"), state }, delegate () {
                 AddActions(ufc, new() { "SHF", (isRadio1 ? "GCML" : "GCMR") });
             });
 
@@ -139,6 +159,9 @@ namespace JAFDTC.Models.F15E.Upload
             }
         }
 
+        /// <summary>
+        /// enter a frequency via the ufc.
+        /// </summary>
         private void InputFrequency(AirframeDevice ufc, string freq)
         {
             if (freq.Length == 6)

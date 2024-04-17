@@ -18,6 +18,7 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.DCS;
 using JAFDTC.Models.F15E.Upload;
 using System.Diagnostics;
 using System.Text;
@@ -30,6 +31,44 @@ namespace JAFDTC.Models.F15E
     /// </summary>
     public class F15EUploadAgent : UploadAgentBase, IUploadAgent
     {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // private classes
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// generates the command sequence for setup in the strike eagle. this includes making sure we're in the
+        /// proper seat.
+        /// </summary>
+        private class F15ESetupBuilder : CoreSetupBuilder, IBuilder
+        {
+            private readonly F15EConfiguration _cfg;
+
+            public F15ESetupBuilder(F15EConfiguration cfg, F15EDeviceManager dcsCmds, StringBuilder sb) 
+                : base(dcsCmds, sb)
+            {
+                _cfg = cfg;
+            }
+
+            public override void Build()
+            {
+                // TODO: consider putting this back in. not clear we want to force cockpit changes if someone starts
+                // TODO: a wso configuration from the pilot seat
+#if ENABLE_FORCE_COCKPIT_CHANGE
+                if (_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT)
+                {
+                    AddRunFunction("GoToFrontCockpit");
+                }
+                else if (_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO)
+                {
+                    AddRunFunction("GoToRearCockpit");
+                }
+                AddWait(2 * WAIT_LONG);
+#endif
+            }
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -61,5 +100,7 @@ namespace JAFDTC.Models.F15E
             new STPTBuilder(_cfg, _dcsCmds, sb).Build();
             new UFCBuilder(_cfg, _dcsCmds, sb).Build();
         }
+
+        public override IBuilder SetupBuilder(StringBuilder sb) => new F15ESetupBuilder(_cfg, _dcsCmds, sb);
     }
 }

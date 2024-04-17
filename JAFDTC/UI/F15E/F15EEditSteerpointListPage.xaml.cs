@@ -644,6 +644,13 @@ namespace JAFDTC.UI.F15E
         }
 
         /// <summary>
+        /// on aux command invoked, update the state of the editor based on the command.
+        /// </summary>
+        private void AuxCommandInvokedHandler(object sender, ConfigAuxCommandInfo args)
+        {
+        }
+
+        /// <summary>
         /// on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
         /// we are editing.
         ///
@@ -658,6 +665,7 @@ namespace JAFDTC.UI.F15E
             CopyConfigToEdit();
 
             NavArgs.BackButton.IsEnabled = true;
+            NavArgs.ConfigPage.AuxCommandInvoked += AuxCommandInvokedHandler;
 
             Config.ConfigurationSaved += ConfigurationSavedHandler;
             EditSTPT.Points.CollectionChanged += CollectionChangedHandler;
@@ -675,6 +683,7 @@ namespace JAFDTC.UI.F15E
 
         protected override void OnNavigatedFrom(NavigationEventArgs args)
         {
+            NavArgs.ConfigPage.AuxCommandInvoked -= AuxCommandInvokedHandler;
             Config.ConfigurationSaved -= ConfigurationSavedHandler;
             EditSTPT.Points.CollectionChanged -= CollectionChangedHandler;
             Clipboard.ContentChanged -= ClipboardChangedHandler;

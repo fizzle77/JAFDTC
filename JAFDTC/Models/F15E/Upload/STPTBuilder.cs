@@ -52,23 +52,38 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         public override void Build()
         {
-            ObservableCollection<SteerpointInfo> stpts = _cfg.STPT.Points;
-            AirframeDevice ufc = _aircraft.GetDevice("UFC_PILOT");
+            AirframeDevice ufcPilot = _aircraft.GetDevice("UFC_PILOT");
+            AirframeDevice ufcWizzo = _aircraft.GetDevice("UFC_WSO");
 
-            if (!_cfg.STPT.IsDefault)
+            if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT) && !_cfg.STPT.IsDefault)
             {
-                // TODO: fix this...
-                // AddIfBlock("GoToFrontCockpit", null, delegate() { });
-
-                AddActions(ufc, new() { "CLR", "CLR", "MENU", "SHF", "3", "PB10", "PB10" });
-
-                BuildSteerpoints(ufc, stpts);
-
-                string number = _cfg.STPT.Points[0].Number.ToString();
-                string route = RouteToPB(_cfg.STPT.Points[0].Route);
-
-                AddActions(ufc, new() { "CLR", "CLR", "MENU", number, "SHF", route, "PB10" });
+                AddIfBlock("IsInFrontCockpit", null, delegate ()
+                {
+                    BuildSteerpointCore(ufcPilot, _cfg.STPT.Points);
+                });
             }
+            if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO) && !_cfg.STPT.IsDefault)
+            {
+                AddIfBlock("IsInRearCockpit", null, delegate ()
+                {
+                    BuildSteerpointCore(ufcWizzo, _cfg.STPT.Points);
+                });
+            }
+        }
+
+        /// <summary>
+        /// core cockpit independent steerpoint setup.
+        /// </summary>
+        private void BuildSteerpointCore(AirframeDevice ufc, ObservableCollection<SteerpointInfo> stpts)
+        {
+            AddActions(ufc, new() { "CLR", "CLR", "MENU", "SHF", "3", "PB10", "PB10" });
+
+            BuildSteerpoints(ufc, stpts);
+
+            string number = _cfg.STPT.Points[0].Number.ToString();
+            string route = RouteToPB(_cfg.STPT.Points[0].Route);
+
+            AddActions(ufc, new() { "CLR", "CLR", "MENU", number, "SHF", route, "PB10" });
         }
 
         /// <summary>
@@ -84,17 +99,19 @@ namespace JAFDTC.Models.F15E.Upload
                     string routePB = RouteToPB(stpt.Route);
                     AddActions(ufc, ActionsForString(stptNum), new() { "SHF", routePB, "PB1" });
 
-                    // TODO: check this...
-                    AddIfBlock("IsStrDifferent", new() { $"STR {stptNum}{stpt.Route}" }, delegate()
+                    // TODO: check this, not clear what purpose it serves based on the manual...
+#if NOPE
+                    AddIfBlock("IsStrDifferent", new() { ufc.Name, $"STR {stptNum}{stpt.Route}" }, delegate()
                     {
                         AddActions(ufc, new() { "CLR", "CLR" });
                         AddActions(ufc, ActionsForString(stptNum), new() { ".", "SHF", routePB, "PB1" });
                     });
                     // TODO: check this...
-                    AddIfBlock("IsStrDifferent", new() { $"STR {stptNum}{stpt.Route}" }, delegate()
+                    AddIfBlock("IsStrDifferent", new() { ufc.Name, $"STR {stptNum}{stpt.Route}" }, delegate()
                     {
                         AddActions(ufc, ActionsForString(stptNum), new() { "SHF", routePB, "PB1" });
                     });
+#endif
 
                     if (stpt.IsTarget)
                     {

@@ -390,6 +390,13 @@ namespace JAFDTC.UI.F15E
         }
 
         /// <summary>
+        /// on aux command invoked, update the state of the editor based on the command.
+        /// </summary>
+        private void AuxCommandInvokedHandler(object sender, ConfigAuxCommandInfo args)
+        {
+        }
+
+        /// <summary>
         /// on navigating to this page, set up our internal and ui state based on the configuration we are editing.
         /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
@@ -397,6 +404,7 @@ namespace JAFDTC.UI.F15E
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
             Config = (F15EConfiguration)NavArgs.Config;
 
+            NavArgs.ConfigPage.AuxCommandInvoked += AuxCommandInvokedHandler;
             Config.ConfigurationSaved += ConfigurationSavedHandler;
 
             Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, UFCSystem.SystemTag,
@@ -415,6 +423,7 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         protected override void OnNavigatedFrom(NavigationEventArgs args)
         {
+            NavArgs.ConfigPage.AuxCommandInvoked -= AuxCommandInvokedHandler;
             Config.ConfigurationSaved -= ConfigurationSavedHandler;
 
             base.OnNavigatedFrom(args);

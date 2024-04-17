@@ -65,21 +65,19 @@ namespace JAFDTC.Models.F15E.Upload
                 [MPDSystem.CockpitDisplays.WSO_R_MPCD] = _aircraft.GetDevice("RRMPCD")
             };
 
-            if (!_cfg.MPD.IsCrewMemberDefault(MPDSystem.CrewPositions.PILOT))
+            if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT) &&
+                !_cfg.MPD.IsCrewMemberDefault(F15EConfiguration.CrewPositions.PILOT))
             {
                 AddIfBlock("IsInFrontCockpit", null, delegate ()
                 {
-                    AddRunFunction("GoToFrontCockpit");
-                    AddWait(2 * WAIT_LONG);
                     BuildDisplays(devMap, MPDSystem.CockpitDisplays.PILOT_L_MPD, MPDSystem.CockpitDisplays.PILOT_R_MPD);
                 });
             }
-            if (!_cfg.MPD.IsCrewMemberDefault(MPDSystem.CrewPositions.WSO))
+            else if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO) && 
+                     !_cfg.MPD.IsCrewMemberDefault(F15EConfiguration.CrewPositions.WSO))
             {
                 AddIfBlock("IsInRearCockpit", null, delegate ()
                 {
-                    AddRunFunction("GoToRearCockpit");
-                    AddWait(2 * WAIT_LONG);
                     BuildDisplays(devMap, MPDSystem.CockpitDisplays.WSO_L_MPCD, MPDSystem.CockpitDisplays.WSO_R_MPCD);
                 });
             }
@@ -209,152 +207,3 @@ namespace JAFDTC.Models.F15E.Upload
         }
     }
 }
-
-
-#if NOPE
-
-using DTC.New.Presets.V2.Aircrafts.F15E.Systems;
-using DTC.New.Uploader.Base;
-
-namespace DTC.New.Uploader.Aircrafts.F15E;
-
-public partial class F15EUploader : Base.Uploader
-{
-
-    private void ConfigureFrontDisplays()
-    {
-        if (config.Displays.Pilot.LeftMPD.FirstDisplay != Display.None)
-        {
-            BuildDisplay(FLMPD, config.Displays.Pilot.LeftMPD);
-        }
-
-        if (config.Displays.Pilot.RightMPD.FirstDisplay != Display.None)
-        {
-            BuildDisplay(FRMPD, config.Displays.Pilot.RightMPD);
-        }
-
-        if (config.Displays.Pilot.MPCD.FirstDisplay != Display.None)
-        {
-            BuildDisplay(FMPCD, config.Displays.Pilot.MPCD);
-        }
-    }
-
-    private void ConfigureRearDisplays()
-    {
-        if (config.Displays.WSO.LeftMPCD.FirstDisplay != Display.None)
-        {
-            BuildDisplay(RLMPCD, config.Displays.WSO.LeftMPCD);
-        }
-
-        if (config.Displays.WSO.LeftMPD.FirstDisplay != Display.None)
-        {
-            BuildDisplay(RLMPD, config.Displays.WSO.LeftMPD);
-        }
-
-        if (config.Displays.WSO.RightMPD.FirstDisplay != Display.None)
-        {
-            BuildDisplay(RRMPD, config.Displays.WSO.RightMPD);
-        }
-
-        if (config.Displays.WSO.RightMPCD.FirstDisplay != Display.None)
-        {
-            BuildDisplay(RRMPCD, config.Displays.WSO.RightMPCD);
-        }
-    }
-
-    private void BuildDisplay(Device display, DisplayConfig config)
-    {
-        NavigateToMainMenu(display);
-
-        StartIf(NoDisplaysProgrammed(display));
-        {
-            Cmd(display.GetCommand("PB06"));
-
-            SelectDisplay(display, config.FirstDisplay);
-
-            if (config.SecondDisplay != Display.None)
-            {
-                SelectDisplay(display, config.SecondDisplay);
-            }
-
-            if (config.ThirdDisplay != Display.None)
-            {
-                SelectDisplay(display, config.ThirdDisplay);
-            }
-
-            if (config.FirstDisplayMode != DisplayMode.None)
-            {
-                NavigateToDisplayMode(display, config.FirstDisplayMode);
-                SelectDisplay(display, config.FirstDisplay);
-                ExitDisplayMode(display, config.FirstDisplayMode);
-            }
-
-            if (config.SecondDisplayMode != DisplayMode.None)
-            {
-                NavigateToDisplayMode(display, config.SecondDisplayMode);
-                SelectDisplay(display, config.SecondDisplay);
-                ExitDisplayMode(display, config.SecondDisplayMode);
-            }
-
-            if (config.ThirdDisplayMode != DisplayMode.None)
-            {
-                NavigateToDisplayMode(display, config.ThirdDisplayMode);
-                SelectDisplay(display, config.ThirdDisplay);
-                ExitDisplayMode(display, config.ThirdDisplayMode);
-            }
-
-            Cmd(display.GetCommand("PB06"));
-
-            SelectDisplay(display, config.FirstDisplay, false);
-        }
-        EndIf();
-    }
-
-    private void NavigateToDisplayMode(Device device, DisplayMode displayMode)
-    {
-        Cmd(device.GetCommand("PB07"));
-
-        if (displayMode == DisplayMode.AG)
-        {
-            Cmd(device.GetCommand("PB07"));
-        }
-        if (displayMode == DisplayMode.NAV)
-        {
-            Cmd(device.GetCommand("PB07"));
-            Cmd(device.GetCommand("PB07"));
-        }
-    }
-
-    private void ExitDisplayMode(Device device, DisplayMode displayMode)
-    {
-        Cmd(device.GetCommand("PB07"));
-
-        if (displayMode == DisplayMode.AG)
-        {
-            Cmd(device.GetCommand("PB07"));
-        }
-        if (displayMode == DisplayMode.AA)
-        {
-            Cmd(device.GetCommand("PB07"));
-            Cmd(device.GetCommand("PB07"));
-        }
-    }
-
-
-    private Condition NoDisplaysProgrammed(Device display)
-    {
-        return new Condition($"NoDisplaysProgrammed('{display.Name}')");
-    }
-
-    private CustomCommand GoToFrontCockpit()
-    {
-        return new CustomCommand("GoToFrontCockpit()");
-    }
-
-    private CustomCommand GoToRearCockpit()
-    {
-        return new CustomCommand("GoToRearCockpit()");
-    }
-}
-
-#endif

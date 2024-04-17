@@ -53,7 +53,13 @@ namespace JAFDTC.Models.F15E.Upload
         {
             AirframeDevice fltInst = _aircraft.GetDevice("FLTINST");
 
-            BuildBingo(fltInst);
+            if (_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT)
+            {
+                AddIfBlock("IsInFrontCockpit", null, delegate ()
+                {
+                    BuildBingo(fltInst);
+                });
+            }
         }
 
         /// <summary>

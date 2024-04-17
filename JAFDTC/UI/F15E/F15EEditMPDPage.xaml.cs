@@ -57,7 +57,7 @@ namespace JAFDTC.UI.F15E
 
         private MPDSystem EditMPD { get; set; }
 
-        private int EditCrewMember { get; set; }
+        private F15EConfiguration.CrewPositions EditCrewMember { get; set; }
 
         private bool IsRebuildPending { get; set; }
 
@@ -241,7 +241,7 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void CopyConfigToEdit()
         {
-            EditCrewMember = (string.IsNullOrEmpty(Config.MPD.CurCrewPosition)) ? 0 : int.Parse(Config.MPD.CurCrewPosition);
+            EditCrewMember = Config.CrewMember;
             for (int i = 0; i < (int)MPDSystem.CockpitDisplays.NUM_DISPLAYS; i++)
             {
                 for (int j = 0; j < MPDConfiguration.NUM_SEQUENCES; j++)
@@ -257,7 +257,6 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         private void CopyEditToConfig(bool isPersist = false)
         {
-            Config.MPD.CurCrewPosition = EditCrewMember.ToString();
             for (int i = 0; i < (int)MPDSystem.CockpitDisplays.NUM_DISPLAYS; i++)
             {
                 for (int j = 0; j < MPDConfiguration.NUM_SEQUENCES; j++)
@@ -334,54 +333,21 @@ namespace JAFDTC.UI.F15E
         /// <summary>
         /// change the selected crew member and update various ui and model state.
         /// </summary>
-        private void SelectCrewMember(int member, bool isForce = false)
+        private void SelectCrewMember(F15EConfiguration.CrewPositions member)
         {
-            if ((member != EditCrewMember) || isForce)
+            if (member == (int)F15EConfiguration.CrewPositions.PILOT)
             {
-                if (member == (int)MPDSystem.CrewPositions.PILOT)
-                {
-                    uiGridPilotFormats.Visibility = Visibility.Visible;
-                    uiGridWizzoFormats.Visibility = Visibility.Collapsed;
-                }
-                else
-                {
-                    uiGridPilotFormats.Visibility = Visibility.Collapsed;
-                    uiGridWizzoFormats.Visibility = Visibility.Visible;
-                }
-                EditCrewMember = member;
-                CopyEditToConfig(true);
-                RebuildInterfaceState();
+                uiGridPilotFormats.Visibility = Visibility.Visible;
+                uiGridWizzoFormats.Visibility = Visibility.Collapsed;
             }
-        }
-
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private void RebuildCrewSelectMenu()
-        {
-            Visibility viz = Visibility.Collapsed;
-            for (int i = (int)MPDSystem.CockpitDisplays.PILOT_L_MPD; i <= (int)MPDSystem.CockpitDisplays.PILOT_R_MPD; i++)
+            else
             {
-                if (!EditMPD.Displays[i].IsDefault)
-                {
-                    viz = Visibility.Visible;
-                }
+                uiGridPilotFormats.Visibility = Visibility.Collapsed;
+                uiGridWizzoFormats.Visibility = Visibility.Visible;
             }
-            uiMemberSelectItem0Icon.Visibility = viz;
-            
-            viz = Visibility.Collapsed;
-            for (int i = (int)MPDSystem.CockpitDisplays.WSO_L_MPCD; i <= (int)MPDSystem.CockpitDisplays.WSO_R_MPCD; i++)
-            {
-                if (!EditMPD.Displays[i].IsDefault)
-                {
-                    viz = Visibility.Visible;
-                }
-            }
-            uiMemberSelectItem1Icon.Visibility = viz;
-
-            IsRebuildingUI = true;
-            uiMemberSelectCombo.SelectedIndex = EditCrewMember;
-            IsRebuildingUI = false;
+            EditCrewMember = member;
+            CopyEditToConfig(true);
+            RebuildInterfaceState();
         }
 
         /// <summary>
@@ -514,9 +480,6 @@ namespace JAFDTC.UI.F15E
 
             Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
             Utilities.SetEnableState(uiPageBtnReset, !EditMPD.IsDefault);
-
-            Utilities.SetEnableState(uiMemberPrevBtn, (EditCrewMember != (int)MPDSystem.CrewPositions.PILOT));
-            Utilities.SetEnableState(uiMemberNextBtn, (EditCrewMember != (int)MPDSystem.CrewPositions.WSO));
         }
 
         // rebuild the state of controls on the page in response to a change in the configuration.
@@ -529,7 +492,6 @@ namespace JAFDTC.UI.F15E
                 DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
                 {
                     IsRebuildingUI = true;
-                    RebuildCrewSelectMenu();
                     RebuildFormatSelects();
                     RebuildModeSelects();
                     RebuildLinkControls();
@@ -591,37 +553,7 @@ namespace JAFDTC.UI.F15E
             }
         }
 
-        // ---- crew member selection ---------------------------------------------------------------------------------
-
-        /// <summary>
-        /// previous member click: advance to previous crew member position
-        /// </summary>
-        private void BtnMemberPrev_Click(object sender, RoutedEventArgs args)
-        {
-            SelectCrewMember(EditCrewMember - 1);
-            uiMemberSelectCombo.SelectedIndex = EditCrewMember;
-        }
-
-        /// <summary>
-        /// next member click: advance to previous crew member position
-        /// </summary>
-        private void BtnMemberNext_Click(object sender, RoutedEventArgs args)
-        {
-            SelectCrewMember(EditCrewMember + 1);
-            uiMemberSelectCombo.SelectedIndex = EditCrewMember;
-        }
-
-        /// <summary>
-        /// member combo selection changed: switch crew member positions and update the ui
-        /// </summary>
-        private void MemberSelectCombo_SelectionChanged(object sender, RoutedEventArgs args)
-        {
-            Grid item = (Grid)((ComboBox)sender).SelectedItem;
-            if ((item != null) && (item.Tag != null))
-            {
-                SelectCrewMember(int.Parse((string)item.Tag));
-            }
-        }
+        // ---- format selection --------------------------------------------------------------------------------------
 
         /// <summary>
         /// format combo selection changed: determine which sequence on which display was updated and mirror the
@@ -714,6 +646,15 @@ namespace JAFDTC.UI.F15E
         }
 
         /// <summary>
+        /// on aux command invoked, update the state of the editor based on the command.
+        /// </summary>
+        private void AuxCommandInvokedHandler(object sender, ConfigAuxCommandInfo args)
+        {
+            Config.Save(this, MPDSystem.SystemTag);
+            SelectCrewMember(Config.CrewMember);
+        }
+
+        /// <summary>
         /// on navigating to this page, set up our internal and ui state based on the configuration we are editing.
         /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
@@ -721,6 +662,7 @@ namespace JAFDTC.UI.F15E
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
             Config = (F15EConfiguration)NavArgs.Config;
 
+            NavArgs.ConfigPage.AuxCommandInvoked += AuxCommandInvokedHandler;
             Config.ConfigurationSaved += ConfigurationSavedHandler;
 
             Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, MPDSystem.SystemTag,
@@ -728,7 +670,7 @@ namespace JAFDTC.UI.F15E
 
             CopyConfigToEdit();
 
-            SelectCrewMember(EditCrewMember, true);
+            SelectCrewMember(EditCrewMember);
             RebuildInterfaceState();
 
             base.OnNavigatedTo(args);
@@ -739,6 +681,7 @@ namespace JAFDTC.UI.F15E
         /// </summary>
         protected override void OnNavigatedFrom(NavigationEventArgs args)
         {
+            NavArgs.ConfigPage.AuxCommandInvoked -= AuxCommandInvokedHandler;
             Config.ConfigurationSaved -= ConfigurationSavedHandler;
 
             base.OnNavigatedFrom(args);
