@@ -44,7 +44,7 @@ namespace JAFDTC.Models.F16C
         /// </summary>
         private class F16CSetupBuilder : CoreSetupBuilder, IBuilder
         {
-            public F16CSetupBuilder(F16DeviceManager dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
+            public F16CSetupBuilder(F16CDeviceManager dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
 
             public override void Build()
             {
@@ -69,7 +69,7 @@ namespace JAFDTC.Models.F16C
         {
             private readonly F16CConfiguration _cfg;
 
-            public F16CTeardownBuilder(F16CConfiguration cfg, F16DeviceManager dcsCmds, StringBuilder sb)
+            public F16CTeardownBuilder(F16CConfiguration cfg, F16CDeviceManager dcsCmds, StringBuilder sb)
                 : base(dcsCmds, sb)
             {
                 _cfg = cfg;
@@ -97,7 +97,7 @@ namespace JAFDTC.Models.F16C
         // ------------------------------------------------------------------------------------------------------------
 
         private readonly F16CConfiguration _cfg;
-        private readonly F16DeviceManager _dcsCmds;
+        private readonly F16CDeviceManager _dcsCmds;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -105,7 +105,7 @@ namespace JAFDTC.Models.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F16CUploadAgent(F16CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new F16DeviceManager());
+        public F16CUploadAgent(F16CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new F16CDeviceManager());
 
         // ------------------------------------------------------------------------------------------------------------
         //

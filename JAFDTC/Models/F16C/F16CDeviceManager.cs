@@ -27,7 +27,7 @@ namespace JAFDTC.Models.F16C
     /// <summary>
     /// manages the set of dcs airframe devices and associated commands/actions for the viper.
     /// </summary>
-    internal class F16DeviceManager : AirframeDeviceManagerBase, IAirframeDeviceManager
+    internal class F16CDeviceManager : AirframeDeviceManagerBase, IAirframeDeviceManager
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -35,7 +35,7 @@ namespace JAFDTC.Models.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
         
-        public F16DeviceManager()
+        public F16CDeviceManager()
         {
             int delay = Settings.CommandDelaysMs[AirframeTypes.F16C];
             int delayMFDs = delay / 4;
