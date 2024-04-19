@@ -42,7 +42,7 @@ namespace JAFDTC.Models.F15E
         /// generates the command sequence for setup in the strike eagle. this includes making sure we're in the
         /// proper seat.
         /// </summary>
-        private sealed class F15ESetupBuilder : CoreSetupBuilder, IBuilder
+        private sealed class F15ESetupBuilder : CoreTeardownBuilder, IBuilder
         {
             private readonly F15EConfiguration _cfg;
 
@@ -115,7 +115,7 @@ namespace JAFDTC.Models.F15E
                         AddIfBlock("IsInFrontCockpit", null, delegate ()
                         {
                             AddDynamicAction(intl, "F_INTL_WARN_TEST", 0, 1);
-                            AddWait(2500);
+                            AddWait(2000);
                             AddDynamicAction(intl, "F_INTL_WARN_TEST", 1, 0);
                         });
                     }
@@ -125,7 +125,7 @@ namespace JAFDTC.Models.F15E
                         AddIfBlock("IsInRearCockpit", null, delegate ()
                         {
                             AddDynamicAction(intl, "R_INTL_WARN_TEST", 0, 1);
-                            AddWait(2500);
+                            AddWait(2000);
                             AddDynamicAction(intl, "R_INTL_WARN_TEST", 1, 0);
                         });
                     }

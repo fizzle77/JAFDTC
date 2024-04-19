@@ -42,7 +42,7 @@ namespace JAFDTC.Models.FA18C
         /// generates the command sequence for teardown in the strike eagle. this includes triggering light test
         /// feedback at the end of the sequence.
         /// </summary>
-        private sealed class FA18CTeardownBuilder : CoreSetupBuilder, IBuilder
+        private sealed class FA18CTeardownBuilder : CoreTeardownBuilder, IBuilder
         {
             private readonly FA18CConfiguration _cfg;
 
@@ -61,7 +61,7 @@ namespace JAFDTC.Models.FA18C
                 {
                     AirframeDevice intl = _aircraft.GetDevice("INTL");
                     AddDynamicAction(intl, "LIGHTS_TEST_SW", 0, 1);
-                    AddWait(2500);
+                    AddWait(2000);
                     AddDynamicAction(intl, "LIGHTS_TEST_SW", 1, 0);
                 }
             }

@@ -41,7 +41,7 @@ namespace JAFDTC.Models.A10C
         /// generates the command sequence for teardown in the warthog. this includes triggering light test feedback at
         /// the end of the sequence.
         /// </summary>
-        private sealed class A10CTeardownBuilder : CoreSetupBuilder, IBuilder
+        private sealed class A10CTeardownBuilder : CoreTeardownBuilder, IBuilder
         {
             private readonly A10CConfiguration _cfg;
 
@@ -60,7 +60,7 @@ namespace JAFDTC.Models.A10C
                 {
                     AirframeDevice intl = _aircraft.GetDevice("AUX_LTCTL");
                     AddDynamicAction(intl, "LAMP_TEST_BTN", 0, 1);
-                    AddWait(2500);
+                    AddWait(2000);
                     AddDynamicAction(intl, "LAMP_TEST_BTN", 1, 0);
                 }
             }

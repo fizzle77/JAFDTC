@@ -65,7 +65,7 @@ namespace JAFDTC.Models.F16C
         /// generates the command sequence for teardown in the strike eagle. this includes triggering light test
         /// feedback at the end of the sequence.
         /// </summary>
-        private sealed class F16CTeardownBuilder : CoreSetupBuilder, IBuilder
+        private sealed class F16CTeardownBuilder : CoreTeardownBuilder, IBuilder
         {
             private readonly F16CConfiguration _cfg;
 
@@ -84,7 +84,7 @@ namespace JAFDTC.Models.F16C
                 {
                     AirframeDevice intl = _aircraft.GetDevice("INTL");
                     AddDynamicAction(intl, "MAL_IND_LTS_TEST", 0, 1);
-                    AddWait(2500);
+                    AddWait(2000);
                     AddDynamicAction(intl, "MAL_IND_LTS_TEST", 1, 0);
                 }
             }
