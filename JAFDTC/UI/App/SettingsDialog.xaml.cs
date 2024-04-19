@@ -71,10 +71,19 @@ namespace JAFDTC.UI.App
 
             uiSetValueWingName.Text = WingName;
             uiSetValueCallsign.Text = Callsign;
-            uiSetComboFeedback.SelectedIndex = (int)UploadFeedback;
             uiSetCkbxNPIgnoresAirframe.IsChecked = IsNavPtImportIgnoreAirframe;
             uiSetCkbxRemainOnTop.IsChecked = IsAppOnTop;
             uiSetCkbxVersionCheck.IsChecked = !IsNewVersCheckDisabled;
+
+            for (int i = 0; i < uiSetComboFeedback.Items.Count; i++)
+            {
+                TextBlock tblk = (TextBlock)uiSetComboFeedback.Items[i];
+                if (UploadFeedback == (SettingsData.UploadFeedbackTypes)int.Parse((string)tblk.Tag))
+                {
+                    uiSetComboFeedback.SelectedIndex = i;
+                    break;
+                }
+            }
 
             if (DCSLuaManager.IsLuaInstalled())
             {
@@ -117,7 +126,8 @@ namespace JAFDTC.UI.App
             ComboBox cbox = (ComboBox)sender;
             if (cbox != null)
             {
-                UploadFeedback = (SettingsData.UploadFeedbackTypes)cbox.SelectedIndex;
+                TextBlock tblk = (TextBlock)cbox.SelectedItem;
+                UploadFeedback = (SettingsData.UploadFeedbackTypes)int.Parse((string)tblk.Tag);
             }
         }
 

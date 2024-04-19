@@ -51,7 +51,7 @@ https://www.gnu.org/licenses/.
             <TextBlock Width="120" VerticalAlignment="Center" HorizontalTextAlignment="Right">
                 Wing Name
             </TextBlock>
-            <TextBox Width="220" Margin="12,0,0,0"
+            <TextBox Width="228" Margin="12,0,0,0"
                      VerticalAlignment="Center"
                      x:Name="uiSetValueWingName"
                      LostFocus="SetValueWingName_LostFocus">
@@ -62,7 +62,7 @@ https://www.gnu.org/licenses/.
             <TextBlock Width="120" VerticalAlignment="Center" HorizontalTextAlignment="Right">
                 Callsign
             </TextBlock>
-            <TextBox Width="220" Margin="12,0,0,0"
+            <TextBox Width="228" Margin="12,0,0,0"
                      VerticalAlignment="Center"
                      x:Name="uiSetValueCallsign"
                      LostFocus="SetValueCallsign_LostFocus">
@@ -73,15 +73,17 @@ https://www.gnu.org/licenses/.
             <TextBlock Width="120" VerticalAlignment="Center" HorizontalTextAlignment="Right">
                 Upload Feedback
             </TextBlock>
-            <ComboBox Width="220" Margin="12,0,0,0"
+            <ComboBox Width="228" Margin="12,0,0,0"
                       x:Name="uiSetComboFeedback"
                       VerticalAlignment="Center"
                       SelectionChanged="SetComboFeedback_SelectionChanged">
                 <!-- tag is SettingsData.UploadFeedbackTypes enum -->
                 <ComboBox.Items>
                     <TextBlock Text="Audio Only" Tag="0"/>
-                    <TextBlock Text="Audio, Done Message" Tag="1"/>
-                    <TextBlock Text="Audio, Progress Messages" Tag="2"/>
+                    <TextBlock Text="Lights Test Only" Tag="4"/>
+                    <TextBlock Text="Audio &amp; Done Message" Tag="1"/>
+                    <TextBlock Text="Audio &amp; Progress Messages" Tag="2"/>
+                    <TextBlock Text="Audio &amp; Lights Test" Tag="3"/>
                 </ComboBox.Items>
 
             </ComboBox>

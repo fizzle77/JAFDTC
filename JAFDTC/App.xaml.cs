@@ -334,15 +334,17 @@ namespace JAFDTC
             {
                 IsUploadInFlight = true;
                 MarkerUpdateTimestamp = 0;
-                Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                if (Settings.UploadFeedback != UploadFeedbackTypes.LIGHTS)
                 {
-                    General.PlayAudio("ux_action.wav");
-                });
+                    Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                    {
+                        General.PlayAudio("ux_action.wav");
+                    });
+                }
                 FileManager.Log($"Upload starts");
             }
             else if (IsUploadInFlight && data.Marker.StartsWith("ERROR: "))
             {
-                Debug.WriteLine("  error");
                 IsUploadInFlight = false;
                 StatusMessageTx.Send(data.Marker.Remove(0, "ERROR: ".Length));
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
@@ -365,16 +367,20 @@ namespace JAFDTC
             else if (IsUploadInFlight && string.IsNullOrEmpty(data.Marker))
             {
                 IsUploadInFlight = false;
-                if (Settings.UploadFeedback != UploadFeedbackTypes.AUDIO)
+                if ((Settings.UploadFeedback == UploadFeedbackTypes.AUDIO_DONE) ||
+                    (Settings.UploadFeedback == UploadFeedbackTypes.AUDIO_PROGRESS))
                 {
                     StatusMessageTx.Send("Avionics Setup Complete");
                 }
-                Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, async () =>
+                if (Settings.UploadFeedback != UploadFeedbackTypes.LIGHTS)
                 {
-                    General.PlayAudio("ux_action.wav");
-                    await Task.Delay(100);
-                    General.PlayAudio("ux_action.wav");
-                });
+                    Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, async () =>
+                    {
+                        General.PlayAudio("ux_action.wav");
+                        await Task.Delay(100);
+                        General.PlayAudio("ux_action.wav");
+                    });
+                }
                 FileManager.Log($"Upload completes");
             }
         }

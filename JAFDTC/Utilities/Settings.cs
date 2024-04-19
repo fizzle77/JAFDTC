@@ -25,7 +25,6 @@ using System.Diagnostics;
 using static JAFDTC.Models.Base.NavpointInfoBase;
 using static JAFDTC.Utilities.SettingsData;
 
-
 namespace JAFDTC.Utilities
 {
     /// <summary>
@@ -41,7 +40,9 @@ namespace JAFDTC.Utilities
         {
             AUDIO = 0,
             AUDIO_DONE = 1,
-            AUDIO_PROGRESS = 2
+            AUDIO_PROGRESS = 2,
+            AUDIO_LIGHTS = 3,
+            LIGHTS = 4,
         };
 
         // ------------------------------------------------------------------------------------------------------------
@@ -143,7 +144,7 @@ namespace JAFDTC.Utilities
                 [AirframeTypes.AH64D] = 200,
                 [AirframeTypes.AV8B] = 200,
                 [AirframeTypes.F14AB] = 200,
-                [AirframeTypes.F15E] = 80,
+                [AirframeTypes.F15E] = 100,
                 [AirframeTypes.F16C] = 200,
                 [AirframeTypes.FA18C] = 200,
                 [AirframeTypes.M2000C] = 200,
