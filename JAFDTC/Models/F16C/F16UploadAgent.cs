@@ -20,6 +20,7 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C.Upload;
+using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text;
 
@@ -55,6 +56,37 @@ namespace JAFDTC.Models.F16C
                 AddIfBlock("RightHdptNotOn", null, delegate () { AddAction(sms, "RIGHT_HDPT"); });
 
                 // TODO: ensure cmds is on?
+            }
+        }
+
+        // ================================================================================================================
+
+        /// <summary>
+        /// generates the command sequence for teardown in the strike eagle. this includes triggering light test
+        /// feedback at the end of the sequence.
+        /// </summary>
+        private sealed class F16CTeardownBuilder : CoreSetupBuilder, IBuilder
+        {
+            private readonly F16CConfiguration _cfg;
+
+            public F16CTeardownBuilder(F16CConfiguration cfg, F16DeviceManager dcsCmds, StringBuilder sb)
+                : base(dcsCmds, sb)
+            {
+                _cfg = cfg;
+            }
+
+            public override void Build()
+            {
+                base.Build();
+
+                if ((Settings.UploadFeedback == SettingsData.UploadFeedbackTypes.AUDIO_LIGHTS) ||
+                    (Settings.UploadFeedback == SettingsData.UploadFeedbackTypes.LIGHTS))
+                {
+                    AirframeDevice intl = _aircraft.GetDevice("INTL");
+                    AddDynamicAction(intl, "MAL_IND_LTS_TEST", 0, 1);
+                    AddWait(2500);
+                    AddDynamicAction(intl, "MAL_IND_LTS_TEST", 1, 0);
+                }
             }
         }
 
@@ -98,5 +130,7 @@ namespace JAFDTC.Models.F16C
         }
 
         public override IBuilder SetupBuilder(StringBuilder sb) => new F16CSetupBuilder(_dcsCmds, sb);
+
+        public override IBuilder TeardownBuilder(StringBuilder sb) => new F16CTeardownBuilder(_cfg, _dcsCmds, sb);
     }
 }

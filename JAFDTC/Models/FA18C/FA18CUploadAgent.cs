@@ -18,7 +18,9 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.DCS;
 using JAFDTC.Models.FA18C.Upload;
+using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text;
 
@@ -30,6 +32,41 @@ namespace JAFDTC.Models.FA18C
     /// </summary>
     public class FA18CUploadAgent : UploadAgentBase, IUploadAgent
     {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // private classes
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// generates the command sequence for teardown in the strike eagle. this includes triggering light test
+        /// feedback at the end of the sequence.
+        /// </summary>
+        private sealed class FA18CTeardownBuilder : CoreSetupBuilder, IBuilder
+        {
+            private readonly FA18CConfiguration _cfg;
+
+            public FA18CTeardownBuilder(FA18CConfiguration cfg, FA18CDeviceManager dcsCmds, StringBuilder sb)
+                : base(dcsCmds, sb)
+            {
+                _cfg = cfg;
+            }
+
+            public override void Build()
+            {
+                base.Build();
+
+                if ((Settings.UploadFeedback == SettingsData.UploadFeedbackTypes.AUDIO_LIGHTS) ||
+                    (Settings.UploadFeedback == SettingsData.UploadFeedbackTypes.LIGHTS))
+                {
+                    AirframeDevice intl = _aircraft.GetDevice("INTL");
+                    AddDynamicAction(intl, "LIGHTS_TEST_SW", 0, 1);
+                    AddWait(2500);
+                    AddDynamicAction(intl, "LIGHTS_TEST_SW", 1, 0);
+                }
+            }
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -59,5 +96,7 @@ namespace JAFDTC.Models.FA18C
             new CMSBuilder(_cfg, _dcsCmds, sb).Build();
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
         }
+
+        public override IBuilder TeardownBuilder(StringBuilder sb) => new FA18CTeardownBuilder(_cfg, _dcsCmds, sb);
     }
 }

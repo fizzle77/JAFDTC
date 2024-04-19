@@ -47,7 +47,9 @@ namespace JAFDTC.Models.FA18C
             var delayIFEI = delay / 2;
             var delayRot = delay / 20;
 
-            var ufc = new AirframeDevice(25, "UFC");
+            // ---- ufc
+
+            AirframeDevice ufc = new(25, "UFC");
             ufc.AddAction(3001, "AP", delayUFC, 1);
             ufc.AddAction(3002, "IFF", delayUFC, 1);
             ufc.AddAction(3003, "TCN", delayUFC, 1);
@@ -81,13 +83,16 @@ namespace JAFDTC.Models.FA18C
             ufc.AddAction(3034, "COM2ChInc", -1, 2);
             AddDevice(ufc);
 
-            var ifei = new AirframeDevice(33, "IFEI");
+            // ---- ifei
+
+            AirframeDevice ifei = new(33, "IFEI");
             ifei.AddAction(3003, "UP", delayIFEI, 1);
             ifei.AddAction(3004, "DOWN", delayIFEI, 1);
             AddDevice(ifei);
 
-            var leftMFD = new AirframeDevice(35, "LMFD");
+            // ---- left mfd
 
+            AirframeDevice leftMFD = new(35, "LMFD");
             leftMFD.AddAction(3011, "OSB-01", delayMFDs, 1);
             leftMFD.AddAction(3012, "OSB-02", delayMFDs, 1);
             leftMFD.AddAction(3013, "OSB-03", delayMFDs, 1);
@@ -110,7 +115,9 @@ namespace JAFDTC.Models.FA18C
             leftMFD.AddAction(3030, "OSB-20", delayMFDs, 1);
             AddDevice(leftMFD);
 
-            var rightMFD = new AirframeDevice(36, "RMFD");
+            // ---- right mfd
+
+            AirframeDevice rightMFD = new(36, "RMFD");
             rightMFD.AddAction(3011, "OSB-01", delayMFDs, 1);
             rightMFD.AddAction(3012, "OSB-02", delayMFDs, 1);
             rightMFD.AddAction(3013, "OSB-03", delayMFDs, 1);
@@ -133,17 +140,27 @@ namespace JAFDTC.Models.FA18C
             rightMFD.AddAction(3030, "OSB-20", delayMFDs, 1);
             AddDevice(rightMFD);
 
-            var radarAltimeter = new AirframeDevice(30, "RadAlt");
+            // ---- radar altimeter
+
+            AirframeDevice radarAltimeter = new(30, "RadAlt");
             radarAltimeter.AddAction(3002, "Decrease", delayRot, -8);
             radarAltimeter.AddAction(3002, "Increase", delayRot, 0.015);
             radarAltimeter.AddAction(3001, "Test", delay, 1);
             AddDevice(radarAltimeter);
 
-            var cmds = new AirframeDevice(54, "CMDS");
+            // ---- cmds
+
+            AirframeDevice cmds = new(54, "CMDS");
             cmds.AddAction(3001, "ON", -1, 0.1);
             cmds.AddAction(3001, "OFF", -1, -1);
             cmds.AddAction(3001, "BYPASS", -1, 1);
             AddDevice(cmds);
+
+            // ---- interior lights
+
+            AirframeDevice intl = new(9, "INTL");
+            intl.AddAction(3007, "LIGHTS_TEST_SW", delay, 1);
+            AddDevice(intl);
         }
     }
 }

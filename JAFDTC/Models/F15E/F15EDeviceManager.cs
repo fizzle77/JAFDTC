@@ -39,6 +39,8 @@ namespace JAFDTC.Models.F15E
         {
             var delay = Settings.CommandDelaysMs[AirframeTypes.F15E];
 
+            // ---- front, ufc
+
             AirframeDevice ufcPilot = new(56, "UFC_PILOT");
             ufcPilot.AddAction(3001, "PB1", delay, 1);
             ufcPilot.AddAction(3002, "PB2", delay, 1);
@@ -72,6 +74,8 @@ namespace JAFDTC.Models.F15E
             ufcPilot.AddAction(3056, "PRESR", delay, 1);
             AddDevice(ufcPilot);
 
+            // ---- rear, ufc
+
             AirframeDevice ufcWizzo = new(57, "UFC_WSO");
             ufcWizzo.AddAction(3001, "PB1", delay, 1);
             ufcWizzo.AddAction(3002, "PB2", delay, 1);
@@ -104,6 +108,8 @@ namespace JAFDTC.Models.F15E
             ufcWizzo.AddAction(3055, "PRESL", delay, 1);
             ufcWizzo.AddAction(3056, "PRESR", delay, 1);
             AddDevice(ufcWizzo);
+
+            // ---- front, rear mpd/mpcd
 
             AirframeDevice frontMPCD = new(35, "FMPCD");
             AirframeDevice frontLeftMPD = new(34, "FLMPD");
@@ -152,10 +158,24 @@ namespace JAFDTC.Models.F15E
             AddDevice(rearRightMPD);
             AddDevice(rearRightMPCD);
 
+            // ---- front, flight instruments
+
             AirframeDevice fltInst = new(17, "FLTINST");
             fltInst.AddAction(3385, "BingoIncrease", 0, 0.1);
             fltInst.AddAction(3385, "BingoDecrease", 0, -0.1);
             AddDevice(fltInst);
+
+            // ---- front, interior lights
+
+            AirframeDevice intlPilot = new(23, "INTL_PILOT");
+            intlPilot.AddAction(3569, "F_INTL_WARN_TEST", delay, 1);
+            AddDevice(intlPilot);
+
+            // ---- rear, interior lights
+
+            AirframeDevice intlWizzo = new(23, "INTL_WSO");
+            intlWizzo.AddAction(3459, "R_INTL_WARN_TEST", delay, 1);
+            AddDevice(intlWizzo);
         }
     }
 }

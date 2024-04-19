@@ -20,6 +20,7 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F15E.Upload;
+using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text;
 
@@ -41,7 +42,7 @@ namespace JAFDTC.Models.F15E
         /// generates the command sequence for setup in the strike eagle. this includes making sure we're in the
         /// proper seat.
         /// </summary>
-        private class F15ESetupBuilder : CoreSetupBuilder, IBuilder
+        private sealed class F15ESetupBuilder : CoreSetupBuilder, IBuilder
         {
             private readonly F15EConfiguration _cfg;
 
@@ -85,6 +86,53 @@ namespace JAFDTC.Models.F15E
             }
         }
 
+        // ================================================================================================================
+
+        /// <summary>
+        /// generates the command sequence for teardown in the strike eagle. this includes triggering light test
+        /// feedback at the end of the sequence.
+        /// </summary>
+        private sealed class F15ETeardownBuilder : CoreSetupBuilder, IBuilder
+        {
+            private readonly F15EConfiguration _cfg;
+
+            public F15ETeardownBuilder(F15EConfiguration cfg, F15EDeviceManager dcsCmds, StringBuilder sb)
+                : base(dcsCmds, sb)
+            {
+                _cfg = cfg;
+            }
+
+            public override void Build()
+            {
+                base.Build();
+
+                if ((Settings.UploadFeedback == SettingsData.UploadFeedbackTypes.AUDIO_LIGHTS) ||
+                    (Settings.UploadFeedback == SettingsData.UploadFeedbackTypes.LIGHTS))
+                {
+                    if (_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT)
+                    {
+                        AirframeDevice intl = _aircraft.GetDevice("INTL_PILOT");
+                        AddIfBlock("IsInFrontCockpit", null, delegate ()
+                        {
+                            AddDynamicAction(intl, "F_INTL_WARN_TEST", 0, 1);
+                            AddWait(2500);
+                            AddDynamicAction(intl, "F_INTL_WARN_TEST", 1, 0);
+                        });
+                    }
+                    else if (_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO)
+                    {
+                        AirframeDevice intl = _aircraft.GetDevice("INTL_WSO");
+                        AddIfBlock("IsInRearCockpit", null, delegate ()
+                        {
+                            AddDynamicAction(intl, "R_INTL_WARN_TEST", 0, 1);
+                            AddWait(2500);
+                            AddDynamicAction(intl, "R_INTL_WARN_TEST", 1, 0);
+                        });
+                    }
+                }
+            }
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -118,5 +166,7 @@ namespace JAFDTC.Models.F15E
         }
 
         public override IBuilder SetupBuilder(StringBuilder sb) => new F15ESetupBuilder(_cfg, _dcsCmds, sb);
+
+        public override IBuilder TeardownBuilder(StringBuilder sb) => new F15ETeardownBuilder(_cfg, _dcsCmds, sb);
     }
 }

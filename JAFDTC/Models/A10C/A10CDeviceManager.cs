@@ -222,6 +222,12 @@ namespace JAFDTC.Models.A10C
             arc186.AddAction(3013, "VHFFM_FREQ3_DN", delay, -0.1);
             arc186.AddAction(3015, "VHFFM_FREQ4_DN", delay, -0.25);
             AddDevice(arc186);
+
+            // ---- aux light control
+
+            AirframeDevice auxLt = new(24, "AUX_LTCTL");
+            auxLt.AddAction(3002, "LAMP_TEST_BTN", delay, 1);
+            AddDevice(auxLt);
         }
     }
 }

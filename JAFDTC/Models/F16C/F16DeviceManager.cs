@@ -46,10 +46,14 @@ namespace JAFDTC.Models.F16C
             int delaySeq = delay;
             int delayRtn = delay;
 
+            // ---- sms
+
             AirframeDevice sms = new(22, "SMS");
             sms.AddAction(3002, "LEFT_HDPT", 0, 1);
             sms.AddAction(3003, "RIGHT_HDPT", 0, 1);
             AddDevice(sms);
+
+            // ---- ufc
 
             AirframeDevice ufc = new(17, "UFC");
             ufc.AddAction(3002, "0", 0, 1);
@@ -77,11 +81,15 @@ namespace JAFDTC.Models.F16C
             ufc.AddAction(3035, "DOWN", delayDown, -1);
             AddDevice(ufc);
 
+            // ---- hotas buttons
+
             AirframeDevice hotas = new(16, "HOTAS");
             hotas.AddAction(3030, "DGFT", 0, 1, 1);
             hotas.AddAction(3030, "MSL", 0, -1, -1);
             hotas.AddAction(3030, "CENTER", 0, 0, 0);
             AddDevice(hotas);
+
+            // ---- left mfd
 
             AirframeDevice leftMFD = new(24, "LMFD");
             leftMFD.AddAction(3012, "OSB-12-PG3", delayMFDs, 1);
@@ -104,6 +112,8 @@ namespace JAFDTC.Models.F16C
             leftMFD.AddAction(3020, "OSB-20-FCR", delayMFDs, 1);
             AddDevice(leftMFD);
 
+            // ---- right mfd
+
             AirframeDevice rightMFD = new(25, "RMFD");
             rightMFD.AddAction(3012, "OSB-12-PG3", delayMFDs, 1);
             rightMFD.AddAction(3013, "OSB-13-PG2", delayMFDs, 1);
@@ -125,13 +135,23 @@ namespace JAFDTC.Models.F16C
             rightMFD.AddAction(3020, "OSB-20-FCR", delayMFDs, 1);
             AddDevice(rightMFD);
 
+            // ---- ehsi
+
             AirframeDevice ehsi = new(28, "EHSI");
             ehsi.AddAction(3001, "MODE", delay, 1);
             AddDevice(ehsi);
 
+            // ---- hmcs panel
+
             AirframeDevice hmcsInt = new(30, "HMCS_INT");
             hmcsInt.AddAction(3001, "INT", 1, 0.0, 0.0);
             AddDevice(hmcsInt);
+
+            // ---- interior lights
+
+            AirframeDevice intl = new(12, "INTL");
+            intl.AddAction(3002, "MAL_IND_LTS_TEST", delay, 1);
+            AddDevice(intl);
         }
     }
 }

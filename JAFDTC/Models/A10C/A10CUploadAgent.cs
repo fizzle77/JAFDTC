@@ -18,6 +18,8 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.A10C.Upload;
+using JAFDTC.Models.DCS;
+using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text;
 
@@ -29,6 +31,41 @@ namespace JAFDTC.Models.A10C
     /// </summary>
     internal class A10CUploadAgent : UploadAgentBase, IUploadAgent
     {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // private classes
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// generates the command sequence for teardown in the warthog. this includes triggering light test feedback at
+        /// the end of the sequence.
+        /// </summary>
+        private sealed class A10CTeardownBuilder : CoreSetupBuilder, IBuilder
+        {
+            private readonly A10CConfiguration _cfg;
+
+            public A10CTeardownBuilder(A10CConfiguration cfg, A10CDeviceManager dcsCmds, StringBuilder sb)
+                : base(dcsCmds, sb)
+            {
+                _cfg = cfg;
+            }
+
+            public override void Build()
+            {
+                base.Build();
+
+                if ((Settings.UploadFeedback == SettingsData.UploadFeedbackTypes.AUDIO_LIGHTS) ||
+                    (Settings.UploadFeedback == SettingsData.UploadFeedbackTypes.LIGHTS))
+                {
+                    AirframeDevice intl = _aircraft.GetDevice("AUX_LTCTL");
+                    AddDynamicAction(intl, "LAMP_TEST_BTN", 0, 1);
+                    AddWait(2500);
+                    AddDynamicAction(intl, "LAMP_TEST_BTN", 1, 0);
+                }
+            }
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -57,5 +94,7 @@ namespace JAFDTC.Models.A10C
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
         }
+
+        public override IBuilder TeardownBuilder(StringBuilder sb) => new A10CTeardownBuilder(_cfg, _dcsCmds, sb);
     }
 }
