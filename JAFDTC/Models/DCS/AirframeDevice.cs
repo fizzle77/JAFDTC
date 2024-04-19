@@ -102,14 +102,19 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// return the dcs "action" command for an action customized with different ValueDn/ValueUp values.
+        /// return the dcs "action" command for an action customized with different ValueDn/ValueUp and delay values.
+        /// if a zero delay is specified, the base delay is used.
         /// </summary>
-        public string CustomizedDCSActionCommand(string name, double valueDn, double valueUp)
+        public string CustomizedDCSActionCommand(string name, int delay,
+                                                 bool isNewValues = false, double valueDn = 0, double valueUp = 0)
         {
             if (_actions.ContainsKey(name))
             {
                 Action baseAction = _actions[name];
-                return DCSActionCommand(new(baseAction.ID, baseAction.Name, baseAction.Delay, valueDn, valueUp));
+                delay = (delay > 0) ? delay : baseAction.Delay;
+                valueDn = (isNewValues) ? valueDn : baseAction.ValueUp;
+                valueUp = (isNewValues) ? valueUp : baseAction.ValueDn;
+                return DCSActionCommand(new(baseAction.ID, baseAction.Name, delay, valueDn, valueUp));
             }
             return "";
         }

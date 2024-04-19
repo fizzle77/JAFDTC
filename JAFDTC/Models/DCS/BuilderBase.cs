@@ -129,13 +129,22 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
+        /// add a action for the key to the command the builder is buidling. the action is updated to use the
+        /// specified delay between up and down rather than the base delay.
+        /// </summary>
+        protected void AddActionWithDelay(AirframeDevice device, string key, int delay)
+        {
+            AddCommand(device.CustomizedDCSActionCommand(key, delay));
+        }
+
+        /// <summary>
         /// add a dyamic action for the key to the command the builder is buidling. a dynamic action has
         /// caller-specified values for the up/down values. this allows programatic switching of controls from
         /// windows.
         /// </summary>
-        protected void AddDynamicAction(AirframeDevice device, string key, double valueDn, double valueUp)
+        protected void AddDynamicAction(AirframeDevice device, string key, double valueDn, double valueUp, int delay = 0)
         {
-            AddCommand(device.CustomizedDCSActionCommand(key, valueDn, valueUp));
+            AddCommand(device.CustomizedDCSActionCommand(key, delay, true, valueDn, valueUp));
         }
 
         /// <summary>
