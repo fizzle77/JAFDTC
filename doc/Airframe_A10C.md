@@ -1,6 +1,6 @@
 # JAFDTC: Configuring A-10C Warthog Airframes
 
-*Version 1.0.0-B.29 of 15-Apr-24*
+*Version 1.0.0-B.30 of 19-Apr-24*
 
 JAFDTC supports configuration of the following systems in the A-10C II Warthog,
 
@@ -32,14 +32,17 @@ JAFDTC currently supports four functions from the Hawg cockpit,
   currently selected A-10C configuration into the jet. JAFDTC provides feedback during the
   upload according to the **Upload Feedback**
   [setting](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#settings).
-* **COM SEC** &ndash; Changes the currently selected configuration to the previous configuration.
-  On the first press, JAFDTC briefly displays the name of the currently selected configuration.
-  Subsequent presses step up or down through the configuration list.
-* **ECCM** &ndash; Changes the currently selected configuration to the next configuration. On
-  the first press, JAFDTC briefly displays the name of the currently selected configuration.
-  Subsequent presses step up or down through the configuration list.
+* **COM SEC** &ndash; Changes the currently selected configuration on the
+  [Configuration List Page](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#configuration-list-page)
+  to the previous configuration.
+* **ECCM** &ndash; Changes the currently selected configuration on the
+  [Configuration List Page](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#configuration-list-page)
+  to the next configuration.
 * **IDM R/T** &ndash; Toggles pinning the JAFDTC window to the top of the window stack over the
   DCS window.
+
+The initial press of **COM SEC** or **ECCM** will briefly display the name of the currently
+selected configuration. Subsequent presses step up or down through the configuration list.
 
 Other functions may be implemented later.
 

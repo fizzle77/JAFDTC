@@ -1,6 +1,6 @@
 # JAFDTC: User’s Guide
 
-*Version 1.0.0-B.29 of 15-Apr-24*
+*Version 1.0.0-B.30 of 19-Apr-24*
 
 _Just Another #%*@^!% DTC_ (JAFDTC) is a Windows application that allows you to upload data
 typically saved on a data cartridge, such as steerpoints/waypoints and other avionics setup,
@@ -494,10 +494,14 @@ There are multiple controls in the settings,
   Some airframes also use this inforamtion for configuration.
 - **Upload Feedback** &ndash; Selects the type of feedback to provide during uploads,
   - *Audio Only* &ndash; Audio cues at the start and completion of upload.
-  - *Audio, Done Message* &ndash; Audio cues and an on-screen message in DCS indicating the
-    upload has finished.
-  - *Audio, Progress Messages* &ndash; Audio cues and an on-screen message in DCS indicating
-    the progress of the upload.
+  - *Lights Test Only* &ndash; Briefly triggers the "lamp test" function (on some select
+     airframes).
+  - *Audio &amp; Done Message* &ndash; Audio cues and an on-screen message in DCS indicating
+    the upload has finished.
+  - *Audio &amp; Progress Messages* &ndash; Audio cues and an on-screen message in DCS
+    indicating the progress of the upload.
+  - *Audio &amp; Light Test* &ndash; Audio cues and brief trigger of the "lamp test"
+    function (on some airframes).
 - **Navpoint Import Ignores Airframe** &ndash; When selected, importing navpoints from a
   [file](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md#importing-and-exporting-navigation-points)
   will not require the airframe in the file to match the airframe of the configuration.
