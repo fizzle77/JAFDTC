@@ -341,7 +341,7 @@ namespace JAFDTC
                         General.PlayAudio("ux_action.wav");
                     });
                 }
-                FileManager.Log($"Upload starts");
+                FileManager.Log($"Upload starts, marker '{data.Marker}'");
             }
             else if (IsUploadInFlight && data.Marker.StartsWith("ERROR: "))
             {
