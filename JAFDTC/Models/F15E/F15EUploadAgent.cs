@@ -42,7 +42,7 @@ namespace JAFDTC.Models.F15E
         /// generates the command sequence for setup in the strike eagle. this includes making sure we're in the
         /// proper seat.
         /// </summary>
-        private sealed class F15ESetupBuilder : CoreTeardownBuilder, IBuilder
+        private sealed class F15ESetupBuilder : CoreSetupBuilder, IBuilder
         {
             private readonly F15EConfiguration _cfg;
 
@@ -92,7 +92,7 @@ namespace JAFDTC.Models.F15E
         /// generates the command sequence for teardown in the strike eagle. this includes triggering light test
         /// feedback at the end of the sequence.
         /// </summary>
-        private sealed class F15ETeardownBuilder : CoreSetupBuilder, IBuilder
+        private sealed class F15ETeardownBuilder : CoreTeardownBuilder, IBuilder
         {
             private readonly F15EConfiguration _cfg;
 
