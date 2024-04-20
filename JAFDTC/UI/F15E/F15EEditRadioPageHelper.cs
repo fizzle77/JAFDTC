@@ -35,7 +35,7 @@ namespace JAFDTC.UI.F15E
     /// helper class for the generic configuration radio system editor, EditRadioPage. provides support for the
     /// uhf/vhf radios in the mudhen.
     /// </summary>
-    internal class F15EEditRadioPageHelper : BaseRadioPageHelper, IEditRadioPageHelper
+    internal class F15EEditRadioPageHelper : RadioPageHelperBase, IEditRadioPageHelper
     {
         public static ConfigEditorPageInfo PageInfo
             => new(RadioSystem.SystemTag, "Radios", "COMM", Glyphs.RADIO, typeof(EditRadioPage), typeof(F15EEditRadioPageHelper));

@@ -260,7 +260,6 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
@@ -307,16 +306,6 @@ https://www.gnu.org/licenses/.
                     <TextBlock x:Name="uiMiscTextAux3"
                                VerticalAlignment="Center">
                         FIXUP Aux3
-                    </TextBlock>
-                </CheckBox>
-                <CheckBox Grid.Column="6" Margin="24,0,0,0"
-                          x:Name="uiMiscCkbxAux4"
-                          IsChecked="{x:Bind EditMisc.IsAux4Enabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                          VerticalAlignment="Center"
-                          Click="MiscCkbxAux4_Click">
-                    <TextBlock x:Name="uiMiscTextAux4"
-                               VerticalAlignment="Center">
-                        FIXUP Aux4
                     </TextBlock>
                 </CheckBox>
             </Grid>

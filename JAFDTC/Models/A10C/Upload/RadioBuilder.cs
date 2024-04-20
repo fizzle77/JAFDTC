@@ -136,10 +136,8 @@ namespace JAFDTC.Models.A10C.Upload
             {
                 AddAction(ufc, "UFC_COM1_LONG");
             }
-            if (!radios.IsCOMM2StatusOnHUD)
-            {
-                AddAction(ufc, "UFC_COM2_LONG");
-            }
+            // Always hide COM2: it's unimplemented and just HUD clutter.
+            AddAction(ufc, "UFC_COM2_LONG");
         }
 
         /// <summary>

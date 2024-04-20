@@ -34,7 +34,7 @@ namespace JAFDTC.UI.F16C
     /// helper class for the generic configuration radio system editor, EditRadioPage. provides support for the uhf
     /// and vhf radios in the viper.
     /// </summary>
-    internal class F16CEditRadioPageHelper : BaseRadioPageHelper, IEditRadioPageHelper
+    internal class F16CEditRadioPageHelper : RadioPageHelperBase, IEditRadioPageHelper
     {
         public static ConfigEditorPageInfo PageInfo
             => new(RadioSystem.SystemTag, "Radios", "COMM", Glyphs.RADIO, typeof(EditRadioPage), typeof(F16CEditRadioPageHelper));

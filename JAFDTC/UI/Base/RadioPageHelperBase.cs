@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JAFDTC.UI.Base
 {
-    internal abstract class BaseRadioPageHelper
+    internal abstract class RadioPageHelperBase
     {
         public virtual string RadioAux1Title(int radio) => null;
 

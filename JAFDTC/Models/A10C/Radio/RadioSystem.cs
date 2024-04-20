@@ -59,8 +59,6 @@ namespace JAFDTC.Models.A10C.Radio
         // ---- public properties
 
         public bool IsCOMM1StatusOnHUD { get; set; }
-        
-        public bool IsCOMM2StatusOnHUD { get; set; }
 
         public bool[] IsMonitorGuard { get; set; }
 
@@ -88,7 +86,7 @@ namespace JAFDTC.Models.A10C.Radio
                         return false;
                     }
                 }
-                return IsCOMM1StatusOnHUD && IsCOMM2StatusOnHUD;
+                return IsCOMM1StatusOnHUD;
             }
         }
 
@@ -129,7 +127,6 @@ namespace JAFDTC.Models.A10C.Radio
                 Presets.Add(newPresets);
             }
             IsCOMM1StatusOnHUD = other.IsCOMM1StatusOnHUD;
-            IsCOMM2StatusOnHUD = other.IsCOMM2StatusOnHUD;
             IsMonitorGuard = new bool[(int)Radios.NUM_RADIOS]
             {
                 other.IsMonitorGuard[0],
@@ -168,7 +165,6 @@ namespace JAFDTC.Models.A10C.Radio
                 radio.Clear();
             }
             IsCOMM1StatusOnHUD = true;
-            IsCOMM2StatusOnHUD = true;
             IsMonitorGuard = new bool[(int)Radios.NUM_RADIOS] { false, false, false };
             IsPresetMode = new bool[(int)Radios.NUM_RADIOS] { false, false, false };
             DefaultSetting = new string[(int)Radios.NUM_RADIOS] { "", "", "" };

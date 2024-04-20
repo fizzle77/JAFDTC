@@ -73,7 +73,6 @@ namespace JAFDTC.UI.F16C
             {
                 editMisc.IsAux2Enabled = ((A10CConfiguration)config).Radio.IsMonitorGuard[radio];
                 editMisc.IsAux3Enabled = ((A10CConfiguration)config).Radio.IsCOMM1StatusOnHUD;
-                editMisc.IsAux4Enabled = ((A10CConfiguration)config).Radio.IsCOMM2StatusOnHUD;
             }
             else if (radio == (int)RadioSystem.Radios.COMM2)
             {
@@ -106,7 +105,6 @@ namespace JAFDTC.UI.F16C
             {
                 ((A10CConfiguration)config).Radio.IsMonitorGuard[radio] = editMisc.IsAux2Enabled;
                 ((A10CConfiguration)config).Radio.IsCOMM1StatusOnHUD = editMisc.IsAux3Enabled;
-                ((A10CConfiguration)config).Radio.IsCOMM2StatusOnHUD = editMisc.IsAux4Enabled;
             }
             else if (radio == (int)RadioSystem.Radios.COMM2)
             {
@@ -140,7 +138,6 @@ namespace JAFDTC.UI.F16C
                                       !((A10CConfiguration)config).Radio.IsPresetMode[radio] &&
                                       !((A10CConfiguration)config).Radio.IsMonitorGuard[radio] &&
                                       ((A10CConfiguration)config).Radio.IsCOMM1StatusOnHUD &&
-                                      ((A10CConfiguration)config).Radio.IsCOMM2StatusOnHUD &&
                                       string.IsNullOrEmpty(((A10CConfiguration)config).Radio.DefaultSetting[radio])),
                 (int)Radios.COMM2 => ((((A10CConfiguration)config).Radio.Presets[radio].Count == 0) &&
                                       !((A10CConfiguration)config).Radio.IsPresetMode[radio] &&
@@ -176,13 +173,6 @@ namespace JAFDTC.UI.F16C
             => radio switch
             {
                 (int)RadioSystem.Radios.COMM1 => "COM1 on HUD",
-                _ => null
-            };
-
-        public string RadioAux4Title(int radio)
-            => radio switch
-            {
-                (int)RadioSystem.Radios.COMM1 => "COM2 on HUD",
                 _ => null
             };
 
