@@ -80,10 +80,7 @@ namespace JAFDTC.Models.F15E.Upload
 
             BuildSteerpoints(ufc, stpts);
 
-            string number = _cfg.STPT.Points[0].Number.ToString();
-            string route = RouteToPB(_cfg.STPT.Points[0].Route);
-
-            AddActions(ufc, new() { "CLR", "CLR", "MENU", number, "SHF", route, "PB10" });
+            AddActions(ufc, new() { "CLR", "CLR", "MENU", "SHF", "3", "PB10" });
         }
 
         /// <summary>
@@ -100,18 +97,15 @@ namespace JAFDTC.Models.F15E.Upload
                     AddActions(ufc, ActionsForString(stptNum), new() { "SHF", routePB, "PB1" });
 
                     // TODO: check this, not clear what purpose it serves based on the manual...
-#if NOPE
                     AddIfBlock("IsStrDifferent", new() { ufc.Name, $"STR {stptNum}{stpt.Route}" }, delegate()
                     {
                         AddActions(ufc, new() { "CLR", "CLR" });
                         AddActions(ufc, ActionsForString(stptNum), new() { ".", "SHF", routePB, "PB1" });
                     });
-                    // TODO: check this...
                     AddIfBlock("IsStrDifferent", new() { ufc.Name, $"STR {stptNum}{stpt.Route}" }, delegate()
                     {
                         AddActions(ufc, ActionsForString(stptNum), new() { "SHF", routePB, "PB1" });
                     });
-#endif
 
                     if (stpt.IsTarget)
                     {
