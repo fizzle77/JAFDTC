@@ -85,9 +85,15 @@ namespace JAFDTC.UI.Base
 
         /// <summary>
         /// retruns the string title to use on the indicated radio (specified by index within RadioNames) can for the
-        /// "aux 2" miscellaneous checkbox control, null if no such control is desired.
+        /// "aux 3" miscellaneous checkbox control, null if no such control is desired.
         /// </summary>
         public string RadioAux3Title(int radio);
+
+        /// <summary>
+        /// retruns the string title to use on the indicated radio (specified by index within RadioNames) can for the
+        /// "aux 4" miscellaneous checkbox control, null if no such control is desired.
+        /// </summary>
+        public string RadioAux4Title(int radio);
 
         /// <summary>
         /// returns true if the radio has programmable per-preset modulation, false otherwise.

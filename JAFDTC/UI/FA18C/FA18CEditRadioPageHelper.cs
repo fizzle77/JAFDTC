@@ -35,7 +35,7 @@ namespace JAFDTC.UI.FA18C
     /// helper class for the generic configuration radio system editor, EditRadioPage. provides support for the
     /// uhf/vhf radios in the hornet.
     /// </summary>
-    internal class FA18CEditRadioPageHelper : IEditRadioPageHelper
+    internal class FA18CEditRadioPageHelper : BaseRadioPageHelper, IEditRadioPageHelper
     {
         public static ConfigEditorPageInfo PageInfo
             => new(RadioSystem.SystemTag, "Radios", "COMM", Glyphs.RADIO, typeof(EditRadioPage), typeof(FA18CEditRadioPageHelper));
@@ -130,20 +130,6 @@ namespace JAFDTC.UI.FA18C
                                       string.IsNullOrEmpty(((FA18CConfiguration)config).Radio.COMM2DefaultTuning)),
                 _ => false
             };
-
-        public string RadioAux1Title(int radio)
-            => null;
-
-        public string RadioAux2Title(int radio)
-            => null;
-        public string RadioAux3Title(int radio)
-            => null;
-
-        public bool RadioCanProgramModulation(int radio)
-            => false;
-
-        public List<TextBlock> RadioModulationItems(int radio, string freq)
-            => null;
 
         public int RadioMaxPresets(int radio)
             => 20;

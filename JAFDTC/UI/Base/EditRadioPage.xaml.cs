@@ -162,9 +162,16 @@ namespace JAFDTC.UI.Base
             set => SetProperty(ref _isAux3Enabled, value, null);
         }
 
+        private bool _isAux4Enabled;
+        public bool IsAux4Enabled
+        {
+            get => _isAux4Enabled;
+            set => SetProperty(ref _isAux4Enabled, value, null);
+        }
+
         public RadioMiscItem(IEditRadioPageHelper helper, int radio)
-            => (NavHelper, Radio, DefaultTuning, IsAux1Enabled, IsAux2Enabled, IsAux3Enabled)
-                = (helper, radio, "", false, false, false);
+            => (NavHelper, Radio, DefaultTuning, IsAux1Enabled, IsAux2Enabled, IsAux3Enabled, IsAux4Enabled)
+                = (helper, radio, "", false, false, false, false);
     }
 
     // ================================================================================================================
@@ -586,6 +593,7 @@ namespace JAFDTC.UI.Base
             RebuildPerRadioMiscAuxControl(uiMiscCkbxAux1, uiMiscTextAux1, NavHelper.RadioAux1Title(EditRadio));
             RebuildPerRadioMiscAuxControl(uiMiscCkbxAux2, uiMiscTextAux2, NavHelper.RadioAux2Title(EditRadio));
             RebuildPerRadioMiscAuxControl(uiMiscCkbxAux3, uiMiscTextAux3, NavHelper.RadioAux3Title(EditRadio));
+            RebuildPerRadioMiscAuxControl(uiMiscCkbxAux4, uiMiscTextAux4, NavHelper.RadioAux4Title(EditRadio));
 
             if (string.IsNullOrEmpty(EditMisc.DefaultTuning) || EditMisc.HasErrors)
             {
@@ -625,6 +633,7 @@ namespace JAFDTC.UI.Base
             Utilities.SetEnableState(uiMiscCkbxAux1, isEditable);
             Utilities.SetEnableState(uiMiscCkbxAux2, isEditable);
             Utilities.SetEnableState(uiMiscCkbxAux3, isEditable);
+            Utilities.SetEnableState(uiMiscCkbxAux4, isEditable);
 
             bool isDefault = NavHelper.RadioSysIsDefault(Config) && (EditPresets.Count == 0);
             Utilities.SetEnableState(uiPageBtnResetAll, !isDefault);
@@ -805,6 +814,18 @@ namespace JAFDTC.UI.Base
             //
             CheckBox cbox = (CheckBox)sender;
             EditMisc.IsAux3Enabled = (bool)cbox.IsChecked;
+            CopyEditToConfig(EditRadio, true);
+        }
+
+        /// <summary>
+        /// aux checkbox 4 click: copy the local backing values to the configuration.
+        /// </summary>
+        private void MiscCkbxAux4_Click(object sender, RoutedEventArgs args)
+        {
+            // HACK: x:Bind doesn't work with bools? seems that way? this is a hack.
+            //
+            CheckBox cbox = (CheckBox)sender;
+            EditMisc.IsAux4Enabled = (bool)cbox.IsChecked;
             CopyEditToConfig(EditRadio, true);
         }
 
