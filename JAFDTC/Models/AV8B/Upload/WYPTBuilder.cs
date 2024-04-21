@@ -71,7 +71,8 @@ namespace JAFDTC.Models.AV8B.Upload
                         {
                             AddActions(ufc, new() { "7", "7" });
                         }
-                        AddActions(ufc, new() { "UFC_ENTER", "ODU_OPT2" });
+                        AddAction(ufc, "UFC_ENTER");
+                        AddAction(odu, "ODU_OPT2");
 
                         AddActions(ufc, ActionsFor2864CoordinateString(wypts[i].LatUI), new() { "UFC_ENTER" });
                         AddActions(ufc, ActionsFor2864CoordinateString(wypts[i].LonUI), new() { "UFC_ENTER" });
