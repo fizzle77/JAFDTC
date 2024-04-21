@@ -96,7 +96,10 @@ namespace JAFDTC.UI.F15E
             F15EConfiguration cfgEagle = (F15EConfiguration)Config;
             cfgEagle.CrewMember = (cfgEagle.CrewMember == F15EConfiguration.CrewPositions.PILOT)
                 ? F15EConfiguration.CrewPositions.WSO : F15EConfiguration.CrewPositions.PILOT;
-            // TODO: save?
+
+            // inform system editors that pilot/wso seat has changed so they can update their state appropriately.
+            //
+            configPage.RaiseAuxCommandInvoked(cmd);
             return true;
         }
     }

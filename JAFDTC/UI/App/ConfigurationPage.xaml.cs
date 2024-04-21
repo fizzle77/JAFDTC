@@ -143,7 +143,7 @@ namespace JAFDTC.UI.App
         private ObservableCollection<ConfigEditorPageInfo> EditorPages { get; set; }
 
         private ObservableCollection<ConfigAuxCommandInfo> AuxCommands { get; set; }
-        
+
         private IConfiguration Config { get; set; }
 
         private Dictionary<string, IConfiguration> UIDtoConfigMap { get; set; }
@@ -352,7 +352,16 @@ namespace JAFDTC.UI.App
                 AuxCommands = ConfigEditor.ConfigAuxCommandInfo();
                 uiNavListAuxCmd.ItemsSource = AuxCommands;
             }
-            AuxCommandInvoked?.Invoke(this, (ConfigAuxCommandInfo)args.ClickedItem);
+        }
+
+        /// <summary>
+        /// called from a IConfigEditor.HandleAuxCommand once processing has finished if the handler wants the
+        /// configuration page to raise a AuxCommandInvoked event to inform subscribers that the specified aux command
+        /// has completed.
+        /// </summary>
+        public void RaiseAuxCommandInvoked(ConfigAuxCommandInfo cmd)
+        {
+            AuxCommandInvoked?.Invoke(this, cmd);
         }
 
         // ---- load to jet command list ------------------------------------------------------------------------------
