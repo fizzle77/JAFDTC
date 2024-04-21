@@ -44,7 +44,7 @@ namespace JAFDTC.UI
         /// </summary>
         public class CfgEditorGlyphs
         {
-            public const string Badge = "\xF0B6";
+            public const string BADGE = "\xF0B6";
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ namespace JAFDTC.UI
                     icons += $" {info.Glyph}";
                     if (config.SystemLinkedTo(info.Tag) != null)
                     {
-                        iconBadges += $" {CfgEditorGlyphs.Badge}";
+                        iconBadges += $" {CfgEditorGlyphs.BADGE}";
                     }
                     else
                     {
