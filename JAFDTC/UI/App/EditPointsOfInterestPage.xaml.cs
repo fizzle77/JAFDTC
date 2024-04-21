@@ -386,7 +386,7 @@ namespace JAFDTC.UI.App
             if (double.TryParse(EditPoI.LL[index].Lat, out double lat) &&
                 double.TryParse(EditPoI.LL[index].Lon, out double lon))
             {
-                theater = PointOfInterestDbase.TheaterForCoords(lat, lon);
+                theater = PointOfInterest.TheaterForCoords(lat, lon);
             }
             return theater;
         }
