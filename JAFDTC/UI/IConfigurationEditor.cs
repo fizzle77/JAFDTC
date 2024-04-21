@@ -70,8 +70,10 @@ namespace JAFDTC.UI
         public Dictionary<string, string> BuildUpdatesStrings(IConfiguration config);
 
         /// <summary>
-        /// handle the provided command from the aux command list. returns true if the aux command list should be
-        /// rebuilt, false if not. current editor will be refreshed as well.
+        /// handle the specified command from the aux command list. returns true if the aux command list should be
+        /// rebuilt, false if not. this method should invoke ConfigurationPage.RaiseAuxCommandInvoked() after
+        /// completing its work if it makes state changes that the configuration page and system editors should be
+        /// aware of.
         /// </summary>
         public bool HandleAuxCommand(ConfigurationPage configPage, ConfigAuxCommandInfo cmd);
     }
