@@ -42,7 +42,6 @@ https://www.gnu.org/licenses/.
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -441,27 +440,7 @@ https://www.gnu.org/licenses/.
 
         <!--
         ===============================================================================================================
-        row 4 : pilot db
-        ===============================================================================================================
-        -->
-        <Grid Grid.Row="4" Margin="0,24,0,24">
-            <Button x:Name="uiPDbBtnEdit"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    Click="PDbBtnEdit_Click">
-                <StackPanel Orientation="Horizontal">
-                    <FontIcon Margin="0,0,6,0"
-                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE77B;"/>
-                    <TextBlock VerticalAlignment="center">
-                        Edit Pilot Database
-                    </TextBlock>
-                </StackPanel>
-            </Button>
-        </Grid>
-
-        <!--
-        ===============================================================================================================
-        row 6 : link / reset
+        row 5 : link / reset
         ===============================================================================================================
         -->
         <Grid Grid.Row="6" Margin="0,0,16,4">
