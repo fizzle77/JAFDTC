@@ -2,7 +2,7 @@
 //
 // A10CEditRadioPageHelper.cs : viper specialization for EditRadioPage
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven, JAFDTC contributors
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -35,7 +35,7 @@ namespace JAFDTC.UI.F16C
     /// helper class for the generic configuration radio system editor, EditRadioPage. provides support for the uhf
     /// and vhf radios in the viper.
     /// </summary>
-    internal class A10CEditRadioPageHelper : IEditRadioPageHelper
+    internal class A10CEditRadioPageHelper : RadioPageHelperBase, IEditRadioPageHelper
     {
         public static ConfigEditorPageInfo PageInfo
             => new(RadioSystem.SystemTag, "Radios", "COMM", Glyphs.RADIO, typeof(EditRadioPage), typeof(A10CEditRadioPageHelper));
@@ -127,9 +127,7 @@ namespace JAFDTC.UI.F16C
         }
 
         public void RadioSysReset(IConfiguration config)
-        {
-            ((A10CConfiguration)config).Radio.Reset();
-        }
+            => ((A10CConfiguration)config).Radio.Reset();
 
         public bool RadioModuleIsDefault(IConfiguration config, int radio)
             => radio switch
@@ -152,7 +150,7 @@ namespace JAFDTC.UI.F16C
         public bool RadioSysIsDefault(IConfiguration config)
             => ((A10CConfiguration)config).Radio.IsDefault;
 
-        public string RadioAux1Title(int radio)
+        public override string RadioAux1Title(int radio)
             => radio switch
             {
                 (int)RadioSystem.Radios.COMM1 => "Preset Mode",
@@ -161,7 +159,7 @@ namespace JAFDTC.UI.F16C
                 _ => null
             };
 
-        public string RadioAux2Title(int radio)
+        public override string RadioAux2Title(int radio)
             => radio switch
             {
                 (int)RadioSystem.Radios.COMM1 => "Monitor Guard",
@@ -169,17 +167,17 @@ namespace JAFDTC.UI.F16C
                 _ => null
             };
 
-        public string RadioAux3Title(int radio)
+        public override string RadioAux3Title(int radio)
             => radio switch
             {
                 (int)RadioSystem.Radios.COMM1 => "COM1 on HUD",
                 _ => null
             };
 
-        public bool RadioCanProgramModulation(int radio)
+        public override bool RadioCanProgramModulation(int radio)
             => (radio == (int)RadioSystem.Radios.COMM1);
 
-        public List<TextBlock> RadioModulationItems(int radio, string freq)
+        public override List<TextBlock> RadioModulationItems(int radio, string freq)
         {
             if (radio == (int)RadioSystem.Radios.COMM1)
             {
@@ -197,7 +195,7 @@ namespace JAFDTC.UI.F16C
             return null;
         }
 
-        public int RadioMaxPresets(int radio)
+        public override int RadioMaxPresets(int radio)
             => (radio == (int)RadioSystem.Radios.COMM1) ? 25 : 20;
 
         public string RadioDefaultFrequency(int radio)
@@ -211,30 +209,5 @@ namespace JAFDTC.UI.F16C
 
         public int RadioPresetCount(int radio, IConfiguration config)
             => ((A10CConfiguration)config).Radio.Presets[radio].Count;
-
-        public bool ValidatePreset(int radio, string preset, bool isNoEValid = true)
-            => BindableObject.IsIntegerFieldValid(preset, 1, RadioMaxPresets(radio), isNoEValid);
-
-        public bool ValidateFrequency(int radio, string freq, bool isNoEValid = true)
-            => RadioSystem.IsFreqValidForRadio((RadioSystem.Radios) radio, freq, isNoEValid);
-
-        public string ValidateDefaultTuning(int radio, string value, bool isNoEValid = true)
-        {
-            if (ValidateFrequency(radio, value, isNoEValid))
-            {
-                return FixupFrequency(radio, value);
-            }
-            else if (ValidatePreset(radio, value, isNoEValid))
-            {
-                return value;
-            }
-            return null;
-        }
-
-        public string FixupPreset(int radio, string preset)
-            => BindableObject.FixupIntegerField(preset);
-
-        public string FixupFrequency(int radio, string freq)
-            => BindableObject.FixupDecimalField(freq, "F3");
     }
 }

@@ -2,7 +2,7 @@
 //
 // F16CEditRadioPageHelper.cs : viper specialization for EditRadioPage
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven, JAFDTC contributors
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -115,9 +115,7 @@ namespace JAFDTC.UI.F16C
         }
 
         public void RadioSysReset(IConfiguration config)
-        {
-            ((F16CConfiguration)config).Radio.Reset();
-        }
+            => ((F16CConfiguration)config).Radio.Reset();
 
         public bool RadioModuleIsDefault(IConfiguration config, int radio)
             => radio switch
@@ -133,11 +131,10 @@ namespace JAFDTC.UI.F16C
         public bool RadioSysIsDefault(IConfiguration config)
             => ((F16CConfiguration)config).Radio.IsDefault;
 
-        public new string RadioAux2Title(int radio)
+        public override string RadioAux2Title(int radio)
             => (radio == (int)Radios.COMM1) ? "Monitor Guard" : null;
 
-        public int RadioMaxPresets(int radio)
-            => 20;
+        public override int RadioMaxPresets(int radio) => 20;
 
         public string RadioDefaultFrequency(int radio)
             => (radio == (int)Radios.COMM1) ? "225.00" : "108.00";
@@ -145,10 +142,7 @@ namespace JAFDTC.UI.F16C
         public int RadioPresetCount(int radio, IConfiguration config)
             => ((F16CConfiguration)config).Radio.Presets[radio].Count;
 
-        public bool ValidatePreset(int radio, string preset, bool isNoEValid = true)
-            => BindableObject.IsIntegerFieldValid(preset, 1, 20, isNoEValid);
-
-        public bool ValidateFrequency(int radio, string freq, bool isNoEValid = true)
+        public override bool ValidateFrequency(int radio, string freq, bool isNoEValid = true)
             => radio switch
             {
                 // TODO: valid freqs are discrete, not continuous, need to check that as well...
@@ -159,23 +153,7 @@ namespace JAFDTC.UI.F16C
                 _ => false,
             };
 
-        public string ValidateDefaultTuning(int radio, string value, bool isNoEValid = true)
-        {
-            if (ValidateFrequency(radio, value, isNoEValid))
-            {
-                return FixupFrequency(radio, value);
-            }
-            else if (ValidatePreset(radio, value, isNoEValid))
-            {
-                return value;
-            }
-            return null;
-        }
-
-        public string FixupPreset(int radio, string preset)
-            => BindableObject.FixupIntegerField(preset);
-
-        public string FixupFrequency(int radio, string freq)
+        public override string FixupFrequency(int radio, string freq)
             => BindableObject.FixupDecimalField(freq, "F2");
     }
 }

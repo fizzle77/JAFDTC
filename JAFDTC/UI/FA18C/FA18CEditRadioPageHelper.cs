@@ -2,7 +2,7 @@
 //
 // FA18CEditRadioPageHelper.cs : hornet specialization for EditRadioPage
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven, JAFDTC contributors
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -114,9 +114,7 @@ namespace JAFDTC.UI.FA18C
         }
 
         public void RadioSysReset(IConfiguration config)
-        {
-            ((FA18CConfiguration)config).Radio.Reset();
-        }
+            => ((FA18CConfiguration)config).Radio.Reset();
 
         public bool RadioSysIsDefault(IConfiguration config)
             => ((FA18CConfiguration)config).Radio.IsDefault;
@@ -131,19 +129,14 @@ namespace JAFDTC.UI.FA18C
                 _ => false
             };
 
-        public int RadioMaxPresets(int radio)
-            => 20;
+        public override int RadioMaxPresets(int radio) => 20;
 
-        public string RadioDefaultFrequency(int radio)
-            => "225.00";
+        public string RadioDefaultFrequency(int radio) => "225.00";
 
         public int RadioPresetCount(int radio, IConfiguration config)
             => ((FA18CConfiguration)config).Radio.Presets[radio].Count;
 
-        public bool ValidatePreset(int radio, string preset, bool isNoEValid = true)
-            => BindableObject.IsIntegerFieldValid(preset, 1, 20, isNoEValid);
-
-        public bool ValidateFrequency(int radio, string freq, bool isNoEValid = true)
+        public override bool ValidateFrequency(int radio, string freq, bool isNoEValid = true)
             => radio switch
             {
                 // TODO: valid freqs are discrete, not continuous, need to check that as well
@@ -157,24 +150,5 @@ namespace JAFDTC.UI.FA18C
                                      BindableObject.IsDecimalFieldValid(freq, 225.0, 399.975, isNoEValid),
                 _ => false,
             };
-
-        public string ValidateDefaultTuning(int radio, string value, bool isNoEValid = true)
-        {
-            if (ValidateFrequency(radio, value, isNoEValid))
-            {
-                return FixupFrequency(radio, value);
-            }
-            else if (ValidatePreset(radio, value, isNoEValid))
-            {
-                return value;
-            }
-            return null;
-        }
-
-        public string FixupPreset(int radio, string preset)
-            => BindableObject.FixupIntegerField(preset);
-
-        public string FixupFrequency(int radio, string freq)
-            => BindableObject.FixupDecimalField(freq, "F3");
     }
 }
