@@ -132,10 +132,12 @@ namespace JAFDTC.Models.A10C.Upload
                                                                                      : "ARC210_MASTER_TR");
             AddAction(arc210, (radios.IsPresetMode[(int)RadioSystem.Radios.COMM1]) ? "ARC210_SEC_SW_PRST"
                                                                                    : "ARC210_SEC_SW_MAN");
-            if (radios.IsCOMM1StatusOnHUD)
+            if (!radios.IsCOMM1StatusOnHUD)
             {
                 AddAction(ufc, "UFC_COM1_LONG");
             }
+            // Always hide COM2: it's unimplemented and just HUD clutter.
+            AddAction(ufc, "UFC_COM2_LONG");
         }
 
         /// <summary>
