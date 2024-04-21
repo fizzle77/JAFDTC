@@ -18,17 +18,34 @@
 //
 // ********************************************************************************************************************
 
+using System;
 using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace JAFDTC.Models.DCS
 {
+    /// <summary>
+    /// types for points of interest.
+    /// </summary>
     public enum PointOfInterestType
     {
         UNKNOWN = -1,
         DCS_CORE = 0,
         USER = 1,
         CAMPAIGN = 2
+    }
+
+    /// <summary>
+    /// type mask for PointOfInterestType enum.
+    /// </summary>
+    [Flags]
+    public enum PointOfInterestTypeMask
+    {
+        NONE = 0,
+        ANY = -1,
+        DCS_CORE = 1 << PointOfInterestType.DCS_CORE,
+        USER = 1 << PointOfInterestType.USER,
+        CAMPAIGN = 1 << PointOfInterestType.CAMPAIGN,
     }
 
     /// <summary>
@@ -83,6 +100,14 @@ namespace JAFDTC.Models.DCS
         // functions
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// return true if the type of the poi matches a type mask, false otherwise.
+        /// </summary>
+        public bool IsMatchTypeMask(PointOfInterestTypeMask mask)
+        {
+            return mask.HasFlag((PointOfInterestTypeMask)(1 << (int)Type));
+        }
 
         /// <summary>
         /// return sanitized tag string with empty tags removed, extra spaces removed, etc.
