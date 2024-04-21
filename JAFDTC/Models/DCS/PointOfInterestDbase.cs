@@ -153,7 +153,7 @@ namespace JAFDTC.Models.DCS
             {
                 return "Caucasus";
             }
-            else if (InRange(10.0, lat, 23.0) && InRange(-149.0, lon, -137.0))
+            else if (InRange(10.0, lat, 23.0) && InRange(137.0, lon, 149.0))
             {
                 return "Marianas";
             }
