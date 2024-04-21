@@ -325,8 +325,8 @@ namespace JAFDTC.Utilities
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// load the database at the given path. here, a "database" is a List<T> of objects of type T that is
-        /// serialized to a .json file. return an empty list on error.
+        /// load the database at the given path. here, a "database" is persisted as a List<T> of objects of type T
+        /// that is serialized to a .json file. return an empty list on error.
         /// </summary>
         private static List<T> LoadDbaseCore<T>(string path)
         {
@@ -418,8 +418,8 @@ namespace JAFDTC.Utilities
 
         /// <summary>
         /// return the point of interest database that provides coordinates on known points in the world. this database
-        /// is the combination of a system dbase that carries fixed dcs points, a user dbase that holds editable
-        /// user-specified points, and any number of read-only campaign databases.
+        /// is the combination of a read-only system dbase that carries fixed dcs points, a user dbase that holds
+        /// editable user-specified points, and any number of read-only campaign databases.
         /// </summary>
         public static List<PointOfInterest> LoadPointsOfInterest()
         {
@@ -457,7 +457,7 @@ namespace JAFDTC.Utilities
 
         /// <summary>
         /// saves points of interest to the campaign point of interest database. returns true on success, false
-        /// otherwise.
+        /// otherwise. this function is used to create a campaign database.
         /// </summary>
         public static bool SaveCampaignPointsOfInterest(string campaign, List<PointOfInterest> userPoIs)
         {

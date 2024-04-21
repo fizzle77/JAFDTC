@@ -2,26 +2,22 @@
 
 *Version 1.0.0-B.30 of 19-Apr-24*
 
-_Just Another #%*@^!% DTC_ (JAFDTC) is a Windows application that allows you to upload data
-typically saved on a data cartridge, such as steerpoints/waypoints and other avionics setup,
-into a DCS model at the start of a flight.
+_Just Another #%*@^!% DTC_ (JAFDTC) is a native Windows application that allows you to upload
+data typically saved on a data cartridge in real life, such as steerpoints/waypoints and other
+avionics setup, into a DCS module during a flight. There are three components to the user's
+guide,
 
-After reading through this user’s guide and the
-[common elements guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md), the airframe-specific documentation provides additional details on the systems
-JAFDTC can configuration for each supported airframe.
+- This document provides a broad overview of JAFDTC
+- The
+  [Common Elements Guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
+  discusses topics that are common across multiple airframes
+- The
+  [Airframe Documentation](#what-now)
+  presents details that are specific or unique to a particular airframe
 
-| Airframe | Systems JAFDTC Can Configure |
-|:--------:|------------------------------|
-| [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | Radios, Waypoints
-| [AV-8B Harrier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_AV8B.md) | Waypoints
-| [F-14A/B Tomcat](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F14AB.md) | Waypoints
-| [F-15E Strike Eagle](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F15E.md) | MPD/MPCD Formats, Radios, Steerpoints, Miscellaneous Systems
-| [F-16C Viper](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F16C.md) | Countermeasures, Datalink, HARM (ALIC, HTS), MFD Formats, Radios, Steerpoints, Miscellaneous DED Systems
-| [F/A-18C Hornet](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_FA18C.md) | Countermeasures, Radios, Waypoints
-| [Mirage M-2000C](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_M2000C.md) | Waypoints
-
-The above links provide additional details on JAFDTC's capabilities and operation on a specific
-airframe.
+General installation and troubleshooting instructions for JAFDTC can be found
+[here](https://github.com/51st-Vfw/JAFDTC/tree/master/README.md)
+and will not be covered in this document.
 
 # Preliminaries
 
@@ -31,13 +27,16 @@ that JAFDTC uses.
 ## Configurations & Systems
 
 JAFDTC allows you to manage multiple avionics *Configurations* for multiple airframes.
+Currently, JAFDTC supports A-10C Warthog, AV-8B Harrier, F-14A/B Tomcat, F-15E Strike Eagle,
+F-16C Viper, F/A-18C Hornet, and Mirage M-2000C airframes.
 
 ### Overview
 
 In JAFDTC, a *Configuration* is composed of multiple *System Configurations*, or *Systems*,
-that each correspond to systems in an airframe such as radios, countermeasures, navigation,
-and so on. *Configurations* and *Systems* are **unique** to a specific airframe, though
-different airframes may have systems that provide similar functionality.
+that each correspond to systems (typically avionics) in an airframe such as radios,
+countermeasures, navigation, and so on. *Configurations* and *Systems* are **unique** to a
+specific airframe, though different airframes may have systems that provide similar
+functionality.
 
 Each configuration has a unique name identifies the configuration in the user interface. This
 name is set up when the configuration is first created and may be changed later.
@@ -46,12 +45,16 @@ name is set up when the configuration is first created and may be changed later.
 > any character. Names are case-insensitive so "A2G" and "a2g" are treated as the same name.
 
 The specific systems available in a configuration, along with the system parameters that
-JAFDTC can apply, vary from airframe to airframe (see the airframe-specific documentation
-mentioned above for more information). Some systems may not exist in some airframes and
-"common" systems may operate differently and track different information in different
-airframes.
+JAFDTC can apply, vary from airframe to airframe.
 
-### Configuration Storage
+> Details specific to a particular airframe can be found in the
+> [airframe-specific documentation](#what-now)
+> linked below.
+
+Some systems may not exist in some airframes and even "common" systems may operate differently
+and track different information in different airframes.
+
+### Storing Configurations
 
 JAFDTC stores configuration and supporting files, such as settings, in the `Documents\JAFDTC`
 folder for the active profile. Configurations are found in the `Configs` folder in this
@@ -70,15 +73,19 @@ setups.
 
 Links are particularly useful when you have basic setups that you tend to reuse often. For
 example, you might want to always configure your MFDs one way for A2G sorties and another way
-for A2A sorties. Let's assume configurations for our airframe support an MFD system (MFD) that
+for A2A sorties. Let's assume configurations for the airframe support an MFD system (MFD) that
 sets up cockpit displays and a navigation system (NAV) that sets up steerpoints. Once you
 setup your A2G and A2A MFD configurations, you can simply link to them from new configurations
-to avoid having to set the MFDs up again in the new configuration.
+to avoid having to set the MFDs in each new configuration.
+
+This pictures illustrates how this works,
 
 ![](images/Core_Cfg_Links.png)
 
 Here, the arrow points to the source system configuration: the MFD system configuration in
-"A2G Mission" comes from (or, is *linked to*) the MFD system configuration in "A2G Fav".
+"A2G Mission" comes from (or, is *linked to*) the MFD system configuration in "A2G Fav". In
+this example, "A2G Mission" would only set up the NAV system; it relies on the "A2G Fav" to
+provide the configuration for the MFD system.
 
 Any change you make to the MFD system in "A2G Fav" or "A2A Fav" is immediately reflected in
 the configurations that link to these system configurations; in this example, "A2G Mission",
@@ -116,32 +123,14 @@ of navigation points or target locations. There are three basic types of PoI,
   set in Syria. These PoIs are managed by the user but cannot be edited.
 
 The user interface provides mechanisms to search and select PoIs from the set of known
-locations.
-
-See the
-[discussion below](#point-of-interest-database)
-for more details.
+locations. Points of interest are discussed further
+[later](#point-of-interest-database).
 
 ## DCS Integration
 
-As a DTC, JAFDTC integrates with DCS. See
-[common elements guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
-for more details.
-
-### Uploading Configurations to DCS
-
-Once set up, a *Configuration* can be uploaded into the corresponding airframe in DCS through
-the scripting engine that DCS exposes to the local system. To upload, JAFDTC walks through the
-configuration, updating system parameters that differ from their defaults in the jet. For
-example, consider a BINGO warning system. If you change the BINGO value from the default for
-the airframe, JAFDTC will update the BINGO value in the avionics when uploading. If you do
-not change the value, JAFDTC will not make any changes to that parameter in the airframe.
-
-### Capturing Coordinates in DCS
-
-JAFDTC can capture latitude, longitude, and elevation parameters from the DCS F10 map for use
-in a system configuration (such as the location of a navigation point) as well as the point
-of interest database.
+This section focuses on a brief overview of the integration between JAFDTC and DCS. The
+[Common Elements Guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
+examines this topic in more depth.
 
 ### DCS Support Scripts
 
@@ -163,22 +152,36 @@ three changes,
 JAFDTC will automatically update these files as needed, notifying you when an update is made.
 
 > If DCS is running when JAFDTC installs or updates the DCS support scripts, you should restart
-> DCS to make sure DCS picks up the latest version of the DCS support.
+> DCS to make sure DCS picks up the latest version of the DCS support scripts.
 
 While JAFDTC allows you to decline the installation, doing so will prevent JAFDTC from
 interacting with DCS in any capacity.
+
+### Uploading Configurations to DCS
+
+Once set up, a *Configuration* can be uploaded into the corresponding airframe in DCS through
+the scripting engine that DCS exposes to the local system. To upload, JAFDTC walks through the
+configuration, updating system parameters that differ from their defaults in the jet. For
+example, consider a BINGO warning system. If you change the BINGO value from the default for
+the airframe, JAFDTC will update the BINGO value in the avionics when uploading. If you do
+not change the value, JAFDTC will not make any changes to that parameter in the airframe.
+
+### Capturing Coordinates From DCS
+
+JAFDTC can capture latitude, longitude, and elevation parameters from the DCS F10 map for use
+in a system configuration (such as the location of a navigation point) as well as the point
+of interest database.
 
 # User Interface Basics
 
 The JAFDTC user interface is based around a single window that displays a list of configrations
 for an airframe and allows you to edit the specfic systems in a configuration. This section
-covers the basics of this user interface that are largely independent of the specific airframe
+covers the aspects of this user interface that are largely independent of the specific airframe
 you are configuring. Additional details on user interface elements that are common to multiple
-airframes can be found
-[here](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
-while the documentation linked in the table
-[here](#jafdtc-users-guide)
-presents user interface concepts applicable to a specific airframe.
+airframes can be found in the
+[Common Elements Guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
+along with the airframe specific documentation linked
+[below](#what-now).
 
 ## Configuration List Page
 
@@ -523,9 +526,19 @@ changes in the dialog, while “**Cancel**” will discard any changes.
 # What Now?
 
 Now that you have a basic familiarity with JAFDTC, you can take a look at the
-[common elements guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
-that provides the next level of detail on JAFDTC, its operation, and its user interface.
-Following that documentation, reading the airframe-specific
-[document](#jafdtc-users-guide)
-for the airframes you want to use JAFDTC with will cover any specifics related to the
+[Common Elements Guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
+that provides the next level of detail on JAFDTC, its operation, and its user interface. From
+there, move on to the airframe specific documentation for airframes of interest,
+
+| Airframe | Systems JAFDTC Can Configure |
+|:--------:|------------------------------|
+| [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | Radios, Waypoints
+| [AV-8B Harrier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_AV8B.md) | Waypoints
+| [F-14A/B Tomcat](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F14AB.md) | Waypoints
+| [F-15E Strike Eagle](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F15E.md) | MPD/MPCD Formats, Radios, Steerpoints, Miscellaneous Systems
+| [F-16C Viper](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F16C.md) | Countermeasures, Datalink, HARM (ALIC, HTS), MFD Formats, Radios, Steerpoints, Miscellaneous DED Systems
+| [F/A-18C Hornet](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_FA18C.md) | Countermeasures, Radios, Waypoints
+| [Mirage M-2000C](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_M2000C.md) | Waypoints
+
+The above links provide additional details on JAFDTC's capabilities and operation on a specific
 airframe.
