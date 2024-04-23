@@ -49,10 +49,6 @@ namespace JAFDTC.UI.A10C
         private readonly Dictionary<string, string> _configNameToUID;
         private readonly List<string> _configNameList;
 
-        private readonly Dictionary<string, TextBox> _baseFieldValueMap;
-        private readonly Brush _defaultBorderBrush;
-        private readonly Brush _defaultBkgndBrush;
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction

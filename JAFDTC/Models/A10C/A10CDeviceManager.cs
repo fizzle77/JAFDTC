@@ -88,6 +88,7 @@ namespace JAFDTC.Models.A10C
             cdu.AddAction(3006, "LSK_5R", delay, 1);
             cdu.AddAction(3007, "LSK_7R", delay, 1);
             cdu.AddAction(3008, "LSK_9R", delay, 1);
+            cdu.AddAction(3010, "NAV", delay, 1);
             cdu.AddAction(3011, "WP", delay, 1);
             AddDevice(cdu);
 
