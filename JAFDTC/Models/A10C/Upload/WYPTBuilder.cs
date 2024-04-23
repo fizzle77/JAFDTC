@@ -58,9 +58,6 @@ namespace JAFDTC.Models.A10C.Upload
 
             if (wypts.Count > 0)
             {
-                // TODO: set STEER_PT to MISSION
-                // TODO: set PAGE to OTHER
-
                 AddActions(cdu, new() { "WP", "LSK_3L" });
                 AddWait(WAIT_BASE);
 
