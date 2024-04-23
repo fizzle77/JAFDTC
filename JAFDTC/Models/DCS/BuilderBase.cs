@@ -19,7 +19,10 @@
 // ********************************************************************************************************************
 
 #define noDEBUG_CMD_FORMAT
+#define noDEBUG_LOG_ACTIONS
+#define DEBUG_LOG_BOGUS_ACTIONS
 
+using JAFDTC.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -124,6 +127,15 @@ namespace JAFDTC.Models.DCS
         /// </summary>
         protected void AddAction(AirframeDevice device, string key, int dtWaitPost = WAIT_NONE)
         {
+#if DEBUG_LOG_ACTIONS
+            FileManager.Log($"{device.Name}.{key}");
+#endif
+#if DEBUG_LOG_BOGUS_ACTIONS
+            if (string.IsNullOrEmpty(device[key]))
+            {
+                FileManager.Log($"Action {device.Name}.{key} is undefined");
+            }
+#endif
             AddCommand(device[key]);
             AddWait(dtWaitPost);
         }
