@@ -59,6 +59,24 @@
                     <TextBlock Text="MGRS" Tag="1"/>
                 </ComboBox.Items>
             </ComboBox>
+
+            <!-- Coordinate System setup -->
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0"
+                Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                HorizontalTextAlignment="Right">
+                FPM Flight Plan 01
+            </TextBlock>
+            <ComboBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0" Width="200"
+                x:Name="uiComboFlightPlan1Manual"
+                VerticalAlignment="Center"
+                ToolTipService.ToolTip="Flight Plan 01 Auto/Manual"
+                SelectionChanged="ComboFPM01_SelectionChanged">
+                <ComboBox.Items>
+                    <!-- Tag is enum TODO -->
+                    <TextBlock Text="Auto" Tag="0"/>
+                    <TextBlock Text="Manual" Tag="1"/>
+                </ComboBox.Items>
+            </ComboBox>
         </Grid>
 
         <!--

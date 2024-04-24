@@ -31,7 +31,15 @@ namespace JAFDTC.Models.A10C.Misc
         LL = 0,
         MGRS = 1
     }
- 
+
+    // defines the flight plan auto options
+    //
+    public enum FlightPlanManualOptions
+    {
+        Auto = 0,
+        Manual = 1
+    }
+
     /// <summary>
     /// TODO: document
     /// </summary>
@@ -58,6 +66,17 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
+        private string _flightPlan1Manual;                              // integer [0, 1]
+        public string FlightPlan1Manual
+        {
+            get => _flightPlan1Manual;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 1)) ? null : "Invalid format";
+                SetProperty(ref _flightPlan1Manual, value, error);
+            }
+        }
+
         // ---- following properties are synthesized
 
         // returns a MiscSystem with the fields populated with the actual default values (note that usually the value
@@ -67,7 +86,8 @@ namespace JAFDTC.Models.A10C.Misc
         //
         public readonly static MiscSystem ExplicitDefaults = new()
         {
-            CoordSystem = "0" // Lat/Long
+            CoordSystem = "0", // Lat/Long
+            FlightPlan1Manual = "0" // Auto
         };
 
         // returns true if the instance indicates a default setup (all fields are "") or the object is in explicit
@@ -76,13 +96,19 @@ namespace JAFDTC.Models.A10C.Misc
         [JsonIgnore]
         public bool IsDefault
         {
-            get => (IsCoordSystemDefault);
+            get => IsCoordSystemDefault && IsFlightPlan1ManualDefault;
         }
 
         [JsonIgnore]
         public bool IsCoordSystemDefault
         {
             get => string.IsNullOrEmpty(CoordSystem) || CoordSystem == ExplicitDefaults.CoordSystem;
+        }
+
+        [JsonIgnore]
+        public bool IsFlightPlan1ManualDefault
+        {
+            get => string.IsNullOrEmpty(FlightPlan1Manual) || FlightPlan1Manual == ExplicitDefaults.FlightPlan1Manual;
         }
 
 
@@ -92,6 +118,12 @@ namespace JAFDTC.Models.A10C.Misc
         public CoordSystems CoordSystemValue
         {
             get => (CoordSystems)int.Parse((string.IsNullOrEmpty(CoordSystem)) ? ExplicitDefaults.CoordSystem : CoordSystem);
+        }
+
+        [JsonIgnore]
+        public FlightPlanManualOptions FlightPlan1ManualValue
+        {
+            get => (FlightPlanManualOptions)int.Parse((string.IsNullOrEmpty(FlightPlan1Manual)) ? ExplicitDefaults.FlightPlan1Manual : FlightPlan1Manual);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -108,6 +140,7 @@ namespace JAFDTC.Models.A10C.Misc
         public MiscSystem(MiscSystem other)
         {
             CoordSystem = new(other.CoordSystem);
+            FlightPlan1Manual = new(other.FlightPlan1Manual);
          }
 
         public virtual object Clone() => new MiscSystem(this);
@@ -123,6 +156,7 @@ namespace JAFDTC.Models.A10C.Misc
         public void Reset()
         {
             CoordSystem = "";
+            FlightPlan1Manual = "";
          }
     }
 }

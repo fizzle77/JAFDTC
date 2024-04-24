@@ -23,7 +23,6 @@ using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.UI.A10C;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using JAFDTC.Utilities;

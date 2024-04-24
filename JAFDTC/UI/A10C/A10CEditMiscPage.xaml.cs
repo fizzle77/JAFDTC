@@ -83,6 +83,7 @@ namespace JAFDTC.UI.A10C
         private void CopyConfigToEdit()
         {
             EditMisc.CoordSystem = Config.Misc.CoordSystem;
+            EditMisc.FlightPlan1Manual = Config.Misc.FlightPlan1Manual;
         }
 
         private void CopyEditToConfig(bool isPersist = false)
@@ -90,6 +91,7 @@ namespace JAFDTC.UI.A10C
             if (!EditMisc.HasErrors)
             {
                 Config.Misc.CoordSystem = EditMisc.CoordSystem;
+                Config.Misc.FlightPlan1Manual = EditMisc.FlightPlan1Manual;
 
                 if (isPersist)
                 {
@@ -111,15 +113,27 @@ namespace JAFDTC.UI.A10C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // rebuild the setup of the tacan band according to the current settings. 
+        // rebuild the setup of the coordinate system according to the current settings. 
         //
         private void RebuildCoordSystemSetup()
         {
-            int band = (string.IsNullOrEmpty(EditMisc.CoordSystem)) ? int.Parse(_miscSysDefault.CoordSystem)
+            int coordSystem = (string.IsNullOrEmpty(EditMisc.CoordSystem)) ? int.Parse(_miscSysDefault.CoordSystem)
                                                                   : int.Parse(EditMisc.CoordSystem);
-            if (uiComboCoordSystem.SelectedIndex != band)
+            if (uiComboCoordSystem.SelectedIndex != coordSystem)
             {
-                uiComboCoordSystem.SelectedIndex = band;
+                uiComboCoordSystem.SelectedIndex = coordSystem;
+            }
+        }
+
+        // rebuild the setup of the first flight plan's manual setting according to the current settings. 
+        //
+        private void RebuildFlightPlan1ManualSetup()
+        {
+            int manualOrAuto = (string.IsNullOrEmpty(EditMisc.FlightPlan1Manual)) ? int.Parse(_miscSysDefault.FlightPlan1Manual)
+                                                                          : int.Parse(EditMisc.FlightPlan1Manual);
+            if (uiComboFlightPlan1Manual.SelectedIndex != manualOrAuto)
+            {
+                uiComboFlightPlan1Manual.SelectedIndex = manualOrAuto;
             }
         }
 
@@ -138,6 +152,7 @@ namespace JAFDTC.UI.A10C
         {
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(MiscSystem.SystemTag));
             Utilities.SetEnableState(uiComboCoordSystem, isEditable);
+            Utilities.SetEnableState(uiComboFlightPlan1Manual, isEditable);
 
             Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
             Utilities.SetEnableState(uiPageBtnReset, !EditMisc.IsDefault);
@@ -154,6 +169,7 @@ namespace JAFDTC.UI.A10C
                 {
                     IsRebuildingUI = true;
                     RebuildCoordSystemSetup();
+                    RebuildFlightPlan1ManualSetup();
                     RebuildLinkControls();
                     RebuildEnableState();
                     IsRebuildingUI = false;
@@ -207,7 +223,7 @@ namespace JAFDTC.UI.A10C
             }
         }
 
-        // ---- tacan setup -------------------------------------------------------------------------------------------
+        // ---- coordinate system setup -------------------------------------------------------------------------------------------
 
         private void ComboCoordSystem_SelectionChanged(object sender, RoutedEventArgs args)
         {
@@ -215,6 +231,18 @@ namespace JAFDTC.UI.A10C
             if (!IsRebuildingUI && (item != null) && (item.Tag != null))
             {
                 EditMisc.CoordSystem = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        // ---- flight plan 1 manual/auto setup -------------------------------------------------------------------------------------------
+
+        private void ComboFPM01_SelectionChanged(object sender, RoutedEventArgs args)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.FlightPlan1Manual = (string)item.Tag;
                 CopyEditToConfig(true);
             }
         }
