@@ -237,7 +237,7 @@ namespace JAFDTC.UI.A10C
 
         // ---- flight plan 1 manual/auto setup -------------------------------------------------------------------------------------------
 
-        private void ComboFPM01_SelectionChanged(object sender, RoutedEventArgs args)
+        private void ComboFlightPlan1Manual_SelectionChanged(object sender, RoutedEventArgs args)
         {
             TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
             if (!IsRebuildingUI && (item != null) && (item.Tag != null))

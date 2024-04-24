@@ -60,7 +60,7 @@
                 </ComboBox.Items>
             </ComboBox>
 
-            <!-- Coordinate System setup -->
+            <!-- Flight Plan 1 Auto/Manual setup -->
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0"
                 Style="{StaticResource EditorParamStaticTextBlockStyle}"
                 HorizontalTextAlignment="Right">
@@ -70,7 +70,7 @@
                 x:Name="uiComboFlightPlan1Manual"
                 VerticalAlignment="Center"
                 ToolTipService.ToolTip="Flight Plan 01 Auto/Manual"
-                SelectionChanged="ComboFPM01_SelectionChanged">
+                SelectionChanged="ComboFlightPlan1Manual_SelectionChanged">
                 <ComboBox.Items>
                     <!-- Tag is enum TODO -->
                     <TextBlock Text="Auto" Tag="0"/>

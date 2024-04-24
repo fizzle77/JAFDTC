@@ -54,6 +54,7 @@ namespace JAFDTC.Models.A10C.Upload
             if (!_cfg.Misc.IsDefault)
             {
                 BuildCoordSystem(cdu, _cfg.Misc);
+                BuildFlightPlan1Manual(cdu, _cfg.Misc);
             }
         }
 
@@ -90,6 +91,20 @@ namespace JAFDTC.Models.A10C.Upload
             // AddActions(rmfd, new() { "RMFD_01" });
             // AddWait(WAIT_BASE);
             // AddActions(rmfd, new() { "RMFD_07", "RMFD_01", "RMFD_03", });
+        }
+
+        /// <summary>
+        /// configure the first flight plan's manual/auto setting according to the non-default programming settings
+        /// </summary>
+        /// <param name="cdu"></param>
+        /// <param name="miscSystem"></param>
+        private void BuildFlightPlan1Manual(AirframeDevice cdu, MiscSystem miscSystem)
+        {
+            if (miscSystem.IsFlightPlan1ManualDefault)
+                return;
+
+            // CDU
+            AddActions(cdu, new() { "FPM", "LSK_3L" }); // TODO verify current setting?
         }
     }
 }
