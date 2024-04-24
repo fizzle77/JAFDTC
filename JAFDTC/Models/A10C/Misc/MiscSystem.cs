@@ -66,6 +66,17 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
+        private string _bullseyeOnHUD;                           // string (boolean)
+        public string BullseyeOnHUD
+        {
+            get => _bullseyeOnHUD;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsBooleanFieldValid(value)) ? null : "Invalid format";
+                SetProperty(ref _bullseyeOnHUD, value, error);
+            }
+        }
+
         private string _flightPlan1Manual;                              // integer [0, 1]
         public string FlightPlan1Manual
         {
@@ -87,6 +98,7 @@ namespace JAFDTC.Models.A10C.Misc
         public readonly static MiscSystem ExplicitDefaults = new()
         {
             CoordSystem = "0", // Lat/Long
+            BullseyeOnHUD = false.ToString(),
             FlightPlan1Manual = "0" // Auto
         };
 
@@ -96,13 +108,19 @@ namespace JAFDTC.Models.A10C.Misc
         [JsonIgnore]
         public bool IsDefault
         {
-            get => IsCoordSystemDefault && IsFlightPlan1ManualDefault;
+            get => IsCoordSystemDefault && IsBullseyeOnHUDDefault && IsFlightPlan1ManualDefault;
         }
 
         [JsonIgnore]
         public bool IsCoordSystemDefault
         {
             get => string.IsNullOrEmpty(CoordSystem) || CoordSystem == ExplicitDefaults.CoordSystem;
+        }
+
+        [JsonIgnore]
+        public bool IsBullseyeOnHUDDefault
+        {
+            get => string.IsNullOrEmpty(BullseyeOnHUD) || BullseyeOnHUD == ExplicitDefaults.BullseyeOnHUD;
         }
 
         [JsonIgnore]
@@ -118,6 +136,12 @@ namespace JAFDTC.Models.A10C.Misc
         public CoordSystems CoordSystemValue
         {
             get => (CoordSystems)int.Parse((string.IsNullOrEmpty(CoordSystem)) ? ExplicitDefaults.CoordSystem : CoordSystem);
+        }
+
+        [JsonIgnore]
+        public bool IsBullseyeOnHUDValue
+        {
+            get => bool.Parse((string.IsNullOrEmpty(BullseyeOnHUD)) ? ExplicitDefaults.BullseyeOnHUD : BullseyeOnHUD);
         }
 
         [JsonIgnore]
@@ -140,6 +164,7 @@ namespace JAFDTC.Models.A10C.Misc
         public MiscSystem(MiscSystem other)
         {
             CoordSystem = new(other.CoordSystem);
+            BullseyeOnHUD = new(other.BullseyeOnHUD);
             FlightPlan1Manual = new(other.FlightPlan1Manual);
          }
 
@@ -156,6 +181,7 @@ namespace JAFDTC.Models.A10C.Misc
         public void Reset()
         {
             CoordSystem = "";
+            BullseyeOnHUD = "";
             FlightPlan1Manual = "";
          }
     }

@@ -163,6 +163,8 @@ namespace JAFDTC.Models.A10C
             ufc.AddAction(3008, "8", delay, 1);
             ufc.AddAction(3009, "9", delay, 1);
             ufc.AddAction(3010, "0", delay, 1);
+            ufc.AddAction(3011, "SPC", delay, 1);
+            ufc.AddAction(3013, "FN", delay, 1);
             AddDevice(ufc);
 
             // ---- an/arc-210 uhf radio

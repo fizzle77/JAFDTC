@@ -50,10 +50,12 @@ namespace JAFDTC.Models.A10C.Upload
         public override void Build()
         {
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
+            AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
             if (!_cfg.Misc.IsDefault)
             {
                 BuildCoordSystem(cdu, _cfg.Misc);
+                BuildBullseyeOnHUD(cdu, ufc, _cfg.Misc);
                 BuildFlightPlan1Manual(cdu, _cfg.Misc);
             }
         }
@@ -91,6 +93,23 @@ namespace JAFDTC.Models.A10C.Upload
             // AddActions(rmfd, new() { "RMFD_01" });
             // AddWait(WAIT_BASE);
             // AddActions(rmfd, new() { "RMFD_07", "RMFD_01", "RMFD_03", });
+        }
+
+        /// <summary>
+        /// configure the bullseye on hud setting according to the non-default programming settings
+        /// </summary>
+        /// <param name="cdu"></param>
+        /// <param name="miscSystem"></param>
+        private void BuildBullseyeOnHUD(AirframeDevice cdu, AirframeDevice ufc, MiscSystem miscSystem)
+        {
+            if (miscSystem.IsBullseyeOnHUDDefault)
+                return;
+
+            // Navigate to WAYPT page with UFC
+            AddActions(ufc, new() { "FN", "SPC"});
+
+            // CDU
+            AddActions(cdu, new() { "CLR", "LSK_7R", "LSK_9L" }); // TODO verify current setting?
         }
 
         /// <summary>

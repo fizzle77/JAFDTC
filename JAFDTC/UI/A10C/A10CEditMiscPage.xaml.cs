@@ -83,6 +83,7 @@ namespace JAFDTC.UI.A10C
         private void CopyConfigToEdit()
         {
             EditMisc.CoordSystem = Config.Misc.CoordSystem;
+            EditMisc.BullseyeOnHUD = Config.Misc.BullseyeOnHUD;
             EditMisc.FlightPlan1Manual = Config.Misc.FlightPlan1Manual;
         }
 
@@ -91,6 +92,7 @@ namespace JAFDTC.UI.A10C
             if (!EditMisc.HasErrors)
             {
                 Config.Misc.CoordSystem = EditMisc.CoordSystem;
+                Config.Misc.BullseyeOnHUD = EditMisc.BullseyeOnHUD;
                 Config.Misc.FlightPlan1Manual = EditMisc.FlightPlan1Manual;
 
                 if (isPersist)
@@ -125,6 +127,13 @@ namespace JAFDTC.UI.A10C
             }
         }
 
+        // rebuild the setup of the bullseye on HUD setting according to the current settings. 
+        //
+        private void RebuildBullseyeOnHUDSetup()
+        {
+            uiCkboxBullsOnHUD.IsChecked = EditMisc.IsBullseyeOnHUDValue;
+        }
+
         // rebuild the setup of the first flight plan's manual setting according to the current settings. 
         //
         private void RebuildFlightPlan1ManualSetup()
@@ -152,6 +161,7 @@ namespace JAFDTC.UI.A10C
         {
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(MiscSystem.SystemTag));
             Utilities.SetEnableState(uiComboCoordSystem, isEditable);
+            Utilities.SetEnableState(uiCkboxBullsOnHUD, isEditable);
             Utilities.SetEnableState(uiComboFlightPlan1Manual, isEditable);
 
             Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
@@ -169,6 +179,7 @@ namespace JAFDTC.UI.A10C
                 {
                     IsRebuildingUI = true;
                     RebuildCoordSystemSetup();
+                    RebuildBullseyeOnHUDSetup();
                     RebuildFlightPlan1ManualSetup();
                     RebuildLinkControls();
                     RebuildEnableState();
@@ -231,6 +242,18 @@ namespace JAFDTC.UI.A10C
             if (!IsRebuildingUI && (item != null) && (item.Tag != null))
             {
                 EditMisc.CoordSystem = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        // ---- bullseye on hud setup -------------------------------------------------------------------------------------------
+
+        private void uiCkboxBullsOnHUD_Click(object sender, RoutedEventArgs args)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            if (!IsRebuildingUI && (checkBox != null))
+            {
+                EditMisc.BullseyeOnHUD = checkBox.IsChecked.ToString();
                 CopyEditToConfig(true);
             }
         }

@@ -32,6 +32,7 @@
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -41,7 +42,7 @@
             <!-- Coordinate System setup -->
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
-                CDU Navigation Configuration:
+                CDU Misc Configuration:
             </TextBlock>
             <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,0"
                 Style="{StaticResource EditorParamStaticTextBlockStyle}"
@@ -60,13 +61,26 @@
                 </ComboBox.Items>
             </ComboBox>
 
-            <!-- Flight Plan 1 Auto/Manual setup -->
+            <!-- Bullseye on HUD setup -->
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0"
+                Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                HorizontalTextAlignment="Right">
+                Bullseye on HUD
+            </TextBlock>
+            <CheckBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0"
+                x:Name="uiCkboxBullsOnHUD"
+                VerticalAlignment="Center"
+                ToolTipService.ToolTip="Display Bullseye Position on HUD"
+                Click="uiCkboxBullsOnHUD_Click">
+            </CheckBox>
+
+            <!-- Flight Plan 1 Auto/Manual setup -->
+            <TextBlock Grid.Row="3" Grid.Column="0" Margin="12,12,0,0"
                 Style="{StaticResource EditorParamStaticTextBlockStyle}"
                 HorizontalTextAlignment="Right">
                 FPM Flight Plan 01
             </TextBlock>
-            <ComboBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0" Width="200"
+            <ComboBox Grid.Row="3" Grid.Column="1" Margin="12,12,0,0" Width="200"
                 x:Name="uiComboFlightPlan1Manual"
                 VerticalAlignment="Center"
                 ToolTipService.ToolTip="Flight Plan 01 Auto/Manual"
