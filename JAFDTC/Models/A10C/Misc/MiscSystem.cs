@@ -40,6 +40,15 @@ namespace JAFDTC.Models.A10C.Misc
         Manual = 1
     }
 
+    // defines the flight plan auto options
+    //
+    public enum SpeedDisplayOptions
+    {
+        IAS = 0,
+        TAS = 1,
+        GND = 2
+    }
+
     /// <summary>
     /// TODO: document
     /// </summary>
@@ -88,6 +97,17 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
+        private string _speedDisplay;                              // integer [0, 1, 2]
+        public string SpeedDisplay
+        {
+            get => _speedDisplay;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
+                SetProperty(ref _speedDisplay, value, error);
+            }
+        }
+
         // ---- following properties are synthesized
 
         // returns a MiscSystem with the fields populated with the actual default values (note that usually the value
@@ -99,7 +119,8 @@ namespace JAFDTC.Models.A10C.Misc
         {
             CoordSystem = "0", // Lat/Long
             BullseyeOnHUD = false.ToString(),
-            FlightPlan1Manual = "0" // Auto
+            FlightPlan1Manual = "0", // Auto
+            SpeedDisplay = "0", // IAS
         };
 
         // returns true if the instance indicates a default setup (all fields are "") or the object is in explicit
@@ -129,6 +150,12 @@ namespace JAFDTC.Models.A10C.Misc
             get => string.IsNullOrEmpty(FlightPlan1Manual) || FlightPlan1Manual == ExplicitDefaults.FlightPlan1Manual;
         }
 
+        [JsonIgnore]
+        public bool IsSpeedDisplayDefault
+        {
+            get => string.IsNullOrEmpty(SpeedDisplay) || SpeedDisplay == ExplicitDefaults.SpeedDisplay;
+        }
+
 
         // ---- following accessors get the current value (default or non-default) for various properties
 
@@ -150,6 +177,12 @@ namespace JAFDTC.Models.A10C.Misc
             get => (FlightPlanManualOptions)int.Parse((string.IsNullOrEmpty(FlightPlan1Manual)) ? ExplicitDefaults.FlightPlan1Manual : FlightPlan1Manual);
         }
 
+        [JsonIgnore]
+        public SpeedDisplayOptions SpeedDisplayValue
+        {
+            get => (SpeedDisplayOptions)int.Parse((string.IsNullOrEmpty(SpeedDisplay)) ? ExplicitDefaults.SpeedDisplay : SpeedDisplay);
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction
@@ -166,6 +199,7 @@ namespace JAFDTC.Models.A10C.Misc
             CoordSystem = new(other.CoordSystem);
             BullseyeOnHUD = new(other.BullseyeOnHUD);
             FlightPlan1Manual = new(other.FlightPlan1Manual);
+            SpeedDisplay = new(other.SpeedDisplay);
          }
 
         public virtual object Clone() => new MiscSystem(this);
@@ -183,6 +217,7 @@ namespace JAFDTC.Models.A10C.Misc
             CoordSystem = "";
             BullseyeOnHUD = "";
             FlightPlan1Manual = "";
+            SpeedDisplay = "";
          }
     }
 }

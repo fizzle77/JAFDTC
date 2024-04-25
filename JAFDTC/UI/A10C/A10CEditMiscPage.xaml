@@ -33,6 +33,7 @@
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -49,7 +50,7 @@
                 HorizontalTextAlignment="Right">
                 Coordinate System
             </TextBlock>
-            <ComboBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" Width="200"
+            <ComboBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
                 x:Name="uiComboCoordSystem"
                 VerticalAlignment="Center"
                 ToolTipService.ToolTip="Coordinate System Selection"
@@ -80,7 +81,7 @@
                 HorizontalTextAlignment="Right">
                 FPM Flight Plan 01
             </TextBlock>
-            <ComboBox Grid.Row="3" Grid.Column="1" Margin="12,12,0,0" Width="200"
+            <ComboBox Grid.Row="3" Grid.Column="1" Margin="12,12,0,0"
                 x:Name="uiComboFlightPlan1Manual"
                 VerticalAlignment="Center"
                 ToolTipService.ToolTip="Flight Plan 01 Auto/Manual"
@@ -89,6 +90,25 @@
                     <!-- Tag is enum TODO -->
                     <TextBlock Text="Auto" Tag="0"/>
                     <TextBlock Text="Manual" Tag="1"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- STEER Page Speed Display setup -->
+            <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,12,0,0"
+                Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                HorizontalTextAlignment="Right">
+                STEER Page Speed Display
+            </TextBlock>
+            <ComboBox Grid.Row="4" Grid.Column="1" Margin="12,12,0,0"
+                x:Name="uiComboSpeedDisplay"
+                VerticalAlignment="Center"
+                ToolTipService.ToolTip="Speed Displayed on the CDU STEER Page"
+                SelectionChanged="ComboSpeedDisplay_SelectionChanged">
+                <ComboBox.Items>
+                    <!-- Tag is enum TODO -->
+                    <TextBlock Text="IAS" Tag="0"/>
+                    <TextBlock Text="TAS" Tag="1"/>
+                    <TextBlock Text="GND" Tag="2"/>
                 </ComboBox.Items>
             </ComboBox>
         </Grid>

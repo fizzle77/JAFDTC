@@ -85,6 +85,7 @@ namespace JAFDTC.UI.A10C
             EditMisc.CoordSystem = Config.Misc.CoordSystem;
             EditMisc.BullseyeOnHUD = Config.Misc.BullseyeOnHUD;
             EditMisc.FlightPlan1Manual = Config.Misc.FlightPlan1Manual;
+            EditMisc.SpeedDisplay = Config.Misc.SpeedDisplay;
         }
 
         private void CopyEditToConfig(bool isPersist = false)
@@ -94,6 +95,7 @@ namespace JAFDTC.UI.A10C
                 Config.Misc.CoordSystem = EditMisc.CoordSystem;
                 Config.Misc.BullseyeOnHUD = EditMisc.BullseyeOnHUD;
                 Config.Misc.FlightPlan1Manual = EditMisc.FlightPlan1Manual;
+                Config.Misc.SpeedDisplay = EditMisc.SpeedDisplay;
 
                 if (isPersist)
                 {
@@ -146,6 +148,18 @@ namespace JAFDTC.UI.A10C
             }
         }
 
+        // rebuild the setup of the speed display setting according to the current settings. 
+        //
+        private void RebuildSpeedDisplaySetup()
+        {
+            int speedDisplay = (string.IsNullOrEmpty(EditMisc.SpeedDisplay)) ? int.Parse(_miscSysDefault.SpeedDisplay)
+                                                                             : int.Parse(EditMisc.SpeedDisplay);
+            if (uiComboSpeedDisplay.SelectedIndex != speedDisplay)
+            {
+                uiComboSpeedDisplay.SelectedIndex = speedDisplay;
+            }
+        }
+
         // TODO: document
         private void RebuildLinkControls()
         {
@@ -163,6 +177,7 @@ namespace JAFDTC.UI.A10C
             Utilities.SetEnableState(uiComboCoordSystem, isEditable);
             Utilities.SetEnableState(uiCkboxBullsOnHUD, isEditable);
             Utilities.SetEnableState(uiComboFlightPlan1Manual, isEditable);
+            Utilities.SetEnableState(uiComboSpeedDisplay, isEditable);
 
             Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
             Utilities.SetEnableState(uiPageBtnReset, !EditMisc.IsDefault);
@@ -181,6 +196,7 @@ namespace JAFDTC.UI.A10C
                     RebuildCoordSystemSetup();
                     RebuildBullseyeOnHUDSetup();
                     RebuildFlightPlan1ManualSetup();
+                    RebuildSpeedDisplaySetup();
                     RebuildLinkControls();
                     RebuildEnableState();
                     IsRebuildingUI = false;
@@ -236,7 +252,7 @@ namespace JAFDTC.UI.A10C
 
         // ---- coordinate system setup -------------------------------------------------------------------------------------------
 
-        private void ComboCoordSystem_SelectionChanged(object sender, RoutedEventArgs args)
+        private void ComboCoordSystem_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
             TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
             if (!IsRebuildingUI && (item != null) && (item.Tag != null))
@@ -260,12 +276,24 @@ namespace JAFDTC.UI.A10C
 
         // ---- flight plan 1 manual/auto setup -------------------------------------------------------------------------------------------
 
-        private void ComboFlightPlan1Manual_SelectionChanged(object sender, RoutedEventArgs args)
+        private void ComboFlightPlan1Manual_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
             TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
             if (!IsRebuildingUI && (item != null) && (item.Tag != null))
             {
                 EditMisc.FlightPlan1Manual = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        // ---- steer page speed display setup -------------------------------------------------------------------------------------------
+
+        private void ComboSpeedDisplay_SelectionChanged(object sender, SelectionChangedEventArgs args)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.SpeedDisplay = (string)item.Tag;
                 CopyEditToConfig(true);
             }
         }

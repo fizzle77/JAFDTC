@@ -57,6 +57,7 @@ namespace JAFDTC.Models.A10C.Upload
                 BuildCoordSystem(cdu, _cfg.Misc);
                 BuildBullseyeOnHUD(cdu, ufc, _cfg.Misc);
                 BuildFlightPlan1Manual(cdu, _cfg.Misc);
+                BuildSpeedDisplay(cdu, ufc, _cfg.Misc);
             }
         }
 
@@ -124,6 +125,26 @@ namespace JAFDTC.Models.A10C.Upload
 
             // CDU
             AddActions(cdu, new() { "FPM", "LSK_3L" }); // TODO verify current setting?
+        }
+
+        /// <summary>
+        /// configure the CDU Steerpoint page speed display setting according to the non-default programming settings
+        /// </summary>
+        /// <param name="cdu"></param>
+        /// <param name="miscSystem"></param>
+        private void BuildSpeedDisplay(AirframeDevice cdu, AirframeDevice ufc, MiscSystem miscSystem)
+        {
+            if (miscSystem.IsSpeedDisplayDefault)
+                return; // IAS
+
+            // Navigate to STEER page with UFC
+            AddActions(ufc, new() { "FN", "0" });
+
+            // CDU
+            // TODO verify current setting?
+            AddActions(cdu, new() { "LSK_9R" }); // TAS
+            if (miscSystem.SpeedDisplayValue == SpeedDisplayOptions.GND)
+                AddActions(cdu, new() { "LSK_9R" });
         }
     }
 }
