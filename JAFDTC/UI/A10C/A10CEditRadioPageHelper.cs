@@ -209,5 +209,8 @@ namespace JAFDTC.UI.F16C
 
         public int RadioPresetCount(int radio, IConfiguration config)
             => ((A10CConfiguration)config).Radio.Presets[radio].Count;
+
+        public override bool ValidateFrequency(int radio, string freq, bool isNoEValid = true)
+            => RadioSystem.IsFreqValidForRadio((RadioSystem.Radios)radio, freq, isNoEValid);
     }
 }
