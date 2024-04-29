@@ -55,11 +55,17 @@ namespace JAFDTC.Models.A10C.Upload
         {
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
+            AirframeDevice aap = _aircraft.GetDevice("AAP");
 
             if (wypts.Count > 0)
             {
-                // TODO: set STEER_PT to MISSION
-                // TODO: set PAGE to OTHER
+                // STEER PT Knob to MISSION
+                AddActions(aap, new() { "STEER_MISSION" });
+                AddWait(WAIT_BASE);
+
+                // CDU Page Knob to OTHER
+                AddActions(aap, new() { "PAGE_OTHER" });
+                AddWait(WAIT_BASE);
 
                 AddActions(cdu, new() { "WP", "LSK_3L" });
                 AddWait(WAIT_BASE);
