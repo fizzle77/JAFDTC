@@ -132,7 +132,11 @@ namespace JAFDTC.Models.A10C.Upload
                 return;
 
             // CDU
-            AddActions(cdu, new() { "FPM", "LSK_3L" }); // TODO verify current setting?
+            AddAction(cdu, "FPM");
+            AddIfBlock("IsFlightPlanNotManual", null, delegate ()
+            {
+                AddAction(cdu, "LSK_3L");
+            });
         }
 
         /// <summary>

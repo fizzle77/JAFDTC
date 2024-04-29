@@ -58,6 +58,14 @@ function JAFDTC_A10C_CheckCondition_IsBullsNotOnHUD()
     return false
 end
 
+function JAFDTC_A10C_CheckCondition_IsFlightPlanNotManual()
+    local value = JAFDTC_A10C_GetCDU_value("FPMode");
+    if value ~= "MAN" then
+        return true
+    end
+    return false
+end
+
 function JAFDTC_A10C_CheckCondition_SpeedIsNot(speed)
     JAFDTC_Log("SpeedIsNot(" .. speed .. ")");
     local table = JAFDTC_A10C_GetCDU();
