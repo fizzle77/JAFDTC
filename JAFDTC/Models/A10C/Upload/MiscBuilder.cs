@@ -149,10 +149,10 @@ namespace JAFDTC.Models.A10C.Upload
             AddActions(ufc, new() { "FN", "0" });
 
             // CDU
-            // TODO verify current setting?
-            AddActions(cdu, new() { "LSK_9R" }); // TAS
-            if (miscSystem.SpeedDisplayValue == SpeedDisplayOptions.GND)
-                AddActions(cdu, new() { "LSK_9R" });
+            AddWhileBlock("SpeedIsNot", new() { $"{miscSystem.SpeedDisplayValue}" }, delegate () 
+            { 
+                AddAction(cdu, "LSK_9R");
+            });
         }
 
         /// <summary>

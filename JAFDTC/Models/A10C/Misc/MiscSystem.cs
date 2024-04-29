@@ -46,7 +46,7 @@ namespace JAFDTC.Models.A10C.Misc
     {
         IAS = 0,
         TAS = 1,
-        GND = 2
+        GS = 2
     }
 
     // defines the aap steer pt knob options
@@ -173,7 +173,7 @@ namespace JAFDTC.Models.A10C.Misc
         public bool IsDefault
         {
             get => IsCoordSystemDefault && IsBullseyeOnHUDDefault && IsFlightPlan1ManualDefault
-                   && IsAapSteerPtDefault && IsAapPageDefault;
+                   && IsSpeedDisplayDefault && IsAapSteerPtDefault && IsAapPageDefault;
         }
 
         [JsonIgnore]

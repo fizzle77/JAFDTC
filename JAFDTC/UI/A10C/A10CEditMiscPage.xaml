@@ -112,7 +112,7 @@
                     <!-- Tag is enum TODO -->
                     <TextBlock Text="IAS" Tag="0"/>
                     <TextBlock Text="TAS" Tag="1"/>
-                    <TextBlock Text="GND" Tag="2"/>
+                    <TextBlock Text="GS" Tag="2"/>
                 </ComboBox.Items>
             </ComboBox>
 

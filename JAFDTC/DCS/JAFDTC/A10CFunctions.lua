@@ -22,14 +22,20 @@ You should have received a copy of the GNU General Public License along with thi
 dofile(lfs.writedir() .. 'Scripts/JAFDTC/CommonFunctions.lua')
 
 function JAFDTC_A10C_GetCDU()
-	return JAFDTC_ParseDisplay(3)
+	local table = JAFDTC_ParseDisplay(3)
+    JAFDTC_DebugDisplay(table);
+    return table;
+end
+
+function JAFDTC_A10C_GetCDU_value(key)
+	local table = JAFDTC_A10C_GetCDU();
+    local value = table[key] or "---";
+    JAFDTC_Log("CDU table[" .. key .. "]: " .. value);
+    return value
 end
 
 function JAFDTC_A10C_CheckCondition_IsCoordFmtLL()
-    local table = JAFDTC_A10C_GetCDU();
-    JAFDTC_DebugDisplay(table);
-    local value = table["WAYPTCoordFormat"] or "---";
-    JAFDTC_Log("table value: " .. value);
+    local value = JAFDTC_A10C_GetCDU_value("WAYPTCoordFormat");
     if string.sub(value, 1, 3) == "L/L" then
         return true
     end
@@ -37,10 +43,7 @@ function JAFDTC_A10C_CheckCondition_IsCoordFmtLL()
 end
 
 function JAFDTC_A10C_CheckCondition_IsCoordFmtNotLL()
-    local table = JAFDTC_A10C_GetCDU();
-    JAFDTC_DebugDisplay(table);
-    local value = table["WAYPTCoordFormat"] or "---";
-    JAFDTC_Log("table value: " .. value);
+    local value = JAFDTC_A10C_GetCDU_value("WAYPTCoordFormat");
     if string.sub(value, 1, 3) ~= "L/L" then
         return true
     end
@@ -48,14 +51,26 @@ function JAFDTC_A10C_CheckCondition_IsCoordFmtNotLL()
 end
 
 function JAFDTC_A10C_CheckCondition_IsBullsNotOnHUD()
-    local table = JAFDTC_A10C_GetCDU();
-    JAFDTC_DebugDisplay(table);
-    local value = table["HUD_OFF"] or "---";
-    JAFDTC_Log("table value: " .. value);
+    local value = JAFDTC_A10C_GetCDU_value("HUD_OFF");
     if value == "OFF" then
         return true
     end
     return false
+end
+
+function JAFDTC_A10C_CheckCondition_SpeedIsNot(speed)
+    JAFDTC_Log("SpeedIsNot(" .. speed .. ")");
+    local table = JAFDTC_A10C_GetCDU();
+    if speed == "IAS" then
+        return table["STRSpeedMode4"] ~= "IAS"
+    end
+    if speed == "TAS" then
+        return table["STRSpeedMode5"] ~= "TAS"
+    end
+    if speed == "GS" then
+        return table["STRSpeedMode6"] ~= "GS"
+    end
+    return true
 end
 
 --[[
