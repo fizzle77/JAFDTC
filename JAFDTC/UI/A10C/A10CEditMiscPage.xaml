@@ -37,6 +37,8 @@
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -147,7 +149,7 @@
                 PAGE
             </TextBlock>
             <ComboBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0"
-                x:Name="uiComboPage"
+                x:Name="uiComboAapPage"
                 VerticalAlignment="Center"
                 ToolTipService.ToolTip="CDU PAGE Selection"
                 SelectionChanged="ComboPage_SelectionChanged">
@@ -157,6 +159,30 @@
                     <TextBlock Text="Position" Tag="1"/>
                     <TextBlock Text="Steer" Tag="2"/>
                     <TextBlock Text="Waypt" Tag="3"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                Autopilot Configuration:
+            </TextBlock>
+
+            <!-- Autopilot Mode Switch setup -->
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0"
+                Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                HorizontalTextAlignment="Right">
+                Mode
+            </TextBlock>
+            <ComboBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0"
+                x:Name="uiComboAutopilotMode"
+                VerticalAlignment="Center"
+                ToolTipService.ToolTip="Autopilot Mode Selection"
+                SelectionChanged="ComboAutopilotMode_SelectionChanged">
+                <ComboBox.Items>
+                    <!-- Tag is enum TODO -->
+                    <TextBlock Text="PATH" Tag="1"/>
+                    <TextBlock Text="ALT/HDG" Tag="0"/>
+                    <TextBlock Text="ALT" Tag="-1"/>
                 </ComboBox.Items>
             </ComboBox>
         </Grid>

@@ -88,6 +88,7 @@ namespace JAFDTC.UI.A10C
             EditMisc.SpeedDisplay = Config.Misc.SpeedDisplay;
             EditMisc.AapSteerPt = Config.Misc.AapSteerPt;
             EditMisc.AapPage = Config.Misc.AapPage;
+            EditMisc.AutopilotMode = Config.Misc.AutopilotMode;
         }
 
         private void CopyEditToConfig(bool isPersist = false)
@@ -100,6 +101,7 @@ namespace JAFDTC.UI.A10C
                 Config.Misc.SpeedDisplay = EditMisc.SpeedDisplay;
                 Config.Misc.AapSteerPt = EditMisc.AapSteerPt;
                 Config.Misc.AapPage = EditMisc.AapPage;
+                Config.Misc.AutopilotMode = EditMisc.AutopilotMode;
 
                 if (isPersist)
                 {
@@ -182,9 +184,25 @@ namespace JAFDTC.UI.A10C
         {
             int aapPage = (string.IsNullOrEmpty(EditMisc.AapPage)) ? int.Parse(_miscSysDefault.AapPage)
                                                                              : int.Parse(EditMisc.AapPage);
-            if (uiComboPage.SelectedIndex != aapPage)
+            if (uiComboAapPage.SelectedIndex != aapPage)
             {
-                uiComboPage.SelectedIndex = aapPage;
+                uiComboAapPage.SelectedIndex = aapPage;
+            }
+        }
+
+        // rebuild the setup of the autopilot mode according to the current settings. 
+        //
+        private void RebuildAutopilotModeSetup()
+        {
+            int autopilotMode = (string.IsNullOrEmpty(EditMisc.AutopilotMode)) ? int.Parse(_miscSysDefault.AutopilotMode)
+                                                                             : int.Parse(EditMisc.AutopilotMode);
+            foreach (TextBlock item in uiComboAutopilotMode.Items)
+            {
+                if ( int.Parse((string)item.Tag) == autopilotMode)
+                {
+                    uiComboAutopilotMode.SelectedItem = item;
+                    return;
+                }
             }
         }
 
@@ -207,7 +225,8 @@ namespace JAFDTC.UI.A10C
             Utilities.SetEnableState(uiComboFlightPlan1Manual, isEditable);
             Utilities.SetEnableState(uiComboSpeedDisplay, isEditable);
             Utilities.SetEnableState(uiComboSteerPt, isEditable);
-            Utilities.SetEnableState(uiComboPage, isEditable);
+            Utilities.SetEnableState(uiComboAapPage, isEditable);
+            Utilities.SetEnableState(uiComboAutopilotMode, isEditable);
 
             Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
             Utilities.SetEnableState(uiPageBtnReset, !EditMisc.IsDefault);
@@ -229,6 +248,7 @@ namespace JAFDTC.UI.A10C
                     RebuildSpeedDisplaySetup();
                     RebuildAapSteerPtSetup();
                     RebuildAapPageSetup();
+                    RebuildAutopilotModeSetup();
 
                     RebuildLinkControls();
                     RebuildEnableState();
@@ -352,6 +372,18 @@ namespace JAFDTC.UI.A10C
             if (!IsRebuildingUI && (item != null) && (item.Tag != null))
             {
                 EditMisc.AapPage = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        // ---- autopilot mode switch setup -------------------------------------------------------------------------------------------
+
+        private void ComboAutopilotMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.AutopilotMode = (string)item.Tag;
                 CopyEditToConfig(true);
             }
         }

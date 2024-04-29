@@ -110,6 +110,13 @@ namespace JAFDTC.Models.A10C
 
             AddDevice(aap);
 
+            // ---- Autopilot (LASTE) panel
+
+            AirframeDevice ap = new(38, "AUTOPILOT");
+            ap.AddAction(3001, "AP_MODE", delay, 0); // -1 down, 0 mid, 1 up
+            AddDevice(ap);
+
+
             // ---- left mfd
 
             AirframeDevice lmfd = new(2, "LMFD");

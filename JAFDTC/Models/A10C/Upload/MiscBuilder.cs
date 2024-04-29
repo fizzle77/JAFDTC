@@ -51,7 +51,8 @@ namespace JAFDTC.Models.A10C.Upload
         {
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
-            AirframeDevice aap = _aircraft.GetDevice("AAP");
+            AirframeDevice aap = _aircraft.GetDevice("AAP"); // "auxiliary avionics panel"
+            AirframeDevice ap  = _aircraft.GetDevice("AUTOPILOT");
 
             if (!_cfg.Misc.IsDefault)
             {
@@ -61,6 +62,7 @@ namespace JAFDTC.Models.A10C.Upload
                 BuildSpeedDisplay(cdu, ufc, _cfg.Misc);
                 BuildAapSteerPt(aap, _cfg.Misc);
                 BuildAapPage(aap, _cfg.Misc);
+                BuildAutopilot(ap, _cfg.Misc);
             }
         }
 
@@ -202,6 +204,15 @@ namespace JAFDTC.Models.A10C.Upload
                     AddAction(aap, "PAGE_WAYPT");
                     break;
             }
+        }
+
+        private void BuildAutopilot(AirframeDevice ap, MiscSystem miscSystem)
+        {
+            if (miscSystem.IsAutopilotModeDefault)
+                return; // Alt/Hdg
+
+            int setValue = (int)miscSystem.AutopilotModeValue;
+            AddDynamicAction(ap, "AP_MODE", setValue, setValue);
         }
     }
 }
