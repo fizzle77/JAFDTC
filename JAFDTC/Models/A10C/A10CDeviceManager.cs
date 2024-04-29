@@ -52,6 +52,7 @@ namespace JAFDTC.Models.A10C
             cdu.AddAction(3022, "8", delayChar, 1);
             cdu.AddAction(3023, "9", delayChar, 1);
             cdu.AddAction(3024, "0", delayChar, 1);
+            cdu.AddAction(3025, ".", delayChar, 1);
             cdu.AddAction(3027, "A", delayChar, 1);
             cdu.AddAction(3028, "B", delayChar, 1);
             cdu.AddAction(3029, "C", delayChar, 1);

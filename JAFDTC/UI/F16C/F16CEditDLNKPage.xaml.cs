@@ -32,10 +32,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using Windows.Storage.Pickers;
-using Windows.Storage;
-using WinRT.Interop;
 
 namespace JAFDTC.UI.F16C
 {
@@ -46,8 +42,6 @@ namespace JAFDTC.UI.F16C
     {
         public static ConfigEditorPageInfo PageInfo
             => new(DLNKSystem.SystemTag, "Datalink", "DLNK", Glyphs.DLNK, typeof(F16CEditDLNKPage));
-
-        private readonly static string PilotDbFilename = "jafdtc-pilots-f16c.json";
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -105,8 +99,7 @@ namespace JAFDTC.UI.F16C
             IsRebuildPending = false;
             IsRebuildingUI = false;
 
-            PilotDbase = FileManager.LoadUserDbase<ViperDriver>(PilotDbFilename);
-            FileManager.SaveUserDbase<ViperDriver>(PilotDbFilename, PilotDbase);
+            PilotDbase = FileManager.LoadUserDbase<ViperDriver>(F16CConfigAuxCmdPilotDbase.PilotDbFilename);
 
             _configNameToUID = new Dictionary<string, string>();
             _configNameList = new List<string>();
@@ -320,96 +313,6 @@ namespace JAFDTC.UI.F16C
         // ui support
         //
         // ------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// handle imports into the pilot database. open a file picker to select the file to import from, then
-        /// attempt to read the file and deserialize it to either replace or append-to the existing database.
-        /// returns the new database (this will be the current database on errors).
-        /// </summary>
-        private async Task<List<ViperDriver>> PilotDbImport(List<ViperDriver> curDbase)
-        {
-            List<ViperDriver> newDbase = new(curDbase);
-            try
-            {
-                // ---- pick file
-
-                FileOpenPicker picker = new()
-                {
-                    SuggestedStartLocation = PickerLocationId.Desktop
-                };
-                picker.FileTypeFilter.Add(".json");
-                var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-                InitializeWithWindow.Initialize(picker, hwnd);
-
-                StorageFile file = await picker.PickSingleFileAsync();
-
-                // ---- do the import
-
-                if ((file != null) && (file.FileType.ToLower() == ".json"))
-                {
-                    ContentDialogResult action = await Utilities.Message3BDialog(Content.XamlRoot,
-                        "Import Pilots",
-                        "Do you want to replace or append to the pilots currently in the database?",
-                        "Replace",
-                        "Append",
-                        "Cancel");
-                    if (action != ContentDialogResult.None)
-                    {
-                        List<ViperDriver> fileDrivers = FileManager.LoadUserDbase<ViperDriver>(file.Path);
-                        if (fileDrivers != null)
-                        {
-                            if (action == ContentDialogResult.Primary)
-                            {
-                                newDbase.Clear();
-                            }
-                            foreach (ViperDriver driver in fileDrivers)
-                            {
-                                newDbase.Add(driver);
-                            }
-                        }
-                        else
-                        {
-                            await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed", "Unable to read the pilots from the database file.");
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                FileManager.Log($"F16CEditDLNKPage:PilotDbImport exception {ex}");
-                await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed", "Unable to import pilots.");
-            }
-            return newDbase;
-        }
-
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private async void PilotDbExport(List<ViperDriver> exportDrivers)
-        {
-            try
-            {
-                FileSavePicker picker = new()
-                {
-                    SuggestedStartLocation = PickerLocationId.Desktop,
-                    SuggestedFileName = "Viper Drivers"
-                };
-                picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
-                var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-                InitializeWithWindow.Initialize(picker, hwnd);
-
-                StorageFile file = await picker.PickSaveFileAsync();
-                if (file != null)
-                {
-                    FileManager.SaveUserDbase<ViperDriver>(file.Path, exportDrivers);
-                }
-            }
-            catch (Exception ex)
-            {
-                FileManager.Log($"F16CEditDLNKPage:PilotDbExport exception {ex}");
-                await Utilities.Message1BDialog(Content.XamlRoot, "Export Failed", "Unable to export pilots.");
-            }
-        }
 
         /// <summary>
         /// returns a StackPanel for use as a pilot item in the callsign combo boxes. items are a pilot name with the
@@ -843,42 +746,6 @@ namespace JAFDTC.UI.F16C
             }
         }
 
-        // ---- pilot database ----------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private async void PDbBtnEdit_Click(object sender, RoutedEventArgs args)
-        {
-            while (true)
-            {
-                F16CPilotDbaseDialog dialog = new(Content.XamlRoot, PilotDbase);
-                ContentDialogResult result = await dialog.ShowAsync();
-                if (dialog.IsExportRequested)
-                {
-                    PilotDbase = new List<ViperDriver>(dialog.Pilots);
-                    FileManager.SaveUserDbase<ViperDriver>(PilotDbFilename, PilotDbase);
-                    PilotDbExport(dialog.SelectedDrivers);
-                }
-                else if (dialog.IsImportRequested)
-                {
-                    PilotDbase = await PilotDbImport(new List<ViperDriver>(dialog.Pilots));
-                    FileManager.SaveUserDbase<ViperDriver>(PilotDbFilename, PilotDbase);
-                }
-                else if (result == ContentDialogResult.Primary)
-                {
-                    PilotDbase = new List<ViperDriver>(dialog.Pilots);
-                    FileManager.SaveUserDbase<ViperDriver>(PilotDbFilename, PilotDbase);
-                    break;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            RebuildCallsignCombos();
-        }
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // events
@@ -894,6 +761,15 @@ namespace JAFDTC.UI.F16C
         }
 
         /// <summary>
+        /// on aux command invoked, update the state of the editor based on the command.
+        /// </summary>
+        private void AuxCommandInvokedHandler(object sender, ConfigAuxCommandInfo args)
+        {
+            PilotDbase = FileManager.LoadUserDbase<ViperDriver>(F16CConfigAuxCmdPilotDbase.PilotDbFilename);
+            RebuildCallsignCombos();
+        }
+
+        /// <summary>
         /// on navigating to this page, set up internal and ui state.
         /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
@@ -901,6 +777,7 @@ namespace JAFDTC.UI.F16C
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
             Config = (F16CConfiguration)NavArgs.Config;
 
+            NavArgs.ConfigPage.AuxCommandInvoked += AuxCommandInvokedHandler;
             Config.ConfigurationSaved += ConfigurationSavedHandler;
 
             Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, DLNKSystem.SystemTag,
@@ -920,6 +797,7 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         protected override void OnNavigatedFrom(NavigationEventArgs args)
         {
+            NavArgs.ConfigPage.AuxCommandInvoked -= AuxCommandInvokedHandler;
             Config.ConfigurationSaved -= ConfigurationSavedHandler;
 
             base.OnNavigatedFrom(args);

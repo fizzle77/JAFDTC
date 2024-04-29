@@ -69,7 +69,7 @@ namespace JAFDTC.UI.App
                 txtBlock.TextHighlighters.Clear();
                 for (int index = 0; index < badges.Length; index++)
                 {
-                    if (badges[index] == CfgEditorGlyphs.Badge[0])
+                    if (badges[index] == CfgEditorGlyphs.BADGE[0])
                     {
                         TextHighlighter highlighter = new()
                         {

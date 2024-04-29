@@ -239,7 +239,7 @@ namespace JAFDTC.Models.A10C.Upload
             AddActions(cdu, new() { "CLR", "CLR" }, ActionsForString(AdjustOnlyAlphaNum(descr)));
             AddAction(rmfd, "RMFD_16");
 
-            AddActions(cdu, new() { "CLR", "CLR" }, ActionsForString(preset.Frequency));
+            AddActions(cdu, new() { "CLR", "CLR" }, ActionsForString(AdjustNoSeparators(preset.Frequency)));
             AddAction(rmfd, "RMFD_17");
 
             if (!RadioSystem.IsModulationDefaultForFreq(RadioSystem.Radios.COMM1, preset.Frequency, preset.Modulation))

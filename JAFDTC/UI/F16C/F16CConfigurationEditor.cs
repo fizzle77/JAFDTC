@@ -2,7 +2,7 @@
 //
 // F16CConfigurationEditor.cs : supports editors for the f16c configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -28,13 +28,15 @@ using JAFDTC.Models.F16C.Misc;
 using JAFDTC.Models.F16C.Radio;
 using JAFDTC.Models.F16C.STPT;
 using JAFDTC.UI.App;
-using System.Collections.Generic;
+using Microsoft.UI.Xaml;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace JAFDTC.UI.F16C
 {
-    // defines the glyphs to use for each system editor page in the viper configuration.
-    //
+    /// <summary>
+    /// defines the glyphs to use for each system editor page in the viper configuration.
+    /// </summary>
     public class Glyphs
     {
         public const string CMDS = "\xEA18";
@@ -45,6 +47,7 @@ namespace JAFDTC.UI.F16C
         public const string MISC = "\xE8B7";
         public const string RADIO = "\xE704";
         public const string STPT = "\xE707";
+        public const string PILOT_DB = "\xE77B";
     }
 
     /// <summary>
@@ -65,9 +68,16 @@ namespace JAFDTC.UI.F16C
                 F16CEditMiscPage.PageInfo
         };
 
-        public F16CConfigurationEditor(IConfiguration config) => (Config) = (config);
+        private static readonly ObservableCollection<ConfigAuxCommandInfo> _configAuxCmdInfo = new()
+        {
+            new("PDb", "Edit Pilot Database", Glyphs.PILOT_DB)
+        };
 
         public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo() => _configEditorPageInfo;
+
+        public override ObservableCollection<ConfigAuxCommandInfo> ConfigAuxCommandInfo() => _configAuxCmdInfo;
+
+        public F16CConfigurationEditor(IConfiguration config) => (Config) = (config);
 
         public override ISystem SystemForConfig(IConfiguration config, string tag)
         {
@@ -84,6 +94,14 @@ namespace JAFDTC.UI.F16C
                 _ => null,
             };
             return system;
+        }
+
+        public override bool HandleAuxCommand(ConfigurationPage configPage, ConfigAuxCommandInfo cmd)
+        {
+            F16CConfigAuxCmdPilotDbase cmdHelper = new((Application.Current as JAFDTC.App)?.Window,
+                                                       configPage.Content.XamlRoot);
+            cmdHelper.RunPilotDbEditorUI(configPage, cmd);
+            return false;
         }
     }
 }
