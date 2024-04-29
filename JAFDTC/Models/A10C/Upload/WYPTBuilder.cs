@@ -73,11 +73,15 @@ namespace JAFDTC.Models.A10C.Upload
                 AddActions(cdu, new() { "CLR", "CLR" });
                 AddWait(WAIT_BASE);
 
+                bool resetUTM = false;
                 AddIfBlock("IsCoordFmtNotLL", null, delegate ()
                 {
+                    resetUTM = true;
                     AddActions(cdu, new() { "LSK_9R" });
                 });
                 BuildWaypoints(cdu, wypts);
+                if (resetUTM)
+                    AddActions(cdu, new() { "LSK_9R" });
             }
         }
 
