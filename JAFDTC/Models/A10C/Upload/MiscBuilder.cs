@@ -110,10 +110,15 @@ namespace JAFDTC.Models.A10C.Upload
                 return;
 
             // Navigate to WAYPT page with UFC
-            AddActions(ufc, new() { "FN", "SPC"});
+            AddActions(ufc, new() { "FN", "SPC" });
 
-            // CDU
-            AddActions(cdu, new() { "CLR", "LSK_7R", "LSK_9L" }); // TODO verify current setting?
+            // Navigate to ANCHOR PT page on  CDU
+            AddActions(cdu, new() { "CLR", "LSK_7R" });
+            // Turn BULLS ON if not already
+            AddIfBlock("IsBullsNotOnHUD", null, delegate ()
+            {
+                AddActions(cdu, new() { "LSK_9L" });
+            });
         }
 
         /// <summary>

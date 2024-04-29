@@ -27,7 +27,9 @@ end
 
 function JAFDTC_A10C_CheckCondition_IsCoordFmtLL()
     local table = JAFDTC_A10C_GetCDU();
+    JAFDTC_DebugDisplay(table);
     local value = table["WAYPTCoordFormat"] or "---";
+    JAFDTC_Log("table value: " .. value);
     if string.sub(value, 1, 3) == "L/L" then
         return true
     end
@@ -36,9 +38,21 @@ end
 
 function JAFDTC_A10C_CheckCondition_IsCoordFmtNotLL()
     local table = JAFDTC_A10C_GetCDU();
+    JAFDTC_DebugDisplay(table);
     local value = table["WAYPTCoordFormat"] or "---";
+    JAFDTC_Log("table value: " .. value);
     if string.sub(value, 1, 3) ~= "L/L" then
-        JAFDTC_DebugDisplay(table)
+        return true
+    end
+    return false
+end
+
+function JAFDTC_A10C_CheckCondition_IsBullsNotOnHUD()
+    local table = JAFDTC_A10C_GetCDU();
+    JAFDTC_DebugDisplay(table);
+    local value = table["HUD_OFF"] or "---";
+    JAFDTC_Log("table value: " .. value);
+    if value == "OFF" then
         return true
     end
     return false
