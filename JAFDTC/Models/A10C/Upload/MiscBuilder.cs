@@ -79,7 +79,7 @@ namespace JAFDTC.Models.A10C.Upload
             AddWait(WAIT_BASE);
             AddIfBlock("IsCoordFmtLL", null, delegate ()
             {
-                AddActions(cdu, new() { "LSK_9R" });
+                AddAction(cdu, "LSK_9R");
             });
 
             // TAD
@@ -117,7 +117,7 @@ namespace JAFDTC.Models.A10C.Upload
             // Turn BULLS ON if not already
             AddIfBlock("IsBullsNotOnHUD", null, delegate ()
             {
-                AddActions(cdu, new() { "LSK_9L" });
+                AddAction(cdu, "LSK_9L");
             });
         }
 
@@ -168,10 +168,10 @@ namespace JAFDTC.Models.A10C.Upload
             switch (miscSystem.AapSteerPtValue)
             {
                 case AapSteerPtOptions.Mark:
-                    AddActions(aap, new() { "STEER_MARK" });
+                    AddAction(aap, "STEER_MARK");
                     break;
                 case AapSteerPtOptions.Mission:
-                    AddActions(aap, new() { "STEER_MISSION" });
+                    AddAction(aap, "STEER_MISSION");
                     break;
             }
         }
@@ -189,13 +189,13 @@ namespace JAFDTC.Models.A10C.Upload
             switch (miscSystem.AapPageValue)
             {
                 case AapPageOptions.Position:
-                    AddActions(aap, new() { "PAGE_POSITION" });
+                    AddAction(aap, "PAGE_POSITION");
                     break;
                 case AapPageOptions.Steer:
-                    AddActions(aap, new() { "PAGE_STEER" });
+                    AddAction(aap, "PAGE_STEER");
                     break;
                 case AapPageOptions.Waypt:
-                    AddActions(aap, new() { "PAGE_WAYPT" });
+                    AddAction(aap, "PAGE_WAYPT");
                     break;
             }
         }
