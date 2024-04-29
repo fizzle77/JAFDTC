@@ -49,6 +49,25 @@ namespace JAFDTC.Models.A10C.Misc
         GND = 2
     }
 
+    // defines the aap steer pt knob options
+    //
+    public enum AapSteerPtOptions
+    {
+        FltPlan = 0,
+        Mark = 1,
+        Mission = 2
+    }
+
+    // defines the aap page options
+    //
+    public enum AapPageOptions
+    {
+        Other = 0,
+        Position = 1,
+        Steer = 2,
+        Waypt = 3
+    }
+
     /// <summary>
     /// TODO: document
     /// </summary>
@@ -108,6 +127,28 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
+        private string _aapSteerPt;                              // integer [0, 1, 2]
+        public string AapSteerPt
+        {
+            get => _aapSteerPt;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
+                SetProperty(ref _aapSteerPt, value, error);
+            }
+        }
+
+        private string _aapPage;                              // integer [0, 1, 2, 3]
+        public string AapPage
+        {
+            get => _aapPage;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 3)) ? null : "Invalid format";
+                SetProperty(ref _aapPage, value, error);
+            }
+        }
+
         // ---- following properties are synthesized
 
         // returns a MiscSystem with the fields populated with the actual default values (note that usually the value
@@ -121,6 +162,8 @@ namespace JAFDTC.Models.A10C.Misc
             BullseyeOnHUD = false.ToString(),
             FlightPlan1Manual = "0", // Auto
             SpeedDisplay = "0", // IAS
+            AapSteerPt = "0", // Flt Plan
+            AapPage = "0", // Other
         };
 
         // returns true if the instance indicates a default setup (all fields are "") or the object is in explicit
@@ -129,7 +172,8 @@ namespace JAFDTC.Models.A10C.Misc
         [JsonIgnore]
         public bool IsDefault
         {
-            get => IsCoordSystemDefault && IsBullseyeOnHUDDefault && IsFlightPlan1ManualDefault;
+            get => IsCoordSystemDefault && IsBullseyeOnHUDDefault && IsFlightPlan1ManualDefault
+                   && IsAapSteerPtDefault && IsAapPageDefault;
         }
 
         [JsonIgnore]
@@ -156,6 +200,17 @@ namespace JAFDTC.Models.A10C.Misc
             get => string.IsNullOrEmpty(SpeedDisplay) || SpeedDisplay == ExplicitDefaults.SpeedDisplay;
         }
 
+        [JsonIgnore]
+        public bool IsAapSteerPtDefault
+        {
+            get => string.IsNullOrEmpty(AapSteerPt) || AapSteerPt == ExplicitDefaults.AapSteerPt;
+        }
+
+        [JsonIgnore]
+        public bool IsAapPageDefault
+        {
+            get => string.IsNullOrEmpty(AapPage) || AapPage == ExplicitDefaults.AapPage;
+        }
 
         // ---- following accessors get the current value (default or non-default) for various properties
 
@@ -183,6 +238,18 @@ namespace JAFDTC.Models.A10C.Misc
             get => (SpeedDisplayOptions)int.Parse((string.IsNullOrEmpty(SpeedDisplay)) ? ExplicitDefaults.SpeedDisplay : SpeedDisplay);
         }
 
+        [JsonIgnore]
+        public AapSteerPtOptions AapSteerPtValue
+        {
+            get => (AapSteerPtOptions)int.Parse((string.IsNullOrEmpty(AapSteerPt)) ? ExplicitDefaults.AapSteerPt : AapSteerPt);
+        }
+
+        [JsonIgnore]
+        public AapPageOptions AapPageValue
+        {
+            get => (AapPageOptions)int.Parse((string.IsNullOrEmpty(AapPage)) ? ExplicitDefaults.AapPage : AapPage);
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction
@@ -200,6 +267,8 @@ namespace JAFDTC.Models.A10C.Misc
             BullseyeOnHUD = new(other.BullseyeOnHUD);
             FlightPlan1Manual = new(other.FlightPlan1Manual);
             SpeedDisplay = new(other.SpeedDisplay);
+            AapSteerPt = new(other.AapSteerPt);
+            AapPage = new(other.AapPage);
          }
 
         public virtual object Clone() => new MiscSystem(this);
@@ -218,6 +287,8 @@ namespace JAFDTC.Models.A10C.Misc
             BullseyeOnHUD = "";
             FlightPlan1Manual = "";
             SpeedDisplay = "";
+            AapSteerPt = "";
+            AapPage = "";
          }
     }
 }

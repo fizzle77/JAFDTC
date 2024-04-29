@@ -86,6 +86,8 @@ namespace JAFDTC.UI.A10C
             EditMisc.BullseyeOnHUD = Config.Misc.BullseyeOnHUD;
             EditMisc.FlightPlan1Manual = Config.Misc.FlightPlan1Manual;
             EditMisc.SpeedDisplay = Config.Misc.SpeedDisplay;
+            EditMisc.AapSteerPt = Config.Misc.AapSteerPt;
+            EditMisc.AapPage = Config.Misc.AapPage;
         }
 
         private void CopyEditToConfig(bool isPersist = false)
@@ -96,6 +98,8 @@ namespace JAFDTC.UI.A10C
                 Config.Misc.BullseyeOnHUD = EditMisc.BullseyeOnHUD;
                 Config.Misc.FlightPlan1Manual = EditMisc.FlightPlan1Manual;
                 Config.Misc.SpeedDisplay = EditMisc.SpeedDisplay;
+                Config.Misc.AapSteerPt = EditMisc.AapSteerPt;
+                Config.Misc.AapPage = EditMisc.AapPage;
 
                 if (isPersist)
                 {
@@ -160,6 +164,30 @@ namespace JAFDTC.UI.A10C
             }
         }
 
+        // rebuild the setup of the aap steer point according to the current settings. 
+        //
+        private void RebuildAapSteerPtSetup()
+        {
+            int aapSteerPt = (string.IsNullOrEmpty(EditMisc.AapSteerPt)) ? int.Parse(_miscSysDefault.AapSteerPt)
+                                                                             : int.Parse(EditMisc.AapSteerPt);
+            if (uiComboSteerPt.SelectedIndex != aapSteerPt)
+            {
+                uiComboSteerPt.SelectedIndex = aapSteerPt;
+            }
+        }
+
+        // rebuild the setup of the aap page according to the current settings. 
+        //
+        private void RebuildAapPageSetup()
+        {
+            int aapPage = (string.IsNullOrEmpty(EditMisc.AapPage)) ? int.Parse(_miscSysDefault.AapPage)
+                                                                             : int.Parse(EditMisc.AapPage);
+            if (uiComboPage.SelectedIndex != aapPage)
+            {
+                uiComboPage.SelectedIndex = aapPage;
+            }
+        }
+
         // TODO: document
         private void RebuildLinkControls()
         {
@@ -178,6 +206,8 @@ namespace JAFDTC.UI.A10C
             Utilities.SetEnableState(uiCkboxBullsOnHUD, isEditable);
             Utilities.SetEnableState(uiComboFlightPlan1Manual, isEditable);
             Utilities.SetEnableState(uiComboSpeedDisplay, isEditable);
+            Utilities.SetEnableState(uiComboSteerPt, isEditable);
+            Utilities.SetEnableState(uiComboPage, isEditable);
 
             Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
             Utilities.SetEnableState(uiPageBtnReset, !EditMisc.IsDefault);
@@ -197,6 +227,9 @@ namespace JAFDTC.UI.A10C
                     RebuildBullseyeOnHUDSetup();
                     RebuildFlightPlan1ManualSetup();
                     RebuildSpeedDisplaySetup();
+                    RebuildAapSteerPtSetup();
+                    RebuildAapPageSetup();
+
                     RebuildLinkControls();
                     RebuildEnableState();
                     IsRebuildingUI = false;
@@ -294,6 +327,31 @@ namespace JAFDTC.UI.A10C
             if (!IsRebuildingUI && (item != null) && (item.Tag != null))
             {
                 EditMisc.SpeedDisplay = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        // ---- aap steer pt knob setup -------------------------------------------------------------------------------------------
+
+        private void ComboSteerPt_SelectionChanged(object sender, SelectionChangedEventArgs args)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.AapSteerPt = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+
+        }
+
+        // ---- aap page knob setup -------------------------------------------------------------------------------------------
+
+        private void ComboPage_SelectionChanged(object sender, SelectionChangedEventArgs args)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.AapPage = (string)item.Tag;
                 CopyEditToConfig(true);
             }
         }

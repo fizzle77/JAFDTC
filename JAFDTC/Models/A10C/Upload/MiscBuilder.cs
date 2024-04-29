@@ -51,6 +51,7 @@ namespace JAFDTC.Models.A10C.Upload
         {
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
+            AirframeDevice aap = _aircraft.GetDevice("AAP");
 
             if (!_cfg.Misc.IsDefault)
             {
@@ -58,6 +59,8 @@ namespace JAFDTC.Models.A10C.Upload
                 BuildBullseyeOnHUD(cdu, ufc, _cfg.Misc);
                 BuildFlightPlan1Manual(cdu, _cfg.Misc);
                 BuildSpeedDisplay(cdu, ufc, _cfg.Misc);
+                BuildAapSteerPt(aap, _cfg.Misc);
+                BuildAapPage(aap, _cfg.Misc);
             }
         }
 
@@ -145,6 +148,51 @@ namespace JAFDTC.Models.A10C.Upload
             AddActions(cdu, new() { "LSK_9R" }); // TAS
             if (miscSystem.SpeedDisplayValue == SpeedDisplayOptions.GND)
                 AddActions(cdu, new() { "LSK_9R" });
+        }
+
+        /// <summary>
+        /// configure the AAP Steerpoint knob setting according to the non-default programming settings
+        /// </summary>
+        /// <param name="cdu"></param>
+        /// <param name="miscSystem"></param>
+        private void BuildAapSteerPt(AirframeDevice aap, MiscSystem miscSystem)
+        {
+            if (miscSystem.IsAapSteerPtDefault)
+                return; // Flt Plan
+
+            switch (miscSystem.AapSteerPtValue)
+            {
+                case AapSteerPtOptions.Mark:
+                    AddActions(aap, new() { "STEER_MARK" });
+                    break;
+                case AapSteerPtOptions.Mission:
+                    AddActions(aap, new() { "STEER_MISSION" });
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// configure the AAP Page knob setting according to the non-default programming settings
+        /// </summary>
+        /// <param name="cdu"></param>
+        /// <param name="miscSystem"></param>
+        private void BuildAapPage(AirframeDevice aap, MiscSystem miscSystem)
+        {
+            if (miscSystem.IsAapPageDefault)
+                return; // Other
+
+            switch (miscSystem.AapPageValue)
+            {
+                case AapPageOptions.Position:
+                    AddActions(aap, new() { "PAGE_POSITION" });
+                    break;
+                case AapPageOptions.Steer:
+                    AddActions(aap, new() { "PAGE_STEER" });
+                    break;
+                case AapPageOptions.Waypt:
+                    AddActions(aap, new() { "PAGE_WAYPT" });
+                    break;
+            }
         }
     }
 }
