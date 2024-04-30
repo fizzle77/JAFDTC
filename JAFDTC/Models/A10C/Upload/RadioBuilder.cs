@@ -86,7 +86,7 @@ namespace JAFDTC.Models.A10C.Upload
                     AddActions(lmfd, new() { "LMFD_13", "LMFD_19" });
                     BuildARC210Presets(cdu, arc210, lmfd, "LMFD_", radios);
                 });
-                AddIfBlock("IsCommPageNotOnDefaultButton", true, null, delegate ()
+                AddIfBlock("IsCommPageOnDefaultButton", false, null, delegate ()
                 {
                     // If COMM isn't in its default location on the left MFD, put it in place of MSG on the right.
                     AddActions(rmfd, new() { "RMFD_12_LONG", "RMFD_06", "RMFD_12", "RMFD_12", "RMFD_19" });
@@ -272,12 +272,27 @@ namespace JAFDTC.Models.A10C.Upload
                 }
             }
 
-            if (!radios.IsCOMM1StatusOnHUD)
+            // Show/hide ARC-210 COMM1 status on the HUD based on the setting and the current state.
+            if (radios.IsCOMM1StatusOnHUD)
             {
-                AddAction(ufc, "UFC_COM1_LONG");
+                AddIfBlock("Arc210Com1IsOnHUD", false, null, delegate ()
+                {
+                    AddAction(ufc, "UFC_COM1_LONG"); // Set to be on, currently off, turn it on.
+                });
             }
+            else
+            {
+                AddIfBlock("Arc210Com1IsOnHUD", true, null, delegate ()
+                {
+                    AddAction(ufc, "UFC_COM1_LONG"); // Set to be off, currently on, turn it off.
+                });
+            }
+
             // Always hide COM2: it's unimplemented and just HUD clutter.
-            AddAction(ufc, "UFC_COM2_LONG");
+            AddIfBlock("Arc210Com2IsOnHUD", true, null, delegate ()
+            {
+                AddAction(ufc, "UFC_COM2_LONG");
+            });
         }
 
         /// <summary>

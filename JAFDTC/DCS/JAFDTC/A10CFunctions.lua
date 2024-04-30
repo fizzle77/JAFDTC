@@ -52,11 +52,6 @@ function JAFDTC_A10C_Fn_IsCommPageOnDefaultButton()
     return value == "COMM"
 end
 
-function JAFDTC_A10C_Fn_IsCommPageNotOnDefaultButton()
-    local value = JAFDTC_A10C_GetLMFD_value("label_12");
-    return value ~= "COMM"
-end
-
 -- CDU Routines
 
 function JAFDTC_A10C_GetCDU()
@@ -128,6 +123,29 @@ function JAFDTC_A10C_Fn_SpeedIsNot(speed)
     end
     return true
 end
+
+-- HUD Routines
+
+function JAFDTC_A10C_GetHUD()
+	local table = JAFDTC_ParseDisplay(5);
+    JAFDTC_DebugDisplay(table);
+    return table;
+end
+
+function JAFDTC_A10C_GetHUD_value(key)
+	local table = JAFDTC_A10C_GetHUD();
+    local value = table[key] or "---";
+    JAFDTC_Log("HUD table[" .. key .. "]: " .. value);
+    return value;
+end
+
+function JAFDTC_A10C_CheckCondition_Arc210Com1IsOnHUD()
+    return JAFDTC_A10C_GetHUD_value("ARC_210_Radio_1_Status") ~= "---"
+end
+function JAFDTC_A10C_CheckCondition_Arc210Com2IsOnHUD()
+    return JAFDTC_A10C_GetHUD_value("ARC_210_Radio_2_Status") ~= "---"
+end
+
 
 --[[
 local vhf_lut1 = {
