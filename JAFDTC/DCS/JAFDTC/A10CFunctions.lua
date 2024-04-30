@@ -32,6 +32,33 @@ dofile(lfs.writedir() .. 'Scripts/JAFDTC/CommonFunctions.lua')
 -- 7: CMS (countmeasures panel on right)
 -- 8: CMSC (countermeasure and jammer display below UFC)
 
+-- LFMD Routines
+
+function JAFDTC_A10C_GetLMFD()
+	local table = JAFDTC_ParseDisplay(1);
+    JAFDTC_DebugDisplay(table);
+    return table;
+end
+
+function JAFDTC_A10C_GetLMFD_value(key)
+	local table = JAFDTC_A10C_GetLMFD();
+    local value = table[key] or "---";
+    JAFDTC_Log("LMFD table[" .. key .. "]: " .. value);
+    return value;
+end
+
+function JAFDTC_A10C_CheckCondition_IsCommPageOnDefaultButton()
+    local value = JAFDTC_A10C_GetLMFD_value("label_12");
+    return value == "COMM"
+end
+
+function JAFDTC_A10C_CheckCondition_IsCommPageNotOnDefaultButton()
+    local value = JAFDTC_A10C_GetLMFD_value("label_12");
+    return value ~= "COMM"
+end
+
+-- CDU Routines
+
 function JAFDTC_A10C_GetCDU()
 	local table = JAFDTC_ParseDisplay(3);
     JAFDTC_DebugDisplay(table);

@@ -120,22 +120,22 @@ namespace JAFDTC.Models.A10C
             // ---- left mfd
 
             AirframeDevice lmfd = new(2, "LMFD");
-            lmfd.AddAction(3001, "LMFD_01", delay, 1);
+            lmfd.AddAction(3001, "LMFD_01", delay, 1); // top row, left
             lmfd.AddAction(3002, "LMFD_02", delay, 1);
             lmfd.AddAction(3003, "LMFD_03", delay, 1);
             lmfd.AddAction(3004, "LMFD_04", delay, 1);
             lmfd.AddAction(3005, "LMFD_05", delay, 1);
-            lmfd.AddAction(3006, "LMFD_06", delay, 1);
+            lmfd.AddAction(3006, "LMFD_06", delay, 1); // right side, top
             lmfd.AddAction(3007, "LMFD_07", delay, 1);
             lmfd.AddAction(3008, "LMFD_08", delay, 1);
             lmfd.AddAction(3009, "LMFD_09", delay, 1);
             lmfd.AddAction(3010, "LMFD_10", delay, 1);
-            lmfd.AddAction(3011, "LMFD_11", delay, 1);
+            lmfd.AddAction(3011, "LMFD_11", delay, 1); // bottom row, right
             lmfd.AddAction(3012, "LMFD_12", delay, 1);
             lmfd.AddAction(3013, "LMFD_13", delay, 1);
             lmfd.AddAction(3014, "LMFD_14", delay, 1);
             lmfd.AddAction(3015, "LMFD_15", delay, 1);
-            lmfd.AddAction(3016, "LMFD_16", delay, 1);
+            lmfd.AddAction(3016, "LMFD_16", delay, 1); // left side, bottom
             lmfd.AddAction(3017, "LMFD_17", delay, 1);
             lmfd.AddAction(3018, "LMFD_18", delay, 1);
             lmfd.AddAction(3019, "LMFD_19", delay, 1);
@@ -146,22 +146,22 @@ namespace JAFDTC.Models.A10C
             // ---- right mfd
 
             AirframeDevice rmfd = new(3, "RMFD");
-            rmfd.AddAction(3001, "RMFD_01", delay, 1);
+            rmfd.AddAction(3001, "RMFD_01", delay, 1); // top row, left
             rmfd.AddAction(3002, "RMFD_02", delay, 1);
             rmfd.AddAction(3003, "RMFD_03", delay, 1);
             rmfd.AddAction(3004, "RMFD_04", delay, 1);
             rmfd.AddAction(3005, "RMFD_05", delay, 1);
-            rmfd.AddAction(3006, "RMFD_06", delay, 1);
+            rmfd.AddAction(3006, "RMFD_06", delay, 1); // right side, top
             rmfd.AddAction(3007, "RMFD_07", delay, 1);
             rmfd.AddAction(3008, "RMFD_08", delay, 1);
             rmfd.AddAction(3009, "RMFD_09", delay, 1);
             rmfd.AddAction(3010, "RMFD_10", delay, 1);
-            rmfd.AddAction(3011, "RMFD_11", delay, 1);
+            rmfd.AddAction(3011, "RMFD_11", delay, 1); // bottom row, right
             rmfd.AddAction(3012, "RMFD_12", delay, 1);
             rmfd.AddAction(3013, "RMFD_13", delay, 1);
             rmfd.AddAction(3014, "RMFD_14", delay, 1);
             rmfd.AddAction(3015, "RMFD_15", delay, 1);
-            rmfd.AddAction(3016, "RMFD_16", delay, 1);
+            rmfd.AddAction(3016, "RMFD_16", delay, 1); // left side, bottom
             rmfd.AddAction(3017, "RMFD_17", delay, 1);
             rmfd.AddAction(3018, "RMFD_18", delay, 1);
             rmfd.AddAction(3019, "RMFD_19", delay, 1);
