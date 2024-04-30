@@ -154,10 +154,27 @@ namespace JAFDTC.Models.A10C.Upload
             // Navigate to STEER page with UFC
             AddActions(ufc, new() { "FN", "0" });
 
-            // CDU
-            AddWhileBlock("SpeedIsNot", new() { $"{miscSystem.SpeedDisplayValue}" }, delegate () 
-            { 
-                AddAction(cdu, "LSK_9R");
+            // Alter speed display setting itself on the CDU
+
+            // During startup, before alignment, the speed setting is not yet visible but you can still change it
+            // with button presses. In this state we assume it's still at the default IAS and press the button
+            // once for TAS, twice for GS.
+            AddIfBlock("SpeedIsNotAvailable", null, delegate ()
+            {
+                AddAction(cdu, "LSK_9R"); // TAS
+                if (miscSystem.SpeedDisplayValue == SpeedDisplayOptions.GS)
+                    AddAction(cdu, "LSK_9R"); // GS
+            });
+
+            // TODO consider an "else" delegate for if blocks?
+
+            // If we're aligned and can see the setting, we can just press the button until it says what we want.
+            AddIfBlock("SpeedIsAvailable", null, delegate ()
+            {
+                AddWhileBlock("SpeedIsNot", new() { $"{miscSystem.SpeedDisplayValue}" }, delegate ()
+                {
+                    AddAction(cdu, "LSK_9R");
+                });
             });
         }
 
