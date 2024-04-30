@@ -21,8 +21,19 @@ You should have received a copy of the GNU General Public License along with thi
 
 dofile(lfs.writedir() .. 'Scripts/JAFDTC/CommonFunctions.lua')
 
+-- Displays
+-----------
+-- 1: LMFD
+-- 2: RMFD
+-- 3: CDU
+-- 4: ?
+-- 5: HUD
+-- 6: ?
+-- 7: CMS (countmeasures panel on right)
+-- 8: CMSC (countermeasure and jammer display below UFC)
+
 function JAFDTC_A10C_GetCDU()
-	local table = JAFDTC_ParseDisplay(3)
+	local table = JAFDTC_ParseDisplay(3);
     JAFDTC_DebugDisplay(table);
     return table;
 end
@@ -31,7 +42,7 @@ function JAFDTC_A10C_GetCDU_value(key)
 	local table = JAFDTC_A10C_GetCDU();
     local value = table[key] or "---";
     JAFDTC_Log("CDU table[" .. key .. "]: " .. value);
-    return value
+    return value;
 end
 
 function JAFDTC_A10C_CheckCondition_IsCoordFmtLL()
