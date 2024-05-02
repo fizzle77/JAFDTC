@@ -26,8 +26,8 @@
     <None Remove="Audio\ux_cap_cpan.wav" />
     <None Remove="Audio\ux_cap_wypt.wav" />
     <None Remove="Audio\ux_error.wav" />
+    <None Remove="Data\db-a10-munitions.json" />
     <None Remove="Data\db-emitters.json" />
-    <None Remove="Data\db-munitions.json" />
     <None Remove="Data\db-pois-airbases.json" />
     <None Remove="DCS\Hooks\JAFDTCStatusMsgHook.lua" />
     <None Remove="DCS\Hooks\JAFDTCWyptCaptureHook.lua" />
@@ -85,7 +85,7 @@
     <Content Include="Audio\ux_cap_wypt.wav" />
     <Content Include="Audio\ux_error.wav" />
     <Content Include="Data\db-emitters.json" />
-    <Content Include="Data\db-munitions.json" />
+    <Content Include="Data\db-a10-munitions.json" />
     <Content Include="Data\db-pois-airbases.json" />
     <Content Include="DCS\Hooks\JAFDTCStatusMsgHook.lua" />
     <Content Include="DCS\Hooks\JAFDTCWyptCaptureHook.lua" />

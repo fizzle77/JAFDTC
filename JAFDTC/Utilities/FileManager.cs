@@ -21,6 +21,7 @@
 #define JAFDTC_LOG
 
 using JAFDTC.Models;
+using JAFDTC.Models.A10C;
 using JAFDTC.Models.DCS;
 using System;
 using System.Collections.Generic;
@@ -495,9 +496,9 @@ namespace JAFDTC.Utilities
         /// <summary>
         /// return the emitter database that provides information on known emitters for harm alic/hts systems.
         /// </summary>
-        public static List<Munition> LoadMunitions()
+        public static List<A10CMunition> LoadMunitions()
         {
-            return LoadSystemDbase<Munition>("db-munitions.json");
+            return LoadSystemDbase<A10CMunition>("db-a10-munitions.json");
         }
     }
 }

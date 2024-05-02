@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// Munition.cs -- munition class
+// A10CMunition.cs -- munition class
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
 // Copyright(C) 2023 ilominar/raven
@@ -19,28 +19,30 @@
 //
 // ********************************************************************************************************************
 
-namespace JAFDTC.Models.DCS
+namespace JAFDTC.Models.A10C
 {
-    public sealed class Munition
+    public sealed class A10CMunition
     {
-        public string Name { get; set; }
+        public string Key { get; set; } // name as it appears in on DCS display scrape. must be unique.
 
-        public string Image { get; set; }
+        public string Name { get; set; } // display name for the weapon
 
-        // Feels like a hack but I can't find a better way.
-        public string ImageFullPath
-        {
-            get => "/Images/" + Image;
-        }
+        public string Image { get; set; } // name of the weapon's image file
 
+        // values to enable/disable settings UI
         public bool CCIP { get; set; }
         public bool CCRP { get; set; }
         public bool EscMnvr { get; set; }
         public bool Laser { get; set; }
+        public bool AutoLase { get; set; }
         public bool Pairs { get; set; }
         public bool Ripple { get; set; }
         public bool RipFt { get; set; }
         public bool HOF { get; set; }
         public bool Fuze { get; set; }
+
+        // synthesized properties
+        public string ImageFullPath => "/Images/" + Image;
+        public bool SingleReleaseOnly => !Pairs && !Ripple;
     }
 }
