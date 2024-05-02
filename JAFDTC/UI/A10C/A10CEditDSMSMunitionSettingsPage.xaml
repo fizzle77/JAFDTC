@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="JAFDTC.UI.A10C.A10CEditDSMSMunitionSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.Models.DCS"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid Grid.Row="0" Grid.Column="0"
+        VerticalAlignment="Top"
+        HorizontalAlignment="Left">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Munition Selection -->
+        <ListView Grid.Row="0" Grid.Column="0" Grid.RowSpan="6"
+            x:Name="uiComboMunition"
+            ToolTipService.ToolTip="Select munition to alter settings"
+            ItemsSource="{x:Bind Munitions}"
+            SelectionMode="Single" SelectionChanged="ComboMunition_SelectionChanged">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local:Munition">
+                    <StackPanel Orientation="Horizontal" Height="48">
+                        <Image Source="{x:Bind ImageFullPath}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" 
+                                    Style="{ThemeResource EditorParamStaticTextBlockStyle}" 
+                                    Margin="12,0,0,0" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!-- Laser Settings -->
+        <TextBlock Grid.Row="0" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">Laser Code</TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2" Margin="6,12,0,0">
+            <TextBox Width="86" 
+                x:Name="uiTextLaserCode"
+                Style="{StaticResource EditorParamEditTextBoxStyle}"
+                MaxLength="4"
+                HorizontalAlignment="Left" VerticalAlignment="Center"
+                ToolTipService.ToolTip="Laser code the selected munition will track"/>
+            <CheckBox x:Name="uiCheckAutoLase" Margin="12,0,0,0">Auto Lase</CheckBox>
+            <TextBox Width="43" Margin="6,0,0,0"
+                x:Name="uiTextLaseTime"
+                Style="{StaticResource EditorParamEditTextBoxStyle}"
+                MaxLength="2"
+                HorizontalAlignment="Left" VerticalAlignment="Center"
+                ToolTipService.ToolTip="Seconds before impact to automatically start the laser firing"/>
+            <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center" Margin="6,0,0,0">seconds</TextBlock>
+        </StackPanel>
+            
+        <!-- CCIP/CCRP Mode -->
+        <TextBlock Grid.Row="1" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">Mode</TextBlock>
+        <ComboBox x:Name="uiComboMode" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Margin="6,12,0,0" Width="100">
+            <ComboBoxItem Tag="0">CCIP</ComboBoxItem>
+            <ComboBoxItem Tag="0">CCRP</ComboBoxItem>
+        </ComboBox>
+
+        <!-- Escape Maneuver -->
+        <TextBlock Grid.Row="2" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">Esc Mnvr</TextBlock>
+        <ComboBox x:Name="uiComboEscMnvr" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Margin="6,12,0,0" Width="100">
+            <ComboBoxItem Tag="0">NONE</ComboBoxItem>
+            <ComboBoxItem Tag="1">CLB</ComboBoxItem>
+            <ComboBoxItem Tag="2">TRN</ComboBoxItem>
+            <ComboBoxItem Tag="3">TLT</ComboBoxItem>
+        </ComboBox>
+
+        <!-- Release -->
+        <TextBlock Grid.Row="3" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">Release</TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="2" Margin="6,12,0,0" >
+            <ComboBox x:Name="uiComboReleaseMode" Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" Width="110">
+                <ComboBoxItem Tag="0">SGL</ComboBoxItem>
+                <ComboBoxItem Tag="1">PRS</ComboBoxItem>
+                <ComboBoxItem Tag="2">RIP SGL</ComboBoxItem>
+                <ComboBoxItem Tag="3">RIP PRS</ComboBoxItem>
+            </ComboBox>
+            <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center" Margin="12,0,0,0">Ripple Qty</TextBlock>
+            <TextBox Width="43" Margin="6,0,0,0"
+                x:Name="uiTextRippleQty"
+                Style="{StaticResource EditorParamEditTextBoxStyle}"
+                MaxLength="2"
+                HorizontalAlignment="Left" VerticalAlignment="Center"
+                ToolTipService.ToolTip="Number of munitions to release per weapons release depression"/>
+            <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center" Margin="12,0,0,0">Ft</TextBlock>
+            <TextBox Width="74" Margin="6,0,0,0"
+                x:Name="uiTextRippleFt"
+                Style="{StaticResource EditorParamEditTextBoxStyle}"
+                MaxLength="3"
+                HorizontalAlignment="Left" VerticalAlignment="Center"
+                ToolTipService.ToolTip="Distance between impacts, in feet"/>
+        </StackPanel>
+
+        <!-- HOF -->
+        <TextBlock Grid.Row="4" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">HOF</TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="2" Margin="6,12,0,0" >
+            <ComboBox x:Name="uiComboHOF" VerticalAlignment="Center" Width="100">
+                <ComboBoxItem Tag="0">300</ComboBoxItem>
+                <ComboBoxItem Tag="1">500</ComboBoxItem>
+                <ComboBoxItem Tag="2">700</ComboBoxItem>
+                <ComboBoxItem Tag="3">900</ComboBoxItem>
+                <ComboBoxItem Tag="4">1200</ComboBoxItem>
+                <ComboBoxItem Tag="5">1500</ComboBoxItem>
+                <ComboBoxItem Tag="6">1800</ComboBoxItem>
+                <ComboBoxItem Tag="7">2200</ComboBoxItem>
+                <ComboBoxItem Tag="8">2600</ComboBoxItem>
+                <ComboBoxItem Tag="9">3000</ComboBoxItem>
+            </ComboBox>
+            <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,0,0,0" VerticalAlignment="Center">RPM</TextBlock>
+            <ComboBox x:Name="uiComboRPM" VerticalAlignment="Center" Width="100" Margin="6,0,0,0">
+                <ComboBoxItem Tag="0">0</ComboBoxItem>
+                <ComboBoxItem Tag="1">500</ComboBoxItem>
+                <ComboBoxItem Tag="2">1000</ComboBoxItem>
+                <ComboBoxItem Tag="3">1500</ComboBoxItem>
+                <ComboBoxItem Tag="4">2000</ComboBoxItem>
+                <ComboBoxItem Tag="5">2500</ComboBoxItem>
+            </ComboBox>
+        </StackPanel>
+    </Grid>
+
+</Page>

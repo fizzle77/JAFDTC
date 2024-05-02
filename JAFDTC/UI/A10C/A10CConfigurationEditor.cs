@@ -36,6 +36,7 @@ namespace JAFDTC.UI.A10C
         public const string MISC = "\xE8B7";
         public const string RADIO = "\xE704";
         public const string WYPT = "\xE707";
+        public const string DSMS = "\xEBD2";
     }
 
     /// <summary>
@@ -50,6 +51,7 @@ namespace JAFDTC.UI.A10C
             {
                 // This is the order they appear in the UI. Resist the temptation to alphabetize.
                 A10CEditWaypointListHelper.PageInfo,
+                A10CEditDSMSPage.PageInfo,
                 A10CEditRadioPageHelper.PageInfo,
                 A10CEditMiscPage.PageInfo
             };

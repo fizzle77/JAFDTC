@@ -485,5 +485,19 @@ namespace JAFDTC.Utilities
         {
             return LoadSystemDbase<Emitter>("db-emitters.json");
         }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // munitions database
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// return the emitter database that provides information on known emitters for harm alic/hts systems.
+        /// </summary>
+        public static List<Munition> LoadMunitions()
+        {
+            return LoadSystemDbase<Munition>("db-munitions.json");
+        }
     }
 }

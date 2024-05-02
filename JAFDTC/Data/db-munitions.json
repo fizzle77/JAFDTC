@@ -1,0 +1,13 @@
+[
+{"Name": "CBU-97", "Image": "cbu-87-105.jpg",	"CCIP": true,  "CCRP": true,  "EscMnvr": true,  "Laser": false, "Pairs": true,  "Ripple": true,  "RipFt": true,  "HOF": true,  "Fuze": true},
+{"Name": "CBU-87", "Image": "cbu-87-105.jpg",	"CCIP": true,  "CCRP": true,  "EscMnvr": true,  "Laser": false, "Pairs": true,  "Ripple": true,  "RipFt": true,  "HOF": true,  "Fuze": true},
+{"Name": "CBU-103", "Image": "cbu-87-105.jpg",	"CCIP": false, "CCRP": true,  "EscMnvr": false, "Laser": false, "Pairs": false, "Ripple": false, "RipFt": false, "HOF": true,  "Fuze": false},
+{"Name": "CBU-105", "Image": "cbu-87-105.jpg",	"CCIP": false, "CCRP": true,  "EscMnvr": false, "Laser": false, "Pairs": false, "Ripple": false, "RipFt": false, "HOF": true,  "Fuze": false},
+{"Name": "GBU-10", "Image": "gbu-10-12.jpg",	"CCIP": true,  "CCRP": true,  "EscMnvr": true,  "Laser": true,  "Pairs": true,  "Ripple": true,  "RipFt": true,  "HOF": false, "Fuze": true},
+{"Name": "GBU-12", "Image": "gbu-10-12.jpg",	"CCIP": true,  "CCRP": true,  "EscMnvr": true,  "Laser": true,  "Pairs": true,  "Ripple": true,  "RipFt": true,  "HOF": false, "Fuze": true},
+{"Name": "GBU-31", "Image": "gbu-31.jpg",		"CCIP": false, "CCRP": true,  "EscMnvr": false, "Laser": false, "Pairs": false, "Ripple": false, "RipFt": false, "HOF": false, "Fuze": false},
+{"Name": "GBU-38", "Image": "gbu-38.jpg",		"CCIP": false, "CCRP": true,  "EscMnvr": false, "Laser": false, "Pairs": false, "Ripple": false, "RipFt": false, "HOF": false, "Fuze": false},
+{"Name": "GBU-54", "Image": "gbu-54.jpg",		"CCIP": false, "CCRP": true,  "EscMnvr": false, "Laser": true,  "Pairs": false, "Ripple": false, "RipFt": false, "HOF": false, "Fuze": false},
+{"Name": "M151 HE ", "Image": "agr.jpg",		"CCIP": true,  "CCRP": false, "EscMnvr": false, "Laser": true,  "Pairs": true,  "Ripple": true,  "RipFt": false, "HOF": true,  "Fuze": true},
+{"Name": "M288 MPP", "Image": "agr.jpg",		"CCIP": true,  "CCRP": false, "EscMnvr": false, "Laser": true,  "Pairs": true,  "Ripple": true,  "RipFt": false, "HOF": true,  "Fuze": true}
+]
