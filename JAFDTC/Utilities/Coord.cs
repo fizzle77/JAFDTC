@@ -32,6 +32,7 @@ namespace JAFDTC.Utilities
         DD,             // decimal degrees (raw number only)
         DDU,            // decimal degrees (with degree units)
         DMS,            // degrees, minutes, seconds
+        DMDS_P2ZF,      // degrees, minutes, decimal seconds (to 2-digit precision), zero-fill degrees
         DDM_P3ZF,       // degrees, decimal minutes (to 3-digit precision), zero-fill degrees
         DDM_P2ZF,       // degrees, decimal minutes (to 2-digit precision), zero-fill degrees
         DDM_P1ZF,       // degrees, decimal minutes (to 1-digit precision), zero-fill degrees
@@ -53,6 +54,7 @@ namespace JAFDTC.Utilities
             [LLFormat.DD] = new(@"^([\-]{0,1}[0-9]\.[0-9]{6,12})|([\-]{0,1}[1-8][0-9]\.[0-9]{6,12})|([\-]{0,1}90\.[0]{6,12})$"),
             [LLFormat.DDU] = new(@"^([\-]{0,1}[0-9]\.[0-9]{6,12}°)|([\-]{0,1}[1-8][0-9]\.[0-9]{6,12}°)|([\-]{0,1}90\.[0]{6,12}°)$"),
             [LLFormat.DMS] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]’ [0-5][0-9]’’)|([NSns] 90° 00’ 00’’)$"),
+            [LLFormat.DMDS_P2ZF] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]’ [0-5][0-9]\.[0-9]{2}’’)|([NSns] 90° 00’ 00\.00’’)$"),
             [LLFormat.DDM_P3ZF] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{3}’)|([NSns] 90° 00\.000’)$"),
             [LLFormat.DDM_P2ZF] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{2}’)|([NSns] 90° 00\.00’)$"),
             [LLFormat.DDM_P1ZF] = new(@"^([NSns] [0-8][0-9]° [0-5][0-9]\.[0-9]{1}’)|([NSns] 90° 00\.0’)$"),
@@ -65,6 +67,7 @@ namespace JAFDTC.Utilities
             [LLFormat.DD] = new(@"^([\-]{0,1}[0-9]\.[0-9]{6,12})|([\-]{0,1}[1-9][0-9]\.[0-9]{6,12})|([\-]{0,1}1[0-7][0-9]\.[0-9]{6,12})|([\-]{0,1}180\.[0]{6,12})$"),
             [LLFormat.DDU] = new(@"^([\-]{0,1}[0-9]\.[0-9]{6,12}°)|([\-]{0,1}[1-9][0-9]\.[0-9]{6,12}°)|([\-]{0,1}1[0-7][0-9]\.[0-9]{6,12}°)|([\-]{0,1}180\.[0]{6,12}°)$"),
             [LLFormat.DMS] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]’ [0-5][0-9]’’)|([EWew] 1[0-7][0-9]° [0-5][0-9]’ [0-5][0-9]’’)|([EWew] 180° 00’ 00’’)$"),
+            [LLFormat.DMDS_P2ZF] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]’ [0-5][0-9]\.[0-9]{2}’’)|([EWew] 1[0-7][0-9]° [0-5][0-9]’ [0-5][0-9]\.[0-9]{2}’’)|([EWew] 180° 00’ 00.00’’)$"),
             [LLFormat.DDM_P3ZF] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{3}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{3}’)|([EWew] 180° 00\.000’)$"),
             [LLFormat.DDM_P2ZF] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{2}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{2}’)|([EWew] 180° 00\.00’)$"),
             [LLFormat.DDM_P1ZF] = new(@"^([EWew] 0[0-9]{2}° [0-5][0-9]\.[0-9]{1}’)|([EWew] 1[0-7][0-9]° [0-5][0-9]\.[0-9]{1}’)|([EWew] 180° 00\.0’)$"),
@@ -98,6 +101,7 @@ namespace JAFDTC.Utilities
                 LLFormat.DD => latDD,
                 LLFormat.DDU => $"{latDD}°",
                 LLFormat.DMS => CoreDDtoDMS(latDD, 90.0, "N", "S"),
+                LLFormat.DMDS_P2ZF => CoreDDtoDMS(latDD, 90.0, "N", "S", 2),
                 LLFormat.DDM_P3ZF => CoreDDtoDDM(latDD, 90.0, "N", "S", 3, true),
                 LLFormat.DDM_P2ZF => CoreDDtoDDM(latDD, 90.0, "N", "S", 2, true),
                 LLFormat.DDM_P1ZF => CoreDDtoDDM(latDD, 90.0, "N", "S", 1, true),
@@ -116,6 +120,7 @@ namespace JAFDTC.Utilities
                 LLFormat.DD => lonDD,
                 LLFormat.DDU => $"{lonDD}°",
                 LLFormat.DMS => CoreDDtoDMS(lonDD, 180.0, "E", "W"),
+                LLFormat.DMDS_P2ZF => CoreDDtoDMS(lonDD, 180.0, "E", "W", 2, true),
                 LLFormat.DDM_P3ZF => CoreDDtoDDM(lonDD, 180.0, "E", "W", 3, true),
                 LLFormat.DDM_P2ZF => CoreDDtoDDM(lonDD, 180.0, "E", "W", 2, true),
                 LLFormat.DDM_P1ZF => CoreDDtoDDM(lonDD, 180.0, "E", "W", 1, true),
@@ -134,6 +139,7 @@ namespace JAFDTC.Utilities
                 LLFormat.DD => latFmt,
                 LLFormat.DDU => latFmt.Replace("°", ""),
                 LLFormat.DMS => CoreDMStoDD(latFmt, _regexFormatLat[fmt], "N"),
+                LLFormat.DMDS_P2ZF => CoreDMStoDD(latFmt, _regexFormatLat[fmt], "N"),
                 LLFormat.DDM_P3ZF => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
                 LLFormat.DDM_P2ZF => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
                 LLFormat.DDM_P1ZF => CoreDDMtoDD(latFmt, _regexFormatLat[fmt], "N"),
@@ -152,6 +158,7 @@ namespace JAFDTC.Utilities
                 LLFormat.DD => lonFmt,
                 LLFormat.DDU => lonFmt.Replace("°", ""),
                 LLFormat.DMS => CoreDMStoDD(lonFmt, _regexFormatLon[fmt], "E"),
+                LLFormat.DMDS_P2ZF => CoreDMStoDD(lonFmt, _regexFormatLon[fmt], "E"),
                 LLFormat.DDM_P3ZF => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
                 LLFormat.DDM_P2ZF => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
                 LLFormat.DDM_P1ZF => CoreDDMtoDD(lonFmt, _regexFormatLon[fmt], "E"),
@@ -206,8 +213,9 @@ namespace JAFDTC.Utilities
 
         // ---- decimal degrees <--> degrees, minutes, seconds --------------------------------------------------------
 
-        private static string CoreDDtoDMS(string ddValue, double max, string posDir, string negDir)
+        private static string CoreDDtoDMS(string ddValue, double max, string posDir, string negDir, int precision = 0, bool fillDeg = true)
         {
+            string dms = "";
             if (double.TryParse(ddValue, out double dd) && (Math.Abs(dd) < max))
             {
                 string dir = (dd >= 0.0) ? posDir : negDir;
@@ -215,10 +223,27 @@ namespace JAFDTC.Utilities
                 int d = (int)Math.Truncate(dd);
                 double dm = (dd - (double)d) * 60.0;
                 int m = (int)Math.Truncate(dm);
-                int s = (int)((dm - (double)m) * 60.0);
-                return (max >= 100.0) ? $"{dir} {d,3:D3}° {m,2:D2}’ {s,2:D2}’’" : $"{dir} {d,2:D2}° {m,2:D2}’ {s,2:D2}’’";
+
+                string dOut = $"{d}";
+                if (fillDeg)
+                {
+                    dOut = (max > 100.0) ? $"{d,3:D3}" : $"{d,2:D2}";
+                }
+
+                if (precision == 0)
+                {
+                    int s = (int)((dm - (double)m) * 60.0);
+                    dms = $"{dir} {dOut}° {m,2:D2}’ {s,2:D2}’’";
+                }
+                else
+                {
+                    double ds = (dm - (double)m) * 60.0;
+                    string pad = (ds < 10.0) ? "0" : "";
+                    string dsOut = string.Format(string.Format("{{0}}{{1:F{0}}}", precision), pad, ds);
+                    dms = $"{dir} {dOut}° {m,2:D2}’ {dsOut}’’";
+                }
             }
-            return "";
+            return dms;
         }
 
         private static string CoreDMStoDD(string ddmValue, Regex regex, string posDir)
@@ -228,7 +253,7 @@ namespace JAFDTC.Utilities
                 string[] parts = ddmValue.Replace("°", "").Replace("’", "").Split(' ');
                 if ((parts.Length == 4) && int.TryParse(parts[1], out int d) &&
                                            int.TryParse(parts[2], out int m) &&
-                                           int.TryParse(parts[3], out int s))
+                                           double.TryParse(parts[3], out double s))
                 {
                     double dd = (d + (m / 60.0) + (s / 3600.0)) * ((parts[0] == posDir) ? 1.0 : -1.0);
                     return $"{dd:F8}";
