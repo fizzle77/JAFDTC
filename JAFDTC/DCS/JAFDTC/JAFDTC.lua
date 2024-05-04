@@ -68,6 +68,23 @@ function JAFDTC_CallUpstream(fn, what)
     end
 end
 
+-- core function to perform clickable action. expected to be called from main processing loop as it will yield
+-- the current co-routine to handle the down-up delay.
+--
+function JAFDTC_Core_PerformAction(dev, code, valDn, valUp, dt)
+    GetDevice(dev):performClickableAction(code, valDn)
+    coroutine.yield(0, dt)
+    if valDn ~= valUp then
+        GetDevice(dev):performClickableAction(code, valUp)
+    end
+end
+
+-- core function to perform wait by yielding. expected to be called from main processing loop.
+--
+function JAFDTC_Core_Wait(dt)
+    coroutine.yield(0, dt)
+end
+
 -- ---- sockets
 
 -- returns new tcp socket, use pcall() to catch any errors thrown on failures
@@ -169,21 +186,17 @@ function JAFDTC_Cmd_Actn(list, index)
     local valUp = args["up"] or 0
     local dt = args["dt"] or 0
 
-    GetDevice(dev):performClickableAction(code, valDn)
-    coroutine.yield(0, dt)
-    if valDn ~= valUp then
-        GetDevice(dev):performClickableAction(code, valUp)
-    end
+    JAFDTC_Core_PerformAction(dev, code, valDn, valUp, dt)
     return 1, 0
 end
 
--- cmd_runfunc(string fn)
+-- cmd_runfunc(string fn, string prm0 = nil, string prm1 = nil, string prm2 = nil)
 function JAFDTC_Cmd_RunFunc(list, index)
     local args = list[index]["a"]
     local fn = args["fn"]
 
     local funcName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_Func_" .. fn;
-    _G[funcName]()
+    _G[funcName](args["prm0"], args["prm1"], args["prm2"])
     return 1, 0
 end
 
@@ -211,7 +224,7 @@ function JAFDTC_Cmd_EndIf(list, index)
     return 1, 0
 end
 
--- cmd_While(string cond, number tout = 0, string prm0 = nil, string prm1 = nil, string prm2 = nil)
+-- cmd_while(string cond, number tout = 0, string prm0 = nil, string prm1 = nil, string prm2 = nil)
 function JAFDTC_Cmd_While(list, index)
     local args = list[index]["a"]
     local cond = args["cond"]
@@ -264,7 +277,7 @@ end
 -- cmd_wait(number dt)
 function JAFDTC_Cmd_Wait(list, index)
     local args = list[index]["a"]
-    coroutine.yield(0, args["dt"])
+    JAFDTC_Core_Wait(args["dt"])
     return 1, 0
 end
 

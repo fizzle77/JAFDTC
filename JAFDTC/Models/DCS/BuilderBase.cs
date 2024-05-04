@@ -200,9 +200,17 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// add a run function command to the command the builder is building.
         /// </summary>
-        protected void AddRunFunction(string fn)
+        protected void AddRunFunction(string fn, List<string> argsFunc = null)
         {
-            string cmd = $"{{\"f\":\"RunFunc\",\"a\":{{\"fn\":\"{fn}\"}}}},";
+            string cmd = $"{{\"f\":\"RunFunc\",\"a\":{{\"fn\":\"{fn}\"";
+            if (argsFunc != null)
+            {
+                for (int i = 0; i < argsFunc.Count; i++)
+                {
+                    cmd += $",\"prm{i}\":\"{argsFunc[i]}\"";
+                }
+            }
+            cmd += $"}}}},";
             AddCommand(cmd);
         }
 
