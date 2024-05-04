@@ -68,13 +68,15 @@ namespace JAFDTC.UI.A10C
 
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
+                bool isNotLinked = string.IsNullOrEmpty(_config.SystemLinkedTo(SystemTag));
+
                 A10CMunition selectedMunition = (A10CMunition)uiComboMunition.SelectedItem;
                 string key = selectedMunition.Key;
 
                 // Laser
-                Utilities.SetTextBoxEnabledAndText(uiTextLaserCode, selectedMunition.Laser, _editState.LaserCode, _editState.LaserCode);
-                Utilities.SetCheckEnabledAndState(uiCheckAutoLase, selectedMunition.AutoLase, _editState.GetAutoLaseValue(key));
-                Utilities.SetTextBoxEnabledAndText(uiTextLaseTime, selectedMunition.AutoLase, _editState.GetLaseSeconds(key));
+                Utilities.SetTextBoxEnabledAndText(uiTextLaserCode, isNotLinked, selectedMunition.Laser, _editState.LaserCode, _editState.LaserCode);
+                Utilities.SetCheckEnabledAndState(uiCheckAutoLase, isNotLinked && selectedMunition.AutoLase, _editState.GetAutoLaseValue(key));
+                Utilities.SetTextBoxEnabledAndText(uiTextLaseTime, isNotLinked, selectedMunition.AutoLase, _editState.GetLaseSeconds(key));
 
                 // Delivery Mode (CCIP/CCRP)
                 if (selectedMunition.CCIP ^ selectedMunition.CCRP)
@@ -86,10 +88,10 @@ namespace JAFDTC.UI.A10C
                     uiComboDeliveryMode.IsEnabled = false;
                 }
                 else
-                    Utilities.SetComboEnabledAndSelection(uiComboDeliveryMode, true, (int)_editState.GetDeliveryModeValue(key));
+                    Utilities.SetComboEnabledAndSelection(uiComboDeliveryMode, isNotLinked, true, (int)_editState.GetDeliveryModeValue(key));
 
                 // Escape Maneuver
-                Utilities.SetComboEnabledAndSelection(uiComboEscMnvr, selectedMunition.EscMnvr, (int)_editState.GetEscapeManeuverValue(key));
+                Utilities.SetComboEnabledAndSelection(uiComboEscMnvr, isNotLinked, selectedMunition.EscMnvr, (int)_editState.GetEscapeManeuverValue(key));
 
                 // Release Mode (SGL, PRS, RIP SGL, RIP PRS)
                 if (selectedMunition.SingleReleaseOnly)
@@ -99,19 +101,20 @@ namespace JAFDTC.UI.A10C
                     uiComboReleaseMode.IsEnabled = false;
                 }
                 else
-                    Utilities.SetComboEnabledAndSelection(uiComboReleaseMode, true, (int)_editState.GetReleaseModeValue(key));
+                    Utilities.SetComboEnabledAndSelection(uiComboReleaseMode, isNotLinked, true, (int)_editState.GetReleaseModeValue(key));
 
                 // Ripple Qty and Distance
                 bool enableRippleOptions = selectedMunition.Ripple && uiComboReleaseMode.SelectedIndex > 1; // disabled when SGL or PRS release is selected
-                Utilities.SetTextBoxEnabledAndText(uiTextRippleQty, enableRippleOptions, _editState.GetRippleQty(key));
-                Utilities.SetTextBoxEnabledAndText(uiTextRippleFt, enableRippleOptions, _editState.GetRippleFt(key));
+                Utilities.SetTextBoxEnabledAndText(uiTextRippleQty, isNotLinked, enableRippleOptions, _editState.GetRippleQty(key), null);
+                Utilities.SetTextBoxEnabledAndText(uiTextRippleFt, isNotLinked, enableRippleOptions && selectedMunition.RipFt, 
+                    _editState.GetRippleFt(key));
 
                 // HOF & RPM
-                Utilities.SetComboEnabledAndSelection(uiComboHOF, selectedMunition.HOF, (int)_editState.GetHOFOptionValue(key));
-                Utilities.SetComboEnabledAndSelection(uiComboRPM, selectedMunition.HOF, (int)_editState.GetRPMOptionValue(key));
+                Utilities.SetComboEnabledAndSelection(uiComboHOF, isNotLinked, selectedMunition.HOF, (int)_editState.GetHOFOptionValue(key));
+                Utilities.SetComboEnabledAndSelection(uiComboRPM, isNotLinked, selectedMunition.HOF, (int)_editState.GetRPMOptionValue(key));
 
                 // Fuze
-                Utilities.SetComboEnabledAndSelection(uiComboFuze, selectedMunition.Fuze, (int)_editState.GetFuzeOptionValue(key));
+                Utilities.SetComboEnabledAndSelection(uiComboFuze, isNotLinked, selectedMunition.Fuze, (int)_editState.GetFuzeOptionValue(key));
 
                 MunitionSettings newSettings = _editState.GetMunitionSettings(key);
                 newSettings.ErrorsChanged += BaseField_DataValidationError;
@@ -121,16 +124,18 @@ namespace JAFDTC.UI.A10C
             });
         }
 
-        private void SaveEditStateToConfig(string selectedMunitionKey)
+        private void SaveEditStateToConfig(string selectedMunitionKey = null)
         {
             if (_editState.HasErrors)
+                return;
+
+            _config.DSMS.LaserCode = _editState.LaserCode;
+            if (selectedMunitionKey == null)
                 return;
 
             MunitionSettings settings = _editState.GetMunitionSettings(selectedMunitionKey);
             if (settings.HasErrors)
                 return;
-
-            _config.DSMS.LaserCode = _editState.LaserCode;
             _config.DSMS.SetAutoLase(selectedMunitionKey, _editState.GetAutoLase(selectedMunitionKey));
             _config.DSMS.SetLaseSeconds(selectedMunitionKey, _editState.GetLaseSeconds(selectedMunitionKey));
             _config.DSMS.SetDeliveryMode(selectedMunitionKey, _editState.GetDeliveryMode(selectedMunitionKey));
@@ -144,10 +149,25 @@ namespace JAFDTC.UI.A10C
             _config.Save(this, SystemTag);
         }
 
+        public void CopyConfigToEditState()
+        {
+            if (IsMunitionSelectionValid(out string key))
+            {
+                _uiUpdatePending = true;
+                CopyConfigToEditState(key);
+
+                _uiUpdatePending = false;
+                UpdateUIFromEditState();
+            }
+        }
+        
         private void CopyConfigToEditState(A10CMunition munition)
         {
-            string key = munition.Key;
+            CopyConfigToEditState(munition.Key);
+        }
 
+        private void CopyConfigToEditState(string key)
+        {
             _editState.LaserCode = _config.DSMS.LaserCode;
             _editState.SetAutoLase(key, _config.DSMS.GetAutoLase(key));
             _editState.SetLaseSeconds(key, _config.DSMS.GetLaseSeconds(key));
@@ -180,7 +200,6 @@ namespace JAFDTC.UI.A10C
 
         private void ComboMunition_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
             if (e.RemovedItems.Count > 0)
             {
                 A10CMunition oldSelectedMunition = (A10CMunition)e.RemovedItems[0];
@@ -201,72 +220,102 @@ namespace JAFDTC.UI.A10C
                     UpdateUIFromEditState();
                 }
             }
-
         }
 
         private void TextLaserCode_LosingFocus(UIElement sender, LosingFocusEventArgs args)
         {
             _editState.LaserCode = uiTextLaserCode.Text;
+            SaveEditStateToConfig();
         }
 
         private void CheckAutoLase_Changed(object sender, RoutedEventArgs e)
         {
             if (IsMunitionSelectionValid(out string selectedMunitionKey))
+            {
                 _editState.SetAutoLase(selectedMunitionKey, uiCheckAutoLase.IsChecked.ToString());
+                SaveEditStateToConfig(selectedMunitionKey);
+            }
         }
 
         private void TextLaseTime_LosingFocus(UIElement sender, LosingFocusEventArgs args)
         {
             if (IsMunitionSelectionValid(out string selectedMunitionKey))
+            {
                 _editState.SetLaseSeconds(selectedMunitionKey, uiTextLaseTime.Text);
+                SaveEditStateToConfig(selectedMunitionKey);
+            }
         }
 
         private void ComboDeliveryMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (IsMunitionSelectionValid(out string selectedMunitionKey))
+            {
                 _editState.SetDeliveryMode(selectedMunitionKey, uiComboDeliveryMode.SelectedIndex.ToString());
+                SaveEditStateToConfig(selectedMunitionKey);
+            }
         }
 
         private void ComboEscMnvr_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (IsMunitionSelectionValid(out string selectedMunitionKey))
+            {
                 _editState.SetEscapeManeuver(selectedMunitionKey, uiComboEscMnvr.SelectedIndex.ToString());
+                SaveEditStateToConfig(selectedMunitionKey);
+            }
         }
 
         private void ComboReleaseMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (IsMunitionSelectionValid(out string selectedMunitionKey))
+            {
                 _editState.SetReleaseMode(selectedMunitionKey, uiComboReleaseMode.SelectedIndex.ToString());
+                SaveEditStateToConfig(selectedMunitionKey);
+            }
         }
 
         private void TextRippleQty_LosingFocus(UIElement sender, LosingFocusEventArgs args)
         {
             if (IsMunitionSelectionValid(out string selectedMunitionKey))
+            {
                 _editState.SetRippleQty(selectedMunitionKey, uiTextRippleQty.Text);
+                SaveEditStateToConfig(selectedMunitionKey);
+            }
         }
 
         private void TextRippleFt_LosingFocus(UIElement sender, LosingFocusEventArgs args)
         {
             if (IsMunitionSelectionValid(out string selectedMunitionKey))
+            {
                 _editState.SetRippleFt(selectedMunitionKey, uiTextRippleFt.Text);
+                SaveEditStateToConfig(selectedMunitionKey);
+            }
         }
 
         private void ComboHOF_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (IsMunitionSelectionValid(out string selectedMunitionKey))
+            {
                 _editState.SetHOFOption(selectedMunitionKey, uiComboHOF.SelectedIndex.ToString());
+                SaveEditStateToConfig(selectedMunitionKey);
+            }
         }
 
         private void ComboRPM_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (IsMunitionSelectionValid(out string selectedMunitionKey))
+            {
                 _editState.SetRPMOption(selectedMunitionKey, uiComboRPM.SelectedIndex.ToString());
+                SaveEditStateToConfig(selectedMunitionKey);
+            }
         }
 
         private void ComboFuze_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (IsMunitionSelectionValid(out string selectedMunitionKey))
+            {
                 _editState.SetFuzeOption(selectedMunitionKey, uiComboFuze.SelectedIndex.ToString());
+                SaveEditStateToConfig(selectedMunitionKey);
+            }
         }
 
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs e)
@@ -280,9 +329,6 @@ namespace JAFDTC.UI.A10C
             _config = (A10CConfiguration)_navArgs.Config;
 
             _config.ConfigurationSaved += ConfigurationSavedHandler;
-
-            //Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, MiscSystem.SystemTag,
-            //                               _configNameList, _configNameToUID);
 
             if (_munitions.Count > 0)
             {
@@ -352,9 +398,6 @@ namespace JAFDTC.UI.A10C
         //
         private void BaseField_PropertyChanged(object sender, EventArgs args)
         {
-            if (IsMunitionSelectionValid(out string selectedMunitionKey))
-                SaveEditStateToConfig(selectedMunitionKey);
-
             UpdateUIFromEditState();
         }
     }

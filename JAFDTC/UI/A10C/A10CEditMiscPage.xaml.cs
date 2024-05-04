@@ -215,7 +215,7 @@ namespace JAFDTC.UI.A10C
 
 
         // update the enable state on the ui elements based on the current settings. link controls must be set up
-        // vi RebuildLinkControls() prior to calling this function.
+        // via RebuildLinkControls() prior to calling this function.
         //
         private void RebuildEnableState()
         {

@@ -300,22 +300,32 @@ namespace JAFDTC.UI
             check.IsChecked = isChecked;
         }
 
-        public static void SetComboEnabledAndSelection(ComboBox combo, bool isEnabled, int selectedIndex)
+        public static void SetComboEnabledAndSelection(ComboBox combo, bool isNotLinked, bool isEnabled, int selectedIndex)
         {
-            SetEnableState(combo, isEnabled);
-            if (isEnabled)
-                combo.SelectedIndex = selectedIndex;
+            if (!isEnabled)
+            {
+                SetEnableState(combo, false); // always disable if set to disable
+                combo.SelectedItem = null; // always blank if disabled
+            }
             else
-                combo.SelectedItem = null;
+            {
+                SetEnableState(combo, isNotLinked); // otherwise disable if linked
+                combo.SelectedIndex = selectedIndex; // show setting if enabled or linked
+            }
         }
 
-        public static void SetTextBoxEnabledAndText(TextBox tb, bool isEnabled, string text, string disabledText = null)
+        public static void SetTextBoxEnabledAndText(TextBox tb, bool isNotLinked, bool isEnabled, string text, string disabledText = null)
         {
-            SetEnableState(tb, isEnabled);
-            if (isEnabled)
-                tb.Text = text;
+            if (!isEnabled)
+            {
+                SetEnableState(tb, false); // always disable if set to disable
+                tb.Text = disabledText; // always the disabledText if disabled
+            }
             else
-                tb.Text = disabledText;
+            {
+                SetEnableState(tb, isNotLinked); // otherwise disable if linked
+                tb.Text = text; // show setting if enabled or linked
+            }
         }
 
         /// <summary>
