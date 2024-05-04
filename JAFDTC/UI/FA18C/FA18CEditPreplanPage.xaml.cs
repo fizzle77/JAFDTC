@@ -121,7 +121,7 @@ namespace JAFDTC.UI.FA18C
             EditWeapon = Weapons.NONE;
             EditBoxedPPNum = 0;
 
-            EditStationNum = 0;
+            EditStationNum = 2;
             EditProgIdx = 0;
             EditCoordSrcIdx = 0;
             EditCoordIdx = 0;
@@ -697,7 +697,7 @@ namespace JAFDTC.UI.FA18C
                 Config.UnlinkSystem(PPSystem.SystemTag);
                 Config.PP.Reset();
                 Config.Save(this, PPSystem.SystemTag);
-                EditStationNum = 0;
+                EditStationNum = 2;
                 EditProgIdx = 0;
                 EditCoordIdx = 0;
                 EditCoordSrcIdx = 0;
