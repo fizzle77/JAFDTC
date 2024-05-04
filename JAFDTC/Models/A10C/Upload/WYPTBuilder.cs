@@ -109,9 +109,13 @@ namespace JAFDTC.Models.A10C.Upload
                     
                     BuildWaypointCoords(cdu, wypt);
 
-                    AddActions(cdu, ActionsForString(Math.Max(int.Parse(wypt.Alt), 0).ToString()), new() { "LSK_5L" });
-                    AddWait(WAIT_BASE);
-                    AddActions(cdu, new() { "CLR", "CLR" });
+                    // If no altitude was entered, leave it at the A-10's ground level altitude.
+                    if (!string.IsNullOrEmpty(wypt.Alt))
+                    {
+                        AddActions(cdu, ActionsForString(Math.Max(int.Parse(wypt.Alt), 0).ToString()), new() { "LSK_5L" });
+                        AddWait(WAIT_BASE);
+                        AddActions(cdu, new() { "CLR", "CLR" });
+                    }
                 }
             }
         }
