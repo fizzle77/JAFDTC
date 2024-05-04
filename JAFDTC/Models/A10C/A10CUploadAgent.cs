@@ -93,6 +93,7 @@ namespace JAFDTC.Models.A10C
         {
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
+            new MiscBuilder(_cfg, _dcsCmds, sb).Build();
         }
 
         public override IBuilder TeardownBuilder(StringBuilder sb) => new A10CTeardownBuilder(_cfg, _dcsCmds, sb);
