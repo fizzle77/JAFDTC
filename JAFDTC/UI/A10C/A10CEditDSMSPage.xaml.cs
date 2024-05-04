@@ -1,14 +1,10 @@
 using JAFDTC.UI.App;
-using JAFDTC.Models;
-using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.DSMS;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
-using Microsoft.UI.Dispatching;
+using JAFDTC.Models.A10C;
+using Microsoft.UI.Xaml.Navigation;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -20,6 +16,9 @@ namespace JAFDTC.UI.A10C
     /// </summary>
     public sealed partial class A10CEditDSMSPage : Page
     {
+        private ConfigEditorPageNavArgs _navArgs;
+        private A10CConfiguration _config;
+
         public static ConfigEditorPageInfo PageInfo
             => new(DSMSSystem.SystemTag, "DSMS", "DSMS", Glyphs.DSMS, typeof(A10CEditDSMSPage));
 
@@ -31,9 +30,9 @@ namespace JAFDTC.UI.A10C
         private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
             if (ReferenceEquals(args.SelectedItem, uiMunitionTab))
-                DSMSContentFrame.Navigate(typeof(A10CEditDSMSMunitionSettingsPage));
+                DSMSContentFrame.Navigate(typeof(A10CEditDSMSMunitionSettingsPage), _navArgs);
             else if (ReferenceEquals(args.SelectedItem, uiProfileTab))
-                DSMSContentFrame.Navigate(typeof(A10CEditDSMSProfileOrderPage));
+                DSMSContentFrame.Navigate(typeof(A10CEditDSMSProfileOrderPage), _navArgs);
             else
                 throw new ApplicationException("Unexpected NavigationViewItem type");
         }
@@ -46,6 +45,13 @@ namespace JAFDTC.UI.A10C
         private void PageBtnReset_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs args)
+        {
+            _navArgs = (ConfigEditorPageNavArgs)args.Parameter;
+            _config = (A10CConfiguration)_navArgs.Config;
+            base.OnNavigatedTo(args);
         }
 
     }

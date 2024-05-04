@@ -27,7 +27,7 @@ using System.Text.RegularExpressions;
 namespace JAFDTC.Models.A10C.DSMS
 {
     // defines the possible delivery mode settings
-    //
+    // must match combobox order in ui
     public enum DeliveryModes
     {
         CCIP = 0,
@@ -35,7 +35,7 @@ namespace JAFDTC.Models.A10C.DSMS
     }
 
     // defines the possible escape maneuver settings
-    //
+    // must match combobox order in ui
     public enum EscapeManeuvers
     {
         NONE = 0,
@@ -45,7 +45,7 @@ namespace JAFDTC.Models.A10C.DSMS
     }
 
     // defines the possible release mode settings
-    //
+    // must match combobox order in ui
     public enum ReleaseModes
     {
         SGL = 0,
@@ -55,7 +55,7 @@ namespace JAFDTC.Models.A10C.DSMS
     }
 
     // defines the possible height of function (HOF) settings
-    //
+    // must match combobox order in ui
     public enum HOFOptions
     {
         HOF_300 = 0,
@@ -71,7 +71,7 @@ namespace JAFDTC.Models.A10C.DSMS
     }
 
     // defines the RPM settings
-    //
+    // must match combobox order in ui
     public enum RPMOptions
     {
         RPM_0 = 0,
@@ -82,7 +82,8 @@ namespace JAFDTC.Models.A10C.DSMS
         RPM_2500 = 5
     }
 
-    // defineds the Fuze settings
+    // defines the Fuze settings
+    // must match combobox order in ui
     public enum FuzeOptions
     {
         NoseTail = 0,
@@ -135,7 +136,7 @@ namespace JAFDTC.Models.A10C.DSMS
                 get => _escapeManeuver;
                 set
                 {
-                    string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 3)) ? null : "Invalid format";
+                    string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, -1, 3)) ? null : "Invalid format";
                     SetProperty(ref _escapeManeuver, value, error);
                 }
             }
@@ -173,35 +174,35 @@ namespace JAFDTC.Models.A10C.DSMS
                 }
             }
 
-            private string _HOFOption;                          // integer [0..9]
+            private string _HOFOption;                          // integer [-1..9] -1 indicates no selection
             public string HOFOption
             {
                 get => _HOFOption;
                 set
                 {
-                    string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 9)) ? null : "Invalid format";
+                    string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, -1, 9)) ? null : "Invalid format";
                     SetProperty(ref _HOFOption, value, error);
                 }
             }
 
-            private string _RPMOption;                          // integer [0..5]
+            private string _RPMOption;                          // integer [-1..5] -1 indicates no selection
             public string RPMOption
             {
                 get => _RPMOption;
                 set
                 {
-                    string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 5)) ? null : "Invalid format";
+                    string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, -1, 5)) ? null : "Invalid format";
                     SetProperty(ref _RPMOption, value, error);
                 }
             }
 
-            private string _FuzeOption;                          // integer [0..2]
+            private string _FuzeOption;                          // integer [-1..2] -1 indicates no selection
             public string FuzeOption
             {
                 get => _FuzeOption;
                 set
                 {
-                    string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
+                    string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, -1, 2)) ? null : "Invalid format";
                     SetProperty(ref _FuzeOption, value, error);
                 }
             }
@@ -239,6 +240,8 @@ namespace JAFDTC.Models.A10C.DSMS
                 DeliveryMode = "0", // CCIP
                 EscapeManeuver = "1", // CLB
                 ReleaseMode = "0", // SGL
+                RippleQty = "1",
+                RippleFt = "75",
                 HOFOption = "6", // 1800
                 RPMOption = "3", // 1500
                 FuzeOption = "0" // N/T
@@ -256,6 +259,8 @@ namespace JAFDTC.Models.A10C.DSMS
                 DeliveryMode = "";
                 EscapeManeuver = "";
                 ReleaseMode = "";
+                RippleQty = "";
+                RippleFt = "";
                 HOFOption = "";
                 RPMOption = "";
                 FuzeOption = "";
@@ -346,7 +351,7 @@ namespace JAFDTC.Models.A10C.DSMS
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private MunitionSettings GetMunitionSettings(string key)
+        public MunitionSettings GetMunitionSettings(string key)
         {
             MunitionSettings settings;
             if (!_munitionSettingMap.TryGetValue(key, out settings))
