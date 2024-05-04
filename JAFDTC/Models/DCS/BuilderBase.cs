@@ -128,7 +128,7 @@ namespace JAFDTC.Models.DCS
         protected void AddAction(AirframeDevice device, string key, int dtWaitPost = WAIT_NONE)
         {
 #if DEBUG_LOG_ACTIONS
-            FileManager.Log($"{device.Name}.{key}");
+            FileManager.Log($"{device.Name}.{key} -- {device.ActionToString(key)}");
 #endif
 #if DEBUG_LOG_BOGUS_ACTIONS
             if (string.IsNullOrEmpty(device[key]))
@@ -356,6 +356,15 @@ namespace JAFDTC.Models.DCS
         {
             return s.Replace(",", "").Replace(".", "").Replace("°", "").Replace("’", "").Replace("”", "")
                     .Replace("\"", "").Replace("'", "").Replace(":", "");
+        }
+
+        /// <summary>
+        /// adjust a string by removing all separator characters. returns adjusted value.
+        /// </summary>
+        protected static string AdjustNoSeparatorsFloatSafe(string s)
+        {
+            return s.Replace(",", "").Replace("°", "").Replace("’", "").Replace("”", "").Replace("\"", "")
+                    .Replace("'", "").Replace(":", "");
         }
 
         /// <summary>
