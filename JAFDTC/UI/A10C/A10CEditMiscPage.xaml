@@ -32,31 +32,157 @@
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <!-- Coordinate System setup -->
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
-                CDU Navigation Configuration:
+                CDU Misc Configuration:
             </TextBlock>
+
+            <!-- Coordinate System setup -->
             <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,0"
                 Style="{StaticResource EditorParamStaticTextBlockStyle}"
                 HorizontalTextAlignment="Right">
                 Coordinate System
             </TextBlock>
-            <ComboBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" Width="200"
+            <ComboBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
                 x:Name="uiComboCoordSystem"
                 VerticalAlignment="Center"
                 ToolTipService.ToolTip="Coordinate System Selection"
                 SelectionChanged="ComboCoordSystem_SelectionChanged">
                 <ComboBox.Items>
                     <!-- Tag is enum TODO -->
-                    <TextBlock Text="Latitude/Longitude" Tag="0"/>
+                    <TextBlock Text="Lat/Long" Tag="0"/>
                     <TextBlock Text="MGRS" Tag="1"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- Bullseye on HUD setup -->
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0"
+                Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                HorizontalTextAlignment="Right">
+                Bullseye on HUD
+            </TextBlock>
+            <CheckBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0"
+                x:Name="uiCkboxBullsOnHUD"
+                VerticalAlignment="Center"
+                ToolTipService.ToolTip="Display Bullseye Position on HUD"
+                Click="uiCkboxBullsOnHUD_Click">
+            </CheckBox>
+
+            <!-- Flight Plan 1 Auto/Manual setup -->
+            <TextBlock Grid.Row="3" Grid.Column="0" Margin="12,12,0,0"
+                Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                HorizontalTextAlignment="Right">
+                FPM Flight Plan 01
+            </TextBlock>
+            <ComboBox Grid.Row="3" Grid.Column="1" Margin="12,12,0,0"
+                x:Name="uiComboFlightPlan1Manual"
+                VerticalAlignment="Center"
+                ToolTipService.ToolTip="Flight Plan 01 Auto/Manual"
+                SelectionChanged="ComboFlightPlan1Manual_SelectionChanged">
+                <ComboBox.Items>
+                    <!-- Tag is enum TODO -->
+                    <TextBlock Text="Auto" Tag="0"/>
+                    <TextBlock Text="Manual" Tag="1"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- STEER Page Speed Display setup -->
+            <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,12,0,0"
+                Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                HorizontalTextAlignment="Right">
+                STEER Page Speed Display
+            </TextBlock>
+            <ComboBox Grid.Row="4" Grid.Column="1" Margin="12,12,0,0"
+                x:Name="uiComboSpeedDisplay"
+                VerticalAlignment="Center"
+                ToolTipService.ToolTip="Speed Displayed on the CDU STEER Page"
+                SelectionChanged="ComboSpeedDisplay_SelectionChanged">
+                <ComboBox.Items>
+                    <!-- Tag is enum TODO -->
+                    <TextBlock Text="IAS" Tag="0"/>
+                    <TextBlock Text="TAS" Tag="1"/>
+                    <TextBlock Text="GS" Tag="2"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                AAP Configuration:
+            </TextBlock>
+
+            <!-- STEER PT Knob setup -->
+            <TextBlock Grid.Row="6" Grid.Column="0" Margin="12,12,0,0"
+                Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                HorizontalTextAlignment="Right">
+                STEER PT
+            </TextBlock>
+            <ComboBox Grid.Row="6" Grid.Column="1" Margin="12,12,0,0"
+                x:Name="uiComboSteerPt"
+                VerticalAlignment="Center"
+                ToolTipService.ToolTip="STEER PT Selection"
+                SelectionChanged="ComboSteerPt_SelectionChanged">
+                <ComboBox.Items>
+                    <!-- Tag is enum TODO -->
+                    <TextBlock Text="Flt Plan" Tag="0"/>
+                    <TextBlock Text="Mark" Tag="1"/>
+                    <TextBlock Text="Mission" Tag="2"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- CDU PAGE Knob setup -->
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0"
+                Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                HorizontalTextAlignment="Right">
+                PAGE
+            </TextBlock>
+            <ComboBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0"
+                x:Name="uiComboAapPage"
+                VerticalAlignment="Center"
+                ToolTipService.ToolTip="CDU PAGE Selection"
+                SelectionChanged="ComboPage_SelectionChanged">
+                <ComboBox.Items>
+                    <!-- Tag is enum TODO -->
+                    <TextBlock Text="Other" Tag="0"/>
+                    <TextBlock Text="Position" Tag="1"/>
+                    <TextBlock Text="Steer" Tag="2"/>
+                    <TextBlock Text="Waypt" Tag="3"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                Autopilot Configuration:
+            </TextBlock>
+
+            <!-- Autopilot Mode Switch setup -->
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0"
+                Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                HorizontalTextAlignment="Right">
+                Mode
+            </TextBlock>
+            <ComboBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0"
+                x:Name="uiComboAutopilotMode"
+                VerticalAlignment="Center"
+                ToolTipService.ToolTip="Autopilot Mode Selection"
+                SelectionChanged="ComboAutopilotMode_SelectionChanged">
+                <ComboBox.Items>
+                    <!-- Tag is enum TODO -->
+                    <TextBlock Text="PATH" Tag="1"/>
+                    <TextBlock Text="ALT/HDG" Tag="0"/>
+                    <TextBlock Text="ALT" Tag="-1"/>
                 </ComboBox.Items>
             </ComboBox>
         </Grid>

@@ -21,13 +21,32 @@ You should have received a copy of the GNU General Public License along with thi
 
 dofile(lfs.writedir() .. 'Scripts/JAFDTC/CommonFunctions.lua')
 
+-- Displays
+-----------
+-- 1: LMFD
+-- 2: RMFD
+-- 3: CDU
+-- 4: ?
+-- 5: HUD
+-- 6: ?
+-- 7: CMS (countmeasures panel on right)
+-- 8: CMSC (countermeasure and jammer display below UFC)
+
 function JAFDTC_A10C_GetCDU()
-	return JAFDTC_ParseDisplay(3)
+	local table = JAFDTC_ParseDisplay(3);
+    JAFDTC_DebugDisplay(table);
+    return table;
+end
+
+function JAFDTC_A10C_GetCDU_value(key)
+	local table = JAFDTC_A10C_GetCDU();
+    local value = table[key] or "---";
+    JAFDTC_Log("CDU table[" .. key .. "]: " .. value);
+    return value;
 end
 
 function JAFDTC_A10C_CheckCondition_IsCoordFmtLL()
-    local table = JAFDTC_A10C_GetCDU();
-    local value = table["WAYPTCoordFormat"] or "---";
+    local value = JAFDTC_A10C_GetCDU_value("WAYPTCoordFormat");
     if string.sub(value, 1, 3) == "L/L" then
         return true
     end
@@ -35,13 +54,52 @@ function JAFDTC_A10C_CheckCondition_IsCoordFmtLL()
 end
 
 function JAFDTC_A10C_CheckCondition_IsCoordFmtNotLL()
-    local table = JAFDTC_A10C_GetCDU();
-    local value = table["WAYPTCoordFormat"] or "---";
+    local value = JAFDTC_A10C_GetCDU_value("WAYPTCoordFormat");
     if string.sub(value, 1, 3) ~= "L/L" then
-        JAFDTC_DebugDisplay(table)
         return true
     end
     return false
+end
+
+function JAFDTC_A10C_CheckCondition_IsBullsNotOnHUD()
+    local value = JAFDTC_A10C_GetCDU_value("HUD_OFF");
+    if value == "OFF" then
+        return true
+    end
+    return false
+end
+
+function JAFDTC_A10C_CheckCondition_IsFlightPlanNotManual()
+    local value = JAFDTC_A10C_GetCDU_value("FPMode");
+    if value ~= "MAN" then
+        return true
+    end
+    return false
+end
+
+function JAFDTC_A10C_CheckCondition_SpeedIsAvailable()
+    local table = JAFDTC_A10C_GetCDU();
+    return table["STRSpeedMode4"] == "IAS" or table["STRSpeedMode5"] == "TAS" or table["STRSpeedMode6"] == "GS"
+end
+
+function JAFDTC_A10C_CheckCondition_SpeedIsNotAvailable()
+    local table = JAFDTC_A10C_GetCDU();
+    return table["STRSpeedMode4"] ~= "IAS" and table["STRSpeedMode5"] ~= "TAS" and table["STRSpeedMode6"] ~= "GS"
+end
+
+function JAFDTC_A10C_CheckCondition_SpeedIsNot(speed)
+    JAFDTC_Log("SpeedIsNot(" .. speed .. ")");
+    local table = JAFDTC_A10C_GetCDU();
+    if speed == "IAS" then
+        return table["STRSpeedMode4"] ~= "IAS"
+    end
+    if speed == "TAS" then
+        return table["STRSpeedMode5"] ~= "TAS"
+    end
+    if speed == "GS" then
+        return table["STRSpeedMode6"] ~= "GS"
+    end
+    return true
 end
 
 --[[

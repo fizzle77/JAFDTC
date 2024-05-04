@@ -83,6 +83,12 @@ namespace JAFDTC.UI.A10C
         private void CopyConfigToEdit()
         {
             EditMisc.CoordSystem = Config.Misc.CoordSystem;
+            EditMisc.BullseyeOnHUD = Config.Misc.BullseyeOnHUD;
+            EditMisc.FlightPlan1Manual = Config.Misc.FlightPlan1Manual;
+            EditMisc.SpeedDisplay = Config.Misc.SpeedDisplay;
+            EditMisc.AapSteerPt = Config.Misc.AapSteerPt;
+            EditMisc.AapPage = Config.Misc.AapPage;
+            EditMisc.AutopilotMode = Config.Misc.AutopilotMode;
         }
 
         private void CopyEditToConfig(bool isPersist = false)
@@ -90,6 +96,12 @@ namespace JAFDTC.UI.A10C
             if (!EditMisc.HasErrors)
             {
                 Config.Misc.CoordSystem = EditMisc.CoordSystem;
+                Config.Misc.BullseyeOnHUD = EditMisc.BullseyeOnHUD;
+                Config.Misc.FlightPlan1Manual = EditMisc.FlightPlan1Manual;
+                Config.Misc.SpeedDisplay = EditMisc.SpeedDisplay;
+                Config.Misc.AapSteerPt = EditMisc.AapSteerPt;
+                Config.Misc.AapPage = EditMisc.AapPage;
+                Config.Misc.AutopilotMode = EditMisc.AutopilotMode;
 
                 if (isPersist)
                 {
@@ -111,15 +123,86 @@ namespace JAFDTC.UI.A10C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // rebuild the setup of the tacan band according to the current settings. 
+        // rebuild the setup of the coordinate system according to the current settings. 
         //
         private void RebuildCoordSystemSetup()
         {
-            int band = (string.IsNullOrEmpty(EditMisc.CoordSystem)) ? int.Parse(_miscSysDefault.CoordSystem)
+            int coordSystem = (string.IsNullOrEmpty(EditMisc.CoordSystem)) ? int.Parse(_miscSysDefault.CoordSystem)
                                                                   : int.Parse(EditMisc.CoordSystem);
-            if (uiComboCoordSystem.SelectedIndex != band)
+            if (uiComboCoordSystem.SelectedIndex != coordSystem)
             {
-                uiComboCoordSystem.SelectedIndex = band;
+                uiComboCoordSystem.SelectedIndex = coordSystem;
+            }
+        }
+
+        // rebuild the setup of the bullseye on HUD setting according to the current settings. 
+        //
+        private void RebuildBullseyeOnHUDSetup()
+        {
+            uiCkboxBullsOnHUD.IsChecked = EditMisc.IsBullseyeOnHUDValue;
+        }
+
+        // rebuild the setup of the first flight plan's manual setting according to the current settings. 
+        //
+        private void RebuildFlightPlan1ManualSetup()
+        {
+            int manualOrAuto = (string.IsNullOrEmpty(EditMisc.FlightPlan1Manual)) ? int.Parse(_miscSysDefault.FlightPlan1Manual)
+                                                                          : int.Parse(EditMisc.FlightPlan1Manual);
+            if (uiComboFlightPlan1Manual.SelectedIndex != manualOrAuto)
+            {
+                uiComboFlightPlan1Manual.SelectedIndex = manualOrAuto;
+            }
+        }
+
+        // rebuild the setup of the speed display setting according to the current settings. 
+        //
+        private void RebuildSpeedDisplaySetup()
+        {
+            int speedDisplay = (string.IsNullOrEmpty(EditMisc.SpeedDisplay)) ? int.Parse(_miscSysDefault.SpeedDisplay)
+                                                                             : int.Parse(EditMisc.SpeedDisplay);
+            if (uiComboSpeedDisplay.SelectedIndex != speedDisplay)
+            {
+                uiComboSpeedDisplay.SelectedIndex = speedDisplay;
+            }
+        }
+
+        // rebuild the setup of the aap steer point according to the current settings. 
+        //
+        private void RebuildAapSteerPtSetup()
+        {
+            int aapSteerPt = (string.IsNullOrEmpty(EditMisc.AapSteerPt)) ? int.Parse(_miscSysDefault.AapSteerPt)
+                                                                             : int.Parse(EditMisc.AapSteerPt);
+            if (uiComboSteerPt.SelectedIndex != aapSteerPt)
+            {
+                uiComboSteerPt.SelectedIndex = aapSteerPt;
+            }
+        }
+
+        // rebuild the setup of the aap page according to the current settings. 
+        //
+        private void RebuildAapPageSetup()
+        {
+            int aapPage = (string.IsNullOrEmpty(EditMisc.AapPage)) ? int.Parse(_miscSysDefault.AapPage)
+                                                                             : int.Parse(EditMisc.AapPage);
+            if (uiComboAapPage.SelectedIndex != aapPage)
+            {
+                uiComboAapPage.SelectedIndex = aapPage;
+            }
+        }
+
+        // rebuild the setup of the autopilot mode according to the current settings. 
+        //
+        private void RebuildAutopilotModeSetup()
+        {
+            int autopilotMode = (string.IsNullOrEmpty(EditMisc.AutopilotMode)) ? int.Parse(_miscSysDefault.AutopilotMode)
+                                                                             : int.Parse(EditMisc.AutopilotMode);
+            foreach (TextBlock item in uiComboAutopilotMode.Items)
+            {
+                if ( int.Parse((string)item.Tag) == autopilotMode)
+                {
+                    uiComboAutopilotMode.SelectedItem = item;
+                    return;
+                }
             }
         }
 
@@ -138,6 +221,12 @@ namespace JAFDTC.UI.A10C
         {
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(MiscSystem.SystemTag));
             Utilities.SetEnableState(uiComboCoordSystem, isEditable);
+            Utilities.SetEnableState(uiCkboxBullsOnHUD, isEditable);
+            Utilities.SetEnableState(uiComboFlightPlan1Manual, isEditable);
+            Utilities.SetEnableState(uiComboSpeedDisplay, isEditable);
+            Utilities.SetEnableState(uiComboSteerPt, isEditable);
+            Utilities.SetEnableState(uiComboAapPage, isEditable);
+            Utilities.SetEnableState(uiComboAutopilotMode, isEditable);
 
             Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
             Utilities.SetEnableState(uiPageBtnReset, !EditMisc.IsDefault);
@@ -154,6 +243,13 @@ namespace JAFDTC.UI.A10C
                 {
                     IsRebuildingUI = true;
                     RebuildCoordSystemSetup();
+                    RebuildBullseyeOnHUDSetup();
+                    RebuildFlightPlan1ManualSetup();
+                    RebuildSpeedDisplaySetup();
+                    RebuildAapSteerPtSetup();
+                    RebuildAapPageSetup();
+                    RebuildAutopilotModeSetup();
+
                     RebuildLinkControls();
                     RebuildEnableState();
                     IsRebuildingUI = false;
@@ -207,14 +303,87 @@ namespace JAFDTC.UI.A10C
             }
         }
 
-        // ---- tacan setup -------------------------------------------------------------------------------------------
+        // ---- coordinate system setup -------------------------------------------------------------------------------------------
 
-        private void ComboCoordSystem_SelectionChanged(object sender, RoutedEventArgs args)
+        private void ComboCoordSystem_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
             TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
             if (!IsRebuildingUI && (item != null) && (item.Tag != null))
             {
                 EditMisc.CoordSystem = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        // ---- bullseye on hud setup -------------------------------------------------------------------------------------------
+
+        private void uiCkboxBullsOnHUD_Click(object sender, RoutedEventArgs args)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            if (!IsRebuildingUI && (checkBox != null))
+            {
+                EditMisc.BullseyeOnHUD = checkBox.IsChecked.ToString();
+                CopyEditToConfig(true);
+            }
+        }
+
+        // ---- flight plan 1 manual/auto setup -------------------------------------------------------------------------------------------
+
+        private void ComboFlightPlan1Manual_SelectionChanged(object sender, SelectionChangedEventArgs args)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.FlightPlan1Manual = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        // ---- steer page speed display setup -------------------------------------------------------------------------------------------
+
+        private void ComboSpeedDisplay_SelectionChanged(object sender, SelectionChangedEventArgs args)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.SpeedDisplay = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        // ---- aap steer pt knob setup -------------------------------------------------------------------------------------------
+
+        private void ComboSteerPt_SelectionChanged(object sender, SelectionChangedEventArgs args)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.AapSteerPt = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+
+        }
+
+        // ---- aap page knob setup -------------------------------------------------------------------------------------------
+
+        private void ComboPage_SelectionChanged(object sender, SelectionChangedEventArgs args)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.AapPage = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        // ---- autopilot mode switch setup -------------------------------------------------------------------------------------------
+
+        private void ComboAutopilotMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.AutopilotMode = (string)item.Tag;
                 CopyEditToConfig(true);
             }
         }

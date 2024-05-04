@@ -91,7 +91,31 @@ namespace JAFDTC.Models.A10C
             cdu.AddAction(3008, "LSK_9R", delay, 1);
             cdu.AddAction(3010, "NAV", delay, 1);
             cdu.AddAction(3011, "WP", delay, 1);
+            cdu.AddAction(3013, "FPM", delay, 1);
             AddDevice(cdu);
+
+            // ---- auxiliary avionics panel
+            AirframeDevice aap = new(22, "AAP");
+
+            // steer pt selection knob
+            aap.AddAction(3001, "STEER_FLT_PLAN", delay, 0.0, 0.0);
+            aap.AddAction(3001, "STEER_MARK", delay, 0.1, 0.1);
+            aap.AddAction(3001, "STEER_MISSION", delay, 0.2, 0.2);
+
+            // CDU page selection knob
+            aap.AddAction(3004, "PAGE_OTHER", delay, 0.0, 0.0);
+            aap.AddAction(3004, "PAGE_POSITION", delay, 0.1, 0.1);
+            aap.AddAction(3004, "PAGE_STEER", delay, 0.2, 0.2);
+            aap.AddAction(3004, "PAGE_WAYPT", delay, 0.3, 0.3);
+
+            AddDevice(aap);
+
+            // ---- Autopilot (LASTE) panel
+
+            AirframeDevice ap = new(38, "AUTOPILOT");
+            ap.AddAction(3001, "AP_MODE", delay, 0); // -1 down, 0 mid, 1 up
+            AddDevice(ap);
+
 
             // ---- left mfd
 
@@ -162,6 +186,8 @@ namespace JAFDTC.Models.A10C
             ufc.AddAction(3008, "8", delay, 1);
             ufc.AddAction(3009, "9", delay, 1);
             ufc.AddAction(3010, "0", delay, 1);
+            ufc.AddAction(3011, "SPC", delay, 1);
+            ufc.AddAction(3013, "FN", delay, 1);
             AddDevice(ufc);
 
             // ---- an/arc-210 uhf radio
