@@ -311,13 +311,15 @@ function LuaExportBeforeNextFrame()
     if curTime >= cmdResumeTime then
         if not cmdList then
             local data = JAFDTC_TCPServerSockRx(tcpCmdServerSock)
-            cmdCurProgress = 0
-            cmdListIndex = 1
-            cmdList = JSON:decode(data)
-            if not cmdList and data then
-                JAFDTC_Log(string.format("[%.3f] ERROR: JSON decode failed", curTime))
-            elseif cmdList and data then
-                JAFDTC_Log(string.format("[%.3f] Process rx cmdList[1:%d] %dB", curTime, #cmdList, string.len(data)))
+            if data then
+                cmdCurProgress = 0
+                cmdListIndex = 1
+                cmdList = JSON:decode(data)
+                if not cmdList and data then
+                    JAFDTC_Log(string.format("[%.3f] ERROR: JSON decode failed", curTime))
+                elseif cmdList and data then
+                    JAFDTC_Log(string.format("[%.3f] Process rx cmdList[1:%d] %dB", curTime, #cmdList, string.len(data)))
+                end
             end
         end
 

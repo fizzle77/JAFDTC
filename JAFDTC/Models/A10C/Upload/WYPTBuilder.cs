@@ -55,11 +55,17 @@ namespace JAFDTC.Models.A10C.Upload
         {
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
+            AirframeDevice aap = _aircraft.GetDevice("AAP");
 
             if (wypts.Count > 0)
             {
-                // TODO: set STEER_PT to MISSION
-                // TODO: set PAGE to OTHER
+                // STEER PT Knob to MISSION
+                AddActions(aap, new() { "STEER_MISSION" });
+                AddWait(WAIT_BASE);
+
+                // CDU Page Knob to OTHER
+                AddActions(aap, new() { "PAGE_OTHER" });
+                AddWait(WAIT_BASE);
 
                 AddActions(cdu, new() { "WP", "LSK_3L" });
                 AddWait(WAIT_BASE);
@@ -67,11 +73,16 @@ namespace JAFDTC.Models.A10C.Upload
                 AddActions(cdu, new() { "CLR", "CLR" });
                 AddWait(WAIT_BASE);
 
+                AddIfBlock("IsCoordFmtLL", null, delegate ()
+                {
+                    BuildWaypoints(cdu, wypts);
+                });
                 AddIfBlock("IsCoordFmtNotLL", null, delegate ()
                 {
-                    AddActions(cdu, new() { "LSK_9R" });
+                    AddActions(cdu, new() { "LSK_9R" }); // Change to LL
+                    BuildWaypoints(cdu, wypts);
+                    AddActions(cdu, new() { "LSK_9R" }); // Go back to UTM
                 });
-                BuildWaypoints(cdu, wypts);
             }
         }
 
@@ -98,9 +109,13 @@ namespace JAFDTC.Models.A10C.Upload
                     
                     BuildWaypointCoords(cdu, wypt);
 
-                    AddActions(cdu, ActionsForString(Math.Max(int.Parse(wypt.Alt), 0).ToString()), new() { "LSK_5L" });
-                    AddWait(WAIT_BASE);
-                    AddActions(cdu, new() { "CLR", "CLR" });
+                    // If no altitude was entered, leave it at the A-10's ground level altitude.
+                    if (!string.IsNullOrEmpty(wypt.Alt))
+                    {
+                        AddActions(cdu, ActionsForString(Math.Max(int.Parse(wypt.Alt), 0).ToString()), new() { "LSK_5L" });
+                        AddWait(WAIT_BASE);
+                        AddActions(cdu, new() { "CLR", "CLR" });
+                    }
                 }
             }
         }
