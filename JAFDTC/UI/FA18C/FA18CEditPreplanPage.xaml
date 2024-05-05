@@ -167,17 +167,39 @@ https://www.gnu.org/licenses/.
                     <TextBlock Text="SLAM-ER" Tag="8"/>
                 </ComboBox.Items>
             </ComboBox>
-            <Button Grid.Row="0" Grid.Column="3" Width="100" Margin="24,0,0,0"
-                    x:Name="uiWeapBtnUnload"
-                    Click="WeapBtnUload_Click">
-                <StackPanel Orientation="Horizontal">
-                    <FontIcon Margin="0,0,6,0"
+            <Grid Grid.Row="0" Grid.Column="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="48"/>
+                    <ColumnDefinition Width="48"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        VerticalAlignment="Center"
+                        x:Name="uiStationBtnPrev"
+                        ToolTipService.ToolTip="Select previous station"
+                        Click="StationBtnPrev_Click">
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
+                </Button>
+                <Button Grid.Column="1" Margin="6,0,0,0"
+                        VerticalAlignment="Center"
+                        x:Name="uiStationBtnNext"
+                        ToolTipService.ToolTip="Select next station"
+                        Click="StationBtnNext_Click">
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
+                </Button>
+                <Button Grid.Column="2" Margin="24,0,0,0"
+                        HorizontalAlignment="Stretch"
+                        x:Name="uiStationBtnUnload"
+                        Click="StationBtnUnload_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
                               FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
-                    <TextBlock VerticalAlignment="center">
-                        Unload
-                    </TextBlock>
-                </StackPanel>
-            </Button>
+                        <TextBlock  Margin="0,0,6,0" VerticalAlignment="center">
+                            Unload
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+            </Grid>
 
             <!-- row 0.1 : program select
               -->
@@ -289,17 +311,39 @@ https://www.gnu.org/licenses/.
                       Click="ProgCkbxBoxed_Click">
                 Set as Boxed Program for Station
             </CheckBox>
-            <Button Grid.Row="1" Grid.Column="3" Width="100" Margin="24,12,0,0"
-                    x:Name="uiProgBtnReset"
-                    Click="ProgBtnReset_Click">
-                <StackPanel Orientation="Horizontal">
-                    <FontIcon Margin="0,0,6,0"
-                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
-                    <TextBlock VerticalAlignment="center">
-                        Reset
-                    </TextBlock>
-                </StackPanel>
-            </Button>
+            <Grid Grid.Row="1" Grid.Column="3" Margin="0,6,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="48"/>
+                    <ColumnDefinition Width="48"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        VerticalAlignment="Center"
+                        x:Name="uiProgBtnPrev"
+                        ToolTipService.ToolTip="Selects previous station program"
+                        Click="ProgBtnPrev_Click">
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
+                </Button>
+                <Button Grid.Column="1" Margin="6,0,0,0"
+                        VerticalAlignment="Center"
+                        x:Name="uiProgBtnNext"
+                        ToolTipService.ToolTip="Selects next station program"
+                        Click="ProgBtnNext_Click">
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
+                </Button>
+                <Button Grid.Column="2" Margin="24,0,0,0"
+                        HorizontalAlignment="Stretch"
+                        x:Name="uiProgBtnReset"
+                        Click="ProgBtnReset_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                        <TextBlock Margin="0,0,6,0" VerticalAlignment="center">
+                            Reset
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+            </Grid>
 
             <!-- row 0.2 : coordinate, source select
               -->
@@ -336,18 +380,40 @@ https://www.gnu.org/licenses/.
                     </ComboBox.Items>
                 </ComboBox>
             </Grid>
-            <Button Grid.Row="2" Grid.Column="3" Width="100" Margin="24,12,0,0"
-                    x:Name="uiCoordBtnDelete"
-                    Click="CoordBtnDelete_Click">
-                <StackPanel Orientation="Horizontal">
-                    <FontIcon Margin="0,0,6,0"
-                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
-                    <TextBlock VerticalAlignment="center"
-                               x:Name="uiCoordBtnDeleteTitle">
-                        Delete
-                    </TextBlock>
-                </StackPanel>
-            </Button>
+            <Grid Grid.Row="2" Grid.Column="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="48"/>
+                    <ColumnDefinition Width="48"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        VerticalAlignment="Center"
+                        x:Name="uiCoordBtnPrev"
+                        ToolTipService.ToolTip="Selects previous program coordiante"
+                        Click="CoordBtnPrev_Click">
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
+                </Button>
+                <Button Grid.Column="1" Margin="6,0,0,0"
+                        VerticalAlignment="Center"
+                        x:Name="uiCoordBtnNext"
+                        ToolTipService.ToolTip="Selects next program coordinate"
+                        Click="CoordBtnNext_Click">
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
+                </Button>
+                <Button Grid.Column="2" Margin="24,0,0,0"
+                        HorizontalAlignment="Stretch"
+                        x:Name="uiCoordBtnDelete"
+                        Click="CoordBtnDelete_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                        <TextBlock Margin="0,0,6,0" VerticalAlignment="center"
+                                   x:Name="uiCoordBtnDeleteTitle">
+                            Delete
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+            </Grid>
         </Grid>
 
         <!--

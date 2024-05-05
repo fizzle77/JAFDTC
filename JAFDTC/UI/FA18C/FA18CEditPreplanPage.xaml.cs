@@ -630,12 +630,28 @@ namespace JAFDTC.UI.FA18C
 
             uiPoIBtnFilter.IsChecked = (FilterSpec.IsFiltered && isEditable);
 
-            Utilities.SetEnableState(uiWeapBtnUnload, isEditable && isWeaponLoaded);
+            Utilities.SetEnableState(uiStationBtnPrev, (EditStationNum != 2));
+            Utilities.SetEnableState(uiStationBtnNext, (EditStationNum != 8));
+            Utilities.SetEnableState(uiStationBtnUnload, isEditable && isWeaponLoaded);
 
+            Utilities.SetEnableState(uiProgBtnPrev, (EditProgIdx > 0));
+            Utilities.SetEnableState(uiProgBtnNext, (EditProgIdx < (uiProgSelectCombo.Items.Count - 1)));
             Utilities.SetEnableState(uiProgSelectCombo, isEditable && isWeaponLoaded);
             Utilities.SetEnableState(uiProgCkbxBoxed, isEditable && isWeaponLoaded && !isProgDefault);
             Utilities.SetEnableState(uiProgBtnReset, isEditable && isWeaponLoaded && !isProgDefault);
 
+            if (isSLAMER)
+            {
+                uiCoordBtnPrev.Visibility = Visibility.Visible;
+                uiCoordBtnNext.Visibility = Visibility.Visible;
+                Utilities.SetEnableState(uiCoordBtnPrev, (EditCoordIdx > 0));
+                Utilities.SetEnableState(uiCoordBtnNext, (EditCoordIdx < (uiCoordSelectCombo.Items.Count - 1)));
+            }
+            else
+            {
+                uiCoordBtnPrev.Visibility = Visibility.Collapsed;
+                uiCoordBtnNext.Visibility = Visibility.Collapsed;
+            }
             Utilities.SetEnableState(uiCoordSelectCombo, isEditable && isSLAMER);
             Utilities.SetEnableState(uiCoordSrcSelectCombo, isEditable && isWeaponLoaded && isWyptAvailable);
             Utilities.SetEnableState(uiCoordBtnDelete, isEditable && isWeaponLoaded && isCoordValid);
@@ -732,7 +748,7 @@ namespace JAFDTC.UI.FA18C
         /// <summary>
         /// weapon unload click: unload the weapon from the current station on confirmation from the user.
         /// </summary>
-        private async void WeapBtnUload_Click(object sender, RoutedEventArgs args)
+        private async void StationBtnUnload_Click(object sender, RoutedEventArgs args)
         {
             await CoreUnloadWeaponUI();
         }
@@ -920,6 +936,22 @@ namespace JAFDTC.UI.FA18C
         // ---- station selection -------------------------------------------------------------------------------------
 
         /// <summary>
+        /// weapon previous click: advance to previous station. assume button is disabled to prevent under-indexing.
+        /// </summary>
+        private void StationBtnPrev_Click(object sender, RoutedEventArgs args)
+        {
+            uiStationSelectCombo.SelectedIndex = uiStationSelectCombo.SelectedIndex - 1;
+        }
+
+        /// <summary>
+        /// station next click: advance to next station. assume button is disabled to prevent over-indexing.
+        /// </summary>
+        private void StationBtnNext_Click(object sender, RoutedEventArgs args)
+        {
+            uiStationSelectCombo.SelectedIndex = uiStationSelectCombo.SelectedIndex + 1;
+        }
+
+        /// <summary>
         /// station select combo selection changed: switch to the selected station. the tag of the sender (a TextBlock)
         /// gives us the station number to select.
         /// </summary>
@@ -973,6 +1005,23 @@ namespace JAFDTC.UI.FA18C
         // ---- program selection -------------------------------------------------------------------------------------
 
         /// <summary>
+        /// program previous click: advance to previous station program. assume button is disabled to prevent
+        /// under-indexing.
+        /// </summary>
+        private void ProgBtnPrev_Click(object sender, RoutedEventArgs args)
+        {
+            uiProgSelectCombo.SelectedIndex = uiProgSelectCombo.SelectedIndex - 1;
+        }
+
+        /// <summary>
+        /// program next click: advance to next station program. assume button is disabled to prevent over-indexing.
+        /// </summary>
+        private void ProgBtnNext_Click(object sender, RoutedEventArgs args)
+        {
+            uiProgSelectCombo.SelectedIndex = uiProgSelectCombo.SelectedIndex + 1;
+        }
+
+        /// <summary>
         /// program select combo selection changed:
         /// </summary>
         private void ProgSelectCombo_SelectionChanged(object sender, SelectionChangedEventArgs args)
@@ -997,6 +1046,24 @@ namespace JAFDTC.UI.FA18C
         }
 
         // ---- coordinate selection ----------------------------------------------------------------------------------
+
+        /// <summary>
+        /// coordinate previous click: advance to previous program coordinate. assume button is disabled to prevent
+        /// under-indexing.
+        /// </summary>
+        private void CoordBtnPrev_Click(object sender, RoutedEventArgs args)
+        {
+            uiCoordSelectCombo.SelectedIndex = uiCoordSelectCombo.SelectedIndex - 1;
+        }
+
+        /// <summary>
+        /// coordinate next click: advance to next program coordinate. assume button is disabled to prevent
+        /// over-indexing.
+        /// </summary>
+        private void CoordBtnNext_Click(object sender, RoutedEventArgs args)
+        {
+            uiCoordSelectCombo.SelectedIndex = uiCoordSelectCombo.SelectedIndex + 1;
+        }
 
         /// <summary>
         /// TODO: document
