@@ -73,6 +73,20 @@ namespace JAFDTC.Models.DCS
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// returns a human-readable form of the action in the device with the specified name.
+        /// </summary>
+        public string ActionToString(string name)
+        {
+            string str = "(unknown)";
+            if (_actions.ContainsKey(name))
+            {
+                Action action = _actions[name];
+                str = $"{_id}.{action.ID} >> {action.ValueDn} / {action.Delay}ms / {action.ValueUp}";
+            }
+            return str;
+        }
+
+        /// <summary>
         /// return the dcs "action" command for an action targeted at this device.
         /// </summary>
         private string DCSActionCommand(Action action)

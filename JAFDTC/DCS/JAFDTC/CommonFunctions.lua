@@ -41,6 +41,93 @@ function JAFDTC_ParseDisplay(indicator_id)  -- Thanks to [FSF]Ian code
 	return t
 end
 
+function JAFDTC_LinesToList(s)
+    local i = 1
+    local list = { }
+    s:gsub("(.-)\n", function(s)
+        list[i] = s; i = i + 1
+    end)
+    return list
+end
+
+function JAFDTC_FlattenTable(table)
+    local flattened = { }
+    for key, value in pairs(table) do
+        if type(value) == "table" then
+            local nested_flattened = JAFDTC_FlattenTable(value)
+            for nested_key, nested_value in pairs(nested_flattened) do
+                flattened[key .. "." .. nested_key] = nested_value
+            end
+        else
+            flattened[key] = value
+        end
+    end
+    return flattened
+end
+
+function JAFDTC_TrimString(str)
+    return str:gsub("^%s*(.-)%s*$", "%1")
+end
+
+function JAFDTC_SplitString(str, delimiter)
+    local result = {}
+    for token in string.gmatch(str, "[^" .. delimiter .. "]+") do
+        table.insert(result, token)
+    end
+    return result
+end
+
+function JAFDTC_GetDisplay(id)
+    local SEP = "-----------------------------------------"
+    local s = list_indication(id)
+    local err = false
+    if not s then
+        return { }
+    end
+    local cur_table = { }
+    local tables = { cur_table }
+    local strlist = JAFDTC_LinesToList(s)
+    if #strlist == 0 then
+        return { }
+    end
+    local i = 1
+    repeat
+        if strlist[i] == SEP then
+            i = i + 1
+            while i <= #strlist and JAFDTC_TrimString(strlist[i]) == "" do
+                i = i + 1
+            end
+            local name = JAFDTC_TrimString(strlist[i])
+            i = i + 1
+            local value = {}
+            cur_table[name] = value
+            while i <= #strlist and strlist[i] ~= SEP and strlist[i] ~= "}" and strlist[i] ~= "children are {" do
+                value[#value + 1] = JAFDTC_TrimString(strlist[i])
+                i = i + 1
+            end
+            if strlist[i] == "children are {" then
+                new_table = {}
+                tables[#tables + 1] = new_table
+                value[#value + 1] = new_table
+                cur_table = new_table
+                i = i + 1
+            end
+        elseif strlist[i] == "}" then
+            tables[#tables] = nil
+            cur_table = tables[#tables]
+            i = i + 1
+        else
+            err = true
+            JAFDTC_Log("ERROR: Unexpected output, " .. strlist[i])
+            i = i + 1
+        end
+    until i > #strlist
+    if err then
+        JAFDTC_Log("ERROR: " .. s)
+    end
+    return JAFDTC_FlattenTable(cur_table)
+end
+
 -- TODO: do a table lookup here
 function JAFDTC_GetPlayerAircraftType()
     local data = LoGetSelfData();

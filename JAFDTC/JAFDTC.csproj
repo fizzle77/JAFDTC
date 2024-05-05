@@ -62,6 +62,7 @@
     <None Remove="UI\F15E\F15EEditUFCPage.xaml" />
     <None Remove="UI\F16C\F16CEditHTSThreatsPage.xaml" />
     <None Remove="UI\FA18C\FA18CEditCMSPage.xaml" />
+    <None Remove="UI\FA18C\FA18CEditPreplanPage.xaml" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -132,6 +133,12 @@
 
   <ItemGroup>
     <Page Update="UI\A10C\A10CEditMiscPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\FA18C\FA18CEditPreplanPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

@@ -40,11 +40,11 @@ namespace JAFDTC.Models.FA18C
             var delay = Settings.CommandDelaysMs[AirframeTypes.FA18C];
 
             var delayMFDs = delay;
-            var delayUFC = delay / 4;
-            var delayUFCOpt = delay / 4;
+            var delayUFC = delay / 2;
+            var delayUFCOpt = delay;
             var delayUFCOnOff = delay;
-            var delayUFCEnt = delay / 2;
-            var delayIFEI = delay / 2;
+            var delayUFCEnt = delay * 2;
+            var delayIFEI = delay;
             var delayRot = delay / 20;
 
             // ---- ufc

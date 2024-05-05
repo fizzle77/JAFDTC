@@ -22,6 +22,12 @@ You should have received a copy of the GNU General Public License along with thi
 
 dofile(lfs.writedir() .. 'Scripts/JAFDTC/commonFunctions.lua')
 
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- display parsers
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
 function JAFDTC_FA18C_GetLeftDDI()
 	return JAFDTC_ParseDisplay(2)
 end
@@ -38,24 +44,58 @@ function JAFDTC_FA18C_GetIFEI()
 	return JAFDTC_ParseDisplay(5)
 end
 
+function DTC_FA18C_GetUFC()
+    return DTC_ParseDisplay(6)
+end
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- conditions: common
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
+--[[
+function JAFDTC_FA18C_CheckCondition_RightMFDSUPT()
+    local table = DTC_FA18C_GetRightDDI();
+    local str = table["SUPT_id:13"] or ""
+    return (str == "SUPT")
+end
+
+function JAFDTC_FA18C_CheckCondition_LeftMFDTAC()
+    local table = DTC_FA18C_GetLeftDDI();
+    local str = table["TAC_id:23"] or ""
+    return (str == "TAC")
+end
+--]]
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- conditions: waypoint system
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
+function JAFDTC_FA18C_CheckCondition_RmfdNotSupt()
+	local table = JAFDTC_FA18C_GetRightDDI();
+	local str = table["SUPT_id:13"] or ""
+	return (str ~= "SUPT")
+end
+
 function JAFDTC_FA18C_CheckCondition_NotAtWp0()
 	local table = JAFDTC_FA18C_GetRightDDI();
 	local str = table["WYPT_Page_Number"]
-	if str == "0" then
-		return false
-	end 
-	return true
+	return (str == "0")
 end
 
+
+--[[
 function JAFDTC_FA18C_CheckCondition_BingoIsZero()
 	local table = JAFDTC_FA18C_GetIFEI();
 	local str = table["txt_BINGO"]
-	if str == "0" then
-		return true
-	end 
-	return false
+	return (str == "0")
 end
+--]]
 
+--[[
 function JAFDTC_FA18C_CheckCondition_InSequence(i)
 	local table =JAFDTC_FA18C_GetRightDDI();
 	local str = table["WYPT_SequenceData"]
@@ -67,106 +107,161 @@ function JAFDTC_FA18C_CheckCondition_InSequence(i)
 	end
 	return false
 end
+--]]
 
-function JAFDTC_FA18C_CheckCondition_CheckStore(wpn, station)
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- conditions: pre-planned system
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
+function JAFDTC_FA18C_CheckCondition_IsNotLMFDTAC()
 	local table = JAFDTC_FA18C_GetLeftDDI();
-	local str = table["STA"..station.."_Label_TYPE"] or ""
-	if str == wpn then
-		return true
-	end
-	return false
+	local str = table["TAC_id:23"] or ""
+	return (str ~= "TAC")
 end
 
-function JAFDTC_FA18C_CheckCondition_StationSelected(station)
+function JAFDTC_FA18C_CheckCondition_IsStationCarriesStore(stn, store)
+    local table = JAFDTC_GetDisplay(2)
+	local label = table["STA" .. stn .. "_Label_TYPE.1"] or ""
+    return (label == store)
+end
+
+function JAFDTC_FA18C_CheckCondition_IsNotStationCarriesStore(stn, store)
+	return not JAFDTC_FA18C_CheckCondition_IsStationCarriesStore(stn, store)
+end
+
+function JAFDTC_FA18C_CheckCondition_IsStationSelected(station)
 	local table = JAFDTC_FA18C_GetLeftDDI();
 	local str = table["STA"..station.."_Selective_Box_Line_02"] or "x"
-	if str == "" then
-		return true
-	end
-	return false
+	return (str == "")
+end
+
+function JAFDTC_FA18C_CheckCondition_IsNotStationSelected(station)
+	return not JAFDTC_FA18C_CheckCondition_IsStationSelected(station)
+end
+
+function JAFDTC_FA18C_CheckCondition_IsInPPStation(station)
+    local table = JAFDTC_GetDisplay(2)
+    local str = table["Station_JDAM.2.CurrStation_JDAM.1"] or ""
+    return (str == station)
+end
+
+function JAFDTC_FA18C_CheckCondition_IsNotInPPStation(station)
+	return not JAFDTC_FA18C_CheckCondition_IsInPPStation(station)
+end
+
+function JAFDTC_FA18C_CheckCondition_IsNotPPSelected(number)
+	local table = JAFDTC_FA18C_GetLeftDDI();
+	local str = table["MISSION_Type"] or ""
+	return (str ~= "PP" .. number)
 end
 
 function JAFDTC_FA18C_CheckCondition_IsTargetOfOpportunity()
 	local table = JAFDTC_FA18C_GetLeftDDI();
 	local str = table["Miss_Type"] or ""
-	if str == "TOO1" then
-		return true
-	end
-	return false
+	return (str == "TOO1")
 end
 
-function JAFDTC_FA18C_CheckCondition_IsPPNotSelected(number)
-	local table = JAFDTC_FA18C_GetLeftDDI();
-	local str = table["MISSION_Type"] or ""
-	if str ~= "PP"..number then
-		return true
-	end
-	return false
-end
-
-function JAFDTC_FA18C_CheckCondition_LmfdNotTac()
-	local table = JAFDTC_FA18C_GetLeftDDI();
-	local str = table["TAC_id:23"] or ""
-	if str == "TAC" then
-		return false
-	end 
-	return true
-end
-
-function JAFDTC_FA18C_CheckCondition_RmfdNotSupt()
-	local table = JAFDTC_FA18C_GetRightDDI();
-	local str = table["SUPT_id:13"] or ""
-	if str == "SUPT" then
-		return false
-	end 
-	return true
-end
-
+--[[
 function JAFDTC_FA18C_CheckCondition_NotBullseye()
 	local table = JAFDTC_FA18C_GetRightDDI();
 	local str = table["A/A WP_1_box__id:12"] or "x"
-	if str == "x" then
-		return true
-	end 
-	return false
+	return (str == "x")
 end
 
 function JAFDTC_FA18C_CheckCondition_MapBoxed()
 	local table = JAFDTC_FA18C_GetRightDDI();
 	local str = table["MAP_1_box__id:30"] or "x"
-	if str == "" then
-		return true
-	end 
-	return false
+	return (str == "")
 end
 
 function JAFDTC_FA18C_CheckCondition_MapUnboxed()
 	local table = JAFDTC_FA18C_GetRightDDI();
 	local root = table["HSI_Main_Root"] or "x"
 	local str = table["MAP_1_box__id:30"] or "x"
-	if root == "x" and str == "x" then
-		return true
-	end 
-	return false
+	return (root == "x" and str == "x")
 end
 
 function JAFDTC_FA18C_CheckCondition_IsBankLimitOnNav()
 	local table = JAFDTC_FA18C_GetRightDDI();
 	local str = table["_1__id:13"] or ""
-	if str == "N" then
-		return true
-	end 
-	return false
+	return (str == "N")
 end
+--]]
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- conditions: cms system
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_FA18C_CheckCondition_DispenserOff()
 	local table = JAFDTC_FA18C_GetLeftDDI();
 	local str = table["EW_ALE47_MODE_label_cross_Root"] or "x"
-	if str == "" then
-		return true
-	end 
-	return false
+	return (str == "")
 end
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- functions: pre-planned system
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
+function JAFDTC_FA18C_Func_UnSelectStore()
+    local table = JAFDTC_GetDisplay(2)
+    local selOBS06 = table["_1__id:134.2.BP_6_Break_X_Root.1"]
+    local selOBS07 = table["_1__id:137.2.BP_7_Break_X_Root.1"]
+    local selOBS08 = table["_1__id:140.2.BP_8_Break_X_Root.1"]
+    local selOBS09 = table["_1__id:143.2.BP_9_Break_X_Root.1"]
+    local selOBS10 = table["_1__id:146.2.BP_10_Break_X_Root.1"]
+
+    if selOBS06 == "" then
+		JAFDTC_Core_PerformAction(35, 3016, 1, 0, 200)	-- LMFD, OSB-06
+    elseif selOBS07 == "" then
+        JAFDTC_Core_PerformAction(35, 3017, 1, 0, 200)	-- LMFD, OSB-07
+    elseif selOBS08 == "" then
+        JAFDTC_Core_PerformAction(35, 3018, 1, 0, 200)	-- LMFD, OSB-08
+    elseif selOBS09 == "" then
+        JAFDTC_Core_PerformAction(35, 3019, 1, 0, 200)	-- LMFD, OSB-09
+    elseif selOBS10 == "" then
+        JAFDTC_Core_PerformAction(35, 3020, 1, 0, 200)	-- LMFD, OSB-10
+	else
+		JAFDTC_Log("ERROR: JAFDTC_FA18C_Func_UnSelectStore found no match")
+    end
+end
+
+function JAFDTC_FA18C_Func_SelectStore(store)
+    JAFDTC_FA18C_Func_UnSelectStore()
+    JAFDTC_Core_Wait(200)
+
+    local table = JAFDTC_GetDisplay(2)
+    local storeOBS06 = table["_1__id:134.1"] or ""
+    local storeOBS07 = table["_1__id:137.1"] or ""
+    local storeOBS08 = table["_1__id:140.1"] or ""
+    local storeOBS09 = table["_1__id:143.1"] or ""
+    local storeOBS10 = table["_1__id:146.1"] or ""
+
+    if storeOBS06 == store then
+		JAFDTC_Core_PerformAction(35, 3016, 1, 0, 200)	-- LMFD, OSB-06
+    elseif storeOBS07 == store then
+        JAFDTC_Core_PerformAction(35, 3017, 1, 0, 200)	-- LMFD, OSB-07
+    elseif storeOBS08 == store then
+        JAFDTC_Core_PerformAction(35, 3018, 1, 0, 200)	-- LMFD, OSB-08
+    elseif storeOBS09 == store then
+        JAFDTC_Core_PerformAction(35, 3019, 1, 0, 200)	-- LMFD, OSB-09
+    elseif storeOBS10 == store then
+        JAFDTC_Core_PerformAction(35, 3020, 1, 0, 200)	-- LMFD, OSB-10
+	else
+		JAFDTC_Log("ERROR: JAFDTC_FA18C_Func_SelectStore found no match")
+    end
+end
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- frame handler
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_FA18C_AfterNextFrame(params)
 	local mainPanel = GetDevice(0);
