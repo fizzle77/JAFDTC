@@ -407,11 +407,17 @@ namespace JAFDTC.UI.App
             }
             catch (System.Exception ex)
             {
-                FileManager.Log($"MainWindow:CheckForUpdates get version exception {ex}");
+                FileManager.Log($"Update check got exception pulling current remote version number {ex}");
+                githubVersion = "Unknown";
             }
+
+            string skipVers = (string.IsNullOrEmpty(Settings.SkipJAFDTCVersion)) ? "None" : Settings.SkipJAFDTCVersion;
+            FileManager.Log($"Update check found local {Globals.VersionJAFDTC}, remote {githubVersion}, skip {skipVers}");
 
             if ((githubVersion != Settings.SkipJAFDTCVersion) && (githubVersion != Globals.VersionJAFDTC))
             {
+                FileManager.Log($"Update check could update, asking permission...");
+
                 ContentDialogResult actionUpdate = await Utilities.Message3BDialog(
                     Content.XamlRoot,
                     $"New Version Available",
@@ -428,10 +434,14 @@ namespace JAFDTC.UI.App
                         string url = $"https://github.com/51st-Vfw/JAFDTC/releases/download/{githubVersion}/JAFDTC.Installer.msi";
                         string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                                                    "Downloads", "JAFDTC.Installer.msi");
+                        FileManager.Log($"Update check remote: {url}");
+                        FileManager.Log($"Update check local : {path}");
 
                         ContentDialogResult actionReplace = ContentDialogResult.Primary;
                         if (File.Exists(path))
                         {
+                            FileManager.Log($"Update check {path} exists, asking permission...");
+
                             actionReplace = await Utilities.Message2BDialog(
                                 Content.XamlRoot,
                                 $"JAFDTC Package Exists",
@@ -442,7 +452,7 @@ namespace JAFDTC.UI.App
 
                         if (actionReplace == ContentDialogResult.Primary)
                         {
-                            FileManager.Log($"MainWindow:CheckForUpdates {url} --> {path}");
+                            FileManager.Log($"Update check pulls update package from remote to local");
 
                             using HttpClient client = new();
                             Stream msiStream = await client.GetStreamAsync(url);
@@ -454,10 +464,14 @@ namespace JAFDTC.UI.App
                                          $"please install it at your convenience.";
                             await Utilities.Message1BDialog(Content.XamlRoot, "Qapla'!", msg);
                         }
+                        else
+                        {
+                            FileManager.Log($"Update check user cancels download");
+                        }
                     }
                     catch (System.Exception ex)
                     {
-                        FileManager.Log($"MainWindow:CheckForUpdates get .msi exception {ex}");
+                        FileManager.Log($"Update check got .msi exception {ex}");
 
                         await Utilities.Message1BDialog(
                             Content.XamlRoot,
@@ -467,6 +481,7 @@ namespace JAFDTC.UI.App
                 }
                 else if (actionUpdate == ContentDialogResult.Secondary)
                 {
+                    FileManager.Log($"Update check sets SkipJAFDTCVersion to {githubVersion}");
                     Settings.SkipJAFDTCVersion = githubVersion;
                 }
             }
