@@ -143,7 +143,7 @@ namespace JAFDTC.Models.A10C.DSMS
         {
             get
             {
-                if (LaserCode != ExplicitDefaults.LaserCode)
+                if (!IsLaserCodeDefault)
                     return false;
                 foreach (MunitionSettings setting in _munitionSettingMap.Values)
                 {
@@ -154,6 +154,8 @@ namespace JAFDTC.Models.A10C.DSMS
             }
         }
 
+        [JsonIgnore]
+        public bool IsLaserCodeDefault => LaserCode != ExplicitDefaults.LaserCode;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -180,13 +182,13 @@ namespace JAFDTC.Models.A10C.DSMS
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public MunitionSettings GetMunitionSettings(string key)
+        public MunitionSettings GetMunitionSettings(A10CMunition munition)
         {
             MunitionSettings settings;
-            if (!_munitionSettingMap.TryGetValue(key, out settings))
+            if (!_munitionSettingMap.TryGetValue(munition.Key, out settings))
             {
-                settings = new MunitionSettings();
-                _munitionSettingMap.Add(key, settings);
+                settings = new MunitionSettings(munition);
+                _munitionSettingMap.Add(munition.Key, settings);
             }
             return settings;
         }
@@ -198,71 +200,96 @@ namespace JAFDTC.Models.A10C.DSMS
             _munitionSettingMap = new Dictionary<string, MunitionSettings>();
         }
 
+        internal void FixupMunitionReferences()
+        {
+            List<A10CMunition> munitions = FileManager.LoadA10Munitions();
+            foreach (var munition in munitions)
+            {
+                if (_munitionSettingMap.TryGetValue(munition.Key, out MunitionSettings setting))
+                    setting.Munition = munition;
+            }
+        }
+
         //
         // MunitionSettings accessors
         //
-        public void SetAutoLase(string key, string value) => GetMunitionSettings(key).AutoLase = value;
-        public string GetAutoLase(string key) => GetMunitionSettings(key).AutoLase;
-        public bool GetAutoLaseValue(string key)
+
+        // Get munition settings that have non-default settings on the jet's INV page.
+        public List<MunitionSettings> GetNonDefaultInvSettings()
         {
-            string s = GetAutoLase(key);
+            List<MunitionSettings> settings = new List<MunitionSettings>();
+            foreach (MunitionSettings s in _munitionSettingMap.Values)
+            {
+                if (!s.IsInvDefault)
+                    settings.Add(s);
+                else if (s.Munition.Laser && !IsLaserCodeDefault)
+                    settings.Add(s);
+            }
+            return settings;
+        }
+
+        public void SetAutoLase(A10CMunition munition, string value) => GetMunitionSettings(munition).AutoLase = value;
+        public string GetAutoLase(A10CMunition munition) => GetMunitionSettings(munition).AutoLase;
+        public bool GetAutoLaseValue(A10CMunition munition)
+        {
+            string s = GetAutoLase(munition);
             return bool.Parse(string.IsNullOrEmpty(s) ? MunitionSettings.ExplicitDefaults.AutoLase : s);
         }
 
-        public void SetLaseSeconds(string key, string value) => GetMunitionSettings(key).LaseSeconds = value;
-        public string GetLaseSeconds(string key) => GetMunitionSettings(key).LaseSeconds;
+        public void SetLaseSeconds(A10CMunition munition, string value) => GetMunitionSettings(munition).LaseSeconds = value;
+        public string GetLaseSeconds(A10CMunition munition) => GetMunitionSettings(munition).LaseSeconds;
 
-        public void SetDeliveryMode(string key, string value) => GetMunitionSettings(key).DeliveryMode = value;
-        public string GetDeliveryMode(string key) => GetMunitionSettings(key).DeliveryMode;
-        public DeliveryModes GetDeliveryModeValue(string key)
+        public void SetDeliveryMode(A10CMunition munition, string value) => GetMunitionSettings(munition).DeliveryMode = value;
+        public string GetDeliveryMode(A10CMunition munition) => GetMunitionSettings(munition).DeliveryMode;
+        public DeliveryModes GetDeliveryModeValue(A10CMunition munition)
         {
-            string s = GetDeliveryMode(key);
+            string s = GetDeliveryMode(munition);
             return (DeliveryModes)int.Parse(string.IsNullOrEmpty(s) ? MunitionSettings.ExplicitDefaults.DeliveryMode : s);
         }
 
-        public void SetEscapeManeuver(string key, string value) => GetMunitionSettings(key).EscapeManeuver = value;
-        public string GetEscapeManeuver(string key) => GetMunitionSettings(key).EscapeManeuver;
-        public EscapeManeuvers GetEscapeManeuverValue(string key)
+        public void SetEscapeManeuver(A10CMunition munition, string value) => GetMunitionSettings(munition).EscapeManeuver = value;
+        public string GetEscapeManeuver(A10CMunition munition) => GetMunitionSettings(munition).EscapeManeuver;
+        public EscapeManeuvers GetEscapeManeuverValue(A10CMunition munition)
         {
-            string s = GetEscapeManeuver(key);
+            string s = GetEscapeManeuver(munition);
             return (EscapeManeuvers)int.Parse(string.IsNullOrEmpty(s) ? MunitionSettings.ExplicitDefaults.EscapeManeuver : s);
         }
 
-        public void SetReleaseMode(string key, string value) => GetMunitionSettings(key).ReleaseMode = value;
-        public string GetReleaseMode(string key) => GetMunitionSettings(key).ReleaseMode;
-        public ReleaseModes GetReleaseModeValue(string key)
+        public void SetReleaseMode(A10CMunition munition, string value) => GetMunitionSettings(munition).ReleaseMode = value;
+        public string GetReleaseMode(A10CMunition munition) => GetMunitionSettings(munition).ReleaseMode;
+        public ReleaseModes GetReleaseModeValue(A10CMunition munition)
         {
-            string s = GetReleaseMode(key);
+            string s = GetReleaseMode(munition);
             return (ReleaseModes)int.Parse(string.IsNullOrEmpty(s) ? MunitionSettings.ExplicitDefaults.ReleaseMode : s);
         }
 
-        public void SetRippleQty(string key, string value) => GetMunitionSettings(key).RippleQty = value;
-        public string GetRippleQty(string key) => GetMunitionSettings(key).RippleQty;
+        public void SetRippleQty(A10CMunition munition, string value) => GetMunitionSettings(munition).RippleQty = value;
+        public string GetRippleQty(A10CMunition munition) => GetMunitionSettings(munition).RippleQty;
 
-        public void SetRippleFt(string key, string value) => GetMunitionSettings(key).RippleFt = value;
-        public string GetRippleFt(string key) => GetMunitionSettings(key).RippleFt;
+        public void SetRippleFt(A10CMunition munition, string value) => GetMunitionSettings(munition).RippleFt = value;
+        public string GetRippleFt(A10CMunition munition) => GetMunitionSettings(munition).RippleFt;
 
-        public void SetHOFOption(string key, string value) => GetMunitionSettings(key).HOFOption = value;
-        public string GetHOFOption(string key) => GetMunitionSettings(key).HOFOption;
-        public HOFOptions GetHOFOptionValue(string key)
+        public void SetHOFOption(A10CMunition munition, string value) => GetMunitionSettings(munition).HOFOption = value;
+        public string GetHOFOption(A10CMunition munition) => GetMunitionSettings(munition).HOFOption;
+        public HOFOptions GetHOFOptionValue(A10CMunition munition)
         {
-            string s = GetHOFOption(key);
+            string s = GetHOFOption(munition);
             return (HOFOptions)int.Parse(string.IsNullOrEmpty(s) ? MunitionSettings.ExplicitDefaults.HOFOption : s);
         }
 
-        public void SetRPMOption(string key, string value) => GetMunitionSettings(key).RPMOption = value;
-        public string GetRPMOption(string key) => GetMunitionSettings(key).RPMOption;
-        public RPMOptions GetRPMOptionValue(string key)
+        public void SetRPMOption(A10CMunition munition, string value) => GetMunitionSettings(munition).RPMOption = value;
+        public string GetRPMOption(A10CMunition munition) => GetMunitionSettings(munition).RPMOption;
+        public RPMOptions GetRPMOptionValue(A10CMunition munition)
         {
-            string s = GetRPMOption(key);
+            string s = GetRPMOption(munition);
             return (RPMOptions)int.Parse(string.IsNullOrEmpty(s) ? MunitionSettings.ExplicitDefaults.RPMOption : s);
         }
 
-        public void SetFuzeOption(string key, string value) => GetMunitionSettings(key).FuzeOption = value;
-        public string GetFuzeOption(string key) => GetMunitionSettings(key).FuzeOption;
-        public FuzeOptions GetFuzeOptionValue(string key)
+        public void SetFuzeOption(A10CMunition munition, string value) => GetMunitionSettings(munition).FuzeOption = value;
+        public string GetFuzeOption(A10CMunition munition) => GetMunitionSettings(munition).FuzeOption;
+        public FuzeOptions GetFuzeOptionValue(A10CMunition munition)
         {
-            string s = GetFuzeOption(key);
+            string s = GetFuzeOption(munition);
             return (FuzeOptions)int.Parse(string.IsNullOrEmpty(s) ? MunitionSettings.ExplicitDefaults.FuzeOption : s);
         }
     }

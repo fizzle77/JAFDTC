@@ -26,6 +26,8 @@ namespace JAFDTC.Models.A10C.DSMS
 {
     public class MunitionSettings : BindableObject, ISystem
     {
+        private A10CMunition _munition;
+
         private string _autoLase;                              // string (boolean)
         public string AutoLase
         {
@@ -141,6 +143,27 @@ namespace JAFDTC.Models.A10C.DSMS
             IsAutoLaseDefault && IsLaseSecondsDefault && IsDeliveryModeDefault && IsEscapeManeuverDefault &&
             IsReleaseModeDefault && IsHOFOptionDefault && IsRPMOptionDefault && IsFuzeOptionDefault;
 
+        /// <summary>
+        /// Does this configuration require changes on the DSMS INV page?
+        /// </summary>
+        [JsonIgnore]
+        public bool IsInvDefault =>
+            IsHOFOptionDefault && IsRPMOptionDefault;
+
+        /// <summary>
+        /// Does this configuration require changes to the DSMS Profile?
+        /// </summary>
+        [JsonIgnore]
+        public bool IsProfileDefault =>
+            IsAutoLaseDefault && IsLaseSecondsDefault && IsDeliveryModeDefault && IsEscapeManeuverDefault &&
+            IsReleaseModeDefault && IsFuzeOptionDefault;
+
+        [JsonIgnore]
+        public A10CMunition Munition
+        {
+            get => _munition;
+            set => _munition = value; // TODO handle setting during deserialization, keep writer private?
+        }
         [JsonIgnore]
         public bool IsAutoLaseDefault => string.IsNullOrEmpty(AutoLase) || AutoLase == ExplicitDefaults.AutoLase;
         [JsonIgnore]
@@ -176,9 +199,14 @@ namespace JAFDTC.Models.A10C.DSMS
             FuzeOption = "0" // N/T
         };
 
-        public MunitionSettings()
+        private MunitionSettings()
         {
             Reset();
+        }
+
+        public MunitionSettings(A10CMunition munition) : this()
+        {
+            _munition = munition;
         }
 
         public void Reset()

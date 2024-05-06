@@ -148,6 +148,7 @@ namespace JAFDTC.Models.A10C
             Version = _versionCfg;
 
             Save(this);
+            DSMS.FixupMunitionReferences();
             ConfigurationUpdated();
         }
 

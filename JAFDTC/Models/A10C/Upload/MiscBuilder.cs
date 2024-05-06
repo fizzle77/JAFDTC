@@ -24,7 +24,7 @@ using System.Text;
 namespace JAFDTC.Models.A10C.Upload
 {
     /// <summary>
-    /// command builder for the radio system in the warthog. translates cmds setup in A10CConfiguration into
+    /// command builder for miscellaneous systems in the warthog. translates cmds setup in A10CConfiguration into
     /// commands that drive the dcs clickable cockpit.
     /// </summary>
     internal class MiscBuilder : A10CBuilderBase, IBuilder
