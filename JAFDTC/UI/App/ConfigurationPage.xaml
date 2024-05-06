@@ -209,7 +209,7 @@ https://www.gnu.org/licenses/.
                     
                     <!-- load to jet button
                       -->
-                    <ListView Grid.Row="2"
+                    <ListView Grid.Row="2" Margin="0,0,0,10"
                               x:Name="uiNavListLoadToJet"
                               VerticalAlignment="Bottom"
                               SelectionMode="None"
