@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -109,6 +110,8 @@ namespace JAFDTC
         private long MarkerUpdateTimestamp { get; set; }
 
         // ---- public events, posts change/validation events
+
+        public event EventHandler<string> DCSQueryResponseReceived;
 
         // NOTE: these can be called from non-ui threads but may trigger ui actions. we will dispatch the handler
         // NOTE: invocations on a ui thread to avoid the chaos that will ensue.
@@ -293,7 +296,7 @@ namespace JAFDTC
         /// upload given configuration to dcs. the configuration is only uploaded if dcs is available, the configuration
         /// is valid, and the current dcs airframe matches the airframe of the configuration.
         /// </summary>
-        public void UploadConfigurationToJet(IConfiguration cfg)
+        public async void UploadConfigurationToJet(IConfiguration cfg)
         {
             string error = null;
             if (cfg == null)
@@ -304,7 +307,7 @@ namespace JAFDTC
             {
                 error = "DCS or Airframe Unavailable";
             }
-            else if (!cfg.UploadAgent.Load())
+            else if (!await cfg.UploadAgent.Load(this))
             {
                 error = "Configuration Upload Failed";
             }
@@ -323,6 +326,20 @@ namespace JAFDTC
         // export data processing
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// process query replies from the dcs event stream. parties interested in the reply to a query will subscribe
+        /// to DCSQueryResponseReceived events. event handlers are handled on the current thread and should not use ui.
+        /// event handlers are cleared after each response.
+        /// </summary>
+        private void ProcessQueryResponse(TelemDataRx.TelemData data)
+        {
+            if ((data.Response != null) && (DCSQueryResponseReceived.GetInvocationList().Length > 0))
+            {
+                DCSQueryResponseReceived?.Invoke(this, data.Response);
+                DCSQueryResponseReceived = null;
+            }
+        }
 
         /// <summary>
         /// process markers from the dcs event stream. play a sound to indicate uploading has started or ended based
@@ -529,6 +546,7 @@ namespace JAFDTC
                 DCSLastLon = (double.TryParse(data.Lat, out double lon)) ? lon : 0.0;
 #endif
 
+                ProcessQueryResponse(data);
                 ProcessMarker(data);
                 ProcessUploadCommand(data);
                 ProcessWindowStackCommand(data);

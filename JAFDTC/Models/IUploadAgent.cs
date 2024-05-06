@@ -3,7 +3,7 @@
 // IUploadAgent.cs -- interface for airframe upload agent class
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -20,6 +20,7 @@
 
 using JAFDTC.Models.DCS;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace JAFDTC.Models
 {
@@ -35,7 +36,7 @@ namespace JAFDTC.Models
         /// uses SetupBuilder(), BuildSystems(), and TeardownBuilder() to create the command streams for the systems
         /// in the airframe. returns true on success, false on failure.
         /// </summary>
-        public bool Load();
+        public Task<bool> Load(App curApp);
 
         /// <summary>
         /// create the set of commands and state necessary to load a configuration on the jet. Load() uses this

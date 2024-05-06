@@ -27,6 +27,10 @@ using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using System.Diagnostics;
 using System.Text;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.Background;
+using Windows.ApplicationModel.Store;
+using Windows.System;
 
 namespace JAFDTC.Models
 {
@@ -93,20 +97,17 @@ namespace JAFDTC.Models
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public bool Load()
+        /// <summary>
+        /// send a command string to dcs via CockpitCmdTx. returns true on success, false on failure.
+        /// </summary>
+        private static bool SendCommandsToDCS(StringBuilder sb)
         {
-            StringBuilder sb = new();
-
-            SetupBuilder(sb).Build();
-            BuildSystems(sb);
-            TeardownBuilder(sb).Build();
-
             if (sb.Length > 0)
             {
                 sb.Remove(sb.Length - 1, 1);
             }
             string str = sb.ToString();
-            if (str != "")
+            if (!string.IsNullOrEmpty(str))
             {
 #if DEBUG_CMD_LOGGING
                 FileManager.Log($"CMD stream data size is {str.Length}");
@@ -118,9 +119,54 @@ namespace JAFDTC.Models
         }
 
         /// <summary>
+        /// TODO: document
+        /// </summary>
+        public async Task<bool> Load(App curApp)
+        {
+            string preflight = null;
+            if (PreflightBuilder != null)
+            {
+                curApp.DCSQueryResponseReceived += (object sender, string response) =>
+                {
+                    preflight = new(response);
+                };
+
+                StringBuilder sbPreflight = new();
+                PreflightBuilder(sbPreflight).Build();
+
+                if (!SendCommandsToDCS(sbPreflight))
+                {
+                    return false;
+                }
+                for (int i = 0; (i < 20) && string.IsNullOrEmpty(preflight); i++)
+                {
+                    await Task.Delay(50);
+                }
+                if (preflight == null)
+                {
+                    FileManager.Log("Load query response timed out, aborting configuration load");
+                    return false;
+                }
+            }
+
+            // TODO: handle preflight data here...
+            StringBuilder sbConfig = new();
+            SetupBuilder(sbConfig).Build();
+            BuildSystems(sbConfig);
+            TeardownBuilder(sbConfig).Build();
+
+            return SendCommandsToDCS(sbConfig);
+        }
+
+        /// <summary>
         /// derived classes must override this method to build out the system configurations.
         /// </summary>
         public virtual void BuildSystems(StringBuilder sb) { }
+
+        /// <summary>
+        /// derived classes may override this method to return a different builder.
+        /// </summary>
+        public virtual IBuilder PreflightBuilder(StringBuilder sb) => null;
 
         /// <summary>
         /// derived classes may override this method to return a different builder.

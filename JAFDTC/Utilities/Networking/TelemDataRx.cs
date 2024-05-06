@@ -50,6 +50,8 @@ namespace JAFDTC.Utilities.Networking
 
 			public string Marker { get; set; }              // marker from command stream
 
+            public string Response { get; set; }            // query response string, null => no response
+
 #if DCS_TELEM_INCLUDES_LAT_LON
             public string Lat { get; set; }                 // active airframe position, latitude (dd)
 			
