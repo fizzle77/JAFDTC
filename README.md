@@ -5,13 +5,13 @@ Windows 11 that allows you to upload data typically saved on a data cartridge, s
 steerpoints/waypoints and other avionics setup, into a DCS module at the start of a flight. The
 application supports the following DCS airframes and systems,
 
-- *A-10C Warthog* &ndash; Radios, Waypoints
+- *A-10C Warthog* &ndash; Radios, Waypoints, Miscellanesou CDU and ADP Systems
 - *AV-8B Harrier* &ndash; Waypoints
 - *F-14A/B Tomcat* &ndash; Waypoints
 - *F-15E Strike Eagle* &ndash; MPD/MPCD Formats, Radios, Steerpoints, Miscellaneous Systems
 - *F-16C Viper* &ndash; Countermeasures, Datalink, HARM (ALIC, HTS), MFD Formats, Radios,
   Steerpoints, Miscellaneous DED Systems
-- *F/A-18C Hornet* &ndash; Countermeasures, Radios, Waypoints
+- *F/A-18C Hornet* &ndash; Countermeasures, Pre-Planned Weapons, Radios, Waypoints
 - *Mirage M-2000C* &ndash; Waypoints
 
 This document describes how to get JAFDTC installed and running on your system. See the

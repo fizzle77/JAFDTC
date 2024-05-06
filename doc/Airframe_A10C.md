@@ -1,11 +1,12 @@
 # JAFDTC: Configuring A-10C Warthog Airframes
 
-*Version 1.0.0-B.30 of 19-Apr-24*
+*Version 1.0.0-B.31 of 5-May-24*
 
 JAFDTC supports configuration of the following systems in the A-10C II Warthog,
 
 * Radios
 * Waypoints
+* Miscellanesou CDU and ADP Systems
 
 Each of these areas is covered in more depth below. See the
 [user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
@@ -26,7 +27,7 @@ the UFC panel that have no function in the the A-10C that the module models.
 
 ![](images/Hawg_UFC_JAFDTC.png)
 
-JAFDTC currently supports four functions from the Hawg cockpit,
+JAFDTC currently supports the following functions from the Hawg cockpit,
 
 * **IFF** &ndash; Pressing and briefly holding this button causes JAFDTC to load the
   currently selected A-10C configuration into the jet. JAFDTC provides feedback during the
@@ -117,3 +118,7 @@ JAFDTC uses the common
 [Navigation System Editor](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md#navigation-system-editors)
 interface to set up the Warthog *Waypoint* system. Waypoints in the Warthog include elevation
 and DDM (degrees, decimal minutes) formatted latitude and longitude to identify positions.
+
+## Miscellaneous
+
+TODO
