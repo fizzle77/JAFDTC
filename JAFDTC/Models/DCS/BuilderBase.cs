@@ -244,13 +244,19 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// add a while block to the command the builder is building. the block is delimited by "While" and
         /// "EndWhile" commands with the AddBlockCommandsDelegate emitting the commands within the block that
-        /// are exectued while the condition is true.
+        /// are exectued while the condition is true. the loop will exit with an error if more than the timeOut
+        /// number of iterations are encountered.
         /// 
         /// NOTE: nested while blocks are assumed to have unique cond values.
         /// </summary>
-        protected void AddWhileBlock(string cond, List<string> argsCond, AddBlockCommandsDelegate addBlockDelegate)
+        protected void AddWhileBlock(string cond, List<string> argsCond, AddBlockCommandsDelegate addBlockDelegate,
+                                     int timeOut = 0)
         {
             string cmd = $"{{\"f\":\"While\",\"a\":{{\"cond\":\"{cond}\"";
+            if (timeOut != 0)
+            {
+                cmd += $",\"tout\":\"{timeOut}\"";
+            }
             if (argsCond != null)
             {
                 for (int i = 0; i < argsCond.Count; i++)
