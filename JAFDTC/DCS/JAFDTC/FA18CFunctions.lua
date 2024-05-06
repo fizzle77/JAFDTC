@@ -196,7 +196,7 @@ end
 --
 -- --------------------------------------------------------------------------------------------------------------------
 
-function JAFDTC_FA18C_CheckCondition_DispenserOff()
+function JAFDTC_FA18C_CheckCondition_IsDispenserOff()
 	local table = JAFDTC_FA18C_GetLeftDDI();
 	local str = table["EW_ALE47_MODE_label_cross_Root"] or "x"
 	return (str == "")
