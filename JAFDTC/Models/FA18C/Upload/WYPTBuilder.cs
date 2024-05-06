@@ -54,58 +54,47 @@ namespace JAFDTC.Models.FA18C.Upload
 
             if (!_cfg.WYPT.IsDefault)
             {
-                AddActions(rmfd, new() { "OSB-18", "OSB-18", "OSB-02" }); // MENU, MENU, HSI
-                AddActions(rmfd, new() { "OSB-10", "OSB-07", "OSB-05" }); // DATA, WYPT, UFC
-
-                SelectWp0(rmfd, 0);
-                for (int i = 0; i < _cfg.WYPT.Points[0].Number; i++)
+                AddWhileBlock("IsNotRMFDSUPT", null, delegate()
                 {
-                    AddAction(rmfd, "OSB-12");
-                }
+                    AddAction(rmfd, "OSB-18");                                                  // MENU (SUPT)
+                });   
+                AddActions(rmfd, new() { "OSB-02", "OSB-10", "OSB-07", "OSB-05" });             // HSI, DATA, WYPT, UFC
 
+                AddWhileBlock("IsNotAtWYPTn", new() { $"{_cfg.WYPT.Points[0].Number - 1}" }, delegate()
+                {
+                    AddAction(rmfd, "OSB-12", WAIT_BASE);                                       // WYPT ++
+                }, 150);
                 for (int i = 0; i < _cfg.WYPT.Points.Count; i++)
                 {
-                    WaypointInfo wypt = _cfg.WYPT.Points[i];
+                    AddAction(rmfd, "OSB-12", WAIT_BASE);                                       // WYPT ++
 
+                    WaypointInfo wypt = _cfg.WYPT.Points[i];
                     if (wypt.IsValid)
                     {
                         // NOTE: coords are zero-filled in the ui, back that out here.
 
-                        AddAction(ufc, "Opt1");
-                        AddWait(WAIT_BASE);
+                        AddAction(ufc, "Opt1", WAIT_BASE);                                      // POSN
 
                         AddActions(ufc, ActionsFor2864CoordinateString(Coord.RemoveLLDegZeroFill(wypt.LatUI)),  // DDM
-                                   new() { "ENT" });
-                        AddWait(WAIT_LONG);
+                                   new() { "ENT" }, WAIT_LONG);
                         AddActions(ufc, ActionsFor2864CoordinateString(Coord.RemoveLLDegZeroFill(wypt.LonUI)),  // DDM
-                                   new() { "ENT" });
-                        AddWait(WAIT_LONG);
+                                   new() { "ENT" }, WAIT_LONG);
 
-                        AddActions(ufc, new() { "Opt3", "Opt1" });
-                        AddActions(ufc, ActionsForString(wypt.Alt), new() { "ENT" });
-                        AddWait(WAIT_BASE);
+                        AddAction(ufc, "Opt3", WAIT_BASE);                                      // ALT
+                        AddAction(ufc, "Opt1", WAIT_BASE);                                      // FEET
+                        AddActions(ufc, ActionsForString(wypt.Alt), new() { "ENT" }, WAIT_BASE);
                     }
-                    AddAction(rmfd, "OSB-12");   // Next Waypoint
                 }
-
-                for (var i = 0; i < _cfg.WYPT.Points.Count; i++)
+                AddWhileBlock("IsNotAtWYPTn", new() { $"{_cfg.WYPT.Points[0].Number}" }, delegate ()
                 {
-                    AddAction(rmfd, "OSB-13");   // Prev Waypoint
-                }
+                    AddAction(rmfd, "OSB-13", WAIT_BASE);                                       // WYPT --
+                }, 150);
 
-                AddActions(rmfd, new() { "OSB-18", "OSB-18", "OSB-15" });
-            }
-        }
-
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private void SelectWp0(AirframeDevice rmfd, int i)
-        {
-            if (i < 140) // It might not notice on the first pass, so we go around once more
-            {
-                AddIfBlock("NotAtWp0", null, delegate () { AddAction(rmfd, "OSB-13"); });
-                SelectWp0(rmfd, i + 1);
+                AddWhileBlock("IsNotRMFDSUPT", null, delegate()
+                {
+                    AddAction(rmfd, "OSB-18");                                                  // MENU (SUPT)
+                });
+                AddAction(rmfd, "OSB-15");                                                      // FCS
             }
         }
     }
