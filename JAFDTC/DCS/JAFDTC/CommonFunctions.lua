@@ -22,23 +22,23 @@ You should have received a copy of the GNU General Public License along with thi
 
 function JAFDTC_Log(str)
     if JAFDTC_LogFile then
-    	JAFDTC_LogFile:write(str .. "\n");
-	    JAFDTC_LogFile:flush();
+        JAFDTC_LogFile:write(str .. "\n");
+        JAFDTC_LogFile:flush();
     else
         log.write("JAFDTC", log.ERROR, str)
     end
 end
 
 function JAFDTC_ParseDisplay(indicator_id)  -- Thanks to [FSF]Ian code
-	local t = {}
-	local li = list_indication(indicator_id)
-	local m = li:gmatch("-----------------------------------------\n([^\n]+)\n([^\n]*)\n")
-	while true do
-    	local name, value = m()
-    	if not name then break end
-   			t[name]=value
-	end
-	return t
+    local t = {}
+    local li = list_indication(indicator_id)
+    local m = li:gmatch("-----------------------------------------\n([^\n]+)\n([^\n]*)\n")
+    while true do
+        local name, value = m()
+        if not name then break end
+            t[name]=value
+    end
+    return t
 end
 
 function JAFDTC_LinesToList(s)
@@ -132,7 +132,7 @@ end
 function JAFDTC_GetPlayerAircraftType()
     local data = LoGetSelfData();
     if data then
-	    local model = string.upper(data["Name"])
+        local model = string.upper(data["Name"])
         if model == "AV8BNA" then return "AV8B" end
         if model == "A-10C_2" then return "A10C" end
         if model == "F-14A-135-GR" then return "F14AB" end
@@ -141,7 +141,7 @@ function JAFDTC_GetPlayerAircraftType()
         if model == "F-16C_50" then return "F16CM" end
         if model == "FA-18C_HORNET" then return "FA18C" end
         if model == "M-2000C" then return "M2000C" end
-	    return model;
+        return model;
     end
     return "Unknown"
 end
@@ -176,6 +176,6 @@ function JAFDTC_SerializeDisplay(val, name, skipnewlines, depth)
 end
 
 function JAFDTC_DebugDisplay(display)
-	local tbl = JAFDTC_SerializeDisplay(display);
-	JAFDTC_Log(tbl);
+    local tbl = JAFDTC_SerializeDisplay(display);
+    JAFDTC_Log(tbl);
 end

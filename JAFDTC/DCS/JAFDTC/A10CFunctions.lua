@@ -35,13 +35,13 @@ dofile(lfs.writedir() .. 'Scripts/JAFDTC/CommonFunctions.lua')
 -- LFMD Routines
 
 function JAFDTC_A10C_GetLMFD()
-	local table = JAFDTC_ParseDisplay(1);
+    local table = JAFDTC_ParseDisplay(1);
     JAFDTC_DebugDisplay(table);
     return table;
 end
 
 function JAFDTC_A10C_GetLMFD_value(key)
-	local table = JAFDTC_A10C_GetLMFD();
+    local table = JAFDTC_A10C_GetLMFD();
     local value = table[key] or "---";
     JAFDTC_Log("LMFD table[" .. key .. "]: " .. value);
     return value;
@@ -60,13 +60,13 @@ end
 -- CDU Routines
 
 function JAFDTC_A10C_GetCDU()
-	local table = JAFDTC_ParseDisplay(3);
+    local table = JAFDTC_ParseDisplay(3);
     JAFDTC_DebugDisplay(table);
     return table;
 end
 
 function JAFDTC_A10C_GetCDU_value(key)
-	local table = JAFDTC_A10C_GetCDU();
+    local table = JAFDTC_A10C_GetCDU();
     local value = table[key] or "---";
     JAFDTC_Log("CDU table[" .. key .. "]: " .. value);
     return value;
@@ -149,13 +149,13 @@ local vhf_lut1 = {
 
 local function getVhfFmFreqency()
     local freq1 = vhf_lut1[string.format("%.2f",GetDevice(0):get_argument_value(157))]
-	if freq1 == nil then freq1 = " " end
+    if freq1 == nil then freq1 = " " end
     local freq2 = string.format("%1.1f", GetDevice(0):get_argument_value(158)):sub(3)
-	if freq2 == nil then freq2 = " " end
+    if freq2 == nil then freq2 = " " end
     local freq3 = string.format("%1.1f", GetDevice(0):get_argument_value(159)):sub(3)
-	if freq3 == nil then freq3 = " " end
+    if freq3 == nil then freq3 = " " end
     local freq4 = string.format("%1.2f", GetDevice(0):get_argument_value(160)):sub(3)
-	if freq4 == nil then freq4 = "  " end
+    if freq4 == nil then freq4 = "  " end
 
     return freq1 .. freq2 .. "." .. freq3 .. freq4
 end

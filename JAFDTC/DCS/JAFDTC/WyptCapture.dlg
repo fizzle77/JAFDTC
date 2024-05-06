@@ -43,7 +43,7 @@ dialog = {
     },
     ["skin"] = {
         ["params"] = {
-			["headerHeight"] = 0,
+            ["headerHeight"] = 0,
             ["name"] = "windowSkin"
         },
         ["states"] = {
