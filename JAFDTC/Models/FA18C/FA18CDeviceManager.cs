@@ -77,10 +77,10 @@ namespace JAFDTC.Models.FA18C
             ufc.AddAction(3028, "CLR", delayUFC, 1);
             ufc.AddAction(3029, "ENT", delayUFCEnt, 1);
 
-            ufc.AddAction(3033, "COM1ChDec", -1, 0);
-            ufc.AddAction(3033, "COM1ChInc", -1, 2);
-            ufc.AddAction(3034, "COM2ChDec", -1, 0);
-            ufc.AddAction(3034, "COM2ChInc", -1, 2);
+            ufc.AddAction(3033, "COM1ChDec", 0, -1, -1);
+            ufc.AddAction(3033, "COM1ChInc", 0, 1, 1);
+            ufc.AddAction(3034, "COM2ChDec", 0, -1, -1);
+            ufc.AddAction(3034, "COM2ChInc", 0, 1, 1);
             AddDevice(ufc);
 
             // ---- ifei

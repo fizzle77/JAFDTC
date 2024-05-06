@@ -33,6 +33,7 @@ namespace JAFDTC.Models.FA18C.Upload
     /// </summary>
     internal class RadioBuilder : FA18CBuilderBase, IBuilder
     {
+        // TODO: implement non-numeric presets
         private enum ComKnobPresets
         {
             PRESET_G = -3,
@@ -68,8 +69,9 @@ namespace JAFDTC.Models.FA18C.Upload
 
             if (!_cfg.Radio.IsDefault)
             {
-                BuildRadio(ufc, "COM1", _cfg.Radio.Presets[(int)Radios.COMM1], _cfg.Radio.COMM1DefaultTuning);
-                BuildRadio(ufc, "COM2", _cfg.Radio.Presets[(int)Radios.COMM2], _cfg.Radio.COMM2DefaultTuning);
+                BuildRadio(ufc, 1, _cfg.Radio.Presets[(int)Radios.COMM1], _cfg.Radio.COMM1DefaultTuning);
+                BuildRadio(ufc, 2, _cfg.Radio.Presets[(int)Radios.COMM2], _cfg.Radio.COMM2DefaultTuning);
+                AddAction(ufc, "COM", WAIT_LONG);
             }
         }
 
@@ -78,62 +80,38 @@ namespace JAFDTC.Models.FA18C.Upload
         /// preset. presets are in the range [-3, 20], where 1-20 is presets 1-20, 0 is S, -1 is C, -2 is M, and
         /// -3 is G.
         /// </summary>
-        private int SelectPreset(AirframeDevice ufc, string radioCmd, int presetCur, int presetNew)
+        private void SelectPreset(AirframeDevice ufc, int radioNum, string preset)
         {
-            // TODO: bounds checking/clipping on preset numbers
-
-            while (presetNew > presetCur)
+            AddWhileBlock("IsNotRadioOnChannel", new() { $"{radioNum}", preset }, delegate ()
             {
-                presetCur++;
-                AddAction(ufc, radioCmd + "ChInc");
-            }
-            while (presetNew < presetCur)
-            {
-                presetCur--;
-                AddAction(ufc, radioCmd + "ChDec");
-            }
-            AddWait(WAIT_BASE);
-            return presetNew;
+                AddAction(ufc, $"COM{radioNum}ChInc", WAIT_SHORT);
+            });
         }
 
         /// <summary>
-        /// TODO: document
+        /// build commands to configure the radio presets and initial tuning.
         /// </summary>
-        private void BuildRadio(AirframeDevice ufc, string radioCmd, ObservableCollection<RadioPreset> presets,
+        private void BuildRadio(AirframeDevice ufc, int radioNum, ObservableCollection<RadioPreset> presets,
                                 string initialTuning)
         {
-            int presetNum = 0;
-
-            // TODO: verify preset is 1 explictly rather than relying on initial state?
-
-            AddAction(ufc, radioCmd + "ChDec");
             foreach (RadioPresetInfoBase preset in presets)
             {
-                presetNum = SelectPreset(ufc, radioCmd, presetNum, preset.Preset);
-                AddAction(ufc, radioCmd);
-                AddWait(WAIT_LONG);
-
-                AddActions(ufc, ActionsForCleanNum(preset.Frequency), new() { "ENT" });
-                AddWait(WAIT_BASE);
+                SelectPreset(ufc, radioNum, preset.Preset.ToString());
+                AddAction(ufc, $"COM{radioNum}", WAIT_LONG);
+                AddActions(ufc, ActionsForCleanNum(preset.Frequency), new() { "ENT" }, WAIT_BASE);
             }
 
-            if (string.IsNullOrEmpty(initialTuning))
+            if (int.TryParse(initialTuning, out int presetInit) && (presetInit < 20))
             {
-                SelectPreset(ufc, radioCmd, presetNum, 1);
+                SelectPreset(ufc, radioNum, presetInit.ToString());
             }
-            else if (int.TryParse(initialTuning, out int presetInit) && (presetInit < 20))
+            else if (float.TryParse(initialTuning, out float _)) 
             {
-                SelectPreset(ufc, radioCmd, presetNum, presetInit);
+                SelectPreset(ufc, radioNum, "M");
+                AddAction(ufc, $"COM{radioNum}", WAIT_LONG);
+                AddAction(ufc, "CLR", WAIT_BASE);
+                AddActions(ufc, ActionsForCleanNum(initialTuning), new() { "ENT" }, WAIT_BASE);
             }
-            else
-            {
-                SelectPreset(ufc, radioCmd, presetNum, (int)ComKnobPresets.PRESET_M);
-                AddAction(ufc, radioCmd);
-                AddWait(WAIT_LONG);
-                AddActions(ufc, ActionsForCleanNum(initialTuning), new() { "ENT" });
-            }
-            AddAction(ufc, radioCmd);
-            AddWait(WAIT_BASE);
         }
     }
 }

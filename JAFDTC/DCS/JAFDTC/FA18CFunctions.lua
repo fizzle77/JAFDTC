@@ -44,8 +44,8 @@ function JAFDTC_FA18C_GetIFEI()
 	return JAFDTC_ParseDisplay(5)
 end
 
-function DTC_FA18C_GetUFC()
-    return DTC_ParseDisplay(6)
+function JAFDTC_FA18C_GetUFC()
+    return JAFDTC_ParseDisplay(6)
 end
 
 -- --------------------------------------------------------------------------------------------------------------------
@@ -70,44 +70,15 @@ end
 
 -- --------------------------------------------------------------------------------------------------------------------
 --
--- conditions: waypoint system
+-- conditions: cms system
 --
 -- --------------------------------------------------------------------------------------------------------------------
 
-function JAFDTC_FA18C_CheckCondition_IsNotRMFDSUPT()
-	local table = JAFDTC_FA18C_GetRightDDI();
-	local str = table["SUPT_id:13"] or ""
-	return (str ~= "SUPT")
+function JAFDTC_FA18C_CheckCondition_IsDispenserOff()
+	local table = JAFDTC_FA18C_GetLeftDDI();
+	local str = table["EW_ALE47_MODE_label_cross_Root"] or "x"
+	return (str == "")
 end
-
-function JAFDTC_FA18C_CheckCondition_IsNotAtWYPTn(num)
-	local table = JAFDTC_FA18C_GetRightDDI();
-	local str = table["WYPT_Page_Number"]
-	return (str ~= num)
-end
-
-
---[[
-function JAFDTC_FA18C_CheckCondition_BingoIsZero()
-	local table = JAFDTC_FA18C_GetIFEI();
-	local str = table["txt_BINGO"]
-	return (str == "0")
-end
---]]
-
---[[
-function JAFDTC_FA18C_CheckCondition_InSequence(i)
-	local table =JAFDTC_FA18C_GetRightDDI();
-	local str = table["WYPT_SequenceData"]
-	local noSpaces = str:gsub("%s+", "")
-	for token in string.gmatch(noSpaces, "[^-]+") do
-		if token == i then 
-			return true
-		end
-	end
-	return false
-end
---]]
 
 -- --------------------------------------------------------------------------------------------------------------------
 --
@@ -192,15 +163,68 @@ end
 
 -- --------------------------------------------------------------------------------------------------------------------
 --
--- conditions: cms system
+-- conditions: radio system
 --
 -- --------------------------------------------------------------------------------------------------------------------
 
-function JAFDTC_FA18C_CheckCondition_IsDispenserOff()
-	local table = JAFDTC_FA18C_GetLeftDDI();
-	local str = table["EW_ALE47_MODE_label_cross_Root"] or "x"
-	return (str == "")
+function JAFDTC_FA18C_CheckCondition_IsRadioOnChannel(radio, channel)
+    local table = JAFDTC_FA18C_GetUFC();
+    local varName = "UFC_Comm"..radio.."Display"
+    local str = table[varName] or ""
+    local currChannel = str:gsub("%s+", ""):gsub("`", "1"):gsub("~", "2")
+    return (currChannel == channel)
 end
+
+function JAFDTC_FA18C_CheckCondition_IsNotRadioOnChannel(radio, channel)
+	return not JAFDTC_FA18C_CheckCondition_IsRadioOnChannel(radio, channel)
+end
+
+function JAFDTC_FA18C_CheckCondition_IsRadioGuardDisabled()
+    local table = JAFDTC_FA18C_GetUFC();
+    local str = table["UFC_OptionCueing1"] or ""
+    return (str ~= ":")
+end
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- conditions: waypoint system
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
+function JAFDTC_FA18C_CheckCondition_IsNotRMFDSUPT()
+	local table = JAFDTC_FA18C_GetRightDDI();
+	local str = table["SUPT_id:13"] or ""
+	return (str ~= "SUPT")
+end
+
+function JAFDTC_FA18C_CheckCondition_IsNotAtWYPTn(num)
+	local table = JAFDTC_FA18C_GetRightDDI();
+	local str = table["WYPT_Page_Number"]
+	return (str ~= num)
+end
+
+
+--[[
+function JAFDTC_FA18C_CheckCondition_BingoIsZero()
+	local table = JAFDTC_FA18C_GetIFEI();
+	local str = table["txt_BINGO"]
+	return (str == "0")
+end
+--]]
+
+--[[
+function JAFDTC_FA18C_CheckCondition_InSequence(i)
+	local table =JAFDTC_FA18C_GetRightDDI();
+	local str = table["WYPT_SequenceData"]
+	local noSpaces = str:gsub("%s+", "")
+	for token in string.gmatch(noSpaces, "[^-]+") do
+		if token == i then 
+			return true
+		end
+	end
+	return false
+end
+--]]
 
 -- --------------------------------------------------------------------------------------------------------------------
 --
