@@ -74,16 +74,16 @@ end
 --
 -- --------------------------------------------------------------------------------------------------------------------
 
-function JAFDTC_FA18C_CheckCondition_RmfdNotSupt()
+function JAFDTC_FA18C_CheckCondition_IsNotRMFDSUPT()
 	local table = JAFDTC_FA18C_GetRightDDI();
 	local str = table["SUPT_id:13"] or ""
 	return (str ~= "SUPT")
 end
 
-function JAFDTC_FA18C_CheckCondition_NotAtWp0()
+function JAFDTC_FA18C_CheckCondition_IsNotAtWYPTn(num)
 	local table = JAFDTC_FA18C_GetRightDDI();
 	local str = table["WYPT_Page_Number"]
-	return (str == "0")
+	return (str ~= num)
 end
 
 
