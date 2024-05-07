@@ -107,6 +107,22 @@ namespace JAFDTC.Models.DCS
             _sb.Append(s + CMD_EOL);
         }
 
+        /// <summary>
+        /// return the argument parameters to append to a command string. return value starts with "," if non-empty.
+        /// </summary>
+        private string BuildArgList(List<string> args)
+        {
+            string retVal = "";
+            if (args != null)
+            {
+                for (int i = 0; i < args.Count; i++)
+                {
+                    retVal += $",\"prm{i}\":\"{args[i]}\"";
+                }
+            }
+            return retVal;
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // command building methods
@@ -198,19 +214,22 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
+        /// add a query command to the command the builder is building. dcs returns query results asynchronously,
+        /// this command should only be used in conjunction with UploadAgentBase::Query() method with no more than
+        /// one per sequence.
+        /// </summary>
+        protected void AddQuery(string fn, List<string> argsQuery = null)
+        {
+            string cmd = $"{{\"f\":\"Query\",\"a\":{{\"fn\":\"{fn}\"" + BuildArgList(argsQuery) + $"}}}},";
+            AddCommand(cmd);
+        }
+
+        /// <summary>
         /// add a run function command to the command the builder is building.
         /// </summary>
         protected void AddRunFunction(string fn, List<string> argsFunc = null, int dtWaitPost = WAIT_NONE)
         {
-            string cmd = $"{{\"f\":\"RunFunc\",\"a\":{{\"fn\":\"{fn}\"";
-            if (argsFunc != null)
-            {
-                for (int i = 0; i < argsFunc.Count; i++)
-                {
-                    cmd += $",\"prm{i}\":\"{argsFunc[i]}\"";
-                }
-            }
-            cmd += $"}}}},";
+            string cmd = $"{{\"f\":\"RunFunc\",\"a\":{{\"fn\":\"{fn}\"" + BuildArgList(argsFunc) + $"}}}},";
             AddCommand(cmd);
             AddWait(dtWaitPost);
         }
@@ -224,15 +243,7 @@ namespace JAFDTC.Models.DCS
         /// </summary>
         protected void AddIfBlock(string cond, List<string> argsCond, AddBlockCommandsDelegate addBlockDelegate)
         {
-            string cmd = $"{{\"f\":\"If\",\"a\":{{\"cond\":\"{cond}\"";
-            if (argsCond != null)
-            {
-                for (int i = 0; i < argsCond.Count; i++)
-                {
-                    cmd += $",\"prm{i}\":\"{argsCond[i]}\"";
-                }
-            }
-            cmd += $"}}}},";
+            string cmd = $"{{\"f\":\"If\",\"a\":{{\"cond\":\"{cond}\"" + BuildArgList(argsCond) + $"}}}},";
             AddCommand(cmd);
 
             addBlockDelegate();
@@ -257,14 +268,7 @@ namespace JAFDTC.Models.DCS
             {
                 cmd += $",\"tout\":\"{timeOut}\"";
             }
-            if (argsCond != null)
-            {
-                for (int i = 0; i < argsCond.Count; i++)
-                {
-                    cmd += $",\"prm{i}\":\"{argsCond[i]}\"";
-                }
-            }
-            cmd += $"}}}},";
+            cmd += BuildArgList(argsCond) + $"}}}},";
             AddCommand(cmd);
 
             addBlockDelegate();
