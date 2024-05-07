@@ -111,7 +111,10 @@ namespace JAFDTC
 
         // ---- public events, posts change/validation events
 
-        public event EventHandler<string> DCSQueryResponseReceived;
+        // NOTE: this is a static to save us having to pass around App references for use. App should be a singleton
+        // NOTE: anyway, so shouldn't be a big deal to have a static here given what is being reported.
+
+        public static event EventHandler<string> DCSQueryResponseReceived;
 
         // NOTE: these can be called from non-ui threads but may trigger ui actions. we will dispatch the handler
         // NOTE: invocations on a ui thread to avoid the chaos that will ensue.
@@ -307,7 +310,7 @@ namespace JAFDTC
             {
                 error = "DCS or Airframe Unavailable";
             }
-            else if (!await cfg.UploadAgent.Load(this))
+            else if (!await cfg.UploadAgent.Load())
             {
                 error = "Configuration Upload Failed";
             }
@@ -315,6 +318,7 @@ namespace JAFDTC
             {
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
+                    FileManager.Log($"Configuration updload reports error: {error}");
                     StatusMessageTx.Send(error);
                     General.PlayAudio("ux_error.wav");
                 });
@@ -334,7 +338,9 @@ namespace JAFDTC
         /// </summary>
         private void ProcessQueryResponse(TelemDataRx.TelemData data)
         {
-            if ((data.Response != null) && (DCSQueryResponseReceived.GetInvocationList().Length > 0))
+            if (!string.IsNullOrEmpty(data.Response) &&
+                (DCSQueryResponseReceived != null) &&
+                (DCSQueryResponseReceived.GetInvocationList().Length > 0))
             {
                 DCSQueryResponseReceived?.Invoke(this, data.Response);
                 DCSQueryResponseReceived = null;
