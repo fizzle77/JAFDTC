@@ -37,6 +37,12 @@ dofile(lfs.writedir() .. 'Scripts/JAFDTC/F16CFunctions.lua')
 dofile(lfs.writedir() .. 'Scripts/JAFDTC/FA18CFunctions.lua')
 dofile(lfs.writedir() .. 'Scripts/JAFDTC/M2000CFunctions.lua')
 
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- locals
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
 local cmdResumeTime = 0.0
 local cmdList = nil
 local cmdListIndex = 1
@@ -46,6 +52,7 @@ local cmdCurProgress = 0.0
 local whileTout = { }
 
 local markerVal = ""
+local responseVal = ""
 
 local tcpCmdServerSock = nil
 local tcpCmdServerPort = 42001
@@ -57,7 +64,11 @@ local upstreamLuaExportStart = LuaExportStart
 local upstreamLuaExportAfterNextFrame = LuaExportAfterNextFrame
 local upstreamLuaExportBeforeNextFrame = LuaExportBeforeNextFrame
 
--- ---- utility
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- utility
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_CallUpstream(fn, what)
     if fn then
@@ -85,9 +96,14 @@ function JAFDTC_Core_Wait(dt)
     coroutine.yield(0, dt)
 end
 
--- ---- sockets
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- sockets
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 -- returns new tcp socket, use pcall() to catch any errors thrown on failures
+--
 function JAFDTC_TCPServerSockOpen(port)
     local sock, retVal, err = nil, nil, nil
 
@@ -121,6 +137,7 @@ function JAFDTC_TCPServerSockRx(sock)
 end
 
 -- returns new udp socket, use pcall() to catch any errors thrown on failures
+--
 function JAFDTC_UDPSockOpen()
     local sock, err = nil, nil
     
@@ -139,7 +156,11 @@ function JAFDTC_UDPSockTx(sock, port, data)
     end
 end
 
--- ---- command processing
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- command processing
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 -- command processing functions take an array of commands (table) and index within the array of the current command.
 -- each command array element has a "f" key with the processor name (string) and an "a" key with a table of
@@ -171,7 +192,11 @@ function JAFDTC_Debug_Cmd_Args(list, index)
     return output .. " )"
 end
 
--- cmd_abort(string msg)
+-- Abort(string msg)
+--
+-- abort execution by skipping all remaining commands in the command list. returns the msg to jafdtc through the
+-- Marker field of the telemetry.
+--
 function JAFDTC_Cmd_Abort(list, index)
     local args = list[index]["a"]
 
@@ -179,7 +204,11 @@ function JAFDTC_Cmd_Abort(list, index)
     return (#list - index + 1), 0
 end
 
--- cmd_actn(number dev, number code, number dn, number up = 0, number dt = 0)
+-- Actn(number dev, number code, number dn, number up = 0, number dt = 0)
+--
+-- perform the clickable action on device:code. the action sets the state to dn, waits dt ms, then sets the state to
+-- up. if up is not specified, it is assumed to be the same as dn.
+--
 function JAFDTC_Cmd_Actn(list, index)
     local args = list[index]["a"]
     local dev, code, valDn = tostring(args["dev"]), tostring(args["code"]), args["dn"]
@@ -190,7 +219,25 @@ function JAFDTC_Cmd_Actn(list, index)
     return 1, 0
 end
 
--- cmd_runfunc(string fn, string prm0 = nil, string prm1 = nil, string prm2 = nil)
+-- Query(string fn, string prm0 = nil, string prm1 = nil, string prm2 = nil)
+--
+-- invokes the function JAFDTC_<airframe>_Fn_<fn> with the specified parameters. set the responseVal in the telemetry
+-- to the string value returned by the function.
+--
+function JAFDTC_Cmd_Query(list, index)
+    local args = list[index]["a"]
+    local fn = args["fn"]
+
+    local funcName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_Fn_" .. fn;
+    responseVal = _G[funcName](args["prm0"], args["prm1"], args["prm2"])
+    return 1, 0
+end
+
+
+-- RunFunc(string fn, string prm0 = nil, string prm1 = nil, string prm2 = nil)
+--
+-- invokes the function JAFDTC_<airframe>_Func_<fn> with the specified parameters.
+--
 function JAFDTC_Cmd_RunFunc(list, index)
     local args = list[index]["a"]
     local fn = args["fn"]
@@ -200,7 +247,12 @@ function JAFDTC_Cmd_RunFunc(list, index)
     return 1, 0
 end
 
--- cmd_if(string cond, string prm0 = nil, string prm1 = nil, string prm2 = nil)
+-- If(string cond, string prm0 = nil, string prm1 = nil, string prm2 = nil)
+--
+-- performs an "if" block conditional on the function JAFDTC_<airframe>_CheckCondition_<cond> with the specified
+-- parameters. if this function returns false, skip ahead to the next EndIf block in the command list with a
+-- matching cond.
+--
 function JAFDTC_Cmd_If(list, index)
     local args = list[index]["a"]
     local cond = args["cond"]
@@ -219,12 +271,20 @@ function JAFDTC_Cmd_If(list, index)
     return di, 0
 end
 
--- cmd_endif(string cond)
+-- EndIf(string cond)
+--
+-- marks end of an "if" block.
+--
 function JAFDTC_Cmd_EndIf(list, index)
     return 1, 0
 end
 
--- cmd_while(string cond, number tout = 0, string prm0 = nil, string prm1 = nil, string prm2 = nil)
+-- While(string cond, number tout = 50, string prm0 = nil, string prm1 = nil, string prm2 = nil)
+--
+-- performs a "while" block conditional on the function JAFDTC_<airframe>_CheckCondition_<cond> with the specified
+-- parameters. if this function returns false, skip ahead to the next EndWhile block in the command list with a
+-- matching cond. the while loop will iterate for at most tout iterations.
+--
 function JAFDTC_Cmd_While(list, index)
     local args = list[index]["a"]
     local cond = args["cond"]
@@ -253,7 +313,10 @@ function JAFDTC_Cmd_While(list, index)
     return di, 0
 end
 
--- cmd_endwhile(string cond)
+-- EndWhile(string cond)
+--
+-- marks end of a "while" block.
+--
 function JAFDTC_Cmd_EndWhile(list, index)
     local args = list[index]["a"]
     local cond = args["cond"]
@@ -267,21 +330,31 @@ function JAFDTC_Cmd_EndWhile(list, index)
     return 1, 0
 end
 
--- cmd_marker(string mark)
+-- Marker(string mark)
+--
+-- emit the string mark in the Marker field of the telemetry.
+--
 function JAFDTC_Cmd_Marker(list, index)
     local args = list[index]["a"]
     markerVal = args["mark"]
     return 1, 0
 end
 
--- cmd_wait(number dt)
+-- Wait(number dt)
+--
+-- pauses for the dt ms before executing the next command.
+--
 function JAFDTC_Cmd_Wait(list, index)
     local args = list[index]["a"]
     JAFDTC_Core_Wait(args["dt"])
     return 1, 0
 end
 
--- ---- dcs export hooks
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- dcs export hooks
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 function LuaExportStart()
     JAFDTC_CallUpstream(upstreamLuaExportStart, "start")
@@ -304,6 +377,9 @@ function LuaExportStart()
     JAFDTC_Log(string.format("Export hooks starts at %.3f", socket.gettime()))
 end
 
+-- receive incoming command streams from jafdtc, crack, and execute them. commands are run as co-routines so a stream
+-- executes over multiple frames. commands functions are JAFDCT_Cmd_<command_name>, see documentation above.
+--
 function LuaExportBeforeNextFrame()
     JAFDTC_CallUpstream(upstreamLuaExportBeforeNextFrame, "bframe")
 
@@ -354,6 +430,9 @@ function LuaExportBeforeNextFrame()
     end
 end
 
+-- package telemetry to send upstream to jafdtc. calls JAFDTC_<model>_AfterNextFrame to perform modle-specific
+-- operations prior to constructing the telemetry.
+--
 function LuaExportAfterNextFrame()
     JAFDTC_CallUpstream(upstreamLuaExportAfterNextFrame, "aframe")
 
@@ -364,7 +443,7 @@ function LuaExportAfterNextFrame()
     local coords = LoLoCoordinatesToGeoCoordinates(loX, loZ)
     local model = JAFDTC_GetPlayerAircraftType()
 
-    local markerTx = string.gsub(markerVal, "<upload_prog>", string.format("%d", cmdCurProgress))
+    local markerValTx = string.gsub(markerVal, "<upload_prog>", string.format("%d", cmdCurProgress))
 
     local funcName = "JAFDTC_" .. model .. "_AfterNextFrame";
     local params = {}
@@ -378,7 +457,8 @@ function LuaExportAfterNextFrame()
 
     local txData = "{"..
         '"Model": "' .. model .. '",' ..
-        '"Marker": "' .. markerTx .. '",' ..
+        '"Marker": "' .. markerValTx .. '",' ..
+        '"Response": "' .. responseVal .. '",' ..
 -- NOTE: exclude lat/lon/elev for now as its unused on the jafdtc side
 --[[
         '"Lat": "' .. coords.latitude .. '",' ..
@@ -398,4 +478,5 @@ function LuaExportAfterNextFrame()
         JAFDTC_Log("Marker forced to empty after reporting " .. markerVal)
         markerVal = ""
     end
+    responseVal = ""
 end
