@@ -110,7 +110,7 @@ namespace JAFDTC.Models.FA18C.Upload
                 {
                     AddWhileBlock("IsNotLMFDTAC", null, delegate () { AddAction(lmfd, "OSB-18"); });    // MENU (TAC)
                     AddAction(lmfd, "OSB-05");                                                          // STORES
-                    AddRunFunction("SelectStore", new() { GetDCSWeaponCode(group.Key) }, WAIT_LONG);
+                    AddExecFunction("SelectStore", new() { GetDCSWeaponCode(group.Key) }, WAIT_LONG);
 
                     // add steerpoints to stations that carry weapons that support steerpoints.
                     //

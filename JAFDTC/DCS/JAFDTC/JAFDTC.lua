@@ -234,11 +234,11 @@ function JAFDTC_Cmd_Query(list, index)
 end
 
 
--- RunFunc(string fn, string prm0 = nil, string prm1 = nil, string prm2 = nil)
+-- Exec(string fn, string prm0 = nil, string prm1 = nil, string prm2 = nil)
 --
 -- invokes the function JAFDTC_<airframe>_Func_<fn> with the specified parameters.
 --
-function JAFDTC_Cmd_RunFunc(list, index)
+function JAFDTC_Cmd_Exec(list, index)
     local args = list[index]["a"]
     local fn = args["fn"]
 

@@ -225,11 +225,11 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add a run function command to the command the builder is building.
+        /// add an exec function command to the command the builder is building.
         /// </summary>
-        protected void AddRunFunction(string fn, List<string> argsFunc = null, int dtWaitPost = WAIT_NONE)
+        protected void AddExecFunction(string fn, List<string> argsFunc = null, int dtWaitPost = WAIT_NONE)
         {
-            string cmd = $"{{\"f\":\"RunFunc\",\"a\":{{\"fn\":\"{fn}\"" + BuildArgList(argsFunc) + $"}}}},";
+            string cmd = $"{{\"f\":\"Exec\",\"a\":{{\"fn\":\"{fn}\"" + BuildArgList(argsFunc) + $"}}}},";
             AddCommand(cmd);
             AddWait(dtWaitPost);
         }

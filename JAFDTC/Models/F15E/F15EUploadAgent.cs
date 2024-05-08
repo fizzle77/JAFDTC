@@ -60,11 +60,11 @@ namespace JAFDTC.Models.F15E
 #if ENABLE_FORCE_COCKPIT_CHANGE
                 if (_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT)
                 {
-                    AddRunFunction("GoToFrontCockpit");
+                    AddExecFunction("GoToFrontCockpit");
                 }
                 else if (_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO)
                 {
-                    AddRunFunction("GoToRearCockpit");
+                    AddExecFunction("GoToRearCockpit");
                 }
                 AddWait(2 * WAIT_LONG);
 #else
