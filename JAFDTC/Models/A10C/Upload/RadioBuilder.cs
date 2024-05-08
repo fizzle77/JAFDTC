@@ -80,13 +80,13 @@ namespace JAFDTC.Models.A10C.Upload
 
             if (radios.Presets[(int)RadioSystem.Radios.COMM1].Count > 0)
             {
-                AddIfBlock("IsCommPageOnDefaultButton", null, delegate ()
+                AddIfBlock("IsCommPageOnDefaultButton", true, null, delegate ()
                 {
                     // If COMM is in its default location on the left MFD, use it there.
                     AddActions(lmfd, new() { "LMFD_13", "LMFD_19" });
                     BuildARC210Presets(cdu, arc210, lmfd, "LMFD_", radios);
                 });
-                AddIfBlock("IsCommPageNotOnDefaultButton", null, delegate ()
+                AddIfBlock("IsCommPageNotOnDefaultButton", true, null, delegate ()
                 {
                     // If COMM isn't in its default location on the left MFD, put it in place of MSG on the right.
                     AddActions(rmfd, new() { "RMFD_12_LONG", "RMFD_06", "RMFD_12", "RMFD_12", "RMFD_19" });

@@ -79,7 +79,7 @@ namespace JAFDTC.Models.A10C.Upload
             // CDU
             AddActions(cdu, new() { "WP", "LSK_3L" });
             AddWait(WAIT_BASE);
-            AddIfBlock("IsCoordFmtLL", null, delegate ()
+            AddIfBlock("IsCoordFmtLL", true, null, delegate ()
             {
                 AddAction(cdu, "LSK_9R");
             });
@@ -117,7 +117,7 @@ namespace JAFDTC.Models.A10C.Upload
             // Navigate to ANCHOR PT page on  CDU
             AddActions(cdu, new() { "CLR", "LSK_7R" });
             // Turn BULLS ON if not already
-            AddIfBlock("IsBullsNotOnHUD", null, delegate ()
+            AddIfBlock("IsBullsNotOnHUD", true, null, delegate ()
             {
                 AddAction(cdu, "LSK_9L");
             });
@@ -135,7 +135,7 @@ namespace JAFDTC.Models.A10C.Upload
 
             // CDU
             AddAction(cdu, "FPM");
-            AddIfBlock("IsFlightPlanNotManual", null, delegate ()
+            AddIfBlock("IsFlightPlanNotManual", true, null, delegate ()
             {
                 AddAction(cdu, "LSK_3L");
             });
@@ -159,7 +159,7 @@ namespace JAFDTC.Models.A10C.Upload
             // During startup, before alignment, the speed setting is not yet visible but you can still change it
             // with button presses. In this state we assume it's still at the default IAS and press the button
             // once for TAS, twice for GS.
-            AddIfBlock("SpeedIsNotAvailable", null, delegate ()
+            AddIfBlock("SpeedIsNotAvailable", true, null, delegate ()
             {
                 AddAction(cdu, "LSK_9R"); // TAS
                 if (miscSystem.SpeedDisplayValue == SpeedDisplayOptions.GS)
@@ -169,9 +169,9 @@ namespace JAFDTC.Models.A10C.Upload
             // TODO consider an "else" delegate for if blocks?
 
             // If we're aligned and can see the setting, we can just press the button until it says what we want.
-            AddIfBlock("SpeedIsAvailable", null, delegate ()
+            AddIfBlock("SpeedIsAvailable", true, null, delegate ()
             {
-                AddWhileBlock("SpeedIsNot", new() { $"{miscSystem.SpeedDisplayValue}" }, delegate ()
+                AddWhileBlock("SpeedIsNot", true, new() { $"{miscSystem.SpeedDisplayValue}" }, delegate ()
                 {
                     AddAction(cdu, "LSK_9R");
                 });

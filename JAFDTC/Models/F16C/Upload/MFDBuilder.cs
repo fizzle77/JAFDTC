@@ -72,10 +72,10 @@ namespace JAFDTC.Models.F16C.Upload
                 AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" });
                 AddWait(WAIT_BASE);
 
-                AddIfBlock("NotInAAMode", null, delegate ()
+                AddIfBlock("NotInAAMode", true, null, delegate ()
                 {
                     AddAction(ufc, "SEQ");
-                    AddIfBlock("NotInAGMode", null, delegate () { BuildMFDs(ufc, hotas, leftMFD, rightMFD); });
+                    AddIfBlock("NotInAGMode", true, null, delegate () { BuildMFDs(ufc, hotas, leftMFD, rightMFD); });
                     AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
                 });
 
@@ -187,7 +187,10 @@ namespace JAFDTC.Models.F16C.Upload
                         break;
                     case MFDConfiguration.DisplayFormats.HAD:
                         AddAction(mfd, "OSB-02-HAD");
-                        AddIfBlock("HTSOnMFD", new() { mfdSide }, delegate () { BuildHTSOnMFDIfOn(mfd, isLeftMFD); });
+                        AddIfBlock("HTSOnMFD", true, new() { mfdSide }, delegate ()
+                        {
+                            BuildHTSOnMFDIfOn(mfd, isLeftMFD);
+                        });
                         break;
                     case MFDConfiguration.DisplayFormats.HSD:
                         AddAction(mfd, "OSB-07-HSD");
@@ -223,7 +226,7 @@ namespace JAFDTC.Models.F16C.Upload
             AddAction(mfd, "OSB-04-RCCE");
 
             string mfdSide = (isLeftMFD) ? "left" : "right";
-            AddIfBlock("HTSAllNotSelected", new() { mfdSide }, delegate () { AddAction(mfd, "OSB-05"); });
+            AddIfBlock("HTSAllNotSelected", true, new() { mfdSide }, delegate () { AddAction(mfd, "OSB-05"); });
 
             AddAction(mfd, "OSB-05");
 

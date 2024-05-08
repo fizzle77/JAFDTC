@@ -58,10 +58,10 @@ namespace JAFDTC.Models.F16C.Upload
                 AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" });
                 AddWait(WAIT_BASE);
 
-                AddIfBlock("NotInAAMode", null, delegate ()
+                AddIfBlock("NotInAAMode", true, null, delegate ()
                 {
                     AddAction(ufc, "SEQ");
-                    AddIfBlock("NotInAGMode", null, delegate () { BuildHTSManualTable(ufc); });
+                    AddIfBlock("NotInAGMode", true, null, delegate () { BuildHTSManualTable(ufc); });
                     AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
                 });
 
@@ -80,7 +80,7 @@ namespace JAFDTC.Models.F16C.Upload
                 AddActions(ufc, new() { "RTN", "RTN", "LIST", "0" });
                 AddWait(WAIT_BASE);
 
-                AddIfBlock("HTSOnDED", null, delegate ()
+                AddIfBlock("HTSOnDED", true, null, delegate ()
                 {
                     AddAction(ufc, "ENTR");
                     for (int row = 0; row < _cfg.HTS.MANTable.Count; row++)

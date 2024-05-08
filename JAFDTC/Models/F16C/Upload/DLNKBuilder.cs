@@ -69,9 +69,15 @@ namespace JAFDTC.Models.F16C.Upload
                 string cs = _cfg.DLNK.OwnshipCallsign;
                 if (!string.IsNullOrEmpty(cs))
                 {
-                    AddWhileBlock("CallSignChar1IsNot", new() { $"{cs[0]}" }, delegate () { AddAction(ufc, "INC"); });
+                    AddWhileBlock("CallSignChar1IsNot", true, new() { $"{cs[0]}" }, delegate ()
+                    {
+                        AddAction(ufc, "INC");
+                    });
                     AddAction(ufc, "ENTR");
-                    AddWhileBlock("CallSignChar2IsNot", new() { $"{cs[1]}" }, delegate () { AddAction(ufc, "INC"); });
+                    AddWhileBlock("CallSignChar2IsNot", true, new() { $"{cs[1]}" }, delegate ()
+                    {
+                        AddAction(ufc, "INC");
+                    });
                     AddAction(ufc, "ENTR");
                 }
                 else
@@ -80,7 +86,7 @@ namespace JAFDTC.Models.F16C.Upload
                 }
 
                 string flParam = (_cfg.DLNK.IsOwnshipLead) ? "NO" : "YES";
-                AddIfBlock("FlightLead", new() { flParam }, delegate () { AddAction(ufc, "1"); });
+                AddIfBlock("FlightLead", true, new() { flParam }, delegate () { AddAction(ufc, "1"); });
 
                 AddAction(ufc, "SEQ");
 
@@ -99,7 +105,7 @@ namespace JAFDTC.Models.F16C.Upload
                 for (int i = 0; i < _cfg.DLNK.TeamMembers.Length; i++)
                 {
                     string cond = (_cfg.DLNK.TeamMembers[i].TDOA) ? "TDOANotSet" : "TDOASet";
-                    AddIfBlock(cond, new() { (i + 1).ToString() }, delegate () { AddAction(ufc, "7"); });
+                    AddIfBlock(cond, true, new() { (i + 1).ToString() }, delegate () { AddAction(ufc, "7"); });
                     AddActions(ufc, new() { "DOWN", "DOWN" });
                 }
 

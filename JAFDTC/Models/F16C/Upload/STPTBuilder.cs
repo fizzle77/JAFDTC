@@ -151,12 +151,12 @@ namespace JAFDTC.Models.F16C.Upload
                 AddActions(ufc, new() { "RTN", "RTN", "LIST", "3" });
                 AddWait(WAIT_BASE);
 
-                AddIfBlock("VIP_TO_TGT_NotSelected", null, delegate () { AddAction(ufc, "SEQ"); });
-                AddIfBlock("VIP_TO_TGT_NotHighlighted", null, delegate () { AddAction(ufc, "0"); });
+                AddIfBlock("VIP_TO_TGT_NotSelected", true, null, delegate () { AddAction(ufc, "SEQ"); });
+                AddIfBlock("VIP_TO_TGT_NotHighlighted", true, null, delegate () { AddAction(ufc, "0"); });
                 BuildVIPDetail(ufc, stptNum, stpt.VxP[0].Range, stpt.VxP[0].Brng, stpt.VxP[0].Elev);
                 AddAction(ufc, "SEQ");
 
-                AddIfBlock("VIP_TO_PUP_NotHighlighted", null, delegate () { AddAction(ufc, "0"); });
+                AddIfBlock("VIP_TO_PUP_NotHighlighted", true, null, delegate () { AddAction(ufc, "0"); });
                 BuildVIPDetail(ufc, stptNum, stpt.VxP[1].Range, stpt.VxP[1].Brng, stpt.VxP[1].Elev);
 
                 // TODO: not needed?
@@ -199,13 +199,13 @@ namespace JAFDTC.Models.F16C.Upload
                 AddActions(ufc, new() { "RTN", "RTN", "LIST", "9" });
                 AddWait(WAIT_BASE);
 
-                AddIfBlock("TGT_TO_VRP_NotSelected", null, delegate () { AddAction(ufc, "SEQ"); });
-                AddIfBlock("TGT_TO_VRP_NotHighlighted", null, delegate () { AddAction(ufc, "0"); });
+                AddIfBlock("TGT_TO_VRP_NotSelected", true, null, delegate () { AddAction(ufc, "SEQ"); });
+                AddIfBlock("TGT_TO_VRP_NotHighlighted", true, null, delegate () { AddAction(ufc, "0"); });
 
                 BuildVRPDetail(ufc, stptNum, stpt.VxP[0].Range, stpt.VxP[0].Brng, stpt.VxP[0].Elev);
                 AddAction(ufc, "SEQ");
 
-                AddIfBlock("TGT_TO_PUP_NotHighlighted", null, delegate () { AddAction(ufc, "0"); });
+                AddIfBlock("TGT_TO_PUP_NotHighlighted", true, null, delegate () { AddAction(ufc, "0"); });
 
                 BuildVRPDetail(ufc, stptNum, stpt.VxP[1].Range, stpt.VxP[1].Brng, stpt.VxP[1].Elev);
                 AddActions(ufc, new() { "SEQ", "RTN" });

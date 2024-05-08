@@ -59,10 +59,10 @@ namespace JAFDTC.Models.F16C.Upload
 
                 AddWait(WAIT_BASE);
 
-                AddIfBlock("NotInAAMode", null, delegate ()
+                AddIfBlock("NotInAAMode", true, null, delegate ()
                 {
                     AddAction(ufc, "SEQ");
-                    AddIfBlock("NotInAGMode", null, delegate () { BuildHARM(ufc); });
+                    AddIfBlock("NotInAGMode", true, null, delegate () { BuildHARM(ufc); });
                     AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
                 });
                 AddAction(ufc, "RTN");
@@ -76,7 +76,7 @@ namespace JAFDTC.Models.F16C.Upload
         private void BuildHARM(AirframeDevice ufc)
         {
             AddActions(ufc, new() { "RTN", "RTN", "LIST", "0", "AG" });
-            AddIfBlock("HARM", null, delegate ()
+            AddIfBlock("HARM", true, null, delegate ()
             {
                 AddAction(ufc, "0");
                 foreach (ALICTable table in _cfg.HARM.Tables)

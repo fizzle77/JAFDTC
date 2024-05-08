@@ -96,7 +96,7 @@ namespace JAFDTC.Models.F16C.Upload
             // ---- tacan channel
 
             string cond = (_cfg.Misc.TACANBandValue == TACANBands.X) ? "TACANBandY" : "TACANBandX";
-            AddIfBlock(cond, null, delegate () { AddActions(ufc, new() { "0", "ENTR" }); });
+            AddIfBlock(cond, true, null, delegate () { AddActions(ufc, new() { "0", "ENTR" }); });
 
             // ---- ehsi mode
 
@@ -189,7 +189,7 @@ namespace JAFDTC.Models.F16C.Upload
                 AddWait(WAIT_BASE);
 
                 // TODO: assumes bullseye state
-                AddIfBlock("BullseyeNotSelected", null, delegate () { AddAction(ufc, "0"); });
+                AddIfBlock("BullseyeNotSelected", true, null, delegate () { AddAction(ufc, "0"); });
                 AddAction(ufc, "DOWN");
 
                 AddActions(ufc, PredActionsForCleanNumAndEnter(_cfg.Misc.BullseyeWP), new() { "DOWN" });

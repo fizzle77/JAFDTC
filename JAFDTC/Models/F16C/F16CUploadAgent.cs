@@ -52,8 +52,8 @@ namespace JAFDTC.Models.F16C
 
                 AirframeDevice sms = _aircraft.GetDevice("SMS");
 
-                AddIfBlock("LeftHdptNotOn", null, delegate () { AddAction(sms, "LEFT_HDPT"); });
-                AddIfBlock("RightHdptNotOn", null, delegate () { AddAction(sms, "RIGHT_HDPT"); });
+                AddIfBlock("LeftHdptNotOn", true, null, delegate () { AddAction(sms, "LEFT_HDPT"); });
+                AddIfBlock("RightHdptNotOn", true, null, delegate () { AddAction(sms, "RIGHT_HDPT"); });
 
                 // TODO: ensure cmds is on?
             }

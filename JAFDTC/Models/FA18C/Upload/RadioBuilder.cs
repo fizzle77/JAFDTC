@@ -82,7 +82,7 @@ namespace JAFDTC.Models.FA18C.Upload
         /// </summary>
         private void SelectPreset(AirframeDevice ufc, int radioNum, string preset)
         {
-            AddWhileBlock("IsNotRadioOnChannel", new() { $"{radioNum}", preset }, delegate ()
+            AddWhileBlock("IsNotRadioOnChannel", true, new() { $"{radioNum}", preset }, delegate ()
             {
                 AddAction(ufc, $"COM{radioNum}ChInc", WAIT_SHORT);
             });

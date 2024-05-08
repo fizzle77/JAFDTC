@@ -250,9 +250,11 @@ namespace JAFDTC.Models.DCS
         /// 
         /// NOTE: nested if blocks are assumed to have unique cond values.
         /// </summary>
-        protected void AddIfBlock(string cond, List<string> argsCond, AddBlockCommandsDelegate addBlockDelegate)
+        protected void AddIfBlock(string cond, bool expect, List<string> argsCond,
+                                  AddBlockCommandsDelegate addBlockDelegate)
         {
-            string cmd = $"{{\"f\":\"If\",\"a\":{{\"cond\":\"{cond}\"" + BuildArgList(argsCond) + $"}}}},";
+            string cmd = $"{{\"f\":\"If\",\"a\":{{\"cond\":\"{cond}\",\"expt\":\"{expect}\"" + BuildArgList(argsCond)
+                       + $"}}}},";
             AddCommand(cmd);
 
             addBlockDelegate();
@@ -269,10 +271,10 @@ namespace JAFDTC.Models.DCS
         /// 
         /// NOTE: nested while blocks are assumed to have unique cond values.
         /// </summary>
-        protected void AddWhileBlock(string cond, List<string> argsCond, AddBlockCommandsDelegate addBlockDelegate,
-                                     int timeOut = 0)
+        protected void AddWhileBlock(string cond, bool expect, List<string> argsCond,
+                                     AddBlockCommandsDelegate addBlockDelegate, int timeOut = 0)
         {
-            string cmd = $"{{\"f\":\"While\",\"a\":{{\"cond\":\"{cond}\"";
+            string cmd = $"{{\"f\":\"While\",\"a\":{{\"cond\":\"{cond}\",\"expt\":\"{expect}\"";
             if (timeOut != 0)
             {
                 cmd += $",\"tout\":\"{timeOut}\"";

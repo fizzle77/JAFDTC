@@ -59,14 +59,14 @@ namespace JAFDTC.Models.F15E.Upload
 
             if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT) && !_cfg.Radio.IsDefault)
             {
-                AddIfBlock("IsInFrontCockpit", null, delegate ()
+                AddIfBlock("IsInFrontCockpit", true, null, delegate ()
                 {
                     BuildRadioCore(ufcPilot);
                 });
             }
             if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO) && !_cfg.Radio.IsDefault)
             {
-                AddIfBlock("IsInRearCockpit", null, delegate ()
+                AddIfBlock("IsInRearCockpit", true, null, delegate ()
                 {
                     BuildRadioCore(ufcWizzo);
                 });
@@ -96,13 +96,15 @@ namespace JAFDTC.Models.F15E.Upload
 
             if (isPreMode)
             {
-                AddIfBlock("IsRadioPresetOrFreqSelected", new() { ufc.Name, (isRadio1 ? "1" : "2"), "freq" }, delegate () {
+                AddIfBlock("IsRadioPresetOrFreqSelected", true, new() { ufc.Name, (isRadio1 ? "1" : "2"), "freq" },
+                delegate () {
                     AddAction(ufc, isRadio1 ? "GCML" : "GCMR");
                 });
             }
             else
             {
-                AddIfBlock("IsRadioPresetOrFreqSelected", new() { ufc.Name, (isRadio1 ? "1" : "2"), "preset" }, delegate () {
+                AddIfBlock("IsRadioPresetOrFreqSelected", true, new() { ufc.Name, (isRadio1 ? "1" : "2"), "preset" },
+                delegate () {
                     AddAction(ufc, isRadio1 ? "GCML" : "GCMR");
                 });
             }
@@ -135,7 +137,8 @@ namespace JAFDTC.Models.F15E.Upload
             }
 
             string state = (isMonGuard) ? "disabled" : "enabled";
-            AddIfBlock("IsRadioGuardEnabledDisabled", new() { ufc.Name, (isRadio1 ? "1" : "2"), state }, delegate () {
+            AddIfBlock("IsRadioGuardEnabledDisabled", true, new() { ufc.Name, (isRadio1 ? "1" : "2"), state },
+            delegate () {
                 AddActions(ufc, new() { "SHF", (isRadio1 ? "GCML" : "GCMR") });
             });
 
