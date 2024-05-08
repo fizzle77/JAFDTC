@@ -100,12 +100,12 @@ namespace JAFDTC.Models.F15E.Upload
         /// </summary>
         private void BuildDisplay(AirframeDevice dispDev, MPDConfiguration dispConfig)
         {
-            AddIfBlock("IsDisplayNotInMainMenu", true, new() { $"{dispDev.Name}" }, delegate ()
+            AddIfBlock("IsDisplayInMainMenu", false, new() { $"{dispDev.Name}" }, delegate ()
             {
                 AddAction(dispDev, "PB11");
                 AddWait(WAIT_BASE);
             });
-            AddIfBlock("IsDisplayNotInMainMenu", true, new() { $"{dispDev.Name}" }, delegate ()
+            AddIfBlock("IsDisplayInMainMenu", false, new() { $"{dispDev.Name}" }, delegate ()
             {
                 AddAction(dispDev, "PB11");
                 AddWait(WAIT_BASE);
@@ -116,7 +116,7 @@ namespace JAFDTC.Models.F15E.Upload
                 AddWait(WAIT_BASE);
             });
 
-            AddIfBlock("NoDisplaysProgrammed", true, new() { dispDev.Name }, delegate ()
+            AddIfBlock("IsNoDisplaysProgrammed", true, new() { dispDev.Name }, delegate ()
             {
                 AddAction(dispDev, "PB06");
                 for (int i = 0; i < MPDConfiguration.NUM_SEQUENCES; i++)

@@ -20,7 +20,13 @@ You should have received a copy of the GNU General Public License along with thi
 ********************************************************************************************************************
 --]]
 
-dofile(lfs.writedir() .. 'Scripts/JAFDTC/commonFunctions.lua')
+-- NOTE: requires that CommonFunctions.lua has been loaded...
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- display parsers
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 --Displays
 -- 0 - NF FOV
@@ -94,6 +100,12 @@ function JAFDTC_F15E_GetDisplay(disp)
     return table
 end
 
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- general functions
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
 function JAFDTC_F15E_Fn_GoToFrontCockpit()
     LoSetCommand(7)
     if JAFDTC_F15E_Fn_IsInFrontCockpit() == false then
@@ -110,28 +122,44 @@ end
 
 function JAFDTC_F15E_Fn_IsInFrontCockpit()
     local table = JAFDTC_F15E_GetFrontLeftMPD()
-    if next(table) == nil then
-        return false
-    end
-    return true
+    return (next(table) ~= nil)
 end
 
 function JAFDTC_F15E_Fn_IsInRearCockpit()
     local table = JAFDTC_F15E_GetRearLeftMPD()
-    if next(table) == nil then
-        return false
-    end
-    return true
+    return (next(table) ~= nil)
 end
 
-function JAFDTC_F15E_Fn_NoDisplaysProgrammed(disp)
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- mpd support
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
+function JAFDTC_F15E_Fn_IsNoDisplaysProgrammed(disp)
     local table = JAFDTC_F15E_GetDisplay(disp);
     local str = table["PRG_Label_1"] or table["PRG_Label_2"] or table["PRG_Label_3"] or ""
-    if str == "" then
-        return true
-    end
-    return false
+    return (str == "")
 end
+
+function JAFDTC_F15E_Fn_IsProgBoxed(disp)
+    local table = JAFDTC_F15E_GetDisplay(disp);
+    local pb06 = table["PRG_PB06_T"] or "";
+    return (pb06 == "PROG")
+end
+
+function JAFDTC_F15E_Fn_IsDisplayInMainMenu(disp)
+    local table = JAFDTC_F15E_GetDisplay(disp);
+    local pb06 = table["PB06"] or "";
+    local pb11 = table["PB11"] or "";
+    return (pb06 == "PROG" and pb11 == "M2")
+end
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- radio support
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_F15E_Fn_IsRadioPresetOrFreqSelected(ufc, radio, mode)
     local table = JAFDTC_F15E_GetUFC(ufc);
@@ -180,60 +208,38 @@ function JAFDTC_F15E_Fn_IsRadioGuardEnabledDisabled(ufc, radio, mode)
     return false
 end
 
-function JAFDTC_F15E_Fn_IsTACANBand(ufc, band)
-    local table = JAFDTC_F15E_GetUFC(ufc);
-    local str = table["UFC_SC_01"] or "";
-    if str ~= "" and str.sub(str, -1) == band then
-        return true
-    end
-    return false
-end
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- steerpoint support
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_F15E_Fn_IsStrDifferent(ufc, expected)
     local table = JAFDTC_F15E_GetUFC(ufc);
     local str = table["UFC_SC_01"] or "";
-    if str ~= expected then
-        return true
-    end
-    return false
+    return (str ~= expected)
 end
 
-function JAFDTC_F15E_Fn_NoDisplaysProgrammed(disp)
-    local table = JAFDTC_F15E_GetDisplay(disp);
-    local str = table["PRG_Label_1"] or table["PRG_Label_2"] or table["PRG_Label_3"] or ""
-    if str == "" then
-        return true
-    end
-    return false
-end
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- ufc support
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
-function JAFDTC_F15E_Fn_IsProgBoxed(disp)
-    local table = JAFDTC_F15E_GetDisplay(disp);
-    local pb06 = table["PRG_PB06_T"] or "";
-    if pb06 == "PROG" then
-        return true
-    end
-    return false
+function JAFDTC_F15E_Fn_IsTACANBand(ufc, band)
+    local table = JAFDTC_F15E_GetUFC(ufc);
+    local str = table["UFC_SC_01"] or "";
+    return (str ~= "" and str.sub(str, -1) == band)
 end
-
-function JAFDTC_F15E_Fn_IsDisplayNotInMainMenu(disp)
-    local table = JAFDTC_F15E_GetDisplay(disp);
-    local pb06 = table["PB06"] or "";
-    local pb11 = table["PB11"] or "";
-    if pb06 == "PROG" and pb11 == "M2" then
-        return false
-    end
-    return true
-end
-
-local jafdtc_prevNucSwitchFront = "0"
-local jafdtc_prevNucSwitchRear = "0"
 
 -- --------------------------------------------------------------------------------------------------------------------
 --
 -- frame handler
 --
 -- --------------------------------------------------------------------------------------------------------------------
+
+local jafdtc_prevNucSwitchFront = "0"
+local jafdtc_prevNucSwitchRear = "0"
 
 function JAFDTC_F15E_AfterNextFrame(params)
     local mainPanel = GetDevice(0);
