@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License along with thi
 ********************************************************************************************************************
 --]]
 
-dofile(lfs.writedir() .. 'Scripts/JAFDTC/CommonFunctions.lua')
+-- NOTE: requires that CommonFunctions.lua has been loaded...
 
 -- TODO: implement clickable cockpit and setup/configuration checks for harrier
 
