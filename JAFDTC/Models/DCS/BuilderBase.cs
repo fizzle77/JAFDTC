@@ -108,17 +108,25 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// return the argument parameters to append to a command string. return value starts with "," if non-empty.
+        /// return an argument list to append to a command string of the form,
+        /// 
+        ///   "prm" : { "arg[0]", "arg[1]", ... arg[n-1]" }
+        ///   
+        /// where elements of args parameter are output in a list of strings with "prm" key. return value starts
+        /// with "," if argument list is non-empty.
         /// </summary>
-        private string BuildArgList(List<string> args)
+        private static string BuildArgList(List<string> args)
         {
             string retVal = "";
-            if (args != null)
+            if ((args != null) && (args.Count > 0))
             {
+                string prefix = ",\"prm\":[";
                 for (int i = 0; i < args.Count; i++)
                 {
-                    retVal += $",\"prm{i}\":\"{args[i]}\"";
+                    retVal += $"{prefix}\"{args[i]}\"";
+                    prefix = ",";
                 }
+                retVal += "]";
             }
             return retVal;
         }
@@ -130,7 +138,8 @@ namespace JAFDTC.Models.DCS
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// add an abort command to the command the builder is building.
+        /// add an abort command to the command the builder is building. if the message starts with "ERROR: ", the
+        /// message (excluding "ERROR: ") will be output to the user through a dcs message.
         /// </summary>
         protected void AddAbort(string message)
         {
