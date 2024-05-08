@@ -23,6 +23,12 @@ dofile(lfs.writedir() .. 'Scripts/JAFDTC/CommonFunctions.lua')
 
 -- TODO: implement clickable cockpit and setup/configuration checks for mirage
 
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- frame handler
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
 function JAFDTC_M2KC_AfterNextFrame(params)
 --[[
     params["uploadCommand"] = "0"
