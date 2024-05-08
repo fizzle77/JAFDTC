@@ -267,24 +267,24 @@ end
 
 -- Exec(string fn, list<string> prm = nil)
 --
--- invokes the function JAFDTC_<airframe>_Func_<fn> with the specified parameters (list of strings). any return
--- value from the function is discarded.
+-- invokes the function JAFDTC_<airframe>_Fn_<fn> with the specified parameters (list of strings). any return value
+-- from the function is discarded.
 --
 function JAFDTC_Cmd_Exec(list, index)
     local args = list[index]["a"]
     local fn = args["fn"]
     local fnPrm = args["prm"] or { }
 
-    local fnName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_Func_" .. fn;
+    local fnName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_Fn_" .. fn;
     _G[fnName](unpack(fnPrm))
     return 1, 0
 end
 
 -- If(string cond, list<string> prm = nil)
 --
--- performs an "if" block conditional on the function JAFDTC_<airframe>_CheckCondition_<cond> with the specified
--- parameters (list of strings). this function should return a boolean. if this function returns false, skip
--- ahead to the next EndIf block in the command list with a matching cond.
+-- performs an "if" block conditional on the function JAFDTC_<airframe>_Fn_<cond> with the specified parameters (list
+-- of strings). this function should return a boolean. if this function returns false, skip ahead to the next EndIf
+-- block in the command list with a matching cond.
 --
 function JAFDTC_Cmd_If(list, index)
     local args = list[index]["a"]
@@ -292,7 +292,7 @@ function JAFDTC_Cmd_If(list, index)
     local fnPrm = args["prm"] or { }
     local di = 1
 
-    local fnName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_CheckCondition_" .. cond;
+    local fnName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_Fn_" .. cond;
     if not _G[fnName](unpack(fnPrm)) then
         for i = index + 1, #list do
             if list[i]["f"] == "EndIf" and list[i]["a"]["cond"] == cond then
@@ -315,10 +315,9 @@ end
 
 -- While(string cond, number tout = 50, list<string> prm = nil)
 --
--- performs a "while" block conditional on the function JAFDTC_<airframe>_CheckCondition_<cond> with the specified
--- parameters (list of strings). this function should return a boolean. if this function returns false, skip ahead
--- to the next EndWhile block in the command list with a matching cond. the while loop will iterate for at most
--- tout iterations.
+-- performs a "while" block conditional on the function JAFDTC_<airframe>_Fn_<cond> with the specified parameters
+-- (list of strings). this function should return a boolean. if this function returns false, skip ahead to the next
+-- EndWhile block in the command list with a matching cond. the while loop will iterate for at most tout iterations.
 --
 function JAFDTC_Cmd_While(list, index)
     local args = list[index]["a"]
@@ -333,7 +332,7 @@ function JAFDTC_Cmd_While(list, index)
         whileTout[index] = whileTout[index] - 1
     end
 
-    local fnName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_CheckCondition_" .. cond;
+    local fnName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_Fn_" .. cond;
     if not _G[fnName](unpack(fnPrm)) or whileTout[index] == 0 then
         if whileTout[index] == 0 then
             JAFDTC_Log("ERROR: Timeout skips to EndWhile of While for " .. cond)

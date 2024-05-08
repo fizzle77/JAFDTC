@@ -47,12 +47,12 @@ function JAFDTC_A10C_GetLMFD_value(key)
     return value;
 end
 
-function JAFDTC_A10C_CheckCondition_IsCommPageOnDefaultButton()
+function JAFDTC_A10C_Fn_IsCommPageOnDefaultButton()
     local value = JAFDTC_A10C_GetLMFD_value("label_12");
     return value == "COMM"
 end
 
-function JAFDTC_A10C_CheckCondition_IsCommPageNotOnDefaultButton()
+function JAFDTC_A10C_Fn_IsCommPageNotOnDefaultButton()
     local value = JAFDTC_A10C_GetLMFD_value("label_12");
     return value ~= "COMM"
 end
@@ -72,7 +72,7 @@ function JAFDTC_A10C_GetCDU_value(key)
     return value;
 end
 
-function JAFDTC_A10C_CheckCondition_IsCoordFmtLL()
+function JAFDTC_A10C_Fn_IsCoordFmtLL()
     local value = JAFDTC_A10C_GetCDU_value("WAYPTCoordFormat");
     if string.sub(value, 1, 3) == "L/L" then
         return true
@@ -80,7 +80,7 @@ function JAFDTC_A10C_CheckCondition_IsCoordFmtLL()
     return false
 end
 
-function JAFDTC_A10C_CheckCondition_IsCoordFmtNotLL()
+function JAFDTC_A10C_Fn_IsCoordFmtNotLL()
     local value = JAFDTC_A10C_GetCDU_value("WAYPTCoordFormat");
     if string.sub(value, 1, 3) ~= "L/L" then
         return true
@@ -88,7 +88,7 @@ function JAFDTC_A10C_CheckCondition_IsCoordFmtNotLL()
     return false
 end
 
-function JAFDTC_A10C_CheckCondition_IsBullsNotOnHUD()
+function JAFDTC_A10C_Fn_IsBullsNotOnHUD()
     local value = JAFDTC_A10C_GetCDU_value("HUD_OFF");
     if value == "OFF" then
         return true
@@ -96,7 +96,7 @@ function JAFDTC_A10C_CheckCondition_IsBullsNotOnHUD()
     return false
 end
 
-function JAFDTC_A10C_CheckCondition_IsFlightPlanNotManual()
+function JAFDTC_A10C_Fn_IsFlightPlanNotManual()
     local value = JAFDTC_A10C_GetCDU_value("FPMode");
     if value ~= "MAN" then
         return true
@@ -104,17 +104,17 @@ function JAFDTC_A10C_CheckCondition_IsFlightPlanNotManual()
     return false
 end
 
-function JAFDTC_A10C_CheckCondition_SpeedIsAvailable()
+function JAFDTC_A10C_Fn_SpeedIsAvailable()
     local table = JAFDTC_A10C_GetCDU();
     return table["STRSpeedMode4"] == "IAS" or table["STRSpeedMode5"] == "TAS" or table["STRSpeedMode6"] == "GS"
 end
 
-function JAFDTC_A10C_CheckCondition_SpeedIsNotAvailable()
+function JAFDTC_A10C_Fn_SpeedIsNotAvailable()
     local table = JAFDTC_A10C_GetCDU();
     return table["STRSpeedMode4"] ~= "IAS" and table["STRSpeedMode5"] ~= "TAS" and table["STRSpeedMode6"] ~= "GS"
 end
 
-function JAFDTC_A10C_CheckCondition_SpeedIsNot(speed)
+function JAFDTC_A10C_Fn_SpeedIsNot(speed)
     JAFDTC_Log("SpeedIsNot(" .. speed .. ")");
     local table = JAFDTC_A10C_GetCDU();
     if speed == "IAS" then
@@ -160,6 +160,12 @@ local function getVhfFmFreqency()
     return freq1 .. freq2 .. "." .. freq3 .. freq4
 end
 --]]
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- frame handler
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_A10C_AfterNextFrame(params)
     local mainPanel = GetDevice(0);

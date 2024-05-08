@@ -20,7 +20,13 @@ You should have received a copy of the GNU General Public License along with thi
 ********************************************************************************************************************
 --]]
 
-dofile(lfs.writedir() .. 'Scripts/JAFDTC/commonFunctions.lua')
+-- dofile(lfs.writedir() .. 'Scripts/JAFDTC/commonFunctions.lua')
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- display parsers
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_F16CM_GetDED()
     return JAFDTC_ParseDisplay(6)
@@ -34,12 +40,18 @@ function JAFDTC_F16CM_GetRightMFD()
     return JAFDTC_ParseDisplay(5)
 end
 
-function JAFDTC_F16CM_CheckCondition_DebugDED()
+function JAFDTC_F16CM_Fn_DebugDED()
     JAFDTC_DebugDisplay(JAFDTC_F16CM_GetDED())
     return true
 end
 
-function JAFDTC_F16CM_CheckCondition_CallSignChar1IsNot(letter)
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- TODO
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
+function JAFDTC_F16CM_Fn_CallSignChar1IsNot(letter)
     local table = JAFDTC_F16CM_GetDED();
     local value = table["CallSign Name char1_inv"] or "";
     if value ~= letter or str == "" then
@@ -48,7 +60,7 @@ function JAFDTC_F16CM_CheckCondition_CallSignChar1IsNot(letter)
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_CallSignChar2IsNot(letter)
+function JAFDTC_F16CM_Fn_CallSignChar2IsNot(letter)
     local table = JAFDTC_F16CM_GetDED();
     local value = table["CallSign Name char2_inv"] or "";
     if value ~= letter or str == "" then
@@ -57,7 +69,7 @@ function JAFDTC_F16CM_CheckCondition_CallSignChar2IsNot(letter)
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_FlightLead(status)
+function JAFDTC_F16CM_Fn_FlightLead(status)
     local table = JAFDTC_F16CM_GetDED();
     local value = table["FL status"] or "";
     if value == status or str == "" then
@@ -66,7 +78,7 @@ function JAFDTC_F16CM_CheckCondition_FlightLead(status)
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_TDOASet(slot)
+function JAFDTC_F16CM_Fn_TDOASet(slot)
     local table = JAFDTC_F16CM_GetDED()
     local value = table["STN TDOA value_" .. slot] or ""
     if value == "T" then
@@ -75,7 +87,7 @@ function JAFDTC_F16CM_CheckCondition_TDOASet(slot)
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_TDOANotSet(slot)
+function JAFDTC_F16CM_Fn_TDOANotSet(slot)
     local table = JAFDTC_F16CM_GetDED()
     local value = table["STN TDOA value_" .. slot] or ""
     if value ~= "T" then
@@ -84,7 +96,7 @@ function JAFDTC_F16CM_CheckCondition_TDOANotSet(slot)
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_LeftHdptNotOn()
+function JAFDTC_F16CM_Fn_LeftHdptNotOn()
     local switch = GetDevice(0):get_argument_value(670)
     if switch ~= 1 then
         return true
@@ -92,7 +104,7 @@ function JAFDTC_F16CM_CheckCondition_LeftHdptNotOn()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_RightHdptNotOn()
+function JAFDTC_F16CM_Fn_RightHdptNotOn()
     local switch = GetDevice(0):get_argument_value(671)
     if switch ~= 1 then
         return true
@@ -100,7 +112,7 @@ function JAFDTC_F16CM_CheckCondition_RightHdptNotOn()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_RadioNotBoth()
+function JAFDTC_F16CM_Fn_RadioNotBoth()
     local table = JAFDTC_F16CM_GetDED();
     local str = table["Receiver Mode"] or "";
     if str == "MAIN" then
@@ -109,7 +121,7 @@ function JAFDTC_F16CM_CheckCondition_RadioNotBoth()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_HARM()
+function JAFDTC_F16CM_Fn_HARM()
     local table = JAFDTC_F16CM_GetDED();
     local str = table["Misc Item 0 Name"];
     if str == "HARM" then
@@ -118,7 +130,7 @@ function JAFDTC_F16CM_CheckCondition_HARM()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_NotInAAMode()
+function JAFDTC_F16CM_Fn_NotInAAMode()
     local table = JAFDTC_F16CM_GetDED();
     local str = table["Master_mode"];
     if str == "A-A" then
@@ -127,7 +139,7 @@ function JAFDTC_F16CM_CheckCondition_NotInAAMode()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_NotInAGMode()
+function JAFDTC_F16CM_Fn_NotInAGMode()
     local table = JAFDTC_F16CM_GetDED();
     local str = table["Master_mode"];
     if str == "A-G" then
@@ -136,7 +148,7 @@ function JAFDTC_F16CM_CheckCondition_NotInAGMode()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_HTSAllNotSelected(mfd)
+function JAFDTC_F16CM_Fn_HTSAllNotSelected(mfd)
     local mfdTable;
 
     if mfd == "left" then
@@ -152,7 +164,7 @@ function JAFDTC_F16CM_CheckCondition_HTSAllNotSelected(mfd)
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_HTSOnDED()
+function JAFDTC_F16CM_Fn_HTSOnDED()
     local table = JAFDTC_F16CM_GetDED();
     local str = table["Misc Item E Name"];
     if str == "HTS" then
@@ -161,7 +173,7 @@ function JAFDTC_F16CM_CheckCondition_HTSOnDED()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_HTSOnMFD(mfd)
+function JAFDTC_F16CM_Fn_HTSOnMFD(mfd)
     local mfdTable;
 
     if mfd == "left" then
@@ -176,7 +188,7 @@ function JAFDTC_F16CM_CheckCondition_HTSOnMFD(mfd)
     return true
 end
 
-function JAFDTC_F16CM_CheckCondition_BullseyeNotSelected()
+function JAFDTC_F16CM_Fn_BullseyeNotSelected()
     local table = JAFDTC_F16CM_GetDED();
     local str = table["BULLSEYE LABEL"];
     if str == "BULLSEYE" then
@@ -185,7 +197,7 @@ function JAFDTC_F16CM_CheckCondition_BullseyeNotSelected()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_TACANBandX()
+function JAFDTC_F16CM_Fn_TACANBandX()
     local table = JAFDTC_F16CM_GetDED();
     local str = table["TCN BAND XY"];
     if str == "X" then
@@ -194,7 +206,7 @@ function JAFDTC_F16CM_CheckCondition_TACANBandX()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_TACANBandY()
+function JAFDTC_F16CM_Fn_TACANBandY()
     local table = JAFDTC_F16CM_GetDED();
     local str = table["TCN BAND XY"];
     if str == "Y" then
@@ -203,7 +215,7 @@ function JAFDTC_F16CM_CheckCondition_TACANBandY()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_VIP_TO_TGT_NotSelected()
+function JAFDTC_F16CM_Fn_VIP_TO_TGT_NotSelected()
     local table = JAFDTC_F16CM_GetDED();
     local str1 = table["Visual initial point to TGT Label"] or "";
     local str2 = table["Visual initial point to TGT Label_inv"] or "";
@@ -213,7 +225,7 @@ function JAFDTC_F16CM_CheckCondition_VIP_TO_TGT_NotSelected()
     return true
 end
 
-function JAFDTC_F16CM_CheckCondition_VIP_TO_TGT_NotHighlighted()
+function JAFDTC_F16CM_Fn_VIP_TO_TGT_NotHighlighted()
     local table = JAFDTC_F16CM_GetDED();
     local str = table["Visual initial point to TGT Label"];
     if str == "VIP-TO-TGT" then
@@ -222,7 +234,7 @@ function JAFDTC_F16CM_CheckCondition_VIP_TO_TGT_NotHighlighted()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_VIP_TO_PUP_NotHighlighted()
+function JAFDTC_F16CM_Fn_VIP_TO_PUP_NotHighlighted()
     local table = JAFDTC_F16CM_GetDED();
     local str = table["Visual initial point to TGT Label"];
     if str == "VIP-TO-PUP" then
@@ -231,7 +243,7 @@ function JAFDTC_F16CM_CheckCondition_VIP_TO_PUP_NotHighlighted()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_TGT_TO_VRP_NotSelected()
+function JAFDTC_F16CM_Fn_TGT_TO_VRP_NotSelected()
     local table = JAFDTC_F16CM_GetDED();
     local str1 = table["Target to VRP Label"] or "";
     local str2 = table["Target to VRP Label_inv"] or "";
@@ -241,7 +253,7 @@ function JAFDTC_F16CM_CheckCondition_TGT_TO_VRP_NotSelected()
     return true
 end
 
-function JAFDTC_F16CM_CheckCondition_TGT_TO_VRP_NotHighlighted()
+function JAFDTC_F16CM_Fn_TGT_TO_VRP_NotHighlighted()
     local table = JAFDTC_F16CM_GetDED();
     local str = table["Target to VRP Label"];
     if str == "TGT-TO-VRP" then
@@ -250,7 +262,7 @@ function JAFDTC_F16CM_CheckCondition_TGT_TO_VRP_NotHighlighted()
     return false
 end
 
-function JAFDTC_F16CM_CheckCondition_TGT_TO_PUP_NotHighlighted()
+function JAFDTC_F16CM_Fn_TGT_TO_PUP_NotHighlighted()
     local table = JAFDTC_F16CM_GetDED();
     local str = table["Target to VRP Label"];
     if str == "TGT-TO-PUP" then
@@ -258,6 +270,12 @@ function JAFDTC_F16CM_CheckCondition_TGT_TO_PUP_NotHighlighted()
     end
     return false
 end
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- frame handler
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_F16CM_AfterNextFrame(params)
     local mainPanel = GetDevice(0);

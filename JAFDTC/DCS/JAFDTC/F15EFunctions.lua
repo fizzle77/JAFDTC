@@ -94,21 +94,21 @@ function JAFDTC_F15E_GetDisplay(disp)
     return table
 end
 
-function JAFDTC_F15E_Func_GoToFrontCockpit()
+function JAFDTC_F15E_Fn_GoToFrontCockpit()
     LoSetCommand(7)
-    if JAFDTC_F15E_CheckCondition_IsInFrontCockpit() == false then
+    if JAFDTC_F15E_Fn_IsInFrontCockpit() == false then
         LoSetCommand(1602)
     end
 end
 
-function JAFDTC_F15E_Func_GoToRearCockpit()
+function JAFDTC_F15E_Fn_GoToRearCockpit()
     LoSetCommand(7)
-    if JAFDTC_F15E_CheckCondition_IsInRearCockpit() == false then
+    if JAFDTC_F15E_Fn_IsInRearCockpit() == false then
         LoSetCommand(1602)
     end
 end
 
-function JAFDTC_F15E_CheckCondition_IsInFrontCockpit()
+function JAFDTC_F15E_Fn_IsInFrontCockpit()
     local table = JAFDTC_F15E_GetFrontLeftMPD()
     if next(table) == nil then
         return false
@@ -116,7 +116,7 @@ function JAFDTC_F15E_CheckCondition_IsInFrontCockpit()
     return true
 end
 
-function JAFDTC_F15E_CheckCondition_IsInRearCockpit()
+function JAFDTC_F15E_Fn_IsInRearCockpit()
     local table = JAFDTC_F15E_GetRearLeftMPD()
     if next(table) == nil then
         return false
@@ -124,7 +124,7 @@ function JAFDTC_F15E_CheckCondition_IsInRearCockpit()
     return true
 end
 
-function JAFDTC_F15E_CheckCondition_NoDisplaysProgrammed(disp)
+function JAFDTC_F15E_Fn_NoDisplaysProgrammed(disp)
     local table = JAFDTC_F15E_GetDisplay(disp);
     local str = table["PRG_Label_1"] or table["PRG_Label_2"] or table["PRG_Label_3"] or ""
     if str == "" then
@@ -133,7 +133,7 @@ function JAFDTC_F15E_CheckCondition_NoDisplaysProgrammed(disp)
     return false
 end
 
-function JAFDTC_F15E_CheckCondition_IsRadioPresetOrFreqSelected(ufc, radio, mode)
+function JAFDTC_F15E_Fn_IsRadioPresetOrFreqSelected(ufc, radio, mode)
     local table = JAFDTC_F15E_GetUFC(ufc);
     local radio1Preset = table["UFC_SC_06"] or "x";
     local radio2Preset = table["UFC_SC_07"] or "x";
@@ -157,7 +157,7 @@ function JAFDTC_F15E_CheckCondition_IsRadioPresetOrFreqSelected(ufc, radio, mode
     return false
 end
 
-function JAFDTC_F15E_CheckCondition_IsRadioGuardEnabledDisabled(ufc, radio, mode)
+function JAFDTC_F15E_Fn_IsRadioGuardEnabledDisabled(ufc, radio, mode)
     local table = JAFDTC_F15E_GetUFC(ufc);
     local radio1Freq = table["UFC_SC_05"] or "x";
     local radio2Freq = table["UFC_SC_08"] or "x";
@@ -180,7 +180,7 @@ function JAFDTC_F15E_CheckCondition_IsRadioGuardEnabledDisabled(ufc, radio, mode
     return false
 end
 
-function JAFDTC_F15E_CheckCondition_IsTACANBand(ufc, band)
+function JAFDTC_F15E_Fn_IsTACANBand(ufc, band)
     local table = JAFDTC_F15E_GetUFC(ufc);
     local str = table["UFC_SC_01"] or "";
     if str ~= "" and str.sub(str, -1) == band then
@@ -189,7 +189,7 @@ function JAFDTC_F15E_CheckCondition_IsTACANBand(ufc, band)
     return false
 end
 
-function JAFDTC_F15E_CheckCondition_IsStrDifferent(ufc, expected)
+function JAFDTC_F15E_Fn_IsStrDifferent(ufc, expected)
     local table = JAFDTC_F15E_GetUFC(ufc);
     local str = table["UFC_SC_01"] or "";
     if str ~= expected then
@@ -198,7 +198,7 @@ function JAFDTC_F15E_CheckCondition_IsStrDifferent(ufc, expected)
     return false
 end
 
-function JAFDTC_F15E_CheckCondition_NoDisplaysProgrammed(disp)
+function JAFDTC_F15E_Fn_NoDisplaysProgrammed(disp)
     local table = JAFDTC_F15E_GetDisplay(disp);
     local str = table["PRG_Label_1"] or table["PRG_Label_2"] or table["PRG_Label_3"] or ""
     if str == "" then
@@ -207,7 +207,7 @@ function JAFDTC_F15E_CheckCondition_NoDisplaysProgrammed(disp)
     return false
 end
 
-function JAFDTC_F15E_CheckCondition_IsProgBoxed(disp)
+function JAFDTC_F15E_Fn_IsProgBoxed(disp)
     local table = JAFDTC_F15E_GetDisplay(disp);
     local pb06 = table["PRG_PB06_T"] or "";
     if pb06 == "PROG" then
@@ -216,7 +216,7 @@ function JAFDTC_F15E_CheckCondition_IsProgBoxed(disp)
     return false
 end
 
-function JAFDTC_F15E_CheckCondition_IsDisplayNotInMainMenu(disp)
+function JAFDTC_F15E_Fn_IsDisplayNotInMainMenu(disp)
     local table = JAFDTC_F15E_GetDisplay(disp);
     local pb06 = table["PB06"] or "";
     local pb11 = table["PB11"] or "";
@@ -228,6 +228,12 @@ end
 
 local jafdtc_prevNucSwitchFront = "0"
 local jafdtc_prevNucSwitchRear = "0"
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- frame handler
+--
+-- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_F15E_AfterNextFrame(params)
     local mainPanel = GetDevice(0);
