@@ -55,14 +55,11 @@ namespace JAFDTC.Models.F16C.Upload
 
             if (!_cfg.HARM.IsDefault)
             {
-                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" });
-
-                AddWait(WAIT_BASE);
-
-                AddIfBlock("NotInAAMode", true, null, delegate ()
+                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" }, null, WAIT_BASE);
+                AddIfBlock("IsInAAMode", true, null, delegate ()
                 {
                     AddAction(ufc, "SEQ");
-                    AddIfBlock("NotInAGMode", true, null, delegate () { BuildHARM(ufc); });
+                    AddIfBlock("IsInAGMode", true, null, delegate () { BuildHARM(ufc); });
                     AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
                 });
                 AddAction(ufc, "RTN");
@@ -75,8 +72,9 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         private void BuildHARM(AirframeDevice ufc)
         {
+            // TODO: check/force NAV assumption here
             AddActions(ufc, new() { "RTN", "RTN", "LIST", "0", "AG" });
-            AddIfBlock("HARM", true, null, delegate ()
+            AddIfBlock("IsHARMOnDED", true, null, delegate ()
             {
                 AddAction(ufc, "0");
                 foreach (ALICTable table in _cfg.HARM.Tables)

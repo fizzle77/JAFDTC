@@ -69,16 +69,13 @@ namespace JAFDTC.Models.F16C.Upload
 
             if (!_cfg.MFD.IsDefault)
             {
-                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" });
-                AddWait(WAIT_BASE);
-
-                AddIfBlock("NotInAAMode", true, null, delegate ()
+                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" }, null, WAIT_BASE);
+                AddIfBlock("IsInAAMode", true, null, delegate ()
                 {
                     AddAction(ufc, "SEQ");
-                    AddIfBlock("NotInAGMode", true, null, delegate () { BuildMFDs(ufc, hotas, leftMFD, rightMFD); });
+                    AddIfBlock("IsInAGMode", true, null, delegate () { BuildMFDs(ufc, hotas, leftMFD, rightMFD); });
                     AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
                 });
-
                 AddAction(ufc, "RTN");
             }
         }
@@ -187,7 +184,7 @@ namespace JAFDTC.Models.F16C.Upload
                         break;
                     case MFDConfiguration.DisplayFormats.HAD:
                         AddAction(mfd, "OSB-02-HAD");
-                        AddIfBlock("HTSOnMFD", true, new() { mfdSide }, delegate ()
+                        AddIfBlock("IsHTSOnMFD", true, new() { mfdSide }, delegate ()
                         {
                             BuildHTSOnMFDIfOn(mfd, isLeftMFD);
                         });

@@ -95,8 +95,8 @@ namespace JAFDTC.Models.F16C.Upload
 
             // ---- tacan channel
 
-            string cond = (_cfg.Misc.TACANBandValue == TACANBands.X) ? "TACANBandY" : "TACANBandX";
-            AddIfBlock(cond, true, null, delegate () { AddActions(ufc, new() { "0", "ENTR" }); });
+            string band = (_cfg.Misc.TACANBandValue == TACANBands.X) ? "Y" : "X";
+            AddIfBlock("IsTACANBand", true, new () { band }, delegate () { AddActions(ufc, new() { "0", "ENTR" }); });
 
             // ---- ehsi mode
 
@@ -184,12 +184,10 @@ namespace JAFDTC.Models.F16C.Upload
         {
             if (!_cfg.Misc.IsBULLDefault)
             {
-                AddActions(ufc, new() { "LIST", "0", "8" });
-
-                AddWait(WAIT_BASE);
+                AddActions(ufc, new() { "LIST", "0", "8" }, null, WAIT_BASE);
 
                 // TODO: assumes bullseye state
-                AddIfBlock("BullseyeNotSelected", true, null, delegate () { AddAction(ufc, "0"); });
+                AddIfBlock("IsBullseyeSelected", false, null, delegate () { AddAction(ufc, "0"); });
                 AddAction(ufc, "DOWN");
 
                 AddActions(ufc, PredActionsForCleanNumAndEnter(_cfg.Misc.BullseyeWP), new() { "DOWN" });
@@ -210,12 +208,10 @@ namespace JAFDTC.Models.F16C.Upload
                 AddActions(ufc, new() { "LIST", "0", "RCL" });
 
                 // TODO: check current state, assume enabled by default for now
-                AddAction(ufc, (!_cfg.Misc.HMCSBlankHUDValue) ? "0" : "DOWN");
-                AddWait(WAIT_BASE);
+                AddAction(ufc, (!_cfg.Misc.HMCSBlankHUDValue) ? "0" : "DOWN", WAIT_BASE);
 
                 // TODO: check current state, assume enabled by default for now
-                AddAction(ufc, (!_cfg.Misc.HMCSBlankCockpitValue) ? "0" : "DOWN");
-                AddWait(WAIT_BASE);
+                AddAction(ufc, (!_cfg.Misc.HMCSBlankCockpitValue) ? "0" : "DOWN", WAIT_BASE);
 
                 // TODO: check current state, assume lvl1 by default for now
                 if (_cfg.Misc.HMCSDeclutterLvlValue != HMCSDeclutterLevels.LVL1)
