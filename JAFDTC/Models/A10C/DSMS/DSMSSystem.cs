@@ -157,6 +157,10 @@ namespace JAFDTC.Models.A10C.DSMS
         [JsonIgnore]
         public bool IsLaserCodeDefault => LaserCode != ExplicitDefaults.LaserCode;
 
+        // HACK TODO?
+        [JsonIgnore]
+        public Dictionary<int, string> Loadout { set; get; }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction

@@ -20,7 +20,7 @@
 using JAFDTC.Models.A10C.Upload;
 using JAFDTC.Models.DCS;
 using JAFDTC.Utilities;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Text;
 
 namespace JAFDTC.Models.A10C
@@ -36,6 +36,25 @@ namespace JAFDTC.Models.A10C
         // private classes
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        private class LoadoutQueryBuilder : CoreQueryBuilder, IBuilder
+        {
+            public LoadoutQueryBuilder(IAirframeDeviceManager adm, StringBuilder sb, string query, List<string> argsQuery) : base(adm, sb, query, argsQuery)
+            {
+            }
+
+            public override void Build()
+            {
+                AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
+                AddActions(lmfd, new() { "LMFD_14", "LMFD_05" }); // Go to DSMS INV
+
+                // adds query from constructor
+                base.Build();
+            }
+        }
 
         /// <summary>
         /// generates the command sequence for teardown in the warthog. this includes triggering light test feedback at
@@ -92,8 +111,18 @@ namespace JAFDTC.Models.A10C
         public override void BuildSystems(StringBuilder sb)
         {
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
-            new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
             new MiscBuilder(_cfg, _dcsCmds, sb).Build();
+
+            if (!_cfg.DSMS.IsDefault)
+            {
+                StringBuilder sbQuery = new StringBuilder();
+                LoadoutQueryBuilder loadoutQuery = new LoadoutQueryBuilder(_dcsCmds, sbQuery, "QueryLoadout", null);
+                loadoutQuery.Build();
+                string response = Query(sbQuery);
+
+                new DSMSBuilder(_cfg, _dcsCmds, sb).Build();
+            }
+            new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
         }
 
         public override IBuilder TeardownBuilder(StringBuilder sb) => new A10CTeardownBuilder(_cfg, _dcsCmds, sb);

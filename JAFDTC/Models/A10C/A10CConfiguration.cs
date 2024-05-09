@@ -105,7 +105,7 @@ namespace JAFDTC.Models.A10C
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // methods
+        // overriden class methods
         //
         // ------------------------------------------------------------------------------------------------------------
 
@@ -189,5 +189,25 @@ namespace JAFDTC.Models.A10C
             }
             return isSuccess;
         }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // methods
+        //
+        // ------------------------------------------------------------------------------------------------------------
+        public void LoadoutFromQueryResponse(string queryResponse)
+        {
+            Dictionary<int, string> stationMunitionMap = new Dictionary<int, string>(11);
+            string[] keyVals = queryResponse.Split(';');
+            foreach (string keyVal in keyVals)
+            {
+                string[] kv = keyVal.Split("=");
+                string store = kv[1] == "---" ? null : kv[1];
+                stationMunitionMap.Add(int.Parse(kv[0]), store);
+            }
+
+            DSMS.Loadout = stationMunitionMap;
+        }
+
     }
 }

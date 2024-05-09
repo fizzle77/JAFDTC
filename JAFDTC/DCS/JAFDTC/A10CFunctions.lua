@@ -52,6 +52,32 @@ function JAFDTC_A10C_Fn_IsCommPageOnDefaultButton()
     return value == "COMM"
 end
 
+-- DSMS Routines
+
+function JAFDTC_A10C_Fn_IsDSMSInDefaultMFDPosition()
+    local value = JAFDTC_A10C_GetLMFD_value("label_13");
+    return value == "DSMS";
+end
+
+function JAFDTC_A10C_Fn_QueryLoadout()
+    local lmfd = JAFDTC_A10C_GetLMFD();
+    local outputTable = { };
+    for station = 1,11 do
+        outputTable["station_" .. station] = lmfd["STORE_NAME_" .. station] or "---";
+    end
+    local response = "";
+    for k,v in pairs(outputTable) do -- TODO common function
+        response = response .. k .. "=" .. v .. ";"; -- TODO escaping
+    end
+    JAFDTC_Log("QueryLoadout: " .. response);
+    return response;
+end
+
+function JAFDTC_A10C_Fn_StationMatchesKey(station, key)
+    local loadedMunitionKey = JAFDTC_A10C_GetLMFD_value("STORE_NAME_" .. station);
+    return loadedMunitionKey == key;
+end
+
 -- CDU Routines
 
 function JAFDTC_A10C_GetCDU()
