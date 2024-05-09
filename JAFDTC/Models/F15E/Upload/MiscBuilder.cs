@@ -55,7 +55,7 @@ namespace JAFDTC.Models.F15E.Upload
 
             if (_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT)
             {
-                AddIfBlock("IsInFrontCockpit", null, delegate ()
+                AddIfBlock("IsInFrontCockpit", true, null, delegate ()
                 {
                     BuildBingo(fltInst);
                 });

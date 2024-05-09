@@ -54,13 +54,13 @@ namespace JAFDTC.Models.FA18C.Upload
 
             if (!_cfg.WYPT.IsDefault)
             {
-                AddWhileBlock("IsNotRMFDSUPT", null, delegate()
+                AddWhileBlock("IsRMFDSUPT", false, null, delegate()
                 {
                     AddAction(rmfd, "OSB-18");                                                  // MENU (SUPT)
                 });   
                 AddActions(rmfd, new() { "OSB-02", "OSB-10", "OSB-07", "OSB-05" });             // HSI, DATA, WYPT, UFC
 
-                AddWhileBlock("IsNotAtWYPTn", new() { $"{_cfg.WYPT.Points[0].Number - 1}" }, delegate()
+                AddWhileBlock("IsAtWYPTn", false, new() { $"{_cfg.WYPT.Points[0].Number - 1}" }, delegate()
                 {
                     AddAction(rmfd, "OSB-12", WAIT_BASE);                                       // WYPT ++
                 }, 150);
@@ -85,12 +85,12 @@ namespace JAFDTC.Models.FA18C.Upload
                         AddActions(ufc, ActionsForString(wypt.Alt), new() { "ENT" }, WAIT_BASE);
                     }
                 }
-                AddWhileBlock("IsNotAtWYPTn", new() { $"{_cfg.WYPT.Points[0].Number}" }, delegate ()
+                AddWhileBlock("IsAtWYPTn", false, new() { $"{_cfg.WYPT.Points[0].Number}" }, delegate ()
                 {
                     AddAction(rmfd, "OSB-13", WAIT_BASE);                                       // WYPT --
                 }, 150);
 
-                AddWhileBlock("IsNotRMFDSUPT", null, delegate()
+                AddWhileBlock("IsRMFDSUPT", false, null, delegate()
                 {
                     AddAction(rmfd, "OSB-18");                                                  // MENU (SUPT)
                 });

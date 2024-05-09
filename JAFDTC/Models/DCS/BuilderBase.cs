@@ -108,17 +108,25 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// return the argument parameters to append to a command string. return value starts with "," if non-empty.
+        /// return an argument list to append to a command string of the form,
+        /// 
+        ///   "prm" : { "arg[0]", "arg[1]", ... arg[n-1]" }
+        ///   
+        /// where elements of args parameter are output in a list of strings with "prm" key. return value starts
+        /// with "," if argument list is non-empty.
         /// </summary>
-        private string BuildArgList(List<string> args)
+        private static string BuildArgList(List<string> args)
         {
             string retVal = "";
-            if (args != null)
+            if ((args != null) && (args.Count > 0))
             {
+                string prefix = ",\"prm\":[";
                 for (int i = 0; i < args.Count; i++)
                 {
-                    retVal += $",\"prm{i}\":\"{args[i]}\"";
+                    retVal += $"{prefix}\"{args[i]}\"";
+                    prefix = ",";
                 }
+                retVal += "]";
             }
             return retVal;
         }
@@ -130,7 +138,8 @@ namespace JAFDTC.Models.DCS
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// add an abort command to the command the builder is building.
+        /// add an abort command to the command the builder is building. if the message starts with "ERROR: ", the
+        /// message (excluding "ERROR: ") will be output to the user through a dcs message.
         /// </summary>
         protected void AddAbort(string message)
         {
@@ -225,11 +234,11 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add a run function command to the command the builder is building.
+        /// add an exec function command to the command the builder is building.
         /// </summary>
-        protected void AddRunFunction(string fn, List<string> argsFunc = null, int dtWaitPost = WAIT_NONE)
+        protected void AddExecFunction(string fn, List<string> argsFunc = null, int dtWaitPost = WAIT_NONE)
         {
-            string cmd = $"{{\"f\":\"RunFunc\",\"a\":{{\"fn\":\"{fn}\"" + BuildArgList(argsFunc) + $"}}}},";
+            string cmd = $"{{\"f\":\"Exec\",\"a\":{{\"fn\":\"{fn}\"" + BuildArgList(argsFunc) + $"}}}},";
             AddCommand(cmd);
             AddWait(dtWaitPost);
         }
@@ -241,9 +250,11 @@ namespace JAFDTC.Models.DCS
         /// 
         /// NOTE: nested if blocks are assumed to have unique cond values.
         /// </summary>
-        protected void AddIfBlock(string cond, List<string> argsCond, AddBlockCommandsDelegate addBlockDelegate)
+        protected void AddIfBlock(string cond, bool expect, List<string> argsCond,
+                                  AddBlockCommandsDelegate addBlockDelegate)
         {
-            string cmd = $"{{\"f\":\"If\",\"a\":{{\"cond\":\"{cond}\"" + BuildArgList(argsCond) + $"}}}},";
+            string cmd = $"{{\"f\":\"If\",\"a\":{{\"cond\":\"{cond}\",\"expt\":\"{expect}\"" + BuildArgList(argsCond)
+                       + $"}}}},";
             AddCommand(cmd);
 
             addBlockDelegate();
@@ -260,10 +271,10 @@ namespace JAFDTC.Models.DCS
         /// 
         /// NOTE: nested while blocks are assumed to have unique cond values.
         /// </summary>
-        protected void AddWhileBlock(string cond, List<string> argsCond, AddBlockCommandsDelegate addBlockDelegate,
-                                     int timeOut = 0)
+        protected void AddWhileBlock(string cond, bool expect, List<string> argsCond,
+                                     AddBlockCommandsDelegate addBlockDelegate, int timeOut = 0)
         {
-            string cmd = $"{{\"f\":\"While\",\"a\":{{\"cond\":\"{cond}\"";
+            string cmd = $"{{\"f\":\"While\",\"a\":{{\"cond\":\"{cond}\",\"expt\":\"{expect}\"";
             if (timeOut != 0)
             {
                 cmd += $",\"tout\":\"{timeOut}\"";

@@ -91,14 +91,14 @@ namespace JAFDTC.Models.FA18C.Upload
                 // check if stores in configuration match stores in jet, we'll abort from dcs side if not rather
                 // than continue to send button mashes.
                 //
-                AddWhileBlock("IsNotLMFDTAC", null, delegate () { AddAction(lmfd, "OSB-18"); });        // MENU (TAC)
+                AddWhileBlock("IsLMFDTAC", false, null, delegate () { AddAction(lmfd, "OSB-18"); });  // MENU (TAC)
                 AddAction(lmfd, "OSB-05");                                                              // STORES
                 foreach (KeyValuePair<Weapons, List<PPStation>> group in stationGroups)
                 {
                     string wpnCode = GetDCSWeaponCode(group.Key);
                     foreach (var station in group.Value)
                     {
-                        AddIfBlock("IsNotStationCarriesStore", new() { $"{station.Number}", wpnCode }, delegate ()
+                        AddIfBlock("IsStationCarriesStore", false, new() { $"{station.Number}", wpnCode }, delegate ()
                         {
                             AddAbort($"ERROR: Station {station.Number} doesn't match configuration");
                         });
@@ -108,9 +108,9 @@ namespace JAFDTC.Models.FA18C.Upload
 
                 foreach (KeyValuePair<Weapons, List<PPStation>> group in stationGroups)
                 {
-                    AddWhileBlock("IsNotLMFDTAC", null, delegate () { AddAction(lmfd, "OSB-18"); });    // MENU (TAC)
-                    AddAction(lmfd, "OSB-05");                                                          // STORES
-                    AddRunFunction("SelectStore", new() { GetDCSWeaponCode(group.Key) }, WAIT_LONG);
+                    AddWhileBlock("IsLMFDTAC", false, null, delegate () { AddAction(lmfd, "OSB-18"); });    // MENU (TAC)
+                    AddAction(lmfd, "OSB-05");                                                              // STORES
+                    AddExecFunction("SelectStore", new() { GetDCSWeaponCode(group.Key) }, WAIT_LONG);
 
                     // add steerpoints to stations that carry weapons that support steerpoints.
                     //
@@ -120,7 +120,7 @@ namespace JAFDTC.Models.FA18C.Upload
                         {
                             if (!station.IsDefault && (station.STP.Count > 0))
                             {
-                                AddWhileBlock("IsNotStationSelected", new() { $"{station.Number}" }, delegate ()
+                                AddWhileBlock("IsStationSelected", false, new() { $"{station.Number}" }, delegate ()
                                 {
                                     AddAction(lmfd, "OSB-13", WAIT_LONG);                               // STEP
                                 });
@@ -142,7 +142,7 @@ namespace JAFDTC.Models.FA18C.Upload
                     //
                     foreach (PPStation station in group.Value)
                     {
-                        AddWhileBlock("IsNotInPPStation", new() { $"{station.Number}" }, delegate ()
+                        AddWhileBlock("IsInPPStation", false, new() { $"{station.Number}" }, delegate ()
                         {
                             AddAction(lmfd, "OSB-13", WAIT_LONG);                                       // STEP
                         });
@@ -152,11 +152,11 @@ namespace JAFDTC.Models.FA18C.Upload
                             PPCoordinateInfo pp = station.PP[i];
                             if (pp.IsValid)
                             {
-                                AddIfBlock("IsNotPPSelected", new() { $"{i + 1}" }, delegate ()
+                                AddIfBlock("IsPPSelected", false, new() { $"{i + 1}" }, delegate ()
                                 {
                                     AddAction(lmfd, _mapPPNumToOSB[i + 1], WAIT_LONG);
                                 });
-                                AddIfBlock("IsTargetOfOpportunity", null, delegate ()
+                                AddIfBlock("IsTargetOfOpportunity", true, null, delegate ()
                                 {
                                     AddAction(lmfd, "OSB-05", WAIT_BASE);                               // MODE
                                 });
@@ -188,7 +188,7 @@ namespace JAFDTC.Models.FA18C.Upload
                     AddActions(lmfd, new() { "OSB-19" });                                               // RETURN
                 }
 
-                AddWhileBlock("IsNotLMFDTAC", null, delegate () { AddAction(lmfd, "OSB-18"); });        // MENU (TAC)
+                AddWhileBlock("IsLMFDTAC", false, null, delegate () { AddAction(lmfd, "OSB-18"); });    // MENU (TAC)
                 AddAction(lmfd, "OSB-03");                                                              // HUD
             }
         }

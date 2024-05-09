@@ -145,7 +145,7 @@ namespace JAFDTC.Models
         /// from dcs on success, null on failure. this method is asynchronous with any other command sequences
         /// being sent to dcs by the upload agent.
         /// 
-        /// typically, this function would be called from BuildSystems() using code similar to this:
+        /// typically, this function would be called using code similar to this:
         /// 
         ///     string response = null;
         ///     Task.Run(async () => {
@@ -154,7 +154,7 @@ namespace JAFDTC.Models
         ///     
         /// response provides the response from dcs, null if there were issues.
         /// </summary>
-        public async Task<string> Query(string query, List<string> argsQuery)
+        private async Task<string> SendQueryToDCS(string query, List<string> argsQuery)
         {
             string preflight = null;
             App.DCSQueryResponseReceived += (object sender, string response) =>
@@ -179,6 +179,18 @@ namespace JAFDTC.Models
                 FileManager.Log("Query failed to send or response timed out, aborting..");
             }
             return preflight;
+        }
+
+        /// <summary>
+        /// post a query with the specified parameters to dcs and wait for a response. returns the string response
+        /// from dcs on success, null on failure. this method is asynchronous with any other command sequences
+        /// being sent to dcs by the upload agent and will wait for the response or a time-out.
+        /// </summary>
+        public string Query(string query, List<string> argsQuery)
+        {
+            string response = null;
+            Task.Run(async () => { response = await SendQueryToDCS(query, argsQuery); }).Wait();
+            return response;
         }
 
         /// <summary>

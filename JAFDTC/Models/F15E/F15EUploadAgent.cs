@@ -60,24 +60,24 @@ namespace JAFDTC.Models.F15E
 #if ENABLE_FORCE_COCKPIT_CHANGE
                 if (_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT)
                 {
-                    AddRunFunction("GoToFrontCockpit");
+                    AddExecFunction("GoToFrontCockpit");
                 }
                 else if (_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO)
                 {
-                    AddRunFunction("GoToRearCockpit");
+                    AddExecFunction("GoToRearCockpit");
                 }
                 AddWait(2 * WAIT_LONG);
 #else
                 if (_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT)
                 {
-                    AddIfBlock("IsInRearCockpit", null, delegate ()
+                    AddIfBlock("IsInRearCockpit", true, null, delegate ()
                     {
                         AddAbort("ERROR: Configuration is for Pilot Seat");
                     });
                 }
                 else if (_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO)
                 {
-                    AddIfBlock("IsInFrontCockpit", null, delegate ()
+                    AddIfBlock("IsInFrontCockpit", true, null, delegate ()
                     {
                         AddAbort("ERROR: Configuration is for WSO Seat");
                     });
@@ -112,7 +112,7 @@ namespace JAFDTC.Models.F15E
                     if (_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT)
                     {
                         AirframeDevice intl = _aircraft.GetDevice("INTL_PILOT");
-                        AddIfBlock("IsInFrontCockpit", null, delegate ()
+                        AddIfBlock("IsInFrontCockpit", true, null, delegate ()
                         {
                             AddDynamicAction(intl, "F_INTL_WARN_TEST", 0, 1);
                             AddWait(2000);
@@ -122,7 +122,7 @@ namespace JAFDTC.Models.F15E
                     else if (_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO)
                     {
                         AirframeDevice intl = _aircraft.GetDevice("INTL_WSO");
-                        AddIfBlock("IsInRearCockpit", null, delegate ()
+                        AddIfBlock("IsInRearCockpit", true, null, delegate ()
                         {
                             AddDynamicAction(intl, "R_INTL_WARN_TEST", 0, 1);
                             AddWait(2000);

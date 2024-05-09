@@ -58,14 +58,14 @@ namespace JAFDTC.Models.F15E.Upload
 
             if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT) && !_cfg.UFC.IsDefault)
             {
-                AddIfBlock("IsInFrontCockpit", null, delegate ()
+                AddIfBlock("IsInFrontCockpit", true, null, delegate ()
                 {
                     BuildUFCCore(ufcPilot);
                 });
             }
             if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO) && !_cfg.UFC.IsDefault)
             {
-                AddIfBlock("IsInRearCockpit", null, delegate ()
+                AddIfBlock("IsInRearCockpit", true, null, delegate ()
                 {
                     BuildUFCCore(ufcWizzo);
                 });
@@ -106,7 +106,7 @@ namespace JAFDTC.Models.F15E.Upload
                 AddActions(ufc, ActionsForString(_cfg.UFC.TACANChannel.ToString()), new() { "PB1" });
 
                 string band = (_cfg.UFC.TACANBandValue == UFCSystem.TACANBands.X) ? "Y" : "X";
-                AddIfBlock("IsTACANBand", new() { ufc.Name, band }, delegate () { AddAction(ufc, "PB1"); });
+                AddIfBlock("IsTACANBand", true, new() { ufc.Name, band }, delegate () { AddAction(ufc, "PB1"); });
 
                 string modeButton = _cfg.UFC.TACANModeValue switch
                 {

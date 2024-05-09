@@ -57,14 +57,14 @@ namespace JAFDTC.Models.F15E.Upload
 
             if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT) && !_cfg.STPT.IsDefault)
             {
-                AddIfBlock("IsInFrontCockpit", null, delegate ()
+                AddIfBlock("IsInFrontCockpit", true, null, delegate ()
                 {
                     BuildSteerpointCore(ufcPilot, _cfg.STPT.Points);
                 });
             }
             if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO) && !_cfg.STPT.IsDefault)
             {
-                AddIfBlock("IsInRearCockpit", null, delegate ()
+                AddIfBlock("IsInRearCockpit", true, null, delegate ()
                 {
                     BuildSteerpointCore(ufcWizzo, _cfg.STPT.Points);
                 });
@@ -97,12 +97,12 @@ namespace JAFDTC.Models.F15E.Upload
                     AddActions(ufc, ActionsForString(stptNum), new() { "SHF", routePB, "PB1" });
 
                     // TODO: check this, not clear what purpose it serves based on the manual...
-                    AddIfBlock("IsStrDifferent", new() { ufc.Name, $"STR {stptNum}{stpt.Route}" }, delegate()
+                    AddIfBlock("IsStrDifferent", true, new() { ufc.Name, $"STR {stptNum}{stpt.Route}" }, delegate()
                     {
                         AddActions(ufc, new() { "CLR", "CLR" });
                         AddActions(ufc, ActionsForString(stptNum), new() { ".", "SHF", routePB, "PB1" });
                     });
-                    AddIfBlock("IsStrDifferent", new() { ufc.Name, $"STR {stptNum}{stpt.Route}" }, delegate()
+                    AddIfBlock("IsStrDifferent", true, new() { ufc.Name, $"STR {stptNum}{stpt.Route}" }, delegate()
                     {
                         AddActions(ufc, ActionsForString(stptNum), new() { "SHF", routePB, "PB1" });
                     });
