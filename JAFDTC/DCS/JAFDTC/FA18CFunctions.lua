@@ -20,7 +20,7 @@ You should have received a copy of the GNU General Public License along with thi
 ********************************************************************************************************************
 --]]
 
-dofile(lfs.writedir() .. 'Scripts/JAFDTC/commonFunctions.lua')
+-- NOTE: requires that CommonFunctions.lua has been loaded...
 
 -- --------------------------------------------------------------------------------------------------------------------
 --
@@ -86,10 +86,10 @@ end
 --
 -- --------------------------------------------------------------------------------------------------------------------
 
-function JAFDTC_FA18C_Fn_IsNotLMFDTAC()
+function JAFDTC_FA18C_Fn_IsLMFDTAC()
     local table = JAFDTC_FA18C_GetLeftDDI();
     local str = table["TAC_id:23"] or ""
-    return (str ~= "TAC")
+    return (str == "TAC")
 end
 
 function JAFDTC_FA18C_Fn_IsStationCarriesStore(stn, store)
@@ -98,18 +98,10 @@ function JAFDTC_FA18C_Fn_IsStationCarriesStore(stn, store)
     return (label == store)
 end
 
-function JAFDTC_FA18C_Fn_IsNotStationCarriesStore(stn, store)
-    return not JAFDTC_FA18C_Fn_IsStationCarriesStore(stn, store)
-end
-
 function JAFDTC_FA18C_Fn_IsStationSelected(station)
     local table = JAFDTC_FA18C_GetLeftDDI();
     local str = table["STA"..station.."_Selective_Box_Line_02"] or "x"
     return (str == "")
-end
-
-function JAFDTC_FA18C_Fn_IsNotStationSelected(station)
-    return not JAFDTC_FA18C_Fn_IsStationSelected(station)
 end
 
 function JAFDTC_FA18C_Fn_IsInPPStation(station)
@@ -118,14 +110,10 @@ function JAFDTC_FA18C_Fn_IsInPPStation(station)
     return (str == station)
 end
 
-function JAFDTC_FA18C_Fn_IsNotInPPStation(station)
-    return not JAFDTC_FA18C_Fn_IsInPPStation(station)
-end
-
-function JAFDTC_FA18C_Fn_IsNotPPSelected(number)
+function JAFDTC_FA18C_Fn_IsPPSelected(number)
     local table = JAFDTC_FA18C_GetLeftDDI();
     local str = table["MISSION_Type"] or ""
-    return (str ~= "PP" .. number)
+    return (str == "PP" .. number)
 end
 
 function JAFDTC_FA18C_Fn_IsTargetOfOpportunity()
@@ -175,10 +163,6 @@ function JAFDTC_FA18C_Fn_IsRadioOnChannel(radio, channel)
     return (currChannel == channel)
 end
 
-function JAFDTC_FA18C_Fn_IsNotRadioOnChannel(radio, channel)
-    return not JAFDTC_FA18C_Fn_IsRadioOnChannel(radio, channel)
-end
-
 function JAFDTC_FA18C_Fn_IsRadioGuardDisabled()
     local table = JAFDTC_FA18C_GetUFC();
     local str = table["UFC_OptionCueing1"] or ""
@@ -191,18 +175,17 @@ end
 --
 -- --------------------------------------------------------------------------------------------------------------------
 
-function JAFDTC_FA18C_Fn_IsNotRMFDSUPT()
+function JAFDTC_FA18C_Fn_IsRMFDSUPT()
     local table = JAFDTC_FA18C_GetRightDDI();
     local str = table["SUPT_id:13"] or ""
-    return (str ~= "SUPT")
+    return (str == "SUPT")
 end
 
-function JAFDTC_FA18C_Fn_IsNotAtWYPTn(num)
+function JAFDTC_FA18C_Fn_IsAtWYPTn(num)
     local table = JAFDTC_FA18C_GetRightDDI();
-    local str = table["WYPT_Page_Number"]
-    return (str ~= num)
+    local str = table["WYPT_Page_Number"] or ""
+    return (str == num)
 end
-
 
 --[[
 function JAFDTC_FA18C_Fn_BingoIsZero()
@@ -232,6 +215,15 @@ end
 --
 -- --------------------------------------------------------------------------------------------------------------------
 
+-- dcs device / button identifiers
+
+local LMFD = 35
+local LMFD_OSB_06 = 3016
+local LMFD_OSB_07 = 3017
+local LMFD_OSB_08 = 3018
+local LMFD_OSB_09 = 3019
+local LMFD_OSB_10 = 3020
+
 function JAFDTC_FA18C_Fn_UnSelectStore()
     local table = JAFDTC_GetDisplay(2)
     local selOBS06 = table["_1__id:134.2.BP_6_Break_X_Root.1"]
@@ -241,15 +233,15 @@ function JAFDTC_FA18C_Fn_UnSelectStore()
     local selOBS10 = table["_1__id:146.2.BP_10_Break_X_Root.1"]
 
     if selOBS06 == "" then
-        JAFDTC_Core_PerformAction(35, 3016, 1, 0, 200)	-- LMFD, OSB-06
+        JAFDTC_Core_PerformAction(LMFD, LMFD_OSB_06, 1, 0, 200)	-- LMFD, OSB-06
     elseif selOBS07 == "" then
-        JAFDTC_Core_PerformAction(35, 3017, 1, 0, 200)	-- LMFD, OSB-07
+        JAFDTC_Core_PerformAction(LMFD, LMFD_OSB_07, 1, 0, 200)	-- LMFD, OSB-07
     elseif selOBS08 == "" then
-        JAFDTC_Core_PerformAction(35, 3018, 1, 0, 200)	-- LMFD, OSB-08
+        JAFDTC_Core_PerformAction(LMFD, LMFD_OSB_08, 1, 0, 200)	-- LMFD, OSB-08
     elseif selOBS09 == "" then
-        JAFDTC_Core_PerformAction(35, 3019, 1, 0, 200)	-- LMFD, OSB-09
+        JAFDTC_Core_PerformAction(LMFD, LMFD_OSB_09, 1, 0, 200)	-- LMFD, OSB-09
     elseif selOBS10 == "" then
-        JAFDTC_Core_PerformAction(35, 3020, 1, 0, 200)	-- LMFD, OSB-10
+        JAFDTC_Core_PerformAction(LMFD, LMFD_OSB_10, 1, 0, 200)	-- LMFD, OSB-10
     else
         JAFDTC_Log("ERROR: JAFDTC_FA18C_Fn_UnSelectStore found no match")
     end
@@ -267,15 +259,15 @@ function JAFDTC_FA18C_Fn_SelectStore(store)
     local storeOBS10 = table["_1__id:146.1"] or ""
 
     if storeOBS06 == store then
-        JAFDTC_Core_PerformAction(35, 3016, 1, 0, 200)	-- LMFD, OSB-06
+        JAFDTC_Core_PerformAction(LMFD, LMFD_OSB_06, 1, 0, 200)	-- LMFD, OSB-06
     elseif storeOBS07 == store then
-        JAFDTC_Core_PerformAction(35, 3017, 1, 0, 200)	-- LMFD, OSB-07
+        JAFDTC_Core_PerformAction(LMFD, LMFD_OSB_07, 1, 0, 200)	-- LMFD, OSB-07
     elseif storeOBS08 == store then
-        JAFDTC_Core_PerformAction(35, 3018, 1, 0, 200)	-- LMFD, OSB-08
+        JAFDTC_Core_PerformAction(LMFD, LMFD_OSB_08, 1, 0, 200)	-- LMFD, OSB-08
     elseif storeOBS09 == store then
-        JAFDTC_Core_PerformAction(35, 3019, 1, 0, 200)	-- LMFD, OSB-09
+        JAFDTC_Core_PerformAction(LMFD, LMFD_OSB_09, 1, 0, 200)	-- LMFD, OSB-09
     elseif storeOBS10 == store then
-        JAFDTC_Core_PerformAction(35, 3020, 1, 0, 200)	-- LMFD, OSB-10
+        JAFDTC_Core_PerformAction(LMFD, LMFD_OSB_10, 1, 0, 200)	-- LMFD, OSB-10
     else
         JAFDTC_Log("ERROR: JAFDTC_FA18C_Fn_SelectStore found no match")
     end

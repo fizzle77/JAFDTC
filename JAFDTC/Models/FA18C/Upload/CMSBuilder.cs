@@ -57,9 +57,9 @@ namespace JAFDTC.Models.FA18C.Upload
 
             if (!_cfg.CMS.IsDefault)
             {
-                AddWhileBlock("IsNotLMFDTAC", true, null, delegate ()
+                AddWhileBlock("IsLMFDTAC", false, null, delegate ()
                 {
-                    AddAction(lmfd, "OSB-18");                                                  // MENU (SUPT)
+                    AddAction(lmfd, "OSB-18");                                                  // MENU
                 });
                 AddActions(lmfd, new() { "OSB-17" });                                           // EW
                 AddIfBlock("IsDispenserOff", true, null, delegate ()
@@ -104,9 +104,9 @@ namespace JAFDTC.Models.FA18C.Upload
                     AddActions(lmfd, new() { "OSB-19", "OSB-20" }, null, WAIT_BASE);            // SAVE, STEP
                 }
                 AddActions(lmfd, new() { "OSB-09" });                                           // RETURN
-                AddWhileBlock("IsNotLMFDTAC", true, null, delegate ()
+                AddWhileBlock("IsLMFDTAC", false, null, delegate ()
                 {
-                    AddAction(lmfd, "OSB-18");                                                  // MENU (TAC)
+                    AddAction(lmfd, "OSB-18");                                                  // MENU
                 });
                 AddActions(lmfd, new() { "OSB-03" });                                           // HUD
             }
