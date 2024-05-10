@@ -19,6 +19,8 @@
 //
 // ********************************************************************************************************************
 
+using System.Collections.Generic;
+
 namespace JAFDTC.Models.A10C
 {
     public sealed class A10CMunition
@@ -48,5 +50,19 @@ namespace JAFDTC.Models.A10C
         public bool Laser => !string.IsNullOrEmpty(LaserButton);
         public string ImageFullPath => "/Images/" + Image;
         public bool SingleReleaseOnly => !Pairs && !Ripple;
+
+        // because the names for APKWS are different everywhere ARGH
+        private static Dictionary<string, string> _profileKeyRemap = new Dictionary<string, string>
+        {
+            // map from default profile name to munition key used in INV
+            {  "M151L", "M-151L" },
+            {  "M282L", "M-282L" }
+        };
+        public static string GetInvKeyFromDefaultProfileName(string profileName)
+        {
+            if (_profileKeyRemap.TryGetValue(profileName, out var inventoryKey))
+                return inventoryKey;
+            return profileName;
+        }
     }
 }

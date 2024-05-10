@@ -60,6 +60,7 @@ namespace JAFDTC.Models.A10C.Upload
         private void BuildDSMS(AirframeDevice cdu, AirframeDevice lmfd)
         {
             BuildDSMS_INV(cdu, lmfd);
+            BuildDSMS_DefaultProfiles(cdu, lmfd);
         }
 
         private void BuildDSMS_INV(AirframeDevice cdu, AirframeDevice lmfd)
@@ -69,9 +70,9 @@ namespace JAFDTC.Models.A10C.Upload
             if (nonDefaultSettings == null || nonDefaultSettings.Count == 0)
                 return;
 
-            AddActions(lmfd, new() { "LMFD_14", "LMFD_05" }); // Go to DSMS INV
+            AddActions(lmfd, new() { "LMFD_14", "LMFD_05" }, null, WAIT_BASE); // Go to DSMS INV
 
-            Dictionary<int, bool> _setupStations = GetStationSetupMap();
+            Dictionary<int, bool> _setupStations = GetStationIsSetupMap();
             // attempt symmetric loads on the first 5 stations
             for (int station = 1; station <= 5; station++)
             {
@@ -163,6 +164,120 @@ namespace JAFDTC.Models.A10C.Upload
             return -1;
         }
 
+        // Modify default weapon profiles having non-default configured settings.
+        private void BuildDSMS_DefaultProfiles(AirframeDevice cdu, AirframeDevice lmfd)
+        {
+            // get configs that require profile changes
+            Dictionary<string, MunitionSettings> nonDefaultSettings = _cfg.DSMS.GetNonDefaultProfileSettings();
+            if (nonDefaultSettings == null || nonDefaultSettings.Count == 0)
+                return;
+
+            AddActions(lmfd, new() { "LMFD_14", "LMFD_01" }, null, WAIT_BASE); // Go to DSMS Profiles
+            int selectedProfileIndex = 1;
+
+            foreach (KeyValuePair<string, int> kv in _cfg.DSMS.MunitionProfileMap)
+            {
+                if (nonDefaultSettings.TryGetValue(kv.Key, out MunitionSettings settings))
+                {
+                    if (kv.Value > selectedProfileIndex)
+                    {
+                        for (int i = 0; i < kv.Value - selectedProfileIndex; i++)
+                            AddAction(lmfd, "LMFD_19"); // arrow down
+                    }
+                    else if (kv.Value < selectedProfileIndex)
+                    {
+                        for (int i = 0; i < selectedProfileIndex - kv.Value; i++)
+                            AddAction(lmfd, "LMFD_20"); // arrow up
+                    }
+                    selectedProfileIndex = kv.Value;
+                    BuildDSMS_CurrentProfile(cdu, lmfd, settings);
+                }
+            }
+
+            // Back to DSMS Main
+            AddAction(lmfd, "LMFD_01"); // STAT
+        }
+
+        private void BuildDSMS_CurrentProfile(AirframeDevice cdu, AirframeDevice lmfd, MunitionSettings settings)
+        {
+            AddAction(lmfd, "LMFD_03"); // VIEW PRO
+
+            // "front page" stuff first
+
+            // Release Mode: SGL, PRS, RIP SGL, RIP PRS
+            if ((settings.Munition.Pairs || settings.Munition.Ripple) && !settings.IsReleaseModeDefault)
+            {
+                for (int i = 0; i < int.Parse(settings.ReleaseMode); i++)
+                    AddAction(lmfd, "LMFD_06");
+            }
+
+            // Fuze
+            if (settings.Munition.Fuze && !settings.IsFuzeOptionDefault) 
+            {
+                for (int i = 0; i < int.Parse(settings.FuzeOption); i++)
+                    AddAction(lmfd, "LMFD_07");
+            }
+
+            // Ripple Qty
+            if (settings.Munition.Ripple && !settings.IsRippleQtyDefault)
+            {
+                AddAction(cdu, "CLR");
+                foreach (char c in settings.RippleQty)
+                    AddAction(cdu, c.ToString());
+                AddAction(lmfd, "LMFD_08");
+            }
+
+            // Ripple Distance
+            if (settings.Munition.RipFt && !settings.IsRippleFtDefault)
+            {
+                AddAction(cdu, "CLR");
+                foreach (char c in settings.RippleFt)
+                    AddAction(cdu, c.ToString());
+                AddAction(lmfd, "LMFD_09");
+            }
+
+            // Delivery Mode: CCIP/CCRP
+            if (!settings.IsDeliveryModeDefault)
+            {
+                for (int i = 0; i < int.Parse(settings.DeliveryMode); i++)
+                    AddAction(lmfd, "LMFD_10");
+            }
+
+            // Settings inside the "CHG SET" page
+            if (!settings.IsProfileCHGSETDefault)
+            {
+                AddAction(lmfd, "LMFD_16"); // CHG SET
+
+                // Escape Maneuver
+                if (settings.Munition.EscMnvr && !settings.IsEscapeManeuverDefault)
+                {
+                    int escVal = (int)_cfg.DSMS.GetEscapeManeuverValue(settings.Munition);
+                    int numPresses = escVal >= 1 ? escVal - 1 : escVal + 3;
+                    for (int i = 0; i < numPresses; i++)
+                        AddAction(lmfd, "LMFD_20");
+                }
+
+                // Auto Lase
+                if (settings.Munition.Laser && !settings.IsAutoLaseDefault)
+                    AddAction(lmfd, "LMFD_06");
+
+                // Lase Seconds
+                if (settings.Munition.Laser && !settings.IsLaseSecondsDefault)
+                {
+                    AddAction(cdu, "CLR");
+                    foreach (char c in settings.LaseSeconds)
+                        AddAction(cdu, c.ToString());
+                    AddAction(lmfd, "LMFD_17");
+                }
+            }
+
+            // Save
+            AddWait(WAIT_BASE);
+            AddAction(lmfd, "LMFD_03");
+
+        }
+
+
         private static string GetButtonForStation(int station) => _stationButtonMap[station];
         private static readonly Dictionary<int, string> _stationButtonMap = new Dictionary<int, string>
         {
@@ -195,7 +310,7 @@ namespace JAFDTC.Models.A10C.Upload
             { 11,  1 },
         };
 
-        private static Dictionary<int, bool> GetStationSetupMap() => new Dictionary<int, bool>() 
+        private static Dictionary<int, bool> GetStationIsSetupMap() => new Dictionary<int, bool>() 
         {
             {  1, false },
             {  2, false },

@@ -63,19 +63,27 @@ function JAFDTC_A10C_Fn_QueryLoadout()
     local lmfd = JAFDTC_A10C_GetLMFD();
     local outputTable = { };
     for station = 1,11 do
-        outputTable["station_" .. station] = lmfd["STORE_NAME_" .. station] or "---";
+        outputTable[station] = lmfd["STORE_NAME_" .. station] or "---";
     end
-    local response = "";
-    for k,v in pairs(outputTable) do -- TODO common function
-        response = response .. k .. "=" .. v .. ";"; -- TODO escaping
-    end
+    local response = JAFDTC_A10C_TableToString(outputTable);
     JAFDTC_Log("QueryLoadout: " .. response);
     return response;
 end
 
-function JAFDTC_A10C_Fn_StationMatchesKey(station, key)
-    local loadedMunitionKey = JAFDTC_A10C_GetLMFD_value("STORE_NAME_" .. station);
-    return loadedMunitionKey == key;
+function JAFDTC_A10C_Fn_QueryDSMSProfiles()
+    local lmfd = JAFDTC_A10C_GetLMFD();
+    local outputTable = { };
+    profile_index = 0;
+    repeat
+      profile_index = profile_index + 1;  
+      value = lmfd["TABLE_NAMES" .. profile_index] or "###";
+      if value ~= "###" then
+        outputTable[profile_index] = value;
+      end
+    until(value == "###")
+    local response = JAFDTC_A10C_TableToString(outputTable);
+    JAFDTC_Log("QueryDSMSProfiles: " .. response);
+    return response;
 end
 
 -- CDU Routines
@@ -172,6 +180,15 @@ function JAFDTC_A10C_CheckCondition_Arc210Com2IsOnHUD()
     return JAFDTC_A10C_GetHUD_value("ARC_210_Radio_2_Status") ~= "---"
 end
 
+-- Utility
+
+function JAFDTC_A10C_TableToString(table)
+    local response = "";
+    for k,v in pairs(table) do
+        response = response .. k .. "=" .. v .. ";"; -- TODO escaping
+    end
+    return response
+end
 
 --[[
 local vhf_lut1 = {

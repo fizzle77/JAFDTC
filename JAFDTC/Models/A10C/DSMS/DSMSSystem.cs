@@ -160,6 +160,8 @@ namespace JAFDTC.Models.A10C.DSMS
         // HACK TODO?
         [JsonIgnore]
         public Dictionary<int, string> Loadout { set; get; }
+        [JsonIgnore]
+        public Dictionary<string, int> MunitionProfileMap { set; get; }
 
         // Lazy-load munitions DB
         private static List<A10CMunition> _munitions;
@@ -247,6 +249,18 @@ namespace JAFDTC.Models.A10C.DSMS
                 foreach (A10CMunition munition in munitions)
                     if (munition.Laser && !settings.ContainsKey(munition.Key))
                         settings.Add(munition.Key, GetMunitionSettings(munition));
+            }
+            return settings;
+        }
+
+        // Get munition settings that have non-default settings on the profiles page.
+        public Dictionary<string, MunitionSettings> GetNonDefaultProfileSettings()
+        {
+            Dictionary<string, MunitionSettings> settings = new Dictionary<string, MunitionSettings>();
+            foreach (KeyValuePair<string, MunitionSettings> kv in _munitionSettingMap)
+            {
+                if (!kv.Value.IsProfileDefault)
+                    settings.Add(kv.Key, kv.Value);
             }
             return settings;
         }

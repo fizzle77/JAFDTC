@@ -49,7 +49,26 @@ namespace JAFDTC.Models.A10C
             public override void Build()
             {
                 AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
-                AddActions(lmfd, new() { "LMFD_14", "LMFD_05" }); // Go to DSMS INV
+                AddActions(lmfd, new() { "LMFD_14", "LMFD_05" }, null, WAIT_BASE); // Go to DSMS INV
+
+                // adds query from constructor
+                base.Build();
+            }
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        private class DSMSProfileQueryBuilder : CoreQueryBuilder, IBuilder
+        {
+            public DSMSProfileQueryBuilder(IAirframeDeviceManager adm, StringBuilder sb, string query, List<string> argsQuery) : base(adm, sb, query, argsQuery)
+            {
+            }
+
+            public override void Build()
+            {
+                AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
+                AddActions(lmfd, new() { "LMFD_14", "LMFD_01" }, null, WAIT_BASE); // Go to DSMS Profile
 
                 // adds query from constructor
                 base.Build();
@@ -121,6 +140,12 @@ namespace JAFDTC.Models.A10C
                 string response = Query(sbQuery);
                 _cfg.LoadoutFromQueryResponse(response);
 
+                sbQuery.Clear();
+                DSMSProfileQueryBuilder profileQuery = new DSMSProfileQueryBuilder(_dcsCmds, sbQuery, "QueryDSMSProfiles", null);
+                profileQuery.Build();
+                response = Query(sbQuery);
+                _cfg.DSMSProfilesFromQueryResponse(response);
+ 
                 new DSMSBuilder(_cfg, _dcsCmds, sb).Build();
             }
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();

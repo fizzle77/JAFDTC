@@ -158,6 +158,13 @@ namespace JAFDTC.Models.A10C.DSMS
             IsAutoLaseDefault && IsLaseSecondsDefault && IsDeliveryModeDefault && IsEscapeManeuverDefault &&
             IsReleaseModeDefault && IsFuzeOptionDefault;
 
+        /// <summary>
+        /// Does this configuration require changes to the "change settings" page of the DSMS Profile?
+        /// </summary>
+        [JsonIgnore]
+        public bool IsProfileCHGSETDefault =>
+            IsAutoLaseDefault && IsLaseSecondsDefault && IsEscapeManeuverDefault;
+
         [JsonIgnore]
         public A10CMunition Munition
         {
@@ -169,21 +176,21 @@ namespace JAFDTC.Models.A10C.DSMS
         [JsonIgnore]
         public bool IsLaseSecondsDefault => string.IsNullOrEmpty(LaseSeconds) || LaseSeconds == ExplicitDefaults.LaseSeconds;
         [JsonIgnore]
-        public bool IsDeliveryModeDefault => string.IsNullOrEmpty(DeliveryMode) || DeliveryMode == ExplicitDefaults.DeliveryMode;
+        public bool IsDeliveryModeDefault => string.IsNullOrEmpty(DeliveryMode) || DeliveryMode == ExplicitDefaults.DeliveryMode || DeliveryMode == "-1";
         [JsonIgnore]
-        public bool IsEscapeManeuverDefault => string.IsNullOrEmpty(EscapeManeuver) || EscapeManeuver == ExplicitDefaults.EscapeManeuver;
+        public bool IsEscapeManeuverDefault => string.IsNullOrEmpty(EscapeManeuver) || EscapeManeuver == ExplicitDefaults.EscapeManeuver || EscapeManeuver == "-1";
         [JsonIgnore]
-        public bool IsReleaseModeDefault => string.IsNullOrEmpty(ReleaseMode) || ReleaseMode == ExplicitDefaults.ReleaseMode;
+        public bool IsReleaseModeDefault => string.IsNullOrEmpty(ReleaseMode) || ReleaseMode == ExplicitDefaults.ReleaseMode || ReleaseMode == "-1";
         [JsonIgnore]
         public bool IsRippleQtyDefault => string.IsNullOrEmpty(RippleQty) || RippleQty == ExplicitDefaults.RippleQty;
         [JsonIgnore]
         public bool IsRippleFtDefault => string.IsNullOrEmpty(RippleFt) || RippleFt == ExplicitDefaults.RippleFt;
         [JsonIgnore]
-        public bool IsHOFOptionDefault => string.IsNullOrEmpty(HOFOption) || HOFOption == ExplicitDefaults.HOFOption;
+        public bool IsHOFOptionDefault => string.IsNullOrEmpty(HOFOption) || HOFOption == ExplicitDefaults.HOFOption || HOFOption == "-1";
         [JsonIgnore]
-        public bool IsRPMOptionDefault => string.IsNullOrEmpty(RPMOption) || RPMOption == ExplicitDefaults.RPMOption;
+        public bool IsRPMOptionDefault => string.IsNullOrEmpty(RPMOption) || RPMOption == ExplicitDefaults.RPMOption || RPMOption == "-1";
         [JsonIgnore]
-        public bool IsFuzeOptionDefault => string.IsNullOrEmpty(FuzeOption) || HOFOption == ExplicitDefaults.FuzeOption;
+        public bool IsFuzeOptionDefault => string.IsNullOrEmpty(FuzeOption) || HOFOption == ExplicitDefaults.FuzeOption || FuzeOption == "-1";
 
         public readonly static MunitionSettings ExplicitDefaults = new()
         {

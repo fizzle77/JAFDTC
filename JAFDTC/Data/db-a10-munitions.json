@@ -8,6 +8,6 @@
 {"Key": "GBU-31", 	"Name": "GBU-31", 		"Image": "gbu-31.jpg",		"CCIP": false, "CCRP": true,  "EscMnvr": false, "AutoLase": false, "Pairs": false, "Ripple": false, "RipFt": false, "HOF": false, "RPM": false, "Fuze": false},
 {"Key": "GBU-38", 	"Name": "GBU-38", 		"Image": "gbu-38.jpg",		"CCIP": false, "CCRP": true,  "EscMnvr": false, "AutoLase": false, "Pairs": false, "Ripple": false, "RipFt": false, "HOF": false, "RPM": false, "Fuze": false},
 {"Key": "GBU-54", 	"Name": "GBU-54", 		"Image": "gbu-54.jpg",		"CCIP": false, "CCRP": true,  "EscMnvr": false, "AutoLase": true,  "Pairs": false, "Ripple": false, "RipFt": false, "HOF": false, "RPM": false, "Fuze": false,	"LaserButton": "07"},
-{"Key": "M-151L", 	"Name": "M151 HE ", 	"Image": "agr.jpg",			"CCIP": true,  "CCRP": false, "EscMnvr": false, "AutoLase": false, "Pairs": true,  "Ripple": true,  "RipFt": false, "HOF": false, "RPM": false, "Fuze": true,	"LaserButton": "18"},
-{"Key": "M-282L", 	"Name": "M288 MPP", 	"Image": "agr.jpg",			"CCIP": true,  "CCRP": false, "EscMnvr": false, "AutoLase": false, "Pairs": true,  "Ripple": true,  "RipFt": false, "HOF": false, "RPM": false, "Fuze": true,	"LaserButton": "18"}
+{"Key": "M-151L", 	"Name": "M151 HE ", 	"Image": "agr.jpg",			"CCIP": true,  "CCRP": false, "EscMnvr": false, "AutoLase": false, "Pairs": true,  "Ripple": true,  "RipFt": false, "HOF": false, "RPM": false, "Fuze": false,	"LaserButton": "18"},
+{"Key": "M-282L", 	"Name": "M288 MPP", 	"Image": "agr.jpg",			"CCIP": true,  "CCRP": false, "EscMnvr": false, "AutoLase": false, "Pairs": true,  "Ripple": true,  "RipFt": false, "HOF": false, "RPM": false, "Fuze": false,	"LaserButton": "18"}
 ]
