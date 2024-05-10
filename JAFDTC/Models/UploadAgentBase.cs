@@ -48,14 +48,24 @@ namespace JAFDTC.Models
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// core builder to set up a query with the given arguments.
+        /// core builder to set up a query with the given arguments. instances of this class may be passed to Query()
+        /// for query processing. the base implementation adds the query command to the command stream. derived
+        /// classes must follow one of these two implementation paths:
+        /// 
+        /// (1) provide query and argsQuery at construction time and, if they override Build(), invoke base.Build()
+        ///     as their last action before returning.
+        /// (2) do not provide query and argsQuery at construction time and invoke AddQuery() as the last command
+        ///     in the command stream in their Build() implementation.
+        /// 
+        /// instances of this class may be built with a null IAirframeDeviceManager.
         /// </summary>
-        internal sealed class CoreQueryBuilder : BuilderBase, IBuilder
+        internal class CoreQueryBuilder : BuilderBase, IBuilder
         {
             private readonly string _query;
             private readonly List<string> _argsQuery;
 
-            public CoreQueryBuilder(IAirframeDeviceManager adm, StringBuilder sb, string query, List<string> argsQuery)
+            public CoreQueryBuilder(IAirframeDeviceManager adm, StringBuilder sb, string query = null,
+                                    List<string> argsQuery = null)
                 : base(adm, sb) => (_query, _argsQuery) = (query, argsQuery);
 
             public override void Build()
@@ -71,9 +81,9 @@ namespace JAFDTC.Models
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// core setup builder to perform common setup actions at the start of a command stream. the base
-        /// implementation sends a "start of upload" marker. derived classes should invoke base.Build() from their
-        /// Build() methods before returning.
+        /// core setup builder to perform common setup actions at the start of a command stream.  SetupBuilder
+        /// returns an instance of this class. the base implementation sends a "start of upload" marker. derived
+        /// classes should invoke base.Build() from their Build() methods before returning.
         /// 
         /// instances of this class may be built with a null IAirframeDeviceManager.
         /// </summary>
@@ -88,9 +98,9 @@ namespace JAFDTC.Models
         }
 
         /// <summary>
-        /// core teardown builder to perform common teardown actions at the end of a command stream. the base
-        /// implementation sends an "end of upload" marker. derived classes should invoke base.Build() from their
-        /// Build() methods before returning.
+        /// core teardown builder to perform common teardown actions at the end of a command stream. TeardownBuilder
+        /// returns an instance of this class. the base implementation sends an "end of upload" marker. derived
+        /// classes should invoke base.Build() from their Build() methods before returning.
         /// 
         /// instances of this class may be built with a null IAirframeDeviceManager.
         /// </summary>
@@ -119,16 +129,12 @@ namespace JAFDTC.Models
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// send a command string encoded in a StringBuilder to dcs via CockpitCmdTx. returns true on success, false
-        /// on failure. note an empty command sequence is always sent successfully.
+        /// send a command sequence encoded in a IBuilder to dcs via CockpitCmdTx. returns true on success, false on
+        /// failure. note an empty command sequence is always sent successfully.
         /// </summary>
-        private static bool SendCommandsToDCS(StringBuilder sb)
+        private static bool SendCommandsToDCS(IBuilder builder)
         {
-            if (sb.Length > 0)
-            {
-                sb.Remove(sb.Length - 1, 1);
-            }
-            string str = sb.ToString();
+            string str = builder.ToString();
             if (!string.IsNullOrEmpty(str))
             {
 #if DEBUG_CMD_LOGGING
@@ -148,26 +154,28 @@ namespace JAFDTC.Models
         /// typically, this function would be called using code similar to this:
         /// 
         ///     string response = null;
-        ///     Task.Run(async () => {
-        ///         response = await Query("TestQuery", new () { "Testing" });
-        ///     }).Wait();
+        ///     Task.Run(async () => { response = await SendQueryToDCS("TestQuery", new () { "Testing" }); }).Wait();
         ///     
         /// response provides the response from dcs, null if there were issues.
         /// </summary>
-        private async Task<string> SendQueryToDCS(string query, List<string> argsQuery)
+        private static async Task<string> SendQueryToDCS(string query, List<string> argsQuery, IBuilder builder)
         {
+            if (builder == null)
+            {
+                StringBuilder sbPreflight = new();
+                builder = new CoreQueryBuilder(null, sbPreflight, query, argsQuery);
+                builder.Build();
+            }
+
             string preflight = null;
             App.DCSQueryResponseReceived += (object sender, string response) =>
             {
-                // NOTE: we will be automatically unsubscribed from the event upon the response from dcs.
-
                 preflight = new(response);
+                //
+                // NOTE: we are automatically unsubscribed from the event upon the response from dcs.
             };
 
-            StringBuilder sbPreflight = new();
-            new CoreQueryBuilder(null, sbPreflight, query, argsQuery).Build();
-
-            if (SendCommandsToDCS(sbPreflight))
+            if (SendCommandsToDCS(builder))
             {
                 for (int i = 0; (i < 20) && (preflight == null); i++)
                 {
@@ -182,33 +190,38 @@ namespace JAFDTC.Models
         }
 
         /// <summary>
-        /// post a query with the specified parameters to dcs and wait for a response. returns the string response
-        /// from dcs on success, null on failure. this method is asynchronous with any other command sequences
-        /// being sent to dcs by the upload agent and will wait for the response or a time-out.
+        /// post a query with the specified parameters to dcs and wait for a response. the query is added to the end
+        /// of the sequence in the specified builder (if null, a new empty builder is used). builder is typically
+        /// derived from CoreQueryBuilder. returns the string response from dcs to the query on success, null on
+        /// failure.
+        /// 
+        /// this method is asynchronous with any other command sequences being sent to dcs by the upload agent and
+        /// blocks on the response or a time-out.
         /// </summary>
-        public string Query(string query, List<string> argsQuery)
+        public static string Query(string query, List<string> argsQuery, IBuilder builder = null)
         {
             string response = null;
-            Task.Run(async () => { response = await SendQueryToDCS(query, argsQuery); }).Wait();
+            Task.Run(async () => { response = await SendQueryToDCS(query, argsQuery, builder); }).Wait();
             return response;
         }
 
         /// <summary>
-        /// create the set of commands and state necessary to load a configuration on the jet, then send the
-        /// commands to the jet for processing via the network connection to the dcs scripting engine. Load()
+        /// create the stream of commands and state necessary to load a configuration on the jet, then send the
+        /// commands to the jet for processing via our network connection to the dcs scripting engine. Load()
         /// uses SetupBuilder(), BuildSystems(), and TeardownBuilder() to create the command streams for the systems
         /// in the airframe. returns true on success, false on failure.
         /// </summary>
         public async Task<bool> Load()
         {
             StringBuilder sb = new();
-            SetupBuilder(sb).Build();
+            IBuilder setupBuilder = SetupBuilder(sb);
+            IBuilder teardownBuilder = TeardownBuilder(sb);
+
+            setupBuilder.Build();
             await Task.Run(() => BuildSystems(sb));
-            if (sb.Length > 0)
-            {
-                TeardownBuilder(sb).Build();
-            }
-            return SendCommandsToDCS(sb);
+            teardownBuilder.Build();
+
+            return SendCommandsToDCS(teardownBuilder);
         }
 
         /// <summary>
@@ -219,18 +232,21 @@ namespace JAFDTC.Models
             // this function will typically create multiple IBuilder instances for various systems and use them to
             // build out the command string.
             //
-            // prior to building systems, the function may use Query() to query dcs state. the reply from dcs can
+            // while building systems, the function may use Query() to query dcs state. the reply from dcs can
             // then be used in the builders to provide information to inform the commands added to the builder.
             //
             // for example,
             //
+            //     // (optional) build out any command sequences that are needed before the actual query
+            //     // command.
+            //     //
+            //     StringBuilder sbQuery = new();
+            //     MyCoreQueryBuilder queryBuilder = new(_cfg, _dcsCmds, sbQuery).Build();
+            //
             //     // submit query and block until response, then unpack the string from dcs into whatever
             //     // internal representation is appropriate.
             //     //
-            //     string response = null;
-            //     Task.Run(async () => {
-            //         response = await Query("GetStateQuery", new () { "All" });
-            //     }).Wait();
+            //     string response = Query("GetState", new () { "All" }, queryBuilder);
             //     object dcsState = UnpackResponse(response);
             //
             //     // create builder objects and add appropriate commands based on the state we received.
