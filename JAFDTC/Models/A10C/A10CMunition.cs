@@ -40,6 +40,9 @@ namespace JAFDTC.Models.A10C
         public bool RipFt { get; set; }
         public bool HOF { get; set; }
         public bool Fuze { get; set; }
+        
+        // values to configure how settings are loaded
+        public string LaserButton { get; set; }
 
         // synthesized properties
         public string ImageFullPath => "/Images/" + Image;

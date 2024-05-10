@@ -155,7 +155,7 @@ namespace JAFDTC.Models.A10C.DSMS
         }
 
         [JsonIgnore]
-        public bool IsLaserCodeDefault => LaserCode != ExplicitDefaults.LaserCode;
+        public bool IsLaserCodeDefault => LaserCode == ExplicitDefaults.LaserCode;
 
         // HACK TODO?
         [JsonIgnore]
@@ -219,15 +219,15 @@ namespace JAFDTC.Models.A10C.DSMS
         //
 
         // Get munition settings that have non-default settings on the jet's INV page.
-        public List<MunitionSettings> GetNonDefaultInvSettings()
+        public Dictionary<string, MunitionSettings> GetNonDefaultInvSettings()
         {
-            List<MunitionSettings> settings = new List<MunitionSettings>();
-            foreach (MunitionSettings s in _munitionSettingMap.Values)
+            Dictionary<string, MunitionSettings> settings = new Dictionary<string, MunitionSettings>();
+            foreach (KeyValuePair<string, MunitionSettings> kv in _munitionSettingMap)
             {
-                if (!s.IsInvDefault)
-                    settings.Add(s);
-                else if (s.Munition.Laser && !IsLaserCodeDefault)
-                    settings.Add(s);
+                if (!kv.Value.IsInvDefault)
+                    settings.Add(kv.Key, kv.Value);
+                else if (kv.Value.Munition.Laser && !IsLaserCodeDefault)
+                    settings.Add(kv.Key, kv.Value);
             }
             return settings;
         }

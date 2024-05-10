@@ -20,6 +20,7 @@
 using JAFDTC.Models.A10C.DSMS;
 using JAFDTC.Models.DCS;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace JAFDTC.Models.A10C.Upload
@@ -46,23 +47,25 @@ namespace JAFDTC.Models.A10C.Upload
 
         public override void Build()
         {
-            AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
-
             if (_cfg.DSMS.IsDefault)
                 return;
 
-            AddIfBlock("IsDSMSInDefaultMFDPosition", true, null, delegate () { BuildDSMS(lmfd); });
+            AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
+            AirframeDevice cdu = _aircraft.GetDevice("CDU");
+
+            AddIfBlock("IsDSMSInDefaultMFDPosition", true, null, delegate () { BuildDSMS(cdu, lmfd); });
+            // TODO handle non-default DSMS
         }
 
-        private void BuildDSMS(AirframeDevice lmfd)
+        private void BuildDSMS(AirframeDevice cdu, AirframeDevice lmfd)
         {
-            BuildDSMS_INV(lmfd);
+            BuildDSMS_INV(cdu, lmfd);
         }
 
-        private void BuildDSMS_INV(AirframeDevice lmfd)
+        private void BuildDSMS_INV(AirframeDevice cdu, AirframeDevice lmfd)
         {
             // get configs that require INV changes
-            List<MunitionSettings> nonDefaultSettings = _cfg.DSMS.GetNonDefaultInvSettings();
+            Dictionary<string, MunitionSettings> nonDefaultSettings = _cfg.DSMS.GetNonDefaultInvSettings();
             if (nonDefaultSettings == null || nonDefaultSettings.Count == 0)
                 return;
 
@@ -75,48 +78,81 @@ namespace JAFDTC.Models.A10C.Upload
             // load sym
             // mark symmetric station done
 
-            for (int station = 1; station <= 11; station++)
+            Dictionary<int, bool> _setupStations = GetStationSetupMap();
+            for (int station = 1; station <= 5; station++)
             {
-                BuildDSMS_INV_station(lmfd, nonDefaultSettings, station);
+                // attempt symmetric loads on the first 5 stations
+                int symLoadedStation = BuildDSMS_INV_station(cdu, lmfd, nonDefaultSettings, station, true);
+                _setupStations[station] = true;
+                if (symLoadedStation > 0)
+                    _setupStations[symLoadedStation] = true;
             }
-        }
-
-        private bool BuildDSMS_INV_station(AirframeDevice lmfd, List<MunitionSettings> nonDefaultSettings, int station)
-        {
-            foreach (MunitionSettings setting in nonDefaultSettings)
+            // station 6 has no symmetric station, don't attempt sym load
+            BuildDSMS_INV_station(cdu, lmfd, nonDefaultSettings, 6, false);
+            _setupStations[6] = true;
+            for (int station = 7; station <= 11; station++)
             {
-                if (_cfg.DSMS.Loadout[station] == setting.Munition.Key)
+                // set up any stations that weren't symloaded in previous loop
+                if (!_setupStations[station])
                 {
-                    // station, inv stat
-                    AddActions(lmfd, new() { buttonForStation(station), "LMFD_03" }, null, WAIT_BASE);
-
-                    // Laser Code
-                    
-                    // HOF
-                    if (setting.Munition.HOF && !setting.IsHOFOptionDefault)
-                    {
-                        int hofVal = (int)_cfg.DSMS.GetHOFOptionValue(setting.Munition);
-                        int numPresses = hofVal >= 6 ? hofVal - 6 : hofVal + 3;
-                        List<string> actions = new List<string>(numPresses);
-                        for (int i = 0; i < numPresses; i++)
-                            actions.Add("LMFD_18");
-                        AddActions(lmfd, actions);
-                    }
-
-                    // RPM
-
-                    // Load
+                    BuildDSMS_INV_station(cdu, lmfd, nonDefaultSettings, station, false);
                 }
             }
 
-            // return whether we did SYM LOAD on opposite station
-            if (station == 6)
-                return false;
-
-            return true;
         }
 
-        private static string buttonForStation(int station) => _stationButtonMap[station];
+        private int BuildDSMS_INV_station(AirframeDevice cdu, AirframeDevice lmfd, 
+            Dictionary<string, MunitionSettings> nonDefaultSettings, int station, bool attemptSymLoad)
+        {
+            string munitionAtStation = _cfg.DSMS.Loadout[station];
+            if (munitionAtStation == null)
+                return -1; // pylon is empty
+            
+            if (nonDefaultSettings.TryGetValue(munitionAtStation, out MunitionSettings setting))
+            {
+                // station, inv stat
+                AddActions(lmfd, new() { GetButtonForStation(station), "LMFD_03" }, null, WAIT_BASE);
+
+                // Laser Code
+                if (setting.Munition.Laser && !_cfg.DSMS.IsLaserCodeDefault)
+                {
+                    foreach (char c in _cfg.DSMS.LaserCode)
+                        AddAction(cdu, c.ToString());
+                    AddAction(lmfd, "LMFD_" + setting.Munition.LaserButton);
+                }
+
+                // HOF
+                if (setting.Munition.HOF && !setting.IsHOFOptionDefault)
+                {
+                    int hofVal = (int)_cfg.DSMS.GetHOFOptionValue(setting.Munition);
+                    int numPresses = hofVal >= 6 ? hofVal - 6 : hofVal + 4;
+                    for (int i = 0; i < numPresses; i++)
+                        AddAction(lmfd, "LMFD_18");
+                }
+
+                // RPM
+
+                // Load
+                if (attemptSymLoad)
+                {
+                    int symStation = GetSymmetricStation(station);
+                    if (_cfg.DSMS.Loadout[symStation] == setting.Munition.Key)
+                    {
+                        // load sym
+                        AddAction(lmfd, "LMFD_10");
+                        return symStation;
+                    }
+                }
+
+                // load
+                AddAction(lmfd, "LMFD_09");
+                return -1;
+            }
+
+            return -1;
+        }
+
+        private static string GetButtonForStation(int station) => _stationButtonMap[station];
         private static readonly Dictionary<int, string> _stationButtonMap = new Dictionary<int, string>
         {
             {  1, "LMFD_16" },
@@ -130,6 +166,37 @@ namespace JAFDTC.Models.A10C.Upload
             {  9, "LMFD_08" },
             { 10, "LMFD_09" },
             { 11, "LMFD_10" },
+        };
+
+        private static int GetSymmetricStation(int station) => _symStationMap[station];
+        private static readonly Dictionary<int, int> _symStationMap = new Dictionary<int, int>
+        {
+            {  1, 11 },
+            {  2, 10 },
+            {  3,  9 },
+            {  4,  8 },
+            {  5,  7 },
+            {  6, -1 },
+            {  7,  5 },
+            {  8,  4 },
+            {  9,  3 },
+            { 10,  2 },
+            { 11,  1 },
+        };
+
+        private static Dictionary<int, bool> GetStationSetupMap() => new Dictionary<int, bool>() 
+        {
+            {  1, false },
+            {  2, false },
+            {  3, false },
+            {  4, false },
+            {  5, false },
+            {  6, false },
+            {  7, false },
+            {  8, false },
+            {  9, false },
+            { 10, false },
+            { 11, false }
         };
     }
 }

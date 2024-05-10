@@ -202,8 +202,11 @@ namespace JAFDTC.Models.A10C
             foreach (string keyVal in keyVals)
             {
                 string[] kv = keyVal.Split("=");
-                string store = kv[1] == "---" ? null : kv[1];
-                stationMunitionMap.Add(int.Parse(kv[0]), store);
+                if (kv.Length == 2)
+                {
+                    string store = kv[1] == "---" ? null : kv[1];
+                    stationMunitionMap.Add(int.Parse(kv[0].Substring(8)), store);
+                }
             }
 
             DSMS.Loadout = stationMunitionMap;

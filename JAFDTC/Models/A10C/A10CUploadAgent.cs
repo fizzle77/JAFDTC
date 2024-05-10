@@ -119,6 +119,7 @@ namespace JAFDTC.Models.A10C
                 LoadoutQueryBuilder loadoutQuery = new LoadoutQueryBuilder(_dcsCmds, sbQuery, "QueryLoadout", null);
                 loadoutQuery.Build();
                 string response = Query(sbQuery);
+                _cfg.LoadoutFromQueryResponse(response);
 
                 new DSMSBuilder(_cfg, _dcsCmds, sb).Build();
             }
