@@ -26,6 +26,7 @@ using JAFDTC.UI.App;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using JAFDTC.UI.F16C;
+using JAFDTC.Models.A10C.DSMS;
 
 namespace JAFDTC.UI.A10C
 {
@@ -60,6 +61,7 @@ namespace JAFDTC.UI.A10C
         {
             ISystem system = tag switch
             {
+                DSMSSystem.SystemTag => ((A10CConfiguration)config).DSMS,
                 MiscSystem.SystemTag => ((A10CConfiguration)config).Misc,
                 RadioSystem.SystemTag => ((A10CConfiguration)config).Radio,
                 WYPTSystem.SystemTag => ((A10CConfiguration)config).WYPT,

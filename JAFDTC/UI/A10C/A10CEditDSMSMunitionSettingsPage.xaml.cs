@@ -64,13 +64,16 @@ namespace JAFDTC.UI.A10C
         {
             if (_uiUpdatePending)
                 return;
+
+            A10CMunition selectedMunition = (A10CMunition)uiComboMunition.SelectedItem;
+            if (selectedMunition == null)
+                return;
             _uiUpdatePending = true;
 
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
                 bool isNotLinked = string.IsNullOrEmpty(_config.SystemLinkedTo(SystemTag));
 
-                A10CMunition selectedMunition = (A10CMunition)uiComboMunition.SelectedItem;
                 // Laser
                 Utilities.SetTextBoxEnabledAndText(uiTextLaserCode, isNotLinked, selectedMunition.Laser, _editState.LaserCode, _editState.LaserCode);
                 Utilities.SetCheckEnabledAndState(uiCheckAutoLase, isNotLinked && selectedMunition.AutoLase, _editState.GetAutoLaseValue(selectedMunition));
