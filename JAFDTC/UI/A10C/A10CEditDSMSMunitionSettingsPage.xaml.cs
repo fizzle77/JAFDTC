@@ -107,9 +107,11 @@ namespace JAFDTC.UI.A10C
                 Utilities.SetTextBoxEnabledAndText(uiTextRippleFt, isNotLinked, enableRippleOptions && selectedMunition.RipFt, 
                     _editState.GetRippleFt(selectedMunition));
 
-                // HOF & RPM
+                // HOF
                 Utilities.SetComboEnabledAndSelection(uiComboHOF, isNotLinked, selectedMunition.HOF, (int)_editState.GetHOFOptionValue(selectedMunition));
-                Utilities.SetComboEnabledAndSelection(uiComboRPM, isNotLinked, selectedMunition.HOF, (int)_editState.GetRPMOptionValue(selectedMunition));
+                
+                // RPM
+                Utilities.SetComboEnabledAndSelection(uiComboRPM, isNotLinked, selectedMunition.RPM, (int)_editState.GetRPMOptionValue(selectedMunition));
 
                 // Fuze
                 Utilities.SetComboEnabledAndSelection(uiComboFuze, isNotLinked, selectedMunition.Fuze, (int)_editState.GetFuzeOptionValue(selectedMunition));
@@ -128,22 +130,24 @@ namespace JAFDTC.UI.A10C
                 return;
 
             _config.DSMS.LaserCode = _editState.LaserCode;
-            if (selectedMunition == null)
-                return;
+            
+            if (selectedMunition != null)
+            {
+                MunitionSettings settings = _editState.GetMunitionSettings(selectedMunition);
+                if (settings.HasErrors)
+                    return;
+                _config.DSMS.SetAutoLase(selectedMunition, _editState.GetAutoLase(selectedMunition));
+                _config.DSMS.SetLaseSeconds(selectedMunition, _editState.GetLaseSeconds(selectedMunition));
+                _config.DSMS.SetDeliveryMode(selectedMunition, _editState.GetDeliveryMode(selectedMunition));
+                _config.DSMS.SetEscapeManeuver(selectedMunition, _editState.GetEscapeManeuver(selectedMunition));
+                _config.DSMS.SetReleaseMode(selectedMunition, _editState.GetReleaseMode(selectedMunition));
+                _config.DSMS.SetHOFOption(selectedMunition, _editState.GetHOFOption(selectedMunition));
+                _config.DSMS.SetRPMOption(selectedMunition, _editState.GetRPMOption(selectedMunition));
+                _config.DSMS.SetRippleQty(selectedMunition, _editState.GetRippleQty(selectedMunition));
+                _config.DSMS.SetRippleFt(selectedMunition, _editState.GetRippleFt(selectedMunition));
+                _config.DSMS.SetFuzeOption(selectedMunition, _editState.GetFuzeOption(selectedMunition));
+            }
 
-            MunitionSettings settings = _editState.GetMunitionSettings(selectedMunition);
-            if (settings.HasErrors)
-                return;
-            _config.DSMS.SetAutoLase(selectedMunition, _editState.GetAutoLase(selectedMunition));
-            _config.DSMS.SetLaseSeconds(selectedMunition, _editState.GetLaseSeconds(selectedMunition));
-            _config.DSMS.SetDeliveryMode(selectedMunition, _editState.GetDeliveryMode(selectedMunition));
-            _config.DSMS.SetEscapeManeuver(selectedMunition, _editState.GetEscapeManeuver(selectedMunition));
-            _config.DSMS.SetReleaseMode(selectedMunition, _editState.GetReleaseMode(selectedMunition));
-            _config.DSMS.SetHOFOption(selectedMunition, _editState.GetHOFOption(selectedMunition));
-            _config.DSMS.SetRPMOption(selectedMunition, _editState.GetRPMOption(selectedMunition));
-            _config.DSMS.SetRippleQty(selectedMunition, _editState.GetRippleQty(selectedMunition));
-            _config.DSMS.SetRippleFt(selectedMunition, _editState.GetRippleFt(selectedMunition));
-            _config.DSMS.SetFuzeOption(selectedMunition, _editState.GetFuzeOption(selectedMunition));
             _config.Save(this, SystemTag);
         }
 

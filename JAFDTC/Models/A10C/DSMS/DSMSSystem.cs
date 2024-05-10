@@ -39,7 +39,7 @@ namespace JAFDTC.Models.A10C.DSMS
     public enum EscapeManeuvers
     {
         NONE = 0,
-        CLB = 1,
+        CLB = 1, // jet default
         TRN = 2,
         TLT = 3
     }
@@ -48,7 +48,7 @@ namespace JAFDTC.Models.A10C.DSMS
     // must match combobox order in ui
     public enum ReleaseModes
     {
-        SGL = 0,
+        SGL = 0, // jet default
         PRS = 1,
         RIP_SGL = 2,
         RIP_PRS = 3
@@ -64,7 +64,7 @@ namespace JAFDTC.Models.A10C.DSMS
         HOF_900 = 3,
         HOF_1200 = 4,
         HOF_1500 = 5,
-        HOF_1800 = 6,
+        HOF_1800 = 6, // jet default
         HOF_2200 = 7,
         HOF_2600 = 8,
         HOF_3000 = 9
@@ -77,7 +77,7 @@ namespace JAFDTC.Models.A10C.DSMS
         RPM_0 = 0,
         RPM_500 = 1,
         RPM_1000 = 2,
-        RPM_1500 = 3,
+        RPM_1500 = 3, // jet default
         RPM_2000 = 4,
         RPM_2500 = 5
     }
@@ -86,7 +86,7 @@ namespace JAFDTC.Models.A10C.DSMS
     // must match combobox order in ui
     public enum FuzeOptions
     {
-        NoseTail = 0,
+        NoseTail = 0, // jet default
         Nose = 1,
         Tail = 2
     }
@@ -155,7 +155,7 @@ namespace JAFDTC.Models.A10C.DSMS
         }
 
         [JsonIgnore]
-        public bool IsLaserCodeDefault => LaserCode == ExplicitDefaults.LaserCode;
+        public bool IsLaserCodeDefault => string.IsNullOrEmpty(LaserCode) || LaserCode == ExplicitDefaults.LaserCode;
 
         // HACK TODO?
         [JsonIgnore]

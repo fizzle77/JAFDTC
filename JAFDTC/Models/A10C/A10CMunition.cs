@@ -38,6 +38,7 @@ namespace JAFDTC.Models.A10C
         public bool Ripple { get; set; }
         public bool RipFt { get; set; }
         public bool HOF { get; set; }
+        public bool RPM { get; set; }
         public bool Fuze { get; set; }
         
         // values to configure how settings are loaded

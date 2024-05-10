@@ -181,7 +181,7 @@ namespace JAFDTC.Models.A10C.DSMS
         [JsonIgnore]
         public bool IsHOFOptionDefault => string.IsNullOrEmpty(HOFOption) || HOFOption == ExplicitDefaults.HOFOption;
         [JsonIgnore]
-        public bool IsRPMOptionDefault => string.IsNullOrEmpty(RPMOption) || HOFOption == ExplicitDefaults.RPMOption;
+        public bool IsRPMOptionDefault => string.IsNullOrEmpty(RPMOption) || RPMOption == ExplicitDefaults.RPMOption;
         [JsonIgnore]
         public bool IsFuzeOptionDefault => string.IsNullOrEmpty(FuzeOption) || HOFOption == ExplicitDefaults.FuzeOption;
 

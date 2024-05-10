@@ -71,17 +71,10 @@ namespace JAFDTC.Models.A10C.Upload
 
             AddActions(lmfd, new() { "LMFD_14", "LMFD_05" }); // Go to DSMS INV
 
-            // iterate over all stations
-            // iterate over non-default configs
-            // if station matches config's munition, execute
-            // if symmetric station matches config's munition
-            // load sym
-            // mark symmetric station done
-
             Dictionary<int, bool> _setupStations = GetStationSetupMap();
+            // attempt symmetric loads on the first 5 stations
             for (int station = 1; station <= 5; station++)
             {
-                // attempt symmetric loads on the first 5 stations
                 int symLoadedStation = BuildDSMS_INV_station(cdu, lmfd, nonDefaultSettings, station, true);
                 _setupStations[station] = true;
                 if (symLoadedStation > 0)
@@ -90,17 +83,26 @@ namespace JAFDTC.Models.A10C.Upload
             // station 6 has no symmetric station, don't attempt sym load
             BuildDSMS_INV_station(cdu, lmfd, nonDefaultSettings, 6, false);
             _setupStations[6] = true;
+            // set up any stations that weren't symloaded with stations 1-5
             for (int station = 7; station <= 11; station++)
             {
-                // set up any stations that weren't symloaded in previous loop
                 if (!_setupStations[station])
                 {
                     BuildDSMS_INV_station(cdu, lmfd, nonDefaultSettings, station, false);
                 }
             }
-
         }
 
+
+        /// <summary>
+        /// Sets the INV page settings for one station.
+        /// </summary>
+        /// <param name="cdu"></param>
+        /// <param name="lmfd"></param>
+        /// <param name="nonDefaultSettings">All the non-default INV settings</param>
+        /// <param name="station">The A-10 pylon to setup</param>
+        /// <param name="attemptSymLoad">Do symmetric load of the opposite pylon if it has the same munition loaded</param>
+        /// <returns>Station number of a symloaded station if there was one, otherwise -1.</returns>
         private int BuildDSMS_INV_station(AirframeDevice cdu, AirframeDevice lmfd, 
             Dictionary<string, MunitionSettings> nonDefaultSettings, int station, bool attemptSymLoad)
         {
@@ -114,10 +116,12 @@ namespace JAFDTC.Models.A10C.Upload
                 AddActions(lmfd, new() { GetButtonForStation(station), "LMFD_03" }, null, WAIT_BASE);
 
                 // Laser Code
+                // There's a single laser code setting for the whole DSMS system that applies to any Laser-capable weapon.
                 if (setting.Munition.Laser && !_cfg.DSMS.IsLaserCodeDefault)
                 {
                     foreach (char c in _cfg.DSMS.LaserCode)
                         AddAction(cdu, c.ToString());
+                    // The button for setting laser code moves depending on the munition. Grab it from the data.
                     AddAction(lmfd, "LMFD_" + setting.Munition.LaserButton);
                 }
 
@@ -131,6 +135,13 @@ namespace JAFDTC.Models.A10C.Upload
                 }
 
                 // RPM
+                if (setting.Munition.RPM && !setting.IsRPMOptionDefault)
+                {
+                    int rpmVal = (int)_cfg.DSMS.GetRPMOptionValue(setting.Munition);
+                    int numPresses = rpmVal >= 3 ? rpmVal - 3 : rpmVal + 3;
+                    for (int i = 0; i < numPresses; i++)
+                        AddAction(lmfd, "LMFD_17");
+                }
 
                 // Load
                 if (attemptSymLoad)
