@@ -33,7 +33,6 @@ namespace JAFDTC.Models.A10C
         public bool CCIP { get; set; }
         public bool CCRP { get; set; }
         public bool EscMnvr { get; set; }
-        public bool Laser { get; set; }
         public bool AutoLase { get; set; }
         public bool Pairs { get; set; }
         public bool Ripple { get; set; }
@@ -45,6 +44,7 @@ namespace JAFDTC.Models.A10C
         public string LaserButton { get; set; }
 
         // synthesized properties
+        public bool Laser => !string.IsNullOrEmpty(LaserButton);
         public string ImageFullPath => "/Images/" + Image;
         public bool SingleReleaseOnly => !Pairs && !Ripple;
     }

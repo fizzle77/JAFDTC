@@ -161,6 +161,15 @@ namespace JAFDTC.Models.A10C.DSMS
         [JsonIgnore]
         public Dictionary<int, string> Loadout { set; get; }
 
+        // Lazy-load munitions DB
+        private static List<A10CMunition> _munitions;
+        private static List<A10CMunition> GetMunitions()
+        {
+            if (_munitions == null)
+                _munitions = FileManager.LoadA10Munitions();
+            return _munitions;
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction
@@ -206,7 +215,7 @@ namespace JAFDTC.Models.A10C.DSMS
 
         internal void FixupMunitionReferences()
         {
-            List<A10CMunition> munitions = FileManager.LoadA10Munitions();
+            List<A10CMunition> munitions = GetMunitions();
             foreach (var munition in munitions)
             {
                 if (_munitionSettingMap.TryGetValue(munition.Key, out MunitionSettings setting))
@@ -228,6 +237,16 @@ namespace JAFDTC.Models.A10C.DSMS
                     settings.Add(kv.Key, kv.Value);
                 else if (kv.Value.Munition.Laser && !IsLaserCodeDefault)
                     settings.Add(kv.Key, kv.Value);
+            }
+
+            // If laser code is non-default, ensure all laser weapons are added to list
+            // even if they have no other non-default settings.
+            List<A10CMunition> munitions = GetMunitions();
+            if (!IsLaserCodeDefault)
+            {
+                foreach (A10CMunition munition in munitions)
+                    if (munition.Laser && !settings.ContainsKey(munition.Key))
+                        settings.Add(munition.Key, GetMunitionSettings(munition));
             }
             return settings;
         }
