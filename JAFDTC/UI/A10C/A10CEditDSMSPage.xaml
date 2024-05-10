@@ -14,7 +14,7 @@
         <NavigationView.MenuItems>
             <NavigationViewItem x:Name="uiMunitionTab" Content="Munition Settings" IsSelected="True"/>
             <NavigationViewItemSeparator/>
-            <NavigationViewItem x:Name="uiProfileTab" Content="Profile Order"/>
+            <NavigationViewItem x:Name="uiProfileTab" Content="Profile Order" Visibility="Collapsed"/>
         </NavigationView.MenuItems>
 
         <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush }">
