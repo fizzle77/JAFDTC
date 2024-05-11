@@ -91,6 +91,15 @@ namespace JAFDTC.Models.DCS
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        public override string ToString()
+        {
+            // NOTE: Add* methods always end the command they add with a "," delimiter. remove this delimeter prior
+            // NOTE: to returning the string.
+            //
+            string value = _sb.ToString();
+            return (value.Length > 0) ? value.Remove(value.Length - 1, 1) : value;
+        }
+
         public abstract void Build();
 
         // ------------------------------------------------------------------------------------------------------------
@@ -108,12 +117,14 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// return an argument list to append to a command string of the form,
+        /// return an argument list to append to a command string. the argument list is of the form,
         /// 
         ///   "prm" : { "arg[0]", "arg[1]", ... arg[n-1]" }
         ///   
         /// where elements of args parameter are output in a list of strings with "prm" key. return value starts
         /// with "," if argument list is non-empty.
+        /// 
+        /// NOTE: delimeters between elements around the parameter list are left to caller to insert as needed.
         /// </summary>
         private static string BuildArgList(List<string> args)
         {
@@ -131,15 +142,9 @@ namespace JAFDTC.Models.DCS
             return retVal;
         }
 
-        // ------------------------------------------------------------------------------------------------------------
-        //
-        // command building methods
-        //
-        // ------------------------------------------------------------------------------------------------------------
-
         /// <summary>
-        /// add an abort command to the command the builder is building. if the message starts with "ERROR: ", the
-        /// message (excluding "ERROR: ") will be output to the user through a dcs message.
+        /// add an abort command to the command stream the builder is building. if the message starts with "ERROR: ",
+        /// the message (excluding "ERROR: ") will be output to the user through a dcs message.
         /// </summary>
         protected void AddAbort(string message)
         {
@@ -148,7 +153,7 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add an action for the key to the command the builder is buidling.
+        /// add an action for the key to the command stream the builder is buidling.
         /// </summary>
         protected void AddAction(AirframeDevice device, string key, int dtWaitPost = WAIT_NONE)
         {
@@ -166,7 +171,7 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add a action for the key to the command the builder is buidling. the action is updated to use the
+        /// add a action for the key to the command stream the builder is buidling. the action is updated to use the
         /// specified delay between up and down rather than the base delay.
         /// </summary>
         protected void AddActionWithDelay(AirframeDevice device, string key, int delay)
@@ -175,7 +180,7 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add a dyamic action for the key to the command the builder is buidling. a dynamic action has
+        /// add a dyamic action for the key to the command stream the builder is buidling. a dynamic action has
         /// caller-specified values for the up/down values. this allows programatic switching of controls from
         /// windows.
         /// </summary>
@@ -185,8 +190,8 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add actions for the keys in the provided list followed by a post-list set of keys to the command the
-        /// builder is building. each key must be an action the key pad device supports
+        /// add actions for the keys in the provided list followed by a post-list set of keys to the command stream
+        /// the builder is building. each key must be an action the key pad device supports
         /// </summary>
         protected void AddActions(AirframeDevice device, List<string> keys, List<string> keysPost = null,
                                   int dtWaitPost = WAIT_NONE)
@@ -202,7 +207,7 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add a wait command to the command the builder is building.
+        /// add a wait command to the command stream the builder is building.
         /// </summary>
         protected void AddWait(int dt)
         {
@@ -214,7 +219,7 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add a marker command to the command the builder is building.
+        /// add a marker command to the command stream the builder is building.
         /// </summary>
         protected void AddMarker(string marker)
         {
@@ -223,9 +228,9 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add a query command to the command the builder is building. dcs returns query results asynchronously,
-        /// this command should only be used in conjunction with UploadAgentBase::Query() method with no more than
-        /// one per sequence.
+        /// add a query command to the command stream the builder is building. dcs returns query results
+        /// asynchronously, this command should only be used in conjunction with UploadAgentBase::Query() method with
+        /// no more than one per sequence.
         /// </summary>
         protected void AddQuery(string fn, List<string> argsQuery = null)
         {
@@ -234,7 +239,7 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add an exec function command to the command the builder is building.
+        /// add an exec function command to the command stream the builder is building.
         /// </summary>
         protected void AddExecFunction(string fn, List<string> argsFunc = null, int dtWaitPost = WAIT_NONE)
         {
@@ -244,7 +249,7 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add an if block to the command the builder is building. the block is delimited by "If" and "EndIf"
+        /// add an if block to the command stream the builder is building. the block is delimited by "If" and "EndIf"
         /// commands with the AddBlockCommandsDelegate emitting the commands within the block that are exectued
         /// if the condition is true.
         /// 
@@ -264,7 +269,7 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add a while block to the command the builder is building. the block is delimited by "While" and
+        /// add a while block to the command stream the builder is building. the block is delimited by "While" and
         /// "EndWhile" commands with the AddBlockCommandsDelegate emitting the commands within the block that
         /// are exectued while the condition is true. the loop will exit with an error if more than the timeOut
         /// number of iterations are encountered.

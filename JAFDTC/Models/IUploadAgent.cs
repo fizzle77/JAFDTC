@@ -25,13 +25,13 @@ using System.Threading.Tasks;
 namespace JAFDTC.Models
 {
     /// <summary>
-    /// interface for classes that serve as an upload agent that generates a command stream for dcs to setup a
-    /// configuration in the jet.
+    /// interface for classes that serve as an upload agent that generates an airframe-specific command stream for
+    /// dcs to setup a configuration in the jet. instances of this class are specialized to an airframe.
     /// </summary>
     public interface IUploadAgent
     {
         /// <summary>
-        /// create the set of commands and state necessary to load a configuration on the jet, then send the
+        /// create the stream of commands and state necessary to load a configuration on the jet, then send the
         /// commands to the jet for processing via the network connection to the dcs scripting engine. Load()
         /// uses SetupBuilder(), BuildSystems(), and TeardownBuilder() to create the command streams for the systems
         /// in the airframe. returns true on success, false on failure.
@@ -39,23 +39,27 @@ namespace JAFDTC.Models
         public Task<bool> Load();
 
         /// <summary>
-        /// create the set of commands and state necessary to load a configuration on the jet. Load() uses this
-        /// method to build out system-specific command streams. prior to calling this method, the builder from
-        /// SetupBuilder() is invoked. after calling this method, the builder from TeardownBuilder() is invoked.
-        /// this function may use UploadAgentBase:Query() to query dcs state. implementations should clear the
-        /// StringBuilder to indicate an error.
+        /// create the stream of commands and state necessary to load a configuration on the jet using the given
+        /// StringBuilder. Load() will add the command streams from SetupBuilder() and TeardownBuilder() to wrap
+        /// the stream built by this method. implementations should clear the StringBuilder to indicate an error.
+        /// 
+        /// this function may use QueryBuilderBase derivatives along with UploadAgentBase:Query() to query dcs
+        /// state in order to shape the command stream.
+        ///
+        /// this function will typically create multiple IBuilder instances for various systems and use them to
+        /// assemble the command stream.
         /// </summary>
         public void BuildSystems(StringBuilder sb);
 
         /// <summary>
         /// returns an object that implements IBuilder to generate commands that appear at the start of a command
-        /// stream. by default, the returned instance generates a "start of upload" marker command.
+        /// stream. by default, the returned IBuilder generates a stream with a "start of upload" marker command.
         /// </summary>
         public IBuilder SetupBuilder(StringBuilder sb);
 
         /// <summary>
         /// returns an object that implements IBuilder to generate commands that appear at the end of a command
-        /// stream. by default, the returned instance generates a "end of upload" marker command.
+        /// stream. by default, the returned IBuilder generates a stream with an "end of upload" marker command.
         /// </summary>
         public IBuilder TeardownBuilder(StringBuilder sb);
     }
