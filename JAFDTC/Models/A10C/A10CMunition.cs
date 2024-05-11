@@ -19,7 +19,9 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Utilities;
 using System.Collections.Generic;
+using Windows.Media.Streaming.Adaptive;
 
 namespace JAFDTC.Models.A10C
 {
@@ -63,6 +65,15 @@ namespace JAFDTC.Models.A10C
             if (_profileKeyRemap.TryGetValue(profileName, out var inventoryKey))
                 return inventoryKey;
             return profileName;
+        }
+
+        // Lazy-load munitions DB
+        private static List<A10CMunition> _list;
+        public static List<A10CMunition> GetMunitions()
+        {
+            if (_list == null)
+                _list = FileManager.LoadA10Munitions();
+            return _list;
         }
     }
 }

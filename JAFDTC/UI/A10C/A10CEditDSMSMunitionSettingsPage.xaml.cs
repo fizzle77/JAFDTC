@@ -20,7 +20,7 @@ namespace JAFDTC.UI.A10C
     /// <summary>
     /// UI Code for the A-10 DSMS A10CMunition Settings Frame
     /// </summary>
-    public sealed partial class A10CEditDSMSMunitionSettingsPage : Page
+    public sealed partial class A10CEditDSMSMunitionSettingsPage : Page, IA10CDSMSContentFrame
     {
         private ConfigEditorPageNavArgs _navArgs;
         private A10CConfiguration _config;
@@ -158,7 +158,7 @@ namespace JAFDTC.UI.A10C
         {
             if (IsMunitionSelectionValid(out A10CMunition munition))
             {
-                _uiUpdatePending = true;
+                _uiUpdatePending = true; // prevent events from causing spurious UI updates
                 CopyConfigToEditState(munition);
 
                 _uiUpdatePending = false;

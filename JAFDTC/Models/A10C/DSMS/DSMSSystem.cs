@@ -131,6 +131,9 @@ namespace JAFDTC.Models.A10C.DSMS
         }
         private Dictionary<string, MunitionSettings> _munitionSettingMap;
 
+        public bool UseProfileOrder { get; set; }  
+        public List<string> ProfileOrder { get; set; }
+
         // ---- synthesized properties
 
         public readonly static DSMSSystem ExplicitDefaults = new()
@@ -143,7 +146,7 @@ namespace JAFDTC.Models.A10C.DSMS
         {
             get
             {
-                if (!IsLaserCodeDefault)
+                if (!IsLaserCodeDefault || !IsProfileOrderDefault)
                     return false;
                 foreach (MunitionSettings setting in _munitionSettingMap.Values)
                 {
@@ -157,20 +160,14 @@ namespace JAFDTC.Models.A10C.DSMS
         [JsonIgnore]
         public bool IsLaserCodeDefault => string.IsNullOrEmpty(LaserCode) || LaserCode == ExplicitDefaults.LaserCode;
 
-        // HACK TODO?
+        [JsonIgnore]
+        public bool IsProfileOrderDefault => ProfileOrder == null || ProfileOrder.Count == 0 || UseProfileOrder == false;
+
+        // HACK TODO: these set config data from DCS Queries
         [JsonIgnore]
         public Dictionary<int, string> Loadout { set; get; }
         [JsonIgnore]
         public Dictionary<string, int> MunitionProfileMap { set; get; }
-
-        // Lazy-load munitions DB
-        private static List<A10CMunition> _munitions;
-        private static List<A10CMunition> GetMunitions()
-        {
-            if (_munitions == null)
-                _munitions = FileManager.LoadA10Munitions();
-            return _munitions;
-        }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -213,11 +210,13 @@ namespace JAFDTC.Models.A10C.DSMS
         {
             LaserCode = "";
             _munitionSettingMap = new Dictionary<string, MunitionSettings>();
+            ProfileOrder = null;
+            UseProfileOrder = false;
         }
 
         internal void FixupMunitionReferences()
         {
-            List<A10CMunition> munitions = GetMunitions();
+            List<A10CMunition> munitions = A10CMunition.GetMunitions();
             foreach (var munition in munitions)
             {
                 if (_munitionSettingMap.TryGetValue(munition.Key, out MunitionSettings setting))
@@ -243,7 +242,7 @@ namespace JAFDTC.Models.A10C.DSMS
 
             // If laser code is non-default, ensure all laser weapons are added to list
             // even if they have no other non-default settings.
-            List<A10CMunition> munitions = GetMunitions();
+            List<A10CMunition> munitions = A10CMunition.GetMunitions();
             if (!IsLaserCodeDefault)
             {
                 foreach (A10CMunition munition in munitions)

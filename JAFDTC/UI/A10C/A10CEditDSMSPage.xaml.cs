@@ -12,6 +12,11 @@ using System.Collections.Generic;
 
 namespace JAFDTC.UI.A10C
 {
+    public interface IA10CDSMSContentFrame
+    {
+        void CopyConfigToEditState();
+    }
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -62,8 +67,7 @@ namespace JAFDTC.UI.A10C
                 _config.DSMS.Reset();
                 _config.Save(this, DSMSSystem.SystemTag);
 
-                // TODO fix to support profile order when that exists
-                ((A10CEditDSMSMunitionSettingsPage)DSMSContentFrame.Content).CopyConfigToEditState();
+                ((IA10CDSMSContentFrame)DSMSContentFrame.Content).CopyConfigToEditState();
             }
         }
 
