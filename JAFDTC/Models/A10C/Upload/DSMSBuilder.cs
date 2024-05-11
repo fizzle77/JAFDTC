@@ -19,7 +19,9 @@
 
 using JAFDTC.Models.A10C.DSMS;
 using JAFDTC.Models.DCS;
+using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Text;
 
 namespace JAFDTC.Models.A10C.Upload
@@ -70,6 +72,7 @@ namespace JAFDTC.Models.A10C.Upload
         {
             Build_INV(cdu, lmfd);
             Build_DefaultProfiles(cdu, lmfd);
+            Build_DefaultProfileOrder(lmfd);
         }
 
         private void Build_INV(AirframeDevice cdu, AirframeDevice lmfd)
@@ -85,20 +88,20 @@ namespace JAFDTC.Models.A10C.Upload
             // attempt symmetric loads on the first 5 stations
             for (int station = 1; station <= 5; station++)
             {
-                int symLoadedStation = BuildDSMS_INV_station(cdu, lmfd, nonDefaultSettings, station, true);
+                int symLoadedStation = Build_INV_station(cdu, lmfd, nonDefaultSettings, station, true);
                 _setupStations[station] = true;
                 if (symLoadedStation > 0)
                     _setupStations[symLoadedStation] = true;
             }
             // station 6 has no symmetric station, don't attempt sym load
-            BuildDSMS_INV_station(cdu, lmfd, nonDefaultSettings, 6, false);
+            Build_INV_station(cdu, lmfd, nonDefaultSettings, 6, false);
             _setupStations[6] = true;
             // set up any stations that weren't symloaded with stations 1-5
             for (int station = 7; station <= 11; station++)
             {
                 if (!_setupStations[station])
                 {
-                    BuildDSMS_INV_station(cdu, lmfd, nonDefaultSettings, station, false);
+                    Build_INV_station(cdu, lmfd, nonDefaultSettings, station, false);
                 }
             }
         }
@@ -113,7 +116,7 @@ namespace JAFDTC.Models.A10C.Upload
         /// <param name="station">The A-10 pylon to setup</param>
         /// <param name="attemptSymLoad">Do symmetric load of the opposite pylon if it has the same munition loaded</param>
         /// <returns>Station number of a symloaded station if there was one, otherwise -1.</returns>
-        private int BuildDSMS_INV_station(AirframeDevice cdu, AirframeDevice lmfd, 
+        private int Build_INV_station(AirframeDevice cdu, AirframeDevice lmfd, 
             Dictionary<string, MunitionSettings> nonDefaultSettings, int station, bool attemptSymLoad)
         {
             string munitionAtStation = _loadoutQuery.StationMunitionMap[station];
@@ -182,24 +185,14 @@ namespace JAFDTC.Models.A10C.Upload
                 return;
 
             AddActions(lmfd, new() { "LMFD_14", "LMFD_01" }, null, WAIT_BASE); // Go to DSMS Profiles
-            int selectedProfileIndex = 1;
+            int selectedProfileIndex = 0;
 
-            foreach (KeyValuePair<string, int> kv in _profileQuery.StationMunitionMap)
+            foreach (KeyValuePair<string, int> kv in _profileQuery.MunitionProfileMap)
             {
                 if (nonDefaultSettings.TryGetValue(kv.Key, out MunitionSettings settings))
                 {
-                    if (kv.Value > selectedProfileIndex)
-                    {
-                        for (int i = 0; i < kv.Value - selectedProfileIndex; i++)
-                            AddAction(lmfd, "LMFD_19"); // arrow down
-                    }
-                    else if (kv.Value < selectedProfileIndex)
-                    {
-                        for (int i = 0; i < selectedProfileIndex - kv.Value; i++)
-                            AddAction(lmfd, "LMFD_20"); // arrow up
-                    }
-                    selectedProfileIndex = kv.Value;
-                    BuildDSMS_CurrentProfile(cdu, lmfd, settings);
+                    selectedProfileIndex = SelectProfile(lmfd, selectedProfileIndex, kv.Value);
+                    Build_CurrentProfile(cdu, lmfd, settings);
                 }
             }
 
@@ -207,7 +200,7 @@ namespace JAFDTC.Models.A10C.Upload
             AddAction(lmfd, "LMFD_01"); // STAT
         }
 
-        private void BuildDSMS_CurrentProfile(AirframeDevice cdu, AirframeDevice lmfd, MunitionSettings settings)
+        private void Build_CurrentProfile(AirframeDevice cdu, AirframeDevice lmfd, MunitionSettings settings)
         {
             AddAction(lmfd, "LMFD_03"); // VIEW PRO
 
@@ -283,9 +276,99 @@ namespace JAFDTC.Models.A10C.Upload
             // Save
             AddWait(WAIT_BASE);
             AddAction(lmfd, "LMFD_03");
-
         }
 
+        /// <summary>
+        /// Modify the order of the default weapon profiles.
+        /// Important to do this last because it will invalidate the content of _profileQuery.StationMunitionMap
+        /// </summary>
+        /// <param name="lmfd"></param>
+        private void Build_DefaultProfileOrder(AirframeDevice lmfd)
+        {
+            if (_cfg.DSMS.IsProfileOrderDefault)
+                return;
+
+            AddActions(lmfd, new() { "LMFD_14", "LMFD_01" }, null, WAIT_BASE); // Go to DSMS Profiles
+
+            AddAction(lmfd, "LMFD_19"); // arrow down to first profile past WPNS OFF
+            int selectedProfileIndex = 1;
+
+            // simple bubble sort of the profiles according to configured order
+            // TODO there's probably some .NET sorting base class that would be nicer here.
+            List<string> profiles = new List<string>(_profileQuery.MunitionProfileMap.Keys);
+            for (int i = 1; i < profiles.Count - 1; i++)
+            {
+                bool changeMade = false;
+                for (int j = 1; j < profiles.Count - i; j++)
+                {
+                    if (_cfg.DSMS.GetOrderedProfilePosition(profiles[j]) > _cfg.DSMS.GetOrderedProfilePosition(profiles[j + 1]))
+                    {
+                        selectedProfileIndex = bubbleSortSwap(lmfd, selectedProfileIndex, profiles, j);
+                        changeMade = true;
+                    }
+                }
+
+                if (changeMade == false)
+                    break;
+            }
+
+            // Back to DSMS Main
+            AddAction(lmfd, "LMFD_01"); // STAT
+        }
+
+        private int bubbleSortSwap(AirframeDevice lmfd, int selectedProfileIndex, List<string> profiles, int firstToSwapIndex)
+        {
+            // swap on the jet
+            SelectProfile(lmfd, selectedProfileIndex, firstToSwapIndex);
+            AddAction(lmfd, "LMFD_07"); // move down
+
+            // swap in-memory
+            string first = profiles[firstToSwapIndex];
+            string second = profiles[firstToSwapIndex + 1];
+            profiles[firstToSwapIndex] = second;
+            profiles[firstToSwapIndex + 1] = first;
+
+            return firstToSwapIndex + 1;
+        }
+
+        private class ProfileOrderComparer : IComparer<string>
+        {
+            private readonly Dictionary<string, int> _targetOrder;
+
+            public ProfileOrderComparer(Dictionary<string, int> targetOrder)
+            {
+                _targetOrder = targetOrder;
+            }
+
+            public int Compare(string x, string y)
+            {
+                return _targetOrder[x] - _targetOrder[y];
+            }
+        }
+        
+        /// <summary>
+                 /// Moves the selection indicator on the DSMS profile's page to the profile at toSelectIndex.
+                 /// Assumes we are already on the DSMS profile page.
+                 /// </summary>
+                 /// <param name="lmfd"></param>
+                 /// <param name="currentSelectionIndex"></param>
+                 /// <param name="toSelectIndex"></param>
+                 /// <returns>The new, current selected index.</returns>
+        private int SelectProfile(AirframeDevice lmfd, int currentSelectionIndex, int toSelectIndex)
+        {
+            if (toSelectIndex > currentSelectionIndex)
+            {
+                for (int i = 0; i < toSelectIndex - currentSelectionIndex; i++)
+                    AddAction(lmfd, "LMFD_19"); // arrow down
+            }
+            else if (toSelectIndex < currentSelectionIndex)
+            {
+                for (int i = 0; i < currentSelectionIndex - toSelectIndex; i++)
+                    AddAction(lmfd, "LMFD_20"); // arrow up
+            }
+
+            return toSelectIndex;
+        }
 
         private static string GetButtonForStation(int station) => _stationButtonMap[station];
         private static readonly Dictionary<int, string> _stationButtonMap = new Dictionary<int, string>

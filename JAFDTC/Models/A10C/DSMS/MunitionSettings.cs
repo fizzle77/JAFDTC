@@ -190,7 +190,7 @@ namespace JAFDTC.Models.A10C.DSMS
         [JsonIgnore]
         public bool IsRPMOptionDefault => string.IsNullOrEmpty(RPMOption) || RPMOption == ExplicitDefaults.RPMOption || RPMOption == "-1";
         [JsonIgnore]
-        public bool IsFuzeOptionDefault => string.IsNullOrEmpty(FuzeOption) || HOFOption == ExplicitDefaults.FuzeOption || FuzeOption == "-1";
+        public bool IsFuzeOptionDefault => string.IsNullOrEmpty(FuzeOption) || FuzeOption == ExplicitDefaults.FuzeOption || FuzeOption == "-1";
 
         public readonly static MunitionSettings ExplicitDefaults = new()
         {

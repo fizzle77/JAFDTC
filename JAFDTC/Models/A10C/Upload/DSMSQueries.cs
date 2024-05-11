@@ -60,7 +60,7 @@ namespace JAFDTC.Models.A10C.Upload
             private Dictionary<string, int> _munitionProfileMap { set; get; }
 
             // lazy load and cache the query data
-            public Dictionary<string, int> StationMunitionMap
+            public Dictionary<string, int> MunitionProfileMap
             {
                 get
                 {
@@ -73,7 +73,7 @@ namespace JAFDTC.Models.A10C.Upload
                         {
                             string[] kv = keyVal.Split("=");
                             if (kv.Length == 2)
-                                _munitionProfileMap.Add(A10CMunition.GetInvKeyFromDefaultProfileName(kv[1]), int.Parse(kv[0]));
+                                _munitionProfileMap.Add(A10CMunition.GetInvKeyFromDefaultProfileName(kv[1]), int.Parse(kv[0]) - 1);
                         }
                     }
 

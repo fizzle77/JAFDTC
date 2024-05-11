@@ -188,6 +188,34 @@ namespace JAFDTC.Models.A10C.DSMS
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        private Dictionary<string, int> _orderedProfilePositions;
+        /// <summary>
+        /// Return the configured position, according to the "profile order" screen, for the provided profile name.
+        /// </summary>
+        /// <param name="profileName"></param>
+        /// <returns></returns>
+        public int GetOrderedProfilePosition(string profileName)
+        {
+            if (_orderedProfilePositions == null)
+            {
+                if (ProfileOrder != null || ProfileOrder.Count > 0)
+                {
+                    _orderedProfilePositions = new Dictionary<string, int>(ProfileOrder.Count);
+                    for (int i = 0; i < ProfileOrder.Count; i++)
+                        _orderedProfilePositions.Add(ProfileOrder[i], i);
+                }
+            }
+
+            if (_orderedProfilePositions == null)
+                return 0;
+            else
+            {
+                if (_orderedProfilePositions.TryGetValue(profileName, out int position))
+                    return position;
+                else return int.MaxValue; // send unknown profiles to the end of the list
+            }
+        }
+
         public MunitionSettings GetMunitionSettings(A10CMunition munition)
         {
             MunitionSettings settings;
