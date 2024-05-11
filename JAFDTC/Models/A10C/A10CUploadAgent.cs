@@ -38,44 +38,6 @@ namespace JAFDTC.Models.A10C
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO
-        /// </summary>
-        private class LoadoutQueryBuilder : CoreQueryBuilder, IBuilder
-        {
-            public LoadoutQueryBuilder(IAirframeDeviceManager adm, StringBuilder sb, string query, List<string> argsQuery) : base(adm, sb, query, argsQuery)
-            {
-            }
-
-            public override void Build()
-            {
-                AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
-                AddActions(lmfd, new() { "LMFD_14", "LMFD_05" }, null, WAIT_BASE); // Go to DSMS INV
-
-                // adds query from constructor
-                base.Build();
-            }
-        }
-
-        /// <summary>
-        /// TODO
-        /// </summary>
-        private class DSMSProfileQueryBuilder : CoreQueryBuilder, IBuilder
-        {
-            public DSMSProfileQueryBuilder(IAirframeDeviceManager adm, StringBuilder sb, string query, List<string> argsQuery) : base(adm, sb, query, argsQuery)
-            {
-            }
-
-            public override void Build()
-            {
-                AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
-                AddActions(lmfd, new() { "LMFD_14", "LMFD_01" }, null, WAIT_BASE); // Go to DSMS Profile
-
-                // adds query from constructor
-                base.Build();
-            }
-        }
-
-        /// <summary>
         /// generates the command sequence for teardown in the warthog. this includes triggering light test feedback at
         /// the end of the sequence.
         /// </summary>
@@ -131,23 +93,7 @@ namespace JAFDTC.Models.A10C
         {
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new MiscBuilder(_cfg, _dcsCmds, sb).Build();
-
-            if (!_cfg.DSMS.IsDefault)
-            {
-                StringBuilder sbQuery = new StringBuilder();
-                LoadoutQueryBuilder loadoutQuery = new LoadoutQueryBuilder(_dcsCmds, sbQuery, "QueryLoadout", null);
-                loadoutQuery.Build();
-                string response = Query(sbQuery);
-                _cfg.LoadoutFromQueryResponse(response);
-
-                sbQuery.Clear();
-                DSMSProfileQueryBuilder profileQuery = new DSMSProfileQueryBuilder(_dcsCmds, sbQuery, "QueryDSMSProfiles", null);
-                profileQuery.Build();
-                response = Query(sbQuery);
-                _cfg.DSMSProfilesFromQueryResponse(response);
- 
-                new DSMSBuilder(_cfg, _dcsCmds, sb).Build();
-            }
+            new DSMSBuilder(_cfg, _dcsCmds, sb).Build();
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
         }
 

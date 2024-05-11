@@ -189,39 +189,5 @@ namespace JAFDTC.Models.A10C
             }
             return isSuccess;
         }
-
-        // ------------------------------------------------------------------------------------------------------------
-        //
-        // methods
-        //
-        // ------------------------------------------------------------------------------------------------------------
-        public void LoadoutFromQueryResponse(string queryResponse)
-        {
-            Dictionary<int, string> stationMunitionMap = new Dictionary<int, string>(11);
-            string[] keyVals = queryResponse.Split(';');
-            foreach (string keyVal in keyVals)
-            {
-                string[] kv = keyVal.Split("=");
-                if (kv.Length == 2)
-                {
-                    string store = kv[1] == "---" ? null : kv[1];
-                    stationMunitionMap.Add(int.Parse(kv[0]), store);
-                }
-            }
-            DSMS.Loadout = stationMunitionMap;
-        }
-
-        public void DSMSProfilesFromQueryResponse(string queryResponse)
-        {
-            Dictionary<string, int> munitionProfileMap = new Dictionary<string, int>();
-            string[] keyVals = queryResponse.Split(';');
-            foreach (string keyVal in keyVals)
-            {
-                string[] kv = keyVal.Split("=");
-                if (kv.Length == 2)
-                    munitionProfileMap.Add(A10CMunition.GetInvKeyFromDefaultProfileName(kv[1]), int.Parse(kv[0]));
-            }
-            DSMS.MunitionProfileMap = munitionProfileMap;
-        }
     }
 }

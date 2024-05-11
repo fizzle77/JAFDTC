@@ -163,12 +163,6 @@ namespace JAFDTC.Models.A10C.DSMS
         [JsonIgnore]
         public bool IsProfileOrderDefault => ProfileOrder == null || ProfileOrder.Count == 0 || UseProfileOrder == false;
 
-        // HACK TODO: these set config data from DCS Queries
-        [JsonIgnore]
-        public Dictionary<int, string> Loadout { set; get; }
-        [JsonIgnore]
-        public Dictionary<string, int> MunitionProfileMap { set; get; }
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction

@@ -20,7 +20,6 @@
 using JAFDTC.Models.A10C.DSMS;
 using JAFDTC.Models.DCS;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace JAFDTC.Models.A10C.Upload
@@ -29,15 +28,25 @@ namespace JAFDTC.Models.A10C.Upload
     /// command builder for the DSMS systems in the warthog. translates cmds setup in A10CConfiguration into
     /// commands that drive the dcs clickable cockpit.
     /// </summary>
-    internal class DSMSBuilder : A10CBuilderBase, IBuilder
-    { 
+    internal partial class DSMSBuilder : A10CBuilderBase, IBuilder
+    {
+        LoadoutQueryBuilder _loadoutQuery;
+        DSMSProfileQueryBuilder _profileQuery;
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction
         //
         // ------------------------------------------------------------------------------------------------------------
-        
-        public DSMSBuilder(A10CConfiguration cfg, A10CDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+
+        public DSMSBuilder(A10CConfiguration cfg, A10CDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) 
+        {
+            StringBuilder sbLoadoutQuery = new StringBuilder();
+            _loadoutQuery = new LoadoutQueryBuilder(dcsCmds, sbLoadoutQuery, "QueryLoadout", null);
+
+            StringBuilder sbProfileQuery = new StringBuilder();
+            _profileQuery = new DSMSProfileQueryBuilder(dcsCmds, sbProfileQuery, "QueryDSMSProfiles", null);
+        }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -59,11 +68,11 @@ namespace JAFDTC.Models.A10C.Upload
 
         private void BuildDSMS(AirframeDevice cdu, AirframeDevice lmfd)
         {
-            BuildDSMS_INV(cdu, lmfd);
-            BuildDSMS_DefaultProfiles(cdu, lmfd);
+            Build_INV(cdu, lmfd);
+            Build_DefaultProfiles(cdu, lmfd);
         }
 
-        private void BuildDSMS_INV(AirframeDevice cdu, AirframeDevice lmfd)
+        private void Build_INV(AirframeDevice cdu, AirframeDevice lmfd)
         {
             // get configs that require INV changes
             Dictionary<string, MunitionSettings> nonDefaultSettings = _cfg.DSMS.GetNonDefaultInvSettings();
@@ -107,7 +116,7 @@ namespace JAFDTC.Models.A10C.Upload
         private int BuildDSMS_INV_station(AirframeDevice cdu, AirframeDevice lmfd, 
             Dictionary<string, MunitionSettings> nonDefaultSettings, int station, bool attemptSymLoad)
         {
-            string munitionAtStation = _cfg.DSMS.Loadout[station];
+            string munitionAtStation = _loadoutQuery.StationMunitionMap[station];
             if (munitionAtStation == null)
                 return -1; // pylon is empty
             
@@ -148,7 +157,7 @@ namespace JAFDTC.Models.A10C.Upload
                 if (attemptSymLoad)
                 {
                     int symStation = GetSymmetricStation(station);
-                    if (_cfg.DSMS.Loadout[symStation] == setting.Munition.Key)
+                    if (_loadoutQuery.StationMunitionMap[symStation] == setting.Munition.Key)
                     {
                         // load sym
                         AddAction(lmfd, "LMFD_10");
@@ -165,7 +174,7 @@ namespace JAFDTC.Models.A10C.Upload
         }
 
         // Modify default weapon profiles having non-default configured settings.
-        private void BuildDSMS_DefaultProfiles(AirframeDevice cdu, AirframeDevice lmfd)
+        private void Build_DefaultProfiles(AirframeDevice cdu, AirframeDevice lmfd)
         {
             // get configs that require profile changes
             Dictionary<string, MunitionSettings> nonDefaultSettings = _cfg.DSMS.GetNonDefaultProfileSettings();
@@ -175,7 +184,7 @@ namespace JAFDTC.Models.A10C.Upload
             AddActions(lmfd, new() { "LMFD_14", "LMFD_01" }, null, WAIT_BASE); // Go to DSMS Profiles
             int selectedProfileIndex = 1;
 
-            foreach (KeyValuePair<string, int> kv in _cfg.DSMS.MunitionProfileMap)
+            foreach (KeyValuePair<string, int> kv in _profileQuery.StationMunitionMap)
             {
                 if (nonDefaultSettings.TryGetValue(kv.Key, out MunitionSettings settings))
                 {
