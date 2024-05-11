@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// A10CMunition.cs -- munition class
+// A10CMunition.cs -- Properties of A-10C weapons, hydrated from FileManager.LoadA10Munitions().
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
 // Copyright(C) 2023 ilominar/raven
@@ -44,7 +44,7 @@ namespace JAFDTC.Models.A10C
         public bool Fuze { get; set; }
         
         // values to configure how settings are loaded
-        public string LaserButton { get; set; }
+        public string LaserButton { get; set; } // The MFD button to set the laser code varies by weapon
 
         // synthesized properties
         public bool Laser => !string.IsNullOrEmpty(LaserButton);

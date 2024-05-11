@@ -489,12 +489,12 @@ namespace JAFDTC.Utilities
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // munitions database
+        // A10C munitions database
         //
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// return the emitter database that provides information on known emitters for harm alic/hts systems.
+        /// return the A10C munitions database that provides information on weapons for the hawg.
         /// </summary>
         public static List<A10CMunition> LoadA10Munitions()
         {
