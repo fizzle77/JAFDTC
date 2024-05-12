@@ -26,8 +26,6 @@ namespace JAFDTC.Models.A10C.DSMS
 {
     public class MunitionSettings : BindableObject, ISystem
     {
-        private A10CMunition _munition;
-
         private string _autoLase;                              // string (boolean)
         public string AutoLase
         {
@@ -169,8 +167,10 @@ namespace JAFDTC.Models.A10C.DSMS
         public A10CMunition Munition
         {
             get => _munition;
-            set => _munition = value; // TODO handle setting during deserialization, keep writer private?
+            set => _munition = value;
         }
+        private A10CMunition _munition;
+
         [JsonIgnore]
         public bool IsAutoLaseDefault => string.IsNullOrEmpty(AutoLase) || AutoLase == ExplicitDefaults.AutoLase;
         [JsonIgnore]

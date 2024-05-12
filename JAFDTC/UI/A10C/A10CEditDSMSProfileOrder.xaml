@@ -25,7 +25,7 @@
                     <StackPanel Orientation="Horizontal" Height="48">
                         <FontIcon Margin="0,0,6,0" FontFamily="Segoe Fluent Icons" FontSize="24" Glyph="&#xE76F;"/>
                         <Image Source="{x:Bind ImageFullPath}" VerticalAlignment="Center"/>
-                        <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" 
+                        <TextBlock Text="{x:Bind Profile}" VerticalAlignment="Center" 
                             Style="{ThemeResource EditorParamStaticTextBlockStyle}" 
                             Margin="12,0,0,0" />
                     </StackPanel>
@@ -34,7 +34,7 @@
         </ListView>
 
         <CheckBox x:Name="uiCheckUseOrder" Grid.Row="0" Grid.Column="1" VerticalAlignment="Top" Margin="18,18,12,12"
-            IsChecked="{x:Bind _config.DSMS.UseProfileOrder, Mode=TwoWay}" Click="uiCheckUseOrder_Click">
+            IsChecked="{x:Bind _config.DSMS.IsProfileOrderEnabled, Mode=TwoWay}" Click="uiCheckUseOrder_Click">
             Order default weapon profiles as shown
         </CheckBox>
     </Grid>

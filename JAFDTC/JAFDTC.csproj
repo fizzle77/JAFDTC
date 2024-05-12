@@ -42,6 +42,9 @@
     <None Remove="DCS\JAFDTC\M2000CFunctions.lua" />
     <None Remove="DCS\JAFDTC\StatusMsg.dlg" />
     <None Remove="DCS\JAFDTC\WyptCapture.dlg" />
+    <None Remove="Images\agm-65d.jpg" />
+    <None Remove="Images\agm-65h.jpg" />
+    <None Remove="Images\agm-65l.jpg" />
     <None Remove="Images\agr.jpg" />
     <None Remove="Images\cbu-87-105.jpg" />
     <None Remove="Images\gbu-10-12.jpg" />
@@ -100,6 +103,9 @@
     <Content Include="DCS\JAFDTC\FA18CFunctions.lua" />
     <Content Include="DCS\JAFDTC\M2000CFunctions.lua" />
     <Content Include="DCS\JAFDTC\WyptCapture.dlg" />
+    <Content Include="Images\agm-65d.jpg" />
+    <Content Include="Images\agm-65h.jpg" />
+    <Content Include="Images\agm-65l.jpg" />
     <Content Include="Images\agr.jpg" />
     <Content Include="Images\cbu-87-105.jpg" />
     <Content Include="Images\gbu-10-12.jpg" />

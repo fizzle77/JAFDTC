@@ -27,47 +27,45 @@ namespace JAFDTC.Models.A10C
 {
     public sealed class A10CMunition
     {
-        public string Key { get; set; } // name as it appears in on DCS display scrape. must be unique.
-
-        public string Name { get; set; } // display name for the weapon
-
+        //
+        // properties deserialized from DB JSON
+        //
+        public string Name { get; set; } // name as it will apper in UI. Must be unique.
+        public string Profile { get; set; } // name of the weapon's default profile
         public string Image { get; set; } // name of the weapon's image file
 
         // values to enable/disable settings UI
         public bool CCIP { get; set; }
         public bool CCRP { get; set; }
+
         public bool EscMnvr { get; set; }
+        
+        public string LaserButton { get; set; } // The MFD button to set the laser code varies by weapon
         public bool AutoLase { get; set; }
+        
         public bool Pairs { get; set; }
         public bool Ripple { get; set; }
         public bool RipFt { get; set; }
+        
         public bool HOF { get; set; }
         public bool RPM { get; set; }
-        public bool Fuze { get; set; }
         
-        // values to configure how settings are loaded
-        public string LaserButton { get; set; } // The MFD button to set the laser code varies by weapon
+        public bool Fuze { get; set; }
 
+        public List<string> INV_Keys { get; set; } // identifiers for this weapon on DSMS INV page
+        
+        //
         // synthesized properties
+        //
         public bool Laser => !string.IsNullOrEmpty(LaserButton);
         public string ImageFullPath => "/Images/" + Image;
         public bool SingleReleaseOnly => !Pairs && !Ripple;
 
-        // because the names for APKWS are different everywhere ARGH
-        private static Dictionary<string, string> _profileKeyRemap = new Dictionary<string, string>
-        {
-            // map from default profile name to munition key used in INV
-            {  "M151L", "M-151L" },
-            {  "M282L", "M-282L" }
-        };
-        public static string GetInvKeyFromDefaultProfileName(string profileName)
-        {
-            if (_profileKeyRemap.TryGetValue(profileName, out var inventoryKey))
-                return inventoryKey;
-            return profileName;
-        }
+        //
+        // static members
+        //
 
-        // Lazy-load munitions DB
+        // Munitions DB
         private static List<A10CMunition> _list;
         public static List<A10CMunition> GetMunitions()
         {
@@ -75,5 +73,89 @@ namespace JAFDTC.Models.A10C
                 _list = FileManager.LoadA10Munitions();
             return _list;
         }
+
+        private static List<A10CMunition> _profileList;
+        public static List<A10CMunition> GetUniqueProfileMunitions()
+        {
+            if (_profileList == null)
+            {
+                _profileList = FileManager.LoadA10Munitions();
+                // HACK: duplicate maverick profiles don't  matter, so we remove the duplicate entry.
+                // They don't matter because the Maverick has no real profile settings.
+                A10CMunition toRemove = null;
+                foreach (A10CMunition m in _profileList)
+                {
+                    if (m.Name == "Laser Mavericks")
+                    {
+                        toRemove = m;
+                        break;
+                    }
+                }
+                if (toRemove != null)
+                    _profileList.Remove(toRemove);
+            }
+            return _profileList;
+        }
+
+        // INV_Key to Munition Map
+        private static Dictionary<string, A10CMunition> _keyMunitionMap;
+        public static A10CMunition GetMunitionFromInvKey(string key)
+        {
+            if (_keyMunitionMap == null)
+            {
+                _keyMunitionMap = new Dictionary<string, A10CMunition>();
+                foreach (A10CMunition munition in GetMunitions())
+                {
+                    foreach (string k in munition.INV_Keys)
+                        _keyMunitionMap.Add(k, munition);
+                }
+            }
+            return _keyMunitionMap[key];
+        }
+
+        // Name to Munition Map
+        private static Dictionary<string, A10CMunition> _nameMunitionMap;
+        public static A10CMunition GetMunitionFromName(string name)
+        {
+            if (_nameMunitionMap == null)
+            {
+                _nameMunitionMap = new Dictionary<string, A10CMunition>();
+                foreach (A10CMunition munition in GetMunitions())
+                {
+                    _nameMunitionMap.Add(name, munition);
+                }
+            }
+            return _nameMunitionMap[name];
+        }
+
+        // Profile to Munition Map
+        private static Dictionary<string, A10CMunition> _profileMunitionMap;
+        public static A10CMunition GetMunitionFromProfile(string profile)
+        {
+            if (_profileMunitionMap == null)
+            {
+                _profileMunitionMap = new Dictionary<string, A10CMunition>();
+                foreach (A10CMunition munition in GetUniqueProfileMunitions())
+                {
+                    _profileMunitionMap.Add(munition.Profile, munition);
+                }
+            }
+            if (_profileMunitionMap.TryGetValue(profile, out A10CMunition m))
+                return m;
+            return null;
+        }
+
+        //private static Dictionary<string, string> _profileKeyMap;
+        //public static string GetInvKeyFromDefaultProfileName(string profileName)
+        //{
+        //    if (_profileKeyMap == null)
+        //    {
+        //        _profileKeyMap = new Dictionary<string, string>();
+        //        foreach (A10CMunition munition in GetMunitions())
+        //            _profileKeyMap.Add(munition.Profile, munition.Key);
+        //    }
+        //    return _profileKeyMap[profileName];
+        //}
+
     }
 }

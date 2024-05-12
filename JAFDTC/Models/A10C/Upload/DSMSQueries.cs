@@ -22,8 +22,8 @@ namespace JAFDTC.Models.A10C.Upload
                     {
                         _stationMunitionMap = new Dictionary<int, string>(11);
                         Build();
-                        string queryResponse = Query();
-                        string[] keyVals = queryResponse.Split(';');
+                        // 1=GBU-54;2=AGM-65D;...
+                        string[] keyVals = Query().Split(';');
                         foreach (string keyVal in keyVals)
                         {
                             string[] kv = keyVal.Split("=");
@@ -57,29 +57,51 @@ namespace JAFDTC.Models.A10C.Upload
         /// </summary>
         private class DSMSProfileQueryBuilder : QueryBuilderBase, IBuilder
         {
-            private Dictionary<string, int> _munitionProfileMap { set; get; }
+            private Dictionary<string, int> _munitionProfileIndexMap { set; get; }
 
-            // lazy load and cache the query data
-            public Dictionary<string, int> MunitionProfileMap
+            private List<string > _profiles;
+            public List<string> Profiles
+            {
+                get 
+                {
+                    if (_profiles == null)
+                        DoQuery();
+                    return _profiles;
+                }
+            }
+
+            public Dictionary<string, int> MunitionProfileIndexMap
             {
                 get
                 {
-                    if (_munitionProfileMap == null)
-                    {
-                        _munitionProfileMap = new Dictionary<string, int>();
-                        Build();
-                        string[] keyVals = Query().Split(';');
-                        foreach (string keyVal in keyVals)
-                        {
-                            string[] kv = keyVal.Split("=");
-                            if (kv.Length == 2)
-                                _munitionProfileMap.Add(A10CMunition.GetInvKeyFromDefaultProfileName(kv[1]), int.Parse(kv[0]) - 1);
-                        }
-                    }
-
-                    return _munitionProfileMap;
+                    if (_munitionProfileIndexMap == null)
+                        DoQuery();
+                    return _munitionProfileIndexMap;
                 }
             }
+
+            // lazy load and cache the query data
+            private void DoQuery()
+            {
+                _munitionProfileIndexMap = new Dictionary<string, int>();
+                _profiles = new List<string>();
+                Build();
+                // 1=WPNS OFF;2=GBU-54;3=MAVERICK;...
+                string[] keyVals = Query().Split(';');
+                foreach (string keyVal in keyVals)
+                {
+                    string[] kv = keyVal.Split("=");
+                    if (kv.Length == 2)
+                    {
+                        _profiles.Add(kv[1]);
+
+                        A10CMunition m = A10CMunition.GetMunitionFromProfile(kv[1]);
+                        if (m != null)
+                            _munitionProfileIndexMap.Add(m.Name, int.Parse(kv[0]) - 1);
+                    }
+                }
+            }
+
 
             public DSMSProfileQueryBuilder(IAirframeDeviceManager adm, StringBuilder sb, string query, List<string> argsQuery)
                 : base(adm, sb, query, argsQuery) { }

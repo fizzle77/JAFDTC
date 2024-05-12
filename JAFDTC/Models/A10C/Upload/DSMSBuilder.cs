@@ -19,9 +19,7 @@
 
 using JAFDTC.Models.A10C.DSMS;
 using JAFDTC.Models.DCS;
-using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Text;
 
 namespace JAFDTC.Models.A10C.Upload
@@ -160,7 +158,7 @@ namespace JAFDTC.Models.A10C.Upload
                 if (attemptSymLoad)
                 {
                     int symStation = GetSymmetricStation(station);
-                    if (_loadoutQuery.StationMunitionMap[symStation] == setting.Munition.Key)
+                    if (setting.Munition.INV_Keys.Contains(_loadoutQuery.StationMunitionMap[symStation]))
                     {
                         // load sym
                         AddAction(lmfd, "LMFD_10");
@@ -187,7 +185,7 @@ namespace JAFDTC.Models.A10C.Upload
             AddActions(lmfd, new() { "LMFD_14", "LMFD_01" }, null, WAIT_BASE); // Go to DSMS Profiles
             int selectedProfileIndex = 0;
 
-            foreach (KeyValuePair<string, int> kv in _profileQuery.MunitionProfileMap)
+            foreach (KeyValuePair<string, int> kv in _profileQuery.MunitionProfileIndexMap)
             {
                 if (nonDefaultSettings.TryGetValue(kv.Key, out MunitionSettings settings))
                 {
@@ -295,7 +293,7 @@ namespace JAFDTC.Models.A10C.Upload
 
             // simple bubble sort of the profiles according to configured order
             // TODO there's probably some .NET sorting base class that would be nicer here.
-            List<string> profiles = new List<string>(_profileQuery.MunitionProfileMap.Keys);
+            List<string> profiles = _profileQuery.Profiles;
             for (int i = 1; i < profiles.Count - 1; i++)
             {
                 bool changeMade = false;

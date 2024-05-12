@@ -126,12 +126,11 @@ namespace JAFDTC.Models.A10C.DSMS
         public Dictionary<string, MunitionSettings> MunitionSettingMap
         {
             get => _munitionSettingMap;
-            // I would prefer to not have a public setter but this makes JSON deserialization work.
             set => _munitionSettingMap = value;
         }
         private Dictionary<string, MunitionSettings> _munitionSettingMap;
 
-        public bool UseProfileOrder { get; set; }  
+        public bool IsProfileOrderEnabled { get; set; }
         public List<string> ProfileOrder { get; set; }
 
         // ---- synthesized properties
@@ -161,7 +160,7 @@ namespace JAFDTC.Models.A10C.DSMS
         public bool IsLaserCodeDefault => string.IsNullOrEmpty(LaserCode) || LaserCode == ExplicitDefaults.LaserCode;
 
         [JsonIgnore]
-        public bool IsProfileOrderDefault => ProfileOrder == null || ProfileOrder.Count == 0 || UseProfileOrder == false;
+        public bool IsProfileOrderDefault => ProfileOrder == null || ProfileOrder.Count == 0 || IsProfileOrderEnabled == false;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -219,10 +218,10 @@ namespace JAFDTC.Models.A10C.DSMS
         public MunitionSettings GetMunitionSettings(A10CMunition munition)
         {
             MunitionSettings settings;
-            if (!_munitionSettingMap.TryGetValue(munition.Key, out settings))
+            if (!_munitionSettingMap.TryGetValue(munition.Name, out settings))
             {
                 settings = new MunitionSettings(munition);
-                _munitionSettingMap.Add(munition.Key, settings);
+                _munitionSettingMap.Add(munition.Name, settings);
             }
             return settings;
         }
@@ -233,7 +232,7 @@ namespace JAFDTC.Models.A10C.DSMS
             LaserCode = "";
             _munitionSettingMap = new Dictionary<string, MunitionSettings>();
             ProfileOrder = null;
-            UseProfileOrder = false;
+            IsProfileOrderEnabled = false;
         }
 
         internal void FixupMunitionReferences()
@@ -241,7 +240,7 @@ namespace JAFDTC.Models.A10C.DSMS
             List<A10CMunition> munitions = A10CMunition.GetMunitions();
             foreach (var munition in munitions)
             {
-                if (_munitionSettingMap.TryGetValue(munition.Key, out MunitionSettings setting))
+                if (_munitionSettingMap.TryGetValue(munition.Name, out MunitionSettings setting))
                     setting.Munition = munition;
             }
         }
@@ -251,15 +250,16 @@ namespace JAFDTC.Models.A10C.DSMS
         //
 
         // Get munition settings that have non-default settings on the jet's INV page.
+        // The returned Dictionary key is the munition INV_Key.
         public Dictionary<string, MunitionSettings> GetNonDefaultInvSettings()
         {
             Dictionary<string, MunitionSettings> settings = new Dictionary<string, MunitionSettings>();
             foreach (KeyValuePair<string, MunitionSettings> kv in _munitionSettingMap)
             {
                 if (!kv.Value.IsInvDefault)
-                    settings.Add(kv.Key, kv.Value);
-                else if (kv.Value.Munition.Laser && !IsLaserCodeDefault)
-                    settings.Add(kv.Key, kv.Value);
+                    AddMunitionSettingsWithAllInvKeysToDictionary(settings, kv.Value);
+                else if (kv.Value != null && kv.Value.Munition.Laser && !IsLaserCodeDefault)
+                    AddMunitionSettingsWithAllInvKeysToDictionary(settings, kv.Value);
             }
 
             // If laser code is non-default, ensure all laser weapons are added to list
@@ -268,10 +268,18 @@ namespace JAFDTC.Models.A10C.DSMS
             if (!IsLaserCodeDefault)
             {
                 foreach (A10CMunition munition in munitions)
-                    if (munition.Laser && !settings.ContainsKey(munition.Key))
-                        settings.Add(munition.Key, GetMunitionSettings(munition));
+                    if (munition.Laser && !settings.ContainsKey(munition.INV_Keys[0]))
+                        AddMunitionSettingsWithAllInvKeysToDictionary(settings, GetMunitionSettings(munition));
             }
             return settings;
+        }
+
+        private void AddMunitionSettingsWithAllInvKeysToDictionary(
+            Dictionary<string, MunitionSettings> dict, 
+            MunitionSettings settings)
+        {
+            foreach (string invKey in settings.Munition.INV_Keys)
+                dict.Add(invKey, settings);
         }
 
         // Get munition settings that have non-default settings on the profiles page.

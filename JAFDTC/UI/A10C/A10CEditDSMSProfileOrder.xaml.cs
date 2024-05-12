@@ -17,17 +17,12 @@ namespace JAFDTC.UI.A10C
         private A10CConfiguration _config;
 
         private ObservableCollection<A10CMunition> _munitions;
-        private readonly Dictionary<string, A10CMunition> _munitionMap;
 
         private bool _suspendUIUpdates = false;
 
         public A10CEditDSMSProfileOrderPage()
         {
-            _munitions = new ObservableCollection<A10CMunition>(A10CMunition.GetMunitions());
-
-            _munitionMap = new Dictionary<string, A10CMunition>();
-            foreach (A10CMunition m in A10CMunition.GetMunitions())
-                _munitionMap.Add(m.Key, m);
+            _munitions = new ObservableCollection<A10CMunition>(A10CMunition.GetUniqueProfileMunitions());
 
             this.InitializeComponent();
         }
@@ -36,7 +31,7 @@ namespace JAFDTC.UI.A10C
         {
             List<string> newOrder = new List<string>(_munitions.Count);
             foreach (A10CMunition m in _munitions)
-                newOrder.Add(m.Key);
+                newOrder.Add(m.Profile);
             _config.DSMS.ProfileOrder = newOrder;
             _config.Save(this, SystemTag);
         }
@@ -48,18 +43,21 @@ namespace JAFDTC.UI.A10C
 
             if (_config.DSMS.ProfileOrder == null)
             {
-                _munitions = new ObservableCollection<A10CMunition>(A10CMunition.GetMunitions());
+                _munitions = new ObservableCollection<A10CMunition>(A10CMunition.GetUniqueProfileMunitions());
                 uiListProfiles.ItemsSource = _munitions;
-                uiCheckUseOrder.IsChecked = _config.DSMS.UseProfileOrder;
+                uiCheckUseOrder.IsChecked = _config.DSMS.IsProfileOrderEnabled;
             }
             else
             {
                 for (int newIndex = 0; newIndex < _munitions.Count; newIndex++)
                 {
-                    string key = _config.DSMS.ProfileOrder[newIndex];
-                    A10CMunition m = _munitionMap[key];
-                    int oldIndex = _munitions.IndexOf(m);
-                    _munitions.Move(oldIndex, newIndex);
+                    string profileName = _config.DSMS.ProfileOrder[newIndex];
+                    A10CMunition m = A10CMunition.GetMunitionFromProfile(profileName);
+                    if (m != null)
+                    {
+                        int oldIndex = _munitions.IndexOf(m);
+                        _munitions.Move(oldIndex, newIndex);
+                    }
                 }
             }
         }
@@ -73,6 +71,7 @@ namespace JAFDTC.UI.A10C
 
         private void uiCheckUseOrder_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
+            SaveEditStateToConfig();
             _config.Save(this, SystemTag);
         }
 
