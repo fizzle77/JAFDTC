@@ -59,7 +59,7 @@ https://www.gnu.org/licenses/.
                       VerticalAlignment="Center"
                       SelectionChanged="RadSelectCombo_SelectionChanged"
                       ToolTipService.ToolTip="Selects Radio to Edit">
-                <!-- provide 4 items for 4 radios, cut back based on actual needs -->
+                <!-- provide 4 items for up to 4 radios, cut back based on actual needs -->
                 <ComboBox.Items>
                     <Grid Tag="0">
                         <Grid.ColumnDefinitions>
@@ -129,27 +129,27 @@ https://www.gnu.org/licenses/.
             </ComboBox>
             <Button Margin="24,0,6,0" VerticalAlignment="Center"
                     x:Name="uiRadPrevBtn"
-                    ToolTipService.ToolTip="Selects Previous Radio"
+                    ToolTipService.ToolTip="Select previous radio"
                     Click="RadBtnPrev_Click">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
             </Button>
             <Button VerticalAlignment="Center"
                     x:Name="uiRadNextBtn"
-                    ToolTipService.ToolTip="Selects Next Radio"
+                    ToolTipService.ToolTip="Select next radio"
                     Click="RadBtnNext_Click">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
             </Button>
             <CommandBar Margin="56,0,0,0" HorizontalAlignment="Center">
                 <AppBarButton x:Name="uiBarAdd" Icon="Add" Label="Add"
-                          Click="CmdAdd_Click"
-                          ToolTipService.ToolTip="Add a New Preset to Radio"/>
+                              Click="CmdAdd_Click"
+                              ToolTipService.ToolTip="Add new preset to radio"/>
                 <AppBarSeparator/>
                 <AppBarButton x:Name="uiBarImport" Icon="Download" Label="Import"
-                          Click="CmdImport_Click"
-                          ToolTipService.ToolTip="Import Radio Presets from a File"/>
+                              Click="CmdImport_Click"
+                              ToolTipService.ToolTip="Import radio presets from a file"/>
                 <AppBarButton x:Name="uiBarExport" Icon="Upload" Label="Export"
-                          Click="CmdExport_Click"
-                          ToolTipService.ToolTip="Export Radio Presets to a File"/>
+                              Click="CmdExport_Click"
+                              ToolTipService.ToolTip="Export radio presets to a file"/>
                 <AppBarSeparator/>
             </CommandBar>
         </StackPanel>
