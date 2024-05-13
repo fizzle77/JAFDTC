@@ -206,7 +206,6 @@ https://www.gnu.org/licenses/.
                                      HorizontalTextAlignment="Center"
                                      MaxLength="2"
                                      Tag="Preset"
-                                     LostFocus="PageTextBox_LostFocus"
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      Text="{x:Bind Preset, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                             <TextBox Grid.Column="1" Margin="6,0,0,0"
@@ -214,20 +213,16 @@ https://www.gnu.org/licenses/.
                                      HorizontalTextAlignment="Left"
                                      MaxLength="7"
                                      Tag="Frequency"
-                                     LostFocus="PageTextBox_LostFocus"
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      Text="{x:Bind Frequency, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                             <ComboBox Grid.Column="2" Width="72" Margin="6,1,0,0"
                                       Tag="Modulation"
                                       Visibility="{x:Bind ModulationVisibility, Mode=OneWay}"
-                                      ItemsSource="{x:Bind ModulationItems, Mode=OneWay}"
-                                      SelectedIndex="{x:Bind ModulationIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      SelectionChanged="PageModCombo_SelectionChanged"/>
+                                      SelectionChanged="PreListModCombo_SelectionChanged"/>
                             <TextBox Grid.Column="3" Margin="6,0,0,0"
                                      VerticalAlignment="Center"
                                      HorizontalTextAlignment="Center"
                                      Tag="Description"
-                                     LostFocus="PageTextBox_LostFocus"
                                      FontWeight="Medium"
                                      FontSize="16"
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -237,7 +232,7 @@ https://www.gnu.org/licenses/.
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      Tag="{x:Bind Tag}"
                                      ToolTipService.ToolTip="Delete this Preset"
-                                     Click="PreBntDelete_Click">
+                                     Click="PreListBtnDelete_Click">
                                 <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
                             </Button>
                         </Grid>
@@ -271,7 +266,6 @@ https://www.gnu.org/licenses/.
                          VerticalAlignment="Center"
                          PlaceholderText="None Set"
                          MaxLength="7"
-                         LostFocus="PageTextBox_LostFocus"
                          Text="{x:Bind EditMisc.DefaultTuning, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                 <TextBlock Grid.Column="2" Margin="8,0,0,0"
                            x:Name="uiMiscTextDefaultLabel"
