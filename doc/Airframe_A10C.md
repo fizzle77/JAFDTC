@@ -121,4 +121,22 @@ and DDM (degrees, decimal minutes) formatted latitude and longitude to identify 
 
 ## Miscellaneous
 
-TODO
+![a10-misc-system](https://github.com/fizzle77/JAFDTC/assets/42720583/5de7201a-c848-459d-a3b1-bdd7fe3800d3)
+
+The Miscellaneous System enables configuration of various settings. Many of these settings would typically be changed often in flight. The idea behind having them here is getting them set as desired before taxi/takeoff.
+
+#### CDU Misc Configuration
+
+- **Coordinate System** allows changing from the default L/L to MGRS. This only affects the CDU at present, not the TAD or TGP.
+- **Bullseye on HUD** will make visible your aircraft's BULLS position in the upper right corner of the HUD.
+- **FPM Flight Plan 01** allows changing the default flight plan, on the CDU FPM page, between manual and automatinc waypoint advancement.
+- **STEER Page Speed Display** changes the speed displayed on the CDU's STEER page between IAS, TAS, and GS.
+
+#### AAP Configuration
+
+- **STEER PT** sets the AAP's STEER PT knob. Options are Flt Plan, Mark, and Mission.
+- **PAGE** sets the AAP's PAGE knob. Options are Other, Position, Steer, and Waypt.
+
+#### Autopilot Configuration
+
+- **Mode** allows setting the autopilot mode switch between PATH, ALT/HDG, and ALT.
