@@ -86,7 +86,7 @@ namespace JAFDTC.UI.F16C
                     Preset = cfgPreset.Preset.ToString(),
                     Frequency = new(cfgPreset.Frequency),
                     Description = new(cfgPreset.Description),
-                    Modulation = cfgPreset.Modulation
+                    Modulation =  new(cfgPreset.Modulation)
                 };
                 editPresets.Add(newItem);
             }
@@ -119,7 +119,7 @@ namespace JAFDTC.UI.F16C
                     Preset = int.Parse(item.Preset),
                     Frequency = new(item.Frequency),
                     Description = new(item.Description),
-                    Modulation = item.Modulation
+                    Modulation = new(item.Modulation)
                 };
                 cfgPresetList.Add(preset);
             }
