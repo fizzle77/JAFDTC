@@ -460,7 +460,8 @@ namespace JAFDTC.UI.App
                             using FileStream fileStream = new(path, FileMode.Create);
                             await msiStream.CopyToAsync(fileStream);
 
-                            string msg = $"JAFDTC {githubVersion} package successfully copied to your Downloads folder, " +
+                            string msg = $"JAFDTC {githubVersion} package successfully copied to your Downloads folder,\n\n" +
+                                         $"    {path}\n\n" +
                                          $"please install it at your convenience.";
                             await Utilities.Message1BDialog(Content.XamlRoot, "Qapla'!", msg);
                         }
