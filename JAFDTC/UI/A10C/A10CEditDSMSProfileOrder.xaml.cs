@@ -60,6 +60,10 @@ namespace JAFDTC.UI.A10C
                     }
                 }
             }
+
+            bool isNotLinked = string.IsNullOrEmpty(_config.SystemLinkedTo(SystemTag));
+            uiListProfiles.IsEnabled = isNotLinked;
+            uiCheckUseOrder.IsEnabled = isNotLinked;
         }
 
         private void uiListProfiles_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)

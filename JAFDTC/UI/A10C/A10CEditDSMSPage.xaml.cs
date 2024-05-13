@@ -80,12 +80,13 @@ namespace JAFDTC.UI.A10C
             {
                 _config.UnlinkSystem(DSMSSystem.SystemTag);
                 _config.Save(this);
+                ((IA10CDSMSContentFrame)DSMSContentFrame.Content).CopyConfigToEditState();
             }
             else if (selectedItem.Length > 0)
             {
                 _config.LinkSystemTo(DSMSSystem.SystemTag, _navArgs.UIDtoConfigMap[_configNameToUID[selectedItem]]);
                 _config.Save(this);
-                ((A10CEditDSMSMunitionSettingsPage)DSMSContentFrame.Content).CopyConfigToEditState();
+                ((IA10CDSMSContentFrame)DSMSContentFrame.Content).CopyConfigToEditState();
             }
 
             UpdateLinkControls();

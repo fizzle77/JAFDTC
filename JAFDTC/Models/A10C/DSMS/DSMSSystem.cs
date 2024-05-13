@@ -177,6 +177,8 @@ namespace JAFDTC.Models.A10C.DSMS
         {
             LaserCode = other.LaserCode;
             _munitionSettingMap = other._munitionSettingMap;
+            IsProfileOrderEnabled = other.IsProfileOrderEnabled;
+            ProfileOrder = other.ProfileOrder;
         }
 
         public virtual object Clone() => new DSMSSystem(this);
