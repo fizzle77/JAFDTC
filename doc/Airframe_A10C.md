@@ -119,6 +119,43 @@ JAFDTC uses the common
 interface to set up the Warthog *Waypoint* system. Waypoints in the Warthog include elevation
 and DDM (degrees, decimal minutes) formatted latitude and longitude to identify positions.
 
+## DSMS
+
+JAFDTC supports the most common changes made in the DSMS for PGMs and cluster bombs.
+
+The **Munition Settings** tab allows modification of commonly changed options on both the INV page and the default profiles. Any changes you make to a weapon type here will be applied to the weapon wherever it is loaded on the jet.
+
+![a10-dsms-munitions](https://github.com/fizzle77/JAFDTC/assets/42720583/81336ad8-ac6f-44a4-bd31-33a506152b7f)
+
+Note that the **Laser Code** setting applies to all laser weapons. You don't need to set it for each laser weapon type.
+
+The **Profile Order** tab allows setting the order of the default profiles. The list can be dragged into the desired order. When enabled with the checkbox, any profiles present will be sorted as shown. Any profiles not listed here will be sorted to the end of the list.
+
+![a10-dsms-profiless](https://github.com/fizzle77/JAFDTC/assets/42720583/d0c4a172-6640-4759-ad52-77143b0a9791)
+
+#### Not (Yet?) Supported
+
+- There is no support for the creation of custom weapon profiles with varying settings.
+- Settings for less commonly used munitions are not here: unguided bombs or rockets, training munitions, illumination rockets, etc.
+
 ## Miscellaneous
 
-TODO
+![a10-misc-system](https://github.com/fizzle77/JAFDTC/assets/42720583/5de7201a-c848-459d-a3b1-bdd7fe3800d3)
+
+The Miscellaneous System enables configuration of various settings. Many of these settings would typically be changed often in flight. The idea behind having them here is getting them set as desired before taxi/takeoff.
+
+#### CDU Misc Configuration
+
+- **Coordinate System** allows changing from the default L/L to MGRS. This only affects the CDU at present, not the TAD or TGP.
+- **Bullseye on HUD** will make visible your aircraft's BULLS position in the upper right corner of the HUD.
+- **FPM Flight Plan 01** allows changing the default flight plan, on the CDU FPM page, between manual and automatinc waypoint advancement.
+- **STEER Page Speed Display** changes the speed displayed on the CDU's STEER page between IAS, TAS, and GS.
+
+#### AAP Configuration
+
+- **STEER PT** sets the AAP's STEER PT knob. Options are Flt Plan, Mark, and Mission.
+- **PAGE** sets the AAP's PAGE knob. Options are Other, Position, Steer, and Waypt.
+
+#### Autopilot Configuration
+
+- **Mode** allows setting the autopilot mode switch between PATH, ALT/HDG, and ALT.
