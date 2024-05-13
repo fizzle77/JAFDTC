@@ -52,9 +52,38 @@ function JAFDTC_A10C_Fn_IsCommPageOnDefaultButton()
     return value == "COMM"
 end
 
-function JAFDTC_A10C_Fn_IsCommPageNotOnDefaultButton()
-    local value = JAFDTC_A10C_GetLMFD_value("label_12");
-    return value ~= "COMM"
+-- DSMS Routines
+
+function JAFDTC_A10C_Fn_IsDSMSInDefaultMFDPosition()
+    local value = JAFDTC_A10C_GetLMFD_value("label_13");
+    return value == "DSMS";
+end
+
+function JAFDTC_A10C_Fn_QueryLoadout()
+    local lmfd = JAFDTC_A10C_GetLMFD();
+    local outputTable = { };
+    for station = 1,11 do
+        outputTable[station] = lmfd["STORE_NAME_" .. station] or "---";
+    end
+    local response = JAFDTC_A10C_TableToString(outputTable);
+    JAFDTC_Log("QueryLoadout: " .. response);
+    return response;
+end
+
+function JAFDTC_A10C_Fn_QueryDSMSProfiles()
+    local lmfd = JAFDTC_A10C_GetLMFD();
+    local outputTable = { };
+    profile_index = 0;
+    repeat
+      profile_index = profile_index + 1;  
+      value = lmfd["TABLE_NAMES" .. profile_index] or "###";
+      if value ~= "###" then
+        outputTable[profile_index] = value;
+      end
+    until(value == "###")
+    local response = JAFDTC_A10C_TableToString(outputTable);
+    JAFDTC_Log("QueryDSMSProfiles: " .. response);
+    return response;
 end
 
 -- CDU Routines
@@ -129,6 +158,38 @@ function JAFDTC_A10C_Fn_SpeedIsNot(speed)
     return true
 end
 
+-- HUD Routines
+
+function JAFDTC_A10C_GetHUD()
+	local table = JAFDTC_ParseDisplay(5);
+    JAFDTC_DebugDisplay(table);
+    return table;
+end
+
+function JAFDTC_A10C_GetHUD_value(key)
+	local table = JAFDTC_A10C_GetHUD();
+    local value = table[key] or "---";
+    JAFDTC_Log("HUD table[" .. key .. "]: " .. value);
+    return value;
+end
+
+function JAFDTC_A10C_Fn_Arc210Com1IsOnHUD()
+    return JAFDTC_A10C_GetHUD_value("ARC_210_Radio_1_Status") ~= "---"
+end
+function JAFDTC_A10C_Fn_Arc210Com2IsOnHUD()
+    return JAFDTC_A10C_GetHUD_value("ARC_210_Radio_2_Status") ~= "---"
+end
+
+-- Utility
+
+function JAFDTC_A10C_TableToString(table)
+    local response = "";
+    for k,v in pairs(table) do
+        response = response .. k .. "=" .. v .. ";"; -- TODO escaping
+    end
+    return response
+end
+
 --[[
 local vhf_lut1 = {
     ["0.0"] = "3",
@@ -177,7 +238,8 @@ function JAFDTC_A10C_AfterNextFrame(params)
     -- for some reason, UFC_COM_SEC pushbutton activated state is -1, not 1 like the other buttons. dcs works in
     -- strange and mysterious ways...
     if iff == 1 then params["uploadCommand"] = "1" end
-    if comSec == -1 then params["incCommand"] = "1" end
+    if comSec == -1 then params["incCommand"] = "1" end -- oddly, this captures mouse click on just this button
+    if comSec == 1 then params["incCommand"] = "1" end -- oddly, this is also necessary to catch bound device presses
     if eccm == 1 then params["decCommand"] = "1" end
     if idmrt == 1 then params["toggleJAFDTCCommand"] = "1" end
 end

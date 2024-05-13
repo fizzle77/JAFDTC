@@ -318,7 +318,7 @@ namespace JAFDTC
             {
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
-                    FileManager.Log($"Configuration updload reports error: {error}");
+                    FileManager.Log($"Configuration upload reports error: {error}");
                     StatusMessageTx.Send(error);
                     General.PlayAudio("ux_error.wav");
                 });

@@ -26,6 +26,7 @@
     <None Remove="Audio\ux_cap_cpan.wav" />
     <None Remove="Audio\ux_cap_wypt.wav" />
     <None Remove="Audio\ux_error.wav" />
+    <None Remove="Data\db-a10-munitions.json" />
     <None Remove="Data\db-emitters.json" />
     <None Remove="Data\db-pois-airbases.json" />
     <None Remove="DCS\Hooks\JAFDTCStatusMsgHook.lua" />
@@ -41,6 +42,15 @@
     <None Remove="DCS\JAFDTC\M2000CFunctions.lua" />
     <None Remove="DCS\JAFDTC\StatusMsg.dlg" />
     <None Remove="DCS\JAFDTC\WyptCapture.dlg" />
+    <None Remove="Images\agm-65d.jpg" />
+    <None Remove="Images\agm-65h.jpg" />
+    <None Remove="Images\agm-65l.jpg" />
+    <None Remove="Images\agr.jpg" />
+    <None Remove="Images\cbu-87-105.jpg" />
+    <None Remove="Images\gbu-10-12.jpg" />
+    <None Remove="Images\gbu-31.jpg" />
+    <None Remove="Images\gbu-38.jpg" />
+    <None Remove="Images\gbu-54.jpg" />
     <None Remove="Images\LockScreenLogo.scale-200.png" />
     <None Remove="Images\SplashScreen.scale-200.png" />
     <None Remove="Images\Square150x150Logo.scale-200.png" />
@@ -48,6 +58,8 @@
     <None Remove="Images\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <None Remove="Images\Wide310x150Logo.scale-200.png" />
     <None Remove="Package.appxmanifest" />
+    <None Remove="UI\A10C\A10CEditDSMSMunitionSettingsPage.xaml" />
+    <None Remove="UI\A10C\A10CEditDSMSProfileOrder.xaml" />
     <None Remove="UI\A10C\A10CEditMiscPage.xaml" />
     <None Remove="UI\App\EditPointsOfInterestPage.xaml" />
     <None Remove="UI\App\ImportParamsDialog.xaml" />
@@ -55,6 +67,7 @@
     <None Remove="UI\Base\EditNavpointListPage.xaml" />
     <None Remove="UI\Base\EditNavpointPage.xaml" />
     <None Remove="UI\Base\EditRadioPage.xaml" />
+    <None Remove="UI\BlankPage1.xaml" />
     <None Remove="UI\F15E\F15EEditMiscPage.xaml" />
     <None Remove="UI\F15E\F15EEditMPDPage.xaml" />
     <None Remove="UI\F15E\F15EEditSteerpointListPage.xaml" />
@@ -75,6 +88,7 @@
     <Content Include="Audio\ux_cap_wypt.wav" />
     <Content Include="Audio\ux_error.wav" />
     <Content Include="Data\db-emitters.json" />
+    <Content Include="Data\db-a10-munitions.json" />
     <Content Include="Data\db-pois-airbases.json" />
     <Content Include="DCS\Hooks\JAFDTCStatusMsgHook.lua" />
     <Content Include="DCS\Hooks\JAFDTCWyptCaptureHook.lua" />
@@ -89,6 +103,15 @@
     <Content Include="DCS\JAFDTC\FA18CFunctions.lua" />
     <Content Include="DCS\JAFDTC\M2000CFunctions.lua" />
     <Content Include="DCS\JAFDTC\WyptCapture.dlg" />
+    <Content Include="Images\agm-65d.jpg" />
+    <Content Include="Images\agm-65h.jpg" />
+    <Content Include="Images\agm-65l.jpg" />
+    <Content Include="Images\agr.jpg" />
+    <Content Include="Images\cbu-87-105.jpg" />
+    <Content Include="Images\gbu-10-12.jpg" />
+    <Content Include="Images\gbu-31.jpg" />
+    <Content Include="Images\gbu-38.jpg" />
+    <Content Include="Images\gbu-54.jpg" />
     <Content Include="Images\JAFDTC_Icon.ico" />
     <Content Include="Images\LockScreenLogo.scale-200.png" />
     <Content Include="Images\SplashScreen.scale-200.png" />
@@ -129,6 +152,24 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\A10C\A10CEditDSMSProfileOrder.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\A10C\A10CEditDSMSMunitionSettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\BlankPage1.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

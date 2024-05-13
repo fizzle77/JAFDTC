@@ -26,6 +26,7 @@ using JAFDTC.UI.App;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using JAFDTC.UI.F16C;
+using JAFDTC.Models.A10C.DSMS;
 
 namespace JAFDTC.UI.A10C
 {
@@ -36,6 +37,7 @@ namespace JAFDTC.UI.A10C
         public const string MISC = "\xE8B7";
         public const string RADIO = "\xE704";
         public const string WYPT = "\xE707";
+        public const string DSMS = "\xEBD2";
     }
 
     /// <summary>
@@ -50,6 +52,7 @@ namespace JAFDTC.UI.A10C
             {
                 // This is the order they appear in the UI. Resist the temptation to alphabetize.
                 A10CEditWaypointListHelper.PageInfo,
+                A10CEditDSMSPage.PageInfo,
                 A10CEditRadioPageHelper.PageInfo,
                 A10CEditMiscPage.PageInfo
             };
@@ -58,6 +61,7 @@ namespace JAFDTC.UI.A10C
         {
             ISystem system = tag switch
             {
+                DSMSSystem.SystemTag => ((A10CConfiguration)config).DSMS,
                 MiscSystem.SystemTag => ((A10CConfiguration)config).Misc,
                 RadioSystem.SystemTag => ((A10CConfiguration)config).Radio,
                 WYPTSystem.SystemTag => ((A10CConfiguration)config).WYPT,

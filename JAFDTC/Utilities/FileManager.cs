@@ -21,6 +21,7 @@
 #define JAFDTC_LOG
 
 using JAFDTC.Models;
+using JAFDTC.Models.A10C;
 using JAFDTC.Models.DCS;
 using System;
 using System.Collections.Generic;
@@ -484,6 +485,20 @@ namespace JAFDTC.Utilities
         public static List<Emitter> LoadEmitters()
         {
             return LoadSystemDbase<Emitter>("db-emitters.json");
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // A10C munitions database
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// return the A10C munitions database that provides information on weapons for the hawg.
+        /// </summary>
+        public static List<A10CMunition> LoadA10Munitions()
+        {
+            return LoadSystemDbase<A10CMunition>("db-a10-munitions.json");
         }
     }
 }

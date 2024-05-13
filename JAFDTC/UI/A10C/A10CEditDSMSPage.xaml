@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="JAFDTC.UI.A10C.A10CEditDSMSPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.Models.A10C"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <NavigationView PaneDisplayMode="Top" IsSettingsVisible="False" IsBackButtonVisible="Collapsed"
+                    SelectionChanged="NavigationView_SelectionChanged">
+        <NavigationView.MenuItems>
+            <NavigationViewItem x:Name="uiMunitionTab" Content="Munition Settings" IsSelected="True"/>
+            <NavigationViewItemSeparator/>
+            <NavigationViewItem x:Name="uiProfileTab" Content="Profile Order" />
+        </NavigationView.MenuItems>
+
+        <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush }">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- DSMS Content Frame -->
+            <Frame x:Name="DSMSContentFrame" Grid.Row="0" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left" />
+
+            <!--
+            ===============================================================================================================
+            link / reset
+            ===============================================================================================================
+            -->
+            <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="12,12,12,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                    <Button Width="140"
+                        x:Name="uiPageBtnLink"
+                        Click="PageBtnLink_Click"
+                        ToolTipService.ToolTip="Link or unlink this system to/from another configuration">
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE71B;"/>
+                            <TextBlock VerticalAlignment="center"
+                                   x:Name="uiPageBtnTxtLink">
+                            FIXUP
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <TextBlock Margin="12,0,24,0"
+                           x:Name="uiPageTxtLink"
+                           VerticalAlignment="center">
+                    FIXUP
+                    </TextBlock>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                    <Button x:Name="uiPageBtnReset"
+                        Click="PageBtnReset_Click"
+                        ToolTipService.ToolTip="Reset the configuration of this system to its defaults">
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                            <TextBlock VerticalAlignment="center">Reset Page to Defaults</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </NavigationView>
+</Page>
