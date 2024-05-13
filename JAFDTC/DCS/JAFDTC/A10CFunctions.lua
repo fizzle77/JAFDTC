@@ -238,7 +238,8 @@ function JAFDTC_A10C_AfterNextFrame(params)
     -- for some reason, UFC_COM_SEC pushbutton activated state is -1, not 1 like the other buttons. dcs works in
     -- strange and mysterious ways...
     if iff == 1 then params["uploadCommand"] = "1" end
-    if comSec == -1 then params["incCommand"] = "1" end
+    if comSec == -1 then params["incCommand"] = "1" end -- oddly, this captures mouse click on just this button
+    if comSec == 1 then params["incCommand"] = "1" end -- oddly, this is also necessary to catch bound device presses
     if eccm == 1 then params["decCommand"] = "1" end
     if idmrt == 1 then params["toggleJAFDTCCommand"] = "1" end
 end
