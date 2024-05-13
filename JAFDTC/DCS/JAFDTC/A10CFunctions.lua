@@ -173,10 +173,10 @@ function JAFDTC_A10C_GetHUD_value(key)
     return value;
 end
 
-function JAFDTC_A10C_CheckCondition_Arc210Com1IsOnHUD()
+function JAFDTC_A10C_Fn_Arc210Com1IsOnHUD()
     return JAFDTC_A10C_GetHUD_value("ARC_210_Radio_1_Status") ~= "---"
 end
-function JAFDTC_A10C_CheckCondition_Arc210Com2IsOnHUD()
+function JAFDTC_A10C_Fn_Arc210Com2IsOnHUD()
     return JAFDTC_A10C_GetHUD_value("ARC_210_Radio_2_Status") ~= "---"
 end
 
