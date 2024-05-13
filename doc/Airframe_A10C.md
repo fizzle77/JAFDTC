@@ -119,6 +119,25 @@ JAFDTC uses the common
 interface to set up the Warthog *Waypoint* system. Waypoints in the Warthog include elevation
 and DDM (degrees, decimal minutes) formatted latitude and longitude to identify positions.
 
+## DSMS
+
+JAFDTC supports the most common changes made in the DSMS for PGMs and cluster bombs.
+
+The **Munition Settings** tab allows modification of commonly changed options on both the INV page and the default profiles. Any changes you make to a weapon type here will be applied to the weapon wherever it is loaded on the jet.
+
+![a10-dsms-munitions](https://github.com/fizzle77/JAFDTC/assets/42720583/81336ad8-ac6f-44a4-bd31-33a506152b7f)
+
+Note that the **Laser Code** setting applies to all laser weapons. You don't need to set it for each laser weapon type.
+
+The **Profile Order** tab allows setting the order of the default profiles. The list can be dragged into the desired order. When enabled with the checkbox, any profiles present will be sorted as shown. Any profiles not listed here will be sorted to the end of the list.
+
+![a10-dsms-profiless](https://github.com/fizzle77/JAFDTC/assets/42720583/d0c4a172-6640-4759-ad52-77143b0a9791)
+
+#### Not (Yet?) Supported
+
+- There is no support for the creation of custom weapon profiles with varying settings.
+- Settings for less commonly used munitions are not here: unguided bombs or rockets, training munitions, illumination rockets, etc.
+
 ## Miscellaneous
 
 ![a10-misc-system](https://github.com/fizzle77/JAFDTC/assets/42720583/5de7201a-c848-459d-a3b1-bdd7fe3800d3)
