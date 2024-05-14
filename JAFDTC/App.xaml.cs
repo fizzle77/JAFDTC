@@ -28,7 +28,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -88,8 +87,6 @@ namespace JAFDTC
         private DispatcherTimer CheckDCSTimer { get; set; }
 
         private System.DateTimeOffset LastDCSExportCheck { get; set; }
-
-        private bool IsUploadInFlight { get; set; }
 
         private long LastDCSExportPacketCount { get; set; }
 
@@ -213,6 +210,24 @@ namespace JAFDTC
             }
         }
 
+        /// <summary>
+        /// returns current upload state for dcs. this property does not have an explict set handler and generates
+        /// property change events.
+        /// </summary>
+        private bool _isDCSUploadInFlight;
+        public bool IsDCSUploadInFlight
+        {
+            get => _isDCSUploadInFlight;
+            private set
+            {
+                if (_isDCSUploadInFlight != value)
+                {
+                    _isDCSUploadInFlight = value;
+                    OnPropertyChanged(nameof(IsDCSUploadInFlight));
+                }
+            }
+        }
+
         // ---- private properties, read-only
 
         private readonly Dictionary<string, AirframeTypes> _dcsToJAFDTCTypeMap;
@@ -270,7 +285,7 @@ namespace JAFDTC
                 Settings.Preflight();
 
                 IsJAFDTCPinnedToTop = Settings.IsAlwaysOnTop;
-                IsUploadInFlight = false;
+                IsDCSUploadInFlight = false;
 
                 TelemDataRx.Instance.TelemDataReceived += TelemDataReceiver_DataReceived;
                 TelemDataRx.Instance.Start();
@@ -353,9 +368,9 @@ namespace JAFDTC
         /// </summary>
         private void ProcessMarker(TelemDataRx.TelemData data)
         {
-            if (!IsUploadInFlight && !string.IsNullOrEmpty(data.Marker))
+            if (!IsDCSUploadInFlight && !string.IsNullOrEmpty(data.Marker))
             {
-                IsUploadInFlight = true;
+                IsDCSUploadInFlight = true;
                 MarkerUpdateTimestamp = 0;
                 if (Settings.UploadFeedback != UploadFeedbackTypes.LIGHTS)
                 {
@@ -366,9 +381,9 @@ namespace JAFDTC
                 }
                 FileManager.Log($"Upload starts, marker '{data.Marker}'");
             }
-            else if (IsUploadInFlight && data.Marker.StartsWith("ERROR: "))
+            else if (IsDCSUploadInFlight && data.Marker.StartsWith("ERROR: "))
             {
-                IsUploadInFlight = false;
+                IsDCSUploadInFlight = false;
                 StatusMessageTx.Send(data.Marker.Remove(0, "ERROR: ".Length));
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
@@ -376,7 +391,7 @@ namespace JAFDTC
                 });
                 FileManager.Log($"Upload fails, reporting '{data.Marker}'");
             }
-            else if (IsUploadInFlight &&
+            else if (IsDCSUploadInFlight &&
                      !string.IsNullOrEmpty(data.Marker) &&
                      (Settings.UploadFeedback == UploadFeedbackTypes.AUDIO_PROGRESS))
             {
@@ -387,9 +402,9 @@ namespace JAFDTC
                     MarkerUpdateTimestamp = DateTime.Now.Ticks;
                 }
             }
-            else if (IsUploadInFlight && string.IsNullOrEmpty(data.Marker))
+            else if (IsDCSUploadInFlight && string.IsNullOrEmpty(data.Marker))
             {
-                IsUploadInFlight = false;
+                IsDCSUploadInFlight = false;
                 if ((Settings.UploadFeedback == UploadFeedbackTypes.AUDIO_DONE) ||
                     (Settings.UploadFeedback == UploadFeedbackTypes.AUDIO_PROGRESS))
                 {
@@ -414,7 +429,7 @@ namespace JAFDTC
         /// </summary>
         private void ProcessUploadCommand(TelemDataRx.TelemData data)
         {
-            if (IsUploadInFlight)
+            if (IsDCSUploadInFlight)
             {
                 UploadPressed = false;
                 UploadPressedTimestamp = 0;

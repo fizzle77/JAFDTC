@@ -117,7 +117,7 @@ https://www.gnu.org/licenses/.
                               Click="CmdLoadJet_Click"
                               ToolTipService.ToolTip="Upload selected configuration to jet">
                     <AppBarButton.Icon>
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE709;"/>
+                        <FontIcon x:Name="uiBarBtnLoadJetIcon" FontFamily="Segoe Fluent Icons" Glyph="&#xE709;"/>
                     </AppBarButton.Icon>
                 </AppBarButton>
                 <AppBarButton x:Name="uiBarBtnFocusDCS" Label="Focus DCS"
