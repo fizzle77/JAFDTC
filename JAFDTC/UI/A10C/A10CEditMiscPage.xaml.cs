@@ -79,7 +79,8 @@ namespace JAFDTC.UI.A10C
             // For mapping property errors to corresponding text field.
             _miscTextFieldPropertyMap = new Dictionary<string, TextBox>()
             {
-                ["TACANChannel"] = uiTextTACANChannel
+                ["TACANChannel"] = uiTextTACANChannel,
+                ["IFFMode3Code"] = uiTextIFFMode3Code
             };
             _defaultBorderBrush = uiTextTACANChannel.BorderBrush;
             _defaultBkgndBrush = uiTextTACANChannel.Background;
@@ -105,6 +106,9 @@ namespace JAFDTC.UI.A10C
             EditMisc.TACANChannel = Config.Misc.TACANChannel;
             EditMisc.TACANBand = Config.Misc.TACANBand;
             EditMisc.TACANMode = Config.Misc.TACANMode;
+            EditMisc.IFFMasterMode = Config.Misc.IFFMasterMode;
+            EditMisc.IFFMode4On = Config.Misc.IFFMode4On;
+            EditMisc.IFFMode3Code = Config.Misc.IFFMode3Code;
         }
 
         private void CopyEditToConfig(bool isPersist = false)
@@ -121,6 +125,9 @@ namespace JAFDTC.UI.A10C
                 Config.Misc.TACANChannel = EditMisc.TACANChannel;
                 Config.Misc.TACANBand = EditMisc.TACANBand;
                 Config.Misc.TACANMode = EditMisc.TACANMode;
+                Config.Misc.IFFMasterMode = EditMisc.IFFMasterMode;
+                Config.Misc.IFFMode4On = EditMisc.IFFMode4On;
+                Config.Misc.IFFMode3Code = EditMisc.IFFMode3Code;
 
                 if (isPersist)
                 {
@@ -218,7 +225,7 @@ namespace JAFDTC.UI.A10C
             }
         }
 
-        // rebuild the setup of the autopilot mode according to the current settings. 
+        // rebuild the setup of the TACAN band according to the current settings. 
         //
         private void RebuildTACANBandSetup()
         {
@@ -234,7 +241,7 @@ namespace JAFDTC.UI.A10C
             }
         }
 
-        // rebuild the setup of the autopilot mode according to the current settings. 
+        // rebuild the setup of the TACAN mode according to the current settings. 
         //
         private void RebuildTACANModeSetup()
         {
@@ -248,6 +255,29 @@ namespace JAFDTC.UI.A10C
                     return;
                 }
             }
+        }
+
+        // rebuild the setup of the IFF master mode according to the current settings. 
+        //
+        private void RebuildIFFMasterModeSetup()
+        {
+            int tacanMode = (string.IsNullOrEmpty(EditMisc.IFFMasterMode)) ? int.Parse(_miscSysDefault.IFFMasterMode)
+                                                                           : int.Parse(EditMisc.IFFMasterMode);
+            foreach (TextBlock item in uiComboIFFMasterMode.Items)
+            {
+                if (int.Parse((string)item.Tag) == tacanMode)
+                {
+                    uiComboIFFMasterMode.SelectedItem = item;
+                    return;
+                }
+            }
+        }
+
+        // rebuild the setup of the IFF mode 4 ON setting according to the current settings. 
+        //
+        private void RebuildIFFMode4OnSetup()
+        {
+            uiCheckIFFMode4On.IsChecked = EditMisc.IffMode4OnValue;
         }
 
         // TODO: document
@@ -298,6 +328,8 @@ namespace JAFDTC.UI.A10C
                     RebuildAutopilotModeSetup();
                     RebuildTACANBandSetup();
                     RebuildTACANModeSetup();
+                    RebuildIFFMasterModeSetup();
+                    RebuildIFFMode4OnSetup();
 
                     RebuildLinkControls();
                     RebuildEnableState();
@@ -350,6 +382,14 @@ namespace JAFDTC.UI.A10C
                 Config.Save(this);
                 CopyConfigToEdit();
             }
+        }
+
+        private void uiTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+            {
+                CopyEditToConfig(true);
+            });
         }
 
         // ---- coordinate system setup -------------------------------------------------------------------------------------------
@@ -440,15 +480,6 @@ namespace JAFDTC.UI.A10C
 
         // ---- TACAN setup -------------------------------------------------------------------------------------------
 
-
-        private void uiTextTACANChannel_LostFocus(object sender, RoutedEventArgs e)
-        {
-            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-            {
-                CopyEditToConfig(true);
-            });
-        }
-
         private void uiComboTACANBand_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
@@ -465,6 +496,28 @@ namespace JAFDTC.UI.A10C
             if (!IsRebuildingUI && (item != null) && (item.Tag != null))
             {
                 EditMisc.TACANMode = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        // ---- IFF setup -------------------------------------------------------------------------------------------
+
+        private void uiComboIFFMasterMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.IFFMasterMode = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        private void uiCheckIFFMode4On_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            if (!IsRebuildingUI && (checkBox != null))
+            {
+                EditMisc.IFFMode4On = checkBox.IsChecked.ToString();
                 CopyEditToConfig(true);
             }
         }

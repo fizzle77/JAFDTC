@@ -213,6 +213,32 @@ namespace JAFDTC.Models.A10C
             ufc.AddAction(3013, "FN", delay, 1);
             AddDevice(ufc);
 
+            // ---- IFF
+
+            AirframeDevice iff = new(43, "IFF");
+            
+            iff.AddAction(3008, "MASTER_OFF", delay, 0.0, 0.0);
+            iff.AddAction(3008, "MASTER_STBY", delay, 0.1, 0.1);
+            iff.AddAction(3008, "MASTER_NORM", delay, 0.3, 0.3);
+
+            //
+            // following actions are for thumbwheels, add via:
+            //
+            //     AddCommand(device.CustomizedDCSActionCommand(key, posn, posn))
+            //
+            iff.AddAction(3003, "MODE3A-WHEEL1_UP", delay, 0.0, 0.0);
+            iff.AddAction(3003, "MODE3A-WHEEL1_DN", delay, 0.0, 0.0);
+            iff.AddAction(3004, "MODE3A-WHEEL2_UP", delay, 0.0, 0.0);
+            iff.AddAction(3004, "MODE3A-WHEEL2_DN", delay, 0.0, 0.0);
+            iff.AddAction(3005, "MODE3A-WHEEL3_UP", delay, 0.0, 0.0);
+            iff.AddAction(3005, "MODE3A-WHEEL3_DN", delay, 0.0, 0.0);
+            iff.AddAction(3006, "MODE3A-WHEEL4_UP", delay, 0.0, 0.0);
+            iff.AddAction(3007, "MODE3A-WHEEL5_DN", delay, 0.0, 0.0);
+
+            iff.AddAction(3016, "MODE4_ON", delay, 1, 1);
+
+            AddDevice(iff);
+
             // ---- an/arc-210 uhf radio
 
             AirframeDevice arc210 = new(55, "UHF_ARC210");
