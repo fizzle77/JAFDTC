@@ -43,18 +43,20 @@
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:A10CMunition">
                     <StackPanel Orientation="Horizontal" Height="48">
-                        <Image Source="{x:Bind ImageFullPath}" VerticalAlignment="Center"/>
+                        <Image Margin="0,4,0,4" Source="{x:Bind ImageFullPath}" VerticalAlignment="Center"/>
                         <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" 
                             Style="{ThemeResource EditorParamStaticTextBlockStyle}" 
-                            Margin="12,0,0,0" />
+                            Margin="6,0,0,0" />
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
 
         <!-- Laser Settings -->
-        <TextBlock Grid.Row="0" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">Laser Code</TextBlock>
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2" Margin="6,12,0,0">
+        <TextBlock Grid.Row="0" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">
+            Laser Code
+        </TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2" Margin="12,12,0,0">
             <TextBox Width="86" 
                 x:Name="uiTextLaserCode"
                 Style="{StaticResource EditorParamEditTextBoxStyle}"
@@ -63,28 +65,34 @@
                 ToolTipService.ToolTip="Laser code the selected munition will track"/>
             <CheckBox x:Name="uiCheckAutoLase" Margin="12,0,0,0" 
                 Checked="CheckAutoLase_Changed" Unchecked="CheckAutoLase_Changed">Auto Lase</CheckBox>
-            <TextBox Width="43" Margin="6,0,0,0"
+            <TextBox Width="72" Margin="0,0,0,0"
                 x:Name="uiTextLaseTime"
                 Style="{StaticResource EditorParamEditTextBoxStyle}"
                 MaxLength="2" PlaceholderText="0" LosingFocus="TextLaseTime_LosingFocus"
                 HorizontalAlignment="Left" VerticalAlignment="Center"
                 ToolTipService.ToolTip="Seconds before impact to automatically start the laser firing"/>
-            <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center" Margin="12,0,0,0">seconds</TextBlock>
+            <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center" Margin="6,0,0,0">
+                seconds
+            </TextBlock>
         </StackPanel>
             
         <!-- Delivery Mode (CCIP/CCRP) -->
-        <TextBlock Grid.Row="1" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">Mode</TextBlock>
+        <TextBlock Grid.Row="1" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">
+            Mode
+        </TextBlock>
         <ComboBox x:Name="uiComboDeliveryMode" SelectionChanged="ComboDeliveryMode_SelectionChanged"
-            Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Margin="6,12,0,0" Width="100">
+            Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Margin="12,12,0,0" Width="100">
             <!-- Must match order of A10C.DSMSSystem.DeliveryModes -->
             <ComboBoxItem>CCIP</ComboBoxItem>
             <ComboBoxItem>CCRP</ComboBoxItem>
         </ComboBox>
 
         <!-- Escape Maneuver -->
-        <TextBlock Grid.Row="2" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">Esc Mnvr</TextBlock>
+        <TextBlock Grid.Row="2" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">
+            Escape Manuever
+        </TextBlock>
         <ComboBox x:Name="uiComboEscMnvr" SelectionChanged="ComboEscMnvr_SelectionChanged"
-            Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Margin="6,12,0,0" Width="100">
+            Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Margin="12,12,0,0" Width="100">
             <!-- Must match order of A10C.DSMSSystem.EscapeManeuvers -->
             <ComboBoxItem>NONE</ComboBoxItem>
             <ComboBoxItem>CLB</ComboBoxItem>
@@ -93,8 +101,10 @@
         </ComboBox>
 
         <!-- Release Mode -->
-        <TextBlock Grid.Row="3" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">Release</TextBlock>
-        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="2" Margin="6,12,0,0" >
+        <TextBlock Grid.Row="3" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">
+            Release
+        </TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="2" Margin="12,12,0,0" >
             <ComboBox x:Name="uiComboReleaseMode" SelectionChanged="ComboReleaseMode_SelectionChanged"
                 Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" Width="110">
                 <ComboBoxItem>SGL</ComboBoxItem>
@@ -102,27 +112,36 @@
                 <ComboBoxItem>RIP SGL</ComboBoxItem>
                 <ComboBoxItem>RIP PRS</ComboBoxItem>
             </ComboBox>
-            <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center" Margin="12,0,0,0">Ripple Qty</TextBlock>
-            <TextBox Width="43" Margin="6,0,0,0"
+            <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center" Margin="12,0,0,0">
+                Ripple
+            </TextBlock>
+            <TextBox Width="74" Margin="12,0,0,0"
                 x:Name="uiTextRippleQty"
                 LosingFocus="TextRippleQty_LosingFocus"
                 Style="{StaticResource EditorParamEditTextBoxStyle}"
                 MaxLength="2" PlaceholderText="1"
                 HorizontalAlignment="Left" VerticalAlignment="Center"
                 ToolTipService.ToolTip="Number of munitions to release per weapons release depression"/>
-            <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center" Margin="12,0,0,0">Ft</TextBlock>
-            <TextBox Width="74" Margin="6,0,0,0"
+            <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center" Margin="12,0,0,0">
+                at
+            </TextBlock>
+            <TextBox Width="74" Margin="12,0,0,0"
                 x:Name="uiTextRippleFt"
                 LosingFocus="TextRippleFt_LosingFocus"
                 Style="{StaticResource EditorParamEditTextBoxStyle}"
                 MaxLength="3" PlaceholderText="75"
                 HorizontalAlignment="Left" VerticalAlignment="Center"
                 ToolTipService.ToolTip="Distance between impacts, in feet"/>
+            <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center" Margin="6,0,0,0">
+                ft
+            </TextBlock>
         </StackPanel>
 
         <!-- HOF -->
-        <TextBlock Grid.Row="4" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">HOF</TextBlock>
-        <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="2" Margin="6,12,0,0" >
+        <TextBlock Grid.Row="4" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">
+            HOF
+        </TextBlock>
+        <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="2" Margin="12,12,0,0" >
             <ComboBox x:Name="uiComboHOF" SelectionChanged="ComboHOF_SelectionChanged"
                 VerticalAlignment="Center" Width="100">
                 <ComboBoxItem>300</ComboBoxItem>
@@ -149,9 +168,11 @@
         </StackPanel>
 
         <!-- Fuze -->
-        <TextBlock Grid.Row="5" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">Fuze</TextBlock>
+        <TextBlock Grid.Row="5" Grid.Column="1" Style="{ThemeResource EditorParamStaticTextBlockStyle}" Margin="12,12,0,0" VerticalAlignment="Center">
+            Fuze
+        </TextBlock>
         <ComboBox x:Name="uiComboFuze" SelectionChanged="ComboFuze_SelectionChanged"
-            Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" Margin="6,12,0,0" Width="100">
+            Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" Margin="12,12,0,0" Width="100">
             <ComboBoxItem>N/T</ComboBoxItem>
             <ComboBoxItem>Nose</ComboBoxItem>
             <ComboBoxItem>Tail</ComboBoxItem>
