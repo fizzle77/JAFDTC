@@ -95,6 +95,7 @@ namespace JAFDTC.Models.A10C
             AddDevice(cdu);
 
             // ---- auxiliary avionics panel
+
             AirframeDevice aap = new(22, "AAP");
 
             // steer pt selection knob
@@ -109,6 +110,28 @@ namespace JAFDTC.Models.A10C
             aap.AddAction(3004, "PAGE_WAYPT", delay, 0.3, 0.3);
 
             AddDevice(aap);
+
+            // ---- TACAN panel
+
+            // Note "TACAN" device 51 in devices.lua is something else. It doesn't appear in clickabledata.lua.
+            AirframeDevice tacan = new(74, "TACAN_CTRL_PANEL"); 
+
+            tacan.AddAction(3003, "X_BAND", delay, -1.0, -1.0);
+            tacan.AddAction(3003, "Y_BAND", delay, 1.0, 1.0);
+
+            tacan.AddAction(3006, "MODE_OFF", delay, 0.0, 0.0);
+            tacan.AddAction(3006, "MODE_REC", delay, 0.1, 0.1);
+            tacan.AddAction(3006, "MODE_TR", delay, 0.2, 0.2);
+            tacan.AddAction(3006, "MODE_AA_REC", delay, 0.3, 0.3);
+            tacan.AddAction(3006, "MODE_AA_TR", delay, 0.4, 0.4);
+
+            tacan.AddAction(3001, "TENS_UP", delay, 0.1, 0.1);      
+            tacan.AddAction(3001, "TENS_DOWN", delay, -0.1, -0.1);
+            tacan.AddAction(3002, "ONES_UP", delay, 0.1, 0.1);
+            tacan.AddAction(3002, "ONES_DN", delay, -0.1, -0.1);
+
+            AddDevice(tacan);
+
 
             // ---- Autopilot (LASTE) panel
 

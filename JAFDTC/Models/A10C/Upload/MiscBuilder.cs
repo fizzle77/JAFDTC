@@ -19,6 +19,7 @@
 
 using JAFDTC.Models.A10C.Misc;
 using JAFDTC.Models.DCS;
+using System;
 using System.Text;
 
 namespace JAFDTC.Models.A10C.Upload
@@ -53,6 +54,7 @@ namespace JAFDTC.Models.A10C.Upload
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice aap = _aircraft.GetDevice("AAP"); // "auxiliary avionics panel"
             AirframeDevice ap  = _aircraft.GetDevice("AUTOPILOT");
+            AirframeDevice tacan  = _aircraft.GetDevice("TACAN_CTRL_PANEL");
 
             if (!_cfg.Misc.IsDefault)
             {
@@ -63,6 +65,7 @@ namespace JAFDTC.Models.A10C.Upload
                 BuildAapSteerPt(aap, _cfg.Misc);
                 BuildAapPage(aap, _cfg.Misc);
                 BuildAutopilot(ap, _cfg.Misc);
+                BuildTACAN(tacan, _cfg.Misc);
             }
         }
 
@@ -230,6 +233,56 @@ namespace JAFDTC.Models.A10C.Upload
 
             int setValue = (int)miscSystem.AutopilotModeValue;
             AddDynamicAction(ap, "AP_MODE", setValue, setValue);
+        }
+
+        private void BuildTACAN(AirframeDevice tacan, MiscSystem miscSystem)
+        {
+            // Channel
+            if (!miscSystem.IsTACANChannelDefault)
+            {
+                int onesValue = miscSystem.TACANChannelValue % 10;
+                int tensValue = (miscSystem.TACANChannelValue - onesValue) / 10;
+
+                for (int i = 0; i < tensValue; i++)
+                    AddAction(tacan, "TENS_UP");
+                for (int i = 0; i < onesValue; i++)
+                    AddAction(tacan, "ONES_UP");
+            }
+
+            // Band
+            if (!miscSystem.IsTACANBandDefault)
+            {
+                if (miscSystem.TACANBandValue == TACANBandOptions.X)
+                    AddAction(tacan, "X_BAND");
+                else
+                    AddAction(tacan, "Y_BAND");
+
+            }
+
+            // Mode
+            if (!miscSystem.IsTACANModeDefault)
+            {
+                switch (miscSystem.TACANModeValue)
+                {
+                    case TACANModeOptions.Off:
+                        AddAction(tacan, "MODE_OFF");
+                        break;
+                    case TACANModeOptions.Rec:
+                        AddAction(tacan, "MODE_REC");
+                        break;
+                    case TACANModeOptions.Tr:
+                        AddAction(tacan, "MODE_TR");
+                        break;
+                    case TACANModeOptions.AaRec:
+                        AddAction(tacan, "MODE_AA_REC");
+                        break;
+                    case TACANModeOptions.AaTr:
+                        AddAction(tacan, "MODE_AA_TR");
+                        break;
+                    default:
+                        throw new ApplicationException("Unexpected TACAN Mode: " + miscSystem.TACANModeValue);
+                }
+            }
         }
     }
 }

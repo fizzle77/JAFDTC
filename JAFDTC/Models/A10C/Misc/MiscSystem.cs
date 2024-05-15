@@ -77,6 +77,25 @@ namespace JAFDTC.Models.A10C.Misc
         Path = 1
     }
 
+    // defines the TACAN mode options
+    //
+    public enum TACANModeOptions
+    {
+        Off = 0,
+        Rec = 1,
+        Tr = 2,
+        AaRec = 3,
+        AaTr = 4
+    }
+
+    // defines the TACAN band options
+    //
+    public enum TACANBandOptions
+    {
+        X = 0,
+        Y = 1
+    }
+
     /// <summary>
     /// TODO: document
     /// </summary>
@@ -125,7 +144,7 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
-        private string _speedDisplay;                              // integer [0, 1, 2]
+        private string _speedDisplay;                              // integer [0, 2]
         public string SpeedDisplay
         {
             get => _speedDisplay;
@@ -136,7 +155,7 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
-        private string _aapSteerPt;                              // integer [0, 1, 2]
+        private string _aapSteerPt;                              // integer [0, 2]
         public string AapSteerPt
         {
             get => _aapSteerPt;
@@ -147,7 +166,7 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
-        private string _aapPage;                              // integer [0, 1, 2, 3]
+        private string _aapPage;                              // integer [0, 3]
         public string AapPage
         {
             get => _aapPage;
@@ -158,7 +177,7 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
-        private string _autopilotMode;                              // integer [-1, 0, 1]
+        private string _autopilotMode;                              // integer [-1, 1]
         public string AutopilotMode
         {
             get => _autopilotMode;
@@ -166,6 +185,39 @@ namespace JAFDTC.Models.A10C.Misc
             {
                 string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, -1, 1)) ? null : "Invalid format";
                 SetProperty(ref _autopilotMode, value, error);
+            }
+        }
+
+        private string _tacanMode;                              // integer [0, 4]
+        public string TACANMode
+        {
+            get => _tacanMode;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 4)) ? null : "Invalid format";
+                SetProperty(ref _tacanMode, value, error);
+            }
+        }
+
+        private string _tacanBand;                              // integer [0, 1]
+        public string TACANBand
+        {
+            get => _tacanBand;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 1)) ? null : "Invalid format";
+                SetProperty(ref _tacanBand, value, error);
+            }
+        }
+
+        private string _tacanChannel;                           // integer [0, 129]
+        public string TACANChannel
+        {
+            get => _tacanChannel;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 129)) ? null : "Invalid format";
+                SetProperty(ref _tacanChannel, value, error);
             }
         }
 
@@ -184,7 +236,10 @@ namespace JAFDTC.Models.A10C.Misc
             SpeedDisplay = "0", // IAS
             AapSteerPt = "0", // Flt Plan
             AapPage = "0", // Other
-            AutopilotMode = "0" // Alt/Hdg
+            AutopilotMode = "0", // Alt/Hdg
+            TACANMode = "0", // Off
+            TACANBand = "0", // X
+            TACANChannel = "0"
         };
 
         // returns true if the instance indicates a default setup (all fields are "") or the object is in explicit
@@ -195,7 +250,7 @@ namespace JAFDTC.Models.A10C.Misc
         {
             get => IsCoordSystemDefault && IsBullseyeOnHUDDefault && IsFlightPlan1ManualDefault
                 && IsSpeedDisplayDefault && IsAapSteerPtDefault && IsAapPageDefault 
-                && IsAutopilotModeDefault;
+                && IsAutopilotModeDefault && IsTACANModeDefault && IsTACANBandDefault && IsTACANChannelDefault;
         }
 
         [JsonIgnore]
@@ -238,6 +293,24 @@ namespace JAFDTC.Models.A10C.Misc
         public bool IsAutopilotModeDefault
         {
             get => string.IsNullOrEmpty(AutopilotMode) || AutopilotMode == ExplicitDefaults.AutopilotMode;
+        }
+
+        [JsonIgnore]
+        public bool IsTACANModeDefault
+        {
+            get => string.IsNullOrEmpty(TACANMode) || TACANMode == ExplicitDefaults.TACANMode;
+        }
+
+        [JsonIgnore]
+        public bool IsTACANBandDefault
+        {
+            get => string.IsNullOrEmpty(TACANBand) || TACANBand == ExplicitDefaults.TACANBand;
+        }
+
+        [JsonIgnore]
+        public bool IsTACANChannelDefault
+        {
+            get => string.IsNullOrEmpty(TACANChannel) || TACANChannel == ExplicitDefaults.TACANChannel;
         }
 
         // ---- following accessors get the current value (default or non-default) for various properties
@@ -284,6 +357,24 @@ namespace JAFDTC.Models.A10C.Misc
             get => (AutopilotModeOptions)int.Parse((string.IsNullOrEmpty(AutopilotMode)) ? ExplicitDefaults.AutopilotMode : AutopilotMode);
         }
 
+        [JsonIgnore]
+        public TACANModeOptions TACANModeValue
+        {
+            get => (TACANModeOptions)int.Parse((string.IsNullOrEmpty(TACANMode)) ? ExplicitDefaults.TACANMode : TACANMode);
+        }
+
+        [JsonIgnore]
+        public TACANBandOptions TACANBandValue
+        {
+            get => (TACANBandOptions)int.Parse((string.IsNullOrEmpty(TACANBand)) ? ExplicitDefaults.TACANBand : TACANBand);
+        }
+
+        [JsonIgnore]
+        public int TACANChannelValue
+        {
+            get => int.Parse((string.IsNullOrEmpty(TACANChannel)) ? ExplicitDefaults.TACANChannel : TACANChannel);
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction
@@ -304,6 +395,9 @@ namespace JAFDTC.Models.A10C.Misc
             AapSteerPt = new(other.AapSteerPt);
             AapPage = new(other.AapPage);
             AutopilotMode = new(other.AutopilotMode);
+            TACANMode = new(other.TACANMode);
+            TACANBand = new(other.TACANBand);
+            TACANChannel = new(other.TACANChannel);
          }
 
         public virtual object Clone() => new MiscSystem(this);
@@ -325,6 +419,9 @@ namespace JAFDTC.Models.A10C.Misc
             AapSteerPt = "";
             AapPage = "";
             AutopilotMode = "";
+            TACANMode = "";
+            TACANBand = "";
+            TACANChannel = "";
          }
     }
 }

@@ -9,6 +9,12 @@
     mc:Ignorable="d"
     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
 
+    <Page.Resources>
+        <!-- brush for error fields. -->
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBackgroundBrush" Color="LightYellow"/>
+    </Page.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -25,9 +31,10 @@
         left column 
         ===============================================================================================================
         -->
-        <Grid Grid.Row="0" Grid.Column="0" Margin="16,8,12,8"
-              VerticalAlignment="Top"
-              HorizontalAlignment="Left">
+
+        <Grid Grid.Row="0" Grid.Column="0" Margin="16,8,12,8" Grid.ColumnSpan="2"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -189,6 +196,78 @@
                     <TextBlock Text="PATH" Tag="1"/>
                     <TextBlock Text="ALT/HDG" Tag="0"/>
                     <TextBlock Text="ALT" Tag="-1"/>
+                </ComboBox.Items>
+            </ComboBox>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        right column 
+        ===============================================================================================================
+        -->
+
+        <Grid Grid.Row="0" Grid.Column="1" Margin="16,8,12,8" Grid.ColumnSpan="2"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- TACAN setup -->
+            
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                TACAN Configuration:
+            </TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                TACAN Channel
+            </TextBlock>
+            <StackPanel Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
+                <TextBox Width="80"
+                    x:Name="uiTextTACANChannel"
+                    Style="{StaticResource EditorParamEditTextBoxStyle}"
+                    MaxLength="3"
+                    HorizontalAlignment="Left"
+                    Text="{x:Bind EditMisc.TACANChannel, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                    LostFocus="uiTextTACANChannel_LostFocus"
+                    ToolTipService.ToolTip="TACAN Channel Selection"/>
+                <ComboBox Margin="12,0,0,0"
+                    x:Name="uiComboTACANBand"
+                    SelectionChanged="uiComboTACANBand_SelectionChanged"
+                    VerticalAlignment="Center"
+                    ToolTipService.ToolTip="TACAN Band Selection">
+                    <!-- Tag is enum TODO -->
+                    <ComboBox.Items>
+                        <TextBlock Text="X" Tag="0"/>
+                        <TextBlock Text="Y" Tag="1"/>
+                    </ComboBox.Items>
+                </ComboBox>
+            </StackPanel>
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                Mode
+            </TextBlock>
+            <ComboBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0" Width="Auto"
+                x:Name="uiComboTACANMode"
+                SelectionChanged="uiComboTACANMode_SelectionChanged"
+                VerticalAlignment="Center"
+                ToolTipService.ToolTip="TACAN Mode Selection">
+                <!-- Tag is enum TODO -->
+                <ComboBox.Items>
+                    <TextBlock Text="OFF" Tag="0"/>
+                    <TextBlock Text="REC" Tag="1"/>
+                    <TextBlock Text="T/R" Tag="2"/>
+                    <TextBlock Text="A/A REC" Tag="3"/>
+                    <TextBlock Text="A/A T/R" Tag="4"/>
                 </ComboBox.Items>
             </ComboBox>
         </Grid>
