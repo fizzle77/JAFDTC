@@ -19,6 +19,7 @@
 
 using JAFDTC.Models.A10C.Misc;
 using JAFDTC.Models.DCS;
+using System;
 using System.Text;
 
 namespace JAFDTC.Models.A10C.Upload
@@ -53,6 +54,8 @@ namespace JAFDTC.Models.A10C.Upload
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice aap = _aircraft.GetDevice("AAP"); // "auxiliary avionics panel"
             AirframeDevice ap  = _aircraft.GetDevice("AUTOPILOT");
+            AirframeDevice tacan  = _aircraft.GetDevice("TACAN_CTRL_PANEL");
+            AirframeDevice iff  = _aircraft.GetDevice("IFF");
 
             if (!_cfg.Misc.IsDefault)
             {
@@ -63,6 +66,8 @@ namespace JAFDTC.Models.A10C.Upload
                 BuildAapSteerPt(aap, _cfg.Misc);
                 BuildAapPage(aap, _cfg.Misc);
                 BuildAutopilot(ap, _cfg.Misc);
+                BuildTACAN(tacan, _cfg.Misc);
+                BuildIFF(iff, _cfg.Misc);
             }
         }
 
@@ -230,6 +235,97 @@ namespace JAFDTC.Models.A10C.Upload
 
             int setValue = (int)miscSystem.AutopilotModeValue;
             AddDynamicAction(ap, "AP_MODE", setValue, setValue);
+        }
+
+        private void BuildTACAN(AirframeDevice tacan, MiscSystem miscSystem)
+        {
+            // Channel
+            if (!miscSystem.IsTACANChannelDefault)
+            {
+                int onesValue = miscSystem.TACANChannelValue % 10;
+                int tensValue = (miscSystem.TACANChannelValue - onesValue) / 10;
+
+                for (int i = 0; i < tensValue; i++)
+                    AddAction(tacan, "TENS_UP");
+                for (int i = 0; i < onesValue; i++)
+                    AddAction(tacan, "ONES_UP");
+            }
+
+            // Band
+            if (!miscSystem.IsTACANBandDefault)
+            {
+                if (miscSystem.TACANBandValue == TACANBandOptions.X)
+                    AddAction(tacan, "X_BAND");
+                else
+                    AddAction(tacan, "Y_BAND");
+
+            }
+
+            // Mode
+            if (!miscSystem.IsTACANModeDefault)
+            {
+                switch (miscSystem.TACANModeValue)
+                {
+                    case TACANModeOptions.Off:
+                        AddAction(tacan, "MODE_OFF");
+                        break;
+                    case TACANModeOptions.Rec:
+                        AddAction(tacan, "MODE_REC");
+                        break;
+                    case TACANModeOptions.Tr:
+                        AddAction(tacan, "MODE_TR");
+                        break;
+                    case TACANModeOptions.AaRec:
+                        AddAction(tacan, "MODE_AA_REC");
+                        break;
+                    case TACANModeOptions.AaTr:
+                        AddAction(tacan, "MODE_AA_TR");
+                        break;
+                    default:
+                        throw new ApplicationException("Unexpected TACAN Mode: " + miscSystem.TACANModeValue);
+                }
+            }
+        }
+
+        private void BuildIFF(AirframeDevice iff, MiscSystem miscSystem)
+        {
+            // Master Mode
+            if (!miscSystem.IsIFFMasterModeDefault)
+            {
+                switch (miscSystem.IFFMasterModeValue)
+                {
+                    case IFFMasterOptions.OFF:
+                        AddAction(iff, "MASTER_OFF");
+                        break;
+                    case IFFMasterOptions.STBY:
+                        AddAction(iff, "MASTER_STBY");
+                        break;
+                    case IFFMasterOptions.NORM:
+                        AddAction(iff, "MASTER_NORM");
+                        break;
+                    default:
+                        throw new ApplicationException("Unexpected IFF Master Mode: " + miscSystem.IFFMasterModeValue);
+                }
+            }
+
+            // Mode 4 ON
+            if (!miscSystem.IsIFFMode4OnDefault)
+                AddAction(iff, "MODE4_ON");
+
+            // Mode 3 Code
+            if (!miscSystem.IsIFFMode3CodeDefault)
+            {
+                int codeVal = int.Parse(miscSystem.IFFMode3CodeValue);
+                int ones = codeVal % 10;
+                int tens = (codeVal - ones) / 10 % 10;
+                int hundreds = (codeVal - tens) / 100 % 10;
+                int thousands = (codeVal - hundreds) / 1000 % 10;
+
+                AddDynamicAction(iff, "MODE3A-WHEEL1_UP", thousands * 0.1, thousands * 0.1);
+                AddDynamicAction(iff, "MODE3A-WHEEL2_UP", hundreds * 0.1, hundreds * 0.1);
+                AddDynamicAction(iff, "MODE3A-WHEEL3_UP", tens * 0.1, tens * 0.1);
+                AddDynamicAction(iff, "MODE3A-WHEEL4_UP", ones * 0.1, ones * 0.1);
+            }
         }
     }
 }

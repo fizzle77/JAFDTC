@@ -95,6 +95,7 @@ namespace JAFDTC.Models.A10C
             AddDevice(cdu);
 
             // ---- auxiliary avionics panel
+
             AirframeDevice aap = new(22, "AAP");
 
             // steer pt selection knob
@@ -109,6 +110,28 @@ namespace JAFDTC.Models.A10C
             aap.AddAction(3004, "PAGE_WAYPT", delay, 0.3, 0.3);
 
             AddDevice(aap);
+
+            // ---- TACAN panel
+
+            // Note "TACAN" device 51 in devices.lua is something else. It doesn't appear in clickabledata.lua.
+            AirframeDevice tacan = new(74, "TACAN_CTRL_PANEL"); 
+
+            tacan.AddAction(3003, "X_BAND", delay, -1.0, -1.0);
+            tacan.AddAction(3003, "Y_BAND", delay, 1.0, 1.0);
+
+            tacan.AddAction(3006, "MODE_OFF", delay, 0.0, 0.0);
+            tacan.AddAction(3006, "MODE_REC", delay, 0.1, 0.1);
+            tacan.AddAction(3006, "MODE_TR", delay, 0.2, 0.2);
+            tacan.AddAction(3006, "MODE_AA_REC", delay, 0.3, 0.3);
+            tacan.AddAction(3006, "MODE_AA_TR", delay, 0.4, 0.4);
+
+            tacan.AddAction(3001, "TENS_UP", delay, 0.1, 0.1);      
+            tacan.AddAction(3001, "TENS_DOWN", delay, -0.1, -0.1);
+            tacan.AddAction(3002, "ONES_UP", delay, 0.1, 0.1);
+            tacan.AddAction(3002, "ONES_DN", delay, -0.1, -0.1);
+
+            AddDevice(tacan);
+
 
             // ---- Autopilot (LASTE) panel
 
@@ -189,6 +212,32 @@ namespace JAFDTC.Models.A10C
             ufc.AddAction(3011, "SPC", delay, 1);
             ufc.AddAction(3013, "FN", delay, 1);
             AddDevice(ufc);
+
+            // ---- IFF
+
+            AirframeDevice iff = new(43, "IFF");
+            
+            iff.AddAction(3008, "MASTER_OFF", delay, 0.0, 0.0);
+            iff.AddAction(3008, "MASTER_STBY", delay, 0.1, 0.1);
+            iff.AddAction(3008, "MASTER_NORM", delay, 0.3, 0.3);
+
+            //
+            // following actions are for thumbwheels, add via:
+            //
+            //     AddCommand(device.CustomizedDCSActionCommand(key, posn, posn))
+            //
+            iff.AddAction(3003, "MODE3A-WHEEL1_UP", delay, 0.0, 0.0);
+            iff.AddAction(3003, "MODE3A-WHEEL1_DN", delay, 0.0, 0.0);
+            iff.AddAction(3004, "MODE3A-WHEEL2_UP", delay, 0.0, 0.0);
+            iff.AddAction(3004, "MODE3A-WHEEL2_DN", delay, 0.0, 0.0);
+            iff.AddAction(3005, "MODE3A-WHEEL3_UP", delay, 0.0, 0.0);
+            iff.AddAction(3005, "MODE3A-WHEEL3_DN", delay, 0.0, 0.0);
+            iff.AddAction(3006, "MODE3A-WHEEL4_UP", delay, 0.0, 0.0);
+            iff.AddAction(3007, "MODE3A-WHEEL5_DN", delay, 0.0, 0.0);
+
+            iff.AddAction(3016, "MODE4_ON", delay, 1, 1);
+
+            AddDevice(iff);
 
             // ---- an/arc-210 uhf radio
 

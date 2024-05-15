@@ -9,6 +9,12 @@
     mc:Ignorable="d"
     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
 
+    <Page.Resources>
+        <!-- brush for error fields. -->
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBackgroundBrush" Color="LightYellow"/>
+    </Page.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -25,9 +31,10 @@
         left column 
         ===============================================================================================================
         -->
-        <Grid Grid.Row="0" Grid.Column="0" Margin="16,8,12,8"
-              VerticalAlignment="Top"
-              HorizontalAlignment="Left">
+
+        <Grid Grid.Row="0" Grid.Column="0" Margin="16,8,12,8" Grid.ColumnSpan="2"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -195,6 +202,124 @@
 
         <!--
         ===============================================================================================================
+        right column 
+        ===============================================================================================================
+        -->
+
+        <Grid Grid.Row="0" Grid.Column="1" Margin="16,8,12,8" Grid.ColumnSpan="2"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <!-- TACAN setup -->
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                TACAN Configuration:
+            </TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                TACAN Channel
+            </TextBlock>
+            <StackPanel Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
+                <TextBox Width="80"
+                         x:Name="uiTextTACANChannel"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         MaxLength="3"
+                         HorizontalAlignment="Left"
+                         Text="{x:Bind EditMisc.TACANChannel, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         LostFocus="uiTextBox_LostFocus"
+                         ToolTipService.ToolTip="TACAN channel selection"/>
+                <ComboBox Margin="12,0,0,0"
+                          x:Name="uiComboTACANBand"
+                          SelectionChanged="uiComboTACANBand_SelectionChanged"
+                          VerticalAlignment="Center"
+                          ToolTipService.ToolTip="TACAN band selection">
+                    <ComboBox.Items>
+                        <TextBlock Text="X" Tag="0"/>
+                        <TextBlock Text="Y" Tag="1"/>
+                    </ComboBox.Items>
+                </ComboBox>
+            </StackPanel>
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                Mode
+            </TextBlock>
+            <ComboBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0" Width="Auto"
+                      x:Name="uiComboTACANMode"
+                      SelectionChanged="uiComboTACANMode_SelectionChanged"
+                      VerticalAlignment="Center"
+                      ToolTipService.ToolTip="TACAN mode selection">
+                <ComboBox.Items>
+                    <TextBlock Text="OFF" Tag="0"/>
+                    <TextBlock Text="REC" Tag="1"/>
+                    <TextBlock Text="T/R" Tag="2"/>
+                    <TextBlock Text="A/A REC" Tag="3"/>
+                    <TextBlock Text="A/A T/R" Tag="4"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- IFF setup -->
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,24,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                IFF Configuration:
+            </TextBlock>
+            <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                Master Mode:
+            </TextBlock>
+            <ComboBox Margin="12,12,0,0" Grid.Row="4" Grid.Column="1" Width="Auto"
+                      x:Name="uiComboIFFMasterMode"
+                      SelectionChanged="uiComboIFFMasterMode_SelectionChanged"
+                      VerticalAlignment="Center"
+                      ToolTipService.ToolTip="TACAN band selection">
+                <ComboBox.Items>
+                    <TextBlock Text="OFF" Tag="0"/>
+                    <TextBlock Text="STBY" Tag="1"/>
+                    <TextBlock Text="NORM" Tag="2"/>
+                </ComboBox.Items>
+            </ComboBox>
+            <TextBlock Grid.Row="5" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                MODE 4 ON:
+            </TextBlock>
+            <CheckBox Margin="12,12,0,0" Grid.Row="5" Grid.Column="1"
+                      x:Name="uiCheckIFFMode4On"
+                      Click="uiCheckIFFMode4On_Click"/>
+            <TextBlock Grid.Row="6" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                MODE 3/A Code
+            </TextBlock>
+            <TextBox Grid.Row="6" Grid.Column="1" Margin="12,12,0,0" Width="80"
+                            x:Name="uiTextIFFMode3Code"
+                            Style="{StaticResource EditorParamEditTextBoxStyle}"
+                            MaxLength="4"
+                            HorizontalAlignment="Left"
+                            Text="{x:Bind EditMisc.IFFMode3Code, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                            LostFocus="uiTextBox_LostFocus"
+                            ToolTipService.ToolTip="IFF MODE 3/A code selection"/>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
         link / reset
         ===============================================================================================================
         -->
@@ -241,6 +366,6 @@
                 </Button>
             </StackPanel>
         </Grid>
-        
+
     </Grid>
 </Page>

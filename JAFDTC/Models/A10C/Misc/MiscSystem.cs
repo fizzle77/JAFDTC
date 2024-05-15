@@ -21,6 +21,7 @@
 
 using JAFDTC.Utilities;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.A10C.Misc
 {
@@ -77,6 +78,34 @@ namespace JAFDTC.Models.A10C.Misc
         Path = 1
     }
 
+    // defines the TACAN mode options
+    //
+    public enum TACANModeOptions
+    {
+        Off = 0,
+        Rec = 1,
+        Tr = 2,
+        AaRec = 3,
+        AaTr = 4
+    }
+
+    // defines the TACAN band options
+    //
+    public enum TACANBandOptions
+    {
+        X = 0,
+        Y = 1
+    }
+
+    // defines the IFF MASTER options
+    //
+    public enum IFFMasterOptions
+    {
+        OFF = 0,
+        STBY = 1,
+        NORM = 2
+    }
+
     /// <summary>
     /// TODO: document
     /// </summary>
@@ -125,7 +154,7 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
-        private string _speedDisplay;                              // integer [0, 1, 2]
+        private string _speedDisplay;                              // integer [0, 2]
         public string SpeedDisplay
         {
             get => _speedDisplay;
@@ -136,7 +165,7 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
-        private string _aapSteerPt;                              // integer [0, 1, 2]
+        private string _aapSteerPt;                              // integer [0, 2]
         public string AapSteerPt
         {
             get => _aapSteerPt;
@@ -147,7 +176,7 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
-        private string _aapPage;                              // integer [0, 1, 2, 3]
+        private string _aapPage;                              // integer [0, 3]
         public string AapPage
         {
             get => _aapPage;
@@ -158,7 +187,7 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
-        private string _autopilotMode;                              // integer [-1, 0, 1]
+        private string _autopilotMode;                              // integer [-1, 1]
         public string AutopilotMode
         {
             get => _autopilotMode;
@@ -166,6 +195,79 @@ namespace JAFDTC.Models.A10C.Misc
             {
                 string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, -1, 1)) ? null : "Invalid format";
                 SetProperty(ref _autopilotMode, value, error);
+            }
+        }
+
+        private string _tacanMode;                              // integer [0, 4]
+        public string TACANMode
+        {
+            get => _tacanMode;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 4)) ? null : "Invalid format";
+                SetProperty(ref _tacanMode, value, error);
+            }
+        }
+
+        private string _tacanBand;                              // integer [0, 1]
+        public string TACANBand
+        {
+            get => _tacanBand;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 1)) ? null : "Invalid format";
+                SetProperty(ref _tacanBand, value, error);
+            }
+        }
+
+        private string _tacanChannel;                           // integer [0, 129]
+        public string TACANChannel
+        {
+            get => _tacanChannel;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 129)) ? null : "Invalid format";
+                SetProperty(ref _tacanChannel, value, error);
+            }
+        }
+
+        private string _iffMasterMode;                           // integer [0, 2]
+        public string IFFMasterMode
+        {
+            get => _iffMasterMode;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
+                SetProperty(ref _iffMasterMode, value, error);
+            }
+        }
+
+        private static readonly Regex _iffMode3CodeRegex = new(@"^[1-7][1-7][1-7][1-7]$");
+
+        private string _iffMode3Code;                           // IFF squawk, [1-7][1-7][1-7][1-7]
+        public string IFFMode3Code
+        {
+            get => _iffMode3Code;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value)) ? null : "Invalid format";
+                if (IsRegexFieldValid(value, _iffMode3CodeRegex))
+                {
+                    value = FixupIntegerField(value);
+                    error = null;
+                }
+                SetProperty(ref _iffMode3Code, value, error);
+            }
+        }
+
+        private string _iffMode4On;                           // string (boolean)
+        public string IFFMode4On
+        {
+            get => _iffMode4On;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsBooleanFieldValid(value)) ? null : "Invalid format";
+                SetProperty(ref _iffMode4On, value, error);
             }
         }
 
@@ -184,7 +286,13 @@ namespace JAFDTC.Models.A10C.Misc
             SpeedDisplay = "0", // IAS
             AapSteerPt = "0", // Flt Plan
             AapPage = "0", // Other
-            AutopilotMode = "0" // Alt/Hdg
+            AutopilotMode = "0", // Alt/Hdg
+            TACANMode = "0", // Off
+            TACANBand = "0", // X
+            TACANChannel = "0",
+            IFFMasterMode = "0", // Off
+            IFFMode3Code = "0000",
+            IFFMode4On = false.ToString()
         };
 
         // returns true if the instance indicates a default setup (all fields are "") or the object is in explicit
@@ -195,7 +303,8 @@ namespace JAFDTC.Models.A10C.Misc
         {
             get => IsCoordSystemDefault && IsBullseyeOnHUDDefault && IsFlightPlan1ManualDefault
                 && IsSpeedDisplayDefault && IsAapSteerPtDefault && IsAapPageDefault 
-                && IsAutopilotModeDefault;
+                && IsAutopilotModeDefault && IsTACANModeDefault && IsTACANBandDefault && IsTACANChannelDefault
+                && IsIFFMasterModeDefault && IsIFFMode3CodeDefault && IsIFFMode4OnDefault;
         }
 
         [JsonIgnore]
@@ -238,6 +347,42 @@ namespace JAFDTC.Models.A10C.Misc
         public bool IsAutopilotModeDefault
         {
             get => string.IsNullOrEmpty(AutopilotMode) || AutopilotMode == ExplicitDefaults.AutopilotMode;
+        }
+
+        [JsonIgnore]
+        public bool IsTACANModeDefault
+        {
+            get => string.IsNullOrEmpty(TACANMode) || TACANMode == ExplicitDefaults.TACANMode;
+        }
+
+        [JsonIgnore]
+        public bool IsTACANBandDefault
+        {
+            get => string.IsNullOrEmpty(TACANBand) || TACANBand == ExplicitDefaults.TACANBand;
+        }
+
+        [JsonIgnore]
+        public bool IsTACANChannelDefault
+        {
+            get => string.IsNullOrEmpty(TACANChannel) || TACANChannel == ExplicitDefaults.TACANChannel;
+        }
+
+        [JsonIgnore]
+        public bool IsIFFMasterModeDefault
+        {
+            get => string.IsNullOrEmpty(IFFMasterMode) || IFFMasterMode == ExplicitDefaults.IFFMasterMode;
+        }
+
+        [JsonIgnore]
+        public bool IsIFFMode3CodeDefault
+        {
+            get => string.IsNullOrEmpty(IFFMode3Code) || IFFMode3Code == ExplicitDefaults.IFFMode3Code;
+        }
+
+        [JsonIgnore]
+        public bool IsIFFMode4OnDefault
+        {
+            get => string.IsNullOrEmpty(IFFMode4On) || IFFMode4On == ExplicitDefaults.IFFMode4On;
         }
 
         // ---- following accessors get the current value (default or non-default) for various properties
@@ -284,6 +429,42 @@ namespace JAFDTC.Models.A10C.Misc
             get => (AutopilotModeOptions)int.Parse((string.IsNullOrEmpty(AutopilotMode)) ? ExplicitDefaults.AutopilotMode : AutopilotMode);
         }
 
+        [JsonIgnore]
+        public TACANModeOptions TACANModeValue
+        {
+            get => (TACANModeOptions)int.Parse((string.IsNullOrEmpty(TACANMode)) ? ExplicitDefaults.TACANMode : TACANMode);
+        }
+
+        [JsonIgnore]
+        public TACANBandOptions TACANBandValue
+        {
+            get => (TACANBandOptions)int.Parse((string.IsNullOrEmpty(TACANBand)) ? ExplicitDefaults.TACANBand : TACANBand);
+        }
+
+        [JsonIgnore]
+        public int TACANChannelValue
+        {
+            get => int.Parse((string.IsNullOrEmpty(TACANChannel)) ? ExplicitDefaults.TACANChannel : TACANChannel);
+        }
+
+        [JsonIgnore]
+        public IFFMasterOptions IFFMasterModeValue
+        {
+            get => (IFFMasterOptions)int.Parse((string.IsNullOrEmpty(IFFMasterMode)) ? ExplicitDefaults.IFFMasterMode : IFFMasterMode);
+        }
+
+        [JsonIgnore]
+        public string IFFMode3CodeValue
+        {
+            get => string.IsNullOrEmpty(IFFMode3Code) ? ExplicitDefaults.IFFMode3Code : IFFMode3Code;
+        }
+
+        [JsonIgnore]
+        public bool IffMode4OnValue
+        {
+            get => bool.Parse((string.IsNullOrEmpty(IFFMode4On)) ? ExplicitDefaults.IFFMode4On : IFFMode4On);
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction
@@ -304,6 +485,12 @@ namespace JAFDTC.Models.A10C.Misc
             AapSteerPt = new(other.AapSteerPt);
             AapPage = new(other.AapPage);
             AutopilotMode = new(other.AutopilotMode);
+            TACANMode = new(other.TACANMode);
+            TACANBand = new(other.TACANBand);
+            TACANChannel = new(other.TACANChannel);
+            IFFMasterMode = new(other.IFFMasterMode);
+            IFFMode3Code = new(other.IFFMode3Code);
+            IFFMode4On = new(other.IFFMode4On);
          }
 
         public virtual object Clone() => new MiscSystem(this);
@@ -325,6 +512,12 @@ namespace JAFDTC.Models.A10C.Misc
             AapSteerPt = "";
             AapPage = "";
             AutopilotMode = "";
-         }
+            TACANMode = "";
+            TACANBand = "";
+            TACANChannel = "";
+            IFFMasterMode = "";
+            IFFMode3Code = "";
+            IFFMode4On = "";
+        }
     }
 }

@@ -9,6 +9,9 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using Microsoft.UI.Dispatching;
+using static JAFDTC.Models.F15E.UFC.UFCSystem;
+using System.Collections;
+using System.ComponentModel;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -48,6 +51,9 @@ namespace JAFDTC.UI.A10C
 
         private readonly Dictionary<string, string> _configNameToUID;
         private readonly List<string> _configNameList;
+        private readonly Dictionary<string, TextBox> _miscTextFieldPropertyMap;
+        private readonly Brush _defaultBorderBrush;
+        private readonly Brush _defaultBkgndBrush;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -68,8 +74,16 @@ namespace JAFDTC.UI.A10C
             _configNameToUID = new Dictionary<string, string>();
             _configNameList = new List<string>();
 
-            // wait for final setup of the ui until we navigate to the page (at which point we will have a
-            // configuration to display).
+            EditMisc.ErrorsChanged += BaseField_DataValidationError;
+            EditMisc.PropertyChanged += BaseField_PropertyChanged;
+            // For mapping property errors to corresponding text field.
+            _miscTextFieldPropertyMap = new Dictionary<string, TextBox>()
+            {
+                ["TACANChannel"] = uiTextTACANChannel,
+                ["IFFMode3Code"] = uiTextIFFMode3Code
+            };
+            _defaultBorderBrush = uiTextTACANChannel.BorderBrush;
+            _defaultBkgndBrush = uiTextTACANChannel.Background;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -89,6 +103,12 @@ namespace JAFDTC.UI.A10C
             EditMisc.AapSteerPt = Config.Misc.AapSteerPt;
             EditMisc.AapPage = Config.Misc.AapPage;
             EditMisc.AutopilotMode = Config.Misc.AutopilotMode;
+            EditMisc.TACANChannel = Config.Misc.TACANChannel;
+            EditMisc.TACANBand = Config.Misc.TACANBand;
+            EditMisc.TACANMode = Config.Misc.TACANMode;
+            EditMisc.IFFMasterMode = Config.Misc.IFFMasterMode;
+            EditMisc.IFFMode4On = Config.Misc.IFFMode4On;
+            EditMisc.IFFMode3Code = Config.Misc.IFFMode3Code;
         }
 
         private void CopyEditToConfig(bool isPersist = false)
@@ -102,19 +122,18 @@ namespace JAFDTC.UI.A10C
                 Config.Misc.AapSteerPt = EditMisc.AapSteerPt;
                 Config.Misc.AapPage = EditMisc.AapPage;
                 Config.Misc.AutopilotMode = EditMisc.AutopilotMode;
+                Config.Misc.TACANChannel = EditMisc.TACANChannel;
+                Config.Misc.TACANBand = EditMisc.TACANBand;
+                Config.Misc.TACANMode = EditMisc.TACANMode;
+                Config.Misc.IFFMasterMode = EditMisc.IFFMasterMode;
+                Config.Misc.IFFMode4On = EditMisc.IFFMode4On;
+                Config.Misc.IFFMode3Code = EditMisc.IFFMode3Code;
 
                 if (isPersist)
                 {
                     Config.Save(this, MiscSystem.SystemTag);
                 }
             }
-        }
-
-        // property changed: rebuild interface state to account for configuration changes.
-        //
-        private void BaseField_PropertyChanged(object sender, EventArgs args)
-        {
-            RebuildInterfaceState();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -206,6 +225,61 @@ namespace JAFDTC.UI.A10C
             }
         }
 
+        // rebuild the setup of the TACAN band according to the current settings. 
+        //
+        private void RebuildTACANBandSetup()
+        {
+            int tacanBand = (string.IsNullOrEmpty(EditMisc.TACANBand)) ? int.Parse(_miscSysDefault.TACANBand)
+                                                                           : int.Parse(EditMisc.TACANBand);
+            foreach (TextBlock item in uiComboTACANBand.Items)
+            {
+                if (int.Parse((string)item.Tag) == tacanBand)
+                {
+                    uiComboTACANBand.SelectedItem = item;
+                    return;
+                }
+            }
+        }
+
+        // rebuild the setup of the TACAN mode according to the current settings. 
+        //
+        private void RebuildTACANModeSetup()
+        {
+            int tacanMode = (string.IsNullOrEmpty(EditMisc.TACANMode)) ? int.Parse(_miscSysDefault.TACANMode)
+                                                                       : int.Parse(EditMisc.TACANMode);
+            foreach (TextBlock item in uiComboTACANMode.Items)
+            {
+                if (int.Parse((string)item.Tag) == tacanMode)
+                {
+                    uiComboTACANMode.SelectedItem = item;
+                    return;
+                }
+            }
+        }
+
+        // rebuild the setup of the IFF master mode according to the current settings. 
+        //
+        private void RebuildIFFMasterModeSetup()
+        {
+            int tacanMode = (string.IsNullOrEmpty(EditMisc.IFFMasterMode)) ? int.Parse(_miscSysDefault.IFFMasterMode)
+                                                                           : int.Parse(EditMisc.IFFMasterMode);
+            foreach (TextBlock item in uiComboIFFMasterMode.Items)
+            {
+                if (int.Parse((string)item.Tag) == tacanMode)
+                {
+                    uiComboIFFMasterMode.SelectedItem = item;
+                    return;
+                }
+            }
+        }
+
+        // rebuild the setup of the IFF mode 4 ON setting according to the current settings. 
+        //
+        private void RebuildIFFMode4OnSetup()
+        {
+            uiCheckIFFMode4On.IsChecked = EditMisc.IffMode4OnValue;
+        }
+
         // TODO: document
         private void RebuildLinkControls()
         {
@@ -227,6 +301,9 @@ namespace JAFDTC.UI.A10C
             Utilities.SetEnableState(uiComboSteerPt, isEditable);
             Utilities.SetEnableState(uiComboAapPage, isEditable);
             Utilities.SetEnableState(uiComboAutopilotMode, isEditable);
+            Utilities.SetEnableState(uiTextTACANChannel, isEditable);
+            Utilities.SetEnableState(uiComboTACANBand, isEditable);
+            Utilities.SetEnableState(uiComboTACANMode, isEditable);
 
             Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
             Utilities.SetEnableState(uiPageBtnReset, !EditMisc.IsDefault);
@@ -249,6 +326,10 @@ namespace JAFDTC.UI.A10C
                     RebuildAapSteerPtSetup();
                     RebuildAapPageSetup();
                     RebuildAutopilotModeSetup();
+                    RebuildTACANBandSetup();
+                    RebuildTACANModeSetup();
+                    RebuildIFFMasterModeSetup();
+                    RebuildIFFMode4OnSetup();
 
                     RebuildLinkControls();
                     RebuildEnableState();
@@ -301,6 +382,14 @@ namespace JAFDTC.UI.A10C
                 Config.Save(this);
                 CopyConfigToEdit();
             }
+        }
+
+        private void uiTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+            {
+                CopyEditToConfig(true);
+            });
         }
 
         // ---- coordinate system setup -------------------------------------------------------------------------------------------
@@ -388,11 +477,101 @@ namespace JAFDTC.UI.A10C
             }
         }
 
+
+        // ---- TACAN setup -------------------------------------------------------------------------------------------
+
+        private void uiComboTACANBand_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.TACANBand = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        private void uiComboTACANMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.TACANMode = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        // ---- IFF setup -------------------------------------------------------------------------------------------
+
+        private void uiComboIFFMasterMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            {
+                EditMisc.IFFMasterMode = (string)item.Tag;
+                CopyEditToConfig(true);
+            }
+        }
+
+        private void uiCheckIFFMode4On_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            if (!IsRebuildingUI && (checkBox != null))
+            {
+                EditMisc.IFFMode4On = checkBox.IsChecked.ToString();
+                CopyEditToConfig(true);
+            }
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // events
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        // ---- field validation -------------------------------------------------------------------------------------------
+
+        private void SetFieldValidVisualState(TextBox field, bool isValid)
+        {
+            field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBackgroundBrush"];
+        }
+
+        private void ValidateAllFields(Dictionary<string, TextBox> fields, IEnumerable errors)
+        {
+            Dictionary<string, bool> map = new();
+            foreach (string error in errors)
+            {
+                map[error] = true;
+            }
+            foreach (KeyValuePair<string, TextBox> kvp in fields)
+            {
+                SetFieldValidVisualState(kvp.Value, !map.ContainsKey(kvp.Key));
+            }
+        }
+
+        // validation error: update ui state for the various components that may have errors.
+        //
+        private void BaseField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
+        {
+            if (args.PropertyName == null)
+            {
+                ValidateAllFields(_miscTextFieldPropertyMap, EditMisc.GetErrors(null));
+            }
+            else
+            {
+                List<string> errors = (List<string>)EditMisc.GetErrors(args.PropertyName);
+                if (_miscTextFieldPropertyMap.ContainsKey(args.PropertyName))
+                    SetFieldValidVisualState(_miscTextFieldPropertyMap[args.PropertyName], (errors.Count == 0));
+            }
+            RebuildInterfaceState();
+        }
+
+        // property changed: rebuild interface state to account for configuration changes.
+        //
+        private void BaseField_PropertyChanged(object sender, EventArgs args)
+        {
+            RebuildInterfaceState();
+        }
 
         // on configuration saved, rebuild the interface state to align with the latest save (assuming we go here
         // through a CopyEditToConfig).
