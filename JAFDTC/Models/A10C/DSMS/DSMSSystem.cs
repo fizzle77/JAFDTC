@@ -131,7 +131,7 @@ namespace JAFDTC.Models.A10C.DSMS
         private Dictionary<int, MunitionSettings> _munitionSettingMap;
 
         public bool IsProfileOrderEnabled { get; set; }
-        public List<string> ProfileOrder { get; set; }
+        public List<int> ProfileOrder { get; set; }
 
         // ---- synthesized properties
 
@@ -203,7 +203,10 @@ namespace JAFDTC.Models.A10C.DSMS
                 {
                     _orderedProfilePositions = new Dictionary<string, int>(ProfileOrder.Count);
                     for (int i = 0; i < ProfileOrder.Count; i++)
-                        _orderedProfilePositions.Add(ProfileOrder[i], i);
+                    {
+                        A10CMunition m = A10CMunition.GetMunitionFromID(ProfileOrder[i]);
+                        _orderedProfilePositions.Add(m.Profile, i);
+                    }
                 }
             }
 

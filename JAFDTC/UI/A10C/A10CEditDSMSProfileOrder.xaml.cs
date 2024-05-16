@@ -29,9 +29,9 @@ namespace JAFDTC.UI.A10C
 
         private void SaveEditStateToConfig()
         {
-            List<string> newOrder = new List<string>(_munitions.Count);
+            List<int> newOrder = new List<int>(_munitions.Count);
             foreach (A10CMunition m in _munitions)
-                newOrder.Add(m.Profile);
+                newOrder.Add(m.ID);
             _config.DSMS.ProfileOrder = newOrder;
             _config.Save(this, SystemTag);
         }
@@ -51,8 +51,8 @@ namespace JAFDTC.UI.A10C
             {
                 for (int newIndex = 0; newIndex < _munitions.Count; newIndex++)
                 {
-                    string profileName = _config.DSMS.ProfileOrder[newIndex];
-                    A10CMunition m = A10CMunition.GetMunitionFromProfile(profileName);
+                    int munitionID = _config.DSMS.ProfileOrder[newIndex];
+                    A10CMunition m = A10CMunition.GetMunitionFromID(munitionID);
                     if (m != null)
                     {
                         int oldIndex = _munitions.IndexOf(m);
