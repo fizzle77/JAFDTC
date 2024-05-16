@@ -30,7 +30,7 @@ namespace JAFDTC.Models.A10C
         // properties deserialized from DB JSON
         //
         public int ID { get; set; } // ID used in configuration files. Must be unique.
-        public string Name { get; set; } // name as it will apper in UI.
+        public string Name { get; set; } // name as it will appear in UI.
         public string Profile { get; set; } // name of the weapon's default profile
         public string Image { get; set; } // name of the weapon's image file
 
