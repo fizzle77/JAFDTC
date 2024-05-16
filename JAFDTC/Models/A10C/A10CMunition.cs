@@ -79,7 +79,7 @@ namespace JAFDTC.Models.A10C
         {
             if (_profileList == null)
             {
-                _profileList = FileManager.LoadA10Munitions();
+                _profileList = GetMunitions();
                 // HACK: duplicate maverick profiles don't  matter, so we remove the duplicate entry.
                 // They don't matter because the Maverick has no real profile settings.
                 A10CMunition toRemove = null;
@@ -121,9 +121,7 @@ namespace JAFDTC.Models.A10C
             {
                 _idMunitionMap = new Dictionary<int, A10CMunition>();
                 foreach (A10CMunition munition in GetMunitions())
-                {
-                    _idMunitionMap.Add(ID, munition);
-                }
+                    _idMunitionMap.Add(munition.ID, munition);
             }
             return _idMunitionMap[ID];
         }
