@@ -21,7 +21,6 @@
 
 using JAFDTC.Utilities;
 using System.Collections.Generic;
-using Windows.Media.Streaming.Adaptive;
 
 namespace JAFDTC.Models.A10C
 {
@@ -30,7 +29,8 @@ namespace JAFDTC.Models.A10C
         //
         // properties deserialized from DB JSON
         //
-        public string Name { get; set; } // name as it will apper in UI. Must be unique.
+        public int ID { get; set; } // ID used in configuration files. Must be unique.
+        public string Name { get; set; } // name as it will apper in UI.
         public string Profile { get; set; } // name of the weapon's default profile
         public string Image { get; set; } // name of the weapon's image file
 
@@ -85,7 +85,7 @@ namespace JAFDTC.Models.A10C
                 A10CMunition toRemove = null;
                 foreach (A10CMunition m in _profileList)
                 {
-                    if (m.Name == "Laser Mavericks")
+                    if (m.ID == 13)
                     {
                         toRemove = m;
                         break;
@@ -113,19 +113,19 @@ namespace JAFDTC.Models.A10C
             return _keyMunitionMap[key];
         }
 
-        // Name to Munition Map
-        private static Dictionary<string, A10CMunition> _nameMunitionMap;
-        public static A10CMunition GetMunitionFromName(string name)
+        // ID to Munition Map
+        private static Dictionary<int, A10CMunition> _idMunitionMap;
+        public static A10CMunition GetMunitionFromID(int ID)
         {
-            if (_nameMunitionMap == null)
+            if (_idMunitionMap == null)
             {
-                _nameMunitionMap = new Dictionary<string, A10CMunition>();
+                _idMunitionMap = new Dictionary<int, A10CMunition>();
                 foreach (A10CMunition munition in GetMunitions())
                 {
-                    _nameMunitionMap.Add(name, munition);
+                    _idMunitionMap.Add(ID, munition);
                 }
             }
-            return _nameMunitionMap[name];
+            return _idMunitionMap[ID];
         }
 
         // Profile to Munition Map
@@ -144,18 +144,5 @@ namespace JAFDTC.Models.A10C
                 return m;
             return null;
         }
-
-        //private static Dictionary<string, string> _profileKeyMap;
-        //public static string GetInvKeyFromDefaultProfileName(string profileName)
-        //{
-        //    if (_profileKeyMap == null)
-        //    {
-        //        _profileKeyMap = new Dictionary<string, string>();
-        //        foreach (A10CMunition munition in GetMunitions())
-        //            _profileKeyMap.Add(munition.Profile, munition.Key);
-        //    }
-        //    return _profileKeyMap[profileName];
-        //}
-
     }
 }

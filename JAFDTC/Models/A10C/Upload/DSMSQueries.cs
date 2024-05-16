@@ -57,7 +57,7 @@ namespace JAFDTC.Models.A10C.Upload
         /// </summary>
         private class DSMSProfileQueryBuilder : QueryBuilderBase, IBuilder
         {
-            private Dictionary<string, int> _munitionProfileIndexMap { set; get; }
+            private Dictionary<int, int> _munitionProfileIndexMap { set; get; }
 
             private List<string > _profiles;
             public List<string> Profiles
@@ -70,7 +70,10 @@ namespace JAFDTC.Models.A10C.Upload
                 }
             }
 
-            public Dictionary<string, int> MunitionProfileIndexMap
+            /// <summary>
+            /// In the returned dictionary, keys are munition IDs and values are the 0-based index in the jet's default profiles.
+            /// </summary>
+            public Dictionary<int, int> MunitionProfileIndexMap
             {
                 get
                 {
@@ -83,7 +86,7 @@ namespace JAFDTC.Models.A10C.Upload
             // lazy load and cache the query data
             private void DoQuery()
             {
-                _munitionProfileIndexMap = new Dictionary<string, int>();
+                _munitionProfileIndexMap = new Dictionary<int, int>();
                 _profiles = new List<string>();
                 Build();
                 // 1=WPNS OFF;2=GBU-54;3=MAVERICK;...
@@ -97,7 +100,7 @@ namespace JAFDTC.Models.A10C.Upload
 
                         A10CMunition m = A10CMunition.GetMunitionFromProfile(kv[1]);
                         if (m != null)
-                            _munitionProfileIndexMap.Add(m.Name, int.Parse(kv[0]) - 1);
+                            _munitionProfileIndexMap.Add(m.ID, int.Parse(kv[0]) - 1);
                     }
                 }
             }
