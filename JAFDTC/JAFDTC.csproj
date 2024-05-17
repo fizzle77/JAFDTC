@@ -51,6 +51,7 @@
     <None Remove="Package.appxmanifest" />
     <None Remove="UI\A10C\A10CEditDSMSMunitionSettingsPage.xaml" />
     <None Remove="UI\A10C\A10CEditDSMSProfileOrder.xaml" />
+    <None Remove="UI\A10C\A10CEditHMCSPage.xaml" />
     <None Remove="UI\A10C\A10CEditMiscPage.xaml" />
     <None Remove="UI\App\EditPointsOfInterestPage.xaml" />
     <None Remove="UI\App\ImportParamsDialog.xaml" />
@@ -164,6 +165,9 @@
     <None Update="Images\gbu-54.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="UI\A10C\A10CEditHMCSPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

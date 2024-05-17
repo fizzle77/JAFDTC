@@ -24,9 +24,8 @@ using JAFDTC.Models.A10C.Radio;
 using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.UI.App;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using JAFDTC.UI.F16C;
 using JAFDTC.Models.A10C.DSMS;
+using JAFDTC.Models.A10C.HMCS;
 
 namespace JAFDTC.UI.A10C
 {
@@ -34,10 +33,11 @@ namespace JAFDTC.UI.A10C
     //
     public class Glyphs
     {
-        public const string MISC = "\xE8B7";
-        public const string RADIO = "\xE704";
         public const string WYPT = "\xE707";
         public const string DSMS = "\xEBD2";
+        public const string RADIO = "\xE704";
+        public const string HMCS = "\xEA4A";
+        public const string MISC = "\xE8B7";
     }
 
     /// <summary>
@@ -54,6 +54,7 @@ namespace JAFDTC.UI.A10C
                 A10CEditWaypointListHelper.PageInfo,
                 A10CEditDSMSPage.PageInfo,
                 A10CEditRadioPageHelper.PageInfo,
+                A10CEditHMCSPage.PageInfo,
                 A10CEditMiscPage.PageInfo
             };
 
@@ -62,6 +63,7 @@ namespace JAFDTC.UI.A10C
             ISystem system = tag switch
             {
                 DSMSSystem.SystemTag => ((A10CConfiguration)config).DSMS,
+                HMCSSystem.SystemTag => ((A10CConfiguration)config).HMCS,
                 MiscSystem.SystemTag => ((A10CConfiguration)config).Misc,
                 RadioSystem.SystemTag => ((A10CConfiguration)config).Radio,
                 WYPTSystem.SystemTag => ((A10CConfiguration)config).WYPT,

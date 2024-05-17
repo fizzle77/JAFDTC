@@ -17,16 +17,17 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.A10C.DSMS;
+using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.Models.A10C.Misc;
 using JAFDTC.Models.A10C.Radio;
 using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.UI.A10C;
+using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using JAFDTC.Utilities;
-using JAFDTC.Models.A10C.DSMS;
 
 namespace JAFDTC.Models.A10C
 {
@@ -46,6 +47,8 @@ namespace JAFDTC.Models.A10C
         // ------------------------------------------------------------------------------------------------------------
 
         public DSMSSystem DSMS { get; set; }
+
+        public HMCSSystem HMCS { get; set; }
 
         public MiscSystem Misc { get; set; }
         

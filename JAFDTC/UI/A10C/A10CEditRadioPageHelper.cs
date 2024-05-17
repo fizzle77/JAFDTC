@@ -28,7 +28,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using static JAFDTC.Models.A10C.Radio.RadioSystem;
 
-namespace JAFDTC.UI.F16C
+namespace JAFDTC.UI.A10C
 {
     /// <summary>
     /// helper class for the generic configuration radio system editor, EditRadioPage. provides support for the uhf
