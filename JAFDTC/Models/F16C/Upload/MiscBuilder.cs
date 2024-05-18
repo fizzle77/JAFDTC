@@ -79,21 +79,25 @@ namespace JAFDTC.Models.F16C.Upload
         {
             AddAction(ufc, "1");
 
-            // TODO: do a better job detecting defaults here to avoid just moving around ded.
-
             // ---- tacan mode
 
-            if (_cfg.Misc.TACANIsYardstickValue)
+            string tacanMode = (TACANModes)int.Parse(_cfg.Misc.TACANMode) switch
             {
-                // TODO: ideally, want a start condition here on current mode, assume default rec here
-                AddActions(ufc, new() { "SEQ", "SEQ" });
-            }
+                TACANModes.REC => "REC",
+                TACANModes.TR => "T/R",
+                TACANModes.AA_TR => "A/A TR",
+                _ => ""
+            };
+            AddWhileBlock("IsTACANMode", false, new() { tacanMode }, delegate ()
+            {
+                AddAction(ufc, "SEQ");
+            }, 6);
 
             // ---- tacan channel
 
             AddActions(ufc, PredActionsForNumAndEnter(_cfg.Misc.TACANChannel));
 
-            // ---- tacan channel
+            // ---- tacan band
 
             string band = (_cfg.Misc.TACANBandValue == TACANBands.X) ? "Y" : "X";
             AddIfBlock("IsTACANBand", true, new () { band }, delegate () { AddActions(ufc, new() { "0", "ENTR" }); });
