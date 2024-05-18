@@ -365,7 +365,9 @@ namespace JAFDTC.UI.App
                     uiBarBtnDelete.IsEnabled = isEnabled;
                     uiBarBtnRename.IsEnabled = isEnabled;
                     uiBarBtnExport.IsEnabled = isEnabled;
-                    uiBarBtnLoadJet.IsEnabled = (isEnabled && CurApp.IsDCSAvailable && isJetMatched);
+                    uiBarBtnLoadJet.IsEnabled = (isEnabled && CurApp.IsDCSAvailable && isJetMatched && 
+                                                 !CurApp.IsDCSUploadInFlight);
+                    uiBarBtnLoadJetIcon.Glyph = (CurApp.IsDCSUploadInFlight) ? "\xEB4C" : "\xE709";
                     uiBarBtnFocusDCS.IsEnabled = CurApp.IsDCSAvailable;
                     IsRebuildPending = false;
                 });

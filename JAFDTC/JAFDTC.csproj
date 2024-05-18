@@ -26,6 +26,7 @@
     <None Remove="Audio\ux_cap_cpan.wav" />
     <None Remove="Audio\ux_cap_wypt.wav" />
     <None Remove="Audio\ux_error.wav" />
+    <None Remove="Data\db-a10-munitions.json" />
     <None Remove="Data\db-emitters.json" />
     <None Remove="Data\db-pois-airbases.json" />
     <None Remove="DCS\Hooks\JAFDTCStatusMsgHook.lua" />
@@ -48,12 +49,16 @@
     <None Remove="Images\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <None Remove="Images\Wide310x150Logo.scale-200.png" />
     <None Remove="Package.appxmanifest" />
+    <None Remove="UI\A10C\A10CEditDSMSMunitionSettingsPage.xaml" />
+    <None Remove="UI\A10C\A10CEditDSMSProfileOrder.xaml" />
+    <None Remove="UI\A10C\A10CEditMiscPage.xaml" />
     <None Remove="UI\App\EditPointsOfInterestPage.xaml" />
     <None Remove="UI\App\ImportParamsDialog.xaml" />
     <None Remove="UI\AV8B\AV8BEditWaypointListPage.xaml" />
     <None Remove="UI\Base\EditNavpointListPage.xaml" />
     <None Remove="UI\Base\EditNavpointPage.xaml" />
     <None Remove="UI\Base\EditRadioPage.xaml" />
+    <None Remove="UI\BlankPage1.xaml" />
     <None Remove="UI\F15E\F15EEditMiscPage.xaml" />
     <None Remove="UI\F15E\F15EEditMPDPage.xaml" />
     <None Remove="UI\F15E\F15EEditSteerpointListPage.xaml" />
@@ -61,6 +66,7 @@
     <None Remove="UI\F15E\F15EEditUFCPage.xaml" />
     <None Remove="UI\F16C\F16CEditHTSThreatsPage.xaml" />
     <None Remove="UI\FA18C\FA18CEditCMSPage.xaml" />
+    <None Remove="UI\FA18C\FA18CEditPreplanPage.xaml" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -73,6 +79,7 @@
     <Content Include="Audio\ux_cap_wypt.wav" />
     <Content Include="Audio\ux_error.wav" />
     <Content Include="Data\db-emitters.json" />
+    <Content Include="Data\db-a10-munitions.json" />
     <Content Include="Data\db-pois-airbases.json" />
     <Content Include="DCS\Hooks\JAFDTCStatusMsgHook.lua" />
     <Content Include="DCS\Hooks\JAFDTCWyptCaptureHook.lua" />
@@ -127,6 +134,66 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Images\agm-65d.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\agm-65l.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\agr-m282l.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\cbu-87-105.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\gbu-10-12.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\gbu-31.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\gbu-38.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\agr-m151l.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\gbu-54.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\A10C\A10CEditDSMSProfileOrder.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\A10C\A10CEditDSMSMunitionSettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\BlankPage1.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\A10C\A10CEditMiscPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\FA18C\FA18CEditPreplanPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

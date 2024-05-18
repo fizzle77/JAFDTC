@@ -20,7 +20,7 @@
 using JAFDTC.Models.A10C.Upload;
 using JAFDTC.Models.DCS;
 using JAFDTC.Utilities;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Text;
 
 namespace JAFDTC.Models.A10C
@@ -92,6 +92,8 @@ namespace JAFDTC.Models.A10C
         public override void BuildSystems(StringBuilder sb)
         {
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
+            new MiscBuilder(_cfg, _dcsCmds, sb).Build();
+            new DSMSBuilder(_cfg, _dcsCmds, sb).Build();
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
         }
 

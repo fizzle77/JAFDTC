@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="JAFDTC.UI.A10C.A10CEditDSMSProfileOrderPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.Models.A10C"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+
+    <Grid HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
+        <ListView x:Name="uiListProfiles" Grid.Row="0" Grid.Column="0" ItemsSource="{x:Bind _munitions}" CanDragItems="True"
+            SelectionMode="None" AllowDrop="True" CanReorderItems="True" DragItemsCompleted="uiListProfiles_DragItemsCompleted">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local:A10CMunition">
+                    <StackPanel Orientation="Horizontal" Height="48">
+                        <FontIcon Margin="0,0,6,0" FontFamily="Segoe Fluent Icons" FontSize="24" Glyph="&#xE76F;"/>
+                        <Image Source="{x:Bind ImageFullPath}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{x:Bind Profile}" VerticalAlignment="Center" 
+                            Style="{ThemeResource EditorParamStaticTextBlockStyle}" 
+                            Margin="12,0,0,0" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <CheckBox x:Name="uiCheckUseOrder" Grid.Row="0" Grid.Column="1" VerticalAlignment="Top" Margin="18,18,12,12"
+            IsChecked="{x:Bind _config.DSMS.IsProfileOrderEnabled, Mode=TwoWay}" Click="uiCheckUseOrder_Click">
+            Order default weapon profiles as shown
+        </CheckBox>
+    </Grid>
+</Page>

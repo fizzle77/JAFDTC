@@ -68,7 +68,7 @@ namespace JAFDTC.Models.F15E.Upload
             if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT) &&
                 !_cfg.MPD.IsCrewMemberDefault(F15EConfiguration.CrewPositions.PILOT))
             {
-                AddIfBlock("IsInFrontCockpit", null, delegate ()
+                AddIfBlock("IsInFrontCockpit", true, null, delegate ()
                 {
                     BuildDisplays(devMap, MPDSystem.CockpitDisplays.PILOT_L_MPD, MPDSystem.CockpitDisplays.PILOT_R_MPD);
                 });
@@ -76,7 +76,7 @@ namespace JAFDTC.Models.F15E.Upload
             else if ((_cfg.CrewMember == F15EConfiguration.CrewPositions.WSO) && 
                      !_cfg.MPD.IsCrewMemberDefault(F15EConfiguration.CrewPositions.WSO))
             {
-                AddIfBlock("IsInRearCockpit", null, delegate ()
+                AddIfBlock("IsInRearCockpit", true, null, delegate ()
                 {
                     BuildDisplays(devMap, MPDSystem.CockpitDisplays.WSO_L_MPCD, MPDSystem.CockpitDisplays.WSO_R_MPCD);
                 });
@@ -100,23 +100,23 @@ namespace JAFDTC.Models.F15E.Upload
         /// </summary>
         private void BuildDisplay(AirframeDevice dispDev, MPDConfiguration dispConfig)
         {
-            AddIfBlock("IsDisplayNotInMainMenu", new() { $"{dispDev.Name}" }, delegate ()
+            AddIfBlock("IsDisplayInMainMenu", false, new() { $"{dispDev.Name}" }, delegate ()
             {
                 AddAction(dispDev, "PB11");
                 AddWait(WAIT_BASE);
             });
-            AddIfBlock("IsDisplayNotInMainMenu", new() { $"{dispDev.Name}" }, delegate ()
+            AddIfBlock("IsDisplayInMainMenu", false, new() { $"{dispDev.Name}" }, delegate ()
             {
                 AddAction(dispDev, "PB11");
                 AddWait(WAIT_BASE);
             });
-            AddIfBlock("IsProgBoxed", new() { $"{dispDev.Name}" }, delegate ()
+            AddIfBlock("IsProgBoxed", true, new() { $"{dispDev.Name}" }, delegate ()
             {
                 AddAction(dispDev, "PB06");
                 AddWait(WAIT_BASE);
             });
 
-            AddIfBlock("NoDisplaysProgrammed", new() { dispDev.Name }, delegate ()
+            AddIfBlock("IsNoDisplaysProgrammed", true, new() { dispDev.Name }, delegate ()
             {
                 AddAction(dispDev, "PB06");
                 for (int i = 0; i < MPDConfiguration.NUM_SEQUENCES; i++)

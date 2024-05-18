@@ -23,19 +23,21 @@
 #define noDEBUG_CMD_LOGGING
 
 using JAFDTC.Models.DCS;
-using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using System.Diagnostics;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace JAFDTC.Models
 {
     /// <summary>
     /// abstract base class for an upload agent responsible for building a stream of commands for use by dcs to set
-    /// up avionics according to a configuration.
+    /// up avionics according to a configuration and sending those commands to dcs via the network.
     /// 
-    /// derived classes must override BuildSystems() and may optionally override SetupBuilder() and TeardownBuilder()
-    /// if they have setup/teardown commands to generate before or after the system configuration commands are built.
+    /// derived classes specialize the agent for a specific airframe and configuration. derived classes must override
+    /// BuildSystems() and may optionally override SetupBuilder() and TeardownBuilder() if they have setup/teardown
+    /// commands streams to generate before or after the system configuration command stream proper. these methods
+    /// create appropriate IBuilder instances to build command streams for various parts of the configuration.
     /// </summary>
     public abstract class UploadAgentBase : IUploadAgent
     {
@@ -46,9 +48,9 @@ namespace JAFDTC.Models
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// core setup builder to perform common setup actions at the start of a command streams such as sending the
-        /// "start of upload" marker. derived classes should invoke base.Build from their Build() methods before
-        /// returning.
+        /// core setup builder to perform common setup actions at the start of a command stream.  SetupBuilder()
+        /// returns an instance of this class. the base implementation sends a "start of upload" marker. derived
+        /// classes should invoke base.Build() from their Build() methods before returning.
         /// 
         /// instances of this class may be built with a null IAirframeDeviceManager.
         /// </summary>
@@ -63,9 +65,9 @@ namespace JAFDTC.Models
         }
 
         /// <summary>
-        /// core setup builder to perform common teardown actions at the end of a command streams such as sending the
-        /// "end of upload" marker. derived classes should invoke base.Build from their Build() methods before
-        /// returning.
+        /// core teardown builder to perform common teardown actions at the end of a command stream. TeardownBuilder()
+        /// returns an instance of this class. the base implementation sends an "end of upload" marker. derived
+        /// classes should invoke base.Build() from their Build() methods before returning.
         /// 
         /// instances of this class may be built with a null IAirframeDeviceManager.
         /// </summary>
@@ -93,24 +95,25 @@ namespace JAFDTC.Models
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public bool Load()
+        /// <summary>
+        /// load a configuration onto the jet, see IUploadAgent.
+        /// </summary>
+        public async Task<bool> Load()
         {
             StringBuilder sb = new();
+            IBuilder setupBuilder = SetupBuilder(sb);
+            IBuilder teardownBuilder = TeardownBuilder(sb);
 
-            SetupBuilder(sb).Build();
-            BuildSystems(sb);
-            TeardownBuilder(sb).Build();
+            setupBuilder.Build();
+            await Task.Run(() => BuildSystems(sb));
+            teardownBuilder.Build();
 
-            if (sb.Length > 0)
-            {
-                sb.Remove(sb.Length - 1, 1);
-            }
-            string str = sb.ToString();
-            if (str != "")
+            string str = teardownBuilder.ToString();
+            if (!string.IsNullOrEmpty(str))
             {
 #if DEBUG_CMD_LOGGING
-                FileManager.Log($"CMD stream data size is {str.Length}");
-                FileManager.Log($"CMD stream:\n****************\n{str}\n****************");
+                FileManager.Log($"UploadAgentBase stream data size is {str.Length}");
+                FileManager.Log($"UploadAgentBase stream:\n****************\n{str}\n****************");
 #endif
                 return CockpitCmdTx.Send(str);
             }
@@ -118,17 +121,17 @@ namespace JAFDTC.Models
         }
 
         /// <summary>
-        /// derived classes must override this method to build out the system configurations.
+        /// derived classes must override this method to build out the system configurations, see IUploadAgent.
         /// </summary>
         public virtual void BuildSystems(StringBuilder sb) { }
 
         /// <summary>
-        /// derived classes may override this method to return a different builder.
+        /// derived classes may override this method to return a different builder, see IUploadAgent.
         /// </summary>
         public virtual IBuilder SetupBuilder(StringBuilder sb) => new CoreSetupBuilder(null, sb);
 
         /// <summary>
-        /// TODOderived classes may override this method to return a different builder.
+        /// TODOderived classes may override this method to return a different builder, see IUploadAgent.
         /// </summary>
         public virtual IBuilder TeardownBuilder(StringBuilder sb) => new CoreTeardownBuilder(null, sb);
     }

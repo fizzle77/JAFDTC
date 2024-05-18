@@ -33,7 +33,7 @@ https://www.gnu.org/licenses/.
 
         <!-- brush for error fields.
           -->
-        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="PaleVioletRed"/>
 
     </Page.Resources>
 
@@ -86,7 +86,7 @@ https://www.gnu.org/licenses/.
                 TACAN Channel
             </TextBlock>
             <StackPanel Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
-                <TextBox Width="90"
+                <TextBox Width="96"
                          x:Name="uiTACANValueChan"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditMisc.TACANChannel, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -94,13 +94,12 @@ https://www.gnu.org/licenses/.
                          HorizontalAlignment="Left"
                          LostFocus="MiscTextBox_LostFocus"
                          ToolTipService.ToolTip="TACAN Channel Selection"/>
-                <ComboBox Margin="12,0,0,0" Width="64"
+                <ComboBox Margin="6,0,0,0" Width="64"
                           x:Name="uiTACANComboBand"
                           VerticalAlignment="Center"
                           SelectionChanged="TACANComboBand_SelectionChanged"
-                          ToolTipService.ToolTip="TACAN Mode Selection">
-                    <!--                SelectionChanged="ALICSelectCombo_SelectionChanged" -->
-                    <!-- Tag is enum TODO -->
+                          ToolTipService.ToolTip="TACAN band">
+                    <!-- Tag is enum TACANBands -->
                     <ComboBox.Items>
                         <TextBlock Text="X" Tag="0"/>
                         <TextBlock Text="Y" Tag="1"/>
@@ -110,13 +109,20 @@ https://www.gnu.org/licenses/.
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="16,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right">
-                Setup TACAN for Yardstick
+                TACAN Mode
             </TextBlock>
-            <CheckBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0"
-                      x:Name="uiTACANCkboxIsYard"
+            <ComboBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0" Width="96"
+                      x:Name="uiTACANComboMode"
                       VerticalAlignment="Center"
-                      Click="TACANCkboxIsYard_Click"
-                      ToolTipService.ToolTip="Switch TACAN to A/A Mode for use as a Yardstick"/>
+                      SelectionChanged="TACANComboMode_SelectionChanged"
+                      ToolTipService.ToolTip="TACAN mode">
+                <!-- Tag is enum TACANModes -->
+                <ComboBox.Items>
+                    <TextBlock Text="REC" Tag="0"/>
+                    <TextBlock Text="TR" Tag="1"/>
+                    <TextBlock Text="A/A TR" Tag="2"/>
+                </ComboBox.Items>
+            </ComboBox>
 
             <!-- ALOW DED page
               -->
@@ -131,7 +137,7 @@ https://www.gnu.org/licenses/.
                 CARA ALOW Setting
             </TextBlock>
             <StackPanel Grid.Row="4" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
-                <TextBox Width="90"
+                <TextBox Width="96"
                          x:Name="uiALOWValueCARAALOW"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditMisc.ALOWCARAALOW, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -139,7 +145,7 @@ https://www.gnu.org/licenses/.
                          HorizontalAlignment="Left"
                          LostFocus="MiscTextBox_LostFocus"
                          ToolTipService.ToolTip="ALOW DED Page: CARA ALLOW Setting (feet, AGL)"/>
-                <TextBlock Margin="12,0,0,0"
+                <TextBlock Margin="6,0,0,0"
                            Style="{StaticResource EditorParamStaticTextBlockStyle}"
                            HorizontalTextAlignment="Right">
                     feet
@@ -152,7 +158,7 @@ https://www.gnu.org/licenses/.
                 MSL FLOOR Setting
             </TextBlock>
             <StackPanel Grid.Row="5" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
-                <TextBox Width="90"
+                <TextBox Width="96"
                          x:Name="uiALOWValueMSLFLOOR"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditMisc.ALOWMSLFloor, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -160,7 +166,7 @@ https://www.gnu.org/licenses/.
                          HorizontalAlignment="Left"
                          LostFocus="MiscTextBox_LostFocus"
                          ToolTipService.ToolTip="ALOW DED Page: MSL FLOOR Setting (feet, MSL)"/>
-                <TextBlock Margin="12,0,0,0"
+                <TextBlock Margin="6,0,0,0"
                            Style="{StaticResource EditorParamStaticTextBlockStyle}"
                            HorizontalTextAlignment="Right">
                     feet
@@ -179,7 +185,7 @@ https://www.gnu.org/licenses/.
                 BINGO Setting
             </TextBlock>
             <StackPanel Grid.Row="7" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
-                <TextBox Width="90"
+                <TextBox Width="96"
                          x:Name="uiBINGOValueBINGO"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditMisc.Bingo, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -187,7 +193,7 @@ https://www.gnu.org/licenses/.
                          HorizontalAlignment="Left"
                          LostFocus="MiscTextBox_LostFocus"
                          ToolTipService.ToolTip="BINGO Setting (lbs.)"/>
-                <TextBlock Margin="12,0,0,0"
+                <TextBlock Margin="6,0,0,0"
                            Style="{StaticResource EditorParamStaticTextBlockStyle}"
                            HorizontalTextAlignment="Right">
                     pounds
@@ -216,7 +222,7 @@ https://www.gnu.org/licenses/.
                        HorizontalTextAlignment="Right">
                 Bullseye Steerpoint
             </TextBlock>
-            <TextBox Grid.Row="10" Grid.Column="1" Width="90" Margin="12,12,0,0"
+            <TextBox Grid.Row="10" Grid.Column="1" Width="96" Margin="12,12,0,0"
                      x:Name="uiBULLValueSP"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      Text="{x:Bind EditMisc.BullseyeWP, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -231,7 +237,7 @@ https://www.gnu.org/licenses/.
         right column 
         ===============================================================================================================
         -->
-        <Grid Grid.Row="0" Grid.Column="1" Margin="12,8,16,8"
+        <Grid Grid.Row="0" Grid.Column="1" Margin="0,8,16,8"
               VerticalAlignment="Top"
               HorizontalAlignment="Center">
             <Grid.RowDefinitions>
@@ -266,7 +272,7 @@ https://www.gnu.org/licenses/.
                 Localizer
             </TextBlock>
             <StackPanel Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
-                <TextBox Width="86"
+                <TextBox Width="96"
                          x:Name="uiILSValueFreq"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditMisc.ILSFrequency, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -303,7 +309,7 @@ https://www.gnu.org/licenses/.
                        HorizontalTextAlignment="Right">
                 TGP Laser Code
             </TextBlock>
-            <TextBox Grid.Row="3" Grid.Column="1" Width="86" Margin="12,12,0,0"
+            <TextBox Grid.Row="3" Grid.Column="1" Width="96" Margin="12,12,0,0"
                      x:Name="uiLASRValueTGP"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      Text="{x:Bind EditMisc.LaserTGPCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -317,7 +323,7 @@ https://www.gnu.org/licenses/.
                        HorizontalTextAlignment="Right">
                 LST Laser Code
             </TextBlock>
-            <TextBox Grid.Row="4" Grid.Column="1" Width="86" Margin="12,12,0,0"
+            <TextBox Grid.Row="4" Grid.Column="1" Width="96" Margin="12,12,0,0"
                      x:Name="uiLASRValueLST"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      Text="{x:Bind EditMisc.LaserLSTCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -332,7 +338,7 @@ https://www.gnu.org/licenses/.
                 Laser ST Time
             </TextBlock>
             <StackPanel Grid.Row="5" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
-                <TextBox Width="86"
+                <TextBox Width="96"
                          x:Name="uiLASRValueTime"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditMisc.LaserStartTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -340,7 +346,7 @@ https://www.gnu.org/licenses/.
                          HorizontalAlignment="Left"
                          LostFocus="MiscTextBox_LostFocus"
                          ToolTipService.ToolTip="Auto Lase at Time To Impact (Seconds)"/>
-                <TextBlock Margin="12,0,0,0"
+                <TextBlock Margin="6,0,0,0"
                            Style="{StaticResource EditorParamStaticTextBlockStyle}"
                            HorizontalTextAlignment="Right">
                     seconds
@@ -353,37 +359,37 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorTitleTextBlockStyle}">
                 HMCS DED Page, Symbology Intensity:
             </TextBlock>
-            <TextBlock Grid.Row="7" Grid.Column="0" Margin="16,12,0,0"
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="16,6,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right"
                        VerticalAlignment="Center">
                 HUD Blanking
             </TextBlock>
-            <CheckBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0"
+            <CheckBox Grid.Row="7" Grid.Column="1" Margin="12,6,0,0"
                       x:Name="uiHMCSCkboxBlankHUD"
                       VerticalAlignment="Center"
                       Click="HMCSCkboxBlankHUD_Click"
                       ToolTipService.ToolTip="Blank the JHMCS in HUD Region"/>
 
-            <TextBlock Grid.Row="8" Grid.Column="0" Margin="16,12,0,0"
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="16,6,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right"
                        VerticalAlignment="Center">
                 Cockpit Blanking
             </TextBlock>
-            <CheckBox Grid.Row="8" Grid.Column="1" Margin="12,12,0,0"
+            <CheckBox Grid.Row="8" Grid.Column="1" Margin="12,6,0,0"
                       x:Name="uiHMCSCkboxBlankCock"
                       VerticalAlignment="Center"
                       Click="HMCSCkboxBlankCock_Click"
                       ToolTipService.ToolTip="Blank the JHMCS in Cockpit Region"/>
 
-            <TextBlock Grid.Row="9" Grid.Column="0" Margin="16,12,0,0"
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="16,6,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right"
                        VerticalAlignment="Center">
                 RWR Display
             </TextBlock>
-            <CheckBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0"
+            <CheckBox Grid.Row="9" Grid.Column="1" Margin="12,6,0,0"
                       x:Name="uiHMCSCkboxShowRWR"
                       VerticalAlignment="Center"
                       Click="HMCSCkboxShowRWR_Click"
@@ -407,13 +413,13 @@ https://www.gnu.org/licenses/.
                     <TextBlock Text="LVL3 (Most)" Tag="2"/>
                 </ComboBox.Items>
             </ComboBox>
-            <TextBlock Grid.Row="11" Grid.Column="0" Margin="12,8,0,0"
+            <TextBlock Grid.Row="11" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right"
                        VerticalAlignment="Center">
                 Symbology Intensity
             </TextBlock>
-            <Slider Grid.Row="11" Grid.Column="1" Margin="12,12,0,0"
+            <Slider Grid.Row="11" Grid.Column="1" Margin="12,16,0,0"
                     x:Name="uiHMCSSliderIntensity"
                     VerticalAlignment="Bottom"
                     ValueChanged="HMCSSliderIntensity_ValueChanged"/>

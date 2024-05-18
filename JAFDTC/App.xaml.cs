@@ -88,8 +88,6 @@ namespace JAFDTC
 
         private System.DateTimeOffset LastDCSExportCheck { get; set; }
 
-        private bool IsUploadInFlight { get; set; }
-
         private long LastDCSExportPacketCount { get; set; }
 
         private bool IsJAFDTCPinnedToTop { get; set; }
@@ -109,6 +107,11 @@ namespace JAFDTC
         private long MarkerUpdateTimestamp { get; set; }
 
         // ---- public events, posts change/validation events
+
+        // NOTE: this is a static to save us having to pass around App references for use. App should be a singleton
+        // NOTE: anyway, so shouldn't be a big deal to have a static here given what is being reported.
+
+        public static event EventHandler<string> DCSQueryResponseReceived;
 
         // NOTE: these can be called from non-ui threads but may trigger ui actions. we will dispatch the handler
         // NOTE: invocations on a ui thread to avoid the chaos that will ensue.
@@ -207,6 +210,24 @@ namespace JAFDTC
             }
         }
 
+        /// <summary>
+        /// returns current upload state for dcs. this property does not have an explict set handler and generates
+        /// property change events.
+        /// </summary>
+        private bool _isDCSUploadInFlight;
+        public bool IsDCSUploadInFlight
+        {
+            get => _isDCSUploadInFlight;
+            private set
+            {
+                if (_isDCSUploadInFlight != value)
+                {
+                    _isDCSUploadInFlight = value;
+                    OnPropertyChanged(nameof(IsDCSUploadInFlight));
+                }
+            }
+        }
+
         // ---- private properties, read-only
 
         private readonly Dictionary<string, AirframeTypes> _dcsToJAFDTCTypeMap;
@@ -264,7 +285,7 @@ namespace JAFDTC
                 Settings.Preflight();
 
                 IsJAFDTCPinnedToTop = Settings.IsAlwaysOnTop;
-                IsUploadInFlight = false;
+                IsDCSUploadInFlight = false;
 
                 TelemDataRx.Instance.TelemDataReceived += TelemDataReceiver_DataReceived;
                 TelemDataRx.Instance.Start();
@@ -293,7 +314,7 @@ namespace JAFDTC
         /// upload given configuration to dcs. the configuration is only uploaded if dcs is available, the configuration
         /// is valid, and the current dcs airframe matches the airframe of the configuration.
         /// </summary>
-        public void UploadConfigurationToJet(IConfiguration cfg)
+        public async void UploadConfigurationToJet(IConfiguration cfg)
         {
             string error = null;
             if (cfg == null)
@@ -304,7 +325,7 @@ namespace JAFDTC
             {
                 error = "DCS or Airframe Unavailable";
             }
-            else if (!cfg.UploadAgent.Load())
+            else if (!await cfg.UploadAgent.Load())
             {
                 error = "Configuration Upload Failed";
             }
@@ -312,6 +333,7 @@ namespace JAFDTC
             {
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
+                    FileManager.Log($"Configuration upload reports error: {error}");
                     StatusMessageTx.Send(error);
                     General.PlayAudio("ux_error.wav");
                 });
@@ -325,14 +347,30 @@ namespace JAFDTC
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// process query replies from the dcs event stream. parties interested in the reply to a query will subscribe
+        /// to DCSQueryResponseReceived events. event handlers are handled on the current thread and should not use ui.
+        /// event handlers are cleared after each response.
+        /// </summary>
+        private void ProcessQueryResponse(TelemDataRx.TelemData data)
+        {
+            if (!string.IsNullOrEmpty(data.Response) &&
+                (DCSQueryResponseReceived != null) &&
+                (DCSQueryResponseReceived.GetInvocationList().Length > 0))
+            {
+                DCSQueryResponseReceived?.Invoke(this, data.Response);
+                DCSQueryResponseReceived = null;
+            }
+        }
+
+        /// <summary>
         /// process markers from the dcs event stream. play a sound to indicate uploading has started or ended based
         /// on the marker. actions are carried out on the main thread via dispatch.
         /// </summary>
         private void ProcessMarker(TelemDataRx.TelemData data)
         {
-            if (!IsUploadInFlight && !string.IsNullOrEmpty(data.Marker))
+            if (!IsDCSUploadInFlight && !string.IsNullOrEmpty(data.Marker))
             {
-                IsUploadInFlight = true;
+                IsDCSUploadInFlight = true;
                 MarkerUpdateTimestamp = 0;
                 if (Settings.UploadFeedback != UploadFeedbackTypes.LIGHTS)
                 {
@@ -343,9 +381,9 @@ namespace JAFDTC
                 }
                 FileManager.Log($"Upload starts, marker '{data.Marker}'");
             }
-            else if (IsUploadInFlight && data.Marker.StartsWith("ERROR: "))
+            else if (IsDCSUploadInFlight && data.Marker.StartsWith("ERROR: "))
             {
-                IsUploadInFlight = false;
+                IsDCSUploadInFlight = false;
                 StatusMessageTx.Send(data.Marker.Remove(0, "ERROR: ".Length));
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
@@ -353,7 +391,7 @@ namespace JAFDTC
                 });
                 FileManager.Log($"Upload fails, reporting '{data.Marker}'");
             }
-            else if (IsUploadInFlight &&
+            else if (IsDCSUploadInFlight &&
                      !string.IsNullOrEmpty(data.Marker) &&
                      (Settings.UploadFeedback == UploadFeedbackTypes.AUDIO_PROGRESS))
             {
@@ -364,9 +402,9 @@ namespace JAFDTC
                     MarkerUpdateTimestamp = DateTime.Now.Ticks;
                 }
             }
-            else if (IsUploadInFlight && string.IsNullOrEmpty(data.Marker))
+            else if (IsDCSUploadInFlight && string.IsNullOrEmpty(data.Marker))
             {
-                IsUploadInFlight = false;
+                IsDCSUploadInFlight = false;
                 if ((Settings.UploadFeedback == UploadFeedbackTypes.AUDIO_DONE) ||
                     (Settings.UploadFeedback == UploadFeedbackTypes.AUDIO_PROGRESS))
                 {
@@ -391,7 +429,7 @@ namespace JAFDTC
         /// </summary>
         private void ProcessUploadCommand(TelemDataRx.TelemData data)
         {
-            if (IsUploadInFlight)
+            if (IsDCSUploadInFlight)
             {
                 UploadPressed = false;
                 UploadPressedTimestamp = 0;
@@ -529,6 +567,7 @@ namespace JAFDTC
                 DCSLastLon = (double.TryParse(data.Lat, out double lon)) ? lon : 0.0;
 #endif
 
+                ProcessQueryResponse(data);
                 ProcessMarker(data);
                 ProcessUploadCommand(data);
                 ProcessWindowStackCommand(data);

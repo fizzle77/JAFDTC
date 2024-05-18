@@ -75,7 +75,34 @@ namespace JAFDTC.Models.A10C.WYPT
             }
         }
 
+        public override string Alt
+        {
+            get => _alt;
+            set
+            {
+                string error = "Invalid altitude format";
+                if (IsIntegerFieldValid(value, -80000, 80000))
+                {
+                    value = FixupIntegerField(value);
+                    error = null;
+                }
+                SetProperty(ref _alt, value, error);
+            }
+        }
+
         // TODO: could add support for TOS
+
+        // ---- public properties, computed
+
+        [JsonIgnore]
+        public override bool IsValid => IsIntegerFieldValid(_alt, -80000, 80000, true) &&
+                                        IsDecimalFieldValid(Lat, -90.0, 90.0, false) &&
+                                        IsDecimalFieldValid(Lon, -180.0, 180.0, false);
+
+        [JsonIgnore]
+        public override string Location => ((string.IsNullOrEmpty(Lat)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LatUI)) + ", " +
+                                          ((string.IsNullOrEmpty(Lon)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LonUI)) + " / " +
+                                          ((string.IsNullOrEmpty(Alt)) ? "Ground" : Alt + "’");
 
         // ------------------------------------------------------------------------------------------------------------
         //

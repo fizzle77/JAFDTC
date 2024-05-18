@@ -95,6 +95,10 @@ namespace JAFDTC.Models.FA18C
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new CMSBuilder(_cfg, _dcsCmds, sb).Build();
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
+            //
+            // pre-planned programs can reference waypoints and should follow their setup...
+            //
+            new PPBuilder(_cfg, _dcsCmds, sb).Build();
         }
 
         public override IBuilder TeardownBuilder(StringBuilder sb) => new FA18CTeardownBuilder(_cfg, _dcsCmds, sb);

@@ -31,7 +31,7 @@ https://www.gnu.org/licenses/.
     <Page.Resources>
 
         <!-- brush for error fields. -->
-        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="PaleVioletRed"/>
 
     </Page.Resources>
 
@@ -59,7 +59,7 @@ https://www.gnu.org/licenses/.
                       VerticalAlignment="Center"
                       SelectionChanged="RadSelectCombo_SelectionChanged"
                       ToolTipService.ToolTip="Selects Radio to Edit">
-                <!-- provide 4 items for 4 radios, cut back based on actual needs -->
+                <!-- provide 4 items for up to 4 radios, cut back based on actual needs -->
                 <ComboBox.Items>
                     <Grid Tag="0">
                         <Grid.ColumnDefinitions>
@@ -129,27 +129,27 @@ https://www.gnu.org/licenses/.
             </ComboBox>
             <Button Margin="24,0,6,0" VerticalAlignment="Center"
                     x:Name="uiRadPrevBtn"
-                    ToolTipService.ToolTip="Selects Previous Radio"
+                    ToolTipService.ToolTip="Select previous radio"
                     Click="RadBtnPrev_Click">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
             </Button>
             <Button VerticalAlignment="Center"
                     x:Name="uiRadNextBtn"
-                    ToolTipService.ToolTip="Selects Next Radio"
+                    ToolTipService.ToolTip="Select next radio"
                     Click="RadBtnNext_Click">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
             </Button>
             <CommandBar Margin="56,0,0,0" HorizontalAlignment="Center">
                 <AppBarButton x:Name="uiBarAdd" Icon="Add" Label="Add"
-                          Click="CmdAdd_Click"
-                          ToolTipService.ToolTip="Add a New Preset to Radio"/>
+                              Click="CmdAdd_Click"
+                              ToolTipService.ToolTip="Add new preset to radio"/>
                 <AppBarSeparator/>
                 <AppBarButton x:Name="uiBarImport" Icon="Download" Label="Import"
-                          Click="CmdImport_Click"
-                          ToolTipService.ToolTip="Import Radio Presets from a File"/>
+                              Click="CmdImport_Click"
+                              ToolTipService.ToolTip="Import radio presets from a file"/>
                 <AppBarButton x:Name="uiBarExport" Icon="Upload" Label="Export"
-                          Click="CmdExport_Click"
-                          ToolTipService.ToolTip="Export Radio Presets to a File"/>
+                              Click="CmdExport_Click"
+                              ToolTipService.ToolTip="Export radio presets to a file"/>
                 <AppBarSeparator/>
             </CommandBar>
         </StackPanel>
@@ -206,7 +206,6 @@ https://www.gnu.org/licenses/.
                                      HorizontalTextAlignment="Center"
                                      MaxLength="2"
                                      Tag="Preset"
-                                     LostFocus="PageTextBox_LostFocus"
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      Text="{x:Bind Preset, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                             <TextBox Grid.Column="1" Margin="6,0,0,0"
@@ -214,20 +213,16 @@ https://www.gnu.org/licenses/.
                                      HorizontalTextAlignment="Left"
                                      MaxLength="7"
                                      Tag="Frequency"
-                                     LostFocus="PageTextBox_LostFocus"
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      Text="{x:Bind Frequency, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                             <ComboBox Grid.Column="2" Width="72" Margin="6,1,0,0"
                                       Tag="Modulation"
                                       Visibility="{x:Bind ModulationVisibility, Mode=OneWay}"
-                                      ItemsSource="{x:Bind ModulationItems, Mode=OneWay}"
-                                      SelectedIndex="{x:Bind ModulationIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      SelectionChanged="PageModCombo_SelectionChanged"/>
+                                      SelectionChanged="PreListModCombo_SelectionChanged"/>
                             <TextBox Grid.Column="3" Margin="6,0,0,0"
                                      VerticalAlignment="Center"
                                      HorizontalTextAlignment="Center"
                                      Tag="Description"
-                                     LostFocus="PageTextBox_LostFocus"
                                      FontWeight="Medium"
                                      FontSize="16"
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -237,7 +232,7 @@ https://www.gnu.org/licenses/.
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      Tag="{x:Bind Tag}"
                                      ToolTipService.ToolTip="Delete this Preset"
-                                     Click="PreBntDelete_Click">
+                                     Click="PreListBtnDelete_Click">
                                 <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
                             </Button>
                         </Grid>
@@ -271,7 +266,6 @@ https://www.gnu.org/licenses/.
                          VerticalAlignment="Center"
                          PlaceholderText="None Set"
                          MaxLength="7"
-                         LostFocus="PageTextBox_LostFocus"
                          Text="{x:Bind EditMisc.DefaultTuning, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                 <TextBlock Grid.Column="2" Margin="8,0,0,0"
                            x:Name="uiMiscTextDefaultLabel"

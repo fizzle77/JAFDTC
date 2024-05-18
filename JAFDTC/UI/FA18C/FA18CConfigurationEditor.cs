@@ -19,13 +19,13 @@
 
 using JAFDTC.Models.FA18C;
 using JAFDTC.Models.FA18C.CMS;
+using JAFDTC.Models.FA18C.PP;
 using JAFDTC.Models.FA18C.Radio;
 using JAFDTC.Models.FA18C.WYPT;
 using JAFDTC.Models;
 using JAFDTC.UI.App;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using JAFDTC.UI.F16C;
 
 namespace JAFDTC.UI.FA18C
 {
@@ -35,6 +35,7 @@ namespace JAFDTC.UI.FA18C
     {
         public const string CMS = "\xEA18";
         public const string MISC = "\xE8B7";
+        public const string PP = "\xF0E3";
         public const string RADIO = "\xE704";
         public const string WYPT = "\xE707";
     }
@@ -50,6 +51,7 @@ namespace JAFDTC.UI.FA18C
         {
             FA18CEditWaypointListHelper.PageInfo,
             FA18CEditRadioPageHelper.PageInfo,
+            FA18CEditPreplanPage.PageInfo,
             FA18CEditCMSPage.PageInfo,
         };
 
@@ -62,6 +64,7 @@ namespace JAFDTC.UI.FA18C
             ISystem system = tag switch
             {
                 CMSSystem.SystemTag => ((FA18CConfiguration)config).CMS,
+                PPSystem.SystemTag => ((FA18CConfiguration)config).PP,
                 RadioSystem.SystemTag => ((FA18CConfiguration)config).Radio,
                 WYPTSystem.SystemTag => ((FA18CConfiguration) config).WYPT,
                 _ => null,

@@ -288,6 +288,46 @@ namespace JAFDTC.UI
             cntrl.AllowFocusWhenDisabled = false;
         }
 
+        public static void SetEnableState(bool isEnabled, params Control[] cntrls)
+        {
+            foreach (Control cntrl in cntrls) 
+                SetEnableState(cntrl, isEnabled);
+        }
+
+        public static void SetCheckEnabledAndState(CheckBox check, bool isEnabled, bool isChecked)
+        {
+            SetEnableState(check, isEnabled);
+            check.IsChecked = isChecked;
+        }
+
+        public static void SetComboEnabledAndSelection(ComboBox combo, bool isNotLinked, bool isEnabled, int selectedIndex)
+        {
+            if (!isEnabled)
+            {
+                SetEnableState(combo, false); // always disable if set to disable
+                combo.SelectedItem = null; // always blank if disabled
+            }
+            else
+            {
+                SetEnableState(combo, isNotLinked); // otherwise disable if linked
+                combo.SelectedIndex = selectedIndex; // show setting if enabled or linked
+            }
+        }
+
+        public static void SetTextBoxEnabledAndText(TextBox tb, bool isNotLinked, bool isEnabled, string text, string disabledText = null)
+        {
+            if (!isEnabled)
+            {
+                SetEnableState(tb, false); // always disable if set to disable
+                tb.Text = disabledText; // always the disabledText if disabled
+            }
+            else
+            {
+                SetEnableState(tb, isNotLinked); // otherwise disable if linked
+                tb.Text = text; // show setting if enabled or linked
+            }
+        }
+
         /// <summary>
         /// rebuild the "link"/"unlink" page buttons based on the state of the link. if the button is set up to
         /// unlink, button title is "unlink" with text containing the name of the linked configuration. if button is

@@ -57,9 +57,12 @@ namespace JAFDTC.Models.FA18C.Upload
 
             if (!_cfg.CMS.IsDefault)
             {
-                AddActions(lmfd, new() { "OSB-18", "OSB-17" }); // Menu, EW
-
-                AddIfBlock("DispenserOff", null, delegate ()
+                AddWhileBlock("IsLMFDTAC", false, null, delegate ()
+                {
+                    AddAction(lmfd, "OSB-18");                                                  // MENU
+                });
+                AddActions(lmfd, new() { "OSB-17" });                                           // EW
+                AddIfBlock("IsDispenserOff", true, null, delegate ()
                 {
                     AddAction(cmds, "ON");
                     AddWait(WAIT_VERY_LONG);
@@ -75,39 +78,37 @@ namespace JAFDTC.Models.FA18C.Upload
                     {
                         if (!string.IsNullOrEmpty(pgm.ChaffQ))
                         {
-                            AddAction(lmfd, "OSB-05"); // Chaff
-                            AddWait(WAIT_BASE);
+                            AddAction(lmfd, "OSB-05", WAIT_BASE);                               // Chaff
                             AdjustQty(lmfd, int.Parse(pgm.ChaffQ), int.Parse(pgmDefault.ChaffQ));
                             AddAction(lmfd, "OSB-05");
                         }
-
                         if (!string.IsNullOrEmpty(pgm.FlareQ))
                         {
-                            AddAction(lmfd, "OSB-04"); // Flare
-                            AddWait(WAIT_BASE);
+                            AddAction(lmfd, "OSB-04", WAIT_BASE);                               // Flare
                             AdjustQty(lmfd, int.Parse(pgm.FlareQ), int.Parse(pgmDefault.FlareQ));
                             AddAction(lmfd, "OSB-04");
                         }
-
                         if (!string.IsNullOrEmpty(pgm.SQ))
                         {
-                            AddAction(lmfd, "OSB-14"); // Rpt
-                            AddWait(WAIT_BASE);
+                            AddAction(lmfd, "OSB-14", WAIT_BASE);                               // Rpt
                             AdjustQty(lmfd, int.Parse(pgm.SQ), int.Parse(pgmDefault.SQ));
                             AddAction(lmfd, "OSB-14");
                         }
-
                         if (!string.IsNullOrEmpty(pgm.SI))
                         {
-                            AddAction(lmfd, "OSB-15"); // Interval
-                            AddWait(WAIT_BASE);
+                            AddAction(lmfd, "OSB-15", WAIT_BASE);                               // Interval
                             AdjustInterval(lmfd, double.Parse(pgm.SI), double.Parse(pgmDefault.SI));
                             AddAction(lmfd, "OSB-15");
                         }
                     }
-                    AddActions(lmfd, new() { "OSB-19", "OSB-20" }); // Save, Step
+                    AddActions(lmfd, new() { "OSB-19", "OSB-20" }, null, WAIT_BASE);            // SAVE, STEP
                 }
-                AddActions(lmfd, new() { "OSB-09", "OSB-18", "OSB-03" }); // RTN, MENU, HUD
+                AddActions(lmfd, new() { "OSB-09" });                                           // RETURN
+                AddWhileBlock("IsLMFDTAC", false, null, delegate ()
+                {
+                    AddAction(lmfd, "OSB-18");                                                  // MENU
+                });
+                AddActions(lmfd, new() { "OSB-03" });                                           // HUD
             }
         }
 

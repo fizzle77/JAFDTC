@@ -22,6 +22,7 @@ using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
+using System;
 
 namespace JAFDTC.Models.F16C.HARM
 {
@@ -93,7 +94,7 @@ namespace JAFDTC.Models.F16C.HARM
         {
             Number = other.Number;
             Table = new ObservableCollection<TableCode>();
-            for (int i = 0; i < other.Table.Count; i++)
+            for (int i = 0; i < Math.Min(NUM_ALICTABLE_ENTRIES, other.Table.Count); i++)
             {
                 Table.Add(new(other.Table[i]));
             }

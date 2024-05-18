@@ -17,15 +17,16 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.A10C.Misc;
 using JAFDTC.Models.A10C.Radio;
 using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.UI.A10C;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using JAFDTC.Utilities;
+using JAFDTC.Models.A10C.DSMS;
 
 namespace JAFDTC.Models.A10C
 {
@@ -44,6 +45,10 @@ namespace JAFDTC.Models.A10C
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        public DSMSSystem DSMS { get; set; }
+
+        public MiscSystem Misc { get; set; }
+        
         public RadioSystem Radio { get; set; }
 
         public WYPTSystem WYPT { get; set; }
@@ -60,6 +65,8 @@ namespace JAFDTC.Models.A10C
         public A10CConfiguration(string uid, string name, Dictionary<string, string> linkedSysMap)
             : base(_versionCfg, AirframeTypes.A10C, uid, name, linkedSysMap)
         {
+            DSMS = new DSMSSystem();
+            Misc = new MiscSystem();
             Radio = new RadioSystem();
             WYPT = new WYPTSystem();
             ConfigurationUpdated();
@@ -74,6 +81,8 @@ namespace JAFDTC.Models.A10C
             }
             A10CConfiguration clone = new(UID, Name, linkedSysMap)
             {
+                DSMS = (DSMSSystem)DSMS.Clone(),
+                Misc = (MiscSystem)Misc.Clone(),
                 Radio = (RadioSystem)Radio.Clone(),
                 WYPT = (WYPTSystem)WYPT.Clone(),
             };
@@ -86,6 +95,8 @@ namespace JAFDTC.Models.A10C
             A10CConfiguration otherHawg = (A10CConfiguration)other;
             switch (systemTag)
             {
+                case DSMSSystem.SystemTag: DSMS = (DSMSSystem)otherHawg.DSMS.Clone(); break;
+                case MiscSystem.SystemTag: Misc = (MiscSystem)otherHawg.Misc.Clone(); break;
                 case RadioSystem.SystemTag: Radio = (RadioSystem)otherHawg.Radio.Clone(); break;
                 case WYPTSystem.SystemTag: WYPT = (WYPTSystem)otherHawg.WYPT.Clone(); break;
                 default: break;
@@ -94,7 +105,7 @@ namespace JAFDTC.Models.A10C
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // methods
+        // overriden class methods
         //
         // ------------------------------------------------------------------------------------------------------------
 
@@ -118,6 +129,8 @@ namespace JAFDTC.Models.A10C
             return systemTag switch
             {
                 null => JsonSerializer.Serialize(this, Configuration.JsonOptions),
+                DSMSSystem.SystemTag => JsonSerializer.Serialize(DSMS, Configuration.JsonOptions),
+                MiscSystem.SystemTag => JsonSerializer.Serialize(Misc, Configuration.JsonOptions),
                 RadioSystem.SystemTag => JsonSerializer.Serialize(Radio, Configuration.JsonOptions),
                 WYPTSystem.SystemTag => JsonSerializer.Serialize(WYPT, Configuration.JsonOptions),
                 _ => null
@@ -126,6 +139,8 @@ namespace JAFDTC.Models.A10C
 
         public override void AfterLoadFromJSON()
         {
+            DSMS ??= new DSMSSystem();
+            Misc ??= new MiscSystem();
             Radio ??= new RadioSystem();
             WYPT ??= new WYPTSystem();
 
@@ -133,15 +148,18 @@ namespace JAFDTC.Models.A10C
             Version = _versionCfg;
 
             Save(this);
+            DSMS.FixupMunitionReferences();
             ConfigurationUpdated();
         }
 
         public override bool CanAcceptPasteForSystem(string cboardTag, string systemTag = null)
         {
-            return (!string.IsNullOrEmpty(cboardTag) &&
-                    (((systemTag != null) && (cboardTag.StartsWith(systemTag))) ||
-                     ((systemTag == null) && ((cboardTag == RadioSystem.SystemTag))) ||
-                     ((systemTag == null) && ((cboardTag == WYPTSystem.SystemTag)))));
+            return !string.IsNullOrEmpty(cboardTag) &&
+                   (((systemTag != null) && (cboardTag.StartsWith(systemTag))) ||
+                   ((systemTag == null) && (cboardTag == DSMSSystem.SystemTag)) ||
+                   ((systemTag == null) && (cboardTag == MiscSystem.SystemTag)) ||
+                   ((systemTag == null) && (cboardTag == RadioSystem.SystemTag)) ||
+                   ((systemTag == null) && (cboardTag == WYPTSystem.SystemTag)));
         }
 
         public override bool Deserialize(string systemTag, string json)
@@ -152,6 +170,8 @@ namespace JAFDTC.Models.A10C
             {
                 switch (systemTag)
                 {
+                    case DSMSSystem.SystemTag: DSMS = JsonSerializer.Deserialize<DSMSSystem>(json); break;
+                    case MiscSystem.SystemTag: Misc = JsonSerializer.Deserialize<MiscSystem>(json); break;
                     case RadioSystem.SystemTag: Radio = JsonSerializer.Deserialize<RadioSystem>(json); break;
                     case WYPTSystem.SystemTag: WYPT = JsonSerializer.Deserialize<WYPTSystem>(json); break;
                     default: isHandled = false; break;

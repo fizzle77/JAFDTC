@@ -37,7 +37,7 @@ https://www.gnu.org/licenses/.
         <Style TargetType="local:F16CPilotDbaseDialog" BasedOn="{StaticResource DefaultContentDialogStyle}"/>
 
         <!-- brush for error fields. -->
-        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="PaleVioletRed"/>
 
     </ContentDialog.Resources>
 

@@ -229,9 +229,14 @@ that will let you specify a file to save the exported information to.
 
 ## HARM ALIC
 
-The HARM ALIC system manages parameters set through the HARM DED page. These parameters
-control the progarmming of the three ALIC tables that specify the threats (i.e., radar
-emitters) an AGM-88 HARM can target.
+The HARM ALIC system manages parameters set through the HARM DED page.
+
+> To configure the ALIC table, a HARM must be loaded on the jet and powered on before
+> JAFDTC can update this configuration. If these conditions are not met, the avionics will
+> not allow JAFDTC to access the ALIC tables for programming.
+
+These parameters control the progarmming of the three ALIC tables that specify the threats
+(i.e., radar emitters) an AGM-88 HARM can target.
 
 ![](images/Viper_Sys_ALIC.png)
 
@@ -274,7 +279,13 @@ Clearing the code field in an entry will also reset that specific entry to its d
 
 The HTS system for the Viper includes threat tables that serves a similar function to the
 [HARM ALIC](#harm-alic)
-table. It defines which emitters the HTS can recognize and target. The HTS system includes
+table.
+
+> To configure the HARM HTS, a HARM and the HTS must be loaded on the jet and powered on before
+> JAFDTC can update this configuration. If these conditions are not met, the avionics will
+> not allow JAFDTC to access the HARM HTS for programming.
+
+It defines which emitters the HTS can recognize and target. The HTS system includes
 several pre-defined, fixed, tables and a manual table, MAN, that can be set by the pilot to
 tailor known threats.
 

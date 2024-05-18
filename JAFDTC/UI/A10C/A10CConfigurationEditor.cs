@@ -17,28 +17,31 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.A10C;
-using JAFDTC.Models.A10C.WYPT;
-using JAFDTC.Models.A10C.Radio;
 using JAFDTC.Models;
+using JAFDTC.Models.A10C;
+using JAFDTC.Models.A10C.Misc;
+using JAFDTC.Models.A10C.Radio;
+using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.UI.App;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using JAFDTC.UI.F16C;
+using JAFDTC.Models.A10C.DSMS;
 
 namespace JAFDTC.UI.A10C
 {
-    // defines the glyphs to use for each system editor page in the viper configuration.
+    // defines the glyphs to use for each system editor page in the hawg configuration.
     //
     public class Glyphs
     {
         public const string MISC = "\xE8B7";
         public const string RADIO = "\xE704";
         public const string WYPT = "\xE707";
+        public const string DSMS = "\xEBD2";
     }
 
     /// <summary>
-    /// TODO: docuemnt
+    /// TODO: document
     /// </summary>
     public class A10CConfigurationEditor : ConfigurationEditor
     {
@@ -47,14 +50,19 @@ namespace JAFDTC.UI.A10C
         public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo()
             => new()
             {
+                // This is the order they appear in the UI. Resist the temptation to alphabetize.
                 A10CEditWaypointListHelper.PageInfo,
-                A10CEditRadioPageHelper.PageInfo
+                A10CEditDSMSPage.PageInfo,
+                A10CEditRadioPageHelper.PageInfo,
+                A10CEditMiscPage.PageInfo
             };
 
         public override ISystem SystemForConfig(IConfiguration config, string tag)
         {
             ISystem system = tag switch
             {
+                DSMSSystem.SystemTag => ((A10CConfiguration)config).DSMS,
+                MiscSystem.SystemTag => ((A10CConfiguration)config).Misc,
                 RadioSystem.SystemTag => ((A10CConfiguration)config).Radio,
                 WYPTSystem.SystemTag => ((A10CConfiguration)config).WYPT,
                 _ => null,

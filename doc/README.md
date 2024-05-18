@@ -1,6 +1,6 @@
 # JAFDTC: User’s Guide
 
-*Version 1.0.0-B.30 of 19-Apr-24*
+*Version 1.0.0-B.31 of 5-May-24*
 
 _Just Another #%*@^!% DTC_ (JAFDTC) is a native Windows application that allows you to upload
 data typically saved on a data cartridge in real life, such as steerpoints/waypoints and other
@@ -532,12 +532,12 @@ there, move on to the airframe specific documentation for airframes of interest,
 
 | Airframe | Systems JAFDTC Can Configure |
 |:--------:|------------------------------|
-| [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | Radios, Waypoints
+| [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | Radios, Waypoints, Miscellanesou CDU and ADP Systems
 | [AV-8B Harrier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_AV8B.md) | Waypoints
 | [F-14A/B Tomcat](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F14AB.md) | Waypoints
 | [F-15E Strike Eagle](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F15E.md) | MPD/MPCD Formats, Radios, Steerpoints, Miscellaneous Systems
 | [F-16C Viper](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F16C.md) | Countermeasures, Datalink, HARM (ALIC, HTS), MFD Formats, Radios, Steerpoints, Miscellaneous DED Systems
-| [F/A-18C Hornet](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_FA18C.md) | Countermeasures, Radios, Waypoints
+| [F/A-18C Hornet](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_FA18C.md) | Countermeasures, Pre-Planned Weapons, Radios, Waypoints
 | [Mirage M-2000C](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_M2000C.md) | Waypoints
 
 The above links provide additional details on JAFDTC's capabilities and operation on a specific

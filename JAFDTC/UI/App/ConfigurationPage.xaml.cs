@@ -197,15 +197,17 @@ namespace JAFDTC.UI.App
                 RebuildIconForeground(info);
             }
 
-            if (CurApp.IsDCSAvailable && (CurApp.DCSActiveAirframe == Config.Airframe))
+            if (CurApp.IsDCSAvailable && (CurApp.DCSActiveAirframe == Config.Airframe) && !CurApp.IsDCSUploadInFlight)
             {
                 uiNavListLoadToJet.IsItemClickEnabled = true;
+                uiIconLoadToJet.Glyph = "\xE709";
                 uiIconLoadToJet.Foreground = (SolidColorBrush)Resources["ItemEnabled"];
                 uiTextLoadToJet.Foreground = (SolidColorBrush)Resources["ItemEnabled"];
             }
             else
             {
                 uiNavListLoadToJet.IsItemClickEnabled = false;
+                uiIconLoadToJet.Glyph = (CurApp.IsDCSUploadInFlight) ? "\xEB4C" : "\xE709";
                 uiIconLoadToJet.Foreground = (SolidColorBrush)Resources["ItemDisabled"];
                 uiTextLoadToJet.Foreground = (SolidColorBrush)Resources["ItemDisabled"];
             }

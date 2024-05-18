@@ -17,12 +17,10 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.A10C.Radio;
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Text;
 
 namespace JAFDTC.Models.A10C.Upload
@@ -54,6 +52,7 @@ namespace JAFDTC.Models.A10C.Upload
         public override void Build()
         {
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
+            AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
             AirframeDevice rmfd = _aircraft.GetDevice("RMFD");
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice arc210 = _aircraft.GetDevice("UHF_ARC210");
@@ -62,7 +61,7 @@ namespace JAFDTC.Models.A10C.Upload
 
             if (!_cfg.Radio.IsDefault)
             {
-                BuildARC210(cdu, ufc, rmfd, arc210, _cfg.Radio);
+                BuildARC210(cdu, ufc, lmfd, rmfd, arc210, _cfg.Radio);
                 BuildARC164(arc164, _cfg.Radio);
                 BuildARC186(arc186, _cfg.Radio);
             }
@@ -73,71 +72,30 @@ namespace JAFDTC.Models.A10C.Upload
         /// function is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// this includes presets, default freq/preset, preset mode, guard monitor, and HUD status display.
         /// </summary>
-        private void BuildARC210(AirframeDevice cdu, AirframeDevice ufc, AirframeDevice rmfd, AirframeDevice arc210,
+        private void BuildARC210(AirframeDevice cdu, AirframeDevice ufc, AirframeDevice lmfd, AirframeDevice rmfd, AirframeDevice arc210,
                                  RadioSystem radios)
         {
+            // Nice to do this first, so you can e.g. monitor guard and the initial freq while preset programming is happening.
+            BuildARC210Initial(ufc, arc210, radios); 
+
             if (radios.Presets[(int)RadioSystem.Radios.COMM1].Count > 0)
             {
-                int maxPreset = RadioMaxPreset(radios.Presets[(int)RadioSystem.Radios.COMM1]);
-                AddActions(rmfd, new() { "RMFD_12_LONG", "RMFD_06", "RMFD_12", "RMFD_12", "RMFD_19" });
-                for (int i = 1; (i <= 18) && (i <= maxPreset); i++)
+                AddIfBlock("IsCommPageOnDefaultButton", true, null, delegate ()
                 {
-                    RadioPreset preset = RadioHasPreset(i, radios.Presets[(int)RadioSystem.Radios.COMM1]);
-                    if (preset != null)
-                    {
-                        BuildARC210Preset(cdu, rmfd, preset);
-                    }
-                    AddAction(rmfd, "RMFD_19");
-                }
-                AddAction(rmfd, "RMFD_02");
-                for (int i = 19; (i <= 25) && (i <= maxPreset); i++)
+                    // If COMM is in its default location on the left MFD, use it there.
+                    AddActions(lmfd, new() { "LMFD_13", "LMFD_19" });
+                    BuildARC210Presets(cdu, arc210, lmfd, "LMFD_", radios);
+                });
+                AddIfBlock("IsCommPageOnDefaultButton", false, null, delegate ()
                 {
-                    RadioPreset preset = RadioHasPreset(i, radios.Presets[(int)RadioSystem.Radios.COMM1]);
-                    if (preset != null)
-                    {
-                        BuildARC210Preset(cdu, rmfd, preset);
-                    }
-                    AddAction(rmfd, "RMFD_19");
-                }
-                AddAction(rmfd, "RMFD_01");
-            }
+                    // If COMM isn't in its default location on the left MFD, put it in place of MSG on the right.
+                    AddActions(rmfd, new() { "RMFD_12_LONG", "RMFD_06", "RMFD_12", "RMFD_12", "RMFD_19" });
+                    BuildARC210Presets(cdu, arc210, rmfd, "RMFD_", radios);
 
-            string defSetting = radios.DefaultSetting[(int)RadioSystem.Radios.COMM1];
-            if (!string.IsNullOrEmpty(radios.DefaultSetting[(int)RadioSystem.Radios.COMM1]))
-            {
-                if (int.TryParse(defSetting, out _))
-                {
-                    AddActions(ufc, ActionsForString(defSetting), new() { "UFC_COM1" });
-                }
-                else if (double.TryParse(defSetting, out double val))
-                {
-                    int val100MHz = (int)(val / 100.0);
-                    val -= val100MHz * 100.0;
-                    int val010MHz = (int)(val / 10.0);
-                    val -= val010MHz * 10.0;
-                    int val001MHz = (int)(val);
-                    val = Math.Round((val - val001MHz) * 1000.0, 0);
-                    int val100KHz = (int)(val / 100.0);
-                    val -= val100KHz * 100.0;
-                    int val025KHz = (int)(val / 25.0) % 4;
-                    AddDynamicAction(arc210, "ARC210_100MHZ_SEL", (double)val100MHz * 0.1, (double)val100MHz * 0.1);
-                    AddDynamicAction(arc210, "ARC210_10MHZ_SEL", (double)val010MHz * 0.1, (double)val010MHz * 0.1);
-                    AddDynamicAction(arc210, "ARC210_1MHZ_SEL", (double)val001MHz * 0.1, (double)val001MHz * 0.1);
-                    AddDynamicAction(arc210, "ARC210_100KHZ_SEL", (double)val100KHz * 0.1, (double)val100KHz * 0.1);
-                    AddDynamicAction(arc210, "ARC210_25KHZ_SEL", (double)val025KHz * 0.1, (double)val025KHz * 0.1);
-                }
+                    // Restore MSG on its usual button on the right MFD.
+                    AddActions(rmfd, new() { "RMFD_12_LONG", "RMFD_17", "RMFD_12", "RMFD_12" });
+                });
             }
-
-            AddAction(arc210, (radios.IsMonitorGuard[(int)RadioSystem.Radios.COMM1]) ? "ARC210_MASTER_TR_G"
-                                                                                     : "ARC210_MASTER_TR");
-            AddAction(arc210, (radios.IsPresetMode[(int)RadioSystem.Radios.COMM1]) ? "ARC210_SEC_SW_PRST"
-                                                                                   : "ARC210_SEC_SW_MAN");
-            if (!radios.IsCOMM1StatusOnHUD)
-            {
-                AddAction(ufc, "UFC_COM1_LONG");
-            }
-            // Always hide COM2: it's unimplemented and just HUD clutter.
-            AddAction(ufc, "UFC_COM2_LONG");
         }
 
         /// <summary>
@@ -227,9 +185,41 @@ namespace JAFDTC.Models.A10C.Upload
         }
 
         /// <summary>
+        ///  Build all the ARC-210 presets on the left or right MFD.
+        /// </summary>
+        private void BuildARC210Presets(AirframeDevice cdu, AirframeDevice arc210, AirframeDevice mfd, string mfdPrefix, RadioSystem radios)
+        {
+            int maxPreset = RadioMaxPreset(radios.Presets[(int)RadioSystem.Radios.COMM1]);
+
+            for (int i = 1; (i <= 18) && (i <= maxPreset); i++)
+            {
+                RadioPreset preset = RadioHasPreset(i, radios.Presets[(int)RadioSystem.Radios.COMM1]);
+                if (preset != null)
+                {
+                    BuildARC210Preset(cdu, mfd, mfdPrefix, preset);
+                }
+                AddAction(mfd, mfdPrefix + "19");
+            }
+            AddAction(mfd, mfdPrefix + "02");
+            for (int i = 19; (i <= 25) && (i <= maxPreset); i++)
+            {
+                RadioPreset preset = RadioHasPreset(i, radios.Presets[(int)RadioSystem.Radios.COMM1]);
+                if (preset != null)
+                {
+                    BuildARC210Preset(cdu, mfd, mfdPrefix, preset);
+                }
+                AddAction(mfd, mfdPrefix + "19");
+            }
+            AddAction(mfd, mfdPrefix + "01");
+
+            AddAction(arc210, (radios.IsPresetMode[(int)RadioSystem.Radios.COMM1]) ? "ARC210_SEC_SW_PRST"
+                                                                                   : "ARC210_SEC_SW_MAN");
+        }
+
+        /// <summary>
         /// build the commands to set up the arc-210 preset including the description, frequency, and modulation.
         /// </summary>
-        private void BuildARC210Preset(AirframeDevice cdu, AirframeDevice rmfd, RadioPreset preset)
+        private void BuildARC210Preset(AirframeDevice cdu, AirframeDevice mfd, string mfdPrefix, RadioPreset preset)
         {
             string descr = preset.Description.ToUpper();
             if (string.IsNullOrEmpty(descr))
@@ -237,15 +227,72 @@ namespace JAFDTC.Models.A10C.Upload
                 descr = $"SP{preset.Preset}";
             }
             AddActions(cdu, new() { "CLR", "CLR" }, ActionsForString(AdjustOnlyAlphaNum(descr)));
-            AddAction(rmfd, "RMFD_16");
+            AddAction(mfd, mfdPrefix + "16");
 
-            AddActions(cdu, new() { "CLR", "CLR" }, ActionsForString(preset.Frequency));
-            AddAction(rmfd, "RMFD_17");
+            AddActions(cdu, new() { "CLR", "CLR" }, ActionsForString(AdjustNoSeparators(preset.Frequency)));
+            AddAction(mfd, mfdPrefix + "17");
 
             if (!RadioSystem.IsModulationDefaultForFreq(RadioSystem.Radios.COMM1, preset.Frequency, preset.Modulation))
             {
-                AddAction(rmfd, "RMFD_05");
+                AddAction(mfd, mfdPrefix + "05");
             }
+        }
+
+        /// <summary>
+        /// Build the settings for the ARC-210 that aren't presets.
+        /// </summary>
+        private void BuildARC210Initial(AirframeDevice ufc, AirframeDevice arc210, RadioSystem radios)
+        {
+            AddAction(arc210, (radios.IsMonitorGuard[(int)RadioSystem.Radios.COMM1]) ? "ARC210_MASTER_TR_G"
+                                                                                     : "ARC210_MASTER_TR");
+
+            string defSetting = radios.DefaultSetting[(int)RadioSystem.Radios.COMM1];
+            if (!string.IsNullOrEmpty(radios.DefaultSetting[(int)RadioSystem.Radios.COMM1]))
+            {
+                if (int.TryParse(defSetting, out _))
+                {
+                    AddActions(ufc, ActionsForString(defSetting), new() { "UFC_COM1" });
+                }
+                else if (double.TryParse(defSetting, out double val))
+                {
+                    int val100MHz = (int)(val / 100.0);
+                    val -= val100MHz * 100.0;
+                    int val010MHz = (int)(val / 10.0);
+                    val -= val010MHz * 10.0;
+                    int val001MHz = (int)(val);
+                    val = Math.Round((val - val001MHz) * 1000.0, 0);
+                    int val100KHz = (int)(val / 100.0);
+                    val -= val100KHz * 100.0;
+                    int val025KHz = (int)(val / 25.0) % 4;
+                    AddDynamicAction(arc210, "ARC210_100MHZ_SEL", (double)val100MHz * 0.1, (double)val100MHz * 0.1);
+                    AddDynamicAction(arc210, "ARC210_10MHZ_SEL", (double)val010MHz * 0.1, (double)val010MHz * 0.1);
+                    AddDynamicAction(arc210, "ARC210_1MHZ_SEL", (double)val001MHz * 0.1, (double)val001MHz * 0.1);
+                    AddDynamicAction(arc210, "ARC210_100KHZ_SEL", (double)val100KHz * 0.1, (double)val100KHz * 0.1);
+                    AddDynamicAction(arc210, "ARC210_25KHZ_SEL", (double)val025KHz * 0.1, (double)val025KHz * 0.1);
+                }
+            }
+
+            // Show/hide ARC-210 COMM1 status on the HUD based on the setting and the current state.
+            if (radios.IsCOMM1StatusOnHUD)
+            {
+                AddIfBlock("Arc210Com1IsOnHUD", false, null, delegate ()
+                {
+                    AddAction(ufc, "UFC_COM1_LONG"); // Set to be on, currently off, turn it on.
+                });
+            }
+            else
+            {
+                AddIfBlock("Arc210Com1IsOnHUD", true, null, delegate ()
+                {
+                    AddAction(ufc, "UFC_COM1_LONG"); // Set to be off, currently on, turn it off.
+                });
+            }
+
+            // Always hide COM2: it's unimplemented and just HUD clutter.
+            AddIfBlock("Arc210Com2IsOnHUD", true, null, delegate ()
+            {
+                AddAction(ufc, "UFC_COM2_LONG");
+            });
         }
 
         /// <summary>

@@ -79,24 +79,28 @@ namespace JAFDTC.Models.F16C.Upload
         {
             AddAction(ufc, "1");
 
-            // TODO: do a better job detecting defaults here to avoid just moving around ded.
-
             // ---- tacan mode
 
-            if (_cfg.Misc.TACANIsYardstickValue)
+            string tacanMode = (TACANModes)int.Parse(_cfg.Misc.TACANMode) switch
             {
-                // TODO: ideally, want a start condition here on current mode, assume default rec here
-                AddActions(ufc, new() { "SEQ", "SEQ" });
-            }
+                TACANModes.REC => "REC",
+                TACANModes.TR => "T/R",
+                TACANModes.AA_TR => "A/A TR",
+                _ => ""
+            };
+            AddWhileBlock("IsTACANMode", false, new() { tacanMode }, delegate ()
+            {
+                AddAction(ufc, "SEQ");
+            }, 6);
 
             // ---- tacan channel
 
             AddActions(ufc, PredActionsForNumAndEnter(_cfg.Misc.TACANChannel));
 
-            // ---- tacan channel
+            // ---- tacan band
 
-            string cond = (_cfg.Misc.TACANBandValue == TACANBands.X) ? "TACANBandY" : "TACANBandX";
-            AddIfBlock(cond, null, delegate () { AddActions(ufc, new() { "0", "ENTR" }); });
+            string band = (_cfg.Misc.TACANBandValue == TACANBands.X) ? "Y" : "X";
+            AddIfBlock("IsTACANBand", true, new () { band }, delegate () { AddActions(ufc, new() { "0", "ENTR" }); });
 
             // ---- ehsi mode
 
@@ -184,12 +188,10 @@ namespace JAFDTC.Models.F16C.Upload
         {
             if (!_cfg.Misc.IsBULLDefault)
             {
-                AddActions(ufc, new() { "LIST", "0", "8" });
-
-                AddWait(WAIT_BASE);
+                AddActions(ufc, new() { "LIST", "0", "8" }, null, WAIT_BASE);
 
                 // TODO: assumes bullseye state
-                AddIfBlock("BullseyeNotSelected", null, delegate () { AddAction(ufc, "0"); });
+                AddIfBlock("IsBullseyeSelected", false, null, delegate () { AddAction(ufc, "0"); });
                 AddAction(ufc, "DOWN");
 
                 AddActions(ufc, PredActionsForCleanNumAndEnter(_cfg.Misc.BullseyeWP), new() { "DOWN" });
@@ -210,12 +212,10 @@ namespace JAFDTC.Models.F16C.Upload
                 AddActions(ufc, new() { "LIST", "0", "RCL" });
 
                 // TODO: check current state, assume enabled by default for now
-                AddAction(ufc, (!_cfg.Misc.HMCSBlankHUDValue) ? "0" : "DOWN");
-                AddWait(WAIT_BASE);
+                AddAction(ufc, (!_cfg.Misc.HMCSBlankHUDValue) ? "0" : "DOWN", WAIT_BASE);
 
                 // TODO: check current state, assume enabled by default for now
-                AddAction(ufc, (!_cfg.Misc.HMCSBlankCockpitValue) ? "0" : "DOWN");
-                AddWait(WAIT_BASE);
+                AddAction(ufc, (!_cfg.Misc.HMCSBlankCockpitValue) ? "0" : "DOWN", WAIT_BASE);
 
                 // TODO: check current state, assume lvl1 by default for now
                 if (_cfg.Misc.HMCSDeclutterLvlValue != HMCSDeclutterLevels.LVL1)

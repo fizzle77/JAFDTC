@@ -61,17 +61,19 @@ namespace JAFDTC.Utilities
         {
             if (object.Equals(storage, value)) return false;
 
-            storage = value;
-            OnPropertyChanged(propertyName);
-
-            if ((error != null) && !_errors.ContainsKey(propertyName))
+            if (error == null)
+            {
+                storage = value;
+                OnPropertyChanged(propertyName);
+                if (_errors.ContainsKey(propertyName))
+                {
+                    _errors.Remove(propertyName);
+                    OnErrorsChanged(propertyName);
+                }
+            }
+            else if (!_errors.ContainsKey(propertyName))
             {
                 _errors[propertyName] = true;
-                OnErrorsChanged(propertyName);
-            }
-            else if ((error == null) && _errors.ContainsKey(propertyName))
-            {
-                _errors.Remove(propertyName);
                 OnErrorsChanged(propertyName);
             }
 

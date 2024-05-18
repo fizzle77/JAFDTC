@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// A10CEditRadioPageHelper.cs : viper specialization for EditRadioPage
+// A10CEditRadioPageHelper.cs : A-10 specialization for EditRadioPage
 //
 // Copyright(C) 2023-2024 ilominar/raven, JAFDTC contributors
 //
@@ -23,7 +23,6 @@ using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.Radio;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
-using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -87,7 +86,7 @@ namespace JAFDTC.UI.F16C
                     Preset = cfgPreset.Preset.ToString(),
                     Frequency = new(cfgPreset.Frequency),
                     Description = new(cfgPreset.Description),
-                    Modulation = cfgPreset.Modulation
+                    Modulation =  new(cfgPreset.Modulation)
                 };
                 editPresets.Add(newItem);
             }
@@ -120,7 +119,7 @@ namespace JAFDTC.UI.F16C
                     Preset = int.Parse(item.Preset),
                     Frequency = new(item.Frequency),
                     Description = new(item.Description),
-                    Modulation = item.Modulation
+                    Modulation = new(item.Modulation)
                 };
                 cfgPresetList.Add(preset);
             }
@@ -209,5 +208,8 @@ namespace JAFDTC.UI.F16C
 
         public int RadioPresetCount(int radio, IConfiguration config)
             => ((A10CConfiguration)config).Radio.Presets[radio].Count;
+
+        public override bool ValidateFrequency(int radio, string freq, bool isNoEValid = true)
+            => RadioSystem.IsFreqValidForRadio((RadioSystem.Radios)radio, freq, isNoEValid);
     }
 }

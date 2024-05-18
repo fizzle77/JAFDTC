@@ -27,6 +27,11 @@ namespace JAFDTC.Models.DCS
     public interface IBuilder
     {
         /// <summary>
+        /// return the current command stream associated with the builder as a string.
+        /// </summary>
+        public string ToString();
+
+        /// <summary>
         /// build the command stream appropriate for the object and add it to internal object state.
         /// </summary>
         public void Build();
