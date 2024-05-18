@@ -304,6 +304,9 @@ namespace JAFDTC.UI.A10C
             Utilities.SetEnableState(uiTextTACANChannel, isEditable);
             Utilities.SetEnableState(uiComboTACANBand, isEditable);
             Utilities.SetEnableState(uiComboTACANMode, isEditable);
+            Utilities.SetEnableState(uiComboIFFMasterMode, isEditable);
+            Utilities.SetEnableState(uiCheckIFFMode4On, isEditable);
+            Utilities.SetEnableState(uiTextIFFMode3Code, isEditable);
 
             Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
             Utilities.SetEnableState(uiPageBtnReset, !EditMisc.IsDefault);
