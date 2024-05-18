@@ -123,15 +123,15 @@ namespace JAFDTC.Models.A10C.DSMS
         }
 
         [JsonPropertyName("MunitionSettings")]
-        public Dictionary<string, MunitionSettings> MunitionSettingMap
+        public Dictionary<int, MunitionSettings> MunitionSettingMap
         {
             get => _munitionSettingMap;
             set => _munitionSettingMap = value;
         }
-        private Dictionary<string, MunitionSettings> _munitionSettingMap;
+        private Dictionary<int, MunitionSettings> _munitionSettingMap;
 
         public bool IsProfileOrderEnabled { get; set; }
-        public List<string> ProfileOrder { get; set; }
+        public List<int> ProfileOrder { get; set; }
 
         // ---- synthesized properties
 
@@ -203,7 +203,10 @@ namespace JAFDTC.Models.A10C.DSMS
                 {
                     _orderedProfilePositions = new Dictionary<string, int>(ProfileOrder.Count);
                     for (int i = 0; i < ProfileOrder.Count; i++)
-                        _orderedProfilePositions.Add(ProfileOrder[i], i);
+                    {
+                        A10CMunition m = A10CMunition.GetMunitionFromID(ProfileOrder[i]);
+                        _orderedProfilePositions.Add(m.Profile, i);
+                    }
                 }
             }
 
@@ -220,10 +223,10 @@ namespace JAFDTC.Models.A10C.DSMS
         public MunitionSettings GetMunitionSettings(A10CMunition munition)
         {
             MunitionSettings settings;
-            if (!_munitionSettingMap.TryGetValue(munition.Name, out settings))
+            if (!_munitionSettingMap.TryGetValue(munition.ID, out settings))
             {
                 settings = new MunitionSettings(munition);
-                _munitionSettingMap.Add(munition.Name, settings);
+                _munitionSettingMap.Add(munition.ID, settings);
             }
             return settings;
         }
@@ -232,7 +235,7 @@ namespace JAFDTC.Models.A10C.DSMS
         public void Reset()
         {
             LaserCode = "";
-            _munitionSettingMap = new Dictionary<string, MunitionSettings>();
+            _munitionSettingMap = new Dictionary<int, MunitionSettings>();
             ProfileOrder = null;
             IsProfileOrderEnabled = false;
         }
@@ -242,7 +245,7 @@ namespace JAFDTC.Models.A10C.DSMS
             List<A10CMunition> munitions = A10CMunition.GetMunitions();
             foreach (var munition in munitions)
             {
-                if (_munitionSettingMap.TryGetValue(munition.Name, out MunitionSettings setting))
+                if (_munitionSettingMap.TryGetValue(munition.ID, out MunitionSettings setting))
                     setting.Munition = munition;
             }
         }
@@ -256,12 +259,12 @@ namespace JAFDTC.Models.A10C.DSMS
         public Dictionary<string, MunitionSettings> GetNonDefaultInvSettings()
         {
             Dictionary<string, MunitionSettings> settings = new Dictionary<string, MunitionSettings>();
-            foreach (KeyValuePair<string, MunitionSettings> kv in _munitionSettingMap)
+            foreach (MunitionSettings munSettings in _munitionSettingMap.Values)
             {
-                if (!kv.Value.IsInvDefault)
-                    AddMunitionSettingsWithAllInvKeysToDictionary(settings, kv.Value);
-                else if (kv.Value != null && kv.Value.Munition.Laser && !IsLaserCodeDefault)
-                    AddMunitionSettingsWithAllInvKeysToDictionary(settings, kv.Value);
+                if (!munSettings.IsInvDefault)
+                    AddMunitionSettingsWithAllInvKeysToDictionary(settings, munSettings);
+                else if (munSettings != null && munSettings.Munition.Laser && !IsLaserCodeDefault)
+                    AddMunitionSettingsWithAllInvKeysToDictionary(settings, munSettings);
             }
 
             // If laser code is non-default, ensure all laser weapons are added to list
@@ -285,10 +288,10 @@ namespace JAFDTC.Models.A10C.DSMS
         }
 
         // Get munition settings that have non-default settings on the profiles page.
-        public Dictionary<string, MunitionSettings> GetNonDefaultProfileSettings()
+        public Dictionary<int, MunitionSettings> GetNonDefaultProfileSettings()
         {
-            Dictionary<string, MunitionSettings> settings = new Dictionary<string, MunitionSettings>();
-            foreach (KeyValuePair<string, MunitionSettings> kv in _munitionSettingMap)
+            Dictionary<int, MunitionSettings> settings = new Dictionary<int, MunitionSettings>();
+            foreach (KeyValuePair<int, MunitionSettings> kv in _munitionSettingMap)
             {
                 if (!kv.Value.IsProfileDefault)
                     settings.Add(kv.Key, kv.Value);

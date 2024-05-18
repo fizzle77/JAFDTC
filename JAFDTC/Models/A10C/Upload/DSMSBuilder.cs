@@ -178,14 +178,14 @@ namespace JAFDTC.Models.A10C.Upload
         private void Build_DefaultProfiles(AirframeDevice cdu, AirframeDevice lmfd)
         {
             // get configs that require profile changes
-            Dictionary<string, MunitionSettings> nonDefaultSettings = _cfg.DSMS.GetNonDefaultProfileSettings();
+            Dictionary<int, MunitionSettings> nonDefaultSettings = _cfg.DSMS.GetNonDefaultProfileSettings();
             if (nonDefaultSettings == null || nonDefaultSettings.Count == 0)
                 return;
 
             AddActions(lmfd, new() { "LMFD_14", "LMFD_01" }, null, WAIT_BASE); // Go to DSMS Profiles
             int selectedProfileIndex = 0;
 
-            foreach (KeyValuePair<string, int> kv in _profileQuery.MunitionProfileIndexMap)
+            foreach (KeyValuePair<int, int> kv in _profileQuery.MunitionProfileIndexMap)
             {
                 if (nonDefaultSettings.TryGetValue(kv.Key, out MunitionSettings settings))
                 {

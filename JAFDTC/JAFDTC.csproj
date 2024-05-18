@@ -42,15 +42,6 @@
     <None Remove="DCS\JAFDTC\M2000CFunctions.lua" />
     <None Remove="DCS\JAFDTC\StatusMsg.dlg" />
     <None Remove="DCS\JAFDTC\WyptCapture.dlg" />
-    <None Remove="Images\agm-65d.jpg" />
-    <None Remove="Images\agm-65h.jpg" />
-    <None Remove="Images\agm-65l.jpg" />
-    <None Remove="Images\agr.jpg" />
-    <None Remove="Images\cbu-87-105.jpg" />
-    <None Remove="Images\gbu-10-12.jpg" />
-    <None Remove="Images\gbu-31.jpg" />
-    <None Remove="Images\gbu-38.jpg" />
-    <None Remove="Images\gbu-54.jpg" />
     <None Remove="Images\LockScreenLogo.scale-200.png" />
     <None Remove="Images\SplashScreen.scale-200.png" />
     <None Remove="Images\Square150x150Logo.scale-200.png" />
@@ -103,15 +94,6 @@
     <Content Include="DCS\JAFDTC\FA18CFunctions.lua" />
     <Content Include="DCS\JAFDTC\M2000CFunctions.lua" />
     <Content Include="DCS\JAFDTC\WyptCapture.dlg" />
-    <Content Include="Images\agm-65d.jpg" />
-    <Content Include="Images\agm-65h.jpg" />
-    <Content Include="Images\agm-65l.jpg" />
-    <Content Include="Images\agr.jpg" />
-    <Content Include="Images\cbu-87-105.jpg" />
-    <Content Include="Images\gbu-10-12.jpg" />
-    <Content Include="Images\gbu-31.jpg" />
-    <Content Include="Images\gbu-38.jpg" />
-    <Content Include="Images\gbu-54.jpg" />
     <Content Include="Images\JAFDTC_Icon.ico" />
     <Content Include="Images\LockScreenLogo.scale-200.png" />
     <Content Include="Images\SplashScreen.scale-200.png" />
@@ -152,6 +134,36 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Images\agm-65d.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\agm-65l.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\agr-m282l.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\cbu-87-105.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\gbu-10-12.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\gbu-31.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\gbu-38.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\agr-m151l.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\gbu-54.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
