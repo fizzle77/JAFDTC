@@ -433,6 +433,7 @@ function LuaExportBeforeNextFrame()
                     JAFDTC_Log(string.format("[%.3f] ERROR: JSON decode failed", curTime))
                 elseif cmdList and data then
                     JAFDTC_Log(string.format("[%.3f] Process rx cmdList[1:%d] %dB", curTime, #cmdList, string.len(data)))
+                    whileTout = { }
                 end
             end
         end

@@ -73,24 +73,6 @@ function JAFDTC_F16CM_Fn_IsInAGMode()
     return (str == "A-G")
 end
 
---[[ DEPRECATE
-function JAFDTC_F16CM_Fn_NotInAAMode()
-    local table = JAFDTC_F16CM_GetDED()
-    local str = table["Master_mode"]
-    JAFDTC_Log("not in aa "..str)
-    return (str == "A-A")
-end
-
-function JAFDTC_F16CM_Fn_NotInAGMode()
-    JAFDTC_Log("not in ag")
-    local table = JAFDTC_F16CM_GetDED()
-    JAFDTC_Log("not in ag")
-    local str = table["Master_mode"]
-    JAFDTC_Log("not in ag "..str)
-    return (str == "A-G")
-end
---]]
-
 -- --------------------------------------------------------------------------------------------------------------------
 --
 -- dlnk support
@@ -194,6 +176,12 @@ function JAFDTC_F16CM_Fn_IsTACANBand(band)
     local table = JAFDTC_F16CM_GetDED()
     local str = table["TCN BAND XY"]
     return (str == band)
+end
+
+function JAFDTC_F16CM_Fn_IsTACANMode(mode)
+    local table = JAFDTC_F16CM_GetDED()
+    local str = table["TCN Mode"]
+    return (str == mode)
 end
 
 -- --------------------------------------------------------------------------------------------------------------------

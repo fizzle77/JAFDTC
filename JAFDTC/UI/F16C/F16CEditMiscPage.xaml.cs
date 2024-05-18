@@ -20,14 +20,10 @@
 using JAFDTC.Models;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.Misc;
-using JAFDTC.UI;
 using JAFDTC.UI.App;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
@@ -35,11 +31,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 namespace JAFDTC.UI.F16C
 {
@@ -167,7 +158,7 @@ namespace JAFDTC.UI.F16C
 
             EditMisc.TACANChannel = Config.Misc.TACANChannel;
             EditMisc.TACANBand = Config.Misc.TACANBand;
-            EditMisc.TACANIsYardstick = Config.Misc.TACANIsYardstick;
+            EditMisc.TACANMode = Config.Misc.TACANMode;
         }
 
         private void CopyEditToConfig(bool isPersist = false)
@@ -197,7 +188,7 @@ namespace JAFDTC.UI.F16C
 
                 Config.Misc.TACANChannel = EditMisc.TACANChannel;
                 Config.Misc.TACANBand = EditMisc.TACANBand;
-                Config.Misc.TACANIsYardstick = EditMisc.TACANIsYardstick;
+                Config.Misc.TACANMode = EditMisc.TACANMode;
 
                 if (isPersist)
                 {
@@ -235,8 +226,9 @@ namespace JAFDTC.UI.F16C
             }
         }
 
-        // validation error: update ui state for the various components that may have errors.
-        //
+        /// <summary>
+        /// validation error: update ui state for the various components that may have errors.
+        /// </summary>
         private void BaseField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
         {
             if (args.PropertyName == null)
@@ -252,8 +244,9 @@ namespace JAFDTC.UI.F16C
             RebuildInterfaceState();
         }
 
-        // property changed: rebuild interface state to account for configuration changes.
-        //
+        /// <summary>
+        /// property changed: rebuild interface state to account for configuration changes.
+        /// </summary>
         private void BaseField_PropertyChanged(object sender, EventArgs args)
         {
             RebuildInterfaceState();
@@ -265,8 +258,9 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // rebuild the setup of the tacan band according to the current settings. 
-        //
+        /// <summary>
+        /// rebuild the setup of the tacan band according to the current settings. 
+        /// </summary>
         private void RebuildTACANSetup()
         {
             int band = (string.IsNullOrEmpty(EditMisc.TACANBand)) ? int.Parse(_miscSysDefault.TACANBand)
@@ -276,11 +270,11 @@ namespace JAFDTC.UI.F16C
                 uiTACANComboBand.SelectedIndex = band;
             }
 
-            bool isEnable = (string.IsNullOrEmpty(EditMisc.TACANIsYardstick)) ? bool.Parse(_miscSysDefault.TACANIsYardstick)
-                                                                              : bool.Parse(EditMisc.TACANIsYardstick);
-            if (uiTACANCkboxIsYard.IsChecked != isEnable)
+            int mode = (string.IsNullOrEmpty(EditMisc.TACANMode)) ? int.Parse(_miscSysDefault.TACANMode)
+                                                                  : int.Parse(EditMisc.TACANMode);
+            if (uiTACANComboMode.SelectedIndex != mode)
             {
-                uiTACANCkboxIsYard.IsChecked = isEnable;
+                uiTACANComboMode.SelectedIndex = mode;
             }
         }
 
@@ -348,7 +342,7 @@ namespace JAFDTC.UI.F16C
                 Utilities.SetEnableState(kvp.Value, isEditable);
             }
             Utilities.SetEnableState(uiTACANComboBand, isEditable);
-            Utilities.SetEnableState(uiTACANCkboxIsYard, isEditable);
+            Utilities.SetEnableState(uiTACANComboMode, isEditable);
             Utilities.SetEnableState(uiBULLCkboxShowRefs, isEditable);
             Utilities.SetEnableState(uiHMCSComboDeclutSelect, isEditable);
             Utilities.SetEnableState(uiHMCSCkboxBlankCock, isEditable);
@@ -440,12 +434,15 @@ namespace JAFDTC.UI.F16C
             }
         }
 
-        private void TACANCkboxIsYard_Click(object sender, RoutedEventArgs args)
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void TACANComboMode_SelectionChanged(object sender, RoutedEventArgs args)
         {
-            CheckBox checkBox = (CheckBox)sender;
-            if (!IsRebuildingUI && (checkBox != null))
+            TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
+            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
             {
-                EditMisc.TACANIsYardstick = checkBox.IsChecked.ToString();
+                EditMisc.TACANMode = (string)item.Tag;
                 CopyEditToConfig(true);
             }
         }
@@ -542,17 +539,19 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // on configuration saved, rebuild the interface state to align with the latest save (assuming we go here
-        // through a CopyEditToConfig).
-        //
+        /// <summary>
+        /// on configuration saved, rebuild the interface state to align with the latest save (assuming we go here
+        /// through a CopyEditToConfig).
+        /// </summary>
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
         {
             RebuildInterfaceState();
         }
 
-        // on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
-        // we are editing.
-        //
+        /// <summary>
+        /// on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
+        /// we are editing.
+        /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;

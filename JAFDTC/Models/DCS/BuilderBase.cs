@@ -251,7 +251,7 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// add an if block to the command stream the builder is building. the block is delimited by "If" and "EndIf"
         /// commands with the AddBlockCommandsDelegate emitting the commands within the block that are exectued
-        /// if the condition is true.
+        /// if the condition matches the expect value.
         /// 
         /// NOTE: nested if blocks are assumed to have unique cond values.
         /// </summary>
@@ -271,8 +271,8 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// add a while block to the command stream the builder is building. the block is delimited by "While" and
         /// "EndWhile" commands with the AddBlockCommandsDelegate emitting the commands within the block that
-        /// are exectued while the condition is true. the loop will exit with an error if more than the timeOut
-        /// number of iterations are encountered.
+        /// are exectued while the condition matches the expect value. the loop will exit with an error if more than
+        /// the timeOut number of iterations are encountered.
         /// 
         /// NOTE: nested while blocks are assumed to have unique cond values.
         /// </summary>

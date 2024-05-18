@@ -22,19 +22,32 @@ using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using static JAFDTC.Models.F15E.UFC.UFCSystem;
 
 namespace JAFDTC.Models.F16C.Misc
 {
-    // defines the bands for tacan.
-    //
+    /// <summary>
+    /// tacan modes.
+    /// </summary>
+    public enum TACANModes
+    {
+        REC = 0,
+        TR = 1,
+        AA_TR = 2
+    }
+
+    /// <summary>
+    /// tacan bands.
+    /// </summary>
     public enum TACANBands
     {
         X = 0,
         Y = 1
     }
 
-    // defines declutter levels for the hmcs.
-    //
+    /// <summary>
+    /// declutter levels for the hmcs.
+    /// </summary>
     public enum HMCSDeclutterLevels
     {
         LVL1 = 0,
@@ -201,7 +214,7 @@ namespace JAFDTC.Models.F16C.Misc
             }
         }
 
-        private string _tacanBand;                              // integer [0, 1]
+        private string _tacanBand;                              // integer [0, 1], TACANBands
         public string TACANBand
         {
             get => _tacanBand;
@@ -212,14 +225,14 @@ namespace JAFDTC.Models.F16C.Misc
             }
         }
 
-        private string _tacanIsYardstick;                       // string (boolean)
-        public string TACANIsYardstick
+        private string _tacanMode;                              // integer [0, 2], TACANModes
+        public string TACANMode
         {
-            get => _tacanIsYardstick;
+            get => _tacanMode;
             set
             {
-                string error = (string.IsNullOrEmpty(value) || IsBooleanFieldValid(value)) ? null : "Invalid format";
-                SetProperty(ref _tacanIsYardstick, value, error);
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
+                SetProperty(ref _tacanMode, value, error);
             }
         }
 
@@ -326,7 +339,7 @@ namespace JAFDTC.Models.F16C.Misc
             LaserStartTime = "8",
             TACANChannel = "1",
             TACANBand = ((int)TACANBands.X).ToString(),
-            TACANIsYardstick = false.ToString(),
+            TACANMode = ((int)TACANModes.REC).ToString(),
             ILSFrequency = "108.10",
             ILSCourse = "0",
             HMCSBlankHUD = true.ToString(),
@@ -383,7 +396,7 @@ namespace JAFDTC.Models.F16C.Misc
             // TODO: technically, could be default with non-empty values...
             get => (string.IsNullOrEmpty(TACANChannel) &&
                     string.IsNullOrEmpty(TACANBand) &&
-                    string.IsNullOrEmpty(TACANIsYardstick));
+                    string.IsNullOrEmpty(TACANMode));
         }
 
         [JsonIgnore]
@@ -408,15 +421,14 @@ namespace JAFDTC.Models.F16C.Misc
         // ---- following accessors get the current value (default or non-default) for various properties
 
         [JsonIgnore]
-        public bool TACANIsYardstickValue
-        {
-            get => bool.Parse((string.IsNullOrEmpty(TACANIsYardstick)) ? ExplicitDefaults.TACANIsYardstick : TACANIsYardstick);
-        }
-
-        [JsonIgnore]
         public TACANBands TACANBandValue
         {
             get => (TACANBands)int.Parse((string.IsNullOrEmpty(TACANBand)) ? ExplicitDefaults.TACANBand : TACANBand);
+        }
+
+        public TACANModes TACANModeValue
+        {
+            get => (TACANModes)int.Parse((string.IsNullOrEmpty(TACANMode)) ? ExplicitDefaults.TACANMode : TACANMode);
         }
 
         [JsonIgnore]
@@ -466,7 +478,7 @@ namespace JAFDTC.Models.F16C.Misc
             LaserStartTime = new(other.LaserStartTime);
             TACANChannel = new(other.TACANChannel);
             TACANBand = new(other.TACANBand);
-            TACANIsYardstick = new(other.TACANIsYardstick);
+            TACANMode = new(other.TACANMode);
             ILSFrequency = new(other.ILSFrequency);
             ILSCourse = new(other.ILSCourse);
             HMCSBlankHUD = new(other.HMCSBlankHUD);
@@ -497,7 +509,7 @@ namespace JAFDTC.Models.F16C.Misc
             LaserStartTime = "";
             TACANChannel = "";
             TACANBand = "";
-            TACANIsYardstick = "";
+            TACANMode = "";
             ILSFrequency = "";
             ILSCourse = "";
             HMCSBlankHUD = "";
