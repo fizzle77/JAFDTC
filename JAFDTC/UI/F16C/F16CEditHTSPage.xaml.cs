@@ -1,6 +1,6 @@
 // ********************************************************************************************************************
 //
-// F16CEditHTSPage.cs : ui c# for viper hts editor page
+// F16CEditHTSPage.xaml.cs : ui c# for viper hts editor page
 //
 // Copyright(C) 2023 ilominar/raven
 //

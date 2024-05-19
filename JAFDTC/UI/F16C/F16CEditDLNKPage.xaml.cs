@@ -1,6 +1,6 @@
 // ********************************************************************************************************************
 //
-// F16CEditDLNKPage.cs : ui c# for viper data link editor page
+// F16CEditDLNKPage.xaml.cs : ui c# for viper data link editor page
 //
 // Copyright(C) 2023-2024 ilominar/raven
 //

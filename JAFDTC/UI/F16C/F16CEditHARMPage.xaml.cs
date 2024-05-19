@@ -1,6 +1,6 @@
 // ********************************************************************************************************************
 //
-// F16CEditHARMPage.cs : ui c# for viper harm alic editor page
+// F16CEditHARMPage.xaml.cs : ui c# for viper harm alic editor page
 //
 // Copyright(C) 2023 ilominar/raven
 //

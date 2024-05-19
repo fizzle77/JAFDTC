@@ -1,6 +1,6 @@
 // ********************************************************************************************************************
 //
-// F16CEditCMDSPage.cs : ui c# for viper cmds editor page
+// F16CEditCMDSPage.xaml.cs : ui c# for viper cmds editor page
 //
 // Copyright(C) 2023 ilominar/raven
 //

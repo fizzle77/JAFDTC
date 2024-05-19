@@ -2,7 +2,7 @@
 <!--
 **********************************************************************************************************************
     
-F16CEditHARMPage.cs : ui xaml for viper harm alic editor page
+F16CEditHARMPage.xaml : ui xaml for viper harm alic editor page
 
 Copyright(C) 2023-2024 ilominar/raven
 

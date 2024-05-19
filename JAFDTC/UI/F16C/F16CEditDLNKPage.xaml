@@ -2,7 +2,7 @@
 <!--
 **********************************************************************************************************************
     
-F16CEditDLNKPage.cs : ui xaml for viper data link editor page
+F16CEditDLNKPage.xaml : ui xaml for viper data link editor page
 
 Copyright(C) 2023-2024 ilominar/raven
 

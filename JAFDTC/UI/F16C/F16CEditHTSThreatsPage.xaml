@@ -2,7 +2,7 @@
 <!--
 **********************************************************************************************************************
     
-F16CEditHTSPage.cs : ui xaml for viper hts threat editor page
+F16CEditHTSThreatsPage.xaml : ui xaml for viper hts threat editor page
 
 Copyright(C) 2023 ilominar/raven
 

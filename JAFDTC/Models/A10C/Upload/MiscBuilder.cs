@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// RadioBuilder.cs -- a-10c misc system builder
+// MiscBuilder.cs -- a-10c misc system builder
 //
 // Copyright(C) 2024 fizzle, JAFDTC contributors
 //

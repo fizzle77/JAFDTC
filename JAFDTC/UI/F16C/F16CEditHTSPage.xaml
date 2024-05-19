@@ -2,7 +2,7 @@
 <!--
 **********************************************************************************************************************
     
-F16CEditHTSPage.cs : ui xaml for viper hts editor page
+F16CEditHTSPage.xaml : ui xaml for viper hts editor page
 
 Copyright(C) 2023-2024 ilominar/raven
 

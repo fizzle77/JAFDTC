@@ -1,6 +1,6 @@
 // ********************************************************************************************************************
 //
-// FA18CEditPreplanPage.cs : ui c# for hornet pre-planned editor page
+// FA18CEditPreplanPage.xaml.cs : ui c# for hornet pre-planned editor page
 //
 // Copyright(C) 2024 ilominar/raven
 //

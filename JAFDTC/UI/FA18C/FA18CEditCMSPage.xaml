@@ -2,7 +2,7 @@
 <!--
 **********************************************************************************************************************
     
-FA18CEditCMSPage.cs : ui xaml for hornet cms editor page
+FA18CEditCMSPage.xaml : ui xaml for hornet cms editor page
 
 Copyright(C) 2023-2024 ilominar/raven
 

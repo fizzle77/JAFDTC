@@ -2,7 +2,7 @@
 <!--
 **********************************************************************************************************************
     
-FA18CEditPreplanPage.cs : ui xaml for hornet pre-planned editor page
+FA18CEditPreplanPage.xaml : ui xaml for hornet pre-planned editor page
 
 Copyright(C) 2023-2024 ilominar/raven
 

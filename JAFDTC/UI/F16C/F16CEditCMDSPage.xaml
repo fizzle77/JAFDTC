@@ -2,7 +2,7 @@
 <!--
 **********************************************************************************************************************
     
-F16CEditCMDSPage.cs : ui xaml for viper cmds editor page
+F16CEditCMDSPage.xaml : ui xaml for viper cmds editor page
 
 Copyright(C) 2023-2024 ilominar/raven
 
