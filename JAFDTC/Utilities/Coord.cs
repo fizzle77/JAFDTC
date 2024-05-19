@@ -26,22 +26,25 @@ namespace JAFDTC.Utilities
 {
     /// <summary>
     /// known lat/lon coordiante formats for use wth the conversion functions Coord provides.
+    /// 
+    /// NOTE: avoid changing the order of this enum because some bad people did bad things. NO BISCUIT, RAVEN!
     /// </summary>
     public enum LLFormat
     {
         DD,             // decimal degrees (raw number only)
         DDU,            // decimal degrees (with degree units)
         DMS,            // degrees, minutes, seconds
-        DMDS_P2ZF,      // degrees, minutes, decimal seconds (to 2-digit precision), zero-fill degrees
         DDM_P3ZF,       // degrees, decimal minutes (to 3-digit precision), zero-fill degrees
         DDM_P2ZF,       // degrees, decimal minutes (to 2-digit precision), zero-fill degrees
         DDM_P1ZF,       // degrees, decimal minutes (to 1-digit precision), zero-fill degrees
         DDM_P2,         // degrees, decimal minutes (to 2-digit precision)
         DDM_P1,         // degrees, decimal minutes (to 1-digit precision)
+        DMDS_P2ZF       // degrees, minutes, decimal seconds (to 2-digit precision), zero-fill degrees
     }
 
     /// <summary>
-    /// TODO: document
+    /// class encapsulating static coordinate transformation and conversion functions to switch between different
+    /// coordiante representations. LLFormat defines the known formats.
     /// </summary>
     public class Coord
     {
