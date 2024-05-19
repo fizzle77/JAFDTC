@@ -60,14 +60,18 @@ map for use by JAFDTC including
 [navigation point editors](#navigation-system-editors),
 the
 [point of interest database](TODO),
-and so on. Once capture begins in one of these scenarios, JAFDTC displays a dialog like this
-that remains visible while you interact with DCS,
+and so on. Typically, JAFDTC uses a button like this to start the capture process,
+
+![](images/Core_Base_Capture_UI.png)
+
+To start capturing from DCS, JAFDTC displays a dialog like this that will remain visible while
+you interact with DCS,
 
 ![](images/Core_Base_Capture_C2.png)
 
 JAFDTC will interact with the coordinate capture in DCS as long as this dialog is active. After
 you have completed the capture in DCS, clicking “**Done**” in this dialog incorporates the
-captured coordinates.
+captured coordinates into JAFDTC as appropriate.
 
 The DCS side of the interaction occurs on the F10 map.
 
@@ -100,8 +104,8 @@ to interact with the list.
 The handling of target versus steerpoints added by **Add STPT** and **Add TGT** commands
 depends on the specific airframe.
 
-After sending the navigation points to JAFDTC, you must dismissing the “Capturing” dialog in
-JAFDTC as discussed above.
+After sending the navigation points to JAFDTC via the **Send to JAFDTC** button, you must
+dismiss the “Capturing” dialog in JAFDTC as discussed above.
 
 ## Applying Configurations to the Jet
 
@@ -148,13 +152,13 @@ a system that is not modeled in the module).
 > [airframe-specific documentation](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#jafdtc-users-guide)
 > for further details on what a given airframe supports.
 
-## Applying Configurations to the Jet from the Cockpit
+### Applying Configurations to the Jet from the Cockpit
 
 Some airframes allow cockpit controls to trigger configuration upload to the jet. In these
 airframes, clicking a button in the cockpit will case JAFDTC to upload the currently selected
 configuration into the jet.
 
-## Changing the Selected Configuration from the Cockpit
+### Changing the Selected Configuration from the Cockpit
 
 Some airframes allow cockpit controls to change the currently selected configuration. With this
 capability, you can step sequentially through the configurations. As you change the
@@ -263,7 +267,9 @@ changes. Clicking either of these buttons will take you back to the navigation p
 ## Capturing Coordinates for Navpoints
 
 Both the navigation point list and navigation point editor pages allow you to capture
-coordinates for navigation points from the DCS F10 map.
+coordinates for navigation points from the DCS F10 map. The earlier discussion
+[here](#capturing-coordinates-from-dcs)
+provides an overview of the process.
 
 > Capturing coordinates in this fashion requires access to the F10 map. This implies a
 > mission is running with a pilot slotted in pint.

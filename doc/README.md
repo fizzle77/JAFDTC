@@ -33,7 +33,7 @@ F-16C Viper, F/A-18C Hornet, and Mirage M-2000C airframes.
 ### Overview
 
 In JAFDTC, a *Configuration* is composed of multiple *System Configurations*, or *Systems*,
-that each correspond to systems (typically avionics) in an airframe such as radios,
+that each correspond to systems (strangely enough) in an airframe such as radios,
 countermeasures, navigation, and so on. *Configurations* and *Systems* are **unique** to a
 specific airframe, though different airframes may have systems that provide similar
 functionality.
@@ -45,21 +45,21 @@ name is set up when the configuration is first created and may be changed later.
 > any character. Names are case-insensitive so "A2G" and "a2g" are treated as the same name.
 
 The specific systems available in a configuration, along with the system parameters that
-JAFDTC can apply, vary from airframe to airframe.
+JAFDTC can set up, vary from airframe to airframe.
 
 > Details specific to a particular airframe can be found in the
 > [airframe-specific documentation](#what-now)
 > linked below.
 
 Some systems may not exist in some airframes and even "common" systems may operate differently
-and track different information in different airframes.
+in different airframes.
 
 ### Storing Configurations
 
 JAFDTC stores configuration and supporting files, such as settings, in the `Documents\JAFDTC`
 folder for the active profile. Configurations are found in the `Configs` folder in this
 directory. Generally, you should not need to access the files in the `JAFDTC` folder as JAFDTC
-provides import and export functions as described later to allow the exchange of information.
+supports sharing and exchanging information through various UI functions.
 
 > As with all things, there are exceptions. A good general rule is if the JAFDTC UI can do
 > something, use the UI and don't try to work around it.
@@ -84,8 +84,8 @@ This pictures illustrates how this works,
 
 Here, the arrow points to the source system configuration: the MFD system configuration in
 "A2G Mission" comes from (or, is *linked to*) the MFD system configuration in "A2G Fav". In
-this example, "A2G Mission" would only set up the NAV system; it relies on the "A2G Fav" to
-provide the configuration for the MFD system.
+this example, "A2G Mission" would only fully specify the set up for the NAV system; it relies
+on the "A2G Fav" to specify the set up for the MFD system.
 
 Any change you make to the MFD system in "A2G Fav" or "A2A Fav" is immediately reflected in
 the configurations that link to these system configurations; in this example, "A2G Mission",
@@ -141,8 +141,12 @@ install this support in up to two places,
 - `Saved Games\DCS\Scripts`
 - `Saved Games\DCS.openbeta\Scripts`
 
-depending which versions of DCS are installed on your system. Within these areas, JAFDTC makes
-three changes,
+depending which versions of DCS are installed on your system.
+
+> As of the 2.9.2.49940 release, the OpenBeta and Stable versions of DCS are the same though
+> the folder names may still reflect the pre-2.9.2.49940 split between stable and open beta.
+
+Within these areas, JAFDTC makes three changes,
 
 - Adds scripts in the `Scripts\JAFDTC` folder to enable integration with supported airframes
 - Adds `JAFDTCStatusMsgHook.lua` and `JAFDTCWyptCaptureHook.lua` script to the `Scripts\Hooks`
@@ -344,8 +348,8 @@ associated icon whose tint and badging specifies details on the configuration.
 The tint of the icon indicates the state of the system: blue icons mark systems whose
 configuration has changed from defaults, white icons mark systems that have not been changed.
 
-> JAFDTC uses the system highlight color; if you change it, the blue icons in the screenshots
-> may be a different color based on your choice.
+> JAFDTC uses the system highlight color; if you change it through Windows settings, the blue
+> icons in the screenshots in this guide may be a different color based on your choice.
 
 A small gold dot in the lower right corner of the icon marks those systems that are linked to
 other configurations.
@@ -532,11 +536,11 @@ there, move on to the airframe specific documentation for airframes of interest,
 
 | Airframe | Systems JAFDTC Can Configure |
 |:--------:|------------------------------|
-| [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | Radios, Waypoints, Miscellanesou CDU and ADP Systems
+| [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | DSMS, Radios, Waypoints, Miscellaneous Systems
 | [AV-8B Harrier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_AV8B.md) | Waypoints
 | [F-14A/B Tomcat](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F14AB.md) | Waypoints
 | [F-15E Strike Eagle](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F15E.md) | MPD/MPCD Formats, Radios, Steerpoints, Miscellaneous Systems
-| [F-16C Viper](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F16C.md) | Countermeasures, Datalink, HARM (ALIC, HTS), MFD Formats, Radios, Steerpoints, Miscellaneous DED Systems
+| [F-16C Viper](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F16C.md) | Countermeasures, Datalink, HARM (ALIC, HTS), MFD Formats, Radios, Steerpoints, Miscellaneous Systems
 | [F/A-18C Hornet](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_FA18C.md) | Countermeasures, Pre-Planned Weapons, Radios, Waypoints
 | [Mirage M-2000C](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_M2000C.md) | Waypoints
 
