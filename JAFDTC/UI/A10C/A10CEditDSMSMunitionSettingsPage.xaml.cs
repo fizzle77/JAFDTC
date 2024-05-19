@@ -1,3 +1,22 @@
+// ********************************************************************************************************************
+//
+// A10CEditDSMSMunitionSettingsPage.cs : ui c# for warthog dsms munitions editor page
+//
+// Copyright(C) 2024 fizzle, JAFDTC contributors
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+// for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.  If not, see
+// <https://www.gnu.org/licenses/>.
+//
+// ********************************************************************************************************************
+
 using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.DSMS;
@@ -78,6 +97,15 @@ namespace JAFDTC.UI.A10C
                 Utilities.SetTextBoxEnabledAndText(uiTextLaserCode, isNotLinked, selectedMunition.Laser, _editState.LaserCode, _editState.LaserCode);
                 Utilities.SetCheckEnabledAndState(uiCheckAutoLase, isNotLinked && selectedMunition.AutoLase, _editState.GetAutoLaseValue(selectedMunition));
                 Utilities.SetTextBoxEnabledAndText(uiTextLaseTime, isNotLinked, selectedMunition.AutoLase, _editState.GetLaseSeconds(selectedMunition));
+                Visibility autoLaseVisible = (selectedMunition.AutoLase) ? Visibility.Visible : Visibility.Collapsed;
+                Visibility autoLaseFieldVisible = (selectedMunition.AutoLase &&
+                                                   _editState.GetAutoLaseValue(selectedMunition)) ? Visibility.Visible : Visibility.Collapsed;
+                uiLabelAutoLase.Visibility = autoLaseVisible;
+                uiStackAutoLase.Visibility = autoLaseVisible;
+                uiTextLaseTime.Visibility = autoLaseFieldVisible;
+                uiLabelLaseTimeUnits.Visibility = autoLaseFieldVisible;
+
+                uiLabelLaserCode.Foreground = (selectedMunition.Laser) ? uiTextLaserCode.Foreground : uiTextLaserCode.PlaceholderForeground;
 
                 // Delivery Mode (CCIP/CCRP)
                 if (selectedMunition.CCIP ^ selectedMunition.CCRP)
@@ -89,10 +117,15 @@ namespace JAFDTC.UI.A10C
                     uiComboDeliveryMode.IsEnabled = false;
                 }
                 else
+                {
                     Utilities.SetComboEnabledAndSelection(uiComboDeliveryMode, isNotLinked, true, (int)_editState.GetDeliveryModeValue(selectedMunition));
+                }
 
                 // Escape Maneuver
                 Utilities.SetComboEnabledAndSelection(uiComboEscMnvr, isNotLinked, selectedMunition.EscMnvr, (int)_editState.GetEscapeManeuverValue(selectedMunition));
+                Visibility escVisible = (selectedMunition.EscMnvr) ? Visibility.Visible : Visibility.Collapsed;
+                uiLabelEscMnvr.Visibility = escVisible;
+                uiComboEscMnvr.Visibility = escVisible;
 
                 // Release Mode (SGL, PRS, RIP SGL, RIP PRS)
                 if (selectedMunition.SingleReleaseOnly)
@@ -100,9 +133,13 @@ namespace JAFDTC.UI.A10C
                     // For munitions allowing only SGL release, select it and disable.
                     uiComboReleaseMode.SelectedIndex = 0;
                     uiComboReleaseMode.IsEnabled = false;
+                    uiStackRipple.Visibility = Visibility.Collapsed;
                 }
                 else
+                {
                     Utilities.SetComboEnabledAndSelection(uiComboReleaseMode, isNotLinked, true, (int)_editState.GetReleaseModeValue(selectedMunition));
+                    uiStackRipple.Visibility = (uiComboReleaseMode.SelectedIndex < 2) ? Visibility.Collapsed : Visibility.Visible;
+                }
 
                 // Ripple Qty and Distance
                 bool enableRippleOptions = selectedMunition.Ripple && uiComboReleaseMode.SelectedIndex > 1; // disabled when SGL or PRS release is selected
@@ -112,12 +149,20 @@ namespace JAFDTC.UI.A10C
 
                 // HOF
                 Utilities.SetComboEnabledAndSelection(uiComboHOF, isNotLinked, selectedMunition.HOF, (int)_editState.GetHOFOptionValue(selectedMunition));
-                
+                Visibility hofVisible = (selectedMunition.HOF) ? Visibility.Visible : Visibility.Collapsed;
+                uiLabelHOF.Visibility = hofVisible;
+                uiComboHOF.Visibility = hofVisible;
+
                 // RPM
                 Utilities.SetComboEnabledAndSelection(uiComboRPM, isNotLinked, selectedMunition.RPM, (int)_editState.GetRPMOptionValue(selectedMunition));
+                Visibility rpmVisible = (selectedMunition.RPM) ? Visibility.Visible : Visibility.Collapsed;
+                uiStackRPM.Visibility = rpmVisible;
 
                 // Fuze
                 Utilities.SetComboEnabledAndSelection(uiComboFuze, isNotLinked, selectedMunition.Fuze, (int)_editState.GetFuzeOptionValue(selectedMunition));
+                Visibility fuzeVisible = (selectedMunition.Fuze) ? Visibility.Visible : Visibility.Collapsed;
+                uiLabelFuse.Visibility = fuzeVisible;
+                uiComboFuze.Visibility = fuzeVisible;
 
                 MunitionSettings newSettings = _editState.GetMunitionSettings(selectedMunition);
                 newSettings.ErrorsChanged += BaseField_DataValidationError;
