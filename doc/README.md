@@ -9,10 +9,10 @@ guide,
 
 - This document provides a broad overview of JAFDTC
 - The
-  [Common Elements Guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
+  [_Common Elements Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
   discusses topics that are common across multiple airframes
 - The
-  [Airframe Documentation](#what-now)
+  [airframe documentation](#what-now)
   presents details that are specific or unique to a particular airframe
 
 General installation and troubleshooting instructions for JAFDTC can be found
@@ -530,7 +530,7 @@ changes in the dialog, while “**Cancel**” will discard any changes.
 # What Now?
 
 Now that you have a basic familiarity with JAFDTC, you can take a look at the
-[Common Elements Guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
+[_Common Elements Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
 that provides the next level of detail on JAFDTC, its operation, and its user interface. From
 there, move on to the airframe specific documentation for airframes of interest,
 

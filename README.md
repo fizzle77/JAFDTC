@@ -15,7 +15,7 @@ application supports the following DCS airframes and systems,
 - *Mirage M-2000C* &ndash; Waypoints
 
 This document describes how to get JAFDTC installed and running on your system. See the
-[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
+[_User's Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
 in the JAFDTC repository for detailed discussion of how to use JAFDTC and operate its features.
 
 ## Quick Overview

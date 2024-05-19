@@ -1,6 +1,6 @@
 # JAFDTC: Configuring F-16C Viper Airframes
 
-*Version 1.0.0-B.21 of 28-Jan-24*
+*Version 1.0.0-B.31 of 5-May-24*
 
 JAFDTC supports configuration of the following systems in the Viper,
 
@@ -15,9 +15,8 @@ JAFDTC supports configuration of the following systems in the Viper,
 * Steerpoints including OAP, VIP, and VRP reference points
 
 Each of these areas is covered in more depth below. See the
-[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
-and the
-[common elements guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
+[_User's Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md) and
+[_Common Elements Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
 for more on the aspects of JAFDTC that are common to multiple airframes.
 
 # DCS Cockpit Interactions
@@ -364,7 +363,7 @@ including TACAN/ILS, ALOW, BNGO, BULL, LASR, and HMCS DED/UFC pages.
 
 ![](images/Viper_Sys_Misc.png)
 
-Most of these settings should be self-apparent. Yardstick setup will set the TACAN to A/A mode.
+Most of these settings should be self-apparent.
 The Symbology Intensity control will set the intensity knob to control the HMCS brighness.  The
 common controls implement the link and reset functionality described
 [earlier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#common-editor-controls).

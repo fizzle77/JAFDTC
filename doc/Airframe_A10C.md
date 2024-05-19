@@ -4,14 +4,14 @@
 
 JAFDTC supports configuration of the following systems in the A-10C II Warthog,
 
+* DSMS
 * Radios
 * Waypoints
-* Miscellanesou CDU and ADP Systems
+* Miscellaneous Systems
 
 Each of these areas is covered in more depth below. See the
-[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
-and the
-[common elements guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
+[_User's Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md) and
+[_Common Elements Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
 for more on the aspects of JAFDTC that are common to multiple airframes.
 
 > JAFDTC does not support the original DCS A-10C module.
@@ -125,13 +125,13 @@ JAFDTC supports the most common changes made in the DSMS for PGMs and cluster bo
 
 The **Munition Settings** tab allows modification of commonly changed options on both the INV page and the default profiles. Any changes you make to a weapon type here will be applied to the weapon wherever it is loaded on the jet.
 
-![a10-dsms-munitions](https://github.com/fizzle77/JAFDTC/assets/42720583/81336ad8-ac6f-44a4-bd31-33a506152b7f)
+![a10-dsms-munitions](images/Hawg_Sys_DSMS_Munition.png)
 
 Note that the **Laser Code** setting applies to all laser weapons. You don't need to set it for each laser weapon type.
 
 The **Profile Order** tab allows setting the order of the default profiles. The list can be dragged into the desired order. When enabled with the checkbox, any profiles present will be sorted as shown. Any profiles not listed here will be sorted to the end of the list.
 
-![a10-dsms-profiless](https://github.com/fizzle77/JAFDTC/assets/42720583/d0c4a172-6640-4759-ad52-77143b0a9791)
+![a10-dsms-profiless](images/Hawg_Sys_DSMS_Profile.png)
 
 #### Not (Yet?) Supported
 
@@ -140,22 +140,23 @@ The **Profile Order** tab allows setting the order of the default profiles. The 
 
 ## Miscellaneous
 
-![a10-misc-system](https://github.com/fizzle77/JAFDTC/assets/42720583/5de7201a-c848-459d-a3b1-bdd7fe3800d3)
+The miscellaneous system covers a number of smaller systems accessed through the Hawg CDU
+and other interfaces including CDU, AAP, autopilot, TACAN, and IFF. Many of these settings would typically be changed often in flight. The idea behind having them here is getting them set as desired before taxi/takeoff.
 
-The Miscellaneous System enables configuration of various settings. Many of these settings would typically be changed often in flight. The idea behind having them here is getting them set as desired before taxi/takeoff.
+![a10-misc-system](images/Hawg_Sys_Misc.png)
 
-#### CDU Misc Configuration
+Most of these settings should be self-apparent. For the CDU,
 
 - **Coordinate System** allows changing from the default L/L to MGRS. This only affects the CDU at present, not the TAD or TGP.
 - **Bullseye on HUD** will make visible your aircraft's BULLS position in the upper right corner of the HUD.
 - **FPM Flight Plan 01** allows changing the default flight plan, on the CDU FPM page, between manual and automatinc waypoint advancement.
 - **STEER Page Speed Display** changes the speed displayed on the CDU's STEER page between IAS, TAS, and GS.
 
-#### AAP Configuration
+For the AAP,
 
 - **STEER PT** sets the AAP's STEER PT knob. Options are Flt Plan, Mark, and Mission.
 - **PAGE** sets the AAP's PAGE knob. Options are Other, Position, Steer, and Waypt.
 
-#### Autopilot Configuration
+For the autopilot,
 
 - **Mode** allows setting the autopilot mode switch between PATH, ALT/HDG, and ALT.

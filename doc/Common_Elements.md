@@ -3,9 +3,9 @@
 *Version 1.0.0-B.31 of 5-May-24*
 
 Though systems differ from airframe to airframe, based on the preculariites of the airframe,
-there are many concepts and tasks in the JAFDTC user interface that share general similarities
-across airframes even where the specifics differ. This section discusses some of thes common
-tasks and user interface abstractions.
+there are many concepts, layouts, and tasks in the JAFDTC user interface that share general
+similarities across airframes even where the specifics differ. This section discusses these
+common areas.
 
 > As usual, consult the
 > [airframe-specific documentation](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#jafdtc-users-guide)
@@ -13,9 +13,44 @@ tasks and user interface abstractions.
 
 # Common Interface Tasks
 
-The user interface has tasks that can be used in multiple contexts within an airframe as well
-as tasks that may share some common features between different airframes. This section
+The JAFDTC user interface has tasks that can be used in multiple contexts within an airframe as
+well as tasks that may share some common features between different airframes. This section
 discusses some of these common tasks.
+
+## Applying Configurations to the Jet
+
+The primary interaction between JAFDTC and DCS involves uploading configurations to the jet. To
+upload a configuration, four conditions must hold,
+
+1. The DCS scripting support must be
+   [installed](#support-scripts)
+2. DCS must be running
+3. A configuration must be selected in the configuration list
+4. A mission must be running with a pilot in pit in an airframe that matches the airframe of
+   the selection in (3)
+
+The lower left corner of the main configuration list page indicates the status conditions 2-4
+as
+[discussed earlier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#status-area).
+Once these conditions are met, you can use any of the **Load to Jet** buttons in the interface
+to load the currently selected configuration to the jet.
+
+Generally, the upload should take place before any changes are made to the avionics with all
+relevant systems powered up. Typically, shortly before taxi.
+
+> In some cases, it is difficult to impossible for JAFDTC to get the jet in a known
+> configuration from a non-default starting point. In these situations, JAFDTC must rely on the
+> avionics being in a known state coming out of a cold or hot start. For example, if there is a
+> 4-position switch whose setting JAFDTC is unable to read, JAFDTC will not be able to reliably
+> set the switch to a particular setting except if assumes the switch hasn't changed positions
+> since mission start.
+>
+> For these reasons, it is generally advisable to perform uploads prior to manually changing
+> any avionics settings that overlap with those in the configuration.
+
+Because JAFDTC works through the clickable cockpit, you should limit your interactions with
+cockpit switches while JAFDTC is loading a configuration. Interacting with controls that
+JAFDTC will use can cause incorrect command sequences that will mess up the configuration.
 
 ## Selecting & Filtering Points of Interest
 
@@ -106,40 +141,6 @@ depends on the specific airframe.
 
 After sending the navigation points to JAFDTC via the **Send to JAFDTC** button, you must
 dismiss the “Capturing” dialog in JAFDTC as discussed above.
-
-## Applying Configurations to the Jet
-
-The primary interaction between JAFDTC and DCS involves uploading configurations to the jet. To
-upload a configuration, four conditions must hold,
-
-1. The DCS scripting support must be
-   [installed](#support-scripts)
-2. DCS must be running
-3. A configuration must be selected in the configuration list
-4. A mission must be running with a pilot in pit in an airframe that matches the airframe of
-   the selection in (3)
-
-The lower left corner of the main configuration list page indicates the status conditions 2-4
-as
-[discussed earlier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#status-area).
-Once these conditions are met, you can use any of the **Load to Jet** buttons in the interface
-to load the currently selected configuration to the jet.
-
-Generally, the upload should take place before any changes are made to the avionics.
-
-> In some cases, it is difficult to impossible for JAFDTC to get the jet in a known
-> configuration from a non-default starting point. In these situations, JAFDTC must rely on the
-> avionics being in a known state coming out of a cold or hot start. For example, if there is a
-> 4-position switch whose setting JAFDTC is unable to read, JAFDTC will not be able to reliably
-> set the switch to a particular setting except if assumes the switch hasn't changed positions
-> since mission start.
->
-> For these reasons, it is generally advisable to perform uploads prior to manually changing
-> any avionics settings that overlap with those in the configuration.
-
-Because JAFDTC works through the clickable cockpit, you should limit your interactions with
-cockpit switches while JAFDTC is loading a configuration. Interacting with controls that
-JAFDTC will use can cause incorrect command sequences that will mess up the configuration.
 
 ## VR Quality of Life Improvements
 
@@ -360,4 +361,4 @@ TODO
 Now that you are familiarity with JAFDTC, you should explore the airframe-specific
 [documentation](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#jafdtc-users-guide)
 for the airframes you want to use JAFDTC. This documentation builds on the common elements
-to describe specific capabilities of JAFDTC on a particular airframe.
+outlined here to describe specific capabilities of JAFDTC on a particular airframe.

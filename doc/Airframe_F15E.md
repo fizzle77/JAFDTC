@@ -1,6 +1,6 @@
 # JAFDTC: Configuring F-15E Strike Eagle Airframes
 
-*Version 1.0.0-B.30 of 19-Apr-24*
+*Version 1.0.0-B.31 of 5-May-24*
 
 JAFDTC supports configuration of the following systems in the Strike Eagle,
 
@@ -10,7 +10,8 @@ JAFDTC supports configuration of the following systems in the Strike Eagle,
 - Miscellaneous systems not configured through UFC such as BINGO
 
 Each of these areas is covered in more depth below. See the
-[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
+[_User's Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md) and
+[_Common Elements Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
 for more on the aspects of JAFDTC that are common to multiple airframes.
 
 # Pilots and WSOs
