@@ -81,17 +81,20 @@ namespace JAFDTC.Models.F16C.Upload
 
             // ---- tacan mode
 
-            string tacanMode = (TACANModes)int.Parse(_cfg.Misc.TACANMode) switch
+            string tacanMode = _cfg.Misc.TACANModeValue switch
             {
                 TACANModes.REC => "REC",
                 TACANModes.TR => "T/R",
                 TACANModes.AA_TR => "A/A TR",
                 _ => ""
             };
-            AddWhileBlock("IsTACANMode", false, new() { tacanMode }, delegate ()
+            if (!string.IsNullOrEmpty(tacanMode))
             {
-                AddAction(ufc, "SEQ");
-            }, 6);
+                AddWhileBlock("IsTACANMode", false, new() { tacanMode }, delegate ()
+                {
+                    AddAction(ufc, "SEQ");
+                }, 6);
+            }
 
             // ---- tacan channel
 
