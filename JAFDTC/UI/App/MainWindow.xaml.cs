@@ -299,7 +299,7 @@ namespace JAFDTC.UI.App
                 {
                     await CheckForUpdates();
                 }
-                if (Settings.IsVersionUpdated || true)
+                if (Settings.IsVersionUpdated)
                 {
                     await Utilities.Message1BDialog(Content.XamlRoot, "Welcome to JAFDTC!", $"Version {Settings.VersionJAFDTC}");
                 }
