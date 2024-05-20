@@ -518,7 +518,7 @@ namespace JAFDTC.UI.App
             {
                 ContentDialogResult result = await Utilities.Message2BDialog(
                     Content.XamlRoot,
-                    "Delete Configruation?",
+                    "Delete Configuration?",
                     "Are you sure you want to delete this configuration? This action cannot be undone.",
                     "Delete"
                 );

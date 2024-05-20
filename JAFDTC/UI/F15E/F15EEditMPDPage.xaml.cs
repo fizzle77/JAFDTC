@@ -518,7 +518,7 @@ namespace JAFDTC.UI.F15E
         {
             ContentDialogResult result = await Utilities.Message2BDialog(
                 Content.XamlRoot,
-                "Reset Configruation?",
+                "Reset Configuration?",
                 "Are you sure you want to reset the MPD/MPCD system configurations to avionics defaults? This action cannot be undone.",
                 "Reset"
             );

@@ -100,7 +100,7 @@ namespace JAFDTC.UI.A10C
         {
             ContentDialogResult result = await Utilities.Message2BDialog(
                 Content.XamlRoot,
-                "Reset Configruation?",
+                "Reset Configuration?",
                 "Are you sure you want to reset the DSMS configurations to avionics defaults? This action cannot be undone.",
                 "Reset"
             );

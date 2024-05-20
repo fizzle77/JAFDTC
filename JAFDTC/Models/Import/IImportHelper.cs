@@ -23,7 +23,7 @@ using System.Collections.Generic;
 namespace JAFDTC.Models.Import
 {
     /// <summary>
-    /// interface for classes that help interface between jafdtc navpoint system configruations an an import data
+    /// interface for classes that help interface between jafdtc navpoint system Configurations an an import data
     /// source to allow import of navpoints.
     /// </summary>
     public interface IImportHelper
