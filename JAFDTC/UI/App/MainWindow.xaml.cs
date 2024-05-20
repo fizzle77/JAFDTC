@@ -299,11 +299,11 @@ namespace JAFDTC.UI.App
                 {
                     await CheckForUpdates();
                 }
-                Sploosh(DCSLuaManager.LuaCheck());
-                if (Settings.IsVersionUpdated)
+                if (Settings.IsVersionUpdated || true)
                 {
                     await Utilities.Message1BDialog(Content.XamlRoot, "Welcome to JAFDTC!", $"Version {Settings.VersionJAFDTC}");
                 }
+                Sploosh(DCSLuaManager.LuaCheck());
             }
             else
             {
