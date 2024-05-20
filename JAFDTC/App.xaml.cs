@@ -472,7 +472,7 @@ namespace JAFDTC
                 TogglePressed = true;
                 isUpdateWindowLayer = true;
             }
-            else if (data.CmdToggle == "0")
+            else if (TogglePressed && (data.CmdToggle == "0"))
             {
                 TogglePressed = false;
             }
