@@ -278,7 +278,7 @@ namespace JAFDTC.Models.A10C.Upload
 
         /// <summary>
         /// Modify the order of the default weapon profiles.
-        /// Important to do this last because it will invalidate the content of _profileQuery.StationMunitionMap
+        /// Important to do this last because it will invalidate the content of _profileQuery.MunitionProfileIndexMap
         /// </summary>
         /// <param name="lmfd"></param>
         private void Build_DefaultProfileOrder(AirframeDevice lmfd)
@@ -345,13 +345,13 @@ namespace JAFDTC.Models.A10C.Upload
         }
         
         /// <summary>
-                 /// Moves the selection indicator on the DSMS profile's page to the profile at toSelectIndex.
-                 /// Assumes we are already on the DSMS profile page.
-                 /// </summary>
-                 /// <param name="lmfd"></param>
-                 /// <param name="currentSelectionIndex"></param>
-                 /// <param name="toSelectIndex"></param>
-                 /// <returns>The new, current selected index.</returns>
+        /// Moves the selection indicator on the DSMS profile's page to the profile at toSelectIndex.
+        /// Assumes we are already on the DSMS profile page.
+        /// </summary>
+        /// <param name="lmfd"></param>
+        /// <param name="currentSelectionIndex"></param>
+        /// <param name="toSelectIndex"></param>
+        /// <returns>The new, current selected index.</returns>
         private int SelectProfile(AirframeDevice lmfd, int currentSelectionIndex, int toSelectIndex)
         {
             if (toSelectIndex > currentSelectionIndex)
