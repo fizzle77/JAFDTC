@@ -336,14 +336,14 @@ namespace JAFDTC.Models.A10C.HMCS
         // Skipped because no function in DCS: GND OTHER
         // Skipped because no function in DCS: EMER PONIT
 
-        private string _steerPoint;
-        public string SteerPoint
+        private string _steerpoint;
+        public string Steerpoint
         {
-            get => _steerPoint;
+            get => _steerpoint;
             set
             {
                 string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
-                SetProperty(ref _steerPoint, value, error);
+                SetProperty(ref _steerpoint, value, error);
             }
         }
 
@@ -575,7 +575,7 @@ namespace JAFDTC.Models.A10C.HMCS
         public bool IsGndVMFFriendRangeDefault => string.IsNullOrEmpty(GndVMFFriendRange) || GndVMFFriendRange == GetExplicitDefaults(_profile).GndVMFFriendRange;
         
         [JsonIgnore]
-        public bool IsSteerPointDefault => string.IsNullOrEmpty(SteerPoint) || SteerPoint == GetExplicitDefaults(_profile).SteerPoint;
+        public bool IsSteerPointDefault => string.IsNullOrEmpty(Steerpoint) || Steerpoint == GetExplicitDefaults(_profile).Steerpoint;
         
         [JsonIgnore]
         public bool IsSteerPointRangeDefault => string.IsNullOrEmpty(SteerPointRange) || SteerPointRange == GetExplicitDefaults(_profile).SteerPointRange;
@@ -701,7 +701,7 @@ namespace JAFDTC.Models.A10C.HMCS
                 GndEnvir = "1",
                 GndVMFFriend = "1",
                 GndVMFFriendRange = "50",
-                SteerPoint = "1",
+                Steerpoint = "1",
                 SteerPointRange = "50",
                 MsnMarkpoints = "1",
                 MsnMarkpointsRange = "50",
@@ -762,10 +762,10 @@ namespace JAFDTC.Models.A10C.HMCS
             dest.GndEnvir = src.GndEnvir;
             dest.GndVMFFriend = src.GndVMFFriend;
             dest.GndVMFFriendRange = src.GndVMFFriendRange;
-            dest.SteerPoint = src.SteerPoint;
+            dest.Steerpoint = src.Steerpoint;
             dest.SteerPointRange = src.SteerPointRange;
             dest.MsnMarkpoints = src.MsnMarkpoints;
-            dest.MsnMarkpointsRange  = src.MsnMarkpointsRange ;
+            dest.MsnMarkpointsRange  = src.MsnMarkpointsRange;
             dest.MsnMarkLabels = src.MsnMarkLabels;
             dest.Airspeed = src.Airspeed;
             dest.RadarAltitude = src.RadarAltitude;
