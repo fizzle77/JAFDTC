@@ -31,6 +31,23 @@ namespace JAFDTC.UI.A10C
             _configNameList = new List<string>();
         }
 
+        // ---- control event handlers --------------------------------------------------------------------------------
+
+        private void uiComboProfile_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void uiButtonNext_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void uiButtonPrev_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         // ---- page settings -----------------------------------------------------------------------------------------
 
         // on clicks of the reset all button, reset all settings back to default.
@@ -40,18 +57,17 @@ namespace JAFDTC.UI.A10C
             ContentDialogResult result = await Utilities.Message2BDialog(
                 Content.XamlRoot,
                 "Reset Configuration?",
-                "Are you sure you want to reset the DSMS configurations to avionics defaults? This action cannot be undone.",
+                "Are you sure you want to reset the HMCS configurations to avionics defaults? This action cannot be undone.",
                 "Reset"
             );
             if (result == ContentDialogResult.Primary)
             {
                 _config.UnlinkSystem(HMCSSystem.SystemTag);
-                _config.DSMS.Reset();
+                _config.HMCS.Reset();
                 _config.Save(this, HMCSSystem.SystemTag);
             }
         }
 
-        // TODO: document
         private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
         {
             string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, _config, HMCSSystem.SystemTag,
@@ -60,15 +76,14 @@ namespace JAFDTC.UI.A10C
             {
                 _config.UnlinkSystem(HMCSSystem.SystemTag);
                 _config.Save(this);
-                //((IA10CDSMSContentFrame)DSMSContentFrame.Content).CopyConfigToEditState();
             }
             else if (selectedItem.Length > 0)
             {
                 _config.LinkSystemTo(HMCSSystem.SystemTag, _navArgs.UIDtoConfigMap[_configNameToUID[selectedItem]]);
                 _config.Save(this);
-                //((IA10CDSMSContentFrame)DSMSContentFrame.Content).CopyConfigToEditState();
             }
 
+            //CopyConfigToEditState();
             UpdateLinkControls();
         }
 
