@@ -3,7 +3,6 @@
     x:Class="JAFDTC.UI.A10C.A10CEditHMCSPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:JAFDTC.UI.A10C"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -29,7 +28,7 @@
             <Setter Property="HorizontalAlignment" Value="Left"/>
         </Style>
         <Style x:Key="TopRowBase" BasedOn="{StaticResource Base}" TargetType="FrameworkElement">
-            <Setter Property="Margin" Value="12,0,0,0"/>
+            <Setter Property="Margin" Value="12,12,0,0"/>
         </Style>
         <Style x:Key="TopRowCombo" BasedOn="{StaticResource TopRowBase}" TargetType="ComboBox">
             <Setter Property="Width" Value="90"/>
@@ -54,6 +53,7 @@
 
     <Grid Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush }">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -138,10 +138,14 @@
 
         <!--
         ===============================================================================================================
-        row 1 : profile settings
+        rows 1 and 2 : profile settings
         ===============================================================================================================
         -->
-        <ScrollView Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" 
+        <TextBlock Grid.Row="1" Style="{StaticResource EditorTitleTextBlockStyle}">
+            Profile-Specific Settings:
+        </TextBlock>
+
+        <ScrollView Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Center" 
                     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush }" Margin="0,12,0,24"
                     Name="uiSettingsScrollView">
             <Grid Name="uiSettingsGrid">
@@ -169,228 +173,255 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource TopRowText}">Crosshair</TextBlock>
-                <ComboBox Grid.Row="0" Grid.Column="1" Style="{StaticResource TopRowCombo}" Name="uiComboCrosshair"
+                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource TopRowText}">Crosshair</TextBlock>
+                <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource TopRowCombo}" Name="uiComboCrosshair"
+                          ToolTipService.ToolTip="Indicates HMD line of sight"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="Crosshair">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource TextBase}">Own SPI</TextBlock>
-                <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboOwnSPI"
+                <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource TextBase}">Own SPI</TextBlock>
+                <ComboBox Grid.Row="2" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboOwnSPI"
+                          ToolTipService.ToolTip="Ownship SPI"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="OwnSPI">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource TextIndented}">SPI Indicator</TextBlock>
-                <ComboBox Grid.Row="2" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboSPIIndicator"
+                <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource TextIndented}">SPI Indicator</TextBlock>
+                <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboSPIIndicator"
+                          ToolTipService.ToolTip="TLL connecting crosshair to SPI when SPI is outside HMD FOV"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="SPIInIndicator">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource TextBase}">Horizon Line</TextBlock>
-                <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboHorizonLine"
+                <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource TextBase}">Horizon Line</TextBlock>
+                <ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboHorizonLine"
+                          ToolTipService.ToolTip="Indicator type for the horizon"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="HorizonLine">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>NORM</ComboBoxItem>
                     <ComboBoxItem>GHST</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource TextBase}">HDC</TextBlock>
-                <ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboHDC"
+                <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource TextBase}">HDC</TextBlock>
+                <ComboBox Grid.Row="5" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboHDC"
+                          ToolTipService.ToolTip="Helmet designation cursor"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="HDC">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource TextBase}">Hookship</TextBlock>
-                <ComboBox Grid.Row="5" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboHookship"
+                <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource TextBase}">Hookship</TextBlock>
+                <ComboBox Grid.Row="6" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboHookship"
+                          ToolTipService.ToolTip="Indicates hooked target"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="Hookship">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource TextBase}">TGP Diamond</TextBlock>
-                <ComboBox Grid.Row="6" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboTGPDiamond"
+                <TextBlock Grid.Row="7" Grid.Column="0" Style="{StaticResource TextBase}">TGP Diamond</TextBlock>
+                <ComboBox Grid.Row="7" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboTGPDiamond"
+                          ToolTipService.ToolTip="Indicates TGP line of sight"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="TGPDiamond">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="7" Grid.Column="0" Style="{StaticResource TextIndented}">TGP FOV</TextBlock>
-                <ComboBox Grid.Row="7" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboTGPFOV"
+                <TextBlock Grid.Row="8" Grid.Column="0" Style="{StaticResource TextIndented}">TGP FOV</TextBlock>
+                <ComboBox Grid.Row="8" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboTGPFOV"
+                          ToolTipService.ToolTip="Dashed box outlining TGP field of view"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="TGPFOV">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="8" Grid.Column="0" Style="{StaticResource TextBase}">Flight Members</TextBlock>
-                <ComboBox Grid.Row="8" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboFlightMembers"
+                <TextBlock Grid.Row="9" Grid.Column="0" Style="{StaticResource TextBase}">Flight Members</TextBlock>
+                <ComboBox Grid.Row="9" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboFlightMembers"
+                          ToolTipService.ToolTip="Flight member PPLI"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="FlightMembers">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="8" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextFlightMembers"
+                <TextBox Grid.Row="9" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextFlightMembers"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="FlightMembersRange"/>
 
-                <TextBlock Grid.Row="9" Grid.Column="0" Style="{StaticResource TextIndented}">FM SPI</TextBlock>
-                <ComboBox Grid.Row="9" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboFMSPI"
+                <TextBlock Grid.Row="10" Grid.Column="0" Style="{StaticResource TextIndented}">FM SPI</TextBlock>
+                <ComboBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboFMSPI"
+                          ToolTipService.ToolTip="Donor SPI from flight member"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="FMSPI">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="9" Grid.Column="2" Style="{StaticResource ValueIndented}" Name="uiTextFMSPI"
+                <TextBox Grid.Row="10" Grid.Column="2" Style="{StaticResource ValueIndented}" Name="uiTextFMSPI"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="FMSPIRange"/>
 
-                <TextBlock Grid.Row="10" Grid.Column="0" Style="{StaticResource TextBase}">Donor Air PPLI</TextBlock>
-                <ComboBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboDonorAirPPLI"
+                <TextBlock Grid.Row="11" Grid.Column="0" Style="{StaticResource TextBase}">Donor Air PPLI</TextBlock>
+                <ComboBox Grid.Row="11" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboDonorAirPPLI"
+                          ToolTipService.ToolTip="Other aircraft (non-flight members) PPLI"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="DonorAirPPLI">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="10" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextDonorAirPPLI"
+                <TextBox Grid.Row="11" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextDonorAirPPLI"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="DonorAirPPLIRange"/>
 
-                <TextBlock Grid.Row="11" Grid.Column="0" Style="{StaticResource TextIndented}">Donor SPI</TextBlock>
-                <ComboBox Grid.Row="11" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboDonorSPI"
+                <TextBlock Grid.Row="12" Grid.Column="0" Style="{StaticResource TextIndented}">Donor SPI</TextBlock>
+                <ComboBox Grid.Row="12" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboDonorSPI"
+                          ToolTipService.ToolTip="Donor SPI from other aircraft (non-flight members)"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="DonorSPI">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="11" Grid.Column="2" Style="{StaticResource ValueIndented}" Name="uiTextDonorSPI"
+                <TextBox Grid.Row="12" Grid.Column="2" Style="{StaticResource ValueIndented}" Name="uiTextDonorSPI"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="DonorSPIRange"/>
 
-                <TextBlock Grid.Row="12" Grid.Column="0" Style="{StaticResource TextBase}">Current MA</TextBlock>
-                <ComboBox Grid.Row="12" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboCurrentMA"
+                <TextBlock Grid.Row="13" Grid.Column="0" Style="{StaticResource TextBase}">Current MA</TextBlock>
+                <ComboBox Grid.Row="13" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboCurrentMA"
+                          ToolTipService.ToolTip="Current SADL tasking from JTAC or flight member"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="CurrentMA">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="12" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextCurrentMA"
+                <TextBox Grid.Row="13" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextCurrentMA"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="CurrentMARange"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="4" Style="{StaticResource TopRowText}">Air Environment</TextBlock>
-                <ComboBox Grid.Row="0" Grid.Column="5" Style="{StaticResource TopRowCombo}" Name="uiComboAirEnvir"
+                <TextBlock Grid.Row="1" Grid.Column="4" Style="{StaticResource TopRowText}">Air Environment</TextBlock>
+                <ComboBox Grid.Row="1" Grid.Column="5" Style="{StaticResource TopRowCombo}" Name="uiComboAirEnvir"
+                          ToolTipService.ToolTip="All air assets"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="AirEnvir">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="1" Grid.Column="4" Style="{StaticResource TextIndented}">Air PPLI Non-Donor</TextBlock>
-                <ComboBox Grid.Row="1" Grid.Column="5" Style="{StaticResource ComboIndented}" Name="uiComboAirPPLINonDonor"
+                <TextBlock Grid.Row="2" Grid.Column="4" Style="{StaticResource TextIndented}">Air PPLI Non-Donor</TextBlock>
+                <ComboBox Grid.Row="2" Grid.Column="5" Style="{StaticResource ComboIndented}" Name="uiComboAirPPLINonDonor"
+                          ToolTipService.ToolTip="Air PPLIs that are not flight members or donors"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="AirPPLINonDonor">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="1" Grid.Column="6" Style="{StaticResource ValueIndented}" Name="uiTextAirPPLINonDonor"
+                <TextBox Grid.Row="2" Grid.Column="6" Style="{StaticResource ValueIndented}" Name="uiTextAirPPLINonDonor"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="AirPPLINonDonorRange"/>
 
-                <TextBlock Grid.Row="2" Grid.Column="4" Style="{StaticResource TextBase}">Ground Environment</TextBlock>
-                <ComboBox Grid.Row="2" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboGndEnvironment"
+                <TextBlock Grid.Row="3" Grid.Column="4" Style="{StaticResource TextBase}">Ground Environment</TextBlock>
+                <ComboBox Grid.Row="3" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboGndEnvironment"
+                          ToolTipService.ToolTip="All land and surface objects"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="GndEnvir">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="3" Grid.Column="4" Style="{StaticResource TextIndented}">Ground VMF Friend</TextBlock>
-                <ComboBox Grid.Row="3" Grid.Column="5" Style="{StaticResource ComboIndented}" Name="uiComboGndVMFFriend"
+                <TextBlock Grid.Row="4" Grid.Column="4" Style="{StaticResource TextIndented}">Ground VMF Friend</TextBlock>
+                <ComboBox Grid.Row="4" Grid.Column="5" Style="{StaticResource ComboIndented}" Name="uiComboGndVMFFriend"
+                          ToolTipService.ToolTip="All ground VMFs"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="GndVMFFriend">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="3" Grid.Column="6" Style="{StaticResource ValueIndented}" Name="uiTextGndVMFFriend"
+                <TextBox Grid.Row="4" Grid.Column="6" Style="{StaticResource ValueIndented}" Name="uiTextGndVMFFriend"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="GndVMFFriendRange"/>
 
-                <TextBlock Grid.Row="4" Grid.Column="4" Style="{StaticResource TextBase}">Steerpoint</TextBlock>
-                <ComboBox Grid.Row="4" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboSteerpoint"
+                <TextBlock Grid.Row="5" Grid.Column="4" Style="{StaticResource TextBase}">Steerpoint</TextBlock>
+                <ComboBox Grid.Row="5" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboSteerpoint"
+                          ToolTipService.ToolTip="Current steerpoint"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="Steerpoint">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="4" Grid.Column="6" Style="{StaticResource ValueBase}" Name="uiTextSteerpoint"
+                <TextBox Grid.Row="5" Grid.Column="6" Style="{StaticResource ValueBase}" Name="uiTextSteerpoint"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="SteerpointRange"/>
 
-                <TextBlock Grid.Row="5" Grid.Column="4" Style="{StaticResource TextBase}">Mission/Markpoints</TextBlock>
-                <ComboBox Grid.Row="5" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboMsnMarkpoints"
+                <TextBlock Grid.Row="6" Grid.Column="4" Style="{StaticResource TextBase}">Mission/Markpoints</TextBlock>
+                <ComboBox Grid.Row="6" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboMsnMarkpoints"
+                          ToolTipService.ToolTip="Mission points and mark points based on steerpoint switch setting"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="MsnMarkpoints">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="5" Grid.Column="6" Style="{StaticResource ValueBase}" Name="uiTextMsnMarkpoints"
+                <TextBox Grid.Row="6" Grid.Column="6" Style="{StaticResource ValueBase}" Name="uiTextMsnMarkpoints"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="MsnMarkpointsRange"/>
 
-                <TextBlock Grid.Row="6" Grid.Column="4" Style="{StaticResource TextBase}">Mission/Mark Labels</TextBlock>
-                <ComboBox Grid.Row="6" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboMsnMarkLabels"
+                <TextBlock Grid.Row="7" Grid.Column="4" Style="{StaticResource TextBase}">Mission/Mark Labels</TextBlock>
+                <ComboBox Grid.Row="7" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboMsnMarkLabels"
+                          ToolTipService.ToolTip="Mission point and mark point text labels"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="MsnMarkLabels">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="7" Grid.Column="4" Style="{StaticResource TextBase}">Airspeed</TextBlock>
-                <ComboBox Grid.Row="7" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboAirspeed"
+                <TextBlock Grid.Row="8" Grid.Column="4" Style="{StaticResource TextBase}">Airspeed</TextBlock>
+                <ComboBox Grid.Row="8" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboAirspeed"
+                          ToolTipService.ToolTip="Indicated airspeed"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="Airspeed">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="8" Grid.Column="4" Style="{StaticResource TextBase}">Radar Altitude</TextBlock>
-                <ComboBox Grid.Row="8" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboRadarAltitude"
+                <TextBlock Grid.Row="9" Grid.Column="4" Style="{StaticResource TextBase}">Radar Altitude</TextBlock>
+                <ComboBox Grid.Row="9" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboRadarAltitude"
+                          ToolTipService.ToolTip="Radar altitude indication"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="RadarAltitude">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="9" Grid.Column="4" Style="{StaticResource TextBase}">Baro Altitude</TextBlock>
-                <ComboBox Grid.Row="9" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboBaroAltitude"
+                <TextBlock Grid.Row="10" Grid.Column="4" Style="{StaticResource TextBase}">Baro Altitude</TextBlock>
+                <ComboBox Grid.Row="10" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboBaroAltitude"
+                          ToolTipService.ToolTip="Barometric altitude indication"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="BaroAltitude">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="10" Grid.Column="4" Style="{StaticResource TextBase}">AC Heading</TextBlock>
-                <ComboBox Grid.Row="10" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboACHeading"
+                <TextBlock Grid.Row="11" Grid.Column="4" Style="{StaticResource TextBase}">AC Heading</TextBlock>
+                <ComboBox Grid.Row="11" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboACHeading"
+                          ToolTipService.ToolTip="Aircraft heading"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="ACHeading">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="11" Grid.Column="4" Style="{StaticResource TextBase}">Helmet Heading</TextBlock>
-                <ComboBox Grid.Row="11" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboHelmetHeading"
+                <TextBlock Grid.Row="12" Grid.Column="4" Style="{StaticResource TextBase}">Helmet Heading</TextBlock>
+                <ComboBox Grid.Row="12" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboHelmetHeading"
+                          ToolTipService.ToolTip="Pilot line of sight heading"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="HelmetHeading">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="12" Grid.Column="4" Style="{StaticResource TextBase}">HMD Elev Lines</TextBlock>
-                <ComboBox Grid.Row="12" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboHMDElevLines"
+                <TextBlock Grid.Row="13" Grid.Column="4" Style="{StaticResource TextBase}">HMD Elev Lines</TextBlock>
+                <ComboBox Grid.Row="13" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboHMDElevLines"
+                          ToolTipService.ToolTip="Pitch ladder"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="HMDElevLines">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -405,38 +436,49 @@
         ===============================================================================================================
         -->
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,12,0,24">
-            <TextBlock VerticalAlignment="Center">TGP Track</TextBlock>
-            <ComboBox VerticalAlignment="Center" Margin="12,0,0,0" Name="uiComboTGPTrack" Width="90"
-                      SelectionChanged="ComboBox_SelectionChanged" Tag="TGPTrack">
-                <ComboBoxItem>INR</ComboBoxItem>
-                <ComboBoxItem>Area</ComboBoxItem>
-                <ComboBoxItem>Point</ComboBoxItem>
-            </ComboBox>
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
 
-            <TextBlock VerticalAlignment="Center" Margin="36,0,0,0">Active Profile</TextBlock>
-            <ComboBox VerticalAlignment="Center" Margin="12,0,0,0" Name="uiComboActiveProfile" Width="105"
-                      SelectionChanged="ComboBox_SelectionChanged" Tag="ActiveProfile">
-                <ComboBoxItem>Profile 1</ComboBoxItem>
-                <ComboBoxItem>Profile 2</ComboBoxItem>
-                <ComboBoxItem>Profile 3</ComboBoxItem>
-            </ComboBox>
+            <TextBlock Grid.Row="0" Style="{StaticResource EditorTitleTextBlockStyle}">
+                Common HMCS Settings:
+            </TextBlock>
 
-            <TextBlock VerticalAlignment="Center" Margin="36,0,0,0">Brightness</TextBlock>
-            <ComboBox VerticalAlignment="Center" Margin="12,0,0,0" Name="uiComboBrightnessSetting" Width="100"
-                      SelectionChanged="ComboBox_SelectionChanged" Tag="BrightnessSetting">
-                <ComboBoxItem>Default</ComboBoxItem>
-                <ComboBoxItem>Day</ComboBoxItem>
-                <ComboBoxItem>Night</ComboBoxItem>
-            </ComboBox>
-        </StackPanel>
-        
+            <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,12,0,24">
+                <TextBlock VerticalAlignment="Center">TGP Track</TextBlock>
+                <ComboBox VerticalAlignment="Center" Margin="12,0,0,0" Name="uiComboTGPTrack" Width="90"
+                          SelectionChanged="ComboBox_SelectionChanged" Tag="TGPTrack">
+                    <ComboBoxItem>INR</ComboBoxItem>
+                    <ComboBoxItem>Area</ComboBoxItem>
+                    <ComboBoxItem>Point</ComboBoxItem>
+                </ComboBox>
+
+                <TextBlock VerticalAlignment="Center" Margin="36,0,0,0">Active Profile</TextBlock>
+                <ComboBox VerticalAlignment="Center" Margin="12,0,0,0" Name="uiComboActiveProfile" Width="105"
+                          SelectionChanged="ComboBox_SelectionChanged" Tag="ActiveProfile">
+                    <ComboBoxItem>Profile 1</ComboBoxItem>
+                    <ComboBoxItem>Profile 2</ComboBoxItem>
+                    <ComboBoxItem>Profile 3</ComboBoxItem>
+                </ComboBox>
+
+                <TextBlock VerticalAlignment="Center" Margin="36,0,0,0">Brightness</TextBlock>
+                <ComboBox VerticalAlignment="Center" Margin="12,0,0,0" Name="uiComboBrightnessSetting" Width="100"
+                          SelectionChanged="ComboBox_SelectionChanged" Tag="BrightnessSetting">
+                    <ComboBoxItem>Default</ComboBoxItem>
+                    <ComboBoxItem>Day</ComboBoxItem>
+                    <ComboBoxItem>Night</ComboBoxItem>
+                </ComboBox>
+            </StackPanel>
+        </Grid>
+
         <!--
         ===============================================================================================================
         row 3: link / reset
         ===============================================================================================================
         -->
-        <Grid Grid.Row="3" Margin="12,12,12,12">
+        <Grid Grid.Row="4" Margin="12,12,12,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
