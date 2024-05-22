@@ -130,7 +130,6 @@ namespace JAFDTC.Models.A10C.DSMS
         }
         private Dictionary<int, MunitionSettings> _munitionSettingMap;
 
-        public bool IsProfileOrderEnabled { get; set; }
         public List<int> ProfileOrder { get; set; }
 
         // ---- synthesized properties
@@ -160,7 +159,7 @@ namespace JAFDTC.Models.A10C.DSMS
         public bool IsLaserCodeDefault => string.IsNullOrEmpty(LaserCode) || LaserCode == ExplicitDefaults.LaserCode;
 
         [JsonIgnore]
-        public bool IsProfileOrderDefault => ProfileOrder == null || ProfileOrder.Count == 0 || IsProfileOrderEnabled == false;
+        public bool IsProfileOrderDefault => ProfileOrder == null || ProfileOrder.Count == 0;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -177,7 +176,6 @@ namespace JAFDTC.Models.A10C.DSMS
         {
             LaserCode = other.LaserCode;
             _munitionSettingMap = other._munitionSettingMap;
-            IsProfileOrderEnabled = other.IsProfileOrderEnabled;
             ProfileOrder = other.ProfileOrder;
         }
 
@@ -237,7 +235,6 @@ namespace JAFDTC.Models.A10C.DSMS
             LaserCode = "";
             _munitionSettingMap = new Dictionary<int, MunitionSettings>();
             ProfileOrder = null;
-            IsProfileOrderEnabled = false;
         }
 
         internal void FixupMunitionReferences()

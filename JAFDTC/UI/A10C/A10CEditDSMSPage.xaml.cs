@@ -38,6 +38,19 @@ namespace JAFDTC.UI.A10C
     /// </summary>
     public sealed partial class A10CEditDSMSPage : Page
     {
+        internal class DSMSEditorNavArgs
+        {
+            internal ConfigEditorPageNavArgs NavArgs { get; }
+            internal A10CEditDSMSPage ParentPage { get; }
+
+            internal DSMSEditorNavArgs(ConfigEditorPageNavArgs navArgs, A10CEditDSMSPage parentPage)
+            {
+                NavArgs = navArgs;
+                ParentPage = parentPage;
+            }
+        }
+
+        private DSMSEditorNavArgs _dsmsEditorNavArgs;
         private ConfigEditorPageNavArgs _navArgs;
         private A10CConfiguration _config;
 
@@ -58,9 +71,9 @@ namespace JAFDTC.UI.A10C
         private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
             if (ReferenceEquals(args.SelectedItem, uiMunitionTab))
-                DSMSContentFrame.Navigate(typeof(A10CEditDSMSMunitionSettingsPage), _navArgs);
+                DSMSContentFrame.Navigate(typeof(A10CEditDSMSMunitionSettingsPage), _dsmsEditorNavArgs);
             else if (ReferenceEquals(args.SelectedItem, uiProfileTab))
-                DSMSContentFrame.Navigate(typeof(A10CEditDSMSProfileOrderPage), _navArgs);
+                DSMSContentFrame.Navigate(typeof(A10CEditDSMSProfileOrderPage), _dsmsEditorNavArgs);
             else
                 throw new ApplicationException("Unexpected NavigationViewItem type");
         }
@@ -111,6 +124,7 @@ namespace JAFDTC.UI.A10C
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             _navArgs = (ConfigEditorPageNavArgs)args.Parameter;
+            _dsmsEditorNavArgs = new DSMSEditorNavArgs(_navArgs, this);
             _config = (A10CConfiguration)_navArgs.Config;
 
             Utilities.BuildSystemLinkLists(_navArgs.UIDtoConfigMap, _config.UID, DSMSSystem.SystemTag,

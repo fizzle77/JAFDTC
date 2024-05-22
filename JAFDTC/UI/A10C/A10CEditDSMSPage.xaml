@@ -22,7 +22,6 @@ https://www.gnu.org/licenses/.
     x:Class="JAFDTC.UI.A10C.A10CEditDSMSPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:JAFDTC.Models.A10C"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -47,7 +46,7 @@ https://www.gnu.org/licenses/.
             </Grid.ColumnDefinitions>
 
             <!-- DSMS Content Frame -->
-            <Frame x:Name="DSMSContentFrame" Grid.Row="0" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left" />
+            <Frame x:Name="DSMSContentFrame" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Top" />
 
             <!--
             ===============================================================================================================
