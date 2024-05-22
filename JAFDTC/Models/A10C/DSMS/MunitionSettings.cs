@@ -176,7 +176,30 @@ namespace JAFDTC.Models.A10C.DSMS
         [JsonIgnore]
         public bool IsLaseSecondsDefault => string.IsNullOrEmpty(LaseSeconds) || LaseSeconds == ExplicitDefaults.LaseSeconds;
         [JsonIgnore]
-        public bool IsDeliveryModeDefault => string.IsNullOrEmpty(DeliveryMode) || DeliveryMode == ExplicitDefaults.DeliveryMode || DeliveryMode == "-1";
+        public bool IsDeliveryModeDefault 
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(DeliveryMode) || DeliveryMode == "-1")
+                    return true;
+                if (_munition == null)
+                    return true;
+                if (_munition.CCIP ^ _munition.CCRP)
+                {
+                    // For the weapons that only allow one of CCIP or CCRP, ensure the one they allow is treated as default.
+                    if (_munition.CCIP && DeliveryMode == ((int)DeliveryModes.CCIP).ToString())
+                        return true;
+                    if (_munition.CCRP && DeliveryMode == ((int)DeliveryModes.CCRP).ToString())
+                        return true;
+                }
+                else
+                {
+                    // For weapons that support both, CCIP is the default, specified in ExplicitDefaults.
+                    return DeliveryMode == ExplicitDefaults.DeliveryMode;
+                }
+                return false;
+            }
+        }
         [JsonIgnore]
         public bool IsEscapeManeuverDefault => string.IsNullOrEmpty(EscapeManeuver) || EscapeManeuver == ExplicitDefaults.EscapeManeuver || EscapeManeuver == "-1";
         [JsonIgnore]
