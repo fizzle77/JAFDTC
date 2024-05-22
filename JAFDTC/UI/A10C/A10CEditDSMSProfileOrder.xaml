@@ -42,12 +42,20 @@ https://www.gnu.org/licenses/.
             SelectionMode="None" AllowDrop="True" CanReorderItems="True" DragItemsCompleted="uiListProfiles_DragItemsCompleted">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:A10CMunition">
-                    <StackPanel Orientation="Horizontal" Height="48">
-                        <Image Margin="0,4,0,4" Source="{x:Bind ImageFullPath}" VerticalAlignment="Center"/>
-                        <TextBlock Text="{x:Bind Profile}" VerticalAlignment="Center" 
-                            Style="{ThemeResource EditorParamStaticTextBlockStyle}" 
-                            Margin="6,0,0,0" />
-                    </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/> <!-- Always empty here, but matching the layout on the munition settings tab. -->
+                            <ColumnDefinition Width="48"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="48"/>
+                        </Grid.RowDefinitions>
+                        <Image Grid.Column="1" Margin="0,4,0,4" Source="{x:Bind ImageFullPath}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="{x:Bind Profile}" VerticalAlignment="Center" 
+                                   Style="{ThemeResource EditorParamStaticTextBlockStyle}" 
+                                   Margin="6,0,0,0" />
+                    </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

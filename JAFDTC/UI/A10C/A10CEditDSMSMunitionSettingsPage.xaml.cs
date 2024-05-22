@@ -164,6 +164,8 @@ namespace JAFDTC.UI.A10C
                 uiLabelFuse.Visibility = fuzeVisible;
                 uiComboFuze.Visibility = fuzeVisible;
 
+                UpdateNonDefaultMunitionIcons();
+
                 MunitionSettings newSettings = _editState.GetMunitionSettings(selectedMunition);
                 newSettings.ErrorsChanged += BaseField_DataValidationError;
                 newSettings.PropertyChanged += BaseField_PropertyChanged;
@@ -230,6 +232,22 @@ namespace JAFDTC.UI.A10C
         {
             selectedMunition = (A10CMunition)uiComboMunition.SelectedItem;
             return selectedMunition != null;
+        }
+
+        private void UpdateNonDefaultMunitionIcons()
+        {
+            foreach (A10CMunition munition in uiComboMunition.Items)
+            {
+                UIElement container = (UIElement)uiComboMunition.ContainerFromItem(munition);
+                FontIcon icon = Utilities.FindControl<FontIcon>(container, typeof(FontIcon), "icon");
+                if (icon != null)
+                {
+                    if (_config.DSMS.GetMunitionSettings(munition).IsDefault)
+                        icon.Visibility = Visibility.Collapsed;
+                    else
+                        icon.Visibility = Visibility.Visible;
+                }
+            }
         }
 
         // ---- event handlers -------------------------------------------------------------------------------------------
