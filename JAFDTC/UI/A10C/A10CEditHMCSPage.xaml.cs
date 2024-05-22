@@ -10,8 +10,8 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq.Expressions;
 using System.Reflection;
+using Windows.Networking.NetworkOperators;
 
 namespace JAFDTC.UI.A10C
 {
@@ -29,14 +29,15 @@ namespace JAFDTC.UI.A10C
         private ConfigEditorPageNavArgs _navArgs;
         private A10CConfiguration _config;
 
+        // For configuration linking UI.
         private readonly Dictionary<string, string> _configNameToUID= new Dictionary<string, string>();
         private readonly List<string> _configNameList = new List<string>();
 
         private bool _isUIUpdatePending = false;
         private HMCSSystem _editState;
+
         private readonly Brush _defaultBorderBrush;
         private readonly Brush _defaultBkgndBrush;
-
 
         public static ConfigEditorPageInfo PageInfo
             => new(HMCSSystem.SystemTag, "HMCS", "HMCS", Glyphs.HMCS, typeof(A10CEditHMCSPage));
@@ -87,6 +88,15 @@ namespace JAFDTC.UI.A10C
             CopyAllSettings(editStateProfileSettings, SettingLocation.Config, SettingLocation.Edit);
         }
 
+
+        /// <summary>
+        /// Iterate over all the settings controls via PageComboBoxes and PageTextBoxes.
+        /// For each control, get the corresponding property and copy its value from source to destination.
+        /// </summary>
+        /// <param name="editStateProfileSettings">The currently select profile's edit state.</param>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <exception cref="ArgumentException"></exception>
         private void CopyAllSettings(HMCSProfileSettings editStateProfileSettings, SettingLocation source, SettingLocation destination)
         {
             if (source == destination)
@@ -94,7 +104,7 @@ namespace JAFDTC.UI.A10C
             
             // ComboBox settings may be in the top-level HMCS config or the individual
             // profiles settings, so we check for each one.
-            foreach (var kv in GetPageComboBoxes())
+            foreach (var kv in PageComboBoxes)
             {
                 string propName = kv.Key;
                 ComboBox comboBox = kv.Value;
@@ -125,11 +135,14 @@ namespace JAFDTC.UI.A10C
                 profileSrc = _config.HMCS.GetProfileSettings(editStateProfileSettings.Profile);
                 profileDest = editStateProfileSettings;
             }
-            foreach (string propertyName in GetPageTextBoxes().Keys)
+            foreach (string propertyName in PageTextBoxes.Keys)
                 CopyProperty(propertyName, profileSrc, profileDest);
         }
 
-        private void CopyProperty(string propertyName, object source, object dest)
+        /// <summary>
+        /// Find propertyName on source and copy its value to dest.
+        /// </summary>
+        private void CopyProperty(string propertyName, BindableObject source, BindableObject dest)
         {
             PropertyInfo propInfo;
             if (source is HMCSSystem)
@@ -139,9 +152,12 @@ namespace JAFDTC.UI.A10C
             propInfo.SetValue(dest, propInfo.GetValue(source));
         }
 
+        /// <summary>
+        /// If there is a valid selection for the current profile to edit, set selectedProfileEditState and return true.
+        /// </summary>
         private bool IsProfileSelectionValid(out HMCSProfileSettings selectedProfileEditState)
         {
-            Grid g = (Grid)uiComboProfile.SelectedItem;
+            Grid g = (Grid)uiComboEditProfile.SelectedItem;
             if (g == null)
                 selectedProfileEditState = null;
             else
@@ -150,44 +166,54 @@ namespace JAFDTC.UI.A10C
         }
 
         /// <summary>
-        /// Returns all the TextBox controls on this page, indexed by corresponding property name.
+        /// Lazy load and return all the TextBox controls on this page having a Tag set.
+        /// By convention, the tags are all property names. Keys in the returned dictionary
+        /// are property names.
         /// </summary>
-        private Dictionary<string, TextBox> GetPageTextBoxes()
+        private Dictionary<string, TextBox> PageTextBoxes
         {
-            if (_pageTextBoxes == null || _pageTextBoxes.Count == 0)
+            get
             {
-                var allTextBoxes = new List<TextBox>();
-                Utilities.FindChildren(allTextBoxes, this);
-
-                _pageTextBoxes = new Dictionary<string, TextBox>(allTextBoxes.Count);
-                foreach ( var textBox in allTextBoxes )
+                if (_pageTextBoxes == null || _pageTextBoxes.Count == 0)
                 {
-                    if (textBox.Tag != null)
-                    _pageTextBoxes[textBox.Tag.ToString()] = textBox;
+                    var allTextBoxes = new List<TextBox>();
+                    Utilities.FindChildren(allTextBoxes, this);
+
+                    _pageTextBoxes = new Dictionary<string, TextBox>(allTextBoxes.Count);
+                    foreach (var textBox in allTextBoxes)
+                    {
+                        if (textBox.Tag != null)
+                            _pageTextBoxes[textBox.Tag.ToString()] = textBox;
+                    }
                 }
+                return _pageTextBoxes;
             }
-            return _pageTextBoxes;
         }
         private Dictionary<string, TextBox> _pageTextBoxes;
 
         /// <summary>
-        /// Returns all the ComboBox controls on this page, indexed by corresponding property name.
+        /// Lazy load and return all the ComboBox controls on this page having a Tag set.
+        /// By convention, the tags are all property names. Keys in the returned dictionary
+        /// are property names.
         /// </summary>
-        private Dictionary<string, ComboBox> GetPageComboBoxes()
+        private Dictionary<string, ComboBox> PageComboBoxes
         {
-            if (_pageComboBoxes == null || _pageComboBoxes.Count == 0)
+            get
             {
-                var allComboBoxes = new List<ComboBox>();
-                Utilities.FindChildren(allComboBoxes, this);
-
-                _pageComboBoxes = new Dictionary<string, ComboBox>(allComboBoxes.Count);
-                foreach (var comboBox in allComboBoxes)
+                if (_pageComboBoxes == null || _pageComboBoxes.Count == 0)
                 {
-                    if (comboBox.Tag != null)
-                        _pageComboBoxes[comboBox.Tag.ToString()] = comboBox;
+                    var allComboBoxes = new List<ComboBox>();
+                    Utilities.FindChildren(allComboBoxes, this);
+
+                    _pageComboBoxes = new Dictionary<string, ComboBox>(allComboBoxes.Count);
+                    foreach (var comboBox in allComboBoxes)
+                    {
+                        if (comboBox.Tag != null)
+                            _pageComboBoxes[comboBox.Tag.ToString()] = comboBox;
+                    }
                 }
+                return _pageComboBoxes;
             }
-            return _pageComboBoxes;
         }
         private Dictionary<string, ComboBox> _pageComboBoxes;
 
@@ -201,14 +227,14 @@ namespace JAFDTC.UI.A10C
             {
                 bool isNotLinked = string.IsNullOrEmpty(_config.SystemLinkedTo(HMCSSystem.SystemTag));
 
-                foreach (var comboBox in GetPageComboBoxes().Values)
+                foreach (var comboBox in PageComboBoxes.Values)
                 {
                     GetControlEditStateProperty(comboBox, out PropertyInfo property, out BindableObject editState);
                     if (editState != null)
                         Utilities.SetComboEnabledAndSelection(comboBox, isNotLinked, true, int.Parse(property.GetValue(editState).ToString()));
                 }
 
-                foreach (var textBox in GetPageTextBoxes().Values)
+                foreach (var textBox in PageTextBoxes.Values)
                 {
                     GetControlEditStateProperty(textBox, out PropertyInfo property, out BindableObject editState);
                     if (editState != null)
@@ -225,41 +251,50 @@ namespace JAFDTC.UI.A10C
             });
         }
 
+        /// <summary>
+        /// Find and return the property on the edit state object corresponding to the provided control.
+        /// </summary>
         private void GetControlEditStateProperty(FrameworkElement control, out PropertyInfo property, out BindableObject editState)
+        {
+            GetControlPropertyHelper(SettingLocation.Edit, control, out property, out editState);
+        }
+
+        /// <summary>
+        /// Find and return the property on the persisted configuration object corresponding to the provided control.
+        /// </summary>
+        private void GetControlConfigProperty(FrameworkElement control, out PropertyInfo property, out BindableObject config)
+        {
+            GetControlPropertyHelper(SettingLocation.Config, control, out property, out config);
+        }
+
+        private void GetControlPropertyHelper(SettingLocation settingLocation, FrameworkElement control, 
+            out PropertyInfo property, out BindableObject configOrEdit)
         {
             string propName = control.Tag.ToString();
 
             property = typeof(HMCSSystem).GetProperty(propName);
-            editState = _editState;
+            if (settingLocation == SettingLocation.Edit)
+                configOrEdit = _editState;
+            else
+                configOrEdit = _config.HMCS;
             if (property == null)
             {
                 property = typeof(HMCSProfileSettings).GetProperty(propName);
                 if (IsProfileSelectionValid(out HMCSProfileSettings profileSettingsEditState))
-                    editState = profileSettingsEditState;
+                {
+                    if (settingLocation == SettingLocation.Edit)
+                        configOrEdit = profileSettingsEditState;
+                    else
+                        configOrEdit = _config.HMCS.GetProfileSettings(profileSettingsEditState.Profile);
+                }
                 else
-                    editState = null;
-            }
-        }
-
-        private void GetControlConfigProperty(FrameworkElement control, out PropertyInfo property, out BindableObject config)
-        {
-            string propName = control.Tag.ToString();
-
-            property = typeof(HMCSSystem).GetProperty(propName);
-            config = _config.HMCS;
-            if (property == null)
-            {
-                property = typeof(HMCSProfileSettings).GetProperty(propName);
-                if (IsProfileSelectionValid(out HMCSProfileSettings profileSettings))
-                    config = _config.HMCS.GetProfileSettings(profileSettings.Profile);
-                else
-                    config = null;
+                    configOrEdit = null;
             }
         }
 
         // ---- control event handlers --------------------------------------------------------------------------------
 
-        private void uiComboProfile_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void uiComboEditProfile_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.RemovedItems.Count > 0)
             {
@@ -269,7 +304,7 @@ namespace JAFDTC.UI.A10C
                     oldSettings.ErrorsChanged -= BaseField_DataValidationError;
                     oldSettings.PropertyChanged -= BaseField_PropertyChanged;
                     
-                    // BindableObject remembers errors but not the value that caused them. So changing the profile
+                    // BindableObject remembers errors but not the value that caused them. So changing this
                     // back to a profile with an error, you get a red box on a good value. Clearing the error
                     // state is far from ideal, but slightly less mysterious user behavior.
                     oldSettings.ClearErrors();
@@ -290,7 +325,7 @@ namespace JAFDTC.UI.A10C
                 }
             }
 
-            switch (uiComboProfile.SelectedIndex)
+            switch (uiComboEditProfile.SelectedIndex)
             {
                 case 0:
                     uiButtonPrev.IsEnabled = false;
@@ -309,14 +344,18 @@ namespace JAFDTC.UI.A10C
 
         private void uiButtonNext_Click(object sender, RoutedEventArgs e)
         {
-            uiComboProfile.SelectedIndex++;
+            uiComboEditProfile.SelectedIndex++;
         }
 
         private void uiButtonPrev_Click(object sender, RoutedEventArgs e)
         {
-            uiComboProfile.SelectedIndex--;
+            uiComboEditProfile.SelectedIndex--;
         }
 
+        /// <summary>
+        /// Change handler for all of the ComboBoxes that manage a setting.
+        /// Sets the corresponding edit state property value and updates the underlying config.
+        /// </summary>
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox comboBox = (ComboBox)sender;
@@ -328,6 +367,10 @@ namespace JAFDTC.UI.A10C
             SaveEditStateToConfig();
         }
 
+        /// <summary>
+        /// Change handler for all of the TextBoxes that manage a setting.
+        /// Sets the corresponding edit state property value and updates the underlying config.
+        /// </summary>
         private void TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             TextBox textBox = (TextBox)sender;
@@ -339,6 +382,12 @@ namespace JAFDTC.UI.A10C
             SaveEditStateToConfig();
         }
 
+        /// <summary>
+        /// A UX nicety: highlight the whole value in a TextBox when it
+        /// gets focus such that the new value can immediately be entered.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             TextBox textBox = (TextBox)sender;
@@ -363,13 +412,13 @@ namespace JAFDTC.UI.A10C
         private void ValidateEditState(BindableObject editState, string propertyName)
         {
             List<string> errors = (List<string>)editState.GetErrors(propertyName);
-            if (GetPageTextBoxes().ContainsKey(propertyName))
-                SetFieldValidVisualState(GetPageTextBoxes()[propertyName], (errors.Count == 0));
+            if (PageTextBoxes.ContainsKey(propertyName))
+                SetFieldValidVisualState(PageTextBoxes[propertyName], (errors.Count == 0));
         }
 
         private void ValidateAllFields()
         {
-            foreach (var kv in GetPageTextBoxes())
+            foreach (var kv in PageTextBoxes)
             {
                 string propName = kv.Key;
                 TextBox textBox = kv.Value;
@@ -440,8 +489,32 @@ namespace JAFDTC.UI.A10C
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            if (uiComboProfile.SelectedIndex < 0)
-                uiComboProfile.SelectedIndex = 0;
+            // This needs to be done here, not OnNavigatedTo, so that the visual tree is fully built
+            // such that PageComboBoxes and PageTextBoxes finds things.
+            if (uiComboEditProfile.SelectedIndex < 0)
+                uiComboEditProfile.SelectedIndex = 0;
+
+            // Leaving this here as a breadcrumb...
+            //
+            // The default ComboBox width behavior is so bad. Setting width to Auto has them resize based on the current selection, 
+            // resulting in "wiggle" of surrounding elements. Setting a fixed size resolves this, but if people have increased their
+            // default font size, or if you're running on Win 10 vs. 11, there isn't a single fixed size that's appropriate.
+            // This seems like it should work, but generally gives a width that's ~20% too big and text inside the ComboBox gets
+            // aligned to the far left and looks bad. I wonder if it needs to be done at a different time during load or layout?
+            // Unsure and I've spent way too much time on this. *SHRUG*
+
+            //foreach (ComboBox comboBox in GetPageComboBoxes().Values)
+            //{
+            //    double width = 0;
+            //    foreach (ComboBoxItem item in comboBox.Items)
+            //    {
+            //        item.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            //        if (item.DesiredSize.Width > width)
+            //            width = item.DesiredSize.Width;
+            //    }
+            //    comboBox.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            //    comboBox.Width = comboBox.DesiredSize.Width + width;
+            //}
         }
 
         private void UpdateLinkControls()

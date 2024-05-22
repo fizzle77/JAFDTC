@@ -22,16 +22,22 @@
             <Setter Property="MaxLength" Value="3" />
             <Setter Property="PlaceholderText" Value="50" />
         </Style>
+        <Style x:Key="ComboBase" BasedOn="{StaticResource Base}" TargetType="ComboBox">
+            <Setter Property="Width" Value="90"/>
+        </Style>
         <Style x:Key="TextBase" BasedOn="{StaticResource Base}" TargetType="TextBlock">
             <Setter Property="HorizontalAlignment" Value="Left"/>
         </Style>
         <Style x:Key="TopRowBase" BasedOn="{StaticResource Base}" TargetType="FrameworkElement">
             <Setter Property="Margin" Value="12,0,0,0"/>
         </Style>
+        <Style x:Key="TopRowCombo" BasedOn="{StaticResource TopRowBase}" TargetType="ComboBox">
+            <Setter Property="Width" Value="90"/>
+        </Style>
         <Style x:Key="TopRowText" BasedOn="{StaticResource TopRowBase}" TargetType="TextBlock">
             <Setter Property="HorizontalAlignment" Value="Left"/>
         </Style>
-        <Style x:Key="ComboIndented" BasedOn="{StaticResource Base}" TargetType="ComboBox">
+        <Style x:Key="ComboIndented" BasedOn="{StaticResource ComboBase}" TargetType="ComboBox">
             <Setter Property="Margin" Value="12,6,0,0"/>
         </Style>
         <Style x:Key="ValueIndented" BasedOn="{StaticResource ValueBase}" TargetType="TextBox">
@@ -62,11 +68,10 @@
         row 0 : profile editor selection
         ===============================================================================================================
         -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal"
-                    VerticalAlignment="Center">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
             <ComboBox Margin="24,0,0,0" Width="200"
-                      x:Name="uiComboProfile"
-                      SelectionChanged="uiComboProfile_SelectionChanged"
+                      x:Name="uiComboEditProfile"
+                      SelectionChanged="uiComboEditProfile_SelectionChanged"
                       VerticalAlignment="Center"
                       ToolTipService.ToolTip="Selects HMCS profile to edit">
                 <ComboBox.Items>
@@ -129,23 +134,6 @@
                     Click="uiButtonNext_Click">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
             </Button>
-
-            <TextBlock VerticalAlignment="Center" Margin="36,0,0,0">TGP Track</TextBlock>
-            <ComboBox VerticalAlignment="Center" Margin="12,0,0,0" Width="75" Name="uiComboTGPTrack"
-                      SelectionChanged="ComboBox_SelectionChanged" Tag="TGPTrack">
-                <ComboBoxItem>INR</ComboBoxItem>
-                <ComboBoxItem>Area</ComboBoxItem>
-                <ComboBoxItem>Point</ComboBoxItem>
-            </ComboBox>
-
-            <TextBlock VerticalAlignment="Center" Margin="18,0,0,0">Active Profile</TextBlock>
-            <ComboBox VerticalAlignment="Center" Margin="12,0,0,0" Name="uiComboActiveProfile"
-                      SelectionChanged="ComboBox_SelectionChanged" Tag="ActiveProfile">
-                <ComboBoxItem>Profile 1</ComboBoxItem>
-                <ComboBoxItem>Profile 2</ComboBoxItem>
-                <ComboBoxItem>Profile 3</ComboBoxItem>
-            </ComboBox>
-
         </StackPanel>
 
         <!--
@@ -154,7 +142,7 @@
         ===============================================================================================================
         -->
         <ScrollView Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" 
-                    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush }" Margin="0,12,0,18"
+                    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush }" Margin="0,12,0,24"
                     Name="uiSettingsScrollView">
             <Grid Name="uiSettingsGrid">
                 <Grid.ColumnDefinitions>
@@ -184,7 +172,7 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource TopRowText}">Crosshair</TextBlock>
-                <ComboBox Grid.Row="0" Grid.Column="1" Style="{StaticResource TopRowBase}" Name="uiComboCrosshair"
+                <ComboBox Grid.Row="0" Grid.Column="1" Style="{StaticResource TopRowCombo}" Name="uiComboCrosshair"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="Crosshair">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -192,7 +180,7 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource TextBase}">Own SPI</TextBlock>
-                <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource Base}" Name="uiComboOwnSPI"
+                <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboOwnSPI"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="OwnSPI">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -208,7 +196,7 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource TextBase}">Horizon Line</TextBlock>
-                <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource Base}" Name="uiComboHorizonLine"
+                <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboHorizonLine"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="HorizonLine">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>NORM</ComboBoxItem>
@@ -216,7 +204,7 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource TextBase}">HDC</TextBlock>
-                <ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource Base}" Name="uiComboHDC"
+                <ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboHDC"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="HDC">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -224,7 +212,7 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource TextBase}">Hookship</TextBlock>
-                <ComboBox Grid.Row="5" Grid.Column="1" Style="{StaticResource Base}" Name="uiComboHookship"
+                <ComboBox Grid.Row="5" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboHookship"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="Hookship">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -232,7 +220,7 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource TextBase}">TGP Diamond</TextBlock>
-                <ComboBox Grid.Row="6" Grid.Column="1" Style="{StaticResource Base}" Name="uiComboTGPDiamond"
+                <ComboBox Grid.Row="6" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboTGPDiamond"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="TGPDiamond">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -248,7 +236,7 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="8" Grid.Column="0" Style="{StaticResource TextBase}">Flight Members</TextBlock>
-                <ComboBox Grid.Row="8" Grid.Column="1" Style="{StaticResource Base}" Name="uiComboFlightMembers"
+                <ComboBox Grid.Row="8" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboFlightMembers"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="FlightMembers">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -268,7 +256,7 @@
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="FMSPIRange"/>
 
                 <TextBlock Grid.Row="10" Grid.Column="0" Style="{StaticResource TextBase}">Donor Air PPLI</TextBlock>
-                <ComboBox Grid.Row="10" Grid.Column="1" Style="{StaticResource Base}" Name="uiComboDonorAirPPLI"
+                <ComboBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboDonorAirPPLI"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="DonorAirPPLI">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -288,7 +276,7 @@
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="DonorSPIRange"/>
 
                 <TextBlock Grid.Row="12" Grid.Column="0" Style="{StaticResource TextBase}">Current MA</TextBlock>
-                <ComboBox Grid.Row="12" Grid.Column="1" Style="{StaticResource Base}" Name="uiComboCurrentMA"
+                <ComboBox Grid.Row="12" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboCurrentMA"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="CurrentMA">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -298,7 +286,7 @@
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="CurrentMARange"/>
 
                 <TextBlock Grid.Row="0" Grid.Column="4" Style="{StaticResource TopRowText}">Air Environment</TextBlock>
-                <ComboBox Grid.Row="0" Grid.Column="5" Style="{StaticResource TopRowBase}" Name="uiComboAirEnvir"
+                <ComboBox Grid.Row="0" Grid.Column="5" Style="{StaticResource TopRowCombo}" Name="uiComboAirEnvir"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="AirEnvir">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -316,7 +304,7 @@
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="AirPPLINonDonorRange"/>
 
                 <TextBlock Grid.Row="2" Grid.Column="4" Style="{StaticResource TextBase}">Ground Environment</TextBlock>
-                <ComboBox Grid.Row="2" Grid.Column="5" Style="{StaticResource Base}" Name="uiComboGndEnvironment"
+                <ComboBox Grid.Row="2" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboGndEnvironment"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="GndEnvir">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -334,7 +322,7 @@
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="GndVMFFriendRange"/>
 
                 <TextBlock Grid.Row="4" Grid.Column="4" Style="{StaticResource TextBase}">Steerpoint</TextBlock>
-                <ComboBox Grid.Row="4" Grid.Column="5" Style="{StaticResource Base}" Name="uiComboSteerpoint"
+                <ComboBox Grid.Row="4" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboSteerpoint"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="Steerpoint">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -344,7 +332,7 @@
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="SteerpointRange"/>
 
                 <TextBlock Grid.Row="5" Grid.Column="4" Style="{StaticResource TextBase}">Mission/Markpoints</TextBlock>
-                <ComboBox Grid.Row="5" Grid.Column="5" Style="{StaticResource Base}" Name="uiComboMsnMarkpoints"
+                <ComboBox Grid.Row="5" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboMsnMarkpoints"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="MsnMarkpoints">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -354,7 +342,7 @@
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="MsnMarkpointsRange"/>
 
                 <TextBlock Grid.Row="6" Grid.Column="4" Style="{StaticResource TextBase}">Mission/Mark Labels</TextBlock>
-                <ComboBox Grid.Row="6" Grid.Column="5" Style="{StaticResource Base}" Name="uiComboMsnMarkLabels"
+                <ComboBox Grid.Row="6" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboMsnMarkLabels"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="MsnMarkLabels">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -362,7 +350,7 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="7" Grid.Column="4" Style="{StaticResource TextBase}">Airspeed</TextBlock>
-                <ComboBox Grid.Row="7" Grid.Column="5" Style="{StaticResource Base}" Name="uiComboAirspeed"
+                <ComboBox Grid.Row="7" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboAirspeed"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="Airspeed">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -370,7 +358,7 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="8" Grid.Column="4" Style="{StaticResource TextBase}">Radar Altitude</TextBlock>
-                <ComboBox Grid.Row="8" Grid.Column="5" Style="{StaticResource Base}" Name="uiComboRadarAltitude"
+                <ComboBox Grid.Row="8" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboRadarAltitude"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="RadarAltitude">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -378,7 +366,7 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="9" Grid.Column="4" Style="{StaticResource TextBase}">Baro Altitude</TextBlock>
-                <ComboBox Grid.Row="9" Grid.Column="5" Style="{StaticResource Base}" Name="uiComboBaroAltitude"
+                <ComboBox Grid.Row="9" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboBaroAltitude"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="BaroAltitude">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -386,7 +374,7 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="10" Grid.Column="4" Style="{StaticResource TextBase}">AC Heading</TextBlock>
-                <ComboBox Grid.Row="10" Grid.Column="5" Style="{StaticResource Base}" Name="uiComboACHeading"
+                <ComboBox Grid.Row="10" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboACHeading"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="ACHeading">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -394,7 +382,7 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="11" Grid.Column="4" Style="{StaticResource TextBase}">Helmet Heading</TextBlock>
-                <ComboBox Grid.Row="11" Grid.Column="5" Style="{StaticResource Base}" Name="uiComboHelmetHeading"
+                <ComboBox Grid.Row="11" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboHelmetHeading"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="HelmetHeading">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -402,7 +390,7 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="12" Grid.Column="4" Style="{StaticResource TextBase}">HMD Elev Lines</TextBlock>
-                <ComboBox Grid.Row="12" Grid.Column="5" Style="{StaticResource Base}" Name="uiComboHMDElevLines"
+                <ComboBox Grid.Row="12" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboHMDElevLines"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="HMDElevLines">
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -413,7 +401,39 @@
 
         <!--
         ===============================================================================================================
-        link / reset
+        row 2 : common HMCS settings
+        ===============================================================================================================
+        -->
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,12,0,24">
+            <TextBlock VerticalAlignment="Center">TGP Track</TextBlock>
+            <ComboBox VerticalAlignment="Center" Margin="12,0,0,0" Name="uiComboTGPTrack" Width="90"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="TGPTrack">
+                <ComboBoxItem>INR</ComboBoxItem>
+                <ComboBoxItem>Area</ComboBoxItem>
+                <ComboBoxItem>Point</ComboBoxItem>
+            </ComboBox>
+
+            <TextBlock VerticalAlignment="Center" Margin="36,0,0,0">Active Profile</TextBlock>
+            <ComboBox VerticalAlignment="Center" Margin="12,0,0,0" Name="uiComboActiveProfile" Width="105"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="ActiveProfile">
+                <ComboBoxItem>Profile 1</ComboBoxItem>
+                <ComboBoxItem>Profile 2</ComboBoxItem>
+                <ComboBoxItem>Profile 3</ComboBoxItem>
+            </ComboBox>
+
+            <TextBlock VerticalAlignment="Center" Margin="36,0,0,0">Brightness</TextBlock>
+            <ComboBox VerticalAlignment="Center" Margin="12,0,0,0" Name="uiComboBrightnessSetting" Width="100"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="BrightnessSetting">
+                <ComboBoxItem>Default</ComboBoxItem>
+                <ComboBoxItem>Day</ComboBoxItem>
+                <ComboBoxItem>Night</ComboBoxItem>
+            </ComboBox>
+        </StackPanel>
+        
+        <!--
+        ===============================================================================================================
+        row 3: link / reset
         ===============================================================================================================
         -->
         <Grid Grid.Row="3" Margin="12,12,12,12">
