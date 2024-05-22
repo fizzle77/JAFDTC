@@ -30,9 +30,41 @@ https://www.gnu.org/licenses/.
     <NavigationView PaneDisplayMode="Top" IsSettingsVisible="False" IsBackButtonVisible="Collapsed"
                     SelectionChanged="NavigationView_SelectionChanged">
         <NavigationView.MenuItems>
-            <NavigationViewItem x:Name="uiMunitionTab" Content="Munition Settings" IsSelected="True"/>
+            <NavigationViewItem x:Name="uiMunitionTab" IsSelected="True">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <FontIcon Grid.Column="0"
+                                  x:Name="uiIconMunitionTab"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                    <TextBlock Grid.Column="1" Margin="8,0,0,0"
+                                   VerticalAlignment="Center">
+                            Munition Settings
+                    </TextBlock>
+                </Grid>
+            </NavigationViewItem>
             <NavigationViewItemSeparator/>
-            <NavigationViewItem x:Name="uiProfileTab" Content="Profile Order" />
+            <NavigationViewItem x:Name="uiProfileTab">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <FontIcon Grid.Column="0"
+                                  x:Name="uiIconProfileTab"
+                                  VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                    <TextBlock Grid.Column="1" Margin="8,0,0,0"
+                                   VerticalAlignment="Center">
+                            Profile Order
+                    </TextBlock>
+                </Grid>
+            </NavigationViewItem>
         </NavigationView.MenuItems>
 
         <Grid Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush }">

@@ -25,6 +25,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using JAFDTC.Models;
 
 namespace JAFDTC.UI.A10C
 {
@@ -76,6 +77,19 @@ namespace JAFDTC.UI.A10C
                 DSMSContentFrame.Navigate(typeof(A10CEditDSMSProfileOrderPage), _dsmsEditorNavArgs);
             else
                 throw new ApplicationException("Unexpected NavigationViewItem type");
+        }
+
+        private void UpdateNonDefaultIcons() 
+        {
+            if (_config.DSMS.IsLaserCodeDefault && _config.DSMS.AreAllMunitionSettingsDefault)
+                uiIconMunitionTab.Visibility = Visibility.Collapsed;
+            else
+                uiIconMunitionTab.Visibility = Visibility.Visible;
+
+            if (_config.DSMS.IsProfileOrderDefault)
+                uiIconProfileTab.Visibility = Visibility.Collapsed;
+            else
+                uiIconProfileTab.Visibility = Visibility.Visible;
         }
 
         // ---- page settings -----------------------------------------------------------------------------------------
@@ -130,9 +144,23 @@ namespace JAFDTC.UI.A10C
             Utilities.BuildSystemLinkLists(_navArgs.UIDtoConfigMap, _config.UID, DSMSSystem.SystemTag,
                                            _configNameList, _configNameToUID);
 
+            _config.ConfigurationSaved += ConfigurationSavedHandler;
+
+            UpdateNonDefaultIcons();
             UpdateLinkControls();
 
             base.OnNavigatedTo(args);
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            _config.ConfigurationSaved -= ConfigurationSavedHandler;
+            base.OnNavigatedFrom(e);
+        }
+
+        private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
+        {
+            UpdateNonDefaultIcons();
         }
 
         private void UpdateLinkControls()

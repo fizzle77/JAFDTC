@@ -146,12 +146,7 @@ namespace JAFDTC.Models.A10C.DSMS
             {
                 if (!IsLaserCodeDefault || !IsProfileOrderDefault)
                     return false;
-                foreach (MunitionSettings setting in _munitionSettingMap.Values)
-                {
-                    if (!setting.IsDefault)
-                        return false;
-                }
-                return true;
+                return AreAllMunitionSettingsDefault;
             }
         }
 
@@ -160,6 +155,21 @@ namespace JAFDTC.Models.A10C.DSMS
 
         [JsonIgnore]
         public bool IsProfileOrderDefault => ProfileOrder == null || ProfileOrder.Count == 0;
+
+        [JsonIgnore]
+        public bool AreAllMunitionSettingsDefault
+        {
+            get
+            {
+                foreach (MunitionSettings setting in _munitionSettingMap.Values)
+                {
+                    if (!setting.IsDefault)
+                        return false;
+                }
+                return true;
+            }
+        }
+           
 
         // ------------------------------------------------------------------------------------------------------------
         //
