@@ -165,25 +165,25 @@ namespace JAFDTC.Models.A10C.HMCS
             }
         }
 
-        private string _flightMemberSPI;
-        public string FlightMemberSPI
+        private string _fmSPI;
+        public string FMSPI
         {
-            get => _flightMemberSPI;
+            get => _fmSPI;
             set
             {
                 string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
-                SetProperty(ref _flightMemberSPI, value, error);
+                SetProperty(ref _fmSPI, value, error);
             }
         }
 
-        private string _flightMemberSPIRange;
-        public string FlightMemberSPIRange
+        private string _fmSPIRange;
+        public string FMSPIRange
         {
-            get => _flightMemberSPIRange;
+            get => _fmSPIRange;
             set
             {
                 string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 1, 999)) ? null : "Invalid format";
-                SetProperty(ref _flightMemberSPIRange, value, error);
+                SetProperty(ref _fmSPIRange, value, error);
             }
         }
 
@@ -347,14 +347,14 @@ namespace JAFDTC.Models.A10C.HMCS
             }
         }
 
-        private string _steerPointRange;
-        public string SteerPointRange
+        private string _steerpointRange;
+        public string SteerpointRange
         {
-            get => _steerPointRange;
+            get => _steerpointRange;
             set
             {
                 string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 1, 999)) ? null : "Invalid format";
-                SetProperty(ref _steerPointRange, value, error);
+                SetProperty(ref _steerpointRange, value, error);
             }
         }
 
@@ -457,6 +457,13 @@ namespace JAFDTC.Models.A10C.HMCS
             }
         }
 
+        // Mostly here to make JSON de/serialization work.
+        // Name must match JsonConstructor constructor parameter (case insensitive).
+        public Profiles Profile
+        {
+            get => _profile;
+        }
+
         // ---- synthesized properties
 
         [JsonIgnore]
@@ -504,6 +511,8 @@ namespace JAFDTC.Models.A10C.HMCS
 
         [JsonIgnore]
         public bool IsCrosshairDefault => string.IsNullOrEmpty(Crosshair) || Crosshair == GetExplicitDefaults(_profile).Crosshair;
+        [JsonIgnore]
+        public int CrosshairValue => string.IsNullOrEmpty(Crosshair) ? int.Parse(GetExplicitDefaults(_profile).HMDElevLines) : int.Parse(Crosshair);
 
         [JsonIgnore]
         public bool IsOwnSPIDefault => string.IsNullOrEmpty(OwnSPI) || OwnSPI == GetExplicitDefaults(_profile).OwnSPI;
@@ -533,10 +542,10 @@ namespace JAFDTC.Models.A10C.HMCS
         public bool IsFlightMembersRangeDefault => string.IsNullOrEmpty(FlightMembersRange) || FlightMembersRange == GetExplicitDefaults(_profile).FlightMembersRange;
         
         [JsonIgnore]
-        public bool IsFlightMemberSPIDefault => string.IsNullOrEmpty(FlightMemberSPI) || FlightMemberSPI == GetExplicitDefaults(_profile).FlightMemberSPI;
+        public bool IsFlightMemberSPIDefault => string.IsNullOrEmpty(FMSPI) || FMSPI == GetExplicitDefaults(_profile).FMSPI;
         
         [JsonIgnore]
-        public bool IsFlightMemberSPIRangeDefault => string.IsNullOrEmpty(FlightMemberSPIRange) || FlightMemberSPIRange == GetExplicitDefaults(_profile).FlightMemberSPIRange;
+        public bool IsFlightMemberSPIRangeDefault => string.IsNullOrEmpty(FMSPIRange) || FMSPIRange == GetExplicitDefaults(_profile).FMSPIRange;
         
         [JsonIgnore]
         public bool IsDonorAirPPLIDefault => string.IsNullOrEmpty(DonorAirPPLI) || DonorAirPPLI == GetExplicitDefaults(_profile).DonorAirPPLI;
@@ -578,7 +587,7 @@ namespace JAFDTC.Models.A10C.HMCS
         public bool IsSteerPointDefault => string.IsNullOrEmpty(Steerpoint) || Steerpoint == GetExplicitDefaults(_profile).Steerpoint;
         
         [JsonIgnore]
-        public bool IsSteerPointRangeDefault => string.IsNullOrEmpty(SteerPointRange) || SteerPointRange == GetExplicitDefaults(_profile).SteerPointRange;
+        public bool IsSteerPointRangeDefault => string.IsNullOrEmpty(SteerpointRange) || SteerpointRange == GetExplicitDefaults(_profile).SteerpointRange;
         
         [JsonIgnore]
         public bool IsMsnMarkpointsDefault => string.IsNullOrEmpty(MsnMarkpoints) || MsnMarkpoints == GetExplicitDefaults(_profile).MsnMarkpoints;
@@ -606,6 +615,8 @@ namespace JAFDTC.Models.A10C.HMCS
         
         [JsonIgnore]
         public bool IsHMDElevLinesDefault => string.IsNullOrEmpty(HMDElevLines) || HMDElevLines == GetExplicitDefaults(_profile).HMDElevLines;
+        [JsonIgnore]
+        public int HMDElevLinesValue => string.IsNullOrEmpty(HMDElevLines) ? int.Parse(GetExplicitDefaults(_profile).HMDElevLines) : int.Parse(HMDElevLines);
 
         // ---- non-property members
 
@@ -616,7 +627,7 @@ namespace JAFDTC.Models.A10C.HMCS
         // construction
         //
         // ------------------------------------------------------------------------------------------------------------
-
+        [JsonConstructor]
         public HMCSProfileSettings(Profiles profile)
         {
             _profile = profile;
@@ -645,7 +656,8 @@ namespace JAFDTC.Models.A10C.HMCS
                 Profiles.PRO3 => _pro3Defaults,
                 _ => throw new System.ApplicationException("Unexpected profile: " + _profile)
             };
-            CopySettings(sourceSettings, this);
+            if (sourceSettings != null) // static constructor
+                CopySettings(sourceSettings, this);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -687,8 +699,8 @@ namespace JAFDTC.Models.A10C.HMCS
                 TGPFOV = "1",
                 FlightMembers = "1",
                 FlightMembersRange = "50",
-                FlightMemberSPI = "1",
-                FlightMemberSPIRange = "50",
+                FMSPI = "1",
+                FMSPIRange = "50",
                 DonorAirPPLI = "1",
                 DonorAirPPLIRange = "50",
                 DonorSPI = "1",
@@ -702,7 +714,7 @@ namespace JAFDTC.Models.A10C.HMCS
                 GndVMFFriend = "1",
                 GndVMFFriendRange = "50",
                 Steerpoint = "1",
-                SteerPointRange = "50",
+                SteerpointRange = "50",
                 MsnMarkpoints = "1",
                 MsnMarkpointsRange = "50",
                 MsnMarkLabels = "1",
@@ -715,7 +727,7 @@ namespace JAFDTC.Models.A10C.HMCS
             };
 
             _pro2Defaults = (HMCSProfileSettings)_pro1Defaults.Clone();
-            _pro3Defaults._profile = Profiles.PRO2;
+            _pro2Defaults._profile = Profiles.PRO2;
             _pro2Defaults.DonorSPI = "0";
             _pro2Defaults.HMDElevLines = "0";
 
@@ -726,7 +738,7 @@ namespace JAFDTC.Models.A10C.HMCS
             _pro3Defaults.Hookship = "0";
             _pro3Defaults.TGPFOV = "0";
             _pro3Defaults.FlightMembers = "0";
-            _pro3Defaults.FlightMemberSPI = "0";
+            _pro3Defaults.FMSPI = "0";
             _pro3Defaults.DonorAirPPLI = "0";
             _pro3Defaults.DonorSPI = "0";
             _pro3Defaults.CurrentMA = "0";
@@ -748,8 +760,8 @@ namespace JAFDTC.Models.A10C.HMCS
             dest.TGPFOV = src.TGPFOV;
             dest.FlightMembers = src.FlightMembers;
             dest.FlightMembersRange = src.FlightMembersRange;
-            dest.FlightMemberSPI = src.FlightMemberSPI;
-            dest.FlightMemberSPIRange = src.FlightMemberSPIRange;
+            dest.FMSPI = src.FMSPI;
+            dest.FMSPIRange = src.FMSPIRange;
             dest.DonorAirPPLI = src.DonorAirPPLI;
             dest.DonorAirPPLIRange = src.DonorAirPPLIRange;
             dest.DonorSPI = src.DonorSPI;
@@ -763,7 +775,7 @@ namespace JAFDTC.Models.A10C.HMCS
             dest.GndVMFFriend = src.GndVMFFriend;
             dest.GndVMFFriendRange = src.GndVMFFriendRange;
             dest.Steerpoint = src.Steerpoint;
-            dest.SteerPointRange = src.SteerPointRange;
+            dest.SteerpointRange = src.SteerpointRange;
             dest.MsnMarkpoints = src.MsnMarkpoints;
             dest.MsnMarkpointsRange  = src.MsnMarkpointsRange;
             dest.MsnMarkLabels = src.MsnMarkLabels;

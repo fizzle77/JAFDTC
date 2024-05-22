@@ -28,9 +28,9 @@ namespace JAFDTC.Models.A10C.HMCS
     // Defines the available HMCS profiles
     public enum Profiles
     {
-        PRO1 = 1,
-        PRO2 = 2,
-        PRO3 = 3
+        PRO1 = 0,
+        PRO2 = 1,
+        PRO3 = 2
     }
 
     // Defines the TGP track to be set from the HMCS
@@ -68,7 +68,7 @@ namespace JAFDTC.Models.A10C.HMCS
             get => _activeProfile;
             set
             {
-                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 1, 3)) ? null : "Invalid format";
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
                 SetProperty(ref _activeProfile, value, error);
             }
         }
@@ -116,10 +116,13 @@ namespace JAFDTC.Models.A10C.HMCS
                 if (!(IsActiveProfileDefault && IsTGPTrackDefault && IsBrightnessSettingDefault))
                     return false;
 
-                foreach (var profile in ProfileSettingMap.Values)
+                if (ProfileSettingMap != null)
                 {
-                    if (!profile.IsDefault)
-                        return false;
+                    foreach (var profile in ProfileSettingMap.Values)
+                    {
+                        if (!profile.IsDefault)
+                            return false;
+                    }
                 }
                 return true;   
             }
@@ -127,12 +130,18 @@ namespace JAFDTC.Models.A10C.HMCS
 
         [JsonIgnore]
         public bool IsActiveProfileDefault => string.IsNullOrEmpty(ActiveProfile) || ActiveProfile == _explicitDefaults.ActiveProfile;
+        [JsonIgnore]
+        public int ActiveProfileValue => string.IsNullOrEmpty(ActiveProfile) ? int.Parse(_explicitDefaults.ActiveProfile) : int.Parse(ActiveProfile);
 
         [JsonIgnore]
         public bool IsTGPTrackDefault => string.IsNullOrEmpty(TGPTrack) || TGPTrack == _explicitDefaults.TGPTrack;
+        [JsonIgnore]
+        public int TGPTrackValue => string.IsNullOrEmpty(TGPTrack) ? int.Parse(_explicitDefaults.TGPTrack) : int.Parse(TGPTrack);
 
         [JsonIgnore]
         public bool IsBrightnessSettingDefault => string.IsNullOrEmpty(BrightnessSetting) || BrightnessSetting == _explicitDefaults.BrightnessSetting;
+        [JsonIgnore]
+        public int BrightnessSettingValue => string.IsNullOrEmpty(BrightnessSetting) ? int.Parse(_explicitDefaults.BrightnessSetting) : int.Parse(BrightnessSetting);
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -164,9 +173,17 @@ namespace JAFDTC.Models.A10C.HMCS
 
         public void Reset()
         {
-            ActiveProfile = _explicitDefaults.ActiveProfile;
-            TGPTrack = _explicitDefaults.TGPTrack;
-            BrightnessSetting = _explicitDefaults.BrightnessSetting;
+            ActiveProfile = "0";
+            TGPTrack = "0";
+            BrightnessSetting = "0";
+
+            _profileSettingMap = new Dictionary<Profiles, HMCSProfileSettings>
+            {
+                { Profiles.PRO1, new HMCSProfileSettings(Profiles.PRO1) },
+                { Profiles.PRO2, new HMCSProfileSettings(Profiles.PRO2) },
+                { Profiles.PRO3, new HMCSProfileSettings(Profiles.PRO3) }
+            };
+
         }
 
         public HMCSProfileSettings GetProfileSettings(Profiles profile)
@@ -179,6 +196,11 @@ namespace JAFDTC.Models.A10C.HMCS
             return profileSettings;
         }
 
+        public HMCSProfileSettings GetProfileSettings(string profileString)
+        {
+            return GetProfileSettings((Profiles)int.Parse(profileString));
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // static members
@@ -187,7 +209,7 @@ namespace JAFDTC.Models.A10C.HMCS
 
         private readonly static HMCSSystem _explicitDefaults = new()
         {
-            ActiveProfile = "1",
+            ActiveProfile = "0",
             TGPTrack = "0",
             BrightnessSetting = "0"
         };
