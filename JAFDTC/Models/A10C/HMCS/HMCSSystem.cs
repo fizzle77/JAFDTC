@@ -129,19 +129,19 @@ namespace JAFDTC.Models.A10C.HMCS
         }
 
         [JsonIgnore]
-        public bool IsActiveProfileDefault => string.IsNullOrEmpty(ActiveProfile) || ActiveProfile == _explicitDefaults.ActiveProfile;
+        public bool IsActiveProfileDefault => string.IsNullOrEmpty(ActiveProfile) || ActiveProfile == ExplicitDefaults.ActiveProfile;
         [JsonIgnore]
-        public int ActiveProfileValue => string.IsNullOrEmpty(ActiveProfile) ? int.Parse(_explicitDefaults.ActiveProfile) : int.Parse(ActiveProfile);
+        public int ActiveProfileValue => string.IsNullOrEmpty(ActiveProfile) ? int.Parse(ExplicitDefaults.ActiveProfile) : int.Parse(ActiveProfile);
 
         [JsonIgnore]
-        public bool IsTGPTrackDefault => string.IsNullOrEmpty(TGPTrack) || TGPTrack == _explicitDefaults.TGPTrack;
+        public bool IsTGPTrackDefault => string.IsNullOrEmpty(TGPTrack) || TGPTrack == ExplicitDefaults.TGPTrack;
         [JsonIgnore]
-        public int TGPTrackValue => string.IsNullOrEmpty(TGPTrack) ? int.Parse(_explicitDefaults.TGPTrack) : int.Parse(TGPTrack);
+        public int TGPTrackValue => string.IsNullOrEmpty(TGPTrack) ? int.Parse(ExplicitDefaults.TGPTrack) : int.Parse(TGPTrack);
 
         [JsonIgnore]
-        public bool IsBrightnessSettingDefault => string.IsNullOrEmpty(BrightnessSetting) || BrightnessSetting == _explicitDefaults.BrightnessSetting;
+        public bool IsBrightnessSettingDefault => string.IsNullOrEmpty(BrightnessSetting) || BrightnessSetting == ExplicitDefaults.BrightnessSetting;
         [JsonIgnore]
-        public int BrightnessSettingValue => string.IsNullOrEmpty(BrightnessSetting) ? int.Parse(_explicitDefaults.BrightnessSetting) : int.Parse(BrightnessSetting);
+        public int BrightnessSettingValue => string.IsNullOrEmpty(BrightnessSetting) ? int.Parse(ExplicitDefaults.BrightnessSetting) : int.Parse(BrightnessSetting);
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -207,7 +207,7 @@ namespace JAFDTC.Models.A10C.HMCS
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private readonly static HMCSSystem _explicitDefaults = new()
+        public readonly static HMCSSystem ExplicitDefaults = new()
         {
             ActiveProfile = "0",
             TGPTrack = "0",

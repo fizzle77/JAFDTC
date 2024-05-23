@@ -180,8 +180,8 @@
                 <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource TopRowCombo}" Name="uiComboCrosshair"
                           ToolTipService.ToolTip="Indicates HMD line of sight"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="Crosshair">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -189,35 +189,34 @@
                 <ComboBox Grid.Row="2" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboOwnSPI"
                           ToolTipService.ToolTip="Ownship SPI"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="OwnSPI">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
                 <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource TextIndented}">SPI Indicator</TextBlock>
                 <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboSPIIndicator"
                           ToolTipService.ToolTip="TLL connecting crosshair to SPI when SPI is outside HMD FOV"
-                          SelectionChanged="ComboBox_SelectionChanged" Tag="SPIInIndicator">
-                    <ComboBoxItem>OFF</ComboBoxItem>
+                          SelectionChanged="ComboBox_SelectionChanged" Tag="SPIIndicator">
                     <ComboBoxItem>OCLD</ComboBoxItem>
-                    <ComboBoxItem>ON</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                 </ComboBox>
 
                 <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource TextBase}">Horizon Line</TextBlock>
                 <ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboHorizonLine"
                           ToolTipService.ToolTip="Indicator type for the horizon"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="HorizonLine">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>NORM</ComboBoxItem>
                     <ComboBoxItem>GHST</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                 </ComboBox>
 
                 <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource TextBase}">HDC</TextBlock>
                 <ComboBox Grid.Row="5" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboHDC"
                           ToolTipService.ToolTip="Helmet designation cursor"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="HDC">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -225,8 +224,8 @@
                 <ComboBox Grid.Row="6" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboHookship"
                           ToolTipService.ToolTip="Indicates hooked target"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="Hookship">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -234,8 +233,8 @@
                 <ComboBox Grid.Row="7" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboTGPDiamond"
                           ToolTipService.ToolTip="Indicates TGP line of sight"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="TGPDiamond">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -243,8 +242,8 @@
                 <ComboBox Grid.Row="8" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboTGPFOV"
                           ToolTipService.ToolTip="Dashed box outlining TGP field of view"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="TGPFOV">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -252,8 +251,8 @@
                 <ComboBox Grid.Row="9" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboFlightMembers"
                           ToolTipService.ToolTip="Flight member PPLI"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="FlightMembers">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
                 <TextBox Grid.Row="9" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextFlightMembers"
@@ -263,8 +262,8 @@
                 <ComboBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboFMSPI"
                           ToolTipService.ToolTip="Donor SPI from flight member"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="FMSPI">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
                 <TextBox Grid.Row="10" Grid.Column="2" Style="{StaticResource ValueIndented}" Name="uiTextFMSPI"
@@ -274,8 +273,8 @@
                 <ComboBox Grid.Row="11" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboDonorAirPPLI"
                           ToolTipService.ToolTip="Other aircraft (non-flight members) PPLI"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="DonorAirPPLI">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
                 <TextBox Grid.Row="11" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextDonorAirPPLI"
@@ -285,8 +284,8 @@
                 <ComboBox Grid.Row="12" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboDonorSPI"
                           ToolTipService.ToolTip="Donor SPI from other aircraft (non-flight members)"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="DonorSPI">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
                 <TextBox Grid.Row="12" Grid.Column="2" Style="{StaticResource ValueIndented}" Name="uiTextDonorSPI"
@@ -296,8 +295,8 @@
                 <ComboBox Grid.Row="13" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboCurrentMA"
                           ToolTipService.ToolTip="Current SADL tasking from JTAC or flight member"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="CurrentMA">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
                 <TextBox Grid.Row="13" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextCurrentMA"
@@ -307,8 +306,8 @@
                 <ComboBox Grid.Row="1" Grid.Column="5" Style="{StaticResource TopRowCombo}" Name="uiComboAirEnvir"
                           ToolTipService.ToolTip="All air assets"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="AirEnvir">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -316,8 +315,8 @@
                 <ComboBox Grid.Row="2" Grid.Column="5" Style="{StaticResource ComboIndented}" Name="uiComboAirPPLINonDonor"
                           ToolTipService.ToolTip="Air PPLIs that are not flight members or donors"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="AirPPLINonDonor">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
                 <TextBox Grid.Row="2" Grid.Column="6" Style="{StaticResource ValueIndented}" Name="uiTextAirPPLINonDonor"
@@ -327,8 +326,8 @@
                 <ComboBox Grid.Row="3" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboGndEnvironment"
                           ToolTipService.ToolTip="All land and surface objects"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="GndEnvir">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -336,8 +335,8 @@
                 <ComboBox Grid.Row="4" Grid.Column="5" Style="{StaticResource ComboIndented}" Name="uiComboGndVMFFriend"
                           ToolTipService.ToolTip="All ground VMFs"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="GndVMFFriend">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
                 <TextBox Grid.Row="4" Grid.Column="6" Style="{StaticResource ValueIndented}" Name="uiTextGndVMFFriend"
@@ -347,8 +346,8 @@
                 <ComboBox Grid.Row="5" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboSteerpoint"
                           ToolTipService.ToolTip="Current steerpoint"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="Steerpoint">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
                 <TextBox Grid.Row="5" Grid.Column="6" Style="{StaticResource ValueBase}" Name="uiTextSteerpoint"
@@ -358,8 +357,8 @@
                 <ComboBox Grid.Row="6" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboMsnMarkpoints"
                           ToolTipService.ToolTip="Mission points and mark points based on steerpoint switch setting"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="MsnMarkpoints">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
                 <TextBox Grid.Row="6" Grid.Column="6" Style="{StaticResource ValueBase}" Name="uiTextMsnMarkpoints"
@@ -369,8 +368,8 @@
                 <ComboBox Grid.Row="7" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboMsnMarkLabels"
                           ToolTipService.ToolTip="Mission point and mark point text labels"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="MsnMarkLabels">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -378,8 +377,8 @@
                 <ComboBox Grid.Row="8" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboAirspeed"
                           ToolTipService.ToolTip="Indicated airspeed"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="Airspeed">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -387,8 +386,8 @@
                 <ComboBox Grid.Row="9" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboRadarAltitude"
                           ToolTipService.ToolTip="Radar altitude indication"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="RadarAltitude">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -396,8 +395,8 @@
                 <ComboBox Grid.Row="10" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboBaroAltitude"
                           ToolTipService.ToolTip="Barometric altitude indication"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="BaroAltitude">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -405,8 +404,8 @@
                 <ComboBox Grid.Row="11" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboACHeading"
                           ToolTipService.ToolTip="Aircraft heading"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="ACHeading">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -414,8 +413,8 @@
                 <ComboBox Grid.Row="12" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboHelmetHeading"
                           ToolTipService.ToolTip="Pilot line of sight heading"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="HelmetHeading">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
@@ -423,8 +422,8 @@
                 <ComboBox Grid.Row="13" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboHMDElevLines"
                           ToolTipService.ToolTip="Pitch ladder"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="HMDElevLines">
-                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>OCLD</ComboBoxItem>
+                    <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
             </Grid>

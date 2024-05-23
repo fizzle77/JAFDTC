@@ -40,10 +40,23 @@ function JAFDTC_A10C_GetLMFD()
     return table;
 end
 
+function JAFDTC_A10C_GetRMFD()
+    local table = JAFDTC_ParseDisplay(2);
+    JAFDTC_DebugDisplay(table);
+    return table;
+end
+
 function JAFDTC_A10C_GetLMFD_value(key)
     local table = JAFDTC_A10C_GetLMFD();
     local value = table[key] or "---";
     JAFDTC_Log("LMFD table[" .. key .. "]: " .. value);
+    return value;
+end
+
+function JAFDTC_A10C_GetRMFD_value(key)
+    local table = JAFDTC_A10C_GetRMFD();
+    local value = table[key] or "---";
+    JAFDTC_Log("RMFD table[" .. key .. "]: " .. value);
     return value;
 end
 
@@ -85,6 +98,14 @@ function JAFDTC_A10C_Fn_QueryDSMSProfiles()
     JAFDTC_Log("QueryDSMSProfiles: " .. response);
     return response;
 end
+
+-- HMCS Routines
+
+function JAFDTC_A10C_Fn_IsSTATInDefaultMFDPosition()
+    local value = JAFDTC_A10C_GetRMFD_value("label_13");
+    return value == "STAT";
+end
+
 
 -- CDU Routines
 

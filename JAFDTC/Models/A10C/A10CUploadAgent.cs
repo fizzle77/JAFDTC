@@ -94,6 +94,7 @@ namespace JAFDTC.Models.A10C
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new MiscBuilder(_cfg, _dcsCmds, sb).Build();
             new DSMSBuilder(_cfg, _dcsCmds, sb).Build();
+            new HMCSBuilder(_cfg, _dcsCmds, sb).Build();
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();
         }
 

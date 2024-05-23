@@ -27,17 +27,17 @@ namespace JAFDTC.Models.A10C.HMCS
     // Defines the visbility options for each setting in a HMCS profile
     public enum VisibilityOptions
     {
-        OFF = 0,
-        OCLD = 1, // Occluded
+        OCLD = 0, // Occluded
+        OFF = 1,
         ON = 2
     }
 
     // Defines the visbility options for the horizon line setting
     public enum HorizonLineOptions
     {
-        OFF = 0,
-        NORM = 1,
-        GHST = 2
+        NORM = 0,
+        GHST = 1,
+        OFF = 2
     }
 
     /// <summary>
@@ -78,12 +78,12 @@ namespace JAFDTC.Models.A10C.HMCS
         }
 
         private string _spiIndicator;
-        public string SPIInIndicator
+        public string SPIIndicator
         {
             get => _spiIndicator;
             set
             {
-                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 1)) ? null : "Invalid format";
                 SetProperty(ref _spiIndicator, value, error);
             }
         }
@@ -334,7 +334,7 @@ namespace JAFDTC.Models.A10C.HMCS
         // Skipped because no function in DCS: GND SUSPECT
         // Skipped because no function in DCS: GND HOSTILE
         // Skipped because no function in DCS: GND OTHER
-        // Skipped because no function in DCS: EMER PONIT
+        // Skipped because no function in DCS: EMER POINT
 
         private string _steerpoint;
         public string Steerpoint
@@ -473,7 +473,7 @@ namespace JAFDTC.Models.A10C.HMCS
             {
                 return IsCrosshairDefault
                     && IsOwnSPIDefault
-                    && IsSPIInIndicatorDefault
+                    && IsSPIIndicatorDefault
                     && IsHorizonLineDefault
                     && IsHDCDefault
                     && IsHookshipDefault
@@ -518,7 +518,7 @@ namespace JAFDTC.Models.A10C.HMCS
         public bool IsOwnSPIDefault => string.IsNullOrEmpty(OwnSPI) || OwnSPI == GetExplicitDefaults(_profile).OwnSPI;
 
         [JsonIgnore]
-        public bool IsSPIInIndicatorDefault => string.IsNullOrEmpty(SPIInIndicator) || SPIInIndicator == GetExplicitDefaults(_profile).SPIInIndicator;
+        public bool IsSPIIndicatorDefault => string.IsNullOrEmpty(SPIIndicator) || SPIIndicator == GetExplicitDefaults(_profile).SPIIndicator;
         
         [JsonIgnore]
         public bool IsHorizonLineDefault => string.IsNullOrEmpty(HorizonLine) || HorizonLine == GetExplicitDefaults(_profile).HorizonLine;
@@ -670,7 +670,7 @@ namespace JAFDTC.Models.A10C.HMCS
         private readonly static HMCSProfileSettings _pro2Defaults;
         private readonly static HMCSProfileSettings _pro3Defaults;
 
-        private static HMCSProfileSettings GetExplicitDefaults(Profiles profile)
+        public static HMCSProfileSettings GetExplicitDefaults(Profiles profile)
         {
             return profile switch
             {
@@ -683,76 +683,76 @@ namespace JAFDTC.Models.A10C.HMCS
 
         static HMCSProfileSettings()
         {
-            // 0 = OFF
-            // 1 = OCLD
+            // 0 = OCLD
+            // 1 = OFF
             // 2 = ON
 
             _pro1Defaults = new(Profiles.PRO1)
             {
-                Crosshair = "1",
-                OwnSPI = "1",
-                SPIInIndicator = "1",
-                HorizonLine = "1",
-                HDC = "1",
-                Hookship = "1",
-                TGPDiamond = "1",
-                TGPFOV = "1",
-                FlightMembers = "1",
+                Crosshair = "0",
+                OwnSPI = "0",
+                SPIIndicator = "0",
+                HorizonLine = "0",
+                HDC = "0",
+                Hookship = "0",
+                TGPDiamond = "0",
+                TGPFOV = "0",
+                FlightMembers = "0",
                 FlightMembersRange = "50",
-                FMSPI = "1",
+                FMSPI = "0",
                 FMSPIRange = "50",
-                DonorAirPPLI = "1",
+                DonorAirPPLI = "0",
                 DonorAirPPLIRange = "50",
-                DonorSPI = "1",
+                DonorSPI = "0",
                 DonorSPIRange = "50",
-                CurrentMA = "1",
+                CurrentMA = "0",
                 CurrentMARange = "50",
-                AirEnvir = "1",
-                AirPPLINonDonor = "1",
+                AirEnvir = "0",
+                AirPPLINonDonor = "0",
                 AirPPLINonDonorRange = "50",
-                GndEnvir = "1",
-                GndVMFFriend = "1",
+                GndEnvir = "0",
+                GndVMFFriend = "0",
                 GndVMFFriendRange = "50",
-                Steerpoint = "1",
+                Steerpoint = "0",
                 SteerpointRange = "50",
-                MsnMarkpoints = "1",
+                MsnMarkpoints = "0",
                 MsnMarkpointsRange = "50",
-                MsnMarkLabels = "1",
-                Airspeed = "1",
-                RadarAltitude = "1",
-                BaroAltitude = "1",
-                ACHeading = "1",
-                HelmetHeading = "1",
-                HMDElevLines = "1"
+                MsnMarkLabels = "0",
+                Airspeed = "0",
+                RadarAltitude = "0",
+                BaroAltitude = "0",
+                ACHeading = "0",
+                HelmetHeading = "0",
+                HMDElevLines = "0"
             };
 
             _pro2Defaults = (HMCSProfileSettings)_pro1Defaults.Clone();
             _pro2Defaults._profile = Profiles.PRO2;
-            _pro2Defaults.DonorSPI = "0";
-            _pro2Defaults.HMDElevLines = "0";
+            _pro2Defaults.DonorSPI = "1";
+            _pro2Defaults.HMDElevLines = "1";
 
             _pro3Defaults = (HMCSProfileSettings)_pro2Defaults.Clone();
             _pro3Defaults._profile = Profiles.PRO3;
-            _pro3Defaults.OwnSPI = "0";
-            _pro3Defaults.SPIInIndicator = "0";
-            _pro3Defaults.Hookship = "0";
-            _pro3Defaults.TGPFOV = "0";
-            _pro3Defaults.FlightMembers = "0";
-            _pro3Defaults.FMSPI = "0";
-            _pro3Defaults.DonorAirPPLI = "0";
-            _pro3Defaults.DonorSPI = "0";
-            _pro3Defaults.CurrentMA = "0";
-            _pro3Defaults.AirEnvir = "0";
-            _pro3Defaults.AirPPLINonDonor = "0";
-            _pro3Defaults.GndEnvir = "0";
-            _pro3Defaults.GndVMFFriend = "0";
+            _pro3Defaults.OwnSPI = "1";
+            _pro3Defaults.SPIIndicator = "1";
+            _pro3Defaults.Hookship = "1";
+            _pro3Defaults.TGPFOV = "1";
+            _pro3Defaults.FlightMembers = "1";
+            _pro3Defaults.FMSPI = "1";
+            _pro3Defaults.DonorAirPPLI = "1";
+            _pro3Defaults.DonorSPI = "1";
+            _pro3Defaults.CurrentMA = "1";
+            _pro3Defaults.AirEnvir = "1";
+            _pro3Defaults.AirPPLINonDonor = "1";
+            _pro3Defaults.GndEnvir = "1";
+            _pro3Defaults.GndVMFFriend = "1";
         }
 
         public static void CopySettings(HMCSProfileSettings src, HMCSProfileSettings dest)
         {
             dest.Crosshair = src.Crosshair;
             dest.OwnSPI = src.OwnSPI;
-            dest.SPIInIndicator = src.SPIInIndicator;
+            dest.SPIIndicator = src.SPIIndicator;
             dest.HorizonLine = src.HorizonLine;
             dest.HDC = src.HDC;
             dest.Hookship = src.Hookship;
