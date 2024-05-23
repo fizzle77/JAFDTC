@@ -33,9 +33,7 @@ namespace JAFDTC.Models.A10C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public HMCSBuilder(A10CConfiguration cfg, A10CDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb)
-        {
-        }
+        public HMCSBuilder(A10CConfiguration cfg, A10CDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -59,24 +57,42 @@ namespace JAFDTC.Models.A10C.Upload
         {
             AddActions(rmfd, new() { "RMFD_14", "RMFD_03" }); // Go to STAT, HMCS
 
+            //
             // Common HMCS settings
+            //
+
+            // TGP Track
             if (!_cfg.HMCS.IsTGPTrackDefault)
                 AddActionsForSettingProperty(rmfd, "RMFD_08", "TGPTrack");
 
-            // TODO query for brightness state
-            //
-            //if (!_cfg.HMCS.IsBrightnessSettingDefault)
-            //    Click(rmfd, "RMFD_08", "TGPTrack");
+            // Brightess
+            if (!_cfg.HMCS.IsBrightnessSettingDefault)
+            {
+                if (_cfg.HMCS.BrightnessSettingValue == (int)BrightnessSettingOptions.NIGHT)
+                    AddIfBlock("IsDayBrightnessSelected", true, null, delegate () { SetHMCSBrightness(rmfd, BrightnessSettingOptions.NIGHT); });
+                else
+                    AddIfBlock("IsDayBrightnessSelected", false, null, delegate () { SetHMCSBrightness(rmfd, BrightnessSettingOptions.DAY); });
+            }
 
-            // Profiles...
+            //
+            // Profiles
+            //
+
             BuildProfile(cdu, rmfd, Profiles.PRO1);
             BuildProfile(cdu, rmfd, Profiles.PRO2);
             BuildProfile(cdu, rmfd, Profiles.PRO3);
 
-            // Active profile
+            // Set the active profile. Has to be done after the profile setting upload.
             SetProfileActive(rmfd, (Profiles)_cfg.HMCS.ActiveProfileValue);
         }
 
+        private void SetHMCSBrightness(AirframeDevice rmfd, BrightnessSettingOptions setting)
+        {
+            if (setting == BrightnessSettingOptions.NIGHT)
+                AddAction(rmfd, "RMFD_10");
+            else
+                AddAction(rmfd, "RMFD_09");
+        }
 
         private void BuildProfile(AirframeDevice cdu, AirframeDevice rmfd, Profiles profile)
         {
@@ -230,7 +246,7 @@ namespace JAFDTC.Models.A10C.Upload
             AddAction(rmfd, "RMFD_19");
         }
 
-        private void SetProfileActive(AirframeDevice rmfd, Profiles profile, bool skipReEnter = false)
+        private void SetProfileActive(AirframeDevice rmfd, Profiles profile)
         {
             AddActions(rmfd, new() { "RMFD_14", "RMFD_03" }); // Go to STAT, HMCS: ensure we're at the top of the list
 

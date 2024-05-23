@@ -93,7 +93,7 @@ namespace JAFDTC.Models.A10C.HMCS
             get => _brightnessSetting;
             set
             {
-                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 1)) ? null : "Invalid format";
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
                 SetProperty(ref _brightnessSetting, value, error);
             }
         }

@@ -106,6 +106,10 @@ function JAFDTC_A10C_Fn_IsSTATInDefaultMFDPosition()
     return value == "STAT";
 end
 
+function JAFDTC_A10C_Fn_IsDayBrightnessSelected()
+    local value = JAFDTC_A10C_GetRMFD_value("HMCS_page1_brightness_DAY_label_text_inversed");
+    return value == " DAY";
+end
 
 -- CDU Routines
 
