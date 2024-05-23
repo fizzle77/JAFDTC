@@ -159,8 +159,10 @@ namespace JAFDTC.Models.A10C.HMCS
             ActiveProfile = other.ActiveProfile;
             TGPTrack = other.TGPTrack;
             BrightnessSetting = other.BrightnessSetting;
-            foreach (var kv in ProfileSettingMap)
-                other._profileSettingMap.Add(kv.Key, (HMCSProfileSettings)kv.Value.Clone());
+
+            _profileSettingMap = new Dictionary<Profiles, HMCSProfileSettings>(3);
+            foreach (var kv in other.ProfileSettingMap)
+                _profileSettingMap.Add(kv.Key, (HMCSProfileSettings)kv.Value.Clone());
         }
 
         public virtual object Clone() => new HMCSSystem(this);
