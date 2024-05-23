@@ -17,17 +17,11 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.A10C.DSMS;
 using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.Models.DCS;
-using JAFDTC.Utilities;
-using Microsoft.UI.Composition;
-using Microsoft.UI.Xaml.Markup;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.A10C.Upload
 {
@@ -83,66 +77,92 @@ namespace JAFDTC.Models.A10C.Upload
             SetProfileActive(rmfd, (Profiles)_cfg.HMCS.ActiveProfileValue);
         }
 
+
         private void BuildProfile(AirframeDevice cdu, AirframeDevice rmfd, Profiles profile)
         {
             HMCSProfileSettings profileCfg = _cfg.HMCS.GetProfileSettings(profile);
             if (profileCfg.IsDefault)
                 return;
 
+            string lastModifiedProp = GetLastModifiedProp(profile);
+
             SetProfileActive(rmfd, profile);
 
             // Do each setting, top to bottom.
+            // It's important that this in the same order as the jet's list of settings.
+
             AddActionsForSettingProperty(rmfd, "RMFD_18", "Crosshair", profile);
+            if (lastModifiedProp == "Crosshair") return;
             AddAction(rmfd, "RMFD_19"); // Move down
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "OwnSPI", profile);
+            if (lastModifiedProp == "OwnSPI") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "SPIIndicator", profile);
+            if (lastModifiedProp == "SPIIndicator") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "HorizonLine", profile);
+            if (lastModifiedProp == "HorizonLine") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "HDC", profile);
+            if (lastModifiedProp == "HDC") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "Hookship", profile);
+            if (lastModifiedProp == "Hookship") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "TGPDiamond", profile);
+            if (lastModifiedProp == "TGPDiamond") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "TGPFOV", profile);
+            if (lastModifiedProp == "TGPFOV") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "FlightMembers", profile);
+            if (lastModifiedProp == "FlightMembers") return;
             AddActionsForRangeProperty(cdu, rmfd, "FlightMembersRange", profile);
+            if (lastModifiedProp == "FlightMembersRange") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "FMSPI", profile);
+            if (lastModifiedProp == "FMSPI") return;
             AddActionsForRangeProperty(cdu, rmfd, "FMSPIRange", profile);
+            if (lastModifiedProp == "FMSPIRange") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "DonorAirPPLI", profile);
+            if (lastModifiedProp == "DonorAirPPLI") return;
             AddActionsForRangeProperty(cdu, rmfd, "DonorAirPPLIRange", profile);
+            if (lastModifiedProp == "DonorAirPPLIRange") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "DonorSPI", profile);
+            if (lastModifiedProp == "DonorSPI") return;
             AddActionsForRangeProperty(cdu, rmfd, "DonorSPIRange", profile);
+            if (lastModifiedProp == "DonorSPIRange") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "CurrentMA", profile);
+            if (lastModifiedProp == "CurrentMA") return;
             AddActionsForRangeProperty(cdu, rmfd, "CurrentMARange", profile);
+            if (lastModifiedProp == "CurrentMARange") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "AirEnvir", profile);
+            if (lastModifiedProp == "AirEnvir") return;
             AddAction(rmfd, "RMFD_19");
 
             AddAction(rmfd, "RMFD_19"); // Skipped because no function in DCS: AIR VMF FRIEND
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "AirPPLINonDonor", profile);
+            if (lastModifiedProp == "AirPPLINonDonor") return;
             AddActionsForRangeProperty(cdu, rmfd, "AirPPLINonDonorRange", profile);
+            if (lastModifiedProp == "AirPPLINonDonorRange") return;
             AddAction(rmfd, "RMFD_19");
 
             AddAction(rmfd, "RMFD_19"); // Skipped because no function in DCS: AIR TRK FRIEND
@@ -152,10 +172,13 @@ namespace JAFDTC.Models.A10C.Upload
             AddAction(rmfd, "RMFD_19"); // Skipped because no function in DCS: AIR OTHER
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "GndEnvir", profile);
+            if (lastModifiedProp == "GndEnvir") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "GndVMFFriend", profile);
+            if (lastModifiedProp == "GndVMFFriend") return;
             AddActionsForRangeProperty(cdu, rmfd, "GndVMFFriendRange", profile);
+            if (lastModifiedProp == "GndVMFFriendRange") return;
             AddAction(rmfd, "RMFD_19");
 
             AddAction(rmfd, "RMFD_19"); // Skipped because no function in DCS: GND PPLI
@@ -167,32 +190,43 @@ namespace JAFDTC.Models.A10C.Upload
             AddAction(rmfd, "RMFD_19"); // Skipped because no function in DCS: EMER POINT
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "Steerpoint", profile);
+            if (lastModifiedProp == "Steerpoint") return;
             AddActionsForRangeProperty(cdu, rmfd, "SteerpointRange", profile);
+            if (lastModifiedProp == "SteerpointRange") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "MsnMarkpoints", profile);
+            if (lastModifiedProp == "MsnMarkpoints") return;
             AddActionsForRangeProperty(cdu, rmfd, "MsnMarkpointsRange", profile);
+            if (lastModifiedProp == "MsnMarkpointsRange") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "MsnMarkLabels", profile);
+            if (lastModifiedProp == "MsnMarkLabels") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "Airspeed", profile);
+            if (lastModifiedProp == "Airspeed") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "RadarAltitude", profile);
+            if (lastModifiedProp == "RadarAltitude") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "BaroAltitude", profile);
+            if (lastModifiedProp == "BaroAltitude") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "ACHeading", profile);
+            if (lastModifiedProp == "ACHeading") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "HelmetHeading", profile);
+            if (lastModifiedProp == "HelmetHeading") return;
             AddAction(rmfd, "RMFD_19");
 
             AddActionsForSettingProperty(rmfd, "RMFD_18", "HMDElevLines", profile);
+            if (lastModifiedProp == "HMDElevLines") return;
             AddAction(rmfd, "RMFD_19");
         }
 
@@ -290,5 +324,127 @@ namespace JAFDTC.Models.A10C.Upload
             AddAction(rmfd, "RMFD_17"); // range button on HMCS profile page
         }
 
+        /// <summary>
+        /// Returns the last non-default property name in the given profile.
+        /// </summary>
+        private string GetLastModifiedProp(Profiles profile)
+        {
+            // This is a lame hack but it works for now. This is to prevent us from
+            // always arrowing down to the very bottom of the list for any modified
+            // profile, even if only one setting at the top is changed.
+
+            string lastPropName = null;
+            HMCSProfileSettings profileCfg = _cfg.HMCS.GetProfileSettings(profile);
+
+            // Check each setting, top to bottom.
+            // It's important that this in the same order as the jet's list of settings.
+
+            if (GetNumClicksForProperty("Crosshair", profile) > 0)
+                lastPropName = "Crosshair";
+
+            if (GetNumClicksForProperty("OwnSPI", profile) > 0)
+                lastPropName = "OwnSPI";
+
+            if (GetNumClicksForProperty("SPIIndicator", profile) > 0)
+                lastPropName = "SPIIndicator";
+
+            if (GetNumClicksForProperty("HorizonLine", profile) > 0)
+                lastPropName = "HorizonLine";
+
+            if (GetNumClicksForProperty("HDC", profile) > 0)
+                lastPropName = "HDC";
+
+            if (GetNumClicksForProperty("Hookship", profile) > 0)
+                lastPropName = "Hookship";
+
+            if (GetNumClicksForProperty("TGPDiamond", profile) > 0)
+                lastPropName = "TGPDiamond";
+
+            if (GetNumClicksForProperty("TGPFOV", profile) > 0)
+                lastPropName = "TGPFOV";
+
+            if (GetNumClicksForProperty("FlightMembers", profile) > 0)
+                lastPropName = "FlightMembers";
+
+            if (!profileCfg.IsFlightMembersRangeDefault)
+                lastPropName = "FlightMembersRange";
+
+            if (GetNumClicksForProperty("FMSPI", profile) > 0)
+                lastPropName = "FMSPI";
+
+            if (!profileCfg.IsFlightMemberSPIRangeDefault)
+                lastPropName = "FMSPIRange";
+
+            if (GetNumClicksForProperty("DonorAirPPLI", profile) > 0)
+                lastPropName = "DonorAirPPLI";
+
+            if (!profileCfg.IsDonorAirPPLIRangeDefault)
+                lastPropName = "DonorAirPPLIRange";
+
+            if (GetNumClicksForProperty("DonorSPI", profile) > 0)
+                lastPropName = "DonorSPI";
+
+            if (!profileCfg.IsDonorSPIRangeDefault)
+                lastPropName = "DonorSPIRange";
+
+            if (GetNumClicksForProperty("CurrentMA", profile) > 0)
+                lastPropName = "CurrentMA";
+
+            if (!profileCfg.IsCurrentMARangeDefault)
+                lastPropName = "CurrentMARange";
+
+            if (GetNumClicksForProperty("AirEnvir", profile) > 0)
+                lastPropName = "AirEnvir";
+
+            if (GetNumClicksForProperty("AirPPLINonDonor", profile) > 0)
+                lastPropName = "AirPPLINonDonor";
+
+            if (!profileCfg.IsAirPPLINonDonorRangeDefault)
+                lastPropName = "AirPPLINonDonorRange";
+
+            if (GetNumClicksForProperty("GndEnvir", profile) > 0)
+                lastPropName = "GndEnvir";
+
+            if (GetNumClicksForProperty("GndVMFFriend", profile) > 0)
+                lastPropName = "GndVMFFriend";
+
+            if (!profileCfg.IsGndVMFFriendRangeDefault)
+                lastPropName = "GndVMFFriendRange";
+
+            if (GetNumClicksForProperty("Steerpoint", profile) > 0)
+                lastPropName = "Steerpoint";
+
+            if (!profileCfg.IsSteerPointRangeDefault)
+                lastPropName = "SteerpointRange";
+
+            if (GetNumClicksForProperty("MsnMarkpoints", profile) > 0)
+                lastPropName = "MsnMarkpoints";
+
+            if (!profileCfg.IsMsnMarkpointsRangeDefault)
+                lastPropName = "MsnMarkpointsRange";
+
+            if (GetNumClicksForProperty("MsnMarkLabels", profile) > 0)
+                lastPropName = "MsnMarkLabels";
+
+            if (GetNumClicksForProperty("Airspeed", profile) > 0)
+                lastPropName = "Airspeed";
+
+            if (GetNumClicksForProperty("RadarAltitude", profile) > 0)
+                lastPropName = "RadarAltitude";
+
+            if (GetNumClicksForProperty("BaroAltitude", profile) > 0)
+                lastPropName = "BaroAltitude";
+
+            if (GetNumClicksForProperty("ACHeading", profile) > 0)
+                lastPropName = "ACHeading";
+
+            if (GetNumClicksForProperty("HelmetHeading", profile) > 0)
+                lastPropName = "HelmetHeading";
+
+            if (GetNumClicksForProperty("HMDElevLines", profile) > 0)
+                lastPropName = "HMDElevLines";
+
+            return lastPropName;
+        }
     }
 }
