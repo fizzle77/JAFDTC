@@ -413,5 +413,27 @@ namespace JAFDTC.Models.DCS
             }
             return "";
         }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // other builder utilities
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// A "wraparound setting" is a setting where I single button moves through the possible values, cycling back to
+        /// the first option after the last.
+        /// 
+        /// When values are in the same order as in the jet (e.g. 0 represents the first option, 1 the second, etc.) this 
+        /// function returns the number of button presses necessary to get to desiredVal, starting from currentVal, where
+        /// there are maxVal total options.
+        /// </summary>
+        protected static int GetNumClicksForWraparoundSetting(int currentVal, int desiredVal, int maxVal)
+        {
+            int clicks = desiredVal - currentVal;
+            if (clicks < 0)
+                clicks = maxVal - currentVal + desiredVal;
+            return clicks;
+        }
     }
 }

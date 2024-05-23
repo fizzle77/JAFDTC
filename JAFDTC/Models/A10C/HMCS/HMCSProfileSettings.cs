@@ -77,6 +77,7 @@ namespace JAFDTC.Models.A10C.HMCS
             }
         }
 
+        // SPI Indicator is slightly different from all the others: you can only set OFF and OCLD.
         private string _spiIndicator;
         public string SPIIndicator
         {
@@ -726,6 +727,8 @@ namespace JAFDTC.Models.A10C.HMCS
                 HMDElevLines = "0"
             };
 
+            // Each profile has more things turned off by default, so we
+            // just clone the previous profile and set what changes.
             _pro2Defaults = (HMCSProfileSettings)_pro1Defaults.Clone();
             _pro2Defaults._profile = Profiles.PRO2;
             _pro2Defaults.DonorSPI = "1";
