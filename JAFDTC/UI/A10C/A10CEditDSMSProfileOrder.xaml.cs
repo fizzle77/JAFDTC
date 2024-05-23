@@ -24,6 +24,7 @@ using Microsoft.UI.Xaml.Navigation;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using static JAFDTC.Models.A10C.DSMS.DSMSSystem;
+using static JAFDTC.UI.A10C.A10CEditDSMSPage;
 
 namespace JAFDTC.UI.A10C
 {
@@ -32,7 +33,7 @@ namespace JAFDTC.UI.A10C
     /// </summary>
     public sealed partial class A10CEditDSMSProfileOrderPage : Page, IA10CDSMSContentFrame
     {
-        private ConfigEditorPageNavArgs _navArgs;
+        private DSMSEditorNavArgs _dsmsEditorNavArgs;
         private A10CConfiguration _config;
 
         private ObservableCollection<A10CMunition> _munitions;
@@ -43,7 +44,7 @@ namespace JAFDTC.UI.A10C
         {
             _munitions = new ObservableCollection<A10CMunition>(A10CMunition.GetUniqueProfileMunitions());
 
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         private void SaveEditStateToConfig()
@@ -52,7 +53,7 @@ namespace JAFDTC.UI.A10C
             foreach (A10CMunition m in _munitions)
                 newOrder.Add(m.ID);
             _config.DSMS.ProfileOrder = newOrder;
-            _config.Save(this, SystemTag);
+            _config.Save(_dsmsEditorNavArgs.ParentPage, SystemTag);
         }
 
         public void CopyConfigToEditState()
@@ -64,7 +65,6 @@ namespace JAFDTC.UI.A10C
             {
                 _munitions = new ObservableCollection<A10CMunition>(A10CMunition.GetUniqueProfileMunitions());
                 uiListProfiles.ItemsSource = _munitions;
-                uiCheckUseOrder.IsChecked = _config.DSMS.IsProfileOrderEnabled;
             }
             else
             {
@@ -82,7 +82,6 @@ namespace JAFDTC.UI.A10C
 
             bool isNotLinked = string.IsNullOrEmpty(_config.SystemLinkedTo(SystemTag));
             uiListProfiles.IsEnabled = isNotLinked;
-            uiCheckUseOrder.IsEnabled = isNotLinked;
         }
 
         private void uiListProfiles_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
@@ -92,16 +91,10 @@ namespace JAFDTC.UI.A10C
             _suspendUIUpdates = false;
         }
 
-        private void uiCheckUseOrder_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-        {
-            SaveEditStateToConfig();
-            _config.Save(this, SystemTag);
-        }
-
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
-            _navArgs = (ConfigEditorPageNavArgs)args.Parameter;
-            _config = (A10CConfiguration)_navArgs.Config;
+            _dsmsEditorNavArgs = (DSMSEditorNavArgs)args.Parameter;
+            _config = (A10CConfiguration)_dsmsEditorNavArgs.NavArgs.Config;
 
             CopyConfigToEditState();
 

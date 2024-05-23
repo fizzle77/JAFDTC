@@ -20,7 +20,6 @@
 using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.DSMS;
-using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -33,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using static JAFDTC.Models.A10C.DSMS.DSMSSystem;
+using static JAFDTC.UI.A10C.A10CEditDSMSPage;
 
 namespace JAFDTC.UI.A10C
 {
@@ -41,7 +41,7 @@ namespace JAFDTC.UI.A10C
     /// </summary>
     public sealed partial class A10CEditDSMSMunitionSettingsPage : Page, IA10CDSMSContentFrame
     {
-        private ConfigEditorPageNavArgs _navArgs;
+        private DSMSEditorNavArgs _dsmsEditorNavArgs;
         private A10CConfiguration _config;
         private readonly DSMSSystem _editState;
 
@@ -164,6 +164,8 @@ namespace JAFDTC.UI.A10C
                 uiLabelFuse.Visibility = fuzeVisible;
                 uiComboFuze.Visibility = fuzeVisible;
 
+                UpdateNonDefaultMunitionIcons();
+
                 MunitionSettings newSettings = _editState.GetMunitionSettings(selectedMunition);
                 newSettings.ErrorsChanged += BaseField_DataValidationError;
                 newSettings.PropertyChanged += BaseField_PropertyChanged;
@@ -196,7 +198,7 @@ namespace JAFDTC.UI.A10C
                 _config.DSMS.SetFuzeOption(selectedMunition, _editState.GetFuzeOption(selectedMunition));
             }
 
-            _config.Save(this, SystemTag);
+            _config.Save(_dsmsEditorNavArgs.ParentPage, SystemTag);
         }
 
         public void CopyConfigToEditState()
@@ -230,6 +232,22 @@ namespace JAFDTC.UI.A10C
         {
             selectedMunition = (A10CMunition)uiComboMunition.SelectedItem;
             return selectedMunition != null;
+        }
+
+        private void UpdateNonDefaultMunitionIcons()
+        {
+            foreach (A10CMunition munition in uiComboMunition.Items)
+            {
+                UIElement container = (UIElement)uiComboMunition.ContainerFromItem(munition);
+                FontIcon icon = Utilities.FindControl<FontIcon>(container, typeof(FontIcon), "icon");
+                if (icon != null)
+                {
+                    if (_config.DSMS.GetMunitionSettings(munition).IsDefault)
+                        icon.Visibility = Visibility.Collapsed;
+                    else
+                        icon.Visibility = Visibility.Visible;
+                }
+            }
         }
 
         // ---- event handlers -------------------------------------------------------------------------------------------
@@ -365,8 +383,8 @@ namespace JAFDTC.UI.A10C
 
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
-            _navArgs = (ConfigEditorPageNavArgs)args.Parameter;
-            _config = (A10CConfiguration)_navArgs.Config;
+            _dsmsEditorNavArgs = (DSMSEditorNavArgs)args.Parameter;
+            _config = (A10CConfiguration)_dsmsEditorNavArgs.NavArgs.Config;
 
             _config.ConfigurationSaved += ConfigurationSavedHandler;
 

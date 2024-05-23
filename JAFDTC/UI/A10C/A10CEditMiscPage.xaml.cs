@@ -615,7 +615,6 @@ namespace JAFDTC.UI.A10C
 
             CopyConfigToEdit();
 
-            //ValidateAllFields(_baseFieldValueMap, EditMisc.GetErrors(null));
             RebuildInterfaceState();
 
             base.OnNavigatedTo(args);

@@ -28,33 +28,40 @@ https://www.gnu.org/licenses/.
     mc:Ignorable="d"
     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
 
-    <Grid HorizontalAlignment="Left" VerticalAlignment="Top">
+    <Grid VerticalAlignment="Top">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-        <ListView x:Name="uiListProfiles" Grid.Row="0" Grid.Column="0" ItemsSource="{x:Bind _munitions}" CanDragItems="True"
+        <ListView x:Name="uiListProfiles" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left"
+                  ItemsSource="{x:Bind _munitions}" CanDragItems="True" Width="175"
             SelectionMode="None" AllowDrop="True" CanReorderItems="True" DragItemsCompleted="uiListProfiles_DragItemsCompleted">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:A10CMunition">
-                    <StackPanel Orientation="Horizontal" Height="48">
-                        <FontIcon Margin="0,0,6,0" FontFamily="Segoe Fluent Icons" FontSize="24" Glyph="&#xE76F;"/>
-                        <Image Source="{x:Bind ImageFullPath}" VerticalAlignment="Center"/>
-                        <TextBlock Text="{x:Bind Profile}" VerticalAlignment="Center" 
-                            Style="{ThemeResource EditorParamStaticTextBlockStyle}" 
-                            Margin="12,0,0,0" />
-                    </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/> <!-- Always empty here, but matching the layout on the munition settings tab. -->
+                            <ColumnDefinition Width="48"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="48"/>
+                        </Grid.RowDefinitions>
+                        <Image Grid.Column="1" Margin="0,4,0,4" Source="{x:Bind ImageFullPath}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="{x:Bind Profile}" VerticalAlignment="Center" 
+                                   Style="{ThemeResource EditorParamStaticTextBlockStyle}" 
+                                   Margin="6,0,0,0" />
+                    </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
 
-        <CheckBox x:Name="uiCheckUseOrder" Grid.Row="0" Grid.Column="1" VerticalAlignment="Top" Margin="18,18,12,12"
-            IsChecked="{x:Bind _config.DSMS.IsProfileOrderEnabled, Mode=TwoWay}" Click="uiCheckUseOrder_Click">
-            Order default weapon profiles as shown
-        </CheckBox>
+        <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" Margin="0,12,0,12">
+            Drag to adjust the order of default weapon profiles in the jet.
+        </TextBlock>
     </Grid>
 </Page>
