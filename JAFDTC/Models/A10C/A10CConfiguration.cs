@@ -21,6 +21,7 @@ using JAFDTC.Models.A10C.DSMS;
 using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.Models.A10C.Misc;
 using JAFDTC.Models.A10C.Radio;
+using JAFDTC.Models.A10C.TGP;
 using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.UI.A10C;
 using JAFDTC.Utilities;
@@ -53,6 +54,8 @@ namespace JAFDTC.Models.A10C
         public MiscSystem Misc { get; set; }
         
         public RadioSystem Radio { get; set; }
+
+        public TGPSystem TGP { get; set; }
 
         public WYPTSystem WYPT { get; set; }
 
