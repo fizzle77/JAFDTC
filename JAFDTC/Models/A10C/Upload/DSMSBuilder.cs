@@ -138,8 +138,9 @@ namespace JAFDTC.Models.A10C.Upload
                 // HOF
                 if (setting.Munition.HOF && !setting.IsHOFOptionDefault)
                 {
+                    int hofDefault = int.Parse(MunitionSettings.ExplicitDefaults.HOFOption);
                     int hofVal = (int)_cfg.DSMS.GetHOFOptionValue(setting.Munition);
-                    int numPresses = hofVal >= 6 ? hofVal - 6 : hofVal + 4;
+                    int numPresses = GetNumClicksForWraparoundSetting<HOFOptions>(hofDefault, hofVal);
                     for (int i = 0; i < numPresses; i++)
                         AddAction(lmfd, "LMFD_18");
                 }
@@ -147,8 +148,9 @@ namespace JAFDTC.Models.A10C.Upload
                 // RPM
                 if (setting.Munition.RPM && !setting.IsRPMOptionDefault)
                 {
+                    int rpmDefault = int.Parse(MunitionSettings.ExplicitDefaults.RPMOption);
                     int rpmVal = (int)_cfg.DSMS.GetRPMOptionValue(setting.Munition);
-                    int numPresses = rpmVal >= 3 ? rpmVal - 3 : rpmVal + 3;
+                    int numPresses = GetNumClicksForWraparoundSetting<RPMOptions>(rpmDefault, rpmVal);
                     for (int i = 0; i < numPresses; i++)
                         AddAction(lmfd, "LMFD_17");
                 }
@@ -248,8 +250,9 @@ namespace JAFDTC.Models.A10C.Upload
                 // Escape Maneuver
                 if (settings.Munition.EscMnvr && !settings.IsEscapeManeuverDefault)
                 {
+                    int escDefault = int.Parse(MunitionSettings.ExplicitDefaults.EscapeManeuver);
                     int escVal = (int)_cfg.DSMS.GetEscapeManeuverValue(settings.Munition);
-                    int numPresses = escVal >= 1 ? escVal - 1 : escVal + 3;
+                    int numPresses = GetNumClicksForWraparoundSetting<EscapeManeuvers>(escDefault, escVal);
                     for (int i = 0; i < numPresses; i++)
                         AddAction(lmfd, "LMFD_20");
                 }
