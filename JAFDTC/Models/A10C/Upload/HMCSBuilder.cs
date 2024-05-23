@@ -253,9 +253,9 @@ namespace JAFDTC.Models.A10C.Upload
             }
 
             int clicks = configuredVal - defaultVal;
-            if (propName == "SPIIndicator") // SPI Indicator is the only prop with just 2 values. All others are 3.
+            if (propName == "SPIIndicator") // SPI Indicator is the only prop with just 2 values: it's always 0 or 1 clicks.
                 clicks = Math.Abs(clicks);
-            else
+            else // All other props have 3 possible values
             {
                 if (clicks == -1)
                     clicks = 2;
@@ -286,8 +286,7 @@ namespace JAFDTC.Models.A10C.Upload
                 return;
 
             AddAction(cdu, "CLR");
-            foreach (char c in configuredVal)
-                AddAction(cdu, c.ToString()); // type numeric range into scratchpad
+            AddActions(cdu, ActionsForCleanNum(configuredVal)); // type numeric range into scratchpad
             AddAction(rmfd, "RMFD_17"); // range button on HMCS profile page
         }
 
