@@ -205,6 +205,18 @@ function JAFDTC_A10C_Fn_Arc210Com2IsOnHUD()
     return JAFDTC_A10C_GetHUD_value("ARC_210_Radio_2_Status") ~= "---"
 end
 
+-- TGP Routines
+
+function JAFDTC_A10C_Fn_IsTGPInDefaultMFDPosition()
+    local value = JAFDTC_A10C_GetRMFD_value("label_14");
+    return value == "TGP";
+end
+
+function JAFDTC_A10C_Fn_IsTGPReady()
+    local table = JAFDTC_A10C_GetRMFD();
+    return table["txt_power_off"] ~= "TGP OFF" and table["txt_power_off#20#"] ~= "NOT TIMED OUT" and table["#10#"] == "A-G";
+end
+
 -- Utility
 
 function JAFDTC_A10C_TableToString(table)

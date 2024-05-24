@@ -51,14 +51,16 @@ namespace JAFDTC.Models.A10C.Upload
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
             AirframeDevice rmfd = _aircraft.GetDevice("RMFD");
 
-            // TODO ensure TGP is on default page, warmed up.
-            // AddIfBlock(TODO, true, null, delegate () { BuildTGP(hotas, cdu, rmfd); });
-            BuildTGP(hotas, cdu, rmfd);
+            // Ensure TGP is on default MFD button and warmed up.
+            AddIfBlock("IsTGPInDefaultMFDPosition", true, null, delegate ()
+            {
+                AddAction(rmfd, "RMFD_15", WAIT_BASE); // Go to TGP page
+                AddIfBlock("IsTGPReady", true, null, delegate () { BuildTGP(hotas, cdu, rmfd); });
+            });
         }
 
         private void BuildTGP(AirframeDevice hotas, AirframeDevice cdu, AirframeDevice rmfd)
         {
-            AddAction(rmfd, "RMFD_15", WAIT_BASE); // Go to TGP page
             AddAction(rmfd, "RMFD_02", 1200); // A-G, wait to go active
 
             // Video Mode
