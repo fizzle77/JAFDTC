@@ -79,9 +79,10 @@ namespace JAFDTC.UI.A10C
                 throw new ApplicationException("Unexpected NavigationViewItem type");
         }
 
-        private void UpdateNonDefaultIcons() 
+        private void UpdateDefaultStateIndicators() 
         {
-            if (_config.DSMS.IsLaserCodeDefault && _config.DSMS.AreAllMunitionSettingsDefault)
+            bool munitionsTabIsDefault = _config.DSMS.IsLaserCodeDefault && _config.DSMS.AreAllMunitionSettingsDefault;
+            if (munitionsTabIsDefault)
                 uiIconMunitionTab.Visibility = Visibility.Collapsed;
             else
                 uiIconMunitionTab.Visibility = Visibility.Visible;
@@ -90,6 +91,8 @@ namespace JAFDTC.UI.A10C
                 uiIconProfileTab.Visibility = Visibility.Collapsed;
             else
                 uiIconProfileTab.Visibility = Visibility.Visible;
+
+            uiPageBtnReset.IsEnabled = !munitionsTabIsDefault || !_config.DSMS.IsProfileOrderDefault;
         }
 
         // ---- page settings -----------------------------------------------------------------------------------------
@@ -147,7 +150,7 @@ namespace JAFDTC.UI.A10C
 
             _config.ConfigurationSaved += ConfigurationSavedHandler;
 
-            UpdateNonDefaultIcons();
+            UpdateDefaultStateIndicators();
             UpdateLinkControls();
 
             base.OnNavigatedTo(args);
@@ -161,7 +164,7 @@ namespace JAFDTC.UI.A10C
 
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
         {
-            UpdateNonDefaultIcons();
+            UpdateDefaultStateIndicators();
         }
 
         private void UpdateLinkControls()

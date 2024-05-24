@@ -245,6 +245,8 @@ namespace JAFDTC.UI.A10C
                 uiProfile2SelectIcon.Visibility = Utilities.HiddenIfDefault(_config.HMCS.GetProfileSettings(Profiles.PRO2));
                 uiProfile3SelectIcon.Visibility = Utilities.HiddenIfDefault(_config.HMCS.GetProfileSettings(Profiles.PRO3));
 
+                uiPageBtnReset.IsEnabled = !_editState.IsDefault;
+                
                 UpdateLinkControls();
 
                 _isUIUpdatePending = false;

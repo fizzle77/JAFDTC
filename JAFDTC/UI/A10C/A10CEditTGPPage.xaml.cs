@@ -87,6 +87,8 @@ namespace JAFDTC.UI.A10C
                 Utilities.SetComboEnabledAndSelection(uiComboVideoMode, isNotLinked, true, int.Parse(_editState.VideoMode));
                 Utilities.SetComboEnabledAndSelection(uiComboCoordDisplay, isNotLinked, true, int.Parse(_editState.CoordDisplay));
 
+                uiPageBtnReset.IsEnabled = !_editState.IsDefault;
+
                 _isUIUpdatePending = false;
             });
         }
