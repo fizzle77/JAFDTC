@@ -93,17 +93,6 @@ namespace JAFDTC.Models.A10C.Upload
             // Leaving this as a reference for changing the coordinate system on the TAD
             // when we add it as its own system later.
             // AddActions(lmfd, new() { "LMFD_15", "LMFD_09" });
-
-            // TGP
-            // Leaving this as a reference for changing the coordinate system on the TGP
-            // when we add it as its own system later.
-            // AddActions(rmfd, new() { "RMFD_15" });
-            // AddWait(WAIT_BASE);
-            // AddActions(rmfd, new() { "RMFD_02" });
-            // AddWait(WAIT_BASE * 5); // Wait for TGP to go active.
-            // AddActions(rmfd, new() { "RMFD_01" });
-            // AddWait(WAIT_BASE);
-            // AddActions(rmfd, new() { "RMFD_07", "RMFD_01", "RMFD_03", });
         }
 
         /// <summary>

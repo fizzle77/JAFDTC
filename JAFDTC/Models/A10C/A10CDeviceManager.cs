@@ -19,7 +19,6 @@
 
 using JAFDTC.Utilities;
 using JAFDTC.Models.DCS;
-using System.Diagnostics;
 
 namespace JAFDTC.Models.A10C
 {
@@ -299,6 +298,21 @@ namespace JAFDTC.Models.A10C
             arc186.AddAction(3013, "VHFFM_FREQ3_DN", delay, -0.1);
             arc186.AddAction(3015, "VHFFM_FREQ4_DN", delay, -0.25);
             AddDevice(arc186);
+
+            // ---- HOTAS
+            AirframeDevice hotas = new(17, "HOTAS");
+            
+            // These probably work but are untested.
+            //hotas.AddAction(539, "CoolieUp", delay, 1);
+            //hotas.AddAction(540, "CoolieDown", delay, 1);
+            //hotas.AddAction(541, "CoolieLeftLong", 1800, 1);
+            //hotas.AddAction(542, "CoolieRightLong", 1800, 1);
+
+            hotas.AddAction(563, "BoatSwitchForward", delay, 1);
+            hotas.AddAction(564, "BoatSwitchAft", delay, 1);
+            hotas.AddAction(565, "BoatSwitchCenter", delay, 1);
+            
+            AddDevice(hotas);
 
             // ---- aux light control
 

@@ -168,13 +168,13 @@ namespace JAFDTC.Models.A10C.TGP
             }
         }
 
-        private string _yardstick;                              // integer [0, 1]
+        private string _yardstick;                              // integer [0, 2]
         public string Yardstick
         {
             get => _yardstick;
             set
             {
-                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 1)) ? null : "Invalid format";
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2) ? null : "Invalid format");
                 SetProperty(ref _yardstick, value, error);
             }
         }
