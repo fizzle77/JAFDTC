@@ -68,6 +68,9 @@ namespace JAFDTC.UI.A10C
 
             dest.VideoMode = source.VideoMode;
             dest.CoordDisplay = source.CoordDisplay;
+            dest.Yardstick = source.Yardstick;
+            dest.TAAF = source.TAAF;
+            dest.FRND = source.FRND;
         }
 
         private void UpdateUIFromEditState()
@@ -82,10 +85,13 @@ namespace JAFDTC.UI.A10C
 
                 Utilities.SetTextBoxEnabledAndText(uiTextLaserCode, isNotLinked, true, _editState.LaserCode);
                 Utilities.SetTextBoxEnabledAndText(uiTextLSS, isNotLinked, true, _editState.LSS);
-                Utilities.SetCheckEnabledAndState(uiCheckLatch, isNotLinked, _editState.Latch == "0");
+                Utilities.SetCheckEnabledAndState(uiCheckLatch, isNotLinked, _editState.LatchValue);
 
-                Utilities.SetComboEnabledAndSelection(uiComboVideoMode, isNotLinked, true, int.Parse(_editState.VideoMode));
-                Utilities.SetComboEnabledAndSelection(uiComboCoordDisplay, isNotLinked, true, int.Parse(_editState.CoordDisplay));
+                Utilities.SetComboEnabledAndSelection(uiComboVideoMode, isNotLinked, true, _editState.VideoModeValue);
+                Utilities.SetComboEnabledAndSelection(uiComboCoordDisplay, isNotLinked, true, _editState.CoordDisplayValue);
+                Utilities.SetComboEnabledAndSelection(uiComboYardstick, isNotLinked, true, _editState.YardstickValue);
+                Utilities.SetTextBoxEnabledAndText(uiTextTAAF, isNotLinked, true, _editState.TAAF);
+                Utilities.SetCheckEnabledAndState(uiCheckFRND, isNotLinked, _editState.FRNDValue);
 
                 uiPageBtnReset.IsEnabled = !_editState.IsDefault;
 
@@ -136,6 +142,9 @@ namespace JAFDTC.UI.A10C
                 case "CoordDisplay":
                     _editState.CoordDisplay = comboBox.SelectedIndex.ToString();
                     break;
+                case "Yardstick":
+                    _editState.Yardstick = comboBox.SelectedIndex.ToString();
+                    break;
                 default:
                     throw new ApplicationException("Unexpected ComboBox: " + comboBox.Tag);
             }
@@ -157,6 +166,9 @@ namespace JAFDTC.UI.A10C
                     break;
                 case "LSS":
                     _editState.LSS = textBox.Text;
+                    break;
+                case "TAAF":
+                    _editState.TAAF = textBox.Text;
                     break;
                 default:
                     throw new ApplicationException("Unexpected TextBox: " + textBox.Tag);
@@ -181,9 +193,19 @@ namespace JAFDTC.UI.A10C
         {
             CheckBox checkBox = (CheckBox)sender;
             if (checkBox.IsChecked == true)
-                _editState.Latch = "0";
+                _editState.Latch = ((int)LatchOptions.ON).ToString();
             else
-                _editState.Latch = "1";
+                _editState.Latch = ((int)LatchOptions.OFF).ToString();
+            SaveEditStateToConfig();
+        }
+
+        private void uiCheckFRND_Clicked(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            if (checkBox.IsChecked == true)
+                _editState.FRND = ((int)FrndOptions.ON).ToString();
+            else
+                _editState.FRND = ((int)FrndOptions.OFF).ToString();
             SaveEditStateToConfig();
         }
 

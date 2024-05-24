@@ -39,6 +39,9 @@
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -105,6 +108,7 @@
                       ToolTipService.ToolTip="Select video mode"
                       SelectionChanged="ComboBox_SelectionChanged" Tag="VideoMode">
                 <ComboBox.Items>
+                    <!-- Must match enum order -->
                     <TextBlock Text="CCD"/>
                     <TextBlock Text="WHOT"/>
                     <TextBlock Text="BHOT"/>
@@ -124,11 +128,58 @@
                       ToolTipService.ToolTip="Select coordinate display"
                       SelectionChanged="ComboBox_SelectionChanged" Tag="CoordDisplay">
                 <ComboBox.Items>
+                    <!-- Must match enum order -->
                     <TextBlock Text="LL"/>
                     <TextBlock Text="MGRS"/>
                     <TextBlock Text="OFF"/>
                 </ComboBox.Items>
             </ComboBox>
+
+
+            <!-- Coordinate Display -->
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Yardstick
+            </TextBlock>
+            <ComboBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0"
+                      x:Name="uiComboYardstick"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Stretch"
+                      ToolTipService.ToolTip="Select coordinate display"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="Yardstick">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="METRIC"/>
+                    <TextBlock Text="USA"/>
+                    <TextBlock Text="OFF"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- TAAF -->
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                TAAF
+            </TextBlock>
+            <TextBox Grid.Row="8" Grid.Column="1" Margin="12,12,0,0" x:Name="uiTextTAAF"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="5" PlaceholderText="0"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="TAAF"
+                     ToolTipService.ToolTip="TGP Attitude Advisory Function: below this altitude, warn at high bank angles. 0 disables."/>
+
+            <!-- FRND -->
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                FRND
+            </TextBlock>
+            <CheckBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0"
+                      x:Name="uiCheckFRND"
+                      VerticalAlignment="Center"
+                      Click="uiCheckFRND_Clicked"
+                      ToolTipService.ToolTip="Mark EPLRS-enabled friendlies with an X">
+            </CheckBox>
         </Grid>
 
         <!--
