@@ -145,6 +145,7 @@ namespace JAFDTC.Models.A10C
                 HMCSSystem.SystemTag => JsonSerializer.Serialize(HMCS, Configuration.JsonOptions),
                 MiscSystem.SystemTag => JsonSerializer.Serialize(Misc, Configuration.JsonOptions),
                 RadioSystem.SystemTag => JsonSerializer.Serialize(Radio, Configuration.JsonOptions),
+                TGPSystem.SystemTag => JsonSerializer.Serialize(TGP, Configuration.JsonOptions),
                 WYPTSystem.SystemTag => JsonSerializer.Serialize(WYPT, Configuration.JsonOptions),
                 _ => null
             };
@@ -156,6 +157,7 @@ namespace JAFDTC.Models.A10C
             HMCS ??= new HMCSSystem();
             Misc ??= new MiscSystem();
             Radio ??= new RadioSystem();
+            TGP ??= new TGPSystem();
             WYPT ??= new WYPTSystem();
 
             // TODO: if the version number is older than current, may need to update object
@@ -174,6 +176,7 @@ namespace JAFDTC.Models.A10C
                    ((systemTag == null) && (cboardTag == HMCSSystem.SystemTag)) ||
                    ((systemTag == null) && (cboardTag == MiscSystem.SystemTag)) ||
                    ((systemTag == null) && (cboardTag == RadioSystem.SystemTag)) ||
+                   ((systemTag == null) && (cboardTag == TGPSystem.SystemTag)) ||
                    ((systemTag == null) && (cboardTag == WYPTSystem.SystemTag)));
         }
 
@@ -189,6 +192,7 @@ namespace JAFDTC.Models.A10C
                     case HMCSSystem.SystemTag: HMCS = JsonSerializer.Deserialize<HMCSSystem>(json); break;
                     case MiscSystem.SystemTag: Misc = JsonSerializer.Deserialize<MiscSystem>(json); break;
                     case RadioSystem.SystemTag: Radio = JsonSerializer.Deserialize<RadioSystem>(json); break;
+                    case TGPSystem.SystemTag: TGP = JsonSerializer.Deserialize<TGPSystem>(json); break;
                     case WYPTSystem.SystemTag: WYPT = JsonSerializer.Deserialize<WYPTSystem>(json); break;
                     default: isHandled = false; break;
                 }
