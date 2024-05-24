@@ -122,6 +122,7 @@ namespace JAFDTC.UI.A10C
             if (selectedItem == null)
             {
                 _config.UnlinkSystem(DSMSSystem.SystemTag);
+                UpdateLinkControls();
                 _config.Save(this);
                 ((IA10CDSMSContentFrame)DSMSContentFrame.Content).CopyConfigToEditState();
             }

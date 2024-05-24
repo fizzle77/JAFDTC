@@ -75,6 +75,7 @@ namespace JAFDTC.Models.A10C
             HMCS = new HMCSSystem();
             Misc = new MiscSystem();
             Radio = new RadioSystem();
+            TGP = new TGPSystem();
             WYPT = new WYPTSystem();
             ConfigurationUpdated();
         }
@@ -92,6 +93,7 @@ namespace JAFDTC.Models.A10C
                 HMCS = (HMCSSystem)HMCS.Clone(),
                 Misc = (MiscSystem)Misc.Clone(),
                 Radio = (RadioSystem)Radio.Clone(),
+                TGP = (TGPSystem)TGP.Clone(),
                 WYPT = (WYPTSystem)WYPT.Clone(),
             };
             clone.ConfigurationUpdated();
@@ -107,6 +109,7 @@ namespace JAFDTC.Models.A10C
                 case HMCSSystem.SystemTag: HMCS = (HMCSSystem)otherHawg.HMCS.Clone(); break;
                 case MiscSystem.SystemTag: Misc = (MiscSystem)otherHawg.Misc.Clone(); break;
                 case RadioSystem.SystemTag: Radio = (RadioSystem)otherHawg.Radio.Clone(); break;
+                case TGPSystem.SystemTag: TGP = (TGPSystem)otherHawg.TGP.Clone(); break;
                 case WYPTSystem.SystemTag: WYPT = (WYPTSystem)otherHawg.WYPT.Clone(); break;
                 default: break;
             }

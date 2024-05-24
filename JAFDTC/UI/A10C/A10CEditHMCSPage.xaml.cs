@@ -436,7 +436,7 @@ namespace JAFDTC.UI.A10C
                 ValidateEditState(selectedProfileEditState, args.PropertyName);
         }
 
-        // ---- page settings -----------------------------------------------------------------------------------------
+        // ---- page events -------------------------------------------------------------------------------------------
 
         // on clicks of the reset all button, reset all settings back to default.
         //
@@ -451,6 +451,7 @@ namespace JAFDTC.UI.A10C
             if (result == ContentDialogResult.Primary)
             {
                 _config.UnlinkSystem(HMCSSystem.SystemTag);
+                UpdateLinkControls();
                 _config.HMCS.Reset();
                 _config.Save(this, HMCSSystem.SystemTag);
                 CopyConfigToEditState();

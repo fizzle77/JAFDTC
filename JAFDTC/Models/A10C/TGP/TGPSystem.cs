@@ -132,7 +132,7 @@ namespace JAFDTC.Models.A10C.TGP
         // ---- synthesized properties
 
         [JsonIgnore]
-        public bool IsDefault => throw new System.NotImplementedException();
+        public bool IsDefault => CoordDisplayIsDefault && VideoModeIsDefault && LaserCodeIsDefault && LSSIsDefault && LatchIsDefault;
 
         [JsonIgnore]
         public bool CoordDisplayIsDefault => string.IsNullOrEmpty(CoordDisplay) || CoordDisplay == ExplicitDefaults.CoordDisplay;
@@ -147,7 +147,7 @@ namespace JAFDTC.Models.A10C.TGP
         public bool LSSIsDefault => string.IsNullOrEmpty(LSS) || LSS == ExplicitDefaults.LSS;
 
         [JsonIgnore]
-        public bool LatchIsDefault => string.IsNullOrEmpty(Latch) || LSS == ExplicitDefaults.Latch;
+        public bool LatchIsDefault => string.IsNullOrEmpty(Latch) || Latch == ExplicitDefaults.Latch;
 
         // ------------------------------------------------------------------------------------------------------------
         //
