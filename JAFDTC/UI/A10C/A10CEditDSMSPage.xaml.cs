@@ -35,7 +35,7 @@ namespace JAFDTC.UI.A10C
     }
 
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// Code-behind class for the A10 DSMS editor.
     /// </summary>
     public sealed partial class A10CEditDSMSPage : Page
     {
@@ -100,7 +100,7 @@ namespace JAFDTC.UI.A10C
         {
             ContentDialogResult result = await Utilities.Message2BDialog(
                 Content.XamlRoot,
-                "Reset Configruation?",
+                "Reset Configuration?",
                 "Are you sure you want to reset the DSMS configurations to avionics defaults? This action cannot be undone.",
                 "Reset"
             );

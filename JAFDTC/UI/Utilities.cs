@@ -31,6 +31,8 @@ using Windows.Foundation;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
+using System.Reflection;
+using JAFDTC.Models.A10C.HMCS;
 
 namespace JAFDTC.UI
 {
@@ -196,6 +198,25 @@ namespace JAFDTC.UI
         }
 
         /// <summary>
+        /// Find all child controls of the specified type.
+        /// </summary>
+        public static void FindChildren<T>(List<T> results, DependencyObject startNode)
+          where T : DependencyObject
+        {
+            int count = VisualTreeHelper.GetChildrenCount(startNode);
+            for (int i = 0; i < count; i++)
+            {
+                DependencyObject current = VisualTreeHelper.GetChild(startNode, i);
+                if (current is T)
+                {
+                    T asType = (T)current;
+                    results.Add(asType);
+                }
+                FindChildren<T>(results, current);
+            }
+        }
+        
+        /// <summary>
         /// truncate a string at the nearest word boundary to the indicated length. the string is suffixed with "...".
         /// </summary>
         public static string TruncateAtWord(string input, int length)
@@ -274,6 +295,12 @@ namespace JAFDTC.UI
                 sender.Select(curPosition, 0);
             }
         }
+
+        public static Visibility HiddenIfDefault(ISystem profileSettings) => profileSettings.IsDefault switch
+        {
+            true => Visibility.Collapsed,
+            false => Visibility.Visible
+        };
 
         /// <summary>
         /// set the enable state of a control, allowing the control to maintain focus.

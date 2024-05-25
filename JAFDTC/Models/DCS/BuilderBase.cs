@@ -23,8 +23,11 @@
 #define DEBUG_LOG_BOGUS_ACTIONS
 
 using JAFDTC.Utilities;
+using Microsoft.UI.Xaml;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -412,6 +415,39 @@ namespace JAFDTC.Models.DCS
                 return $"{h:D2}{m:D2}{s:D2}";
             }
             return "";
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // other builder utilities
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// A "wraparound setting" is a setting where a single button moves through the possible values, cycling back to
+        /// the first option after the last.
+
+        /// <summary>
+        /// When values are in the same order as in the jet (e.g. 0 represents the first option, 1 the second, etc.) this 
+        /// function returns the number of button presses necessary to get to desiredVal, starting from currentVal, where
+        /// there are maxVal total options.
+        /// </summary>
+        protected static int GetNumClicksForWraparoundSetting(int currentVal, int desiredVal, int numOptions)
+        {
+            int clicks = desiredVal - currentVal;
+            if (clicks < 0)
+                clicks = numOptions - currentVal + desiredVal;
+            return clicks;
+        }
+
+        /// <summary>
+        /// When values are in the same order as in the jet (e.g. 0 represents the first option, 1 the second, etc.) and 
+        /// the provided zero-based enum has the same number of options as the jet, this function will return the number
+        /// of button presses necessary to get to desiredVal, starting from currentVal.
+        /// </summary>
+        protected static int GetNumClicksForWraparoundSetting<T>(int currentVal, int desiredVal) where T : Enum
+        {
+            int numOptions = Enum.GetValues(typeof(T)).Length;
+            return GetNumClicksForWraparoundSetting(currentVal, desiredVal, numOptions);
         }
     }
 }

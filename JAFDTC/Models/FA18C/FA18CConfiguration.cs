@@ -187,7 +187,7 @@ namespace JAFDTC.Models.FA18C
             }
             catch (Exception ex)
             {
-                FileManager.Log($"FA18CConfigruation:Deserialize exception {ex}");
+                FileManager.Log($"FA18CConfiguration:Deserialize exception {ex}");
             }
             return isSuccess;
         }

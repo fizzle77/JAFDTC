@@ -155,7 +155,7 @@ namespace JAFDTC.Models.M2000C
             }
             catch (Exception ex)
             {
-                FileManager.Log($"M2000CConfigruation:Deserialize exception {ex}");
+                FileManager.Log($"M2000CConfiguration:Deserialize exception {ex}");
             }
             return isSuccess;
         }

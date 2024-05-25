@@ -155,7 +155,7 @@ namespace JAFDTC.Models.F14AB
             }
             catch (Exception ex)
             {
-                FileManager.Log($"F14ABConfigruation:Deserialize exception {ex}");
+                FileManager.Log($"F14ABConfiguration:Deserialize exception {ex}");
             }
             return isSuccess;
         }

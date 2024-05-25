@@ -202,7 +202,7 @@ namespace JAFDTC.Models
 
         /// <summary>
         /// returns a json serialization of the entire configuration or a single system (identified by the system tag)
-        /// from the configruation. a null system tag requests a serialization of the entire configuration.
+        /// from the Configuration. a null system tag requests a serialization of the entire configuration.
         /// </summary>
         public string Serialize(string systemTag = null);
 

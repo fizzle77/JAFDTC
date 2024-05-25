@@ -377,7 +377,7 @@ namespace JAFDTC.UI.F16C
         {
             ContentDialogResult result = await Utilities.Message2BDialog(
                 Content.XamlRoot,
-                "Reset Configruation?",
+                "Reset Configuration?",
                 "Are you sure you want to reset the HTS configurations to avionics defaults? This action cannot be undone.",
                 "Reset"
             );

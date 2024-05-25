@@ -229,7 +229,7 @@ namespace JAFDTC.Models.F16C
             }
             catch (Exception ex)
             {
-                FileManager.Log($"F16CConfigruation:Deserialize exception {ex}");
+                FileManager.Log($"F16CConfiguration:Deserialize exception {ex}");
             }
             return isSuccess;
         }

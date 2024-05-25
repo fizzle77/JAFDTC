@@ -130,8 +130,7 @@ namespace JAFDTC.Models.A10C.Upload
                 // There's a single laser code setting for the whole DSMS system that applies to any Laser-capable weapon.
                 if (setting.Munition.Laser && !_cfg.DSMS.IsLaserCodeDefault)
                 {
-                    foreach (char c in _cfg.DSMS.LaserCode)
-                        AddAction(cdu, c.ToString());
+                    AddActions(cdu, ActionsForCleanNum(_cfg.DSMS.LaserCode));
                     // The button for setting laser code moves depending on the munition. Grab it from the data.
                     AddAction(lmfd, "LMFD_" + setting.Munition.LaserButton);
                 }
@@ -139,8 +138,9 @@ namespace JAFDTC.Models.A10C.Upload
                 // HOF
                 if (setting.Munition.HOF && !setting.IsHOFOptionDefault)
                 {
+                    int hofDefault = int.Parse(MunitionSettings.ExplicitDefaults.HOFOption);
                     int hofVal = (int)_cfg.DSMS.GetHOFOptionValue(setting.Munition);
-                    int numPresses = hofVal >= 6 ? hofVal - 6 : hofVal + 4;
+                    int numPresses = GetNumClicksForWraparoundSetting<HOFOptions>(hofDefault, hofVal);
                     for (int i = 0; i < numPresses; i++)
                         AddAction(lmfd, "LMFD_18");
                 }
@@ -148,8 +148,9 @@ namespace JAFDTC.Models.A10C.Upload
                 // RPM
                 if (setting.Munition.RPM && !setting.IsRPMOptionDefault)
                 {
+                    int rpmDefault = int.Parse(MunitionSettings.ExplicitDefaults.RPMOption);
                     int rpmVal = (int)_cfg.DSMS.GetRPMOptionValue(setting.Munition);
-                    int numPresses = rpmVal >= 3 ? rpmVal - 3 : rpmVal + 3;
+                    int numPresses = GetNumClicksForWraparoundSetting<RPMOptions>(rpmDefault, rpmVal);
                     for (int i = 0; i < numPresses; i++)
                         AddAction(lmfd, "LMFD_17");
                 }
@@ -222,8 +223,7 @@ namespace JAFDTC.Models.A10C.Upload
             if (settings.Munition.Ripple && !settings.IsRippleQtyDefault)
             {
                 AddAction(cdu, "CLR");
-                foreach (char c in settings.RippleQty)
-                    AddAction(cdu, c.ToString());
+                AddActions(cdu, ActionsForCleanNum(settings.RippleQty));
                 AddAction(lmfd, "LMFD_08");
             }
 
@@ -231,8 +231,7 @@ namespace JAFDTC.Models.A10C.Upload
             if (settings.Munition.RipFt && !settings.IsRippleFtDefault)
             {
                 AddAction(cdu, "CLR");
-                foreach (char c in settings.RippleFt)
-                    AddAction(cdu, c.ToString());
+                AddActions(cdu, ActionsForCleanNum(settings.RippleFt));
                 AddAction(lmfd, "LMFD_09");
             }
 
@@ -251,8 +250,9 @@ namespace JAFDTC.Models.A10C.Upload
                 // Escape Maneuver
                 if (settings.Munition.EscMnvr && !settings.IsEscapeManeuverDefault)
                 {
+                    int escDefault = int.Parse(MunitionSettings.ExplicitDefaults.EscapeManeuver);
                     int escVal = (int)_cfg.DSMS.GetEscapeManeuverValue(settings.Munition);
-                    int numPresses = escVal >= 1 ? escVal - 1 : escVal + 3;
+                    int numPresses = GetNumClicksForWraparoundSetting<EscapeManeuvers>(escDefault, escVal);
                     for (int i = 0; i < numPresses; i++)
                         AddAction(lmfd, "LMFD_20");
                 }
@@ -265,8 +265,7 @@ namespace JAFDTC.Models.A10C.Upload
                 if (settings.Munition.Laser && !settings.IsLaseSecondsDefault)
                 {
                     AddAction(cdu, "CLR");
-                    foreach (char c in settings.LaseSeconds)
-                        AddAction(cdu, c.ToString());
+                    AddActions(cdu, ActionsForCleanNum(settings.LaseSeconds));
                     AddAction(lmfd, "LMFD_17");
                 }
             }
@@ -278,7 +277,7 @@ namespace JAFDTC.Models.A10C.Upload
 
         /// <summary>
         /// Modify the order of the default weapon profiles.
-        /// Important to do this last because it will invalidate the content of _profileQuery.StationMunitionMap
+        /// Important to do this last because it will invalidate the content of _profileQuery.MunitionProfileIndexMap
         /// </summary>
         /// <param name="lmfd"></param>
         private void Build_DefaultProfileOrder(AirframeDevice lmfd)
@@ -345,13 +344,13 @@ namespace JAFDTC.Models.A10C.Upload
         }
         
         /// <summary>
-                 /// Moves the selection indicator on the DSMS profile's page to the profile at toSelectIndex.
-                 /// Assumes we are already on the DSMS profile page.
-                 /// </summary>
-                 /// <param name="lmfd"></param>
-                 /// <param name="currentSelectionIndex"></param>
-                 /// <param name="toSelectIndex"></param>
-                 /// <returns>The new, current selected index.</returns>
+        /// Moves the selection indicator on the DSMS profile's page to the profile at toSelectIndex.
+        /// Assumes we are already on the DSMS profile page.
+        /// </summary>
+        /// <param name="lmfd"></param>
+        /// <param name="currentSelectionIndex"></param>
+        /// <param name="toSelectIndex"></param>
+        /// <returns>The new, current selected index.</returns>
         private int SelectProfile(AirframeDevice lmfd, int currentSelectionIndex, int toSelectIndex)
         {
             if (toSelectIndex > currentSelectionIndex)
