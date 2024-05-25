@@ -236,6 +236,7 @@ namespace JAFDTC.Models.F16C.Upload
                     "Marianas"          => 10,  // UTC +10
                     "Caucasus"          => 4,   // UTC +4
                     "Persian Gulf"      => 4,   // UTC +4
+                    "Kola"              => 3,   // UTC +3
                     "Sinai"             => 3,   // UTC +3
                     "Syria"             => 3,   // UTC +3
                     "South Atlantic"    => -3,  // UTC -3

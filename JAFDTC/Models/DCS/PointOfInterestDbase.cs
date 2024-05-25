@@ -153,6 +153,10 @@ namespace JAFDTC.Models.DCS
             {
                 return "Caucasus";
             }
+            else if (InRange(62.0, lat, 75.0) && InRange(15.0, lon, 48.0))
+            {
+                return "Kola";
+            }
             else if (InRange(10.0, lat, 23.0) && InRange(-149.0, lon, -137.0))
             {
                 return "Marianas";
@@ -197,6 +201,7 @@ namespace JAFDTC.Models.DCS
             return new()
             {
                 "Caucasus",
+                "Kola",
                 "Marianas",
                 "Nevada",
                 "Persian Gulf",

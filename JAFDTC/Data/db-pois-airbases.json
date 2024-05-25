@@ -190,6 +190,114 @@
   },
   {
     "Type": 0,
+    "Theater": "Kola",
+    "Name": "Banak",
+    "Tags": "Airbase",
+    "Latitude": "70.06886667",
+    "Longitude": "24.97365000",
+    "Elevation": "17"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Bas 100",
+    "Tags": "Airbase",
+    "Latitude": "67.06923333",
+    "Longitude": "26.54001667",
+    "Elevation": "736"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Bodo",
+    "Tags": "Airbase",
+    "Latitude": "67.26920000",
+    "Longitude": "14.36535000",
+    "Elevation": "33"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Kalixfors",
+    "Tags": "Airbase",
+    "Latitude": "67.76500000",
+    "Longitude": "20.25100000",
+    "Elevation": "1537"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Kemi Tornio",
+    "Tags": "Airbase",
+    "Latitude": "65.78150000",
+    "Longitude": "24.58230000",
+    "Elevation": "41"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Kiruna",
+    "Tags": "Airbase",
+    "Latitude": "67.82205000",
+    "Longitude": "20.33693333",
+    "Elevation": "1464"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Monchegorsk",
+    "Tags": "Airbase",
+    "Latitude": "67.98906667",
+    "Longitude": "33.01875000",
+    "Elevation": "565"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Murmansk International",
+    "Tags": "Airbase",
+    "Latitude": "68.78166667",
+    "Longitude": "32.75138333",
+    "Elevation": "257"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Olenya",
+    "Tags": "Airbase",
+    "Latitude": "68.15180000",
+    "Longitude": "33.46433333",
+    "Elevation": "682"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Rovaniemi",
+    "Tags": "Airbase",
+    "Latitude": "66.56490000",
+    "Longitude": "25.83058333",
+    "Elevation": "636"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Severomorsk 1",
+    "Tags": "Airbase",
+    "Latitude": "69.03048333",
+    "Longitude": "33.42310000",
+    "Elevation": "267"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Severomorsk 3",
+    "Tags": "Airbase",
+    "Latitude": "68.86698333",
+    "Longitude": "33.71811667",
+    "Elevation": "545"
+  },
+  {
+    "Type": 0,
     "Theater": "Marianas",
     "Name": "Rota Intl",
     "Tags": "Airbase",
