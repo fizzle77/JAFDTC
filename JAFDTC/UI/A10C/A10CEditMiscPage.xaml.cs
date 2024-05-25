@@ -30,7 +30,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using static JAFDTC.Models.F15E.UFC.UFCSystem;
 
 namespace JAFDTC.UI.A10C
 {

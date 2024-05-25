@@ -21,6 +21,7 @@ using JAFDTC.Models.A10C.DSMS;
 using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.Models.A10C.Misc;
 using JAFDTC.Models.A10C.Radio;
+using JAFDTC.Models.A10C.TGP;
 using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.UI.A10C;
 using JAFDTC.Utilities;
@@ -54,6 +55,8 @@ namespace JAFDTC.Models.A10C
         
         public RadioSystem Radio { get; set; }
 
+        public TGPSystem TGP { get; set; }
+
         public WYPTSystem WYPT { get; set; }
 
         [JsonIgnore]
@@ -72,6 +75,7 @@ namespace JAFDTC.Models.A10C
             HMCS = new HMCSSystem();
             Misc = new MiscSystem();
             Radio = new RadioSystem();
+            TGP = new TGPSystem();
             WYPT = new WYPTSystem();
             ConfigurationUpdated();
         }
@@ -89,6 +93,7 @@ namespace JAFDTC.Models.A10C
                 HMCS = (HMCSSystem)HMCS.Clone(),
                 Misc = (MiscSystem)Misc.Clone(),
                 Radio = (RadioSystem)Radio.Clone(),
+                TGP = (TGPSystem)TGP.Clone(),
                 WYPT = (WYPTSystem)WYPT.Clone(),
             };
             clone.ConfigurationUpdated();
@@ -104,6 +109,7 @@ namespace JAFDTC.Models.A10C
                 case HMCSSystem.SystemTag: HMCS = (HMCSSystem)otherHawg.HMCS.Clone(); break;
                 case MiscSystem.SystemTag: Misc = (MiscSystem)otherHawg.Misc.Clone(); break;
                 case RadioSystem.SystemTag: Radio = (RadioSystem)otherHawg.Radio.Clone(); break;
+                case TGPSystem.SystemTag: TGP = (TGPSystem)otherHawg.TGP.Clone(); break;
                 case WYPTSystem.SystemTag: WYPT = (WYPTSystem)otherHawg.WYPT.Clone(); break;
                 default: break;
             }
@@ -139,6 +145,7 @@ namespace JAFDTC.Models.A10C
                 HMCSSystem.SystemTag => JsonSerializer.Serialize(HMCS, Configuration.JsonOptions),
                 MiscSystem.SystemTag => JsonSerializer.Serialize(Misc, Configuration.JsonOptions),
                 RadioSystem.SystemTag => JsonSerializer.Serialize(Radio, Configuration.JsonOptions),
+                TGPSystem.SystemTag => JsonSerializer.Serialize(TGP, Configuration.JsonOptions),
                 WYPTSystem.SystemTag => JsonSerializer.Serialize(WYPT, Configuration.JsonOptions),
                 _ => null
             };
@@ -150,6 +157,7 @@ namespace JAFDTC.Models.A10C
             HMCS ??= new HMCSSystem();
             Misc ??= new MiscSystem();
             Radio ??= new RadioSystem();
+            TGP ??= new TGPSystem();
             WYPT ??= new WYPTSystem();
 
             // TODO: if the version number is older than current, may need to update object
@@ -168,6 +176,7 @@ namespace JAFDTC.Models.A10C
                    ((systemTag == null) && (cboardTag == HMCSSystem.SystemTag)) ||
                    ((systemTag == null) && (cboardTag == MiscSystem.SystemTag)) ||
                    ((systemTag == null) && (cboardTag == RadioSystem.SystemTag)) ||
+                   ((systemTag == null) && (cboardTag == TGPSystem.SystemTag)) ||
                    ((systemTag == null) && (cboardTag == WYPTSystem.SystemTag)));
         }
 
@@ -183,6 +192,7 @@ namespace JAFDTC.Models.A10C
                     case HMCSSystem.SystemTag: HMCS = JsonSerializer.Deserialize<HMCSSystem>(json); break;
                     case MiscSystem.SystemTag: Misc = JsonSerializer.Deserialize<MiscSystem>(json); break;
                     case RadioSystem.SystemTag: Radio = JsonSerializer.Deserialize<RadioSystem>(json); break;
+                    case TGPSystem.SystemTag: TGP = JsonSerializer.Deserialize<TGPSystem>(json); break;
                     case WYPTSystem.SystemTag: WYPT = JsonSerializer.Deserialize<WYPTSystem>(json); break;
                     default: isHandled = false; break;
                 }

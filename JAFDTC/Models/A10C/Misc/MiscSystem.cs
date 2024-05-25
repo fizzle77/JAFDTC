@@ -280,17 +280,17 @@ namespace JAFDTC.Models.A10C.Misc
         //
         public readonly static MiscSystem ExplicitDefaults = new()
         {
-            CoordSystem = "0", // Lat/Long
+            CoordSystem = "0",                  // Lat/Long
             BullseyeOnHUD = false.ToString(),
-            FlightPlan1Manual = "0", // Auto
-            SpeedDisplay = "0", // IAS
-            AapSteerPt = "0", // Flt Plan
-            AapPage = "0", // Other
-            AutopilotMode = "0", // Alt/Hdg
-            TACANMode = "0", // Off
-            TACANBand = "0", // X
+            FlightPlan1Manual = "0",            // Auto
+            SpeedDisplay = "0",                 // IAS
+            AapSteerPt = "0",                   // Flt Plan
+            AapPage = "0",                      // Other
+            AutopilotMode = "0",                // Alt/Hdg
+            TACANMode = "0",                    // Off
+            TACANBand = "0",                    // X
             TACANChannel = "0",
-            IFFMasterMode = "0", // Off
+            IFFMasterMode = "0",                // Off
             IFFMode3Code = "0000",
             IFFMode4On = false.ToString()
         };

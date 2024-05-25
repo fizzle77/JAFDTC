@@ -53,6 +53,7 @@
     <None Remove="UI\A10C\A10CEditDSMSProfileOrder.xaml" />
     <None Remove="UI\A10C\A10CEditHMCSPage.xaml" />
     <None Remove="UI\A10C\A10CEditMiscPage.xaml" />
+    <None Remove="UI\A10C\A10CEditTGPPage.xaml" />
     <None Remove="UI\App\EditPointsOfInterestPage.xaml" />
     <None Remove="UI\App\ImportParamsDialog.xaml" />
     <None Remove="UI\AV8B\AV8BEditWaypointListPage.xaml" />
@@ -165,6 +166,9 @@
     <None Update="Images\gbu-54.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="UI\A10C\A10CEditTGPPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="UI\A10C\A10CEditHMCSPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

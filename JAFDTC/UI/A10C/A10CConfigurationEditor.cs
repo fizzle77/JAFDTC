@@ -19,13 +19,14 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.A10C;
+using JAFDTC.Models.A10C.DSMS;
+using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.Models.A10C.Misc;
 using JAFDTC.Models.A10C.Radio;
+using JAFDTC.Models.A10C.TGP;
 using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.UI.App;
 using System.Collections.ObjectModel;
-using JAFDTC.Models.A10C.DSMS;
-using JAFDTC.Models.A10C.HMCS;
 
 namespace JAFDTC.UI.A10C
 {
@@ -33,11 +34,12 @@ namespace JAFDTC.UI.A10C
     //
     public class Glyphs
     {
-        public const string WYPT = "\xE707";
-        public const string DSMS = "\xEBD2";
+        public const string DSMS =  "\xEBD2";
+        public const string HMCS =  "\xEA4A";
+        public const string MISC =  "\xE8B7";
         public const string RADIO = "\xE704";
-        public const string HMCS = "\xEA4A";
-        public const string MISC = "\xE8B7";
+        public const string TGP =   "\xF272"; // already used by F16 HTS and F15 WSO. choose another?
+        public const string WYPT =  "\xE707";
     }
 
     /// <summary>
@@ -54,6 +56,7 @@ namespace JAFDTC.UI.A10C
                 A10CEditWaypointListHelper.PageInfo,
                 A10CEditDSMSPage.PageInfo,
                 A10CEditRadioPageHelper.PageInfo,
+                A10CEditTGPPage.PageInfo,
                 A10CEditHMCSPage.PageInfo,
                 A10CEditMiscPage.PageInfo
             };
@@ -66,6 +69,7 @@ namespace JAFDTC.UI.A10C
                 HMCSSystem.SystemTag => ((A10CConfiguration)config).HMCS,
                 MiscSystem.SystemTag => ((A10CConfiguration)config).Misc,
                 RadioSystem.SystemTag => ((A10CConfiguration)config).Radio,
+                TGPSystem.SystemTag => ((A10CConfiguration)config).TGP,
                 WYPTSystem.SystemTag => ((A10CConfiguration)config).WYPT,
                 _ => null,
             };
