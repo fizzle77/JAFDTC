@@ -18,11 +18,15 @@
 //
 // ********************************************************************************************************************
 
+using System;
 using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace JAFDTC.Models.DCS
 {
+    /// <summary>
+    /// types for points of interest.
+    /// </summary>
     public enum PointOfInterestType
     {
         UNKNOWN = -1,
@@ -30,6 +34,21 @@ namespace JAFDTC.Models.DCS
         USER = 1,
         CAMPAIGN = 2
     }
+
+    /// <summary>
+    /// type mask for PointOfInterestType enum.
+    /// </summary>
+    [Flags]
+    public enum PointOfInterestTypeMask
+    {
+        NONE = 0,
+        ANY = -1,
+        DCS_CORE = 1 << PointOfInterestType.DCS_CORE,
+        USER = 1 << PointOfInterestType.USER,
+        CAMPAIGN = 1 << PointOfInterestType.CAMPAIGN,
+    }
+
+    // ================================================================================================================
 
     /// <summary>
     /// defines the properties of a point of interest (poi) known to jafdtc. these instances are managed by the poi
@@ -83,6 +102,14 @@ namespace JAFDTC.Models.DCS
         // functions
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// return true if the type of the poi matches a type mask, false otherwise.
+        /// </summary>
+        public bool IsMatchTypeMask(PointOfInterestTypeMask mask)
+        {
+            return mask.HasFlag((PointOfInterestTypeMask)(1 << (int)Type));
+        }
 
         /// <summary>
         /// return true if a value is on [min, max]; false otherwise.

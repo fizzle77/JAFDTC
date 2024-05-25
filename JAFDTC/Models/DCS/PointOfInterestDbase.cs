@@ -23,24 +23,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace JAFDTC.Models.DCS
 {
-    /// <summary>
-    /// type mask for PointOfInterestType enum.
-    /// </summary>
-    [Flags]
-    public enum PointOfInterestTypeMask
-    {
-        NONE = 0,
-        ANY = -1,
-        DCS_CORE = 1 << PointOfInterestType.DCS_CORE,
-        USER = 1 << PointOfInterestType.USER,
-        CAMPAIGN = 1 << PointOfInterestType.CAMPAIGN,
-    }
-
     /// <summary>
     /// flags to control paramters of a query in the point of interest database via Find().
     /// </summary>
@@ -182,8 +168,7 @@ namespace JAFDTC.Models.DCS
 
                 foreach (PointOfInterest poi in kvp.Value)
                 {
-                    PointOfInterestTypeMask poiType = (PointOfInterestTypeMask)(1 << (int)poi.Type);
-                    if (!types.HasFlag(poiType))
+                    if (!poi.IsMatchTypeMask(types))
                     {
                         continue;
                     }
