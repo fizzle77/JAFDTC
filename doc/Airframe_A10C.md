@@ -5,7 +5,9 @@
 JAFDTC supports configuration of the following systems in the A-10C II Warthog,
 
 * DSMS
+* HMCS
 * Radios
+* TGP
 * Waypoints
 * Miscellaneous Systems
 
@@ -56,6 +58,10 @@ implement the link and reset functionality mentioned in the overview of the
 Prior to uploading, you should ensure the relevant systems are powered up and functional.
 Typically, uploads should occur as one of the last steps prior to taxi once you have systems
 powered up, stores loaded, and so on.
+
+## HMCS
+
+TODO
 
 ## Radios
 
@@ -111,6 +117,10 @@ The airframe specific controls for the AN/ARC-210 include,
 Other controls work as described in
 [Communications System Editor](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md#communications-system-editors)
 documentation.
+
+## TGP
+
+TODO
 
 ## Waypoints
 
