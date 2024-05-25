@@ -38,6 +38,8 @@ using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
 using System.Data.SqlTypes;
+using JAFDTC.Utilities.Networking;
+using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.App
 {
@@ -455,7 +457,7 @@ namespace JAFDTC.UI.App
         private void RebuildActionButtonTitle()
         {
             string theater = GetTheaterFromEditor();
-            uiPoITextTheater.Text = theater;
+            uiPoITextTheater.Text = (string.IsNullOrEmpty(theater)) ? "Unknown Theater" : theater;
 
             PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, uiPoIValueName.Text);
             List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
@@ -468,6 +470,8 @@ namespace JAFDTC.UI.App
         /// </summary>
         private void RebuildEnableState()
         {
+            JAFDTC.App curApp = Application.Current as JAFDTC.App;
+
             bool isUserInSel = false;
             bool isCampaignInSel = false;
             foreach (PoIListItem poi in uiPoIListView.SelectedItems.Cast<PoIListItem>())
@@ -505,6 +509,7 @@ namespace JAFDTC.UI.App
 
             Utilities.SetEnableState(uiPoIBtnAdd, !isPoIMatching && isPoIValid);
             Utilities.SetEnableState(uiPoIBtnClear, !EditPoI.IsEmpty);
+            Utilities.SetEnableState(uiPoIBtnCapture, curApp.IsDCSAvailable);
 
             if (!isPoIValid)
             {
@@ -1017,6 +1022,36 @@ namespace JAFDTC.UI.App
         {
             EditPoI.Reset();
             RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// poi capture button click: launch jafdtc side of coordinate capture ui.
+        /// </summary>
+        private async void PoIBtnCapture_Click(object sender, RoutedEventArgs args)
+        {
+            WyptCaptureDataRx.Instance.WyptCaptureDataReceived += PoIBtnCapture_WyptCaptureDataReceived;
+            await Utilities.CaptureSingleDialog(Content.XamlRoot, "Steerpoint");
+            WyptCaptureDataRx.Instance.WyptCaptureDataReceived -= PoIBtnCapture_WyptCaptureDataReceived;
+        }
+
+        /// <summary>
+        /// event handler for data received from the F10 waypoint capture. update the edited poi with the position of
+        /// the location selected in dcs.
+        /// </summary>
+        private void PoIBtnCapture_WyptCaptureDataReceived(WyptCaptureData[] wypts)
+        {
+            // TODO: want to add multiple pois if multiple waypoints selected from f10?
+            if ((wypts.Length > 0) && !wypts[0].IsTarget)
+            {
+                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                {
+                    int index = _llFmtToIndexMap[LLDisplayFmt];
+                    EditPoI.Name = "DCS Capture";
+                    EditPoI.LL[index].LatUI = Coord.ConvertFromLatDD(wypts[0].Latitude, LLDisplayFmt);
+                    EditPoI.LL[index].LonUI = Coord.ConvertFromLonDD(wypts[0].Longitude, LLDisplayFmt);
+                    EditPoI.Alt = wypts[0].Elevation.ToString();
+                });
+            }
         }
 
         // ---- text field changes ------------------------------------------------------------------------------------
