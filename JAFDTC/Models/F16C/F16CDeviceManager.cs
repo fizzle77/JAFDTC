@@ -91,48 +91,56 @@ namespace JAFDTC.Models.F16C
 
             // ---- left mfd
 
+            // NOTE: left and right mfds should use same osb button names
+
             AirframeDevice leftMFD = new(24, "LMFD");
-            leftMFD.AddAction(3012, "OSB-12-PG3", delayMFDs, 1);
-            leftMFD.AddAction(3013, "OSB-13-PG2", delayMFDs, 1);
-            leftMFD.AddAction(3014, "OSB-14-PG1", delayMFDs, 1);
-            leftMFD.AddAction(3001, "OSB-01-BLANK", delayMFDs, 1);
-            leftMFD.AddAction(3002, "OSB-02-HAD", delayMFDs, 1);
+            leftMFD.AddAction(3001, "OSB-01", delayMFDs, 1);
+            leftMFD.AddAction(3002, "OSB-02", delayMFDs, 1);
             leftMFD.AddAction(3003, "OSB-03", delayMFDs, 1);
-            leftMFD.AddAction(3004, "OSB-04-RCCE", delayMFDs, 1);
+            leftMFD.AddAction(3004, "OSB-04", delayMFDs, 1);
             leftMFD.AddAction(3005, "OSB-05", delayMFDs, 1);
-            leftMFD.AddAction(3006, "OSB-06-SMS", delayMFDs, 1);
-            leftMFD.AddAction(3007, "OSB-07-HSD", delayMFDs, 1);
-            leftMFD.AddAction(3008, "OSB-08-DTE", delayMFDs, 1);
-            leftMFD.AddAction(3009, "OSB-09-TEST", delayMFDs, 1);
-            leftMFD.AddAction(3010, "OSB-10-FLCS", delayMFDs, 1);
-            leftMFD.AddAction(3016, "OSB-16-FLIR", delayMFDs, 1);
-            leftMFD.AddAction(3017, "OSB-17-TFR", delayMFDs, 1);
-            leftMFD.AddAction(3018, "OSB-18-WPN", delayMFDs, 1);
-            leftMFD.AddAction(3019, "OSB-19-TGP", delayMFDs, 1);
-            leftMFD.AddAction(3020, "OSB-20-FCR", delayMFDs, 1);
+            leftMFD.AddAction(3006, "OSB-06", delayMFDs, 1);
+            leftMFD.AddAction(3007, "OSB-07", delayMFDs, 1);
+            leftMFD.AddAction(3008, "OSB-08", delayMFDs, 1);
+            leftMFD.AddAction(3009, "OSB-09", delayMFDs, 1);
+            leftMFD.AddAction(3010, "OSB-10", delayMFDs, 1);
+            leftMFD.AddAction(3011, "OSB-11", delayMFDs, 1);
+            leftMFD.AddAction(3012, "OSB-12", delayMFDs, 1);
+            leftMFD.AddAction(3013, "OSB-13", delayMFDs, 1);
+            leftMFD.AddAction(3014, "OSB-14", delayMFDs, 1);
+            leftMFD.AddAction(3015, "OSB-15", delayMFDs, 1);
+            leftMFD.AddAction(3016, "OSB-16", delayMFDs, 1);
+            leftMFD.AddAction(3017, "OSB-17", delayMFDs, 1);
+            leftMFD.AddAction(3018, "OSB-18", delayMFDs, 1);
+            leftMFD.AddAction(3019, "OSB-19", delayMFDs, 1);
+            leftMFD.AddAction(3020, "OSB-20", delayMFDs, 1);
             AddDevice(leftMFD);
 
             // ---- right mfd
 
+            // NOTE: left and right mfds should use same osb button names
+
             AirframeDevice rightMFD = new(25, "RMFD");
-            rightMFD.AddAction(3012, "OSB-12-PG3", delayMFDs, 1);
-            rightMFD.AddAction(3013, "OSB-13-PG2", delayMFDs, 1);
-            rightMFD.AddAction(3014, "OSB-14-PG1", delayMFDs, 1);
-            rightMFD.AddAction(3001, "OSB-01-BLANK", delayMFDs, 1);
-            rightMFD.AddAction(3002, "OSB-02-HAD", delayMFDs, 1);
+            rightMFD.AddAction(3001, "OSB-01", delayMFDs, 1);
+            rightMFD.AddAction(3002, "OSB-02", delayMFDs, 1);
             rightMFD.AddAction(3003, "OSB-03", delayMFDs, 1);
-            rightMFD.AddAction(3004, "OSB-04-RCCE", delayMFDs, 1);
+            rightMFD.AddAction(3004, "OSB-04", delayMFDs, 1);
             rightMFD.AddAction(3005, "OSB-05", delayMFDs, 1);
-            rightMFD.AddAction(3006, "OSB-06-SMS", delayMFDs, 1);
-            rightMFD.AddAction(3007, "OSB-07-HSD", delayMFDs, 1);
-            rightMFD.AddAction(3008, "OSB-08-DTE", delayMFDs, 1);
-            rightMFD.AddAction(3009, "OSB-09-TEST", delayMFDs, 1);
-            rightMFD.AddAction(3010, "OSB-10-FLCS", delayMFDs, 1);
-            rightMFD.AddAction(3016, "OSB-16-FLIR", delayMFDs, 1);
-            rightMFD.AddAction(3017, "OSB-17-TFR", delayMFDs, 1);
-            rightMFD.AddAction(3018, "OSB-18-WPN", delayMFDs, 1);
-            rightMFD.AddAction(3019, "OSB-19-TGP", delayMFDs, 1);
-            rightMFD.AddAction(3020, "OSB-20-FCR", delayMFDs, 1);
+            rightMFD.AddAction(3006, "OSB-06", delayMFDs, 1);
+            rightMFD.AddAction(3007, "OSB-07", delayMFDs, 1);
+            rightMFD.AddAction(3008, "OSB-08", delayMFDs, 1);
+            rightMFD.AddAction(3009, "OSB-09", delayMFDs, 1);
+            rightMFD.AddAction(3010, "OSB-10", delayMFDs, 1);
+            rightMFD.AddAction(3011, "OSB-11", delayMFDs, 1);
+            rightMFD.AddAction(3012, "OSB-12", delayMFDs, 1);
+            rightMFD.AddAction(3013, "OSB-13", delayMFDs, 1);
+            rightMFD.AddAction(3014, "OSB-14", delayMFDs, 1);
+            rightMFD.AddAction(3015, "OSB-15", delayMFDs, 1);
+            rightMFD.AddAction(3016, "OSB-16", delayMFDs, 1);
+            rightMFD.AddAction(3017, "OSB-17", delayMFDs, 1);
+            rightMFD.AddAction(3018, "OSB-18", delayMFDs, 1);
+            rightMFD.AddAction(3019, "OSB-19", delayMFDs, 1);
+            rightMFD.AddAction(3020, "OSB-20", delayMFDs, 1);
             AddDevice(rightMFD);
 
             // ---- ehsi

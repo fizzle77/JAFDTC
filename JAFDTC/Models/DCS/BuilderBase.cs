@@ -145,6 +145,20 @@ namespace JAFDTC.Models.DCS
             return retVal;
         }
 
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // protected methods
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// clear the contents fo the command stream.
+        /// </summary>
+        protected void ClearCommands()
+        {
+            _sb.Clear();
+        }
+
         /// <summary>
         /// add an abort command to the command stream the builder is building. if the message starts with "ERROR: ",
         /// the message (excluding "ERROR: ") will be output to the user through a dcs message.

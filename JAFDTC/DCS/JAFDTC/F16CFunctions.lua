@@ -28,8 +28,11 @@ You should have received a copy of the GNU General Public License along with thi
 --
 -- --------------------------------------------------------------------------------------------------------------------
 
-function JAFDTC_F16CM_GetDED()
-    return JAFDTC_ParseDisplay(6)
+-- 13 hsi
+-- 16 cmds quantities
+
+function JAFDTC_F16CM_GetHUD()
+    return JAFDTC_ParseDisplay(1)
 end
 
 function JAFDTC_F16CM_GetLeftMFD()
@@ -40,16 +43,43 @@ function JAFDTC_F16CM_GetRightMFD()
     return JAFDTC_ParseDisplay(5)
 end
 
+function JAFDTC_F16CM_GetMFD(mfd)
+    if mfd == "left" then
+        return JAFDTC_F16CM_GetLeftMFD()
+    end
+    return JAFDTC_F16CM_GetRightMFD()
+end
+
+function JAFDTC_F16CM_GetDED()
+    return JAFDTC_ParseDisplay(6)
+end
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- debug support
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
+function JAFDTC_F16CM_Fn_DebugDumpDED(msg)
+    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDED - " .. msg)
+    JAFDTC_DebugDisplay(JAFDTC_F16CM_GetDED())
+end
+
+function JAFDTC_F16CM_Fn_DebugDumpLeftMFD(msg)
+    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpLeftMFD - " .. msg)
+    JAFDTC_DebugDisplay(JAFDTC_F16CM_GetLeftMFD())
+end
+
+function JAFDTC_F16CM_Fn_DebugDumpRightMFD(msg)
+    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpRightMFD - " .. msg)
+    JAFDTC_DebugDisplay(JAFDTC_F16CM_GetRightMFD())
+end
+
 -- --------------------------------------------------------------------------------------------------------------------
 --
 -- core support
 --
 -- --------------------------------------------------------------------------------------------------------------------
-
-function JAFDTC_F16CM_Fn_DebugDED(msg)
-    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDED - " .. msg)
-    JAFDTC_DebugDisplay(JAFDTC_F16CM_GetDED())
-end
 
 function JAFDTC_F16CM_Fn_IsLeftHdptOn()
     local switch = GetDevice(0):get_argument_value(670)
@@ -71,6 +101,12 @@ function JAFDTC_F16CM_Fn_IsInAGMode()
     local table = JAFDTC_F16CM_GetDED()
     local str = table["Master_mode"]
     return (str == "A-G")
+end
+
+function JAFDTC_F16CM_Fn_IsInNAVMode()
+    local table = JAFDTC_F16CM_GetHUD()
+    local str = table["HUD_Window8_MasterMode"]
+    return (str == "NAV")
 end
 
 -- --------------------------------------------------------------------------------------------------------------------
@@ -138,25 +174,44 @@ end
 --
 -- --------------------------------------------------------------------------------------------------------------------
 
-function JAFDTC_F16CM_Fn_IsHTSOnMFD(mfd)
-    local mfdTable
-    if mfd == "left" then
-        mfdTable = JAFDTC_F16CM_GetLeftMFD()
-    else
-        mfdTable = JAFDTC_F16CM_GetRightMFD()
+-- return mfd state in format "<sel_osb>,<fmt_12>,<fmt_13>,<fmt_14>" where <sel_osb> is the number of the selected
+-- osb ("0" if unknown), <fmt_x> is the format assigned to osb x.
+--
+function JAFDTC_F16CM_Fn_QueryMFDFormatState(mfd)
+    local function GetSetOSBFormat(table, osb)
+        local format = table["PB_Menu_Label_Black_PB_" .. osb] or table["PB_Menu_Label_" .. osb]
+        if format == "   " then
+            format = ""
+        end
+        return format
     end
+
+    local function GetSetOSBSelected(table)
+        if table["PB_Menu_Label_Black_PB_12"] ~= nil then
+            return "12"
+        elseif table["PB_Menu_Label_Black_PB_13"] ~= nil then
+            return "13"
+        elseif table["PB_Menu_Label_Black_PB_14"] ~= nil then
+            return "14"
+        end
+        return "0"
+    end
+
+    local table = JAFDTC_F16CM_GetMFD(mfd)
+    return string.format("%s,%s,%s,%s",
+                         GetSetOSBSelected(table),
+                         GetSetOSBFormat(table, "12"), GetSetOSBFormat(table, "13"), GetSetOSBFormat(table, "14"))
+end
+
+function JAFDTC_F16CM_Fn_IsHTSOnMFD(mfd)
+    local table = JAFDTC_F16CM_GetMFD(mfd)
     local str = table["HAD_OFF_Lable_name"]
     return (str ~= "HAD")
 end
 
 function JAFDTC_F16CM_Fn_HTSAllNotSelected(mfd)
-    local mfdTable
-    if mfd == "left" then
-        mfdTable = JAFDTC_F16CM_GetLeftMFD()
-    else
-        mfdTable = JAFDTC_F16CM_GetRightMFD()
-    end
-    local str = mfdTable["ALL Table. Root. Unic ID: _id:178. Text"]
+    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local str = table["ALL Table. Root. Unic ID: _id:178. Text"]
     return (str == "ALL")
 end
 
