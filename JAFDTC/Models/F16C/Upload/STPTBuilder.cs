@@ -231,7 +231,7 @@ namespace JAFDTC.Models.F16C.Upload
         {
             if (double.TryParse(stpt.Lat, out double lat) && double.TryParse(stpt.Lon, out double lon))
             {
-                return PointOfInterestDbase.TheaterForCoords(lat, lon) switch
+                return PointOfInterest.TheaterForCoords(lat, lon) switch
                 {
                     "Marianas"          => 10,  // UTC +10
                     "Caucasus"          => 4,   // UTC +4

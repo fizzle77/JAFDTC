@@ -258,7 +258,7 @@ namespace JAFDTC.UI.Base
             {
                 return false;
             }
-            string theater = PointOfInterestDbase.TheaterForCoords(lat, lon);
+            string theater = PointOfInterest.TheaterForCoords(lat, lon);
             PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, EditNavpt.Name);
             List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
             foreach (PointOfInterest poi in pois)
@@ -492,7 +492,7 @@ namespace JAFDTC.UI.Base
             if (!string.IsNullOrEmpty(EditNavpt.Name) && EditNavpt.IsValid &&
                 double.TryParse(EditNavpt.Lat, out double lat) && double.TryParse(EditNavpt.Lon, out double lon))
             {
-                string theater = PointOfInterestDbase.TheaterForCoords(lat, lon);
+                string theater = PointOfInterest.TheaterForCoords(lat, lon);
                 PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, EditNavpt.Name);
                 List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
                 if (pois.Count > 0)
