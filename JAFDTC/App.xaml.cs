@@ -325,9 +325,20 @@ namespace JAFDTC
             {
                 error = "DCS or Airframe Unavailable";
             }
-            else if (!await cfg.UploadAgent.Load())
+            else
             {
-                error = "Configuration Upload Failed";
+                if (Settings.UploadFeedback != UploadFeedbackTypes.LIGHTS)
+                {
+                    Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                    {
+                        General.PlayAudio("ux_action.wav");
+                    });
+                }
+                FileManager.Log($"Upload triggered");
+                if (!await cfg.UploadAgent.Load())
+                {
+                    error = "Configuration Upload Failed";
+                }
             }
             if (error != null)
             {
@@ -372,13 +383,6 @@ namespace JAFDTC
             {
                 IsDCSUploadInFlight = true;
                 MarkerUpdateTimestamp = 0;
-                if (Settings.UploadFeedback != UploadFeedbackTypes.LIGHTS)
-                {
-                    Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
-                    {
-                        General.PlayAudio("ux_action.wav");
-                    });
-                }
                 FileManager.Log($"Upload starts, marker '{data.Marker}'");
             }
             else if (IsDCSUploadInFlight && data.Marker.StartsWith("ERROR: "))
