@@ -407,7 +407,7 @@ namespace JAFDTC.UI.F15E
             {
                 return false;
             }
-            string theater = PointOfInterestDbase.TheaterForCoords(lat, lon);
+            string theater = PointOfInterest.TheaterForCoords(lat, lon);
             PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, EditStpt.Name);
             List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
             foreach (PointOfInterest poi in pois)
@@ -725,41 +725,15 @@ namespace JAFDTC.UI.F15E
         // ---- steerpoint management ---------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// steerpoint add poi click: add current steerpoint to the poi database or update a matching editable poi.
         /// </summary>
         private async void StptBtnAddPoI_Click(object sender, RoutedEventArgs args)
         {
-            if (!string.IsNullOrEmpty(EditStpt.Name) && EditStpt.IsValid &&
-                double.TryParse(EditStpt.Lat, out double lat) && double.TryParse(EditStpt.Lon, out double lon))
+            if (EditStpt.IsValid && await NavpointUIHelper.CreatePoIAt(Content.XamlRoot, EditStpt.Name, EditStpt.Lat,
+                                                                       EditStpt.Lon, EditStpt.Alt))
             {
-                string theater = PointOfInterestDbase.TheaterForCoords(lat, lon);
-                PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, EditStpt.Name);
-                List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
-                if (pois.Count > 0)
-                {
-                    ContentDialogResult result = await Utilities.Message2BDialog(
-                        Content.XamlRoot,
-                        "Point of Interest Already Defined",
-                        $"The database already contains a point of interest for “{EditStpt.Name}”. Would you like to replace it?",
-                        "Replace");
-                    if (result == ContentDialogResult.Primary)
-                    {
-                        pois[0].Name = EditStpt.Name;
-                        pois[0].Latitude = EditStpt.Lat;
-                        pois[0].Longitude = EditStpt.Lon;
-                        pois[0].Elevation = EditStpt.Alt;
-                        RebuildPointsOfInterest();
-                        RebuildInterfaceState();
-                    }
-                }
-                else
-                {
-                    PointOfInterest poi = new(PointOfInterestType.USER,
-                                              theater, EditStpt.Name, "", EditStpt.Lat, EditStpt.Lon, EditStpt.Alt);
-                    PointOfInterestDbase.Instance.Add(poi);
-                    RebuildPointsOfInterest();
-                    RebuildInterfaceState();
-                }
+                RebuildPointsOfInterest();
+                RebuildInterfaceState();
             }
         }
 

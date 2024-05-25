@@ -23,24 +23,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace JAFDTC.Models.DCS
 {
-    /// <summary>
-    /// type mask for PointOfInterestType enum.
-    /// </summary>
-    [Flags]
-    public enum PointOfInterestTypeMask
-    {
-        NONE = 0,
-        ANY = -1,
-        DCS_CORE = 1 << PointOfInterestType.DCS_CORE,
-        USER = 1 << PointOfInterestType.USER,
-        CAMPAIGN = 1 << PointOfInterestType.CAMPAIGN,
-    }
-
     /// <summary>
     /// flags to control paramters of a query in the point of interest database via Find().
     /// </summary>
@@ -139,59 +125,6 @@ namespace JAFDTC.Models.DCS
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// return true if a value is on [min, max]; false otherwise.
-        /// </summary>
-        private static bool InRange(double min, double val, double max) => ((min <= val) && (val <= max));
-
-        /// <summary>
-        /// return the name of the dcs theater that contains the given coordinate, null if no theater matches the
-        /// coordinates. the match is based on approximate lat/lon bounds of the theaters.
-        /// </summary>
-        public static string TheaterForCoords(double lat, double lon)
-        {
-            if (InRange(40.0, lat, 46.0) && InRange(33.0, lon, 46.0))
-            {
-                return "Caucasus";
-            }
-            else if (InRange(62.0, lat, 75.0) && InRange(15.0, lon, 48.0))
-            {
-                return "Kola";
-            }
-            else if (InRange(10.0, lat, 23.0) && InRange(-149.0, lon, -137.0))
-            {
-                return "Marianas";
-            }
-            else if (InRange(34.0, lat, 40.0) && InRange(-119.0, lon, -112.0))
-            {
-                return "Nevada";
-            }
-            else if (InRange(23.0, lat, 33.0) && InRange(47.0, lon, 60.0))
-            {
-                return "Persian Gulf";
-            }
-            else if (InRange(26.0, lat, 32.0) && InRange(28.0, lon, 37.0))
-            {
-                return "Sinai";
-            }
-            else if (InRange(-57.0, lat, -48.0) && InRange(-86.0, lon, -45.0))
-            {
-                return "South Atlantic";
-            }
-            else if (InRange(32.0, lat, 38.0) && InRange(30.0, lon, 41.0))
-            {
-                return "Syria";
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// return the name of the dcs theater that contains the given coordinate, null if no theater matches the
-        /// coordinates. the match is based on approximate lat/lon bounds of the theaters.
-        /// </summary>
-        public static string TheaterForCoords(string lat, string lon)
-            => TheaterForCoords(double.Parse(lat), double.Parse(lon));
-
-        /// <summary>
         /// return a list of strings for all of the theaters represented in the database.
         /// 
         /// TODO: consider allowing user-defined theaters.
@@ -235,8 +168,7 @@ namespace JAFDTC.Models.DCS
 
                 foreach (PointOfInterest poi in kvp.Value)
                 {
-                    PointOfInterestTypeMask poiType = (PointOfInterestTypeMask)(1 << (int)poi.Type);
-                    if (!types.HasFlag(poiType))
+                    if (!poi.IsMatchTypeMask(types))
                     {
                         continue;
                     }
@@ -366,7 +298,7 @@ namespace JAFDTC.Models.DCS
                         Longitude = cols[3].Trim(),
                         Elevation = cols[4].Trim()
                     };
-                    poi.Theater = TheaterForCoords(poi.Latitude, poi.Longitude);
+                    poi.Theater = PointOfInterest.TheaterForCoords(poi.Latitude, poi.Longitude);
                     if (poi.Theater != null )
                     {
                         pois.Add(poi);

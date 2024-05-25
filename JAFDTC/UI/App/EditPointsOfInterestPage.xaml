@@ -323,12 +323,13 @@ https://www.gnu.org/licenses/.
             <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="12,12,0,0"
                   VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="4*"/>
+                    <ColumnDefinition Width="4*"/>
+                    <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="125"/>
                     <ColumnDefinition Width="125"/>
+                    <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- three different lat fields: one for each format (dd, ddm, dms), only one visible at a time
@@ -408,17 +409,32 @@ https://www.gnu.org/licenses/.
                          LostFocus="PoITextBox_LostFocus"
                          ToolTipService.ToolTip="Elevation of point of interest (feet)"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
+                <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,0,0"
                            x:Name="uiPoITextAltUnits"
                            Style="{StaticResource EditorParamStaticTextBlockStyle}">
                     ft
                 </TextBlock>
 
-                <TextBlock Grid.Row="0" Grid.Column="4" Margin="24,0,0,0"
+                <TextBlock Grid.Row="0" Grid.Column="4" Margin="16,0,0,0"
                            x:Name="uiPoITextTheater"
+                           HorizontalAlignment="Left"
                            VerticalAlignment="Center">
-                    FIXUP:THEATER
+                    Unknown Theater
                 </TextBlock>
+                <Button Grid.Column="5" Height="34" Margin="12,0,24,0"
+                        x:Name="uiPoIBtnCapture"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Click="PoIBtnCapture_Click"
+                        ToolTipService.ToolTip="Capture point of interest LAT, LON, ALT from DCS">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE7B7;"/>
+                        <TextBlock VerticalAlignment="Center">
+                            DCS
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
             </Grid>
             <Button Grid.Row="1" Grid.Column="2" Margin="24,12,0,0"
                     x:Name="uiPoIBtnClear"
