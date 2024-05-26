@@ -70,9 +70,6 @@ namespace JAFDTC.Models.A10C.Upload
                 AddActions(cdu, new() { "WP", "LSK_3L" });
                 AddWait(WAIT_BASE);
 
-                AddActions(cdu, new() { "CLR", "CLR" });
-                AddWait(WAIT_BASE);
-
                 AddIfBlock("IsCoordFmtLL", true, null, delegate ()
                 {
                     BuildWaypoints(cdu, wypts);
@@ -98,14 +95,7 @@ namespace JAFDTC.Models.A10C.Upload
 
                 if (wypt.IsValid)
                 {
-                    // TODO: set waypoint id explicitly?
-                    // AddActions(cdu, ActionsForString(wyptID), new() { "LSK_3L", "CLR", "CLR" });
-
-                    AddAction(cdu, "LSK_7R");
-                    AddWait(WAIT_BASE);
-                    AddActions(cdu, new() { "CLR", "CLR" });
-
-                    BuildWaypointName(cdu, wyptID, wypt.Name);
+                    BuildNewWaypointWithName(cdu, wyptID, wypt.Name);
                     
                     BuildWaypointCoords(cdu, wypt);
 
@@ -123,7 +113,7 @@ namespace JAFDTC.Models.A10C.Upload
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void BuildWaypointName(AirframeDevice cdu, string wyptID, string wyptName)
+        private void BuildNewWaypointWithName(AirframeDevice cdu, string wyptID, string wyptName)
         {
             wyptName = Regex.Replace(wyptName.ToUpper(), "^[^A-Z]+", "");
             wyptName = Regex.Replace(wyptName, "[^A-Z0-9 ]", "");
@@ -135,7 +125,7 @@ namespace JAFDTC.Models.A10C.Upload
             {
                 wyptName = wyptName[..12];
             }
-            AddActions(cdu, ActionsForString(wyptName), new(){ "LSK_3R" });
+            AddActions(cdu, ActionsForString(wyptName), new(){ "LSK_7R" });
             AddWait(WAIT_BASE);
             AddActions(cdu, new() { "CLR", "CLR" });
         }
