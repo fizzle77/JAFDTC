@@ -170,6 +170,8 @@ namespace JAFDTC.UI.A10C
                 newSettings.ErrorsChanged += BaseField_DataValidationError;
                 newSettings.PropertyChanged += BaseField_PropertyChanged;
 
+                Utilities.SetEnableState(uiMuniBtnReset, isNotLinked && !newSettings.IsDefault);
+
                 _uiUpdatePending = false;
             });
         }
@@ -373,6 +375,16 @@ namespace JAFDTC.UI.A10C
             {
                 _editState.SetFuzeOption(selectedMunition, uiComboFuze.SelectedIndex.ToString());
                 SaveEditStateToConfig(selectedMunition);
+            }
+        }
+
+        private void MuniBtnReset_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
+            {
+                _editState.GetMunitionSettings(selectedMunition).Reset();
+                SaveEditStateToConfig(selectedMunition);
+                UpdateUIFromEditState();
             }
         }
 
