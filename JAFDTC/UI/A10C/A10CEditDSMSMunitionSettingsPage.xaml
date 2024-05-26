@@ -93,6 +93,7 @@ https://www.gnu.org/licenses/.
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="128" />
@@ -160,18 +161,18 @@ https://www.gnu.org/licenses/.
                 <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center">
                     Ripple
                 </TextBlock>
-                <TextBox Width="72" Margin="12,0,0,0" x:Name="uiTextRippleQty"
+                <TextBox Width="64" Margin="12,0,0,0" x:Name="uiTextRippleQty"
                          HorizontalAlignment="Left" VerticalAlignment="Center"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          MaxLength="2" PlaceholderText="1"
                          LosingFocus="TextRippleQty_LosingFocus"
                          ToolTipService.ToolTip="Number of munitions to release per weapons release depression"/>
-                <TextBlock Margin="12,0,0,0"
+                <TextBlock Margin="6,0,0,0"
                            VerticalAlignment="Center"
                            Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                     at
                 </TextBlock>
-                <TextBox Width="64" Margin="12,0,0,0" x:Name="uiTextRippleFt"
+                <TextBox Width="64" Margin="8,0,0,0" x:Name="uiTextRippleFt"
                          HorizontalAlignment="Left" VerticalAlignment="Center"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          MaxLength="3" PlaceholderText="75"
@@ -274,6 +275,17 @@ https://www.gnu.org/licenses/.
                 seconds
             </TextBlock>
 
+            <!-- Reset Munition -->
+            <Button Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="12,24,0,0" x:Name="uiMuniBtnReset"
+                    HorizontalAlignment="Stretch"
+                    Click="MuniBtnReset_Click"
+                    ToolTipService.ToolTip="Reset the configuration of this munition to its defaults">
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon Margin="0,0,6,0"
+                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                    <TextBlock VerticalAlignment="center">Reset Munition to Defaults</TextBlock>
+                </StackPanel>
+            </Button>
 
         </Grid>
     </Grid>
