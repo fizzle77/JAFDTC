@@ -48,7 +48,7 @@ https://www.gnu.org/licenses/.
             <Setter Property="Margin" Value="12,12,0,0"/>
         </Style>
         <Style x:Key="TextBase" BasedOn="{StaticResource Base}" TargetType="TextBlock">
-            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
         </Style>
         <Style x:Key="TopRowBase" BasedOn="{StaticResource Base}" TargetType="FrameworkElement">
             <Setter Property="Margin" Value="12,12,0,0"/>
@@ -60,16 +60,7 @@ https://www.gnu.org/licenses/.
             <Setter Property="Margin" Value="12,12,0,0"/>
         </Style>
         <Style x:Key="TopRowText" BasedOn="{StaticResource TopRowBase}" TargetType="TextBlock">
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-        </Style>
-        <Style x:Key="ComboIndented" BasedOn="{StaticResource ComboBase}" TargetType="ComboBox">
-            <Setter Property="Margin" Value="12,6,0,0"/>
-        </Style>
-        <Style x:Key="ValueIndented" BasedOn="{StaticResource ValueBase}" TargetType="TextBox">
-            <Setter Property="Margin" Value="12,6,24,0"/>
-        </Style>
-        <Style x:Key="TextIndented" BasedOn="{StaticResource TextBase}" TargetType="TextBlock">
-            <Setter Property="Margin" Value="24,6,0,0"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
         </Style>
 
         <!-- brushes for error fields. -->
@@ -220,8 +211,8 @@ https://www.gnu.org/licenses/.
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource TextIndented}">SPI Indicator</TextBlock>
-                <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboSPIIndicator"
+                <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource TextBase}">SPI Indicator</TextBlock>
+                <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboSPIIndicator"
                           ToolTipService.ToolTip="TLL connecting crosshair to SPI when SPI is outside HMD FOV"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="SPIIndicator">
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -264,8 +255,8 @@ https://www.gnu.org/licenses/.
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="8" Grid.Column="0" Style="{StaticResource TextIndented}">TGP FOV</TextBlock>
-                <ComboBox Grid.Row="8" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboTGPFOV"
+                <TextBlock Grid.Row="8" Grid.Column="0" Style="{StaticResource TextBase}">TGP FOV</TextBlock>
+                <ComboBox Grid.Row="8" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboTGPFOV"
                           ToolTipService.ToolTip="Dashed box outlining TGP field of view"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="TGPFOV">
                     <ComboBoxItem>OCLD</ComboBoxItem>
@@ -284,15 +275,15 @@ https://www.gnu.org/licenses/.
                 <TextBox Grid.Row="9" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextFlightMembers"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="FlightMembersRange"/>
 
-                <TextBlock Grid.Row="10" Grid.Column="0" Style="{StaticResource TextIndented}">FM SPI</TextBlock>
-                <ComboBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboFMSPI"
+                <TextBlock Grid.Row="10" Grid.Column="0" Style="{StaticResource TextBase}">FM SPI</TextBlock>
+                <ComboBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboFMSPI"
                           ToolTipService.ToolTip="Donor SPI from flight member"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="FMSPI">
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="10" Grid.Column="2" Style="{StaticResource ValueIndented}" Name="uiTextFMSPI"
+                <TextBox Grid.Row="10" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextFMSPI"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="FMSPIRange"/>
 
                 <TextBlock Grid.Row="11" Grid.Column="0" Style="{StaticResource TextBase}">Donor Air PPLI</TextBlock>
@@ -306,15 +297,15 @@ https://www.gnu.org/licenses/.
                 <TextBox Grid.Row="11" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextDonorAirPPLI"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="DonorAirPPLIRange"/>
 
-                <TextBlock Grid.Row="12" Grid.Column="0" Style="{StaticResource TextIndented}">Donor SPI</TextBlock>
-                <ComboBox Grid.Row="12" Grid.Column="1" Style="{StaticResource ComboIndented}" Name="uiComboDonorSPI"
+                <TextBlock Grid.Row="12" Grid.Column="0" Style="{StaticResource TextBase}">Donor SPI</TextBlock>
+                <ComboBox Grid.Row="12" Grid.Column="1" Style="{StaticResource ComboBase}" Name="uiComboDonorSPI"
                           ToolTipService.ToolTip="Donor SPI from other aircraft (non-flight members)"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="DonorSPI">
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="12" Grid.Column="2" Style="{StaticResource ValueIndented}" Name="uiTextDonorSPI"
+                <TextBox Grid.Row="12" Grid.Column="2" Style="{StaticResource ValueBase}" Name="uiTextDonorSPI"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="DonorSPIRange"/>
 
                 <TextBlock Grid.Row="13" Grid.Column="0" Style="{StaticResource TextBase}">Current MA</TextBlock>
@@ -337,15 +328,15 @@ https://www.gnu.org/licenses/.
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="2" Grid.Column="4" Style="{StaticResource TextIndented}">Air PPLI Non-Donor</TextBlock>
-                <ComboBox Grid.Row="2" Grid.Column="5" Style="{StaticResource ComboIndented}" Name="uiComboAirPPLINonDonor"
+                <TextBlock Grid.Row="2" Grid.Column="4" Style="{StaticResource TextBase}">Air PPLI Non-Donor</TextBlock>
+                <ComboBox Grid.Row="2" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboAirPPLINonDonor"
                           ToolTipService.ToolTip="Air PPLIs that are not flight members or donors"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="AirPPLINonDonor">
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="2" Grid.Column="6" Style="{StaticResource ValueIndented}" Name="uiTextAirPPLINonDonor"
+                <TextBox Grid.Row="2" Grid.Column="6" Style="{StaticResource ValueBase}" Name="uiTextAirPPLINonDonor"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="AirPPLINonDonorRange"/>
 
                 <TextBlock Grid.Row="3" Grid.Column="4" Style="{StaticResource TextBase}">Ground Environment</TextBlock>
@@ -357,15 +348,15 @@ https://www.gnu.org/licenses/.
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
 
-                <TextBlock Grid.Row="4" Grid.Column="4" Style="{StaticResource TextIndented}">Ground VMF Friend</TextBlock>
-                <ComboBox Grid.Row="4" Grid.Column="5" Style="{StaticResource ComboIndented}" Name="uiComboGndVMFFriend"
+                <TextBlock Grid.Row="4" Grid.Column="4" Style="{StaticResource TextBase}">Ground VMF Friend</TextBlock>
+                <ComboBox Grid.Row="4" Grid.Column="5" Style="{StaticResource ComboBase}" Name="uiComboGndVMFFriend"
                           ToolTipService.ToolTip="All ground VMFs"
                           SelectionChanged="ComboBox_SelectionChanged" Tag="GndVMFFriend">
                     <ComboBoxItem>OCLD</ComboBoxItem>
                     <ComboBoxItem>OFF</ComboBoxItem>
                     <ComboBoxItem>ON</ComboBoxItem>
                 </ComboBox>
-                <TextBox Grid.Row="4" Grid.Column="6" Style="{StaticResource ValueIndented}" Name="uiTextGndVMFFriend"
+                <TextBox Grid.Row="4" Grid.Column="6" Style="{StaticResource ValueBase}" Name="uiTextGndVMFFriend"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="GndVMFFriendRange"/>
 
                 <TextBlock Grid.Row="5" Grid.Column="4" Style="{StaticResource TextBase}">Steerpoint</TextBlock>
