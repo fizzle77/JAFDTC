@@ -1,6 +1,6 @@
 ﻿// ********************************************************************************************************************
 //
-// HMCSSystem.cs -- a-10c tgp system
+// TGPSystem.cs -- a-10c tgp system
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
 // Copyright(C) 2023 ilominar/raven
