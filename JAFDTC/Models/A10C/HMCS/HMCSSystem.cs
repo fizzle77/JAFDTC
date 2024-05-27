@@ -19,7 +19,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -49,7 +48,7 @@ namespace JAFDTC.Models.A10C.HMCS
         NIGHT = 2
     }
 
-    public class HMCSSystem : BindableObject, ISystem
+    public class HMCSSystem : A10CSystemBase
     {
         public const string SystemTag = "JAFDTC:A10C:HMCS";
 
@@ -109,7 +108,7 @@ namespace JAFDTC.Models.A10C.HMCS
         // ---- synthesized properties
 
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get
             {
@@ -173,7 +172,7 @@ namespace JAFDTC.Models.A10C.HMCS
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public void Reset()
+        public override void Reset()
         {
             ActiveProfile = "0";
             TGPTrack = "0";

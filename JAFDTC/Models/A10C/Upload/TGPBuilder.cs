@@ -19,9 +19,7 @@
 
 using JAFDTC.Models.A10C.TGP;
 using JAFDTC.Models.DCS;
-using JAFDTC.Utilities;
 using System;
-using System.Reflection;
 using System.Text;
 
 namespace JAFDTC.Models.A10C.Upload

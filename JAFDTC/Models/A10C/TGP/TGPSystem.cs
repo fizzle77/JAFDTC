@@ -43,14 +43,6 @@ namespace JAFDTC.Models.A10C.TGP
         BHOT = 2
     }
 
-    // defines the laser latch options
-    //
-    public enum LatchOptions
-    {
-        ON = 0, // counterintuitive to have ON be 0, but ON is the default
-        OFF = 1
-    }
-
     // defines the video mode options
     //
     public enum YardstickOptions
@@ -60,15 +52,7 @@ namespace JAFDTC.Models.A10C.TGP
         OFF = 2
     }
 
-    // defines the laser latch options
-    //
-    public enum FrndOptions
-    {
-        ON = 0, // counterintuitive to have ON be 0, but ON is the default
-        OFF = 1
-    }
-
-    public class TGPSystem : BindableObject, ISystem
+    public class TGPSystem : A10CSystemBase
     {
         public const string SystemTag = "JAFDTC:A10C:TGP";
 
@@ -135,13 +119,13 @@ namespace JAFDTC.Models.A10C.TGP
             }
         }
 
-        private string _latch;                              // integer [0, 1]
+        private string _latch;                              // bool
         public string Latch
         {
             get => _latch;
             set
             {
-                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 1)) ? null : "Invalid format";
+                string error = (string.IsNullOrEmpty(value) || IsBooleanFieldValid(value)) ? null : "Invalid format";
                 SetProperty(ref _latch, value, error);
             }
         }
@@ -157,13 +141,13 @@ namespace JAFDTC.Models.A10C.TGP
             }
         }
 
-        private string _frnd;                              // integer [0, 1]
+        private string _frnd;                              // boolean
         public string FRND
         {
             get => _frnd;
             set
             {
-                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 1)) ? null : "Invalid format";
+                string error = (string.IsNullOrEmpty(value) || IsBooleanFieldValid(value)) ? null : "Invalid format";
                 SetProperty(ref _frnd, value, error);
             }
         }
@@ -182,7 +166,7 @@ namespace JAFDTC.Models.A10C.TGP
         // ---- synthesized properties
 
         [JsonIgnore]
-        public bool IsDefault => CoordDisplayIsDefault && VideoModeIsDefault && LaserCodeIsDefault && LSSIsDefault && LatchIsDefault
+        public override bool IsDefault => CoordDisplayIsDefault && VideoModeIsDefault && LaserCodeIsDefault && LSSIsDefault && LatchIsDefault
             && TAAFIsDefault && FrndIsDefault && YardstickIsDefault;
 
         [JsonIgnore]
@@ -252,15 +236,15 @@ namespace JAFDTC.Models.A10C.TGP
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public void Reset()
+        public override void Reset()
         {
-            CoordDisplay = "0";  // LL
+            CoordDisplay = "0"; // LL
             VideoMode = "0";    // CCD
             LaserCode = "1688";
             LSS = "1688";
-            Latch = "0";        // ON
+            Latch = "True";     // ON
             TAAF = "0";
-            FRND = "0";         // ON
+            FRND = "True";      // ON
             Yardstick = "0";    // METRIC
         }
 
@@ -272,13 +256,13 @@ namespace JAFDTC.Models.A10C.TGP
 
         public readonly static TGPSystem ExplicitDefaults = new()
         {
-            CoordDisplay = "0",  // LL
+            CoordDisplay = "0", // LL
             VideoMode = "0",    // CCD
             LaserCode = "1688",
             LSS = "1688",
-            Latch = "0",        // ON
+            Latch = "True",     // ON
             TAAF = "0",
-            FRND = "0",         // ON
+            FRND = "True",      // ON
             Yardstick = "0",    // METRIC
         };
     }

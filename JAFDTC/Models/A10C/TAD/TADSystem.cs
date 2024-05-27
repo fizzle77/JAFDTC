@@ -80,7 +80,7 @@ namespace JAFDTC.Models.A10C.TAD
         Depressed
     }
 
-    public class TADSystem : BindableObject, ISystem
+    public class TADSystem : A10CSystemBase
     {
         public const string SystemTag = "JAFDTC:A10C:TAD";
 
@@ -274,7 +274,7 @@ namespace JAFDTC.Models.A10C.TAD
         // ---- synthesized properties
 
         [JsonIgnore]
-        public bool IsDefault => IsCoordDisplayDefault && IsGrpIDDefault && IsOwnIDDefault && IsCallsignDefault && IsHookOptionDefault
+        public override bool IsDefault => IsCoordDisplayDefault && IsGrpIDDefault && IsOwnIDDefault && IsCallsignDefault && IsHookOptionDefault
             && IsHookOwnshipDefault && IsMapRangeDefault && IsCenterDepressedDefault && IsMapOptionDefault && IsProfileBullseyeDefault
             && IsProfileRangeRingsDefault && IsProfileHookInfoDefault && IsProfileWaypointLinesDefault && IsProfileWaypointLabelDefault
             && IsProfileWaypointsDefault && IsProfileSPIDisplayDefault;
@@ -392,7 +392,7 @@ namespace JAFDTC.Models.A10C.TAD
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public void Reset()
+        public override void Reset()
         {
             CoordDisplay = "0";
             GrpID = "";

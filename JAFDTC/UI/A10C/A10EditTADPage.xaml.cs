@@ -1,6 +1,6 @@
 // ********************************************************************************************************************
 //
-// A10CEditTGPPage.xaml.cs : ui c# for warthog tgp page
+// A10CEditTADPage.xaml.cs : ui c# for warthog tad page
 //
 // Copyright(C) 2024 fizzle
 //
@@ -18,29 +18,30 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.A10C;
-using JAFDTC.Models.A10C.TGP;
+using JAFDTC.Models.A10C.HMCS;
+using JAFDTC.Models.A10C.TAD;
 using JAFDTC.UI.App;
+using System;
 
 namespace JAFDTC.UI.A10C
 {
     /// <summary>
-    /// Code-behind class for the A10 TGP editor.
+    /// Code-behind class for the A10 HMCS editor.
     /// </summary>
-    public sealed partial class A10CEditTGPPage : A10CPageBase
+    public sealed partial class A10CEditTADPage : A10CPageBase
     {
-        private const string SYSTEM_NAME = "TGP";
+        private const string SYSTEM_NAME = "TAD";
 
-        //private TGPSystem EditState => (TGPSystem)_editState;
-        protected override A10CSystemBase SystemConfig => _config.TGP;
+        protected override A10CSystemBase SystemConfig => _config.TAD;
+        private TADSystem EditState => (TADSystem)_editState;
 
         public static ConfigEditorPageInfo PageInfo
-            => new(TGPSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.TGP, typeof(A10CEditTGPPage));
+            => new(HMCSSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.TAD, typeof(A10CEditTADPage));
 
-        public A10CEditTGPPage() : base(SYSTEM_NAME, TGPSystem.SystemTag)
+        public A10CEditTADPage() : base(SYSTEM_NAME, TADSystem.SystemTag)
         {
             InitializeComponent();
-            InitializeBase(new TGPSystem(), uiTextLaserCode, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            //TODO InitializeBase
         }
-
     }
 }
