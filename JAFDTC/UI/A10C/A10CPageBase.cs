@@ -33,20 +33,24 @@ using System.Reflection;
 namespace JAFDTC.UI.A10C
 {
     /// <summary>
-    /// There are some conventions followed in (some of) the A-10's editor pages that make this class work:
+    /// There are some conventions followed in A-10 editor pages that make this class work:
     /// 
     /// 1. All settings are managed by TextBoxes, ComboBoxes, or CheckBoxes. There is no handling of other control 
-    ///    types. The change handlers for those controls provided by this base class (TextBox_LostFocus,
+    ///    types. The change handlers for those control types provided by this base class (TextBox_LostFocus,
     ///    ComboBox_SelectionChanged, and CheckBox_Clicked) should be used for all controls managing a system property.
+    ///    You can use other control types, but you must handle their state yourself.
     /// 
-    /// 2. The underlying type for a setting managed by a CheckBox must be a bool: "True" or "False" in the serialized
+    /// 2. The underlying type for a setting managed by a ComboBox must be an int (or preferably an int-backed enum). 
+    ///    Values displayed in the ComboBox must correspond exactly, and be in the same order as, the corresponding 
+    ///    enum of options.
+    ///    
+    /// 3. The underlying type for a setting managed by a CheckBox must be a bool: "True" or "False" in the serialized
     ///    config.
     /// 
-    /// 3. The underlying type for ComboBox must be an int (or an int-backed enum) and the the list of options must
-    ///    follow the numeric order. The value configured is the ComboBox selectedIndex.
-    ///    
-    /// 4. Every control the manages a system setting (whether TextBox, ComboBox, or CheckBox) must have the property's
-    ///    name as its Tag.
+    /// 4. Every control that manages a system setting (whether TextBox, ComboBox, or CheckBox) must have the property's
+    ///    name as its Tag. For example, the TGP editor's checkbox that manages the Latch setting corresponds to the
+    ///    TGPSystem.Latch property, so it has Tag="Latch" in its XAML definition. Only controls with a tag are handled
+    ///    by this base class.
     ///    
     /// 5. _editState is the in-memory storage for settings, and property values are copied in and out of SystemConfig,
     ///    the config store. For editors that have more sophisticated needs, relevant methods can be overriden:
@@ -54,8 +58,8 @@ namespace JAFDTC.UI.A10C
     ///    
     /// 6. Custom UI update logic can be performed inside the UI Dispatcher delegate by overriding UpdateUICustom().
     ///    
-    /// 6. Derived classes must call the base contructor. They must call InitializeBase() with the provided parameters
-    ///    after the InitializeComponent() call.
+    /// 7. Derived classes must call the base contructor. They must also call InitializeBase() after
+    ///    InitializeComponent().
     /// </summary>
     public abstract class A10CPageBase : Page
     {
@@ -78,7 +82,7 @@ namespace JAFDTC.UI.A10C
         private TextBlock _uiPageTxtLink;
         private Button _uiPageBtnReset;
 
-        // For configuration linking UI.
+        // For the configuration linking UI.
         private readonly Dictionary<string, string> _configNameToUID = new Dictionary<string, string>();
         private readonly List<string> _configNameList = new List<string>();
         private readonly string _systemName;
@@ -151,7 +155,7 @@ namespace JAFDTC.UI.A10C
                 if (_pageTextBoxes == null || _pageTextBoxes.Count == 0)
                 {
                     var allTextBoxes = new List<TextBox>();
-                    Utilities.FindChildren(allTextBoxes, this);
+                    Utilities.FindDescendantControls(allTextBoxes, this);
 
                     _pageTextBoxes = new Dictionary<string, TextBox>(allTextBoxes.Count);
                     foreach (var textBox in allTextBoxes)
@@ -177,7 +181,7 @@ namespace JAFDTC.UI.A10C
                 if (_pageComboBoxes == null || _pageComboBoxes.Count == 0)
                 {
                     var allComboBoxes = new List<ComboBox>();
-                    Utilities.FindChildren(allComboBoxes, this);
+                    Utilities.FindDescendantControls(allComboBoxes, this);
 
                     _pageComboBoxes = new Dictionary<string, ComboBox>(allComboBoxes.Count);
                     foreach (var comboBox in allComboBoxes)
@@ -203,7 +207,7 @@ namespace JAFDTC.UI.A10C
                 if (_pageCheckBoxes == null || _pageCheckBoxes.Count == 0)
                 {
                     var allCheckBoxes = new List<CheckBox>();
-                    Utilities.FindChildren(allCheckBoxes, this);
+                    Utilities.FindDescendantControls(allCheckBoxes, this);
 
                     _pageCheckBoxes = new Dictionary<string, CheckBox>(allCheckBoxes.Count);
                     foreach (var checkBox in allCheckBoxes)
@@ -234,12 +238,10 @@ namespace JAFDTC.UI.A10C
         }
 
         /// <summary>
-        /// Override if not every tagged control on the page is backed by the page's common _editState.
+        /// Finds the corresponding edit-state or config class and property for the provided control.
+        /// Derived classes should override this method if not every tagged control on the page is backed by the page's common 
+        /// _editState and SystemConfig.
         /// </summary>
-        /// <param name="settingLocation"></param>
-        /// <param name="control"></param>
-        /// <param name="property"></param>
-        /// <param name="configOrEdit"></param>
         protected virtual void GetControlPropertyHelper(
             SettingLocation settingLocation, 
             FrameworkElement control,
@@ -261,12 +263,20 @@ namespace JAFDTC.UI.A10C
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Derived classes should override if not all relevant settings are included in the _editState and SystemConfig 
+        /// classes managed by this base class.
+        /// </summary>
         protected virtual void CopyConfigToEditState()
         {
             CopyAllSettings(SystemConfig, _editState);
             UpdateUIFromEditState();
         }
 
+        /// <summary>
+        /// Derived classes should override if not all relevant settings are included in the _editState and SystemConfig 
+        /// classes managed by this base class.
+        /// </summary>
         protected virtual void SaveEditStateToConfig()
         {
             if (_editState.HasErrors)
@@ -279,6 +289,9 @@ namespace JAFDTC.UI.A10C
         /// <summary>
         /// Iterate over all the settings controls via PageTextBoxes, PageComboBoxes, and PageCheckBoxes.
         /// For each control, get the corresponding property and copy its value from source to destination.
+        /// 
+        /// Derived classes should override if not all controls can be mapped to a property on the _editState and 
+        /// SystemConfig classes managed by this base class.
         /// </summary>
         protected virtual void CopyAllSettings(BindableObject source, BindableObject destination)
         {
