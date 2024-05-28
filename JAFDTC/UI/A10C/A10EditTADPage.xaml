@@ -62,13 +62,14 @@ https://www.gnu.org/licenses/.
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="50"/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!--
@@ -114,7 +115,7 @@ https://www.gnu.org/licenses/.
                      MaxLength="4"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="Callsign"/>
 
-
+            
             <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,24,0,0"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
                 Display Settings:
@@ -145,43 +146,58 @@ https://www.gnu.org/licenses/.
                        HorizontalTextAlignment="Right">
                        Range
             </TextBlock>
-            <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" Margin="12,12,0,0">
-                <ComboBox x:Name="uiComboRange"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Left"
-                      SelectionChanged="ComboBox_SelectionChanged" Tag="MapRange">
-                    <ComboBox.Items>
-                        <!-- Must match enum order -->
-                        <TextBlock Text="5 "/>
-                        <TextBlock Text="10"/>
-                        <TextBlock Text="20"/>
-                        <TextBlock Text="40"/>
-                        <TextBlock Text="80"/>
-                        <TextBlock Text="160"/>
-                    </ComboBox.Items>
-                </ComboBox>
-                <ComboBox x:Name="uiCenterDepress"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Left"
-                      SelectionChanged="ComboBox_SelectionChanged" Tag="CenterDepress">
-                    <ComboBox.Items>
-                        <!-- Must match enum order -->
-                        <TextBlock Text="Center"/>
-                        <TextBlock Text="Depress"/>
-                    </ComboBox.Items>
-                </ComboBox>
-            </StackPanel>
+            <ComboBox x:Name="uiComboRange" Grid.Row="6" Grid.Column="1" Margin="12,12,0,0"
+                      Width="100"
+                      VerticalAlignment="Center" 
+                      HorizontalAlignment="Left" 
+                      SelectionChanged="ComboBox_SelectionChanged" 
+                      Tag="MapRange">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="5 "/>
+                    <TextBlock Text="10"/>
+                    <TextBlock Text="20"/>
+                    <TextBlock Text="40"/>
+                    <TextBlock Text="80"/>
+                    <TextBlock Text="160"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+
+            <!-- Ownship Position -->
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Ownship Position
+            </TextBlock>
+            <ComboBox x:Name="uiCenterDepress" 
+                      Grid.Row="7" 
+                      Grid.Column="1" 
+                      Margin="12,12,0,0" 
+                      Width="110" 
+                      VerticalAlignment="Center" 
+                      HorizontalAlignment="Left" 
+                      SelectionChanged="ComboBox_SelectionChanged"
+                      Tag="CenterDepress">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="Center"/>
+                    <TextBlock Text="Depress"/>
+                </ComboBox.Items>
+            </ComboBox>
 
             <!-- Hook Option -->
-            <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0"
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right">
                        Hook Option
             </TextBlock>
-            <ComboBox Grid.Row="7" Grid.Column="1" x:Name="uiComboHookOption" Margin="12,12,0,0"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Left"
-                    SelectionChanged="ComboBox_SelectionChanged" Tag="HookOption">
+            <ComboBox Grid.Row="8" Grid.Column="1" x:Name="uiComboHookOption" Margin="12,12,0,0"
+                      Width="135" 
+                      VerticalAlignment="Center" 
+                      HorizontalAlignment="Left" 
+                      SelectionChanged="ComboBox_SelectionChanged"
+                      Tag="HookOption">
                 <ComboBox.Items>
                     <!-- Must match enum order -->
                     <TextBlock Text="HOOK OWN"/>
@@ -196,29 +212,31 @@ https://www.gnu.org/licenses/.
             </ComboBox>
 
             <!-- Hook Ownship -->
-            <TextBlock Grid.Row="8" Grid.Column="0" Margin="12,12,0,0"
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        VerticalAlignment="Center"
                        HorizontalTextAlignment="Right">
                        Hook Ownship
             </TextBlock>
-            <CheckBox Grid.Row="8" Grid.Column="1" Margin="12,12,0,0"
+            <CheckBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0"
                     x:Name="uiCheckHookOwnship"
                     Click="CheckBox_Clicked"
                     Tag="HookOwnship"
                     ToolTipService.ToolTip="When enabled, hook ownship to enable hook option display"/>
 
             <!-- Map -->
-            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0"
+            <TextBlock Grid.Row="10" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right">
                        Map
             </TextBlock>
-            <ComboBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0"
+            <ComboBox Grid.Row="10" Grid.Column="1" Margin="12,12,0,0"
+                      Width="90"
                       x:Name="uiComboMapOption"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Left"
-                      SelectionChanged="ComboBox_SelectionChanged" Tag="MapOption">
+                      SelectionChanged="ComboBox_SelectionChanged"
+                      Tag="MapOption">
                 <ComboBox.Items>
                     <!-- Must match enum order -->
                     <TextBlock Text="AUTO"/>
@@ -245,10 +263,12 @@ https://www.gnu.org/licenses/.
                        Bullseye
             </TextBlock>
             <ComboBox Grid.Row="1" Grid.Column="4" Margin="12,12,0,0"
+                      Width="100"
                       x:Name="uiComboBullseye"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Left"
-                      SelectionChanged="ComboBox_SelectionChanged" Tag="ProfileBullseye">
+                      SelectionChanged="ComboBox_SelectionChanged"
+                      Tag="ProfileBullseye">
                 <ComboBox.Items>
                     <!-- Must match enum order -->
                     <TextBlock Text="ON"/>
@@ -263,10 +283,12 @@ https://www.gnu.org/licenses/.
                        Range Rings
             </TextBlock>
             <ComboBox Grid.Row="2" Grid.Column="4" Margin="12,12,0,0"
+                      Width="100"
                       x:Name="uiComboRangeRings"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Left"
-                      SelectionChanged="ComboBox_SelectionChanged" Tag="ProfileRangeRings">
+                      SelectionChanged="ComboBox_SelectionChanged"
+                      Tag="ProfileRangeRings">
                 <ComboBox.Items>
                     <!-- Must match enum order -->
                     <TextBlock Text="ON"/>
@@ -281,10 +303,12 @@ https://www.gnu.org/licenses/.
                        Hook Info
             </TextBlock>
             <ComboBox Grid.Row="3" Grid.Column="4" Margin="12,12,0,0"
+                      Width="100"
                       x:Name="uiComboHookInfo"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Left"
-                      SelectionChanged="ComboBox_SelectionChanged" Tag="ProfileHookInfo">
+                      SelectionChanged="ComboBox_SelectionChanged"
+                      Tag="ProfileHookInfo">
                 <ComboBox.Items>
                     <!-- Must match enum order -->
                     <TextBlock Text="ON"/>
@@ -300,10 +324,12 @@ https://www.gnu.org/licenses/.
                        Waypoint Lines
             </TextBlock>
             <ComboBox Grid.Row="4" Grid.Column="4" Margin="12,12,0,0"
+                      Width="100"
                       x:Name="uiComboWaypointLines"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Left"
-                      SelectionChanged="ComboBox_SelectionChanged" Tag="ProfileWaypointLines">
+                      SelectionChanged="ComboBox_SelectionChanged"
+                      Tag="ProfileWaypointLines">
                 <ComboBox.Items>
                     <!-- Must match enum order -->
                     <TextBlock Text="ON"/>
@@ -318,6 +344,7 @@ https://www.gnu.org/licenses/.
                        Waypoint Labels
             </TextBlock>
             <ComboBox Grid.Row="5" Grid.Column="4" Margin="12,12,0,0"
+                      Width="100"
                       x:Name="uiComboWaypointLabel"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Left"
@@ -336,6 +363,7 @@ https://www.gnu.org/licenses/.
                        Waypoints
             </TextBlock>
             <ComboBox Grid.Row="6" Grid.Column="4" Margin="12,12,0,0"
+                      Width="100"
                       x:Name="uiComboWaypoints"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Left"
@@ -354,6 +382,7 @@ https://www.gnu.org/licenses/.
                        SPI Display
             </TextBlock>
             <ComboBox Grid.Row="7" Grid.Column="4" Margin="12,12,0,0"
+                      Width="100"
                       x:Name="uiComboSPIDisplay"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Left"
