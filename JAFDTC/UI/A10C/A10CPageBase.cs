@@ -1,4 +1,23 @@
-﻿using JAFDTC.Models.A10C;
+﻿// ********************************************************************************************************************
+//
+// A10CPageBase.cs : Base Page class for A-10 system editors
+//
+// Copyright(C) 2024 fizzle
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+// for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.  If not, see
+// <https://www.gnu.org/licenses/>.
+//
+// ********************************************************************************************************************
+
+using JAFDTC.Models.A10C;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using Microsoft.UI.Dispatching;
@@ -13,6 +32,31 @@ using System.Reflection;
 
 namespace JAFDTC.UI.A10C
 {
+    /// <summary>
+    /// There are some conventions followed in (some of) the A-10's editor pages that make this class work:
+    /// 
+    /// 1. All settings are managed by TextBoxes, ComboBoxes, or CheckBoxes. There is no handling of other control 
+    ///    types. The change handlers for those controls provided by this base class (TextBox_LostFocus,
+    ///    ComboBox_SelectionChanged, and CheckBox_Clicked) should be used for all controls managing a system property.
+    /// 
+    /// 2. The underlying type for a setting managed by a CheckBox must be a bool: "True" or "False" in the serialized
+    ///    config.
+    /// 
+    /// 3. The underlying type for ComboBox must be an int (or an int-backed enum) and the the list of options must
+    ///    follow the numeric order. The value configured is the ComboBox selectedIndex.
+    ///    
+    /// 4. Every control the manages a system setting (whether TextBox, ComboBox, or CheckBox) must have the property's
+    ///    name as its Tag.
+    ///    
+    /// 5. _editState is the in-memory storage for settings, and property values are copied in and out of SystemConfig,
+    ///    the config store. For editors that have more sophisticated needs, relevant methods can be overriden:
+    ///    GetControlPropertyHelper, CopyConfigToEditState, SaveEditStateToConfig, and CopyAllSettings.
+    ///    
+    /// 6. Custom UI update logic can be performed inside the UI Dispatcher delegate by overriding UpdateUICustom().
+    ///    
+    /// 6. Derived classes must call the base contructor. They must call InitializeBase() with the provided parameters
+    ///    after the InitializeComponent() call.
+    /// </summary>
     public abstract class A10CPageBase : Page
     {
         protected enum SettingLocation
@@ -44,12 +88,26 @@ namespace JAFDTC.UI.A10C
         protected abstract A10CSystemBase SystemConfig { get; }
 
 
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // construction
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Must be called from derived class constructor.
+        /// </summary>
         public A10CPageBase(string systemName, string systemTag) 
         {
+            if (systemName == null) throw new ArgumentException("systemName can not be null");
+            if (systemTag == null) throw new ArgumentException("systemTag can not be null");
             _systemName = systemName;
             _systemTag = systemTag;
         }
 
+        /// <summary>
+        /// Must be called from derived class constructor after InitializeComponent().
+        /// </summary>
         protected void InitializeBase(
             A10CSystemBase editState,
             TextBox setDefaultsFrom, 
@@ -57,6 +115,12 @@ namespace JAFDTC.UI.A10C
             TextBlock uiPageTxtLink,
             Button uiPageBtnReset)
         {
+            if (editState == null) throw new ArgumentException("editState can not be null");
+            if (setDefaultsFrom == null) throw new ArgumentException("setDefaultsFrom can not be null");
+            if (uiPageBtnTxtLink == null) throw new ArgumentException("uiPageBtnTxtLink can not be null");
+            if (uiPageTxtLink == null) throw new ArgumentException("uiPageTxtLink can not be null");
+            if (uiPageBtnReset == null) throw new ArgumentException("uiPageBtnReset can not be null");
+
             _editState = editState;
             _editState.ErrorsChanged += BaseField_DataValidationError;
             _editState.PropertyChanged += BaseField_PropertyChanged;
@@ -68,6 +132,12 @@ namespace JAFDTC.UI.A10C
             _uiPageTxtLink = uiPageTxtLink;
             _uiPageBtnReset = uiPageBtnReset;
         }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // control and property management
+        //
+        // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Lazy load and return all the TextBox controls on this page having a Tag set.
@@ -185,6 +255,12 @@ namespace JAFDTC.UI.A10C
                 configOrEdit = SystemConfig;
         }
 
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // state management: ui/edit/config copying and saving
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
         protected virtual void CopyConfigToEditState()
         {
             CopyAllSettings(SystemConfig, _editState);
@@ -277,6 +353,11 @@ namespace JAFDTC.UI.A10C
         /// </summary>
         protected virtual void UpdateUICustom() { }
 
+        protected void UpdateLinkControls()
+        {
+            Utilities.RebuildLinkControls(_config, _systemTag, _navArgs.UIDtoConfigMap, _uiPageBtnTxtLink, _uiPageTxtLink);
+        }
+
         // ---- control event handlers --------------------------------------------------------------------------------
 
         /// <summary>
@@ -363,6 +444,8 @@ namespace JAFDTC.UI.A10C
             UpdateUIFromEditState();
         }
 
+        // ---- link/reset button handlers -------------------------------------------------------------------------------------------
+
         protected async void PageBtnReset_Click(object sender, RoutedEventArgs e)
         {
             ContentDialogResult result = await Utilities.Message2BDialog(
@@ -400,6 +483,8 @@ namespace JAFDTC.UI.A10C
             UpdateLinkControls();
         }
 
+        // ---- page-level event handlers -------------------------------------------------------------------------------------------
+
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             _navArgs = (ConfigEditorPageNavArgs)args.Parameter;
@@ -411,11 +496,6 @@ namespace JAFDTC.UI.A10C
             CopyConfigToEditState();
 
             base.OnNavigatedTo(args);
-        }
-
-        protected void UpdateLinkControls()
-        {
-            Utilities.RebuildLinkControls(_config, _systemTag, _navArgs.UIDtoConfigMap, _uiPageBtnTxtLink, _uiPageTxtLink);
         }
     }
 }

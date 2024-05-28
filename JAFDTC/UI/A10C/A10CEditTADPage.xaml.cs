@@ -31,7 +31,6 @@ namespace JAFDTC.UI.A10C
         private const string SYSTEM_NAME = "TAD";
 
         protected override A10CSystemBase SystemConfig => _config.TAD;
-        //private TADSystem EditState => (TADSystem)_editState;
 
         public static ConfigEditorPageInfo PageInfo
             => new(TADSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.TAD, typeof(A10CEditTADPage));

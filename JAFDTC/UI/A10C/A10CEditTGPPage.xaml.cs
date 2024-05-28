@@ -30,7 +30,6 @@ namespace JAFDTC.UI.A10C
     {
         private const string SYSTEM_NAME = "TGP";
 
-        //private TGPSystem EditState => (TGPSystem)_editState;
         protected override A10CSystemBase SystemConfig => _config.TGP;
 
         public static ConfigEditorPageInfo PageInfo
