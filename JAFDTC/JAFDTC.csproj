@@ -67,6 +67,7 @@
     <None Remove="UI\F15E\F15EEditSteerpointPage.xaml" />
     <None Remove="UI\F15E\F15EEditUFCPage.xaml" />
     <None Remove="UI\F16C\F16CEditHTSThreatsPage.xaml" />
+    <None Remove="UI\F16C\F16CEditSMSPage.xaml" />
     <None Remove="UI\FA18C\FA18CEditCMSPage.xaml" />
     <None Remove="UI\FA18C\FA18CEditPreplanPage.xaml" />
   </ItemGroup>
@@ -166,6 +167,9 @@
     <None Update="Images\gbu-54.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="UI\F16C\F16CEditSMSPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="UI\A10C\A10CEditTGPPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
