@@ -19,7 +19,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
@@ -73,9 +72,9 @@ namespace JAFDTC.Models.A10C.Misc
     //
     public enum AutopilotModeOptions
     {
-        Alt = -1,
-        AltHdg = 0,
-        Path = 1
+        Path = 0,
+        AltHdg,
+        Alt
     }
 
     // defines the TACAN mode options
@@ -286,7 +285,7 @@ namespace JAFDTC.Models.A10C.Misc
             SpeedDisplay = "0",                 // IAS
             AapSteerPt = "0",                   // Flt Plan
             AapPage = "0",                      // Other
-            AutopilotMode = "0",                // Alt/Hdg
+            AutopilotMode = "1",                // Alt/Hdg
             TACANMode = "0",                    // Off
             TACANBand = "0",                    // X
             TACANChannel = "0",
@@ -505,19 +504,19 @@ namespace JAFDTC.Models.A10C.Misc
         //
         public override void Reset()
         {
-            CoordSystem = "";
-            BullseyeOnHUD = "";
-            FlightPlan1Manual = "";
-            SpeedDisplay = "";
-            AapSteerPt = "";
-            AapPage = "";
-            AutopilotMode = "";
-            TACANMode = "";
-            TACANBand = "";
-            TACANChannel = "";
-            IFFMasterMode = "";
+            CoordSystem = "0";                  // LL
+            BullseyeOnHUD = false.ToString();
+            FlightPlan1Manual = "0";            // Auto
+            SpeedDisplay = "0";                 // IAS
+            AapSteerPt = "0";                   // FltPlan
+            AapPage = "0";                      // Other
+            AutopilotMode = "1";                // Alt/Hdg
+            TACANMode = "0";                    // Off
+            TACANBand = "0";                    // X
+            TACANChannel = "0";
+            IFFMasterMode = "0";                // Off
             IFFMode3Code = "";
-            IFFMode4On = "";
+            IFFMode4On = false.ToString();
         }
     }
 }
