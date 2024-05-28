@@ -302,16 +302,33 @@ namespace JAFDTC.Models.A10C
             // ---- HOTAS
             AirframeDevice hotas = new(17, "HOTAS");
             
-            // These probably work but are untested.
-            //hotas.AddAction(539, "CoolieUp", delay, 1);
-            //hotas.AddAction(540, "CoolieDown", delay, 1);
-            //hotas.AddAction(541, "CoolieLeftLong", 1800, 1);
-            //hotas.AddAction(542, "CoolieRightLong", 1800, 1);
+            hotas.AddAction(563, "BOAT_SWITCH_FWD", delay, 1);
+            hotas.AddAction(564, "BOAT_SWITCH_AFT", delay, 1);
+            hotas.AddAction(565, "BOAT_SWITCH_CENTER", delay, 1);
 
-            hotas.AddAction(563, "BoatSwitchForward", delay, 1);
-            hotas.AddAction(564, "BoatSwitchAft", delay, 1);
-            hotas.AddAction(565, "BoatSwitchCenter", delay, 1);
-            
+            hotas.AddAction(566, "CHINA_HAT_FWD", delay, 1);
+            hotas.AddAction(567, "CHINA_HAT_AFT", delay, 1);
+            hotas.AddAction(589, "CHINA_HAT_OFF", delay, 1);
+
+            hotas.AddAction(549, "DMS_UP", delay, 1);
+            hotas.AddAction(550, "DMS_DN", delay, 1);
+            hotas.AddAction(551, "DMS_LEFT", delay, 1);
+            hotas.AddAction(552, "DMS_RIGHT", delay, 1);
+            hotas.AddAction(553, "DMS_OFF", delay, 1);
+
+            // These probably work but are untested.
+            //hotas.AddAction(539, "COOLIE_UP", delay, 1);
+            //hotas.AddAction(540, "COOLIE_DN", delay, 1);
+            //hotas.AddAction(541, "COOLIE_LEFT_LONG", 1800, 1);
+            //hotas.AddAction(542, "COOLIE_RIGHT_LONG", 1800, 1);
+            //hotas.AddAction(543, "COOLIE_OFF", delay, 1);
+
+            hotas.AddAction(544, "TMS_UP", delay, 1);
+            hotas.AddAction(545, "TMS_DN", delay, 1);
+            hotas.AddAction(546, "TMS_LEFT", delay, 1);
+            hotas.AddAction(547, "TMS_RIGHT", delay, 1);
+            hotas.AddAction(548, "TMS_OFF", delay, 1);
+
             AddDevice(hotas);
 
             // ---- aux light control

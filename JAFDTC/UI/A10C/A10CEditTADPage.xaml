@@ -79,7 +79,7 @@ https://www.gnu.org/licenses/.
             -->
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
-                Datalink Settings:
+                TAD NET Settings:
             </TextBlock>
 
             <!-- Group ID -->
@@ -118,7 +118,7 @@ https://www.gnu.org/licenses/.
             
             <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,24,0,0"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
-                Display Settings:
+                Display Options:
             </TextBlock>
 
             <!-- Coordinate Display -->
@@ -163,15 +163,35 @@ https://www.gnu.org/licenses/.
                 </ComboBox.Items>
             </ComboBox>
 
+            <!-- Map -->
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Map
+            </TextBlock>
+            <ComboBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0"
+                      Width="90"
+                      x:Name="uiComboMapOption"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged"
+                      Tag="MapOption">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="AUTO"/>
+                    <TextBlock Text="OFF"/>
+                    <TextBlock Text="MAN"/>
+                </ComboBox.Items>
+            </ComboBox>
 
             <!-- Ownship Position -->
-            <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0"
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right">
                        Ownship Position
             </TextBlock>
             <ComboBox x:Name="uiCenterDepress" 
-                      Grid.Row="7" 
+                      Grid.Row="8" 
                       Grid.Column="1" 
                       Margin="12,12,0,0" 
                       Width="110" 
@@ -187,12 +207,12 @@ https://www.gnu.org/licenses/.
             </ComboBox>
 
             <!-- Hook Option -->
-            <TextBlock Grid.Row="8" Grid.Column="0" Margin="12,12,0,0"
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right">
                        Hook Option
             </TextBlock>
-            <ComboBox Grid.Row="8" Grid.Column="1" x:Name="uiComboHookOption" Margin="12,12,0,0"
+            <ComboBox Grid.Row="9" Grid.Column="1" x:Name="uiComboHookOption" Margin="12,12,0,0"
                       Width="135" 
                       VerticalAlignment="Center" 
                       HorizontalAlignment="Left" 
@@ -212,38 +232,17 @@ https://www.gnu.org/licenses/.
             </ComboBox>
 
             <!-- Hook Ownship -->
-            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0"
+            <TextBlock Grid.Row="10" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        VerticalAlignment="Center"
                        HorizontalTextAlignment="Right">
                        Hook Ownship
             </TextBlock>
-            <CheckBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0"
+            <CheckBox Grid.Row="10" Grid.Column="1" Margin="12,12,0,0"
                     x:Name="uiCheckHookOwnship"
                     Click="CheckBox_Clicked"
                     Tag="HookOwnship"
                     ToolTipService.ToolTip="When enabled, hook ownship to enable hook option display"/>
-
-            <!-- Map -->
-            <TextBlock Grid.Row="10" Grid.Column="0" Margin="12,12,0,0"
-                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
-                       HorizontalTextAlignment="Right">
-                       Map
-            </TextBlock>
-            <ComboBox Grid.Row="10" Grid.Column="1" Margin="12,12,0,0"
-                      Width="90"
-                      x:Name="uiComboMapOption"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Left"
-                      SelectionChanged="ComboBox_SelectionChanged"
-                      Tag="MapOption">
-                <ComboBox.Items>
-                    <!-- Must match enum order -->
-                    <TextBlock Text="AUTO"/>
-                    <TextBlock Text="OFF"/>
-                    <TextBlock Text="MAN"/>
-                </ComboBox.Items>
-            </ComboBox>
 
             <!--
             ==========================================
@@ -253,7 +252,7 @@ https://www.gnu.org/licenses/.
 
             <TextBlock Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="2"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
-                Profile Display Settings:
+                TAD Default Profile Settings:
             </TextBlock>
 
             <!-- Bullseye -->

@@ -279,6 +279,14 @@ namespace JAFDTC.Models.A10C.TAD
             && IsProfileWaypointsDefault && IsProfileSPIDisplayDefault;
 
         [JsonIgnore]
+        public bool IsDatalinkDefault => IsGrpIDDefault && IsOwnIDDefault && IsCallsignDefault;
+
+        [JsonIgnore]
+        public bool IsProfileDefault => IsProfileBullseyeDefault && IsProfileRangeRingsDefault && IsProfileHookInfoDefault
+            && IsProfileWaypointLinesDefault && IsProfileWaypointLabelDefault && IsProfileWaypointsDefault
+            && IsProfileSPIDisplayDefault;
+
+        [JsonIgnore]
         public bool IsCoordDisplayDefault => string.IsNullOrEmpty(CoordDisplay) || CoordDisplay == ExplicitDefaults.CoordDisplay;
         [JsonIgnore]
         public int CoordDisplayValue => string.IsNullOrEmpty(CoordDisplay) ? int.Parse(ExplicitDefaults.CoordDisplay) : int.Parse(CoordDisplay);

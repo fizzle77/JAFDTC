@@ -1,6 +1,4 @@
 ﻿using JAFDTC.Models.A10C;
-using JAFDTC.Models.A10C.HMCS;
-using JAFDTC.Models.A10C.TGP;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using Microsoft.UI.Dispatching;
@@ -12,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
-using Windows.Networking.NetworkOperators;
 
 namespace JAFDTC.UI.A10C
 {
