@@ -7,8 +7,8 @@ there are many concepts, layouts, and tasks in the JAFDTC user interface that sh
 similarities across airframes even where the specifics differ. This section discusses these
 common areas.
 
-> As usual, consult the
-> [airframe-specific documentation](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#jafdtc-users-guide)
+> Consult the
+> [airframe guides](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#what-now)
 > for further details on a particular airframe.
 
 # Common Interface Tasks
@@ -17,21 +17,24 @@ The JAFDTC user interface has tasks that can be used in multiple contexts within
 well as tasks that may share some common features between different airframes. This section
 discusses some of these common tasks.
 
-## Applying Configurations to the Jet
+## Applying a Configuration to the Jet
 
 The primary interaction between JAFDTC and DCS involves uploading configurations to the jet. To
-upload a configuration, four conditions must hold,
+do so, four conditions must hold,
 
-1. The DCS scripting support must be
-   [installed](#support-scripts)
-2. DCS must be running
-3. A configuration must be selected in the configuration list
+1. The DCS
+   [scripting support](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#dcs-support-scripts)
+   must be installed.
+2. DCS must be running.
+3. A configuration must be selected from the
+   [*Configuration List Page*](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#configuration-list-page).
 4. A mission must be running with a pilot in pit in an airframe that matches the airframe of
-   the selection in (3)
+   the selection in (3).
 
-The lower left corner of the main configuration list page indicates the status conditions 2-4
-as
-[discussed earlier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#status-area).
+The
+[status area](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#status-area)
+in the lower left corner of the *Configuration List Page* indicates the status of these
+conditions.
 Once these conditions are met, you can use any of the **Load to Jet** buttons in the interface
 to load the currently selected configuration to the jet.
 
@@ -99,8 +102,8 @@ and so on. Typically, JAFDTC uses a button like this to start the capture proces
 
 ![](images/Core_Base_Capture_UI.png)
 
-To start capturing from DCS, JAFDTC displays a dialog like this that will remain visible while
-you interact with DCS,
+Clicking on this button starts DCS F10 capture. During this process, JAFDTC displays a dialog
+like this that remains visible while you interact with DCS,
 
 ![](images/Core_Base_Capture_C2.png)
 
@@ -140,7 +143,7 @@ The handling of target versus steerpoints added by **Add STPT** and **Add TGT** 
 depends on the specific airframe.
 
 After sending the navigation points to JAFDTC via the **Send to JAFDTC** button, you must
-dismiss the “Capturing” dialog in JAFDTC as discussed above.
+dismiss the “Capturing” dialog in JAFDTC as discussed earlier.
 
 ## VR Quality of Life Improvements
 
@@ -150,7 +153,7 @@ JAFDTC selects controls for unused systems for this purpose (for example, a set 
 a system that is not modeled in the module).
 
 > See the
-> [airframe-specific documentation](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#jafdtc-users-guide)
+> [airframe guides](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#what-now)
 > for further details on what a given airframe supports.
 
 ### Applying Configurations to the Jet from the Cockpit
@@ -172,30 +175,34 @@ This windows only remains on screen briefly as you are stepping through configur
 
 # Navigation System Editors
 
-All airframes JAFDTC supports provide a navigation system that allows *Navigation Points*
-(i.e., waypoints or steerpoints) to be input into the avionics as a part of a configuration.
-The general layout and operation of the interface for a navigation system editor is similar
-from airframe to airframe, though the specifics differ as discussed in the
-[airframe-specific documentation](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md).
+For all airframes, JAFDTC supports a navigation system that allows *Navigation Points* (i.e.,
+waypoints or steerpoints) to be input into the avionics as a part of a configuration. JAFDTC
+uses two pages to configure these systems,
 
-Navigation systems across all airframes typically follow a pattern where the system editor
-shows a page that contains a list of navigation points known to the system. From this page,
-you an jump to a page that allows you to edit the properties of a navigation point. 
+* [**Navigation Point List**](#navigation-point-editor-ui)
+  &ndash; Summarizes the navigation points in the configuration.
+* [**Navigation Point Editor**](#navigation-point-list-ui)
+  &ndash; Edits the details of a particular point such as location or elevation.
+
+While the details may differ from airframe to airframe, as the
+[airframe guides](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md)
+describe, the general layout and operation of these pages follows a similar pattern.
 
 ## Navigation Point List UI
 
-The first level of the interface presents a list of known navigation points. This is the
+The *Navigation Point List* is the
 [system editor](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#system-editor)
-you will see when you select an airframe's navigation system from the
+for the navigation point system. This is the page you will see when you select an airframe's
+navigation system from the
 [system list](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#system-list).
 
 ![](images/Core_Base_Nav_List.png)
 
-The navigation point list that makes up the bulk of the editor lists the defined navigation
-points, their coordinates, name, and other airframe-specific information. This information is
-formated according to airframe conventions. You can select one or more navigation points from
-the list using the usual Windows interactions as well as right-click items to show a context
-menu with commands applicable to the selected navigation point.
+The list that makes up the bulk of the editor summarizes the navigation points, their
+coordinates, name, and other airframe-specific information. This information is formated
+according to airframe conventions. You can select one or more navigation points from the list
+using the usual Windows interactions as well as right-click items to show a context menu with
+commands applicable to the selected navigation point.
 
 The command bar at the top of the editor allows you to manipulate selected items in the
 navigation point list.
@@ -206,7 +213,7 @@ The command bar includes the following commands,
 
 - **Add** &ndash; Adds a new navigation point and opens up the detail editor to set it up.
 - **Edit** &ndash; Opens the selected navigation point in the
-  [detail editor](#navigation-point-editor).
+  [*Navigation Point Editor*](#navigation-point-editor).
 - **Copy** &ndash; Copy the selected navigation points to the clipboard.
 - **Paste** &ndash; Paste navigation points from the clipboard into the system.
 - **Delete** &ndash; Deletes the currnetly selected navigation points from the configuration.
@@ -234,9 +241,9 @@ to use for the navigation point (see the
 [earlier discussion](#selecting--filtering-points-of-interest)
 on selecting points of interest) and a section to edit the key parameters of the navigation
 point such as name, latitude, longitude, and elevation. The remainder of the page may differ
-significantly from airframe to airframe to adapt to the capabilities of the airframe's
-navigation system. For example, for the Viper, the navigation point editor page includes fields
-to specify a OAP reference points.
+from airframe to airframe to adapt to the capabilities of the airframe's navigation system. For
+example, the Viper's *Navigation Point Editor* page includes fields to specify a OAP reference
+points.
 
 The top section of the page allows you to select points of interest, such as an airbase or
 a DPI that is part of a campaign, from the Point of Interest database as
@@ -317,14 +324,17 @@ other formats.
 
 # Communications System Editors
 
-Many airframes JAFDTC supports provide a communication system that allows configuration of one
-or more radios in the airframe. Typical configuration includes information like preset
-frequencies, enabling guard monitoring, and so on.
+Many airframes JAFDTC supports provide a communication system that allows configuration of
+radios in the airframe. Typical configuration includes information like preset frequencies,
+enabling guard monitoring, and so on.
 
 ## Communication System Editor UI
 
-Communication systems typically follow a pattern where the system editor shows a list of
-presets along with other controls to specify other system configuration.
+The *Communications System Editor* is the
+[system editor](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#system-editor)
+for the communication system. This is the page you will see when you select an airframe's
+communications system from the
+[system list](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#system-list).
 
 ![](images/Core_Base_Comm.png)
 
@@ -348,7 +358,7 @@ description. The `X` button at the right of the row deletes the preset.
 
 The bottom portion of the page includes airframe-specific controls for airframe-specific
 parameters (see the
-[airframe-specific documentation](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#jafdtc-users-guide)
+[airframe guides](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#what-now)
 for further details) along with the common **Link** and **Reset** controls
 [discussed earlier](#common-editor-controls).
 
@@ -358,7 +368,7 @@ TODO
 
 # What Now?
 
-Now that you are familiarity with JAFDTC, you should explore the airframe-specific
-[documentation](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#jafdtc-users-guide)
-for the airframes you want to use JAFDTC. This documentation builds on the common elements
+Now that you are familiarity with JAFDTC, you should explore the
+[airframe guides](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#what-now)
+for the airframes you want to use JAFDTC. These guides build on the common elements
 outlined here to describe specific capabilities of JAFDTC on a particular airframe.

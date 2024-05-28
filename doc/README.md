@@ -12,8 +12,8 @@ guide,
   [_Common Elements Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
   discusses topics that are common across multiple airframes
 - The
-  [airframe documentation](#what-now)
-  presents details that are specific or unique to a particular airframe
+  [airframe guides](#what-now)
+  present details that are specific to a particular airframe
 
 General installation and troubleshooting instructions for JAFDTC can be found
 [here](https://github.com/51st-Vfw/JAFDTC/tree/master/README.md)
@@ -48,7 +48,7 @@ The specific systems available in a configuration, along with the system paramet
 JAFDTC can set up, vary from airframe to airframe.
 
 > Details specific to a particular airframe can be found in the
-> [airframe-specific documentation](#what-now)
+> [airframe guides](#what-now)
 > linked below.
 
 Some systems may not exist in some airframes and even "common" systems may operate differently
@@ -68,15 +68,34 @@ supports sharing and exchanging information through various UI functions.
 
 JAFDTC allows you to link *System Configurations* between different *Configurations* for the
 same airframe. When linked, changes to the source system configuration are automatically
-reflected in all linked systems. This allows you to "compose" configurations from shared
-setups.
+reflected in all linked systems.
 
-Links are particularly useful when you have basic setups that you tend to reuse often. For
-example, you might want to always configure your MFDs one way for A2G sorties and another way
-for A2A sorties. Let's assume configurations for the airframe support an MFD system (MFD) that
-sets up cockpit displays and a navigation system (NAV) that sets up steerpoints. Once you
-setup your A2G and A2A MFD configurations, you can simply link to them from new configurations
-to avoid having to set the MFDs in each new configuration.
+> Links allow you to "compose" configurations from shared setups.
+
+Links are tracked per system. That is, Systems X and Y in Configuration A can be linked
+to different configurations if desired. Once linked, changes to a system are pushed to all
+linked systems regardless of whehter they are linked directly or indirectly.
+
+> For example, say System X in Configuration A is linked to Configuration B and System X in
+> Configuration B is linked to Configuration C. Changes to System X in Configuration
+> C will be reflected in both the Configraution A and B setups for System X.
+
+Breaking a link preserves the configuration of a linked system at the time the link is
+broken. This is, if systems in Configuration A are linked to Configuration B and you delete
+Configuration B, the linked systems in A will retain the values from B at the time it was
+deleted.
+
+> Links are **not** preserved across configuration exports and imports.
+
+While linked, edits to the system configuration are disabled (the system configuration is
+edited through the source configuration).
+
+Links are particularly useful when you have setups that you tend to reuse often. For example,
+you might want to always configure your cockpit displays one way for A2G sorties and another
+way for A2A sorties. Let's assume configurations for the airframe support an MFD system (MFD)
+that sets up cockpit displays and a navigation system (NAV) that sets up steerpoints. Once
+you setup your A2G and A2A MFD configurations, you can link them from new configurations to
+avoid having to setup the MFD in each new configuration.
 
 This pictures illustrates how this works,
 
@@ -87,14 +106,14 @@ Here, the arrow points to the source system configuration: the MFD system config
 this example, "A2G Mission" would only fully specify the set up for the NAV system; it relies
 on the "A2G Fav" to specify the set up for the MFD system.
 
-Any change you make to the MFD system in "A2G Fav" or "A2A Fav" is immediately reflected in
-the configurations that link to these system configurations; in this example, "A2G Mission",
+Any change you make to the MFD system in "A2G Fav" or "A2A Fav" is reflected in the
+configurations that link to these system configurations; in this example, "A2G Mission",
 "A2A Mission", and "Range A2A". Once linked, only the original is editable. That is, the A2G
-MFD system will be read-only in "A2G Mission" but may be edited through "A2G Fav".
+MFD system will be read-only in "A2G Mission" but may be edited through "A2G Fav". In
+general, changes to a system are pushed to all linked (either directly or indirectly) systems.
 
-Links connect *individual* systems in two different configurations. Though "A2A Fav" and
-"A2G Mission" have linked their MFD system configurations, they have completely independent
-NAV system configurations.
+Though "A2A Fav" and "A2G Mission" have linked their MFD system configurations, they have
+completely independent NAV system configurations as links are system-based.
 
 Further, different systems can link to different configurations. In the above picutre,
 "Range A2A" gets it's MFD setup from "A2A Fav" and its NAV setup from "KLAS STPTs". There
@@ -106,19 +125,16 @@ when you delete a source configuration. For example, though deleting "A2G Fav" w
 link with "A2G Mission", the MFD settings in "A2G Mission" will match the MFD settings from
 "A2G Fav" when the configuration was deleted.
 
-> The mechanics of linking system configurations through the user interface is covered
-> [below](#system-editor-page).
-
 ## Points of Interest
 
 JAFDTC supports a collection of points of interest (PoI) that can be used to speed up creation
 of navigation points or target locations. There are three basic types of PoI,
 
-- **DCS** &ndash; includes airfields defined on the supported DCS maps; for example, Nellis AFB
+- **DCS** &ndash; Includes airfields defined on the supported DCS maps; for example, Nellis AFB
   on the NTTR map. These PoIs are provided by JAFDTC and cannot be edited by the user.
-- **User** &ndash; includes individual PoIs defined by the user; for example, a commonly used
+- **User** &ndash; Includes individual PoIs defined by the user; for example, a commonly used
   navigation point for a map. These PoIs are provided, and can be edited, by the user.
-- **Campaign** &ndash; includes groups of PoIs defined by the user that support a group of
+- **Campaign** &ndash; Includes groups of PoIs defined by the user that support a group of
   missions; for example, a set of target DPIs for enemy industry in Beirut for a campaign
   set in Syria. These PoIs are managed by the user but cannot be edited.
 
@@ -129,22 +145,23 @@ locations. Points of interest are discussed further
 ## DCS Integration
 
 This section focuses on a brief overview of the integration between JAFDTC and DCS. The
-[Common Elements Guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
-examines this topic in more depth.
+[_Common Elements Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
+covers the user interface aspects in more depth.
 
 ### DCS Support Scripts
 
-To interoperate with DCS, JAFDTC installs Lua within the `Scripts` hierarchy in the DCS
-installation(s) present in the `Saved Games` folder associated with your profile. JAFDTC can
-install this support in up to two places,
+To work with DCS, JAFDTC installs Lua within the `Scripts` hierarchy in the DCS installation(s)
+present in the `Saved Games` folder associated with your profile. JAFDTC can install this
+support in up to two places,
 
 - `Saved Games\DCS\Scripts`
 - `Saved Games\DCS.openbeta\Scripts`
 
 depending which versions of DCS are installed on your system.
 
-> As of the 2.9.2.49940 release, the OpenBeta and Stable versions of DCS are the same though
-> the folder names may still reflect the pre-2.9.2.49940 split between stable and open beta.
+> As of the DCS 2.9.2.49940 release, the open beta and stable versions of DCS are the same
+> though the folder names may still reflect the pre-2.9.2.49940 split between stable and
+> open beta.
 
 Within these areas, JAFDTC makes three changes,
 
@@ -164,17 +181,18 @@ interacting with DCS in any capacity.
 ### Uploading Configurations to DCS
 
 Once set up, a *Configuration* can be uploaded into the corresponding airframe in DCS through
-the scripting engine that DCS exposes to the local system. To upload, JAFDTC walks through the
-configuration, updating system parameters that differ from their defaults in the jet. For
-example, consider a BINGO warning system. If you change the BINGO value from the default for
-the airframe, JAFDTC will update the BINGO value in the avionics when uploading. If you do
-not change the value, JAFDTC will not make any changes to that parameter in the airframe.
+the scripting engine that DCS exposes to the host system. To upload, JAFDTC walks through the
+configuration, updating system parameters that differ from their defaults in the jet by
+driving the clickable cockpit. For example, consider a BINGO warning system. If you change the
+BINGO value from the default for the airframe, JAFDTC will update the BINGO value in the
+avionics when uploading. If you do not change the value, JAFDTC will not make any changes to
+that parameter in the airframe.
 
 ### Capturing Coordinates From DCS
 
-JAFDTC can capture latitude, longitude, and elevation parameters from the DCS F10 map for use
-in a system configuration (such as the location of a navigation point) as well as the point
-of interest database.
+JAFDTC can capture latitude, longitude, and elevation values from the DCS F10 map for use in a
+system configuration (such as the location of a navigation point) as well as the point of
+interest database.
 
 # User Interface Basics
 
@@ -183,15 +201,15 @@ for an airframe and allows you to edit the specfic systems in a configuration. T
 covers the aspects of this user interface that are largely independent of the specific airframe
 you are configuring. Additional details on user interface elements that are common to multiple
 airframes can be found in the
-[Common Elements Guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
-along with the airframe specific documentation linked
-[below](#what-now).
+[_Common Elements Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
+along with the
+[airframe guides](#what-now)
+linked below.
 
 ## Configuration List Page
 
 The main page of the JAFDTC user interface is the *Configuration List Page* that provides
-a number of controls to manipulate configurations. This page is the first page visible after
-launching JAFDTC.
+a number of controls to manipulate configurations. This page is visible after launching JAFDTC.
 
 ![](images/Core_Cfg_List_Page.png)
 
@@ -228,13 +246,9 @@ airframe.
 
 ### Current Airframe Selection
 
-The combo box control in the upper right of the page allows you to select the airframe
-currently in use. The
+The combo box control in the upper right of the page selects the airframe currently in use. The
 [configuration list](#configuration-list)
-making up the bulk of the page only displays configurations for the selected airframe. Changing
-the value in this control will update the list to show only those configurations for the
-selected airframe.
-
+making up the bulk of the page displays known configurations for the selected airframe only.
 JAFDTC remembers the last airframe you selected and will return to that airframe the next time
 it is launched.
 
@@ -267,11 +281,13 @@ The command bar includes the following commands,
   for further details.
 - **Focus DCS** &ndash; Brings DCS to the foreground and makes it the active application.
 
-> Importing a configuration will implicitly clear all
+> Importing a configuration breaks any
 > [links](#linking-systems)
-> to other configurations that may have been in place at the time of export.
+> to other configurations that may have been in place at the time of export. The configuration
+> will match the linked configuration at export, but will no longer update when changes are
+> made to the source.
 
-The overflow menu (exposed by clicking on the "`...`" button) holds two commands,
+The overflow menu (exposed by clicking on the "`...`" button) holds three commands,
 
 - **Points of Interest** &ndash; Navigates to the
   [POI Editor](#point-of-interest-database)
@@ -287,17 +303,15 @@ a mission with the appropriate airframe.
 
 ### Configuration List
 
-The bulk of the page is taken up by a list of defined configurations for the selected airframe.
-Configurations in the list are sorted alphabetically, with favorites appearing first.
-Each row in this list corresponds to a configuration. On the left side of a row is the name of
-the configuration, a favorite icon (if the configuration is marked as a favorite), and a brief
-summary of what changes to avionics the configuration includes. On the right side of the row is
-a set of icons that also indicate which specific systems the configuration modifies. Systems
-that are linked to other configurations are shown with a small gold dot in the lower right
-corner. This page allows at most configuration to be selected at a time.
+Configurations in the list are sorted alphabetically, with favorites appearing first. On the
+left side of a row is the name of the configuration, a favorite icon (if the configuration is
+marked as a favorite), and a brief summary of what systems the configuration updates. On the
+right side of the row is a set of icons that also indicate which systems the configuration
+modifies. Systems that are linked to other configurations are shown with a small gold dot in
+the lower right corner. This list allows at most configuration to be selected at a time.
 
 Double-clicking a row will open up the
-[System Editor Page](#system-editor-page)
+[*System Editor Page*](#system-editor-page)
 for the configuration that allows you to edit information in the configuration. Right-clicking
 on a row will bring up a context menu with operations, such as **Rename** or **Delete**, that
 you can perform on the clicked configuration. 
@@ -335,8 +349,8 @@ However, the basic structure of the page on which you edit system configurations
 
 At the top of the window is the name of the current configuration being edited along with a
 back button that returns you to the
-[Configuration List](#configuration-list-page)
-page when clicked. Below these two items is text identifying the *Current Airframe*.
+[*Configuration List Page*](#configuration-list-page)
+when clicked. To the right is text identifying the *Current Airframe*.
 
 ### System List
 
@@ -366,7 +380,7 @@ The bulk of the page is taken up by the system editor panel on the right. The co
 panel depends on the system selected from the *System List* to the left. In the figure above,
 the editor is showing the steerpoint list associated with the selected steerpoints system. See
 the
-[airframe discussions](#jafdtc-users-guide)
+[airframe guides](#what-now)
 for further details on system editors for a particular airframe.
 
 ### Common Editor Controls
@@ -374,46 +388,29 @@ for further details on system editors for a particular airframe.
 Depending on the system, the bottom edge of the system configuration editor may contain link
 and reset buttons that provide common link and reset functions for systems.
 
-The **Reset** button restores the default settings to the selected system. This button is
-disabled when the system is in its default configruation.
+* **Reset** &ndash; Restores the default settings to the system. This is disabled if the system
+  is in its default configruation.
+* **Link** &ndash; Links or unlinks the system to or from another configuration (see the
+  [earlier discussion](#linking-systems)).
 
-The **Link** button connects the system to another configuration. This allows you to, for
-example, have a single common radio system configuration that you can share across different
-configurations (as discussed
-[here](#linking-systems)).
-This way, you can make a single change to the shared system configuration and have the linked
-systems automatically update.
-
-> Links are tracked per system. That is, Systems A and B in Configuration X can be linked
-> to completely different configurations if desired.
-
-> At present, links are **not** preserved across export/import operations.
-
-Changes to a system are pushed to all linked (either directly or indirectly) systems.
-
-> For example, assume System X in Configuration A is linked to Configuration B and System X
-> in Configuration B is linked to Configuration C. Changes to System X in Configuration
-> C will be reflected in the Configraution A and B setups for System X.
-
-While linked, edits to the system configuration are disabled (the system configuration is
-edited through the source configuration). The *Link* button changes based on whether or not
-the system is linked,
+The *Link* button changes based on whether or not the system is linked,
 
 ![](images/Core_Cfg_Edit_Link.png)
 
 When unlinked, the button displays "Link To". Clicking the button brings up a list of
 potential source configurations the system can be linked to.
 
-> In the earlier example
-> [here](#linking-systems),
+> In the
+> [earlier example](#linking-systems),
 > to link the MFD configuration in "A2G Fav" to "A2G Mission" you would click the "Link To"
 > button in the MFD system editor in "A2G Mission" and select "A2G Fav" from the list of
-> possible configurations to link to.
+> configurations to link to.
 
-Once linked, the button changes to "Unlink From" and identifies the specific configuration the
-system is presently linked to. When unlinking, the system configuration does not change, but
-will no longer receive updates from the source configuration. Icons for linked systems are
-badged with a small gold dot as described earlier.
+Once linked, edits to the system configuration are disabled (as you must edit the system
+configuration through the source configuration) and the button changes to "Unlink From" with
+the name of the configuration the system is linked to. When unlinking, the system configuration
+does not change, but will no longer receive updates from the source configuration. Icons for
+linked systems are badged with a small gold dot as described earlier.
 
 ## Point of Interest Database
 
@@ -518,10 +515,10 @@ There are multiple controls in the settings,
 - **Check for New Versions at Launch** &ndash; Selects whether JAFDTC will check if a new
   version is available each time it is launched.
 - **Install DCS Lua Support** &ndash; Installs
-  [DCS Lua support](#support-scripts)
+  [DCS Lua support](#dcs-support-scripts)
   if the support is not currently installed (the button is disabled if support is installed).
 - **Uninstall DCS Lua Support** &ndash; Uninstalls
-  [DCS Lua support](#support-scripts)
+  [DCS Lua support](#dcs-support-scripts)
   if the support is currently installed (the button is disabled if support is not installed).
 
 JAFDTC saves its settings to a file in `Documents\JAFDTC`. Clicking “**OK**” will accept any
@@ -532,7 +529,7 @@ changes in the dialog, while “**Cancel**” will discard any changes.
 Now that you have a basic familiarity with JAFDTC, you can take a look at the
 [_Common Elements Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md)
 that provides the next level of detail on JAFDTC, its operation, and its user interface. From
-there, move on to the airframe specific documentation for airframes of interest,
+there, move on to the airframe guides for airframes of interest,
 
 | Airframe | Systems JAFDTC Can Configure |
 |:--------:|------------------------------|
