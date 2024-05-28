@@ -28,7 +28,393 @@ https://www.gnu.org/licenses/.
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <Page.Resources>
+        <!-- brushes for error fields. -->
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="PaleVioletRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBackgroundBrush" Color="PaleVioletRed"/>
+    </Page.Resources>
 
+
+    <Grid Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush }">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0 : tad settings
+        ===============================================================================================================
+        -->
+
+        <Grid Grid.Row="0" Margin="16,8,12,8" VerticalAlignment="Top" HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <!--
+            ==========================================
+            left column
+            ==========================================
+            -->
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                Datalink Settings:
+            </TextBlock>
+
+            <!-- Group ID -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Group ID
+            </TextBlock>
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" x:Name="uiTextGroupID"
+                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="2"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="GrpID"/>
+
+            <!-- Own ID -->
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Own ID
+            </TextBlock>
+            <TextBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0" x:Name="uiTextOwnID"
+                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="2"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="OwnID"/>
+
+            <!-- Callsign -->
+            <TextBlock Grid.Row="3" Grid.Column="0" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Callsign
+            </TextBlock>
+            <TextBox Grid.Row="3" Grid.Column="1" Margin="12,12,0,0" x:Name="uiTextCallsign"
+                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="4"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="Callsign"/>
+
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,24,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                Display Settings:
+            </TextBlock>
+
+            <!-- Coordinate Display -->
+            <TextBlock Grid.Row="5" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Coordinate Display
+            </TextBlock>
+            <ComboBox Grid.Row="5" Grid.Column="1" Margin="12,12,0,0"
+                      x:Name="uiComboCoordDisplay"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="CoordDisplay">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="LL"/>
+                    <TextBlock Text="MGRS"/>
+                    <TextBlock Text="OFF"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- Map Range -->
+            <TextBlock Grid.Row="6" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Range
+            </TextBlock>
+            <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" Margin="12,12,0,0">
+                <ComboBox x:Name="uiComboRange"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="MapRange">
+                    <ComboBox.Items>
+                        <!-- Must match enum order -->
+                        <TextBlock Text="5 "/>
+                        <TextBlock Text="10"/>
+                        <TextBlock Text="20"/>
+                        <TextBlock Text="40"/>
+                        <TextBlock Text="80"/>
+                        <TextBlock Text="160"/>
+                    </ComboBox.Items>
+                </ComboBox>
+                <ComboBox x:Name="uiCenterDepress"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="CenterDepress">
+                    <ComboBox.Items>
+                        <!-- Must match enum order -->
+                        <TextBlock Text="Center"/>
+                        <TextBlock Text="Depress"/>
+                    </ComboBox.Items>
+                </ComboBox>
+            </StackPanel>
+
+            <!-- Hook Option -->
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Hook Option
+            </TextBlock>
+            <ComboBox Grid.Row="7" Grid.Column="1" x:Name="uiComboHookOption" Margin="12,12,0,0"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    SelectionChanged="ComboBox_SelectionChanged" Tag="HookOption">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="HOOK OWN"/>
+                    <TextBlock Text="OWN HOOK"/>
+                    <TextBlock Text="HOOK BULL"/>
+                    <TextBlock Text="BULL HOOK"/>
+                    <TextBlock Text="HOOK CURS"/>
+                    <TextBlock Text="CURS HOOK"/>
+                    <TextBlock Text="BULL CURS"/>
+                    <TextBlock Text="CURS BULL"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- Hook Ownship -->
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       VerticalAlignment="Center"
+                       HorizontalTextAlignment="Right">
+                       Hook Ownship
+            </TextBlock>
+            <CheckBox Grid.Row="8" Grid.Column="1" Margin="12,12,0,0"
+                    x:Name="uiCheckHookOwnship"
+                    Click="CheckBox_Clicked"
+                    Tag="HookOwnship"
+                    ToolTipService.ToolTip="When enabled, hook ownship to enable hook option display"/>
+
+            <!-- Map -->
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Map
+            </TextBlock>
+            <ComboBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0"
+                      x:Name="uiComboMapOption"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="MapOption">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="AUTO"/>
+                    <TextBlock Text="OFF"/>
+                    <TextBlock Text="MAN"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!--
+            ==========================================
+            right column
+            ==========================================
+            -->
+
+            <TextBlock Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="2"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                Profile Display Settings:
+            </TextBlock>
+
+            <!-- Bullseye -->
+            <TextBlock Grid.Row="1" Grid.Column="3" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Bullseye
+            </TextBlock>
+            <ComboBox Grid.Row="1" Grid.Column="4" Margin="12,12,0,0"
+                      x:Name="uiComboBullseye"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="ProfileBullseye">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="ON"/>
+                    <TextBlock Text="OFF"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- Range Rings -->
+            <TextBlock Grid.Row="2" Grid.Column="3" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Range Rings
+            </TextBlock>
+            <ComboBox Grid.Row="2" Grid.Column="4" Margin="12,12,0,0"
+                      x:Name="uiComboRangeRings"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="ProfileRangeRings">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="ON"/>
+                    <TextBlock Text="OFF"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- Hook Info -->
+            <TextBlock Grid.Row="3" Grid.Column="3" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Hook Info
+            </TextBlock>
+            <ComboBox Grid.Row="3" Grid.Column="4" Margin="12,12,0,0"
+                      x:Name="uiComboHookInfo"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="ProfileHookInfo">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="ON"/>
+                    <TextBlock Text="ACT"/>
+                    <TextBlock Text="OFF"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- Waypoint Lines -->
+            <TextBlock Grid.Row="4" Grid.Column="3" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Waypoint Lines
+            </TextBlock>
+            <ComboBox Grid.Row="4" Grid.Column="4" Margin="12,12,0,0"
+                      x:Name="uiComboWaypointLines"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="ProfileWaypointLines">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="ON"/>
+                    <TextBlock Text="OFF"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- Waypoint Labels -->
+            <TextBlock Grid.Row="5" Grid.Column="3" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Waypoint Labels
+            </TextBlock>
+            <ComboBox Grid.Row="5" Grid.Column="4" Margin="12,12,0,0"
+                      x:Name="uiComboWaypointLabel"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="ProfileWaypointLabel">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="ON"/>
+                    <TextBlock Text="OFF"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- Waypoints -->
+            <TextBlock Grid.Row="6" Grid.Column="3" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       Waypoints
+            </TextBlock>
+            <ComboBox Grid.Row="6" Grid.Column="4" Margin="12,12,0,0"
+                      x:Name="uiComboWaypoints"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="ProfileWaypoints">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="ON"/>
+                    <TextBlock Text="OFF"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- SPI Display -->
+            <TextBlock Grid.Row="7" Grid.Column="3" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       SPI Display
+            </TextBlock>
+            <ComboBox Grid.Row="7" Grid.Column="4" Margin="12,12,0,0"
+                      x:Name="uiComboSPIDisplay"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="ProfileSPIDisplay">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="ALL"/>
+                    <TextBlock Text="OWN"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 1: link / reset
+        ===============================================================================================================
+        -->
+
+        <Grid Grid.Row="1" Margin="12,12,12,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button Width="140"
+                        x:Name="uiPageBtnLink"
+                        Click="PageBtnLink_Click"
+                        ToolTipService.ToolTip="Link or unlink this system to/from another configuration">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE71B;"/>
+                        <TextBlock VerticalAlignment="center"
+                                   x:Name="uiPageBtnTxtLink">
+                            FIXUP
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <TextBlock Margin="12,0,24,0"
+                           x:Name="uiPageTxtLink"
+                           VerticalAlignment="center">
+                    FIXUP
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button x:Name="uiPageBtnReset"
+                        Click="PageBtnReset_Click"
+                        ToolTipService.ToolTip="Reset the configuration of this system to its defaults">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                        <TextBlock VerticalAlignment="center">Reset Page to Defaults</TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
     </Grid>
 </local:A10CPageBase>

@@ -156,7 +156,6 @@ https://www.gnu.org/licenses/.
                 </ComboBox.Items>
             </ComboBox>
 
-
             <!-- Yardstick -->
             <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"

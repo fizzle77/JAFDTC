@@ -17,7 +17,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
@@ -26,8 +25,8 @@ namespace JAFDTC.Models.A10C.TAD
     public enum CoordDisplayOptions
     {
         LL = 0,
-        MGRS = 1,
-        OFF = 2
+        MGRS,
+        OFF
     }
 
     public enum HookModeOptions
@@ -74,10 +73,10 @@ namespace JAFDTC.Models.A10C.TAD
         MAN
     }
 
-    public enum CenterDepressed
+    public enum CenterDepressOptions
     {
         Center = 0,
-        Depressed
+        Depress
     }
 
     public class TADSystem : A10CSystemBase
@@ -172,14 +171,14 @@ namespace JAFDTC.Models.A10C.TAD
             }
         }
 
-        private string _centerDepressed;
-        public string CenterDepressed
+        private string _centerDepress;
+        public string CenterDepress
         {
-            get => _centerDepressed;
+            get => _centerDepress;
             set
             {
                 string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 1)) ? null : "Invalid format";
-                SetProperty(ref _centerDepressed, value, error);
+                SetProperty(ref _centerDepress, value, error);
             }
         }
 
@@ -309,9 +308,9 @@ namespace JAFDTC.Models.A10C.TAD
         public int MapRangeValue => string.IsNullOrEmpty(MapRange) ? int.Parse(ExplicitDefaults.MapRange) : int.Parse(MapRange);
 
         [JsonIgnore]
-        public bool IsCenterDepressedDefault => string.IsNullOrEmpty(CenterDepressed) || CenterDepressed == ExplicitDefaults.CenterDepressed;
+        public bool IsCenterDepressedDefault => string.IsNullOrEmpty(CenterDepress) || CenterDepress == ExplicitDefaults.CenterDepress;
         [JsonIgnore]
-        public int CenterDepressedValue => string.IsNullOrEmpty(CenterDepressed) ? int.Parse(ExplicitDefaults.CenterDepressed) : int.Parse(CenterDepressed);
+        public int CenterDepressedValue => string.IsNullOrEmpty(CenterDepress) ? int.Parse(ExplicitDefaults.CenterDepress) : int.Parse(CenterDepress);
 
         [JsonIgnore]
         public bool IsMapOptionDefault => string.IsNullOrEmpty(MapOption) || MapOption == ExplicitDefaults.MapOption;
@@ -373,7 +372,7 @@ namespace JAFDTC.Models.A10C.TAD
             HookOption = other.HookOption;
             HookOwnship = other.HookOwnship;
             MapRange = other.MapRange;
-            CenterDepressed = other.CenterDepressed;
+            CenterDepress = other.CenterDepress;
             MapOption = other.MapOption;
             ProfileBullseye = other.ProfileBullseye;
             ProfileRangeRings = other.ProfileRangeRings;
@@ -399,9 +398,9 @@ namespace JAFDTC.Models.A10C.TAD
             OwnID = "";
             Callsign = "";
             HookOption = "0";
-            HookOwnship = "false";
+            HookOwnship = "False";
             MapRange = "0";
-            CenterDepressed = "0";
+            CenterDepress = "0";
             MapOption = "0";
             ProfileBullseye = "0";
             ProfileRangeRings = "0";
@@ -428,7 +427,7 @@ namespace JAFDTC.Models.A10C.TAD
             HookOption = "0",
             HookOwnship = "false",
             MapRange = "0",
-            CenterDepressed = "0",
+            CenterDepress = "0",
             MapOption = "0",
             ProfileBullseye = "0",
             ProfileRangeRings = "0",

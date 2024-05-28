@@ -18,30 +18,28 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.A10C;
-using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.Models.A10C.TAD;
 using JAFDTC.UI.App;
-using System;
 
 namespace JAFDTC.UI.A10C
 {
     /// <summary>
-    /// Code-behind class for the A10 HMCS editor.
+    /// Code-behind class for the A10 TAD editor.
     /// </summary>
     public sealed partial class A10CEditTADPage : A10CPageBase
     {
         private const string SYSTEM_NAME = "TAD";
 
         protected override A10CSystemBase SystemConfig => _config.TAD;
-        private TADSystem EditState => (TADSystem)_editState;
+        //private TADSystem EditState => (TADSystem)_editState;
 
         public static ConfigEditorPageInfo PageInfo
-            => new(HMCSSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.TAD, typeof(A10CEditTADPage));
+            => new(TADSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.TAD, typeof(A10CEditTADPage));
 
         public A10CEditTADPage() : base(SYSTEM_NAME, TADSystem.SystemTag)
         {
             InitializeComponent();
-            //TODO InitializeBase
+            InitializeBase(new TADSystem(), uiTextGroupID, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
         }
     }
 }

@@ -58,7 +58,7 @@ namespace JAFDTC.UI.A10C
                 A10CEditWaypointListHelper.PageInfo,
                 A10CEditDSMSPage.PageInfo,
                 A10CEditRadioPageHelper.PageInfo,
-                //A10CEditTADPage.PageInfo,
+                A10CEditTADPage.PageInfo,
                 A10CEditTGPPage.PageInfo,
                 A10CEditHMCSPage.PageInfo,
                 A10CEditMiscPage.PageInfo
