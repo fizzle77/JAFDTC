@@ -38,7 +38,7 @@ namespace JAFDTC.UI.A10C
         private const string SYSTEM_NAME = "HMCS";
 
         private HMCSSystem EditState => (HMCSSystem)_editState;
-        protected override A10CSystemBase SystemConfig => _config.HMCS;
+        public override A10CSystemBase SystemConfig => _config.HMCS;
 
         public static ConfigEditorPageInfo PageInfo
             => new(HMCSSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.HMCS, typeof(A10CEditHMCSPage));
@@ -46,7 +46,7 @@ namespace JAFDTC.UI.A10C
         public A10CEditHMCSPage() : base(SYSTEM_NAME, HMCSSystem.SystemTag)
         {
             InitializeComponent();
-            InitializeBase(new HMCSSystem(), uiTextFlightMembers, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            InitializeBase(new HMCSSystem(), uiTextFlightMembers, uiCtlLinkResetBtns);
         }
 
         // ---- UI helpers  -------------------------------------------------------------------------------------------
@@ -186,7 +186,6 @@ namespace JAFDTC.UI.A10C
                 if (oldSettings != null)
                 {
                     oldSettings.ErrorsChanged -= BaseField_DataValidationError;
-                    oldSettings.PropertyChanged -= BaseField_PropertyChanged;
                     
                     // BindableObject remembers errors but not the value that caused them. So changing this
                     // back to a profile with an error, you get a red box on a good value. Clearing the error
@@ -201,7 +200,6 @@ namespace JAFDTC.UI.A10C
                 if (newSettings != null)
                 {
                     newSettings.ErrorsChanged += BaseField_DataValidationError;
-                    newSettings.PropertyChanged += BaseField_PropertyChanged;
 
                     CopyConfigToEditState(newSettings);
                     UpdateUIFromEditState();

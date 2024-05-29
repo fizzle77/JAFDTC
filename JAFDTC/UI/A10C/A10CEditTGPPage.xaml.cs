@@ -30,7 +30,7 @@ namespace JAFDTC.UI.A10C
     {
         private const string SYSTEM_NAME = "TGP";
 
-        protected override A10CSystemBase SystemConfig => _config.TGP;
+        public override A10CSystemBase SystemConfig => _config.TGP;
 
         public static ConfigEditorPageInfo PageInfo
             => new(TGPSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.TGP, typeof(A10CEditTGPPage));
@@ -38,8 +38,7 @@ namespace JAFDTC.UI.A10C
         public A10CEditTGPPage() : base(SYSTEM_NAME, TGPSystem.SystemTag)
         {
             InitializeComponent();
-            InitializeBase(new TGPSystem(), uiTextLaserCode, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            InitializeBase(new TGPSystem(), uiTextLaserCode, uiCtlLinkResetBtns);
         }
-
     }
 }
