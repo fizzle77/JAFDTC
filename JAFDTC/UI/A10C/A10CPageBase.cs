@@ -58,7 +58,7 @@ namespace JAFDTC.UI.A10C
     ///    the config store. For editors that have more sophisticated needs, relevant methods can be overriden:
     ///    GetControlPropertyHelper, CopyConfigToEditState, SaveEditStateToConfig, and CopyAllSettings.
     ///    
-    /// 6. Custom UI update logic can be performed inside the UI Dispatcher delegate by overriding UpdateUICustom().
+    /// 6. Custom UI update logic can be performed inside the UI Dispatcher delegate by overriding UpdateUI().
     ///    
     /// 7. Derived classes must call the base contructor. They must also call InitializeBase() after
     ///    InitializeComponent().
@@ -112,14 +112,17 @@ namespace JAFDTC.UI.A10C
             TextBox setDefaultsFrom,
             LinkResetBtnsControl linkResetBtnsControl)
         {
-            if (editState == null) throw new ArgumentException("editState can not be null");
-            if (setDefaultsFrom == null) throw new ArgumentException("setDefaultsFrom can not be null");
+            //if (editState == null) throw new ArgumentException("editState can not be null");
+            //if (setDefaultsFrom == null) throw new ArgumentException("setDefaultsFrom can not be null");
 
-            _editState = editState;
-            _editState.ErrorsChanged += BaseField_DataValidationError;
+            if (editState != null)
+                _editState = editState;
 
-            _defaultBorderBrush = setDefaultsFrom.BorderBrush;
-            _defaultBkgndBrush = setDefaultsFrom.Background;
+            if (setDefaultsFrom != null)
+            {
+                _defaultBorderBrush = setDefaultsFrom.BorderBrush;
+                _defaultBkgndBrush = setDefaultsFrom.Background;
+            }
 
             _linkResetBtnsControl = linkResetBtnsControl; // can be null
         }
@@ -256,9 +259,12 @@ namespace JAFDTC.UI.A10C
         /// </summary>
         protected virtual void CopyConfigToEditState()
         {
-            _editState.ClearErrors();
-            CopyAllSettings(SystemConfig, _editState);
-            UpdateUIFromEditState();
+            if (_editState != null)
+            {
+                _editState.ClearErrors();
+                CopyAllSettings(SystemConfig, _editState);
+                UpdateUIFromEditState();
+            }
         }
 
         /// <summary>
@@ -267,8 +273,12 @@ namespace JAFDTC.UI.A10C
         /// </summary>
         protected virtual void SaveEditStateToConfig()
         {
-            CopyAllSettings(_editState, SystemConfig, true);
-            _config.Save(this, _systemTag);
+            if (_editState != null)
+            {
+                CopyAllSettings(_editState, SystemConfig, true);
+                _config.Save(this, _systemTag);
+
+            }
         }
 
         /// <summary>
@@ -362,7 +372,7 @@ namespace JAFDTC.UI.A10C
 
                 _linkResetBtnsControl?.SetResetButtonEnabled(!_editState.IsDefault);
 
-                UpdateUICustom();
+                UpdateUI();
 
                 _isUIUpdatePending = false;
             });
@@ -371,7 +381,12 @@ namespace JAFDTC.UI.A10C
         /// <summary>
         /// Override to perform custom UI update steps inside the queued dispatcher delegate.
         /// </summary>
-        protected virtual void UpdateUICustom() { }
+        protected virtual void UpdateUI() { }
+
+        /// <summary>
+        /// Override to perform custom logic when a property changes.
+        /// </summary>
+        protected virtual void EditState_PropertyChanged(object sender, PropertyChangedEventArgs e) { }
 
         // ---- control event handlers --------------------------------------------------------------------------------
 
@@ -457,7 +472,7 @@ namespace JAFDTC.UI.A10C
                 SetFieldValidVisualState(PageTextBoxes[propertyName], !editState.PropertyHasErrors(propertyName));
         }
 
-        protected virtual void BaseField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
+        protected virtual void EditState_ErrorsChanged(object sender, DataErrorsChangedEventArgs args)
         {
             ValidateEditState(_editState, args.PropertyName);
         }
@@ -469,10 +484,16 @@ namespace JAFDTC.UI.A10C
             _navArgs = (ConfigEditorPageNavArgs)args.Parameter;
             _config = (A10CConfiguration)_navArgs.Config;
 
+            if (_editState != null)
+            {
+                _editState.ErrorsChanged += EditState_ErrorsChanged;
+                _editState.PropertyChanged += EditState_PropertyChanged;
+            }
+
             if (_linkResetBtnsControl != null)
             {
                 _linkResetBtnsControl.Initialize(_systemName, _systemTag, this, _config);
-                _linkResetBtnsControl.ConfigChanged += CopyConfigToEditState;
+                _linkResetBtnsControl.ConfigLinkedOrReset += CopyConfigToEditState;
                 _linkResetBtnsControl.NavigatedTo(_navArgs.UIDtoConfigMap);
             }
             CopyConfigToEditState();
@@ -482,8 +503,14 @@ namespace JAFDTC.UI.A10C
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
+            if (_editState != null)
+            {
+                _editState.ErrorsChanged -= EditState_ErrorsChanged;
+                _editState.PropertyChanged -= EditState_PropertyChanged;
+            }
+
             if (_linkResetBtnsControl != null)
-                _linkResetBtnsControl.ConfigChanged -= CopyConfigToEditState;
+                _linkResetBtnsControl.ConfigLinkedOrReset -= CopyConfigToEditState;
 
             base.OnNavigatingFrom(e);
         }

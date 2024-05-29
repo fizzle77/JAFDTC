@@ -24,6 +24,7 @@ using JAFDTC.Utilities;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.ComponentModel;
 using System.Reflection;
@@ -146,11 +147,17 @@ namespace JAFDTC.UI.A10C
             return selectedProfileEditState != null;
         }
 
-        protected override void UpdateUICustom()
+        protected override void UpdateUI()
         {
             uiProfile1SelectIcon.Visibility = Utilities.HiddenIfDefault(_config.HMCS.GetProfileSettings(Profiles.PRO1));
             uiProfile2SelectIcon.Visibility = Utilities.HiddenIfDefault(_config.HMCS.GetProfileSettings(Profiles.PRO2));
             uiProfile3SelectIcon.Visibility = Utilities.HiddenIfDefault(_config.HMCS.GetProfileSettings(Profiles.PRO3));
+        }
+
+        protected override void EditState_PropertyChanged(object sender, PropertyChangedEventArgs e) 
+        {
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () => UpdateUI());
+            base.EditState_PropertyChanged(sender, e);
         }
 
         protected override void GetControlPropertyHelper(
@@ -185,7 +192,8 @@ namespace JAFDTC.UI.A10C
                 HMCSProfileSettings oldSettings = EditState.GetProfileSettings((string)((Grid)e.RemovedItems[0]).Tag);
                 if (oldSettings != null)
                 {
-                    oldSettings.ErrorsChanged -= BaseField_DataValidationError;
+                    oldSettings.ErrorsChanged -= EditState_ErrorsChanged;
+                    oldSettings.PropertyChanged -= EditState_PropertyChanged;
                     
                     // BindableObject remembers errors but not the value that caused them. So changing this
                     // back to a profile with an error, you get a red box on a good value. Clearing the error
@@ -199,7 +207,8 @@ namespace JAFDTC.UI.A10C
                 HMCSProfileSettings newSettings = EditState.GetProfileSettings((string)((Grid)e.AddedItems[0]).Tag);
                 if (newSettings != null)
                 {
-                    newSettings.ErrorsChanged += BaseField_DataValidationError;
+                    newSettings.ErrorsChanged += EditState_ErrorsChanged;
+                    newSettings.PropertyChanged += EditState_PropertyChanged;
 
                     CopyConfigToEditState(newSettings);
                     UpdateUIFromEditState();
@@ -249,9 +258,9 @@ namespace JAFDTC.UI.A10C
             }
         }
 
-        protected override void BaseField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
+        protected override void EditState_ErrorsChanged(object sender, DataErrorsChangedEventArgs args)
         {
-            base.BaseField_DataValidationError(sender, args);
+            base.EditState_ErrorsChanged(sender, args);
             if (IsProfileSelectionValid(out HMCSProfileSettings selectedProfileEditState))
                 ValidateEditState(selectedProfileEditState, args.PropertyName);
         }
@@ -286,6 +295,17 @@ namespace JAFDTC.UI.A10C
             //    comboBox.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             //    comboBox.Width = comboBox.DesiredSize.Width + width;
             //}
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            if (IsProfileSelectionValid(out HMCSProfileSettings profileEditState))
+            {
+                profileEditState.ErrorsChanged -= EditState_ErrorsChanged;
+                profileEditState.PropertyChanged -= EditState_PropertyChanged;
+            }
+
+            base.OnNavigatedFrom(e);
         }
     }
 }

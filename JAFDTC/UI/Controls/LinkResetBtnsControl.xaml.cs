@@ -22,10 +22,10 @@ namespace JAFDTC.UI.Controls
         private string _systemName;
         private Dictionary<string, IConfiguration> _uidToConfigMap;
 
-        public event Action ConfigChanged;
-        private void OnConfigChanged()
+        public event Action ConfigLinkedOrReset;
+        private void OnConfigLinkedOrReset()
         {
-            ConfigChanged?.Invoke();
+            ConfigLinkedOrReset?.Invoke();
         }
 
         public LinkResetBtnsControl()
@@ -58,7 +58,7 @@ namespace JAFDTC.UI.Controls
             Utilities.RebuildLinkControls(_config, _systemTag, _uidToConfigMap, uiPageBtnTxtLink, uiPageTxtLink);
         }
 
-        private async void PageBtnReset_Click(object sender, RoutedEventArgs e)
+        private async void PageBtnReset_Click(object _, RoutedEventArgs __)
         {
             ContentDialogResult result = await Utilities.Message2BDialog(
                 Content.XamlRoot,
@@ -72,7 +72,7 @@ namespace JAFDTC.UI.Controls
                 UpdateLinkControls();
                 _parentPage.SystemConfig.Reset();
                 _config.Save(_parentPage, _systemTag);
-                OnConfigChanged();
+                OnConfigLinkedOrReset();
             }
         }
 
@@ -90,7 +90,7 @@ namespace JAFDTC.UI.Controls
                 _config.Save(_parentPage);
             }
 
-            OnConfigChanged();
+            OnConfigLinkedOrReset();
             UpdateLinkControls();
         }
     }
