@@ -26,7 +26,7 @@ using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.A10C.DSMS
 {
-    public class DSMSSystem : BindableObject, ISystem
+    public class DSMSSystem : A10CSystemBase
     {
         public const string SystemTag = "JAFDTC:A10C:DSMS";
 
@@ -75,7 +75,7 @@ namespace JAFDTC.Models.A10C.DSMS
         };
 
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get
             {
@@ -175,7 +175,7 @@ namespace JAFDTC.Models.A10C.DSMS
         }
 
         // reset the instance to defaults
-        public void Reset()
+        public override void Reset()
         {
             LaserCode = "";
             _munitionSettingMap = new Dictionary<int, MunitionSettings>();

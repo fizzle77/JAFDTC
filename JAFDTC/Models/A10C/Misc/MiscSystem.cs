@@ -109,7 +109,7 @@ namespace JAFDTC.Models.A10C.Misc
     /// <summary>
     /// TODO: document
     /// </summary>
-    public class MiscSystem : BindableObject, ISystem
+    public class MiscSystem : A10CSystemBase
     {
         public const string SystemTag = "JAFDTC:A10C:MISC";
 
@@ -299,7 +299,7 @@ namespace JAFDTC.Models.A10C.Misc
         // form, false otherwise.
         //
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get => IsCoordSystemDefault && IsBullseyeOnHUDDefault && IsFlightPlan1ManualDefault
                 && IsSpeedDisplayDefault && IsAapSteerPtDefault && IsAapPageDefault 
@@ -503,7 +503,7 @@ namespace JAFDTC.Models.A10C.Misc
 
         // reset the instance to defaults (by definition, field value of "" implies default).
         //
-        public void Reset()
+        public override void Reset()
         {
             CoordSystem = "";
             BullseyeOnHUD = "";

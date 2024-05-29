@@ -205,6 +205,13 @@ function JAFDTC_A10C_Fn_Arc210Com2IsOnHUD()
     return JAFDTC_A10C_GetHUD_value("ARC_210_Radio_2_Status") ~= "---"
 end
 
+-- TAD Routines
+
+function JAFDTC_A10C_Fn_IsTADInDefaultMFDPosition()
+    local value = JAFDTC_A10C_GetLMFD_value("label_14");
+    return value == "TAD";
+end
+
 -- TGP Routines
 
 function JAFDTC_A10C_Fn_IsTGPInDefaultMFDPosition()

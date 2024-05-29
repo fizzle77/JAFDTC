@@ -101,7 +101,7 @@ namespace JAFDTC.UI.App
     /// <summary>
     /// class encapsulating arguments/parameters to pass in to a system editor page.
     /// </summary>
-    internal sealed class ConfigEditorPageNavArgs
+    public sealed class ConfigEditorPageNavArgs
     {
         public ConfigurationPage ConfigPage {  get; }
 
