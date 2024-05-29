@@ -66,6 +66,7 @@ namespace JAFDTC.Models.A10C.Upload
                 BuildAapSteerPt(aap, _cfg.Misc);
                 BuildAapPage(aap, _cfg.Misc);
                 BuildAutopilot(ap, _cfg.Misc);
+                BuildAltitudeWarnings(ufc, _cfg.Misc);
                 BuildTACAN(tacan, _cfg.Misc);
                 BuildIFF(iff, _cfg.Misc);
             }
@@ -224,6 +225,50 @@ namespace JAFDTC.Models.A10C.Upload
 
             int setValue = (int)miscSystem.AutopilotModeValue;
             AddDynamicAction(ap, "AP_MODE", setValue, setValue);
+        }
+
+        private void BuildAltitudeWarnings(AirframeDevice ufc, MiscSystem miscSystem)
+        {
+            if (miscSystem.IsAGLFloorDefault && miscSystem.IsMSLFloorDefault && miscSystem.IsMSLCeilingDefault)
+                return;
+
+            AddAction(ufc, "CLR");
+
+            int queuedAltAlrtPresses = 0;
+            if (!miscSystem.IsAGLFloorDefault)
+            {
+                AddAction(ufc, "ALT_ALRT");
+                AddActions(ufc, ActionsForCleanNum(miscSystem.AGLFloor));
+                AddAction(ufc, "ENTER");
+            }
+            else
+                queuedAltAlrtPresses++;
+
+            if (!miscSystem.IsMSLFloorDefault)
+            {
+                queuedAltAlrtPresses = UnqueueAltAlrtPresses(ufc, queuedAltAlrtPresses);
+                AddAction(ufc, "ALT_ALRT");
+                AddActions(ufc, ActionsForCleanNum(miscSystem.MSLFloor));
+                AddAction(ufc, "ENTER");
+            }
+            else
+                queuedAltAlrtPresses++;
+
+            if (!miscSystem.IsMSLCeilingDefault)
+            {
+                UnqueueAltAlrtPresses(ufc, queuedAltAlrtPresses);
+                AddAction(ufc, "ALT_ALRT");
+                AddActions(ufc, ActionsForCleanNum(miscSystem.MSLCeiling));
+                AddAction(ufc, "ENTER");
+                AddAction(ufc, "ALT_ALRT");
+            }
+        }
+
+        private int UnqueueAltAlrtPresses(AirframeDevice ufc, int count)
+        {
+            for (int i = 0; i < count; i++)
+                AddAction(ufc, "ALT_ALRT");
+            return 0;
         }
 
         private void BuildTACAN(AirframeDevice tacan, MiscSystem miscSystem)

@@ -105,6 +105,8 @@ namespace JAFDTC.Utilities
         [JsonIgnore]
         public bool HasErrors { get => (_errors.Count > 0); }
 
+        public bool PropertyHasErrors(string propertyName) => _errors.ContainsKey(propertyName);
+
         public System.Collections.IEnumerable GetErrors(string propertyName = null)
         {
             if (propertyName == null)

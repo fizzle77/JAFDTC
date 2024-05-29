@@ -210,6 +210,9 @@ namespace JAFDTC.Models.A10C
             ufc.AddAction(3010, "0", delay, 1);
             ufc.AddAction(3011, "SPC", delay, 1);
             ufc.AddAction(3013, "FN", delay, 1);
+            ufc.AddAction(3015, "CLR", delay, 1);
+            ufc.AddAction(3016, "ENTER", delay, 1);
+            ufc.AddAction(3018, "ALT_ALRT", delay, 1);
             AddDevice(ufc);
 
             // ---- IFF
