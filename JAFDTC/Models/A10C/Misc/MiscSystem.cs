@@ -270,6 +270,40 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
+        private string _aglFloor;                           // integer [0, 5000]
+        public string AGLFloor
+        {
+            get => _aglFloor;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 5000)) ? null : "Invalid format";
+                SetProperty(ref _aglFloor, value, error);
+            }
+        }
+
+        private string _mslFloor;                           // integer [0, 45000]
+        public string MSLFloor
+        {
+            get => _mslFloor;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 45000)) ? null : "Invalid format";
+                SetProperty(ref _mslFloor, value, error);
+            }
+        }
+
+        private string _mslCeiling;                           // integer [0, 45000]
+        public string MSLCeiling
+        {
+            get => _mslCeiling;
+            set
+            {
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 45000)) ? null : "Invalid format";
+                SetProperty(ref _mslCeiling, value, error);
+            }
+        }
+
+
         // ---- following properties are synthesized
 
         // returns a MiscSystem with the fields populated with the actual default values (note that usually the value
@@ -291,7 +325,10 @@ namespace JAFDTC.Models.A10C.Misc
             TACANChannel = "0",
             IFFMasterMode = "0",                // Off
             IFFMode3Code = "0000",
-            IFFMode4On = false.ToString()
+            IFFMode4On = false.ToString(),
+            AGLFloor = "500",
+            MSLFloor = "0",
+            MSLCeiling = "0"
         };
 
         // returns true if the instance indicates a default setup (all fields are "") or the object is in explicit
@@ -303,7 +340,8 @@ namespace JAFDTC.Models.A10C.Misc
             get => IsCoordSystemDefault && IsBullseyeOnHUDDefault && IsFlightPlan1ManualDefault
                 && IsSpeedDisplayDefault && IsAapSteerPtDefault && IsAapPageDefault 
                 && IsAutopilotModeDefault && IsTACANModeDefault && IsTACANBandDefault && IsTACANChannelDefault
-                && IsIFFMasterModeDefault && IsIFFMode3CodeDefault && IsIFFMode4OnDefault;
+                && IsIFFMasterModeDefault && IsIFFMode3CodeDefault && IsIFFMode4OnDefault
+                && IsAGLFloorDefault && IsMSLFloorDefault && IsMSLCeilingDefault;
         }
 
         [JsonIgnore]
@@ -382,6 +420,24 @@ namespace JAFDTC.Models.A10C.Misc
         public bool IsIFFMode4OnDefault
         {
             get => string.IsNullOrEmpty(IFFMode4On) || IFFMode4On == ExplicitDefaults.IFFMode4On;
+        }
+
+        [JsonIgnore]
+        public bool IsAGLFloorDefault
+        {
+            get => string.IsNullOrEmpty(AGLFloor) || AGLFloor == ExplicitDefaults.AGLFloor;
+        }
+
+        [JsonIgnore]
+        public bool IsMSLFloorDefault
+        {
+            get => string.IsNullOrEmpty(MSLFloor) || MSLFloor == ExplicitDefaults.MSLFloor;
+        }
+
+        [JsonIgnore]
+        public bool IsMSLCeilingDefault
+        {
+            get => string.IsNullOrEmpty(MSLCeiling) || MSLCeiling == ExplicitDefaults.MSLCeiling;
         }
 
         // ---- following accessors get the current value (default or non-default) for various properties
@@ -490,6 +546,9 @@ namespace JAFDTC.Models.A10C.Misc
             IFFMasterMode = new(other.IFFMasterMode);
             IFFMode3Code = new(other.IFFMode3Code);
             IFFMode4On = new(other.IFFMode4On);
+            AGLFloor = new(other.AGLFloor);
+            MSLFloor = new(other.MSLFloor);
+            MSLCeiling = new(other.MSLCeiling);
          }
 
         public virtual object Clone() => new MiscSystem(this);
@@ -517,6 +576,9 @@ namespace JAFDTC.Models.A10C.Misc
             IFFMasterMode = "0";                // Off
             IFFMode3Code = "";
             IFFMode4On = false.ToString();
+            AGLFloor = "500";
+            MSLFloor = "0";
+            MSLCeiling = "0";
         }
     }
 }

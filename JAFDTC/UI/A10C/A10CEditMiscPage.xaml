@@ -243,24 +243,83 @@ https://www.gnu.org/licenses/.
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <!-- TACAN setup -->
+            <!-- Altitude Warnings -->
 
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
+                Altitude Warnings:
+            </TextBlock>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                AGL Floor
+            </TextBlock>
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" Width="80" 
+                     x:Name="uiTextAGLFloor"
+                     Tag="AGLFloor"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="4"
+                     HorizontalAlignment="Left"
+                     GotFocus="TextBox_GotFocus"
+                     LostFocus="TextBox_LostFocus"
+                     ToolTipService.ToolTip="AGL floor altitude"/>
+
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                MSL Floor
+            </TextBlock>
+            <TextBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0" Width="90" 
+                     x:Name="uiTextMSLFloor"
+                     Tag="MSLFloor"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="5"
+                     HorizontalAlignment="Left"
+                     GotFocus="TextBox_GotFocus"
+                     LostFocus="TextBox_LostFocus"
+                     ToolTipService.ToolTip="MSL floor altitude"/>
+
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                MSL Ceiling
+            </TextBlock>
+            <TextBox Grid.Row="3" Grid.Column="1" Margin="12,12,0,0" Width="90" 
+                     x:Name="uiTextMSLCeiling"
+                     Tag="MSLCeiling"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="5"
+                     HorizontalAlignment="Left"
+                     GotFocus="TextBox_GotFocus"
+                     LostFocus="TextBox_LostFocus"
+                     ToolTipService.ToolTip="MSL ceiling altitude"/>
+            
+            <!-- TACAN setup -->
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,24,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
                 TACAN Configuration:
             </TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,0"
+            
+            <TextBlock Grid.Row="5" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right">
                 TACAN Channel
             </TextBlock>
-            <StackPanel Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
+            <StackPanel Grid.Row="5" Grid.Column="1" Margin="12,12,0,0" Orientation="Horizontal">
                 <TextBox Width="80"
                          x:Name="uiTextTACANChannel"
                          Tag="TACANChannel"
@@ -283,12 +342,13 @@ https://www.gnu.org/licenses/.
                     </ComboBox.Items>
                 </ComboBox>
             </StackPanel>
-            <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0"
+            
+            <TextBlock Grid.Row="6" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right">
                 Mode
             </TextBlock>
-            <ComboBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0" Width="Auto"
+            <ComboBox Grid.Row="6" Grid.Column="1" Margin="12,12,0,0" Width="Auto"
                       x:Name="uiComboTACANMode"
                       Tag="TACANMode"
                       SelectionChanged="ComboBox_SelectionChanged"
@@ -306,16 +366,17 @@ https://www.gnu.org/licenses/.
 
             <!-- IFF setup -->
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,24,0,0"
+            <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,24,0,0"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
                 IFF Configuration:
             </TextBlock>
-            <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,12,0,0"
+            
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right">
                 Master Mode:
             </TextBlock>
-            <ComboBox Margin="12,12,0,0" Grid.Row="4" Grid.Column="1" Width="Auto"
+            <ComboBox Margin="12,12,0,0" Grid.Row="8" Grid.Column="1" Width="Auto"
                       x:Name="uiComboIFFMasterMode"
                       Tag="IFFMasterMode"
                       SelectionChanged="ComboBox_SelectionChanged"
@@ -328,21 +389,23 @@ https://www.gnu.org/licenses/.
                     <TextBlock Text="NORM"/>
                 </ComboBox.Items>
             </ComboBox>
-            <TextBlock Grid.Row="5" Grid.Column="0" Margin="12,12,0,0"
+            
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right">
                 MODE 4 ON:
             </TextBlock>
-            <CheckBox Margin="12,12,0,0" Grid.Row="5" Grid.Column="1"
+            <CheckBox Margin="12,12,0,0" Grid.Row="9" Grid.Column="1"
                       x:Name="uiCheckIFFMode4On"
                       Tag="IFFMode4On"
                       Click="CheckBox_Clicked"/>
-            <TextBlock Grid.Row="6" Grid.Column="0" Margin="12,12,0,0"
+            
+            <TextBlock Grid.Row="10" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right">
                 MODE 3/A Code
             </TextBlock>
-            <TextBox Grid.Row="6" Grid.Column="1" Margin="12,12,0,0" Width="80" 
+            <TextBox Grid.Row="10" Grid.Column="1" Margin="12,12,0,0" Width="80" 
                      x:Name="uiTextIFFMode3Code"
                      Tag="IFFMode3Code"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
