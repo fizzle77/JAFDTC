@@ -333,24 +333,41 @@ namespace JAFDTC.UI.A10C
                 {
                     GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
                     if (property == null) throw new ApplicationException("Unexpected TextBox: " + kv.Key);
-                    Utilities.SetTextBoxEnabledAndText(kv.Value, isNotLinked, true, 
-                        (string)property.GetValue(editState));
+
+                    // Don't re-set a text box with errors, because that will set it back to its pre-error value.
+                    if (!editState.PropertyHasErrors(property.Name))
+                    {
+                        Utilities.SetTextBoxEnabledAndText(kv.Value, isNotLinked, true,
+                            (string)property.GetValue(editState));
+                    }
                 }
 
                 foreach (KeyValuePair<string, ComboBox> kv in PageComboBoxes)
                 {
                     GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
+
                     if (property == null) throw new ApplicationException("Unexpected ComboBox: " + kv.Key);
-                    Utilities.SetComboEnabledAndSelection(kv.Value, isNotLinked, true, 
-                        int.Parse((string)property.GetValue(editState)));
+                    if (!int.TryParse((string)property.GetValue(editState), out int selectedIndex))
+                    {
+                        FileManager.Log(string.Format("Unparseable int ({0}) encountered in {1}.{2}. Replacing with 0.",
+                            property.GetValue(editState), editState.GetType(), property.Name));
+                        selectedIndex = 0;
+                    }
+                    Utilities.SetComboEnabledAndSelection(kv.Value, isNotLinked, true, selectedIndex);
                 }
 
                 foreach (KeyValuePair<string, CheckBox> kv in PageCheckBoxes)
                 {
                     GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
+
                     if (property == null) throw new ApplicationException("Unexpected ComboBox: " + kv.Key);
-                    Utilities.SetCheckEnabledAndState(kv.Value, isNotLinked,
-                        bool.Parse((string)property.GetValue(editState)));
+                    if (!bool.TryParse((string)property.GetValue(editState), out bool isChecked))
+                    {
+                        FileManager.Log(string.Format("Unparseable bool ({0}) encountered in {1}.{2}. Replacing with false.",
+                            property.GetValue(editState), editState.GetType(), property.Name));
+                        isChecked = false;
+                    }
+                    Utilities.SetCheckEnabledAndState(kv.Value, isNotLinked, isChecked);
                 }
 
                 _uiPageBtnReset.IsEnabled = !_editState.IsDefault;
