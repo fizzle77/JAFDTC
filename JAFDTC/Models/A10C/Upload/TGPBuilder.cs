@@ -19,9 +19,7 @@
 
 using JAFDTC.Models.A10C.TGP;
 using JAFDTC.Models.DCS;
-using JAFDTC.Utilities;
 using System;
-using System.Reflection;
 using System.Text;
 
 namespace JAFDTC.Models.A10C.Upload
@@ -70,9 +68,9 @@ namespace JAFDTC.Models.A10C.Upload
 
                 string action = (VideoModeOptions)_cfg.TGP.VideoModeValue switch
                 {
-                    VideoModeOptions.BHOT => "BoatSwitchForward",
-                    VideoModeOptions.WHOT => "BoatSwitchAft",
-                    VideoModeOptions.CCD => "BoatSwitchCenter",
+                    VideoModeOptions.BHOT => "BOAT_SWITCH_FWD",
+                    VideoModeOptions.WHOT => "BOAT_SWITCH_AFT",
+                    VideoModeOptions.CCD => "BOAT_SWITCH_CENTER",
                     _ => throw new ApplicationException("Unexpected video mode: " + _cfg.TGP.VideoModeValue)
                 };
                 AddAction(hotas, action);

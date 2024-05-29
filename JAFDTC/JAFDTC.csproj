@@ -54,6 +54,7 @@
     <None Remove="UI\A10C\A10CEditDSMSProfileOrder.xaml" />
     <None Remove="UI\A10C\A10CEditHMCSPage.xaml" />
     <None Remove="UI\A10C\A10CEditMiscPage.xaml" />
+    <None Remove="UI\A10C\A10CEditTADPage.xaml" />
     <None Remove="UI\A10C\A10CEditTGPPage.xaml" />
     <None Remove="UI\App\EditPointsOfInterestPage.xaml" />
     <None Remove="UI\App\ImportParamsDialog.xaml" />
@@ -197,6 +198,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Page Update="UI\F16C\F16CEditSMSPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="UI\A10C\A10CEditTADPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="UI\A10C\A10CEditTGPPage.xaml">

@@ -18,10 +18,11 @@ https://www.gnu.org/licenses/.
 
 **********************************************************************************************************************
 -->
-<Page
+<local:A10CPageBase
     x:Class="JAFDTC.UI.A10C.A10CEditTGPPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.A10C"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -105,7 +106,8 @@ https://www.gnu.org/licenses/.
             <CheckBox Grid.Row="3" Grid.Column="1" Margin="12,12,0,0"
                       x:Name="uiCheckLatch"
                       VerticalAlignment="Center"
-                      Click="uiCheckLatch_Clicked"
+                      Click="CheckBox_Clicked"
+                      Tag="Latch"
                       ToolTipService.ToolTip="When disabled, the laser fires only while the switch is depressed">
             </CheckBox>
 
@@ -154,8 +156,7 @@ https://www.gnu.org/licenses/.
                 </ComboBox.Items>
             </ComboBox>
 
-
-            <!-- Coordinate Display -->
+            <!-- Yardstick -->
             <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}"
                        HorizontalTextAlignment="Right">
@@ -196,7 +197,8 @@ https://www.gnu.org/licenses/.
             <CheckBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0"
                       x:Name="uiCheckFRND"
                       VerticalAlignment="Center"
-                      Click="uiCheckFRND_Clicked"
+                      Click="CheckBox_Clicked"
+                      Tag="FRND"
                       ToolTipService.ToolTip="Mark EPLRS-enabled friendlies with an X">
             </CheckBox>
         </Grid>
@@ -251,4 +253,4 @@ https://www.gnu.org/licenses/.
             </StackPanel>
         </Grid>
     </Grid>
-</Page>
+</local:A10CPageBase>

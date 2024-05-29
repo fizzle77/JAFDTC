@@ -7,6 +7,7 @@ JAFDTC supports configuration of the following systems in the A-10C II Warthog,
 * DSMS
 * HMCS
 * Radios
+* TAD
 * TGP
 * Waypoints
 * Miscellaneous Systems
@@ -59,9 +60,19 @@ Prior to uploading, you should ensure the relevant systems are powered up and fu
 Typically, uploads should occur as one of the last steps prior to taxi once you have systems
 powered up, stores loaded, and so on.
 
+Most of the A-10 systems (everything except the COMM page for the ARC-210) must be in their default position on the MFDs, or their setup will be skipped. This may be improved upon in future releases.
+
 ## HMCS
 
-TODO
+The HMCS system allows modification of every HMCS setting that has a DCS function. If you notice some that are missing, they were omitted for this reason.
+
+Each of the the HMCS profiles' settings can be modified in the middle section of this screen. The tooltips shown by hovering the mouse cursor over each field gives an explanation from the flight manual of each setting's purpose.
+
+Common settings that apply to all profiles are at the bottom of this editor.
+
+- **TGP Track** selectss the type of track the TGP will use when initiated from the HMCS with DMS-right-long.
+- **Active Profile** will set one of the three HMCS profiles active when done configuring.
+- **Brightness** selects either DAY or NIGHT brightness levels.
 
 ## Radios
 
@@ -111,16 +122,30 @@ The airframe specific controls for the AN/ARC-210 include,
   frequencies are set manually.
 - **Monitor Guard** &ndash; When selected, configures the radio to automatically monitor the
   UHF guard frequncy.
-- **HUD Status** &ndash; When selected, show the tuning information for the AN/ARC-210 in the
+- **COM1 on HUD** &ndash; When selected, show the COM1 tuning information for the AN/ARC-210 in the
   HUD.
 
 Other controls work as described in
 [Communications System Editor](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md#communications-system-editors)
 documentation.
 
+## TAD
+
+**TAD NET Settings** allow for changing the Group ID, Own, ID, and Callsign used for SADL and datalink. Leaving them blank makes no changes, leaving the mission editor's configuration. Note that given the buggy state of datalink in May 2024, leaving them blank is often the better choice.
+
+Most of the display options should be self-evident. **Hook Ownship** will hook your own ship to leave the hook option coordinate display visible. This is useful for e.g. the BULL CURS option, displaying a bullseye reference to your cursor even with nothing else hooked.
+
+JAFDTC does not support creation of additional TAD display profiles, but allows changes to the default, initial profile with settings in the right column.
+
 ## TGP
 
-TODO
+In addition to being on the default right MFD button, the TGP must be fully timed out when its settings are loaded from JAFDTC, or it will be skipped.
+
+The settings available in the TGP system editor are mostly self-explanatory, exactly matching commonly set options in the jet. Some less commonly known settings include:
+
+- **Yardstick** is the length of one side of the TGP boresight cross. This option allows showing its length in metric units, USA freedom units, or turning the display off.
+- **TAAF** (TGP Attitude Advisory Function) defaults to 0, which is off. If an altitude is set, below that altitude a warning appears on both MFDs at high bank angles.
+- **FRND** turns off X marks of EPLRS-enabled friendlies. If you're the sort of psychopath who would turn this off at startup, here's your chance.
 
 ## Waypoints
 
@@ -139,7 +164,7 @@ The **Munition Settings** tab allows modification of commonly changed options on
 
 Note that the **Laser Code** setting applies to all laser weapons. You don't need to set it for each laser weapon type.
 
-The **Profile Order** tab allows setting the order of the default profiles. The list can be dragged into the desired order. When enabled with the checkbox, any profiles present will be sorted as shown. Any profiles not listed here will be sorted to the end of the list.
+The **Profile Order** tab allows setting the order of the default profiles. The list can be dragged into the desired order. Any profiles present in the jet will be sorted as shown. Any profiles not listed here but present in the jet will be sorted to the end of the list.
 
 ![a10-dsms-profiless](images/Hawg_Sys_DSMS_Profile.png)
 

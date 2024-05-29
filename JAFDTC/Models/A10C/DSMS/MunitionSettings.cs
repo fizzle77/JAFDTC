@@ -89,7 +89,7 @@ namespace JAFDTC.Models.A10C.DSMS
         Tail = 2
     }
 
-    public class MunitionSettings : BindableObject, ISystem
+    public class MunitionSettings : A10CSystemBase
     {
         private string _autoLase;                              // string (boolean)
         public string AutoLase
@@ -202,7 +202,7 @@ namespace JAFDTC.Models.A10C.DSMS
         }
 
         [JsonIgnore]
-        public bool IsDefault =>
+        public override bool IsDefault =>
             IsAutoLaseDefault && IsLaseSecondsDefault && IsDeliveryModeDefault && IsEscapeManeuverDefault &&
             IsReleaseModeDefault && IsHOFOptionDefault && IsRPMOptionDefault && IsFuzeOptionDefault;
 
@@ -304,7 +304,7 @@ namespace JAFDTC.Models.A10C.DSMS
             _munition = munition;
         }
 
-        public void Reset()
+        public override void Reset()
         {
             AutoLase = "";
             LaseSeconds = "";

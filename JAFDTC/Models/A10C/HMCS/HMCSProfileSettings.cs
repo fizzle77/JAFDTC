@@ -43,7 +43,7 @@ namespace JAFDTC.Models.A10C.HMCS
     /// <summary>
     /// Defines the settings that exist under each of the 3 HMCS profiles.
     /// </summary>
-    public class HMCSProfileSettings : BindableObject, ISystem
+    public class HMCSProfileSettings : A10CSystemBase
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -468,7 +468,7 @@ namespace JAFDTC.Models.A10C.HMCS
         // ---- synthesized properties
 
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get
             {
@@ -648,7 +648,7 @@ namespace JAFDTC.Models.A10C.HMCS
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public void Reset()
+        public override void Reset()
         {
             HMCSProfileSettings sourceSettings = _profile switch
             {

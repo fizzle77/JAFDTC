@@ -198,9 +198,9 @@ namespace JAFDTC.UI
         }
 
         /// <summary>
-        /// Find all child controls of the specified type.
+        /// Find all descendant controls of the specified type in the visual tree.
         /// </summary>
-        public static void FindChildren<T>(List<T> results, DependencyObject startNode)
+        public static void FindDescendantControls<T>(List<T> results, DependencyObject startNode)
           where T : DependencyObject
         {
             int count = VisualTreeHelper.GetChildrenCount(startNode);
@@ -212,7 +212,7 @@ namespace JAFDTC.UI
                     T asType = (T)current;
                     results.Add(asType);
                 }
-                FindChildren<T>(results, current);
+                FindDescendantControls<T>(results, current);
             }
         }
         
