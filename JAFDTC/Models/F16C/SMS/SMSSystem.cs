@@ -28,7 +28,7 @@ namespace JAFDTC.Models.F16C.SMS
     /// <summary>
     /// TODO: document
     /// </summary>
-    public class SMSSystem : BindableObject, ISystem
+    public class SMSSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:F16C:SMS";
 
@@ -76,7 +76,7 @@ namespace JAFDTC.Models.F16C.SMS
         /// default setups.
         /// </summary>
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get
             {
@@ -130,7 +130,7 @@ namespace JAFDTC.Models.F16C.SMS
         /// <summary>
         /// reset the instance to defaults.
         /// </summary>
-        public void Reset()
+        public override void Reset()
         {
             Settings = new();
         }

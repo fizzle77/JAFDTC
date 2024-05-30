@@ -21,23 +21,23 @@ using JAFDTC.Models;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.SMS;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Base;
 using JAFDTC.Utilities;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using static JAFDTC.Models.F16C.SMS.SMSSystem;
 
 namespace JAFDTC.UI.F16C
 {
     /// <summary>
     /// TODO: document
     /// </summary>
-    public sealed partial class F16CEditSMSPage : Page
+    public sealed partial class F16CEditSMSPage : SystemEditorPageBase
     {
         public static ConfigEditorPageInfo PageInfo
             => new(SMSSystem.SystemTag, "Munitions", "SMS", Glyphs.SMS, typeof(F16CEditSMSPage));
@@ -48,12 +48,15 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private ConfigEditorPageNavArgs NavArgs { get; set; }
+        // ---- TODO
 
-        // NOTE: changes to the Config object may only occur through the marshall methods. bindings to and edits by
-        // NOTE: the ui are always directed at the EditSettings property.
-        //
-        private F16CConfiguration Config { get; set; }
+        protected override SystemBase SystemConfig => ((F16CConfiguration)Config).SMS;
+
+        protected override String SystemTag => SMSSystem.SystemTag;
+
+        protected override string SystemName => "SMS munition setup";
+
+        // ---- TODO
 
         private MunitionSettings EditSettings { get; set; }
 
@@ -61,20 +64,15 @@ namespace JAFDTC.UI.F16C
 
         private string EditProfile { get; set; }
 
-        private bool IsRebuildPending { get; set; }
-
-        private bool IsRebuildingUI { get; set; }
-
-        // ---- read-only properties
+        // ---- TODO
 
         private readonly List<F16CMunition> _munitions;
-
-        private readonly Dictionary<string, string> _configNameToUID;
-        private readonly List<string> _configNameList;
-
-        private readonly Dictionary<string, TextBox> _baseFieldValueMap;
-        private readonly Brush _defaultBorderBrush;
-        private readonly Brush _defaultBkgndBrush;
+        private readonly List<FrameworkElement> _elemsProfile;
+        private readonly List<FrameworkElement> _elemsFuze;
+        private readonly List<FrameworkElement> _elemsArmDelay;
+        private readonly List<FrameworkElement> _elemsArmDelay2;
+        private readonly List<FrameworkElement> _elemsSpin;
+        private readonly List<FrameworkElement> _elemsAutoPwr;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -84,19 +82,21 @@ namespace JAFDTC.UI.F16C
 
         public F16CEditSMSPage()
         {
-            InitializeComponent();
-
             EditSettings = new MunitionSettings();
             EditMuni = SMSSystem.Munitions.CBU_87;
             EditProfile = "1";
 
-            IsRebuildPending = false;
-            IsRebuildingUI = false;
-
             _munitions = FileManager.LoadF16CMunitions();
 
-            _configNameToUID = new Dictionary<string, string>();
-            _configNameList = new List<string>();
+            InitializeComponent();
+            InitializeBase(EditSettings, uiTextRippleQty, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+
+            _elemsProfile = new() { uiLabelProfile, uiComboProfile };
+            _elemsFuze = new() { uiLabelFuze, uiComboFuze };
+            _elemsArmDelay = new() { uiLabelArmDelay, uiValueArmDelay, uiLabelArmDelayUnits };
+            _elemsArmDelay2 = new() { uiLabelArmDelay2, uiValueArmDelay2, uiLabelArmDelay2Units };
+            _elemsSpin = new() { uiLabelSpin, uiComboSpin, uiLabelSpinUnits };
+            _elemsAutoPwr = new() { uiLabelAutoPwr, uiComboAutoPwr, uiStackAutoPwr };
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -105,42 +105,32 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // marshall data between our local misc setup and the configuration.
-        //
-        private void CopyConfigToEdit()
+        /// <summary>
+        /// Copy data from the system configuration object to the edit object the page interacts with.
+        /// </summary>
+        protected override void CopyConfigToEditState()
         {
-            MunitionSettings profile = Config.SMS.GetSettingsForMunitionProfile(EditMuni, EditProfile);
-            EditSettings.EmplMode = profile.EmplMode;
-        }
+            F16CConfiguration config = (F16CConfiguration)Config;
+            MunitionSettings settings = config.SMS.GetSettingsForMunitionProfile(EditMuni, EditProfile);
+            EditSettings.EmplMode = settings.EmplMode;
 
-        private void CopyEditToConfig(bool isPersist = false)
-        {
-            if (!EditSettings.HasErrors)
-            {
-                MunitionSettings profile = Config.SMS.GetSettingsForMunitionProfile(EditMuni, EditProfile);
-                profile.EmplMode = new(EditSettings.EmplMode);
-                if (isPersist)
-                {
-                    Config.SMS.CleanUp();
-                    Config.Save(this, SMSSystem.SystemTag);
-                }
-            }
+            UpdateUIFromEditState();
         }
-
-        // ------------------------------------------------------------------------------------------------------------
-        //
-        // field validation
-        //
-        // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// set the border brush and background for a TextBox based on validity. valid fields use the defaults, invalid
-        /// fields use ErrorFieldBorderBrush from the resources.
+        /// Copy data from the edit object the page interacts with to the system configuration object and persist the
+        /// updated configuration to disk.
         /// </summary>
-        private void SetFieldValidState(TextBox field, bool isValid)
+        protected override void SaveEditStateToConfig()
         {
-            field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
-            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+            if (!EditState.HasErrors)
+            {
+                F16CConfiguration config = (F16CConfiguration)Config;
+                MunitionSettings settings = config.SMS.GetSettingsForMunitionProfile(EditMuni, EditProfile);
+                settings.EmplMode = EditSettings.EmplMode;
+                config.SMS.CleanUp();
+                config.Save(this, SystemTag);
+            }
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -150,121 +140,113 @@ namespace JAFDTC.UI.F16C
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// rebuild the link controls on the page based on where the configuration is linked to.
+        /// TODO: document
         /// </summary>
-        private void RebuildLinkControls()
+        private static int GetDefaultComboItemFromSpec(string spec)
         {
-            Utilities.RebuildLinkControls(Config, SMSSystem.SystemTag, NavArgs.UIDtoConfigMap,
-                                          uiPageBtnTxtLink, uiPageTxtLink);
+            List<string> fields = (!string.IsNullOrEmpty(spec)) ? spec.Split(';').ToList() : null;
+            return (!string.IsNullOrEmpty(spec)) ? int.Parse(fields[1]) : -1;
         }
 
         /// <summary>
-        /// update the enable state on the ui elements based on the current settings. link controls must be set up
-        /// via RebuildLinkControls() prior to calling this function.
+        /// return a list of TextBlock instances to serve as the menu items for a ComboBox. the list is constructed
+        /// from a specification of the form: "{items_csv};{default_index}" where {items_csv} is a csv list of strings
+        /// for item names and {default_index} is the index of the default item.
         /// </summary>
-        private void RebuildEnableState()
+        private static IList<TextBlock> BuildComboItemsFromSpec(string spec, out int dfltIndex)
         {
-            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(SMSSystem.SystemTag));
-
-            Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
-
-#if NOPE
-            Utilities.SetEnableState(uiPageBtnReset, !EditMisc.IsDefault);
-#endif
-        }
-
-        /// <summary>
-        /// rebuild the state of controls on the page in response to a change in the configuration.
-        /// </summary>
-        private void RebuildInterfaceState()
-        {
-            if (!IsRebuildPending)
+            List<TextBlock> comboItems = new List<TextBlock>();
+            if (!string.IsNullOrEmpty(spec))
             {
-                IsRebuildPending = true;
-                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-                {
-                    IsRebuildingUI = true;
-                    F16CMunition munition = (F16CMunition)uiListMunition.SelectedItem;
-                    uiTextMuniDesc.Text = (munition != null) ? munition.DescrUI : "No Munition Selected";
-                    RebuildLinkControls();
-                    RebuildEnableState();
-                    IsRebuildingUI = false;
-                    IsRebuildPending = false;
-                });
+                List<string> fields = spec.Split(';').ToList();
+                List<string> items = fields[0].Split(',').ToList();
+                for (int i = 0; i < items.Count; i++)
+                    comboItems.Add(new TextBlock() { Text = items[i], Tag = items[i] });
+
+                dfltIndex = int.Parse(fields[1]);
             }
-        }
-
-        // ------------------------------------------------------------------------------------------------------------
-        //
-        // ui interactions
-        //
-        // ------------------------------------------------------------------------------------------------------------
-
-        // ---- common editor controls --------------------------------------------------------------------------------
-
-        /// <summary>
-        /// reset all button click: reset all dlnk settings back to their defaults if the user consents.
-        /// </summary>
-        private async void PageBtnReset_Click(object sender, RoutedEventArgs e)
-        {
-            ContentDialogResult result = await Utilities.Message2BDialog(
-                Content.XamlRoot,
-                "Reset Configuration?",
-                "Are you sure you want to reset the Stores Management System configurations to avionics defaults? This action cannot be undone.",
-                "Reset"
-            );
-            if (result == ContentDialogResult.Primary)
+            else
             {
-                Config.UnlinkSystem(SMSSystem.SystemTag);
-                Config.Misc.Reset();
-                Config.Save(this, SMSSystem.SystemTag);
-                CopyConfigToEdit();
+                dfltIndex = -1;
             }
+            return comboItems;
         }
 
         /// <summary>
         /// TODO: document
         /// </summary>
-        private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
+        private void SelectComboItemWIthTag(ComboBox combo, string tag, int dfltIndex)
         {
-            string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, SMSSystem.SystemTag,
-                                                                    _configNameList);
-            if (selectedItem == null)
+            for (int i = 0; i < combo.Items.Count; i++)
             {
-                Config.UnlinkSystem(SMSSystem.SystemTag);
-                Config.Save(this);
+                FrameworkElement elem = (FrameworkElement)combo.Items[i];
+                if ((elem != null) && (elem.Tag != null) && (elem.Tag.ToString() == tag))
+                {
+                    if (i != combo.SelectedIndex)
+                        combo.SelectedIndex = i;
+                    return;
+                }
             }
-            else if (selectedItem.Length > 0)
-            {
-                Config.LinkSystemTo(SMSSystem.SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selectedItem]]);
-                Config.Save(this);
-                CopyConfigToEdit();
-            }
+            combo.SelectedIndex = dfltIndex;
         }
 
-        // ---- munition list -----------------------------------------------------------------------------------------
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private Visibility SetVisibility(List<FrameworkElement> elems, string spec)
+        {
+            Visibility visible = (!string.IsNullOrEmpty(spec)) ? Visibility.Visible : Visibility.Collapsed;
+            foreach (FrameworkElement elem in elems)
+                elem.Visibility = visible;
+            return visible;
+        }
 
-        // It's important that these TextBoxes use the LosingFocus focus event, not LostFocus. LosingFocus
-        // fires synchronoulsy before uiComboMunition_SelectionChanged, ensuring an altered text value is
-        // correctly saved before switching munitions.
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void UpdateUIForMunitionChange()
+        {
+            MunitionSettings muni = ((F16CMunition)uiListMunition.SelectedItem).MunitionInfo;
+            uiComboProfile.ItemsSource = BuildComboItemsFromSpec(muni.Profile, out _);
+            uiComboEmploy.ItemsSource = BuildComboItemsFromSpec(muni.EmplMode, out _);
+            uiComboFuze.ItemsSource = BuildComboItemsFromSpec(muni.Fuze, out _);
+
+            Visibility visible;
+            SetVisibility(_elemsProfile, muni.Profile);
+            SetVisibility(_elemsFuze, muni.Fuze);
+            SetVisibility(_elemsArmDelay, muni.ArmDelay);
+            SetVisibility(_elemsArmDelay2, muni.ArmDelay2);
+            SetVisibility(_elemsSpin, muni.Spin);
+            visible = SetVisibility(_elemsAutoPwr, muni.AutoPwrMode);
+            // TODO: hide autopwr sp if supported but disabled...
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        protected override void UpdateUICustom()
+        {
+            F16CMunition muni = (F16CMunition)uiListMunition.SelectedItem;
+            uiTextMuniDesc.Text = (muni != null) ? muni.DescrUI : "No Munition Selected";
+
+            SelectComboItemWIthTag(uiComboProfile, EditProfile, GetDefaultComboItemFromSpec(muni.MunitionInfo.Profile));
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // ui events
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        // ---- munition list -----------------------------------------------------------------------------------------
 
         /// <summary>
         /// TODO: document
         /// </summary>
         private void ListMunition_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
-            if (args.RemovedItems.Count > 0)
-            {
-                F16CMunition oldSelectedMunition = (F16CMunition)args.RemovedItems[0];
-                if (oldSelectedMunition != null)
-                {
-#if NOPE
-                    MunitionSettings oldSettings = _editState.GetMunitionSettings(oldSelectedMunition);
-                    oldSettings.ErrorsChanged -= BaseField_DataValidationError;
-                    oldSettings.PropertyChanged -= BaseField_PropertyChanged;
-#endif
-                }
-            }
+            if ((args.RemovedItems.Count > 0) && ((F16CMunition)args.RemovedItems[0] != null))
+                    SaveEditStateToConfig();
 
             if (args.AddedItems.Count > 0)
             {
@@ -273,14 +255,11 @@ namespace JAFDTC.UI.F16C
                 {
                     EditMuni = (SMSSystem.Munitions)newSelectedMunition.ID;
                     EditProfile = "1";
-#if NOPE
-                    CopyConfigToEditState(newSelectedMunition);
-                    UpdateUIFromEditState();
-#endif
                 }
             }
 
-            RebuildInterfaceState();
+            UpdateUIForMunitionChange();
+            UpdateUIFromEditState();
         }
 
         // ---- munition parameters -----------------------------------------------------------------------------------
@@ -290,76 +269,28 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void ComboProfile_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
+            // TODO: save to current profile, move to new profile
         }
 
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void ComboEmploy_SelectionChanged(object sender, SelectionChangedEventArgs args)
+        private void MuniBtnReset_Click(object sender, RoutedEventArgs args)
         {
+            // TODO: reset munition
         }
 
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private void TextRippleQty_LosingFocus(object sender, LosingFocusEventArgs args)
-        {
-        }
+        // ---- page-level event handlers -----------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
-        /// </summary>
-        private void TextRippleFt_LosingFocus(object sender, LosingFocusEventArgs args)
-        {
-        }
-
-        // ------------------------------------------------------------------------------------------------------------
-        //
-        // events
-        //
-        // ------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// on configuration saved, rebuild the interface state to align with the latest save (assuming we go here
-        /// through a CopyEditToConfig).
-        /// </summary>
-        private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
-        {
-            RebuildInterfaceState();
-        }
-
-        /// <summary>
-        /// on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
-        /// we are editing.
+        /// on navigation to the page, select the first muinition from the munition list to get something set up.
         /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
-            NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
-            Config = (F16CConfiguration)NavArgs.Config;
-
-            Config.SMS.CleanUp();
-
-            Config.ConfigurationSaved += ConfigurationSavedHandler;
-
-            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, SMSSystem.SystemTag,
-                                           _configNameList, _configNameToUID);
-            CopyConfigToEdit();
-
-            uiListMunition.SelectedIndex = 0;
-
-#if NOPE
-            ValidateAllFields(_baseFieldValueMap, EditMisc.GetErrors(null));
-#endif
-            RebuildInterfaceState();
-
             base.OnNavigatedTo(args);
-        }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs args)
-        {
-            Config.ConfigurationSaved -= ConfigurationSavedHandler;
-
-            base.OnNavigatedFrom(args);
+            // TODO: consider preserving selected munition across visits?            
+            uiListMunition.SelectedIndex = 0;
         }
     }
 }

@@ -5,20 +5,20 @@
     "DescrUI": "CBU-87 Cluster bomb with 202 BLU-97B (CEM) submunitions",
     "LabelSMS": "CB87B",
     "Image": "cbu-87-105.png",
-    "Class": "2",
     "MunitionInfo": {
-      "Profile": "1,2;1",
-      "EmplMode": "CCIP,CCRP,DTOS,LADD,MAN;CCIP",
-      "Ripple": "SGL,PAIR;SGL",
-      "RipplePulse": "[\\d]{1,2},0,99;1",
-      "RippleSpacing": "[\\d]{1,3},10,999;10",
-      "Fuse": "NSTL,NOSE,TAIL;NSTL",
-      "ArmDelay": "[\\d\\d\\.\\d\\d\\d],0.0,99.999;0.62",
-      "BurstAlt": "[\\d]{1,5},0,99999;300",
-      "RelaseAng": "[\\d]{1,2},0,45;45",
-      "LADDPR": "[\\d]{0,3}00,0,99900;25000",
-      "LADDToF": "[\\d\\d\\.\\d\\d],0.0,99.99;28.00",
-      "LADDMRA": "[\\d]{0,5},0,99999;1100"
+      "Profile": "1,2;0",
+      "EmplMode": "0,1,2,3,4;0",
+      "Ripple": "SGL,PAIR;0",
+      "RipplePulse": "[\\d]{1,2};0;99;1",
+      "RippleSpacing": "[\\d]{1,3};10;999;10",
+      "Fuze": "NSTL,NOSE,TAIL;0",
+      "CntlClass": "2",
+      "ArmDelay": "[\\d\\d\\.\\d\\d\\d];0.0;99.999;0.62",
+      "BurstAlt": "[\\d]{1,5};0;99999;300",
+      "RelaseAng": "[\\d]{1,2};0;45;45",
+      "LADDPR": "[\\d]{0,3}00;0;99900;25000",
+      "LADDToF": "[\\d\\d\\.\\d\\d];0.0;99.99;28.00",
+      "LADDMRA": "[\\d]{0,5};0;99999;1100"
     }
   },
   {
@@ -27,14 +27,14 @@
     "DescrUI": "CBU-97 Cluster bomb with 10 BLU-108 (SFW) submunitions",
     "LabelSMS": "CB97B",
     "Image": "cbu-87-105.png",
-    "Class": "2",
     "MunitionInfo": {
-      "Profile": "1,2;1",
-      "EmplMode": "CCIP,CCRP,DTOS,LADD,MAN;CCIP",
-      "Ripple": "SGL,PAIR;SGL",
+      "Profile": "1,2;0",
+      "EmplMode": "0,1,2,3,4;0",
+      "Ripple": "SGL,PAIR;0",
       "RipplePulse": "[\\d]{1,2},0,99;1",
       "RippleSpacing": "[\\d]{1,3},10,999;10",
-      "Fuse": "NSTL,NOSE,TAIL;NSTL",
+      "Fuze": "NSTL,NOSE,TAIL;0",
+      "CntlClass": "2",
       "ArmDelay": "[\\d\\d\\.\\d\\d\\d],0.0,99.999;0.62",
       "BurstAlt": "[\\d]{1,5},0,99999;300",
       "RelaseAng": "[\\d]{1,2},0,45;45",
@@ -49,11 +49,13 @@
     "DescrUI": "CBU-103 INS/GPS-guided cluster bomb with 202 BLU-97B (CEM) submunitions",
     "LabelSMS": "CB103",
     "Image": "cbu-87-105.png",
-    "EmplMode": "PRE,VIS;PRE",
-    "Ripple": "SGL,F2B,S2S;SGL",
-    "RippleSpacing": "[\\d]{1,3},10,999;10",
-    "BurstAlt": "[\\d]{1,4},300,3000;300",
-    "Spin": "0,500,1000,1500,2000,2500;1000"
+    "MunitionInfo": {
+      "EmplMode": "5,6;5",
+      "Ripple": "SGL,F2B,S2S;0",
+      "RippleSpacing": "[\\d]{1,3},10,999;10",
+      "BurstAlt": "[\\d]{1,4},300,3000;300",
+      "Spin": "0,500,1000,1500,2000,2500;1000"
+    }
   },
   {
     "ID": 4,
@@ -61,10 +63,12 @@
     "DescrUI": "CBU-105 INS/GPS-guided cluster bomb with 10 BLU-108 (SFW) submunitions",
     "LabelSMS": "CB105",
     "Image": "cbu-87-105.png",
-    "EmplMode": "PRE,VIS;PRE",
-    "Ripple": "SGL,F2B,S2S;SGL",
-    "RippleSpacing": "[\\d]{1,3},10,999;10",
-    "BurstAlt": "[\\d]{1,4},300,3000;300"
+    "MunitionInfo": {
+      "EmplMode": "PRE,VIS;PRE",
+      "Ripple": "SGL,F2B,S2S;SGL",
+      "RippleSpacing": "[\\d]{1,3},10,999;10",
+      "BurstAlt": "[\\d]{1,4},300,3000;300"
+    }
   },
   {
     "ID": 5,
@@ -77,8 +81,8 @@
     "Ripple": "SGL,PAIR;SGL",
     "RipplePulse": "[\\d]{1,2},0,99;1",
     "RippleSpacing": "[\\d]{1,3},10,999;10",
-    "Fuse": "NSTL,NOSE,TAIL;NSTL",
-    "Class": "1",
+    "Fuze": "NSTL,NOSE,TAIL;NSTL",
+    "CntlClass": "1",
     "ArmDelay": "2.0*var|dddd",
     "ArmDelay2": "4.0*var|dddd",
     "RelaseAng": "45*var|dd,val 0-45",
@@ -97,8 +101,8 @@
     "Ripple": "SGL,PAIR;SGL",
     "RipplePulse": "[\\d]{1,2},0,99;1",
     "RippleSpacing": "[\\d]{1,3},10,999;10",
-    "Fuse": "NSTL,NOSE,TAIL;NSTL",
-    "Class": "1",
+    "Fuze": "NSTL,NOSE,TAIL;NSTL",
+    "CntlClass": "1",
     "ArmDelay": "2.0*var|dddd",
     "ArmDelay2": "4.0*var|dddd",
     "RelaseAng": "45*var|dd,val 0-45",
@@ -116,7 +120,7 @@
     "EmplMode": "PRE,VIS;PRE",
     "Ripple": "SGL,PAIR;SGL",
     "RipplePulse": "1,2;1,3,4",
-    "Fuse": "NSTL,NOSE*,TAIL",
+    "Fuze": "NSTL,NOSE*,TAIL",
     "ArmDelay": "4*,5,6,7,8,10,14,21",
     "CueRange": "4*var|dd.ddd,val 0-98",
     "RelaseAng": "-45*var|ddd,val -45-10"
@@ -168,8 +172,8 @@
     "Ripple": "SGL,PAIR;SGL",
     "RipplePulse": "[\\d]{1,2},0,99;1",
     "RippleSpacing": "10*var|ddd, val 10-999",
-    "Fuse": "NSTL,NOSE,TAIL;NSTL",
-    "Class": "1",
+    "Fuze": "NSTL,NOSE,TAIL;NSTL",
+    "CntlClass": "1",
     "ArmDelay": "2.0*var|dddd",
     "ArmDelay2": "4.0*var|dddd",
     "RelaseAng": "[\\d]{0,2},0,45;45",
@@ -188,8 +192,8 @@
     "Ripple": "SGL,PAIR;SGL",
     "RipplePulse": "[\\d]{1,2},0,99;1",
     "RippleSpacing": "10*var|ddd, val 10-999",
-    "Fuse": "NSTL HI*,NOSE LO,TAIL HI",
-    "Class": "1",
+    "Fuze": "NSTL HI*,NOSE LO,TAIL HI",
+    "CntlClass": "1",
     "ArmDelay": "2.0*var|dddd",
     "ArmDelay2": "4.0*var|dddd",
     "RelaseAng": "[\\d]{0,2},0,45;45",
@@ -208,8 +212,8 @@
     "Ripple": "SGL,PAIR;SGL",
     "RipplePulse": "[\\d]{1,2},0,99;1",
     "RippleSpacing": "10*var|ddd, val 10-999",
-    "Fuse": "NSTL HI*,NOSE LO,TAIL HI",
-    "Class": "1",
+    "Fuze": "NSTL HI*,NOSE LO,TAIL HI",
+    "CntlClass": "1",
     "ArmDelay": "2.0*var|dddd",
     "ArmDelay2": "4.0*var|dddd",
     "RelaseAng": "[\\d]{0,2},0,45;45",
@@ -228,8 +232,8 @@
     "Ripple": "SGL,PAIR;SGL",
     "RipplePulse": "[\\d]{1,2},0,99;1",
     "RippleSpacing": "10*var|ddd, val 10-999",
-    "Fuse": "NSTL,NOSE,TAIL;NSTL",
-    "Class": "1",
+    "Fuze": "NSTL,NOSE,TAIL;NSTL",
+    "CntlClass": "1",
     "ArmDelay": "2.0*var|dddd",
     "ArmDelay2": "4.0*var|dddd",
     "RelaseAng": "[\\d]{0,2},0,45;45",
@@ -248,8 +252,8 @@
     "Ripple": "SGL,PAIR;SGL",
     "RipplePulse": "[\\d]{1,2},0,99;1",
     "RippleSpacing": "10*var|ddd, val 10-999",
-    "Fuse": "NSTL HI*,NOSE LO,TAIL HI",
-    "Class": "1",
+    "Fuze": "NSTL HI*,NOSE LO,TAIL HI",
+    "CntlClass": "1",
     "ArmDelay": "2.0*var|dddd",
     "ArmDelay2": "4.0*var|dddd",
     "RelaseAng": "[\\d]{0,2},0,45;45",
@@ -268,8 +272,8 @@
     "Ripple": "SGL,PAIR;SGL",
     "RipplePulse": "[\\d]{1,2},0,99;1",
     "RippleSpacing": "10*var|ddd, val 10-999",
-    "Fuse": "NSTL HI*,NOSE LO,TAIL HI",
-    "Class": "1",
+    "Fuze": "NSTL HI*,NOSE LO,TAIL HI",
+    "CntlClass": "1",
     "ArmDelay": "2.0*var|dddd",
     "ArmDelay2": "4.0*var|dddd",
     "RelaseAng": "[\\d]{0,2},0,45;45",
@@ -283,10 +287,12 @@
     "DescrUI": "AGM-65D Maverick IR-guided missile, 125lb warhead",
     "LabelSMS": "A65D",
     "Image": "agm-65d.png",
-    "EmplMode": "VIS,BORE,PRE;VIS",
-    "RipplePulse": "[\\d],1,2;1",
-    "AutoPwrDir": "NORTH OF,SOUTH OF,EAST OF,WEST OF;NORTH OF",
-    "AutoPwrSP": "[\\d]{1,3},1,699;2"
+    "MunitionInfo": {
+      "EmplMode": "VIS,BORE,PRE;VIS",
+      "RipplePulse": "[\\d];1;2;1",
+      "AutoPwrMode": "DISABLED,NORTH OF,SOUTH OF,EAST OF,WEST OF;NORTH OF",
+      "AutoPwrSP": "[\\d]{1,3};1;699;2"
+    }
   },
   {
     "ID": 18,
@@ -294,10 +300,12 @@
     "DescrUI": "AGM-65G Maverick IR-guided missile, 300lb warhead",
     "LabelSMS": "A65G",
     "Image": "agm-65g.png",
-    "EmplMode": "VIS,BORE,PRE;VIS",
-    "RipplePulse": "[\\d],1,2;1",
-    "AutoPwrDir": "NORTH OF,SOUTH OF,EAST OF,WEST OF;NORTH OF",
-    "AutoPwrSP": "[\\d]{1,3},1,699;2"
+    "MunitionInfo": {
+      "EmplMode": "VIS,BORE,PRE;VIS",
+      "RipplePulse": "[\\d];1;2;1",
+      "AutoPwrMode": "DISABLED,NORTH OF,SOUTH OF,EAST OF,WEST OF;NORTH OF",
+      "AutoPwrSP": "[\\d]{1,3};1;699;2"
+    }
   },
   {
     "ID": 19,
@@ -305,10 +313,12 @@
     "DescrUI": "AGM-65H Maverick TV-guided missile, 125lb warhead",
     "LabelSMS": "A65H",
     "Image": "agm-65h.png",
-    "EmplMode": "VIS,BORE,PRE;VIS",
-    "RipplePulse": "[\\d],1,2;1",
-    "AutoPwrDir": "NORTH OF,SOUTH OF,EAST OF,WEST OF;NORTH OF",
-    "AutoPwrSP": "[\\d]{1,3},1,699;2"
+    "MunitionInfo": {
+      "EmplMode": "VIS,BORE,PRE;VIS",
+      "RipplePulse": "[\\d];1;2;1",
+      "AutoPwrMode": "DISABLED,NORTH OF,SOUTH OF,EAST OF,WEST OF;NORTH OF",
+      "AutoPwrSP": "[\\d]{1,3};1;699;2"
+    }
   },
   {
     "ID": 20,
@@ -316,9 +326,11 @@
     "DescrUI": "AGM-65K Maverick TV-guided missile 300lb warhead",
     "LabelSMS": "A65K",
     "Image": "agm-65k.png",
-    "EmplMode": "VIS,BORE,PRE;VIS",
-    "RipplePulse": "[\\d],1,2;1",
-    "AutoPwrDir": "NORTH OF,SOUTH OF,EAST OF,WEST OF;NORTH OF",
-    "AutoPwrSP": "[\\d]{1,3},1,699;2"
+    "MunitionInfo": {
+      "EmplMode": "VIS,BORE,PRE;VIS",
+      "RipplePulse": "[\\d];1;2;1",
+      "AutoPwrMode": "DISABLED,NORTH OF,SOUTH OF,EAST OF,WEST OF;NORTH OF",
+      "AutoPwrSP": "[\\d]{1,3};1;699;2"
+    }
   }
 ]

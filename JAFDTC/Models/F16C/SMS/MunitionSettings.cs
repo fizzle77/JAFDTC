@@ -30,8 +30,56 @@ namespace JAFDTC.Models.F16C.SMS
     /// <summary>
     /// TODO: document
     /// </summary>
-    public class MunitionSettings : BindableObject
+    public class MunitionSettings : SystemBase
     {
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public enum EmploymentModes
+        {
+            CCIP = 0,
+            CCRP = 1,
+            DTOS = 2,
+            LADD = 3,
+            MAN = 4,
+            PRE = 5,
+            VIS = 6,
+            BORE = 7
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public enum RippleModes
+        {
+            SGL = 0,
+            PAIR = 1,
+            PAIR_F2B = 2,
+            PAIR_L2R = 3
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public enum FuzeModes
+        {
+            NSTL = 0,
+            NOSE = 1,
+            TAIL = 2
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public enum AutoPowerModes
+        {
+            DISABLED = 0,
+            NORTH_OF = 1,
+            SOUTH_OF = 2,
+            EAST_OF = 3,
+            WEST_OF = 4
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // Properties
@@ -50,13 +98,15 @@ namespace JAFDTC.Models.F16C.SMS
         
         public string RippleSpacing { get; set; }
 
-        public string Fuse { get; set; }
+        public string Fuze { get; set; }
 
         public string ArmDelay { get; set; }
 
         public string ArmDelay2 { get; set; }
 
         public string BurstAlt { get; set; }
+
+        public string Spin { get; set; }
 
         public string RelaseAng { get; set; }
 
@@ -66,6 +116,10 @@ namespace JAFDTC.Models.F16C.SMS
 
         public string LADDMRA { get; set; }
 
+        public string AutoPwrMode { get; set; }
+
+        public string AutoPwrSP { get; set; }
+
         // ---- following properties are synthesized
 
         /// <summary>
@@ -73,7 +127,7 @@ namespace JAFDTC.Models.F16C.SMS
         /// default setups.
         /// </summary>
         [JsonIgnore]
-        public bool IsDefault => true;
+        public override bool IsDefault => true;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -102,7 +156,7 @@ namespace JAFDTC.Models.F16C.SMS
         /// <summary>
         /// reset the instance to defaults.
         /// </summary>
-        public void Reset()
+        public override void Reset()
         {
             // TODO
         }
