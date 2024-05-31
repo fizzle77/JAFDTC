@@ -18,13 +18,13 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.A10C;
-using JAFDTC.Models.A10C.TAD;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Controls;
 using JAFDTC.Utilities;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
@@ -82,7 +82,8 @@ namespace JAFDTC.UI.A10C
         protected Brush _defaultBorderBrush;
         protected Brush _defaultBkgndBrush;
 
-        protected bool _isUIUpdatePending = false;
+        private bool _isUIUpdatePending = false;
+        private bool _isUIUpdateInProgress = false;
 
         public abstract A10CSystemBase SystemConfig { get; }
 
@@ -109,8 +110,8 @@ namespace JAFDTC.UI.A10C
         /// </summary>
         protected void InitializeBase(
             A10CSystemBase editState,
-            TextBox setDefaultsFrom,
-            LinkResetBtnsControl linkResetBtnsControl)
+            TextBox setDefaultsFrom = null,
+            LinkResetBtnsControl linkResetBtnsControl = null)
         {
             //if (editState == null) throw new ArgumentException("editState can not be null");
             //if (setDefaultsFrom == null) throw new ArgumentException("setDefaultsFrom can not be null");
@@ -212,6 +213,21 @@ namespace JAFDTC.UI.A10C
         private Dictionary<string, CheckBox> _pageCheckBoxes;
 
         /// <summary>
+        /// OnNavigatedTo populates all the controls, which performs the lazy load for these maps.
+        /// On most editors, that is the right thing to do. On some (noteably the A-10 HMCS editor)
+        /// it needs to be done later, in Page_Loaded. This allows those control maps to be rebuilt
+        /// and is much easier than trying to carefully control when the initial UI build happens.
+        /// Possibly a better understanding of the event model down the line will allow this to be
+        /// removed.
+        /// </summary>
+        protected void ResetControlMaps()
+        {
+            _pageTextBoxes = null;
+            _pageComboBoxes = null;
+            _pageCheckBoxes = null;
+        }
+
+        /// <summary>
         /// Find and return the property on the edit state object corresponding to the provided control.
         /// </summary>
         protected void GetControlEditStateProperty(FrameworkElement control, out PropertyInfo property, out BindableObject editState)
@@ -229,8 +245,11 @@ namespace JAFDTC.UI.A10C
 
         /// <summary>
         /// Finds the corresponding edit-state or config class and property for the provided control.
+        /// 
         /// Derived classes should override this method if not every tagged control on the page is backed by the page's common 
         /// _editState and SystemConfig.
+        /// 
+        /// Both out parameters, property and configOrEdit, may be null and callers must handle the possibility.
         /// </summary>
         protected virtual void GetControlPropertyHelper(
             SettingLocation settingLocation, 
@@ -257,12 +276,12 @@ namespace JAFDTC.UI.A10C
         /// Derived classes should override if not all relevant settings are included in the _editState and SystemConfig 
         /// classes managed by this base class.
         /// </summary>
-        protected virtual void CopyConfigToEditState()
+        public virtual void CopyConfigToEditState()
         {
             if (_editState != null)
             {
                 _editState.ClearErrors();
-                CopyAllSettings(SystemConfig, _editState);
+                CopyAllSettings(SettingLocation.Config, SettingLocation.Edit, false);
                 UpdateUIFromEditState();
             }
         }
@@ -273,46 +292,85 @@ namespace JAFDTC.UI.A10C
         /// </summary>
         protected virtual void SaveEditStateToConfig()
         {
-            if (_editState != null)
+            if (_editState != null && !_isUIUpdateInProgress)
             {
-                CopyAllSettings(_editState, SystemConfig, true);
+                CopyAllSettings(SettingLocation.Edit, SettingLocation.Config, true);
                 _config.Save(this, _systemTag);
-
+                UpdateUIFromEditState();
             }
         }
 
-        /// <summary>
         /// Iterate over all the settings controls via PageTextBoxes, PageComboBoxes, and PageCheckBoxes.
         /// For each control, get the corresponding property and copy its value from source to destination.
+        /// 
+        /// When checkErrorsInSource is true, an error in the source parameter will skip copying only that value.
         /// 
         /// Derived classes should override if not all controls can be mapped to a property on the _editState and 
         /// SystemConfig classes managed by this base class.
         /// </summary>
-        protected virtual void CopyAllSettings(BindableObject source, BindableObject destination, bool checkErrorsInSource = false)
+        protected virtual void CopyAllSettings(SettingLocation srcLoc, SettingLocation destLoc, bool checkErrorsInSource = false)
         {
-            if (source == destination)
+            if (srcLoc == destLoc)
                 throw new ArgumentException("source and destination cannot be equal");
 
-            foreach (string propertyName in PageTextBoxes.Keys)
-                if (!(checkErrorsInSource && source.PropertyHasErrors(propertyName)))
-                    CopyProperty(propertyName, source, destination);
+            foreach (TextBox textbox in PageTextBoxes.Values)
+            {
+                GetControlPropertyHelper(srcLoc, textbox, out PropertyInfo property, out BindableObject source);
+                if (property == null) throw new ApplicationException("Unexpected TextBox: " + textbox.Tag);
+                GetControlPropertyHelper(destLoc, textbox, out PropertyInfo _, out BindableObject destination);
 
-            foreach (string propertyName in PageComboBoxes.Keys)
-                if (!(checkErrorsInSource && source.PropertyHasErrors(propertyName)))
-                    CopyProperty(propertyName, source, destination);
+                // null source/destination are possible, when pages aren't yet fully initialized.
+                // We pass those along to CopyProperty, which will silently ignore them.
+                CopyProperty(property, source, destination, checkErrorsInSource); 
+            }
 
-            foreach (string propertyName in PageCheckBoxes.Keys)
-                if (!(checkErrorsInSource && source.PropertyHasErrors(propertyName)))
-                    CopyProperty(propertyName, source, destination);
+
+            foreach (ComboBox combobox in PageComboBoxes.Values)
+            {
+                GetControlPropertyHelper(srcLoc, combobox, out PropertyInfo property, out BindableObject source);
+                if (property == null) throw new ApplicationException("Unexpected ComboBox: " + combobox.Tag);
+                GetControlPropertyHelper(destLoc, combobox, out PropertyInfo _, out BindableObject destination);
+
+                // null source/destination are possible, when pages aren't yet fully initialized.
+                // We pass those along to CopyProperty, which will silently ignore them.
+                CopyProperty(property, source, destination, checkErrorsInSource);
+            }
+
+            foreach (CheckBox checkbox in PageCheckBoxes.Values)
+            {
+                GetControlPropertyHelper(srcLoc, checkbox, out PropertyInfo property, out BindableObject source);
+                if (property == null) throw new ApplicationException("Unexpected CheckBox: " + checkbox.Tag);
+                GetControlPropertyHelper(destLoc, checkbox, out PropertyInfo _, out BindableObject destination);
+
+                // null source/destination are possible, when pages aren't yet fully initialized.
+                // We pass those along to CopyProperty, which will silently ignore them.
+                CopyProperty(property, source, destination, checkErrorsInSource);
+            }
         }
 
         /// <summary>
-        /// Find propertyName on source and copy its value to dest.
+        /// Find propertyName on source and if found, copy its value to destination.
+        /// 
+        /// Silently does nothing if any of the provided arguments are null.
         /// </summary>
-        protected void CopyProperty(string propertyName, BindableObject source, BindableObject dest)
+        protected void CopyProperty(string propertyName, BindableObject source, BindableObject destination)
         {
             PropertyInfo propInfo = source.GetType().GetProperty(propertyName);
-            propInfo.SetValue(dest, propInfo.GetValue(source));
+            if (propInfo != null && source != null && destination != null)
+                CopyProperty(propInfo, source, destination);
+        }
+
+        /// <summary>
+        /// Find propertyName on source and if found, copy its value to destination.
+        /// 
+        /// When checkErrorsInSource is true, an error in the source parameter will skip copying.
+        /// 
+        /// Silently does nothing if any of the provided arguments are null.
+        /// </summary>
+        protected void CopyProperty(PropertyInfo property, BindableObject source, BindableObject destination, bool checkErrorsInSource = false)
+        {
+            if (source != null && destination != null && !(checkErrorsInSource && source.PropertyHasErrors(property.Name)))
+                property.SetValue(destination, property.GetValue(source));
         }
 
         /// <summary>
@@ -327,13 +385,30 @@ namespace JAFDTC.UI.A10C
 
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
-                bool isNotLinked = string.IsNullOrEmpty(_config.SystemLinkedTo(_systemTag));
-
-                foreach (KeyValuePair<string, TextBox> kv in PageTextBoxes)
+                try
                 {
-                    GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
-                    if (property == null) throw new ApplicationException("Unexpected TextBox: " + kv.Key);
+                    _isUIUpdateInProgress = true;
+                    DoUIUpdate();
+                }
+                finally
+                {
+                    _isUIUpdateInProgress = false;
+                    _isUIUpdatePending = false;
+                }
+            });
+        }
 
+        private void DoUIUpdate()
+        {
+            bool isNotLinked = string.IsNullOrEmpty(_config.SystemLinkedTo(_systemTag));
+
+            foreach (KeyValuePair<string, TextBox> kv in PageTextBoxes)
+            {
+                GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
+                if (property == null) throw new ApplicationException("Unexpected TextBox: " + kv.Key);
+
+                if (editState != null)
+                {
                     // Don't re-set a text box with errors, because that will set it back to its pre-error value.
                     if (!editState.PropertyHasErrors(property.Name))
                     {
@@ -341,12 +416,15 @@ namespace JAFDTC.UI.A10C
                             (string)property.GetValue(editState));
                     }
                 }
+            }
 
-                foreach (KeyValuePair<string, ComboBox> kv in PageComboBoxes)
+            foreach (KeyValuePair<string, ComboBox> kv in PageComboBoxes)
+            {
+                GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
+                if (property == null) throw new ApplicationException("Unexpected ComboBox: " + kv.Key);
+
+                if (editState != null)
                 {
-                    GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
-
-                    if (property == null) throw new ApplicationException("Unexpected ComboBox: " + kv.Key);
                     if (!int.TryParse((string)property.GetValue(editState), out int selectedIndex))
                     {
                         FileManager.Log(string.Format("Unparseable int ({0}) encountered in {1}.{2}. Replacing with 0.",
@@ -355,12 +433,15 @@ namespace JAFDTC.UI.A10C
                     }
                     Utilities.SetComboEnabledAndSelection(kv.Value, isNotLinked, true, selectedIndex);
                 }
+            }
 
-                foreach (KeyValuePair<string, CheckBox> kv in PageCheckBoxes)
+            foreach (KeyValuePair<string, CheckBox> kv in PageCheckBoxes)
+            {
+                GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
+                if (property == null) throw new ApplicationException("Unexpected CheckBox: " + kv.Key);
+
+                if (editState != null)
                 {
-                    GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
-
-                    if (property == null) throw new ApplicationException("Unexpected ComboBox: " + kv.Key);
                     if (!bool.TryParse((string)property.GetValue(editState), out bool isChecked))
                     {
                         FileManager.Log(string.Format("Unparseable bool ({0}) encountered in {1}.{2}. Replacing with false.",
@@ -369,13 +450,11 @@ namespace JAFDTC.UI.A10C
                     }
                     Utilities.SetCheckEnabledAndState(kv.Value, isNotLinked, isChecked);
                 }
+            }
 
-                _linkResetBtnsControl?.SetResetButtonEnabled(!_editState.IsDefault);
+            _linkResetBtnsControl?.SetResetButtonEnabled(!_editState.IsDefault);
 
-                UpdateUI();
-
-                _isUIUpdatePending = false;
-            });
+            UpdateUI();
         }
 
         /// <summary>
@@ -385,8 +464,20 @@ namespace JAFDTC.UI.A10C
 
         /// <summary>
         /// Override to perform custom logic when a property changes.
+        /// 
+        /// Editors having additional custom edit states should subscribe property change events to this handler.
         /// </summary>
         protected virtual void EditState_PropertyChanged(object sender, PropertyChangedEventArgs e) { }
+
+        /// <summary>
+        /// Override to perform custom logic when a property changes.
+        /// 
+        /// Editors having additional custom edit states should subscribe error change events to this handler.
+        /// </summary>
+        protected virtual void EditState_ErrorsChanged(object sender, DataErrorsChangedEventArgs args)
+        {
+            ValidateEditState(_editState, args.PropertyName);
+        }
 
         // ---- control event handlers --------------------------------------------------------------------------------
 
@@ -424,17 +515,14 @@ namespace JAFDTC.UI.A10C
             SaveEditStateToConfig();
         }
 
-        /// <summary>
-        /// Change handler for all of the CheckBoxes that manage a setting.
-        /// Sets the corresponding edit state property value and updates the underlying config.
-        /// </summary>
-        protected void CheckBox_Clicked(object sender, RoutedEventArgs _)
+        // use this everywhere?
+        protected void TextBox_LosingFocus(UIElement sender, LosingFocusEventArgs _)
         {
-            CheckBox checkBox = (CheckBox)sender;
-            GetControlEditStateProperty(checkBox, out PropertyInfo property, out BindableObject editState);
+            TextBox textBox = (TextBox)sender;
+            GetControlEditStateProperty(textBox, out PropertyInfo property, out BindableObject editState);
 
             if (property != null && editState != null)
-                property.SetValue(editState, (checkBox.IsChecked == true).ToString());
+                property.SetValue(editState, textBox.Text);
 
             _linkResetBtnsControl?.SetResetButtonEnabled(!_editState.IsDefault);
 
@@ -451,6 +539,21 @@ namespace JAFDTC.UI.A10C
         {
             TextBox textBox = (TextBox)sender;
             textBox.SelectAll();
+        }
+
+        /// <summary>
+        /// Change handler for all of the CheckBoxes that manage a setting.
+        /// Sets the corresponding edit state property value and updates the underlying config.
+        /// </summary>
+        protected void CheckBox_Clicked(object sender, RoutedEventArgs _)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            GetControlEditStateProperty(checkBox, out PropertyInfo property, out BindableObject editState);
+
+            if (property != null && editState != null)
+                property.SetValue(editState, (checkBox.IsChecked == true).ToString());
+
+            SaveEditStateToConfig();
         }
 
         // ---- field validation -------------------------------------------------------------------------------------------
@@ -470,11 +573,6 @@ namespace JAFDTC.UI.A10C
             }
             else if (PageTextBoxes.ContainsKey(propertyName))
                 SetFieldValidVisualState(PageTextBoxes[propertyName], !editState.PropertyHasErrors(propertyName));
-        }
-
-        protected virtual void EditState_ErrorsChanged(object sender, DataErrorsChangedEventArgs args)
-        {
-            ValidateEditState(_editState, args.PropertyName);
         }
 
         // ---- page-level event handlers -------------------------------------------------------------------------------------------

@@ -185,6 +185,11 @@ namespace JAFDTC.Models
         /// <summary>
         /// TODO: document
         /// </summary>
+        public bool IsLinked(string systemTag);
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         public void CleanupSystemLinks(List<string> validUIDs);
 
         /// <summary>

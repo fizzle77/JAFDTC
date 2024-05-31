@@ -102,6 +102,7 @@ https://www.gnu.org/licenses/.
                         <FontIcon Grid.Column="0"
                                   x:Name="uiProfile1SelectIcon"
                                   VerticalAlignment="Center"
+                                  Visibility="Collapsed"
                                   Foreground="{ThemeResource SystemAccentColor}"
                                   FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
                         <TextBlock Grid.Column="1" Margin="8,0,0,0"
@@ -117,6 +118,7 @@ https://www.gnu.org/licenses/.
                         <FontIcon Grid.Column="0"
                                   x:Name="uiProfile2SelectIcon"
                                   VerticalAlignment="Center"
+                                  Visibility="Collapsed"
                                   Foreground="{ThemeResource SystemAccentColor}"
                                   FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
                         <TextBlock Grid.Column="1" Margin="8,0,0,0"
@@ -132,6 +134,7 @@ https://www.gnu.org/licenses/.
                         <FontIcon Grid.Column="0"
                                   x:Name="uiProfile3SelectIcon"
                                   VerticalAlignment="Center"
+                                  Visibility="Collapsed"
                                   Foreground="{ThemeResource SystemAccentColor}"
                                   FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
                         <TextBlock Grid.Column="1" Margin="8,0,0,0"

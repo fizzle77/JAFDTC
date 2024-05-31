@@ -28,11 +28,6 @@ using JAFDTC.Models;
 
 namespace JAFDTC.UI.A10C
 {
-    public interface IA10CDSMSContentFrame
-    {
-        void CopyConfigToEditState();
-    }
-
     /// <summary>
     /// Code-behind class for the A10 DSMS editor.
     /// </summary>
@@ -40,12 +35,14 @@ namespace JAFDTC.UI.A10C
     {
         internal class DSMSEditorNavArgs
         {
-            internal ConfigEditorPageNavArgs NavArgs { get; }
+            internal NavigationEventArgs BaseArgs { get; }
+            internal ConfigEditorPageNavArgs EditorPageNavArgs { get; }
             internal A10CEditDSMSPage ParentPage { get; }
 
-            internal DSMSEditorNavArgs(ConfigEditorPageNavArgs navArgs, A10CEditDSMSPage parentPage)
+            internal DSMSEditorNavArgs(NavigationEventArgs args, A10CEditDSMSPage parentPage)
             {
-                NavArgs = navArgs;
+                BaseArgs = args;
+                EditorPageNavArgs = (ConfigEditorPageNavArgs)args.Parameter;
                 ParentPage = parentPage;
             }
         }
@@ -67,14 +64,14 @@ namespace JAFDTC.UI.A10C
 
         // ---- UI helpers -----------------------------------------------------------------------------------------
 
-        protected override void CopyConfigToEditState()
+        public override void CopyConfigToEditState()
         {
             if (DSMSContentFrame.Content != null)
-                ((IA10CDSMSContentFrame)DSMSContentFrame.Content).CopyConfigToEditState();
+                ((A10CPageBase)DSMSContentFrame.Content).CopyConfigToEditState();
             UpdateDefaultStateIndicators();
         }
 
-        private void UpdateDefaultStateIndicators() 
+        private void UpdateDefaultStateIndicators()
         {
             bool munitionsTabIsDefault = _config.DSMS.IsLaserCodeDefault && _config.DSMS.AreAllMunitionSettingsDefault;
             if (munitionsTabIsDefault)
@@ -88,12 +85,6 @@ namespace JAFDTC.UI.A10C
                 uiIconProfileTab.Visibility = Visibility.Visible;
 
             uiCtlLinkResetBtns.SetResetButtonEnabled(!munitionsTabIsDefault || !_config.DSMS.IsProfileOrderDefault);
-        }
-
-        private void LinkResetChangeHandler()
-        {
-            ((IA10CDSMSContentFrame)DSMSContentFrame.Content).CopyConfigToEditState();
-            UpdateDefaultStateIndicators();
         }
 
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
@@ -117,8 +108,7 @@ namespace JAFDTC.UI.A10C
         {
             base.OnNavigatedTo(args);
          
-            _dsmsEditorNavArgs = new DSMSEditorNavArgs(_navArgs, this);
-            uiCtlLinkResetBtns.ConfigLinkedOrReset += LinkResetChangeHandler;
+            _dsmsEditorNavArgs = new DSMSEditorNavArgs(args, this);
 
             _config.ConfigurationSaved += ConfigurationSavedHandler;
             UpdateDefaultStateIndicators();
@@ -126,7 +116,6 @@ namespace JAFDTC.UI.A10C
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            uiCtlLinkResetBtns.ConfigLinkedOrReset -= LinkResetChangeHandler;
             _config.ConfigurationSaved -= ConfigurationSavedHandler;
 
             base.OnNavigatedFrom(e);

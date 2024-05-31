@@ -18,6 +18,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.A10C;
+using JAFDTC.Models.A10C.DSMS;
 using JAFDTC.UI.App;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -31,23 +32,24 @@ namespace JAFDTC.UI.A10C
     /// <summary>
     /// Content pane for setting A-10 default weapon profile order.
     /// </summary>
-    public sealed partial class A10CEditDSMSProfileOrderPage : Page, IA10CDSMSContentFrame
+    public sealed partial class A10CEditDSMSProfileOrderPage : A10CPageBase
     {
-        private DSMSEditorNavArgs _dsmsEditorNavArgs;
-        private A10CConfiguration _config;
+        private const string SYSTEM_NAME = "DSMS";
 
+        public override A10CSystemBase SystemConfig => _config.DSMS;
+
+        private DSMSEditorNavArgs _dsmsEditorNavArgs;
         private ObservableCollection<A10CMunition> _munitions;
 
-        private bool _suspendUIUpdates = false;
-
-        public A10CEditDSMSProfileOrderPage()
+        public A10CEditDSMSProfileOrderPage() : base(SYSTEM_NAME, DSMSSystem.SystemTag)
         {
             _munitions = new ObservableCollection<A10CMunition>(A10CMunition.GetUniqueProfileMunitions());
 
             InitializeComponent();
+            InitializeBase(new DSMSSystem());
         }
 
-        private void SaveEditStateToConfig()
+        protected override void SaveEditStateToConfig()
         {
             List<int> newOrder = new List<int>(_munitions.Count);
             foreach (A10CMunition m in _munitions)
@@ -56,11 +58,8 @@ namespace JAFDTC.UI.A10C
             _config.Save(_dsmsEditorNavArgs.ParentPage, SystemTag);
         }
 
-        public void CopyConfigToEditState()
+        public override void CopyConfigToEditState()
         {
-            if (_suspendUIUpdates)
-                return;
-
             if (_config.DSMS.ProfileOrder == null)
             {
                 _munitions = new ObservableCollection<A10CMunition>(A10CMunition.GetUniqueProfileMunitions());
@@ -86,24 +85,13 @@ namespace JAFDTC.UI.A10C
 
         private void uiListProfiles_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
         {
-            _suspendUIUpdates = true;
             SaveEditStateToConfig();
-            _suspendUIUpdates = false;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             _dsmsEditorNavArgs = (DSMSEditorNavArgs)args.Parameter;
-            _config = (A10CConfiguration)_dsmsEditorNavArgs.NavArgs.Config;
-
-            CopyConfigToEditState();
-
-            base.OnNavigatedTo(args);
-        }
-
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-            base.OnNavigatedFrom(e);
+            base.OnNavigatedTo(_dsmsEditorNavArgs.BaseArgs);
         }
     }
 }

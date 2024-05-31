@@ -21,11 +21,9 @@ using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using System;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -52,86 +50,27 @@ namespace JAFDTC.UI.A10C
 
         // ---- UI helpers  -------------------------------------------------------------------------------------------
 
-        protected override void SaveEditStateToConfig()
+        protected override void GetControlPropertyHelper(
+            SettingLocation settingLocation,
+            FrameworkElement control,
+            out PropertyInfo property,
+            out BindableObject configOrEdit)
         {
-            if (IsProfileSelectionValid(out HMCSProfileSettings profileEditState))
-                SaveEditStateToConfig(profileEditState);
-        }
-
-        private void SaveEditStateToConfig(HMCSProfileSettings profileEditState)
-        {
-            if (EditState.HasErrors || profileEditState.HasErrors)
-                return;
-
-            CopyAllSettings(profileEditState, SettingLocation.Edit, SettingLocation.Config);
-            _config.Save(this, HMCSSystem.SystemTag);
-        }
-
-        protected override void CopyConfigToEditState()
-        {
-            if (IsProfileSelectionValid(out HMCSProfileSettings selectedProfileSettings))
+            base.GetControlPropertyHelper(settingLocation, control, out property, out configOrEdit);
+            if (property == null)
             {
-                _isUIUpdatePending = true; // prevent events from causing spurious UI updates
-                CopyConfigToEditState(selectedProfileSettings);
-                _isUIUpdatePending = false;
-
-                UpdateUIFromEditState();
-            }
-        }
-
-        private void CopyConfigToEditState(HMCSProfileSettings editStateProfileSettings)
-        {
-            CopyAllSettings(editStateProfileSettings, SettingLocation.Config, SettingLocation.Edit);
-        }
-
-        /// <summary>
-        /// Iterate over all the settings controls via PageComboBoxes, PageTextBoxes, and PageCheckBoxes.
-        /// For each control, get the corresponding property and copy its value from source to destination.
-        /// </summary>
-        /// <param name="editStateProfileSettings">The currently select profile's edit state.</param>
-        /// <param name="source"></param>
-        /// <param name="destination"></param>
-        /// <exception cref="ArgumentException"></exception>
-        private void CopyAllSettings(HMCSProfileSettings editStateProfileSettings, SettingLocation source, SettingLocation destination)
-        {
-            if (source == destination)
-                throw new ArgumentException("source and destination cannot be equal");
-            
-            // ComboBox settings may be in the top-level HMCS config or the individual
-            // profiles settings, so we check for each one.
-            foreach (var kv in PageComboBoxes)
-            {
-                string propName = kv.Key;
-                ComboBox comboBox = kv.Value;
-
-                GetControlEditStateProperty(comboBox, out PropertyInfo _, out BindableObject editState);
-                GetControlConfigProperty(comboBox, out PropertyInfo _, out BindableObject config);
-                if (editState != null && config != null)
+                string propName = control.Tag.ToString();
+                property = typeof(HMCSProfileSettings).GetProperty(propName);
+                if (IsProfileSelectionValid(out HMCSProfileSettings profileSettingsEditState))
                 {
-                    if (source == SettingLocation.Edit)
-                        CopyProperty(propName, editState, config);
+                    if (settingLocation == SettingLocation.Edit)
+                        configOrEdit = profileSettingsEditState;
                     else
-                        CopyProperty(propName, config, editState);
+                        configOrEdit = _config.HMCS.GetProfileSettings(profileSettingsEditState.Profile);
                 }
+                else
+                    configOrEdit = null;
             }
-
-            // TextBox settings are all in the profile settings, so we need not lookup each one.
-
-            BindableObject profileSrc;  // The profile setting source being copied.
-            BindableObject profileDest; // The profile setting destination for the copy.
-
-            if (source == SettingLocation.Edit)
-            {
-                profileSrc = editStateProfileSettings;
-                profileDest = _config.HMCS.GetProfileSettings(editStateProfileSettings.Profile);
-            }
-            else
-            {
-                profileSrc = _config.HMCS.GetProfileSettings(editStateProfileSettings.Profile);
-                profileDest = editStateProfileSettings;
-            }
-            foreach (string propertyName in PageTextBoxes.Keys)
-                CopyProperty(propertyName, profileSrc, profileDest);
         }
 
         /// <summary>
@@ -154,35 +93,6 @@ namespace JAFDTC.UI.A10C
             uiProfile3SelectIcon.Visibility = Utilities.HiddenIfDefault(_config.HMCS.GetProfileSettings(Profiles.PRO3));
         }
 
-        protected override void EditState_PropertyChanged(object sender, PropertyChangedEventArgs e) 
-        {
-            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () => UpdateUI());
-            base.EditState_PropertyChanged(sender, e);
-        }
-
-        protected override void GetControlPropertyHelper(
-            SettingLocation settingLocation, 
-            FrameworkElement control, 
-            out PropertyInfo property,
-            out BindableObject configOrEdit)
-        {
-            base.GetControlPropertyHelper(settingLocation, control, out property, out configOrEdit);
-            if (property == null)
-            {
-                string propName = control.Tag.ToString();
-                property = typeof(HMCSProfileSettings).GetProperty(propName);
-                if (IsProfileSelectionValid(out HMCSProfileSettings profileSettingsEditState))
-                {
-                    if (settingLocation == SettingLocation.Edit)
-                        configOrEdit = profileSettingsEditState;
-                    else
-                        configOrEdit = _config.HMCS.GetProfileSettings(profileSettingsEditState.Profile);
-                }
-                else
-                    configOrEdit = null;
-            }
-        }
-
         // ---- control event handlers --------------------------------------------------------------------------------
 
         private void uiComboEditProfile_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -196,8 +106,8 @@ namespace JAFDTC.UI.A10C
                     oldSettings.PropertyChanged -= EditState_PropertyChanged;
                     
                     // BindableObject remembers errors but not the value that caused them. So changing this
-                    // back to a profile with an error, you get a red box on a good value. Clearing the error
-                    // state is far from ideal, but slightly less mysterious user behavior.
+                    // back to a profile with an error, you get a red box on a good value. This results in
+                    // a white box accompanying the restored good value.
                     oldSettings.ClearErrors();
                 }
             }
@@ -210,8 +120,7 @@ namespace JAFDTC.UI.A10C
                     newSettings.ErrorsChanged += EditState_ErrorsChanged;
                     newSettings.PropertyChanged += EditState_PropertyChanged;
 
-                    CopyConfigToEditState(newSettings);
-                    UpdateUIFromEditState();
+                    CopyConfigToEditState();
                     ValidateAllFields();
                 }
             }
@@ -270,9 +179,12 @@ namespace JAFDTC.UI.A10C
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             // This needs to be done here, not OnNavigatedTo, so that the visual tree is fully built
-            // such that PageComboBoxes and PageTextBoxes finds things.
+            // such that PageComboBoxes and PageTextBoxes finds All The Things.
+            ResetControlMaps();
             if (uiComboEditProfile.SelectedIndex < 0)
                 uiComboEditProfile.SelectedIndex = 0;
+            else
+                CopyConfigToEditState();
 
             // Leaving this here as a breadcrumb...
             //

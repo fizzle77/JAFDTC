@@ -21,213 +21,155 @@ using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.DSMS;
 using JAFDTC.Utilities;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
-using System.Collections;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using static JAFDTC.Models.A10C.DSMS.DSMSSystem;
 using static JAFDTC.UI.A10C.A10CEditDSMSPage;
+using System.Reflection;
+using System.ComponentModel;
 
 namespace JAFDTC.UI.A10C
 {
     /// <summary>
     /// UI Code for the A-10 DSMS A10CMunition Settings Frame
     /// </summary>
-    public sealed partial class A10CEditDSMSMunitionSettingsPage : Page, IA10CDSMSContentFrame
+    public sealed partial class A10CEditDSMSMunitionSettingsPage : A10CPageBase
     {
+        private const string SYSTEM_NAME = "DSMS";
+
+        private DSMSSystem EditState => (DSMSSystem)_editState;
+        public override A10CSystemBase SystemConfig => _config.DSMS;
+
         private DSMSEditorNavArgs _dsmsEditorNavArgs;
-        private A10CConfiguration _config;
-        private readonly DSMSSystem _editState;
-
-        private bool _uiUpdatePending;
-
-        private readonly Dictionary<string, TextBox> _dsmsTextFieldPropertyMap;
-        private readonly Dictionary<string, TextBox> _munitionTextFieldPropertyMap;
-        private readonly Brush _defaultBorderBrush;
-        private readonly Brush _defaultBkgndBrush;
-
         private readonly List<A10CMunition> _munitions;
 
-        public A10CEditDSMSMunitionSettingsPage()
+        public A10CEditDSMSMunitionSettingsPage() : base(SYSTEM_NAME, DSMSSystem.SystemTag)
         {
-            this.InitializeComponent();
+            InitializeComponent();
+            InitializeBase(new DSMSSystem(), uiTextLaserCode, null);
 
             _munitions = FileManager.LoadA10Munitions();
-            _editState = new DSMSSystem();
-
-            _editState.ErrorsChanged += BaseField_DataValidationError;
-            _editState.PropertyChanged += BaseField_PropertyChanged;
-
-            // For mapping property errors to corresponding text field.
-            _dsmsTextFieldPropertyMap = new Dictionary<string, TextBox>()
-            {
-                ["LaserCode"] = uiTextLaserCode
-            };
-            _munitionTextFieldPropertyMap = new Dictionary<string, TextBox>()
-            {
-                ["LaseSeconds"] = uiTextLaseTime,
-                ["RippleFt"] = uiTextRippleFt,
-                ["RippleQty"] = uiTextRippleQty
-            };
-            _defaultBorderBrush = uiTextLaserCode.BorderBrush;
-            _defaultBkgndBrush = uiTextLaserCode.Background;
         }
 
-        private void UpdateUIFromEditState()
+        // ---- UI helpers  -------------------------------------------------------------------------------------------
+
+        protected override void GetControlPropertyHelper(
+            SettingLocation settingLocation,
+            FrameworkElement control,
+            out PropertyInfo property,
+            out BindableObject configOrEdit)
         {
-            if (_uiUpdatePending)
-                return;
+            // base will check the "normal" DSMSSystem class properties first.
+            base.GetControlPropertyHelper(settingLocation, control, out property, out configOrEdit);
 
-            A10CMunition selectedMunition = (A10CMunition)uiComboMunition.SelectedItem;
-            if (selectedMunition == null)
-                return;
-            _uiUpdatePending = true;
-
-            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+            // if it comes up empty, use the MunitionSettings class for the selected munition.
+            if (property == null)
             {
-                bool isNotLinked = string.IsNullOrEmpty(_config.SystemLinkedTo(SystemTag));
-
-                // Laser
-                Utilities.SetTextBoxEnabledAndText(uiTextLaserCode, isNotLinked, selectedMunition.Laser, _editState.LaserCode, _editState.LaserCode);
-                Utilities.SetCheckEnabledAndState(uiCheckAutoLase, isNotLinked && selectedMunition.AutoLase, _editState.GetAutoLaseValue(selectedMunition));
-                Utilities.SetTextBoxEnabledAndText(uiTextLaseTime, isNotLinked, selectedMunition.AutoLase, _editState.GetLaseSeconds(selectedMunition));
-                Visibility autoLaseVisible = (selectedMunition.AutoLase) ? Visibility.Visible : Visibility.Collapsed;
-                Visibility autoLaseFieldVisible = (selectedMunition.AutoLase &&
-                                                   _editState.GetAutoLaseValue(selectedMunition)) ? Visibility.Visible : Visibility.Collapsed;
-                uiLabelAutoLase.Visibility = autoLaseVisible;
-                uiStackAutoLase.Visibility = autoLaseVisible;
-                uiTextLaseTime.Visibility = autoLaseFieldVisible;
-                uiLabelLaseTimeUnits.Visibility = autoLaseFieldVisible;
-
-                uiLabelLaserCode.Foreground = (selectedMunition.Laser) ? uiTextLaserCode.Foreground : uiTextLaserCode.PlaceholderForeground;
-
-                // Delivery Mode (CCIP/CCRP)
-                if (selectedMunition.CCIP ^ selectedMunition.CCRP)
+                string propName = control.Tag.ToString();
+                property = typeof(MunitionSettings).GetProperty(propName);
+                if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
                 {
-                    if (selectedMunition.CCIP)
-                        uiComboDeliveryMode.SelectedIndex = 0;
+                    if (settingLocation == SettingLocation.Edit)
+                        configOrEdit = EditState.GetMunitionSettings(selectedMunition);
                     else
-                        uiComboDeliveryMode.SelectedIndex = 1;
-                    uiComboDeliveryMode.IsEnabled = false;
+                        configOrEdit = _config.DSMS.GetMunitionSettings(selectedMunition);
                 }
                 else
-                {
-                    Utilities.SetComboEnabledAndSelection(uiComboDeliveryMode, isNotLinked, true, (int)_editState.GetDeliveryModeValue(selectedMunition));
-                }
+                    configOrEdit = null;
+            }
+        }
 
-                // Escape Maneuver
-                Utilities.SetComboEnabledAndSelection(uiComboEscMnvr, isNotLinked, selectedMunition.EscMnvr, (int)_editState.GetEscapeManeuverValue(selectedMunition));
-                Visibility escVisible = (selectedMunition.EscMnvr) ? Visibility.Visible : Visibility.Collapsed;
-                uiLabelEscMnvr.Visibility = escVisible;
-                uiComboEscMnvr.Visibility = escVisible;
+        /// <summary>
+        /// The base UI update will correctly set values and link-related enablement, but this editor has 
+        /// unique visibility and enablement behavior we need to perform here.
+        /// </summary>
+        protected override void UpdateUI()
+        {
+            if (!IsMunitionSelectionValid(out A10CMunition selectedMunition))
+               return;
 
-                // Release Mode (SGL, PRS, RIP SGL, RIP PRS)
-                if (selectedMunition.SingleReleaseOnly)
-                {
-                    // For munitions allowing only SGL release, select it and disable.
-                    uiComboReleaseMode.SelectedIndex = 0;
-                    uiComboReleaseMode.IsEnabled = false;
-                    uiStackRipple.Visibility = Visibility.Collapsed;
-                }
+            SetLabelColorMatchingControlEnabledState(uiLabelLaserCode, uiTextLaserCode);
+
+            Visibility autoLaseVisible = (selectedMunition.AutoLase) ? Visibility.Visible : Visibility.Collapsed;
+            Visibility autoLaseFieldVisible = (selectedMunition.AutoLase && EditState.GetAutoLaseValue(selectedMunition)) 
+                ? Visibility.Visible : Visibility.Collapsed;
+            uiLabelAutoLase.Visibility = autoLaseVisible;
+            uiStackAutoLase.Visibility = autoLaseVisible;
+            uiTextLaseTime.Visibility = autoLaseFieldVisible;
+            uiLabelLaseTimeUnits.Visibility = autoLaseFieldVisible;
+            if (selectedMunition.AutoLase) SetLabelColorMatchingControlEnabledState(new TextBlock[] { uiLabelAutoLase, uiLabelLaseTimeUnits } , uiTextLaseTime);
+
+            // Delivery Mode (CCIP/CCRP)
+            if (selectedMunition.CCIP ^ selectedMunition.CCRP)
+            {
+                if (selectedMunition.CCIP)
+                    uiComboDeliveryMode.SelectedIndex = 0;
                 else
-                {
-                    Utilities.SetComboEnabledAndSelection(uiComboReleaseMode, isNotLinked, true, (int)_editState.GetReleaseModeValue(selectedMunition));
-                    uiStackRipple.Visibility = (uiComboReleaseMode.SelectedIndex < 2) ? Visibility.Collapsed : Visibility.Visible;
-                }
-
-                // Ripple Qty and Distance
-                bool enableRippleOptions = selectedMunition.Ripple && uiComboReleaseMode.SelectedIndex > 1; // disabled when SGL or PRS release is selected
-                Utilities.SetTextBoxEnabledAndText(uiTextRippleQty, isNotLinked, enableRippleOptions, _editState.GetRippleQty(selectedMunition), null);
-                Utilities.SetTextBoxEnabledAndText(uiTextRippleFt, isNotLinked, enableRippleOptions && selectedMunition.RipFt, 
-                    _editState.GetRippleFt(selectedMunition));
-
-                // HOF
-                Utilities.SetComboEnabledAndSelection(uiComboHOF, isNotLinked, selectedMunition.HOF, (int)_editState.GetHOFOptionValue(selectedMunition));
-                Visibility hofVisible = (selectedMunition.HOF) ? Visibility.Visible : Visibility.Collapsed;
-                uiLabelHOF.Visibility = hofVisible;
-                uiComboHOF.Visibility = hofVisible;
-
-                // RPM
-                Utilities.SetComboEnabledAndSelection(uiComboRPM, isNotLinked, selectedMunition.RPM, (int)_editState.GetRPMOptionValue(selectedMunition));
-                Visibility rpmVisible = (selectedMunition.RPM) ? Visibility.Visible : Visibility.Collapsed;
-                uiStackRPM.Visibility = rpmVisible;
-
-                // Fuze
-                Utilities.SetComboEnabledAndSelection(uiComboFuze, isNotLinked, selectedMunition.Fuze, (int)_editState.GetFuzeOptionValue(selectedMunition));
-                Visibility fuzeVisible = (selectedMunition.Fuze) ? Visibility.Visible : Visibility.Collapsed;
-                uiLabelFuse.Visibility = fuzeVisible;
-                uiComboFuze.Visibility = fuzeVisible;
-
-                UpdateNonDefaultMunitionIcons();
-
-                MunitionSettings newSettings = _editState.GetMunitionSettings(selectedMunition);
-                newSettings.ErrorsChanged += BaseField_DataValidationError;
-                newSettings.PropertyChanged += BaseField_PropertyChanged;
-
-                Utilities.SetEnableState(uiMuniBtnReset, isNotLinked && !newSettings.IsDefault);
-
-                _uiUpdatePending = false;
-            });
-        }
-
-        private void SaveEditStateToConfig(A10CMunition selectedMunition = null)
-        {
-            if (_editState.HasErrors)
-                return;
-
-            _config.DSMS.LaserCode = _editState.LaserCode;
-            
-            if (selectedMunition != null)
-            {
-                MunitionSettings settings = _editState.GetMunitionSettings(selectedMunition);
-                if (settings.HasErrors)
-                    return;
-                _config.DSMS.SetAutoLase(selectedMunition, _editState.GetAutoLase(selectedMunition));
-                _config.DSMS.SetLaseSeconds(selectedMunition, _editState.GetLaseSeconds(selectedMunition));
-                _config.DSMS.SetDeliveryMode(selectedMunition, _editState.GetDeliveryMode(selectedMunition));
-                _config.DSMS.SetEscapeManeuver(selectedMunition, _editState.GetEscapeManeuver(selectedMunition));
-                _config.DSMS.SetReleaseMode(selectedMunition, _editState.GetReleaseMode(selectedMunition));
-                _config.DSMS.SetHOFOption(selectedMunition, _editState.GetHOFOption(selectedMunition));
-                _config.DSMS.SetRPMOption(selectedMunition, _editState.GetRPMOption(selectedMunition));
-                _config.DSMS.SetRippleQty(selectedMunition, _editState.GetRippleQty(selectedMunition));
-                _config.DSMS.SetRippleFt(selectedMunition, _editState.GetRippleFt(selectedMunition));
-                _config.DSMS.SetFuzeOption(selectedMunition, _editState.GetFuzeOption(selectedMunition));
+                    uiComboDeliveryMode.SelectedIndex = 1;
+                uiComboDeliveryMode.IsEnabled = false;
+                uiLabelDeliveryMode.Foreground = uiTextLaserCode.PlaceholderForeground;
             }
+            SetLabelColorMatchingControlEnabledState(uiLabelDeliveryMode, uiComboDeliveryMode);
 
-            _config.Save(_dsmsEditorNavArgs.ParentPage, SystemTag);
-        }
+            // Escape Maneuver
+            Visibility escVisible = (selectedMunition.EscMnvr) ? Visibility.Visible : Visibility.Collapsed;
+            uiLabelEscMnvr.Visibility = escVisible;
+            uiComboEscMnvr.Visibility = escVisible;
 
-        public void CopyConfigToEditState()
-        {
-            if (IsMunitionSelectionValid(out A10CMunition munition))
+            // Release Mode (SGL, PRS, RIP SGL, RIP PRS)
+            if (selectedMunition.SingleReleaseOnly)
             {
-                _uiUpdatePending = true; // prevent events from causing spurious UI updates
-                CopyConfigToEditState(munition);
-
-                _uiUpdatePending = false;
-                UpdateUIFromEditState();
+                // For munitions allowing only SGL release, select it and disable.
+                uiComboReleaseMode.SelectedIndex = 0;
+                uiComboReleaseMode.IsEnabled = false;
+                uiStackRipple.Visibility = Visibility.Collapsed;
             }
+            else
+            {
+                uiStackRipple.Visibility = (uiComboReleaseMode.SelectedIndex < 2) ? Visibility.Collapsed : Visibility.Visible;
+            }
+            SetLabelColorMatchingControlEnabledState(uiLabelReleaseMode, uiComboReleaseMode);
+
+            // Ripple Qty and Distance
+            bool enableRippleOptions = selectedMunition.Ripple && uiComboReleaseMode.SelectedIndex > 1; // disabled when SGL or PRS release is selected
+            uiTextRippleQty.IsEnabled = enableRippleOptions;
+            uiTextRippleFt.IsEnabled = enableRippleOptions && selectedMunition.RipFt;
+            SetLabelColorMatchingControlEnabledState(new TextBlock[] { uiLabelRipple, uiLabelRippleAt, uiLabelRippleUnits }, uiComboReleaseMode);
+
+            // HOF
+            Visibility hofVisible = (selectedMunition.HOF) ? Visibility.Visible : Visibility.Collapsed;
+            uiLabelHOF.Visibility = hofVisible;
+            uiComboHOF.Visibility = hofVisible;
+            if (selectedMunition.HOF) SetLabelColorMatchingControlEnabledState(uiLabelHOF, uiComboHOF);
+
+            // RPM
+            uiStackRPM.Visibility = selectedMunition.RPM ? Visibility.Visible : Visibility.Collapsed;
+            if (selectedMunition.RPM) SetLabelColorMatchingControlEnabledState(uiLabelRPM, uiComboRPM);
+
+            // Fuze
+            Visibility fuzeVisible = (selectedMunition.Fuze) ? Visibility.Visible : Visibility.Collapsed;
+            uiLabelFuse.Visibility = fuzeVisible;
+            uiComboFuze.Visibility = fuzeVisible;
+            if (selectedMunition.Fuze) SetLabelColorMatchingControlEnabledState(uiLabelFuse, uiComboFuze);
+
+            UpdateNonDefaultMunitionIcons();
+
+            MunitionSettings newSettings = EditState.GetMunitionSettings(selectedMunition);
+            bool isNotLinked = !_config.IsLinked(SystemTag);
+            Utilities.SetEnableState(uiMuniBtnReset, isNotLinked && !newSettings.IsDefault);
         }
-        
-        private void CopyConfigToEditState(A10CMunition selectedMunition)
+
+        private void SetLabelColorMatchingControlEnabledState(TextBlock[] labels, Control control)
         {
-            _editState.LaserCode = _config.DSMS.LaserCode;
-            _editState.SetAutoLase(selectedMunition, _config.DSMS.GetAutoLase(selectedMunition));
-            _editState.SetLaseSeconds(selectedMunition, _config.DSMS.GetLaseSeconds(selectedMunition));
-            _editState.SetDeliveryMode(selectedMunition, _config.DSMS.GetDeliveryMode(selectedMunition));
-            _editState.SetEscapeManeuver(selectedMunition, _config.DSMS.GetEscapeManeuver(selectedMunition));
-            _editState.SetReleaseMode(selectedMunition, _config.DSMS.GetReleaseMode(selectedMunition));
-            _editState.SetRippleQty(selectedMunition, _config.DSMS.GetRippleQty(selectedMunition));
-            _editState.SetRippleFt(selectedMunition, _config.DSMS.GetRippleFt(selectedMunition));
-            _editState.SetHOFOption(selectedMunition, _config.DSMS.GetHOFOption(selectedMunition));
-            _editState.SetRPMOption(selectedMunition, _config.DSMS.GetRPMOption(selectedMunition));
-            _editState.SetFuzeOption(selectedMunition, _config.DSMS.GetFuzeOption(selectedMunition));
+            foreach (TextBlock label in labels)
+                SetLabelColorMatchingControlEnabledState(label, control);
+        }
+
+        private void SetLabelColorMatchingControlEnabledState(TextBlock label, Control control)
+        {
+            label.Foreground = control.IsEnabled ? uiTextLaserCode.Foreground : uiTextLaserCode.PlaceholderForeground;
         }
 
         private bool IsMunitionSelectionValid(out A10CMunition selectedMunition)
@@ -244,19 +186,13 @@ namespace JAFDTC.UI.A10C
                 FontIcon icon = Utilities.FindControl<FontIcon>(container, typeof(FontIcon), "icon");
                 if (icon != null)
                 {
-                    if (_config.DSMS.GetMunitionSettings(munition).IsDefault)
-                        icon.Visibility = Visibility.Collapsed;
-                    else
-                        icon.Visibility = Visibility.Visible;
+                    ISystem system = _config.DSMS.GetMunitionSettings(munition);
+                    icon.Visibility = Utilities.HiddenIfDefault(system);
                 }
             }
         }
 
         // ---- event handlers -------------------------------------------------------------------------------------------
-
-        // It's important that these TextBoxes use the LosingFocus focus event, not LostFocus. LosingFocus
-        // fires synchronoulsy before uiComboMunition_SelectionChanged, ensuring an altered text value is
-        // correctly saved before switching munitions.
 
         private void ComboMunition_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -265,9 +201,10 @@ namespace JAFDTC.UI.A10C
                 A10CMunition oldSelectedMunition = (A10CMunition)e.RemovedItems[0];
                 if (oldSelectedMunition != null)
                 {
-                    MunitionSettings oldSettings = _editState.GetMunitionSettings(oldSelectedMunition);
-                    oldSettings.ErrorsChanged -= BaseField_DataValidationError;
-                    oldSettings.PropertyChanged -= BaseField_PropertyChanged;
+                    MunitionSettings oldSettings = EditState.GetMunitionSettings(oldSelectedMunition);
+                    // Unnecessary because munition settings have no text boxes so no possible errors.
+                    // oldSettings.ErrorsChanged -= EditState_ErrorsChanged;
+                    oldSettings.PropertyChanged -= EditState_PropertyChanged;
                 }
             }
 
@@ -276,105 +213,13 @@ namespace JAFDTC.UI.A10C
                 A10CMunition newSelectedMunition = (A10CMunition)e.AddedItems[0];
                 if (newSelectedMunition != null)
                 {
-                    CopyConfigToEditState(newSelectedMunition);
-                    UpdateUIFromEditState();
+                    CopyConfigToEditState();
+
+                    MunitionSettings newSettings = EditState.GetMunitionSettings(newSelectedMunition);
+                    // Unnecessary because munition settings have no text boxes so no possible errors.
+                    // newSettings.ErrorsChanged += EditState_ErrorsChanged;
+                    newSettings.PropertyChanged += EditState_PropertyChanged;
                 }
-            }
-        }
-
-        private void TextLaserCode_LosingFocus(UIElement sender, LosingFocusEventArgs args)
-        {
-            _editState.LaserCode = uiTextLaserCode.Text;
-            SaveEditStateToConfig();
-        }
-
-        private void CheckAutoLase_Changed(object sender, RoutedEventArgs e)
-        {
-            if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
-            {
-                _editState.SetAutoLase(selectedMunition, uiCheckAutoLase.IsChecked.ToString());
-                SaveEditStateToConfig(selectedMunition);
-            }
-        }
-
-        private void TextLaseTime_LosingFocus(UIElement sender, LosingFocusEventArgs args)
-        {
-            if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
-            {
-                _editState.SetLaseSeconds(selectedMunition, uiTextLaseTime.Text);
-                SaveEditStateToConfig(selectedMunition);
-            }
-        }
-
-        private void ComboDeliveryMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
-            {
-                _editState.SetDeliveryMode(selectedMunition, uiComboDeliveryMode.SelectedIndex.ToString());
-                SaveEditStateToConfig(selectedMunition);
-            }
-        }
-
-        private void ComboEscMnvr_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
-            {
-                _editState.SetEscapeManeuver(selectedMunition, uiComboEscMnvr.SelectedIndex.ToString());
-                SaveEditStateToConfig(selectedMunition);
-            }
-        }
-
-        private void ComboReleaseMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
-            {
-                _editState.SetReleaseMode(selectedMunition, uiComboReleaseMode.SelectedIndex.ToString());
-                SaveEditStateToConfig(selectedMunition);
-            }
-        }
-
-        private void TextRippleQty_LosingFocus(UIElement sender, LosingFocusEventArgs args)
-        {
-            if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
-            {
-                _editState.SetRippleQty(selectedMunition, uiTextRippleQty.Text);
-                SaveEditStateToConfig(selectedMunition);
-            }
-        }
-
-        private void TextRippleFt_LosingFocus(UIElement sender, LosingFocusEventArgs args)
-        {
-            if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
-            {
-                _editState.SetRippleFt(selectedMunition, uiTextRippleFt.Text);
-                SaveEditStateToConfig(selectedMunition);
-            }
-        }
-
-        private void ComboHOF_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
-            {
-                _editState.SetHOFOption(selectedMunition, uiComboHOF.SelectedIndex.ToString());
-                SaveEditStateToConfig(selectedMunition);
-            }
-        }
-
-        private void ComboRPM_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
-            {
-                _editState.SetRPMOption(selectedMunition, uiComboRPM.SelectedIndex.ToString());
-                SaveEditStateToConfig(selectedMunition);
-            }
-        }
-
-        private void ComboFuze_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
-            {
-                _editState.SetFuzeOption(selectedMunition, uiComboFuze.SelectedIndex.ToString());
-                SaveEditStateToConfig(selectedMunition);
             }
         }
 
@@ -382,93 +227,38 @@ namespace JAFDTC.UI.A10C
         {
             if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
             {
-                _editState.GetMunitionSettings(selectedMunition).Reset();
-                SaveEditStateToConfig(selectedMunition);
+                EditState.GetMunitionSettings(selectedMunition).Reset();
+                SaveEditStateToConfig();
                 UpdateUIFromEditState();
             }
         }
 
-        private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs e)
+        protected override void EditState_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             UpdateUIFromEditState();
+            base.EditState_PropertyChanged(sender, e);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             _dsmsEditorNavArgs = (DSMSEditorNavArgs)args.Parameter;
-            _config = (A10CConfiguration)_dsmsEditorNavArgs.NavArgs.Config;
-
-            _config.ConfigurationSaved += ConfigurationSavedHandler;
 
             if (_munitions.Count > 0)
-            {
-                CopyConfigToEditState(_munitions[0]);
                 uiComboMunition.SelectedIndex = 0;
-                UpdateUIFromEditState();
-            }
 
-            base.OnNavigatedTo(args);
+            base.OnNavigatedTo(_dsmsEditorNavArgs.BaseArgs);
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            _config.ConfigurationSaved -= ConfigurationSavedHandler;
+            if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
+            {
+                MunitionSettings settings = EditState.GetMunitionSettings(selectedMunition);
+                settings.ErrorsChanged -= EditState_ErrorsChanged;
+                settings.PropertyChanged -= EditState_PropertyChanged;
+            }
+
             base.OnNavigatedFrom(e);
-        }
-
-        // ---- field validation -------------------------------------------------------------------------------------------
-
-        private void SetFieldValidVisualState(TextBox field, bool isValid)
-        {
-            field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
-            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBackgroundBrush"];
-        }
-
-        private void ValidateAllFields(Dictionary<string, TextBox> fields, IEnumerable errors)
-        {
-            Dictionary<string, bool> map = new();
-            foreach (string error in errors)
-            {
-                map[error] = true;
-            }
-            foreach (KeyValuePair<string, TextBox> kvp in fields)
-            {
-                SetFieldValidVisualState(kvp.Value, !map.ContainsKey(kvp.Key));
-            }
-        }
-
-        // validation error: update ui state for the various components that may have errors.
-        //
-        private void BaseField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
-        {
-            A10CMunition selectedMunition = (A10CMunition)uiComboMunition.SelectedItem;
-            if (args.PropertyName == null)
-            {
-                ValidateAllFields(_dsmsTextFieldPropertyMap, _editState.GetErrors(null));
-                if (selectedMunition != null)
-                    ValidateAllFields(_munitionTextFieldPropertyMap, _editState.GetMunitionSettings(selectedMunition).GetErrors(null));
-            }
-            else
-            {
-                List<string> errors = (List<string>)_editState.GetErrors(args.PropertyName);
-                if (_dsmsTextFieldPropertyMap.ContainsKey(args.PropertyName))
-                    SetFieldValidVisualState(_dsmsTextFieldPropertyMap[args.PropertyName], (errors.Count == 0));
-
-                if (selectedMunition != null)
-                {
-                    errors = (List<string>)_editState.GetMunitionSettings(selectedMunition).GetErrors(args.PropertyName);
-                    if (_munitionTextFieldPropertyMap.ContainsKey(args.PropertyName))
-                        SetFieldValidVisualState(_munitionTextFieldPropertyMap[args.PropertyName], (errors.Count == 0));
-                }
-            }
-            UpdateUIFromEditState();
-        }
-
-        // property changed: rebuild interface state to account for configuration changes.
-        //
-        private void BaseField_PropertyChanged(object sender, EventArgs args)
-        {
-            UpdateUIFromEditState();
         }
     }
 }
