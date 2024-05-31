@@ -30,7 +30,7 @@ namespace JAFDTC.UI.A10C
     {
         private const string SYSTEM_NAME = "TAD";
 
-        protected override A10CSystemBase SystemConfig => _config.TAD;
+        public override A10CSystemBase SystemConfig => _config.TAD;
 
         public static ConfigEditorPageInfo PageInfo
             => new(TADSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.TAD, typeof(A10CEditTADPage));
@@ -38,7 +38,7 @@ namespace JAFDTC.UI.A10C
         public A10CEditTADPage() : base(SYSTEM_NAME, TADSystem.SystemTag)
         {
             InitializeComponent();
-            InitializeBase(new TADSystem(), uiTextGroupID, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            InitializeBase(new TADSystem(), uiTextGroupID, uiCtlLinkResetBtns);
         }
     }
 }

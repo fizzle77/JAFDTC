@@ -239,6 +239,8 @@ namespace JAFDTC.Models
             return ((LinkedSysMap != null) && LinkedSysMap.ContainsKey(systemTag)) ? LinkedSysMap[systemTag] : null;
         }
 
+        public bool IsLinked(string systemTag) => !string.IsNullOrEmpty(SystemLinkedTo(systemTag));
+
         public void CleanupSystemLinks(List<string> validUIDs)
         {
             List<string> invalidUIDs = new();

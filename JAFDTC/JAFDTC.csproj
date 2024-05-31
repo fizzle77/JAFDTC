@@ -62,6 +62,7 @@
     <None Remove="UI\Base\EditNavpointPage.xaml" />
     <None Remove="UI\Base\EditRadioPage.xaml" />
     <None Remove="UI\BlankPage1.xaml" />
+    <None Remove="UI\Controls\LinkResetBtnsControl.xaml" />
     <None Remove="UI\F15E\F15EEditMiscPage.xaml" />
     <None Remove="UI\F15E\F15EEditMPDPage.xaml" />
     <None Remove="UI\F15E\F15EEditSteerpointListPage.xaml" />
@@ -167,6 +168,9 @@
     <None Update="Images\gbu-54.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="UI\Controls\LinkResetBtnsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="UI\A10C\A10CEditTADPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
