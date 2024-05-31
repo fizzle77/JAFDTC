@@ -28,6 +28,7 @@ using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -59,9 +60,16 @@ namespace JAFDTC.Utilities
         /// desired value.</returns>
         protected bool SetProperty<T>(ref T storage, T value, string error = null, [CallerMemberName] String propertyName = null)
         {
-            if (object.Equals(storage, value)) return false;
-
-            if (error == null)
+            if (object.Equals(storage, value))
+            {
+                if ((error == null) && _errors.ContainsKey(propertyName))
+                {
+                    _errors.Remove(propertyName);
+                    OnErrorsChanged(propertyName);
+                }
+                return false;
+            }
+            else if (error == null)
             {
                 storage = value;
                 OnPropertyChanged(propertyName);
@@ -111,8 +119,7 @@ namespace JAFDTC.Utilities
         {
             if (propertyName == null)
             {
-                // TODO: probably make this a List<string>?
-                return _errors.Keys;
+                return _errors.Keys.ToList();
             }
             return (_errors.ContainsKey(propertyName)) ? new List<string>() { propertyName } : new List<string>();
         }

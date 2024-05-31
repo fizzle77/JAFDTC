@@ -28,6 +28,7 @@
     <None Remove="Audio\ux_error.wav" />
     <None Remove="Data\db-a10-munitions.json" />
     <None Remove="Data\db-emitters.json" />
+    <None Remove="Data\db-f16c-munitions.json" />
     <None Remove="Data\db-pois-airbases.json" />
     <None Remove="DCS\Hooks\JAFDTCStatusMsgHook.lua" />
     <None Remove="DCS\Hooks\JAFDTCWyptCaptureHook.lua" />
@@ -69,6 +70,7 @@
     <None Remove="UI\F15E\F15EEditSteerpointPage.xaml" />
     <None Remove="UI\F15E\F15EEditUFCPage.xaml" />
     <None Remove="UI\F16C\F16CEditHTSThreatsPage.xaml" />
+    <None Remove="UI\F16C\F16CEditSMSPage.xaml" />
     <None Remove="UI\FA18C\FA18CEditCMSPage.xaml" />
     <None Remove="UI\FA18C\FA18CEditPreplanPage.xaml" />
   </ItemGroup>
@@ -84,6 +86,7 @@
     <Content Include="Audio\ux_error.wav" />
     <Content Include="Data\db-emitters.json" />
     <Content Include="Data\db-a10-munitions.json" />
+    <Content Include="Data\db-f16c-munitions.json" />
     <Content Include="Data\db-pois-airbases.json" />
     <Content Include="DCS\Hooks\JAFDTCStatusMsgHook.lua" />
     <Content Include="DCS\Hooks\JAFDTCWyptCaptureHook.lua" />
@@ -144,6 +147,15 @@
     <None Update="Images\agm-65d.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Images\agm-65g.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\agm-65h.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\agm-65k.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Images\agm-65l.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -154,6 +166,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Images\gbu-10-12.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\gbu-24.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Images\gbu-31.png">
@@ -168,6 +183,24 @@
     <None Update="Images\gbu-54.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Images\mk-82.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\mk-82ab.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\mk-82se.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\mk-84.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Images\mk-84hd.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Page Update="UI\F16C\F16CEditSMSPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="UI\Controls\LinkResetBtnsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

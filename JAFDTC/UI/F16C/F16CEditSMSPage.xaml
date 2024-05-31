@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+F16CEditSMSPage.xaml.cs : ui xaml for viper sms editor page
+
+Copyright(C) 2024 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<ui_base:SystemEditorPageBase
+    x:Class="JAFDTC.UI.F16C.F16CEditSMSPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.F16C"
+    xmlns:ui_base="using:JAFDTC.UI.Base"
+    xmlns:f16_mod="using:JAFDTC.Models.F16C"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
+    NavigationCacheMode="Enabled">
+
+    <Page.Resources>
+
+        <!-- brush for error fields. -->
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBackgroundBrush" Color="PaleVioletRed"/>
+
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        munition selection 
+        ===============================================================================================================
+        -->
+        <ListView Grid.Row="0" Grid.Column="0" Margin="8,8,8,8" Name="uiListMunition"
+                  VerticalAlignment="Stretch"
+                  ItemsSource="{x:Bind _munitions}" SelectionMode="Single"
+                  SelectionChanged="ListMunition_SelectionChanged">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="f16_mod:F16CMunition">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="48"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="48"/>
+                        </Grid.RowDefinitions>
+                        <FontIcon Grid.Column="0" Tag="icon"
+                                  VerticalAlignment="Center"
+                                  Visibility="Collapsed"
+                                  Foreground="{ThemeResource SystemAccentColor}"
+                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
+                        <Image Grid.Column="1" Margin="0,4,0,4" Source="{x:Bind ImageFullPath}"
+                               VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Margin="6,0,0,0" Text="{x:Bind LabelUI}"
+                                   VerticalAlignment="Center" 
+                                   Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!--
+        ===============================================================================================================
+        munition parameters
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="0" Grid.Column="1" Margin="8,8,8,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="132" />
+                <ColumnDefinition Width="132" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="3"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                Munition Settings:
+            </TextBlock>
+            <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Margin="0,12,0,0" x:Name="uiTextMuniDesc"
+                       Style="{StaticResource TableHeaderTextStyle}">
+                FIXUP
+            </TextBlock>
+
+            <!-- Profile -->
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelProfile"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Profile
+            </TextBlock>
+            <ComboBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboProfile"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      SelectionChanged="ComboProfile_SelectionChanged">
+                <!-- NOTE: ComboBoxItems are generated and installed at runtime -->
+            </ComboBox>
+            <CheckBox Grid.Row="2" Grid.Column="2" Margin="16,12,0,0" Tag="IsProfileSelected" x:Name="uiCkboxProfileEnb"
+                      VerticalAlignment="Center"
+                      Click="CheckBox_Clicked">
+                Set as Current Profile
+            </CheckBox>
+
+            <!-- Employment -->
+            <TextBlock Grid.Row="3" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelEmploy"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Employment Mode
+            </TextBlock>
+            <ComboBox Grid.Row="3" Grid.Column="1" Margin="12,12,0,0" Tag="EmplMode" x:Name="uiComboEmploy"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      SelectionChanged="ComboBox_SelectionChanged">
+                <!-- NOTE: ComboBoxItems are generated and installed at runtime -->
+            </ComboBox>
+
+            <!-- Release Mode -->
+            <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelRelMode"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Release Mode
+            </TextBlock>
+            <ComboBox Grid.Row="4" Grid.Column="1" Margin="12,12,0,0" Tag="ReleaseMode" x:Name="uiComboRelMode"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      SelectionChanged="ComboBox_SelectionChanged">
+                <!-- NOTE: ComboBoxItems are generated and installed at runtime -->
+            </ComboBox>
+            <StackPanel Grid.Row="4" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStackRelMode"
+                        Orientation="Horizontal">
+                <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" x:Name="uiLabelRippleQty"
+                           VerticalAlignment="Center">
+                    Ripple
+                </TextBlock>
+                <TextBox Width="64" Margin="12,0,0,0" Tag="RipplePulse" x:Name="uiValueRippleQty"
+                         HorizontalAlignment="Left" VerticalAlignment="Center"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         MaxLength="2" PlaceholderText="1"
+                         LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                         ToolTipService.ToolTip="Number of munitions to release per weapons release depression"/>
+                <TextBlock Margin="6,0,0,0"
+                           VerticalAlignment="Center"
+                           Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                    at
+                </TextBlock>
+                <TextBox Width="64" Margin="8,0,0,0" Tag ="RippleSpacing" x:Name="uiValueRippleFt"
+                         HorizontalAlignment="Left" VerticalAlignment="Center"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                         ToolTipService.ToolTip="Distance between impacts, in feet"/>
+                <TextBlock Margin="6,0,0,0" x:Name="uiLabelRippleFtUnits"
+                           VerticalAlignment="Center"
+                           Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                    ft
+                </TextBlock>
+                <ComboBox Width="80" Margin="8,0,0,0" Tag ="RippleDelayMode" x:Name="uiComboRippleDt"
+                          VerticalAlignment="Center"
+                          SelectionChanged="ComboBox_SelectionChanged"
+                          ToolTipService.ToolTip="TODO">
+                    <ComboBox.Items>
+                        <TextBlock HorizontalAlignment="Left" Tag="50">50</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="100">100</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="150">150</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="200">200</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="250">250</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="300">300</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="350">350</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="400">400</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="450">450</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="500">500</TextBlock>
+                    </ComboBox.Items>
+                </ComboBox>
+                <TextBlock Margin="6,0,0,0" x:Name="uiLabelRippleDtUnits"
+                           VerticalAlignment="Center"
+                           Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                    ms
+                </TextBlock>
+            </StackPanel>
+
+            <!-- Spin -->
+            <TextBlock Grid.Row="5" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelSpin"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}" >
+                Spin
+            </TextBlock>
+            <ComboBox Grid.Row="5" Grid.Column="1" Margin="12,12,0,0" Tag="Spin" x:Name="uiComboSpin"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      SelectionChanged="ComboBox_SelectionChanged">
+                <!-- NOTE: ComboBoxItems are generated and installed at runtime -->
+            </ComboBox>
+            <TextBlock Grid.Row="5" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelSpinUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                RPM
+            </TextBlock>
+
+            <!-- Fuze -->
+            <TextBlock Grid.Row="6" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelFuzeMode"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}" >
+                Fuze Mode
+            </TextBlock>
+            <ComboBox Grid.Row="6" Grid.Column="1" Margin="12,12,0,0" Tag="FuzeMode" x:Name="uiComboFuzeMode"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      SelectionChanged="ComboBox_SelectionChanged">
+                <!-- NOTE: ComboBoxItems are generated and installed at runtime -->
+            </ComboBox>
+
+            <!-- Arm Delay -->
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelArmDelay"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Arm Delay
+            </TextBlock>
+            <TextBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0" Tag="ArmDelay" x:Name="uiValueArmDelay"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+            <TextBlock Grid.Row="7" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelArmDelayUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                s
+            </TextBlock>
+
+            <!-- Arm Delay (Combo) -->
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelArmDelayMode"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}" >
+                Arm Delay
+            </TextBlock>
+            <ComboBox Grid.Row="8" Grid.Column="1" Margin="12,12,0,0" Tag="ArmDelayMode" x:Name="uiComboArmDelayMode"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      SelectionChanged="ComboBox_SelectionChanged">
+                <!-- NOTE: ComboBoxItems are generated and installed at runtime -->
+            </ComboBox>
+            <TextBlock Grid.Row="8" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelArmDelayModeUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                s
+            </TextBlock>
+
+            <!-- Arm Delay 2 -->
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelArmDelay2"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Arm Delay 2
+            </TextBlock>
+            <TextBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0" Tag="ArmDelay2" x:Name="uiValueArmDelay2"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+            <TextBlock Grid.Row="9" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelArmDelay2Units"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                s
+            </TextBlock>
+
+            <!-- Burst Altitude -->
+            <TextBlock Grid.Row="10" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelBurstAlt"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Burst Altitude
+            </TextBlock>
+            <TextBox Grid.Row="10" Grid.Column="1" Margin="12,12,0,0" Tag="BurstAlt" x:Name="uiValueBurstAlt"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+            <TextBlock Grid.Row="10" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelBurstAltUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                ft
+            </TextBlock>
+
+            <!-- Release Angle -->
+            <TextBlock Grid.Row="11" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelReleaseAng"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Release Angle
+            </TextBlock>
+            <TextBox Grid.Row="11" Grid.Column="1" Margin="12,12,0,0" Tag="ReleaseAng" x:Name="uiValueReleaseAng"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+            <TextBlock Grid.Row="11" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelReleaseAngUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                °
+            </TextBlock>
+
+            <!-- Impact Angle (Single Configuration) -->
+            <TextBlock Grid.Row="12" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelImpactAng"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Impact Angle
+            </TextBlock>
+            <TextBox Grid.Row="12" Grid.Column="1" Margin="12,12,0,0" Tag="ImpactAng" x:Name="uiValueImpactAng"
+                     VerticalAlignment="Center"
+                     MaxLength="2" PlaceholderText="60" 
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+            <TextBlock Grid.Row="12" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelImpactAngUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                °
+            </TextBlock>
+
+            <!-- Impact Azimuth (Single Configuration) -->
+            <TextBlock Grid.Row="13" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelImpactAzi"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Impact Azimuth
+            </TextBlock>
+            <TextBox Grid.Row="13" Grid.Column="1" Margin="12,12,0,0" Tag="ImpactAzi" x:Name="uiValueImpactAzi"
+                     VerticalAlignment="Center"
+                     MaxLength="3" PlaceholderText="0"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+            <TextBlock Grid.Row="13" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelImpactAziUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                °
+            </TextBlock>
+
+            <!-- Impact Velocity (Single Configuration) -->
+            <TextBlock Grid.Row="14" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelImpactVel"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Impact Velocity
+            </TextBlock>
+            <TextBox Grid.Row="14" Grid.Column="1" Margin="12,12,0,0" Tag="ImpactVel" x:Name="uiValueImpactVel"
+                     VerticalAlignment="Center"
+                     MaxLength="4" PlaceholderText="700"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+            <TextBlock Grid.Row="14" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelImpactVelUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                ft/s
+            </TextBlock>
+
+            <!-- Cue Range (Single Configuration) -->
+            <TextBlock Grid.Row="15" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelCueRng"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Cue Range
+            </TextBlock>
+            <TextBox Grid.Row="15" Grid.Column="1" Margin="12,12,0,0" Tag="CueRange" x:Name="uiValueCueRng"
+                     VerticalAlignment="Center"
+                     MaxLength="4" PlaceholderText="4.000"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+            <TextBlock Grid.Row="15" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelCueRngUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                nm
+            </TextBlock>
+
+            <!-- Maverick Auto-Power -->
+            <TextBlock Grid.Row="16" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelAutoPwr"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}" >
+                Auto Power
+            </TextBlock>
+            <ComboBox Grid.Row="16" Grid.Column="1" Margin="12,12,0,0" Tag="AutoPwrMode" x:Name="uiComboAutoPwr"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      SelectionChanged="ComboBox_SelectionChanged">
+                <!-- Tags are enum AutoPowerModes -->
+                <ComboBox.Items>
+                    <TextBlock HorizontalAlignment="Left" Tag="0">Off</TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Tag="1">NORTH OF</TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Tag="2">SOUTH OF</TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Tag="3">EAST OF</TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Tag="4">WEST OF</TextBlock>
+                </ComboBox.Items>
+            </ComboBox>
+            <StackPanel Grid.Row="16" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStackAutoPwr"
+                        Orientation="Horizontal">
+                <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center">
+                    Steerpoint
+                </TextBlock>
+                <TextBox Width="64" Margin="12,0,0,0" Tag="AutoPwrSP" x:Name="uiValueAutoPwrSP"
+                         HorizontalAlignment="Left" VerticalAlignment="Center"
+                         Style="{StaticResource EditorParamEditTextBoxStyle}"
+                         MaxLength="3" PlaceholderText="2"
+                         LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                         ToolTipService.ToolTip="TODO"/>
+            </StackPanel>
+
+            <!-- Reset Munition -->
+            <Button Grid.Row="17" Grid.Column="0" Grid.ColumnSpan="2" Margin="12,24,0,0" x:Name="uiMuniBtnReset"
+                    HorizontalAlignment="Stretch"
+                    Click="MuniBtnReset_Click"
+                    ToolTipService.ToolTip="Reset the configuration of this munition to its defaults">
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon Margin="0,0,6,0"
+                              FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                    <TextBlock VerticalAlignment="center">Reset Munition to Defaults</TextBlock>
+                </StackPanel>
+            </Button>
+
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        common editor controls 
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="12,12,12,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button Width="140" x:Name="uiPageBtnLink"
+                        Click="PageBtnLink_Click"
+                        ToolTipService.ToolTip="Link or unlink this system to/from another configuration">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE71B;"/>
+                        <TextBlock x:Name="uiPageBtnTxtLink"
+                                   VerticalAlignment="center">
+                            FIXUP
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <TextBlock Margin="12,0,24,0" x:Name="uiPageTxtLink"
+                           VerticalAlignment="center">
+                    FIXUP
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <Button x:Name="uiPageBtnReset"
+                        Click="PageBtnReset_Click"
+                        ToolTipService.ToolTip="Reset the configuration of this system to its defaults">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Margin="0,0,6,0"
+                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
+                        <TextBlock VerticalAlignment="center">Reset Page to Defaults</TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</ui_base:SystemEditorPageBase>

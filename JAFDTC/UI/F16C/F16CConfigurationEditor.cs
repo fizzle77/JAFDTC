@@ -46,6 +46,7 @@ namespace JAFDTC.UI.F16C
         public const string MFD = "\xE950";
         public const string MISC = "\xE8B7";
         public const string RADIO = "\xE704";
+        public const string SMS = "\xEBD2";
         public const string STPT = "\xE707";
         public const string PILOT_DB = "\xE77B";
     }
@@ -61,6 +62,7 @@ namespace JAFDTC.UI.F16C
                 F16CEditSteerpointListPage.PageInfo,
                 F16CEditMFDPage.PageInfo,
                 F16CEditRadioPageHelper.PageInfo,
+                F16CEditSMSPage.PageInfo,
                 F16CEditCMDSPage.PageInfo,
                 F16CEditHARMPage.PageInfo,
                 F16CEditHTSPage.PageInfo,
