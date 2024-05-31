@@ -331,13 +331,16 @@ namespace JAFDTC.UI
         {
             if (!isEnabled)
             {
-                SetEnableState(combo, false); // always disable if set to disable
-                combo.SelectedItem = null; // always blank if disabled
+                SetEnableState(combo, false);               // always disable if set to disable
+                combo.SelectedItem = null;                  // always blank if disabled
             }
             else
             {
-                SetEnableState(combo, isNotLinked); // otherwise disable if linked
-                combo.SelectedIndex = selectedIndex; // show setting if enabled or linked
+                SetEnableState(combo, isNotLinked);         // otherwise disable if linked
+                if (combo.SelectedIndex != selectedIndex)
+                {
+                    combo.SelectedIndex = selectedIndex;    // show setting if enabled or linked
+                }
             }
         }
 
