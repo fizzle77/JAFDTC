@@ -63,6 +63,7 @@
     <None Remove="UI\Base\EditNavpointPage.xaml" />
     <None Remove="UI\Base\EditRadioPage.xaml" />
     <None Remove="UI\BlankPage1.xaml" />
+    <None Remove="UI\Controls\LinkResetBtnsControl.xaml" />
     <None Remove="UI\F15E\F15EEditMiscPage.xaml" />
     <None Remove="UI\F15E\F15EEditMPDPage.xaml" />
     <None Remove="UI\F15E\F15EEditSteerpointListPage.xaml" />
@@ -198,6 +199,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Page Update="UI\F16C\F16CEditSMSPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="UI\Controls\LinkResetBtnsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="UI\A10C\A10CEditTADPage.xaml">

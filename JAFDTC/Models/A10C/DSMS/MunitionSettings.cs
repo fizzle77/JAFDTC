@@ -245,53 +245,51 @@ namespace JAFDTC.Models.A10C.DSMS
         {
             get
             {
-                if (string.IsNullOrEmpty(DeliveryMode) || DeliveryMode == "-1")
+                if (string.IsNullOrEmpty(DeliveryMode))
                     return true;
                 if (_munition == null)
                     return true;
-                if (_munition.CCIP ^ _munition.CCRP)
-                {
-                    // For the weapons that only allow one of CCIP or CCRP, ensure the one they allow is treated as default.
-                    if (_munition.CCIP && DeliveryMode == ((int)DeliveryModes.CCIP).ToString())
-                        return true;
-                    if (_munition.CCRP && DeliveryMode == ((int)DeliveryModes.CCRP).ToString())
-                        return true;
-                }
-                else
-                {
-                    // For weapons that support both, CCIP is the default, specified in ExplicitDefaults.
-                    return DeliveryMode == ExplicitDefaults.DeliveryMode;
-                }
-                return false;
+                return DeliveryMode == DefaultDeliveryMode;
             }
         }
         [JsonIgnore]
-        public bool IsEscapeManeuverDefault => string.IsNullOrEmpty(EscapeManeuver) || EscapeManeuver == ExplicitDefaults.EscapeManeuver || EscapeManeuver == "-1";
+        public bool IsEscapeManeuverDefault => string.IsNullOrEmpty(EscapeManeuver) || EscapeManeuver == ExplicitDefaults.EscapeManeuver;
         [JsonIgnore]
-        public bool IsReleaseModeDefault => string.IsNullOrEmpty(ReleaseMode) || ReleaseMode == ExplicitDefaults.ReleaseMode || ReleaseMode == "-1";
+        public bool IsReleaseModeDefault => string.IsNullOrEmpty(ReleaseMode) || ReleaseMode == ExplicitDefaults.ReleaseMode;
         [JsonIgnore]
         public bool IsRippleQtyDefault => string.IsNullOrEmpty(RippleQty) || RippleQty == ExplicitDefaults.RippleQty;
         [JsonIgnore]
         public bool IsRippleFtDefault => string.IsNullOrEmpty(RippleFt) || RippleFt == ExplicitDefaults.RippleFt;
         [JsonIgnore]
-        public bool IsHOFOptionDefault => string.IsNullOrEmpty(HOFOption) || HOFOption == ExplicitDefaults.HOFOption || HOFOption == "-1";
+        public bool IsHOFOptionDefault => string.IsNullOrEmpty(HOFOption) || HOFOption == ExplicitDefaults.HOFOption;
         [JsonIgnore]
-        public bool IsRPMOptionDefault => string.IsNullOrEmpty(RPMOption) || RPMOption == ExplicitDefaults.RPMOption || RPMOption == "-1";
+        public bool IsRPMOptionDefault => string.IsNullOrEmpty(RPMOption) || RPMOption == ExplicitDefaults.RPMOption;
         [JsonIgnore]
-        public bool IsFuzeOptionDefault => string.IsNullOrEmpty(FuzeOption) || FuzeOption == ExplicitDefaults.FuzeOption || FuzeOption == "-1";
+        public bool IsFuzeOptionDefault => string.IsNullOrEmpty(FuzeOption) || FuzeOption == ExplicitDefaults.FuzeOption;
+
+        [JsonIgnore]
+        public string DefaultDeliveryMode
+        {
+            get
+            {
+                if (_munition == null || _munition.CCIP)
+                    return "0";
+                return "1";
+            }
+        }
 
         public readonly static MunitionSettings ExplicitDefaults = new()
         {
             AutoLase = "False",
             LaseSeconds = "0",
-            DeliveryMode = "0", // CCIP
-            EscapeManeuver = "1", // CLB
-            ReleaseMode = "0", // SGL
+            DeliveryMode = "",
+            EscapeManeuver = "1",   // CLB
+            ReleaseMode = "0",      // SGL
             RippleQty = "1",
             RippleFt = "75",
-            HOFOption = "6", // 1800
-            RPMOption = "3", // 1500
-            FuzeOption = "0" // N/T
+            HOFOption = "6",        // 1800
+            RPMOption = "3",        // 1500
+            FuzeOption = "0"        // N/T
         };
 
         private MunitionSettings()
@@ -306,16 +304,16 @@ namespace JAFDTC.Models.A10C.DSMS
 
         public override void Reset()
         {
-            AutoLase = "";
-            LaseSeconds = "";
+            AutoLase = "False";
+            LaseSeconds = "0";
             DeliveryMode = "";
-            EscapeManeuver = "";
-            ReleaseMode = "";
-            RippleQty = "";
-            RippleFt = "";
-            HOFOption = "";
-            RPMOption = "";
-            FuzeOption = "";
+            EscapeManeuver = "1";   // CLB
+            ReleaseMode = "0";      // SGL
+            RippleQty = "1";
+            RippleFt = "75";
+            HOFOption = "6";        // 1800
+            RPMOption = "3";        // 1500
+            FuzeOption = "0";       // N/T
         }
     }
 }

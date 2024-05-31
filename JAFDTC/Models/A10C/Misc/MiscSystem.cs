@@ -186,13 +186,13 @@ namespace JAFDTC.Models.A10C.Misc
             }
         }
 
-        private string _autopilotMode;                              // integer [-1, 1]
+        private string _autopilotMode;                              // integer [0, 2]
         public string AutopilotMode
         {
             get => _autopilotMode;
             set
             {
-                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, -1, 1)) ? null : "Invalid format";
+                string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, 0, 2)) ? null : "Invalid format";
                 SetProperty(ref _autopilotMode, value, error);
             }
         }

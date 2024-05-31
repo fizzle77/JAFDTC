@@ -223,7 +223,13 @@ namespace JAFDTC.Models.A10C.Upload
             if (miscSystem.IsAutopilotModeDefault)
                 return; // Alt/Hdg
 
-            int setValue = (int)miscSystem.AutopilotModeValue;
+            int setValue = miscSystem.AutopilotModeValue switch
+            {
+                AutopilotModeOptions.Path => 1,
+                AutopilotModeOptions.AltHdg => 0,
+                AutopilotModeOptions.Alt => -1,
+                _ => throw new NotImplementedException()
+            };
             AddDynamicAction(ap, "AP_MODE", setValue, setValue);
         }
 
