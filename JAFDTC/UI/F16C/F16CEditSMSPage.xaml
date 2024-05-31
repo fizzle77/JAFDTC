@@ -34,7 +34,8 @@ https://www.gnu.org/licenses/.
     <Page.Resources>
 
         <!-- brush for error fields. -->
-        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="PaleVioletRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBackgroundBrush" Color="PaleVioletRed"/>
 
     </Page.Resources>
 
@@ -90,11 +91,16 @@ https://www.gnu.org/licenses/.
         -->
         <Grid Grid.Row="0" Grid.Column="1" Margin="8,8,8,8">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="128" />
-                <ColumnDefinition Width="128" />
+                <ColumnDefinition Width="132" />
+                <ColumnDefinition Width="132" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -132,12 +138,17 @@ https://www.gnu.org/licenses/.
                       SelectionChanged="ComboProfile_SelectionChanged">
                 <!-- NOTE: ComboBoxItems are generated and installed at runtime -->
             </ComboBox>
+            <CheckBox Grid.Row="2" Grid.Column="2" Margin="16,12,0,0" Tag="IsProfileSelected" x:Name="uiCkboxProfileEnb"
+                      VerticalAlignment="Center"
+                      Click="CheckBox_Clicked">
+                Set as Current Profile
+            </CheckBox>
 
             <!-- Employment -->
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelEmploy"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
-                Employment
+                Employment Mode
             </TextBlock>
             <ComboBox Grid.Row="3" Grid.Column="1" Margin="12,12,0,0" Tag="EmplMode" x:Name="uiComboEmploy"
                       HorizontalAlignment="Stretch" VerticalAlignment="Center"
@@ -149,37 +160,61 @@ https://www.gnu.org/licenses/.
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelRelMode"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
-                Release
+                Release Mode
             </TextBlock>
-            <ComboBox Grid.Row="4" Grid.Column="1" Margin="12,12,0,0" Tag="Ripple" x:Name="uiComboRelMode"
+            <ComboBox Grid.Row="4" Grid.Column="1" Margin="12,12,0,0" Tag="ReleaseMode" x:Name="uiComboRelMode"
                       HorizontalAlignment="Stretch" VerticalAlignment="Center"
                       SelectionChanged="ComboBox_SelectionChanged">
                 <!-- NOTE: ComboBoxItems are generated and installed at runtime -->
             </ComboBox>
-            <StackPanel Grid.Row="4" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStackRipple"
+            <StackPanel Grid.Row="4" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStackRelMode"
                         Orientation="Horizontal">
-                <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center">
+                <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" x:Name="uiLabelRippleQty"
+                           VerticalAlignment="Center">
                     Ripple
                 </TextBlock>
-                <TextBox Width="64" Margin="12,0,0,0" Tag="RipplePulse" x:Name="uiTextRippleQty"
+                <TextBox Width="64" Margin="12,0,0,0" Tag="RipplePulse" x:Name="uiValueRippleQty"
                          HorizontalAlignment="Left" VerticalAlignment="Center"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          MaxLength="2" PlaceholderText="1"
-                         LostFocus="TextBox_LostFocus"
+                         LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                          ToolTipService.ToolTip="Number of munitions to release per weapons release depression"/>
                 <TextBlock Margin="6,0,0,0"
                            VerticalAlignment="Center"
                            Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                     at
                 </TextBlock>
-                <TextBox Width="64" Margin="8,0,0,0" Tag ="RippleSpacing" x:Name="uiTextRippleFt"
+                <TextBox Width="64" Margin="8,0,0,0" Tag ="RippleSpacing" x:Name="uiValueRippleFt"
                          HorizontalAlignment="Left" VerticalAlignment="Center"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
-                         MaxLength="3" PlaceholderText="75"
-                         LostFocus="TextBox_LostFocus"
+                         LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                          ToolTipService.ToolTip="Distance between impacts, in feet"/>
-                <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center" Margin="6,0,0,0">
+                <TextBlock Margin="6,0,0,0" x:Name="uiLabelRippleFtUnits"
+                           VerticalAlignment="Center"
+                           Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                     ft
+                </TextBlock>
+                <ComboBox Width="80" Margin="8,0,0,0" Tag ="RippleDelayMode" x:Name="uiComboRippleDt"
+                          VerticalAlignment="Center"
+                          SelectionChanged="ComboBox_SelectionChanged"
+                          ToolTipService.ToolTip="TODO">
+                    <ComboBox.Items>
+                        <TextBlock HorizontalAlignment="Left" Tag="50">50</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="100">100</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="150">150</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="200">200</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="250">250</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="300">300</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="350">350</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="400">400</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="450">450</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="500">500</TextBlock>
+                    </ComboBox.Items>
+                </ComboBox>
+                <TextBlock Margin="6,0,0,0" x:Name="uiLabelRippleDtUnits"
+                           VerticalAlignment="Center"
+                           Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                    ms
                 </TextBlock>
             </StackPanel>
 
@@ -201,12 +236,12 @@ https://www.gnu.org/licenses/.
             </TextBlock>
 
             <!-- Fuze -->
-            <TextBlock Grid.Row="6" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelFuze"
+            <TextBlock Grid.Row="6" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelFuzeMode"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}" >
-                Fuze
+                Fuze Mode
             </TextBlock>
-            <ComboBox Grid.Row="6" Grid.Column="1" Margin="12,12,0,0" Tag="Fuze" x:Name="uiComboFuze"
+            <ComboBox Grid.Row="6" Grid.Column="1" Margin="12,12,0,0" Tag="FuzeMode" x:Name="uiComboFuzeMode"
                       HorizontalAlignment="Stretch" VerticalAlignment="Center"
                       SelectionChanged="ComboBox_SelectionChanged">
                 <!-- NOTE: ComboBoxItems are generated and installed at runtime -->
@@ -227,77 +262,169 @@ https://www.gnu.org/licenses/.
                 s
             </TextBlock>
 
+            <!-- Arm Delay (Combo) -->
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelArmDelayMode"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}" >
+                Arm Delay
+            </TextBlock>
+            <ComboBox Grid.Row="8" Grid.Column="1" Margin="12,12,0,0" Tag="ArmDelayMode" x:Name="uiComboArmDelayMode"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      SelectionChanged="ComboBox_SelectionChanged">
+                <!-- NOTE: ComboBoxItems are generated and installed at runtime -->
+            </ComboBox>
+            <TextBlock Grid.Row="8" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelArmDelayModeUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                s
+            </TextBlock>
+
             <!-- Arm Delay 2 -->
-            <TextBlock Grid.Row="8" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelArmDelay2"
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelArmDelay2"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                 Arm Delay 2
             </TextBlock>
-            <TextBox Grid.Row="8" Grid.Column="1" Margin="12,12,0,0" Tag="ArmDelay2" x:Name="uiValueArmDelay2"
+            <TextBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0" Tag="ArmDelay2" x:Name="uiValueArmDelay2"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
-            <TextBlock Grid.Row="8" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelArmDelay2Units"
+            <TextBlock Grid.Row="9" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelArmDelay2Units"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                 s
             </TextBlock>
 
             <!-- Burst Altitude -->
-            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelBurstAlt"
+            <TextBlock Grid.Row="10" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelBurstAlt"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                 Burst Altitude
             </TextBlock>
-            <TextBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0" Tag="BurstAlt" x:Name="uiValueBurstAlt"
+            <TextBox Grid.Row="10" Grid.Column="1" Margin="12,12,0,0" Tag="BurstAlt" x:Name="uiValueBurstAlt"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
-            <TextBlock Grid.Row="9" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelBurstAltUnits"
+            <TextBlock Grid.Row="10" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelBurstAltUnits"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                 ft
             </TextBlock>
 
             <!-- Release Angle -->
-            <TextBlock Grid.Row="10" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelRelaseAng"
+            <TextBlock Grid.Row="11" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelReleaseAng"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                 Release Angle
             </TextBlock>
-            <TextBox Grid.Row="10" Grid.Column="1" Margin="12,12,0,0" Tag="RelaseAng" x:Name="uiValueRelaseAng"
+            <TextBox Grid.Row="11" Grid.Column="1" Margin="12,12,0,0" Tag="ReleaseAng" x:Name="uiValueReleaseAng"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
-            <TextBlock Grid.Row="10" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelRelaseAngUnits"
+            <TextBlock Grid.Row="11" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelReleaseAngUnits"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                 °
             </TextBlock>
 
+            <!-- Impact Angle (Single Configuration) -->
+            <TextBlock Grid.Row="12" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelImpactAng"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Impact Angle
+            </TextBlock>
+            <TextBox Grid.Row="12" Grid.Column="1" Margin="12,12,0,0" Tag="ImpactAng" x:Name="uiValueImpactAng"
+                     VerticalAlignment="Center"
+                     MaxLength="2" PlaceholderText="60" 
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+            <TextBlock Grid.Row="12" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelImpactAngUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                °
+            </TextBlock>
+
+            <!-- Impact Azimuth (Single Configuration) -->
+            <TextBlock Grid.Row="13" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelImpactAzi"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Impact Azimuth
+            </TextBlock>
+            <TextBox Grid.Row="13" Grid.Column="1" Margin="12,12,0,0" Tag="ImpactAzi" x:Name="uiValueImpactAzi"
+                     VerticalAlignment="Center"
+                     MaxLength="3" PlaceholderText="0"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+            <TextBlock Grid.Row="13" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelImpactAziUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                °
+            </TextBlock>
+
+            <!-- Impact Velocity (Single Configuration) -->
+            <TextBlock Grid.Row="14" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelImpactVel"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Impact Velocity
+            </TextBlock>
+            <TextBox Grid.Row="14" Grid.Column="1" Margin="12,12,0,0" Tag="ImpactVel" x:Name="uiValueImpactVel"
+                     VerticalAlignment="Center"
+                     MaxLength="4" PlaceholderText="700"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+            <TextBlock Grid.Row="14" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelImpactVelUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                ft/s
+            </TextBlock>
+
+            <!-- Cue Range (Single Configuration) -->
+            <TextBlock Grid.Row="15" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelCueRng"
+                       VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                Cue Range
+            </TextBlock>
+            <TextBox Grid.Row="15" Grid.Column="1" Margin="12,12,0,0" Tag="CueRange" x:Name="uiValueCueRng"
+                     VerticalAlignment="Center"
+                     MaxLength="4" PlaceholderText="4.000"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+            <TextBlock Grid.Row="15" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelCueRngUnits"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                nm
+            </TextBlock>
+
             <!-- Maverick Auto-Power -->
-            <TextBlock Grid.Row="11" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelAutoPwr"
+            <TextBlock Grid.Row="16" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelAutoPwr"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}" >
                 Auto Power
             </TextBlock>
-            <ComboBox Grid.Row="11" Grid.Column="1" Margin="12,12,0,0" Tag="AutoPwrMode" x:Name="uiComboAutoPwr"
+            <ComboBox Grid.Row="16" Grid.Column="1" Margin="12,12,0,0" Tag="AutoPwrMode" x:Name="uiComboAutoPwr"
                       HorizontalAlignment="Stretch" VerticalAlignment="Center"
                       SelectionChanged="ComboBox_SelectionChanged">
-                <!-- NOTE: ComboBoxItems are generated and installed at runtime -->
+                <!-- Tags are enum AutoPowerModes -->
+                <ComboBox.Items>
+                    <TextBlock HorizontalAlignment="Left" Tag="0">Off</TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Tag="1">NORTH OF</TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Tag="2">SOUTH OF</TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Tag="3">EAST OF</TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Tag="4">WEST OF</TextBlock>
+                </ComboBox.Items>
             </ComboBox>
-            <StackPanel Grid.Row="11" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStackAutoPwr"
+            <StackPanel Grid.Row="16" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStackAutoPwr"
                         Orientation="Horizontal">
                 <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center">
-                    of Steerpoint
+                    Steerpoint
                 </TextBlock>
                 <TextBox Width="64" Margin="12,0,0,0" Tag="AutoPwrSP" x:Name="uiValueAutoPwrSP"
                          HorizontalAlignment="Left" VerticalAlignment="Center"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
-                         MaxLength="2" PlaceholderText="1"
-                         LostFocus="TextBox_LostFocus"
+                         MaxLength="3" PlaceholderText="2"
+                         LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                          ToolTipService.ToolTip="TODO"/>
             </StackPanel>
 
             <!-- Reset Munition -->
-            <Button Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Margin="12,24,0,0" x:Name="uiMuniBtnReset"
+            <Button Grid.Row="17" Grid.Column="0" Grid.ColumnSpan="2" Margin="12,24,0,0" x:Name="uiMuniBtnReset"
                     HorizontalAlignment="Stretch"
                     Click="MuniBtnReset_Click"
                     ToolTipService.ToolTip="Reset the configuration of this munition to its defaults">

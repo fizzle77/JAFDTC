@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Windows.ApplicationModel.Background;
 using static JAFDTC.Models.F16C.SMS.SMSSystem;
 
 namespace JAFDTC.UI.F16C
@@ -58,20 +59,32 @@ namespace JAFDTC.UI.F16C
 
         // ---- TODO
 
-        private MunitionSettings EditSettings { get; set; }
+        private MunitionSettings EditSetup { get; set; }
 
-        private SMSSystem.Munitions EditMuni { get; set; }
+        private SMSSystem.Munitions EditMuniID { get; set; }
 
-        private string EditProfile { get; set; }
+        private string EditProfileID { get; set; }
 
         // ---- TODO
 
         private readonly List<F16CMunition> _munitions;
+        private readonly string[] _textForEmplMode;
+        private readonly string[] _textForRippleMode;
+        private readonly string[] _textForFuzeMode;
+        
         private readonly List<FrameworkElement> _elemsProfile;
+        private readonly List<FrameworkElement> _elemsRelease;
+        private readonly List<FrameworkElement> _elemsSpin;
         private readonly List<FrameworkElement> _elemsFuze;
         private readonly List<FrameworkElement> _elemsArmDelay;
         private readonly List<FrameworkElement> _elemsArmDelay2;
-        private readonly List<FrameworkElement> _elemsSpin;
+        private readonly List<FrameworkElement> _elemsArmDelayMode;
+        private readonly List<FrameworkElement> _elemsBurstAlt;
+        private readonly List<FrameworkElement> _elemsReleaseAng;
+        private readonly List<FrameworkElement> _elemsImpactAng;
+        private readonly List<FrameworkElement> _elemsImpactAzi;
+        private readonly List<FrameworkElement> _elemsImpactVel;
+        private readonly List<FrameworkElement> _elemsCueRange;
         private readonly List<FrameworkElement> _elemsAutoPwr;
 
         // ------------------------------------------------------------------------------------------------------------
@@ -82,21 +95,34 @@ namespace JAFDTC.UI.F16C
 
         public F16CEditSMSPage()
         {
-            EditSettings = new MunitionSettings();
-            EditMuni = SMSSystem.Munitions.CBU_87;
-            EditProfile = "1";
+            EditSetup = new MunitionSettings();
+            EditMuniID = SMSSystem.Munitions.CBU_87;
+            EditProfileID = "1";
 
             _munitions = FileManager.LoadF16CMunitions();
 
-            InitializeComponent();
-            InitializeBase(EditSettings, uiTextRippleQty, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            _textForEmplMode = new[] { "CCIP", "CCRP", "DTOS", "LADD", "MAN", "PRE", "VIS", "BORE" };
+            _textForRippleMode = new[] { "SGL", "PAIR", "Single", "Front/Back", "Left/Right", "1", "2",
+                                         "SGL", "RP 1", "RP 2", "RP 3", "RP 4" };
+            _textForFuzeMode = new[] { "NSTL", "NOSE", "TAIL", "NSTL (HI)", "NOSE (LO)", "TAIL (HI)" };
 
-            _elemsProfile = new() { uiLabelProfile, uiComboProfile };
-            _elemsFuze = new() { uiLabelFuze, uiComboFuze };
+            InitializeComponent();
+            InitializeBase(EditSetup, uiValueRippleQty, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+
+            _elemsProfile = new() { uiLabelProfile, uiComboProfile, uiCkboxProfileEnb };
+            _elemsRelease = new() { uiLabelRelMode, uiComboRelMode, null, uiStackRelMode };
+            _elemsSpin = new() { uiLabelSpin, uiComboSpin, uiLabelSpinUnits };
+            _elemsFuze = new() { uiLabelFuzeMode, uiComboFuzeMode };
             _elemsArmDelay = new() { uiLabelArmDelay, uiValueArmDelay, uiLabelArmDelayUnits };
             _elemsArmDelay2 = new() { uiLabelArmDelay2, uiValueArmDelay2, uiLabelArmDelay2Units };
-            _elemsSpin = new() { uiLabelSpin, uiComboSpin, uiLabelSpinUnits };
-            _elemsAutoPwr = new() { uiLabelAutoPwr, uiComboAutoPwr, uiStackAutoPwr };
+            _elemsArmDelayMode = new() { uiLabelArmDelayMode, uiComboArmDelayMode, uiLabelArmDelayModeUnits };
+            _elemsBurstAlt = new() { uiLabelBurstAlt, uiValueBurstAlt, uiLabelBurstAltUnits };
+            _elemsReleaseAng = new() { uiLabelReleaseAng, uiValueReleaseAng, uiLabelReleaseAngUnits };
+            _elemsImpactAng = new() { uiLabelImpactAng, uiValueImpactAng, uiLabelImpactAngUnits };
+            _elemsImpactAzi = new() { uiLabelImpactAzi, uiValueImpactAzi, uiLabelImpactAziUnits };
+            _elemsImpactVel = new() { uiLabelImpactVel, uiValueImpactVel, uiLabelImpactVelUnits };
+            _elemsCueRange = new() { uiLabelCueRng, uiValueCueRng, uiLabelCueRngUnits };
+            _elemsAutoPwr = new() { uiLabelAutoPwr, uiComboAutoPwr, null, uiStackAutoPwr };
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -111,8 +137,13 @@ namespace JAFDTC.UI.F16C
         protected override void CopyConfigToEditState()
         {
             F16CConfiguration config = (F16CConfiguration)Config;
-            MunitionSettings settings = config.SMS.GetSettingsForMunitionProfile(EditMuni, EditProfile);
-            EditSettings.EmplMode = settings.EmplMode;
+            MunitionSettings settings = config.SMS.GetSettingsForMunitionProfile(EditMuniID, EditProfileID);
+            EditSetup.Profile = new(settings.Profile);
+            EditSetup.IsProfileSelected = new(settings.IsProfileSelected);
+            EditSetup.EmplMode = new(settings.EmplMode);
+            EditSetup.ReleaseMode = new(settings.ReleaseMode);
+            EditSetup.AutoPwrMode = new(settings.AutoPwrMode);
+            EditSetup.AutoPwrSP = new(settings.AutoPwrSP);
 
             UpdateUIFromEditState();
         }
@@ -126,8 +157,14 @@ namespace JAFDTC.UI.F16C
             if (!EditState.HasErrors)
             {
                 F16CConfiguration config = (F16CConfiguration)Config;
-                MunitionSettings settings = config.SMS.GetSettingsForMunitionProfile(EditMuni, EditProfile);
-                settings.EmplMode = EditSettings.EmplMode;
+                MunitionSettings settings = config.SMS.GetSettingsForMunitionProfile(EditMuniID, EditProfileID);
+                settings.IsProfileSelected = new(EditSetup.IsProfileSelected);
+                // TODO: need to make sure this is mutex...
+                settings.EmplMode = new(EditSetup.EmplMode);
+                settings.ReleaseMode = new(EditSetup.ReleaseMode);
+                settings.AutoPwrMode = new(EditSetup.AutoPwrMode);
+                settings.AutoPwrSP = new(EditSetup.AutoPwrSP);
+
                 config.SMS.CleanUp();
                 config.Save(this, SystemTag);
             }
@@ -145,37 +182,34 @@ namespace JAFDTC.UI.F16C
         private static int GetDefaultComboItemFromSpec(string spec)
         {
             List<string> fields = (!string.IsNullOrEmpty(spec)) ? spec.Split(';').ToList() : null;
-            return (!string.IsNullOrEmpty(spec)) ? int.Parse(fields[1]) : -1;
+            return (!string.IsNullOrEmpty(spec)) ? int.Parse(fields[0]) : -1;
         }
 
         /// <summary>
         /// return a list of TextBlock instances to serve as the menu items for a ComboBox. the list is constructed
-        /// from a specification of the form: "{items_csv};{default_index}" where {items_csv} is a csv list of strings
-        /// for item names and {default_index} is the index of the default item.
+        /// from a specification of the form: "{default_index};{tags_csv}" where {tags_csv} is a csv list of strings
+        /// for item tags and {default_index} is the index of the default item. if textMap is given, it is indexed
+        /// by each tag from {tags_csv} to get the text for the item; otherwise, the text and tag are the same.
         /// </summary>
-        private static IList<TextBlock> BuildComboItemsFromSpec(string spec, out int dfltIndex)
+        private static IList<TextBlock> BuildComboItemsFromSpec(string spec, string[] textMap)
         {
-            List<TextBlock> comboItems = new List<TextBlock>();
+            List<TextBlock> comboItems = new();
             if (!string.IsNullOrEmpty(spec))
             {
                 List<string> fields = spec.Split(';').ToList();
-                List<string> items = fields[0].Split(',').ToList();
+                List<string> items = fields[1].Split(',').ToList();
                 for (int i = 0; i < items.Count; i++)
-                    comboItems.Add(new TextBlock() { Text = items[i], Tag = items[i] });
-
-                dfltIndex = int.Parse(fields[1]);
-            }
-            else
-            {
-                dfltIndex = -1;
+                    comboItems.Add(new TextBlock() { Text = (textMap != null) ? textMap[int.Parse(items[i])] : items[i],
+                                                     Tag = items[i] });
             }
             return comboItems;
         }
 
         /// <summary>
-        /// TODO: document
+        /// select the item from a ComboBox that has a tag matching the given value. selects the default index if no
+        /// such item is found.
         /// </summary>
-        private void SelectComboItemWIthTag(ComboBox combo, string tag, int dfltIndex)
+        private static void SelectComboItemWIthTag(ComboBox combo, string tag, int dfltIndex)
         {
             for (int i = 0; i < combo.Items.Count; i++)
             {
@@ -191,13 +225,20 @@ namespace JAFDTC.UI.F16C
         }
 
         /// <summary>
-        /// TODO: document
+        /// sets the visibility of FrameworkElements in a list according to the value of a spec string from munition
+        /// information. elements are hidden if the spec string is null/empty or they follow a null item in the list,
+        /// visible otherwise.
         /// </summary>
-        private Visibility SetVisibility(List<FrameworkElement> elems, string spec)
+        private static Visibility SetVisibility(List<FrameworkElement> elems, string spec)
         {
             Visibility visible = (!string.IsNullOrEmpty(spec)) ? Visibility.Visible : Visibility.Collapsed;
             foreach (FrameworkElement elem in elems)
-                elem.Visibility = visible;
+            {
+                if (elem != null)
+                    elem.Visibility = visible;
+                else
+                    visible = Visibility.Collapsed;
+            }
             return visible;
         }
 
@@ -206,19 +247,53 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void UpdateUIForMunitionChange()
         {
-            MunitionSettings muni = ((F16CMunition)uiListMunition.SelectedItem).MunitionInfo;
-            uiComboProfile.ItemsSource = BuildComboItemsFromSpec(muni.Profile, out _);
-            uiComboEmploy.ItemsSource = BuildComboItemsFromSpec(muni.EmplMode, out _);
-            uiComboFuze.ItemsSource = BuildComboItemsFromSpec(muni.Fuze, out _);
+            StartUIRebuild();
 
-            Visibility visible;
+            SMSSystem.Munitions muniID = ((F16CMunition)uiListMunition.SelectedItem).ID;
+            bool isMav = ((muniID == Munitions.AGM_65D) || (muniID == Munitions.AGM_65G) ||
+                          (muniID == Munitions.AGM_65H) || (muniID == Munitions.AGM_65K));
+
+            MunitionSettings muni = ((F16CMunition)uiListMunition.SelectedItem).MunitionInfo;
+            uiComboProfile.ItemsSource = BuildComboItemsFromSpec(muni.Profile, null);
+            uiComboEmploy.ItemsSource = BuildComboItemsFromSpec(muni.EmplMode, _textForEmplMode);
+            uiComboRelMode.ItemsSource = BuildComboItemsFromSpec(muni.ReleaseMode, _textForRippleMode);
+            uiComboFuzeMode.ItemsSource = BuildComboItemsFromSpec(muni.FuzeMode, _textForFuzeMode);
+            uiComboSpin.ItemsSource = BuildComboItemsFromSpec(muni.Spin, null);
+            uiComboArmDelayMode.ItemsSource = BuildComboItemsFromSpec(muni.ArmDelayMode, null);
+
+            // set baseline visibility based on the munition configuration. note that UpdateUICustom() will take care
+            // of additional visibility changes based on current settings of the configuration.
+            //
             SetVisibility(_elemsProfile, muni.Profile);
-            SetVisibility(_elemsFuze, muni.Fuze);
+            SetVisibility(_elemsRelease, muni.ReleaseMode);
+            SetVisibility(_elemsSpin, muni.Spin);
+            SetVisibility(_elemsFuze, muni.FuzeMode);
             SetVisibility(_elemsArmDelay, muni.ArmDelay);
             SetVisibility(_elemsArmDelay2, muni.ArmDelay2);
-            SetVisibility(_elemsSpin, muni.Spin);
-            visible = SetVisibility(_elemsAutoPwr, muni.AutoPwrMode);
-            // TODO: hide autopwr sp if supported but disabled...
+            SetVisibility(_elemsArmDelayMode, muni.ArmDelayMode);
+            SetVisibility(_elemsBurstAlt, muni.BurstAlt);
+            SetVisibility(_elemsReleaseAng, muni.ReleaseAng);
+            SetVisibility(_elemsImpactAng, muni.ImpactAng);
+            SetVisibility(_elemsImpactAzi, muni.ImpactAzi);
+            SetVisibility(_elemsImpactVel, muni.ImpactVel);
+            SetVisibility(_elemsCueRange, muni.CueRange);
+            SetVisibility(_elemsAutoPwr, muni.AutoPwrMode);
+
+            if (isMav)
+            {
+                uiLabelRelMode.Text = "Ripple Quantity";
+                uiStackRelMode.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                uiLabelRelMode.Text = "Release Mode";
+            }
+
+            // TODO: this needs to be fixed, ripple spacing for cbus is inconsistent with other ripples
+            if (!string.IsNullOrEmpty(muni.RippleSpacing))
+                uiValueRippleFt.PlaceholderText = muni.RippleSpacing;
+
+            FinishUIRebuild();
         }
 
         /// <summary>
@@ -226,10 +301,60 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         protected override void UpdateUICustom()
         {
+            SMSSystem.Munitions muniID = ((F16CMunition)uiListMunition.SelectedItem).ID;
+            bool isMav = ((muniID == Munitions.AGM_65D) || (muniID == Munitions.AGM_65G) ||
+                          (muniID == Munitions.AGM_65H) || (muniID == Munitions.AGM_65K));
+
             F16CMunition muni = (F16CMunition)uiListMunition.SelectedItem;
             uiTextMuniDesc.Text = (muni != null) ? muni.DescrUI : "No Munition Selected";
 
-            SelectComboItemWIthTag(uiComboProfile, EditProfile, GetDefaultComboItemFromSpec(muni.MunitionInfo.Profile));
+            SelectComboItemWIthTag(uiComboProfile, EditProfileID, GetDefaultComboItemFromSpec(muni.MunitionInfo.Profile));
+
+            // set up the ripple fields (quantity, spacing, and delay) based on the current release mode.
+            //
+            switch (EditSetup.ReleaseModeEnum)
+            {
+                case MunitionSettings.ReleaseModes.PAIR:
+                    uiStackRelMode.Visibility = Visibility.Visible;
+                    uiLabelRippleQty.Visibility = Visibility.Visible;
+                    uiValueRippleQty.Visibility = Visibility.Visible;
+                    uiValueRippleFt.Visibility = Visibility.Visible;
+                    uiLabelRippleFtUnits.Visibility = Visibility.Visible;
+                    uiComboRippleDt.Visibility = Visibility.Collapsed;
+                    uiLabelRippleDtUnits.Visibility = Visibility.Collapsed;
+                    break;
+                case MunitionSettings.ReleaseModes.TRI_PAIR_F2B:
+                case MunitionSettings.ReleaseModes.TRI_PAIR_L2R:
+                    uiStackRelMode.Visibility = Visibility.Visible;
+                    uiLabelRippleQty.Visibility = Visibility.Collapsed;
+                    uiValueRippleQty.Visibility = Visibility.Collapsed;
+                    uiValueRippleFt.Visibility = Visibility.Visible;
+                    uiLabelRippleFtUnits.Visibility = Visibility.Visible;
+                    uiComboRippleDt.Visibility = Visibility.Collapsed;
+                    uiLabelRippleDtUnits.Visibility = Visibility.Collapsed;
+                    break;
+                case MunitionSettings.ReleaseModes.GBU24_RP1:
+                case MunitionSettings.ReleaseModes.GBU24_RP2:
+                case MunitionSettings.ReleaseModes.GBU24_RP3:
+                case MunitionSettings.ReleaseModes.GBU24_RP4:
+                    uiStackRelMode.Visibility = Visibility.Visible;
+                    uiLabelRippleQty.Visibility = Visibility.Collapsed;
+                    uiValueRippleQty.Visibility = Visibility.Collapsed;
+                    uiValueRippleFt.Visibility = Visibility.Collapsed;
+                    uiLabelRippleFtUnits.Visibility = Visibility.Collapsed;
+                    uiComboRippleDt.Visibility = Visibility.Visible;
+                    uiLabelRippleDtUnits.Visibility = Visibility.Visible;
+                    break;
+                default:
+                    uiStackRelMode.Visibility = Visibility.Collapsed;
+                    break;
+            }
+
+            // auto power steerpoint fields are only visible if auto power mode is not off.
+            //
+            uiStackAutoPwr.Visibility = ((EditSetup.AutoPwrModeEnum != MunitionSettings.AutoPowerModes.UNKNOWN) &&
+                                         (EditSetup.AutoPwrModeEnum != MunitionSettings.AutoPowerModes.OFF))
+                                        ? Visibility.Visible : Visibility.Collapsed;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -253,8 +378,15 @@ namespace JAFDTC.UI.F16C
                 F16CMunition newSelectedMunition = (F16CMunition)args.AddedItems[0];
                 if (newSelectedMunition != null)
                 {
-                    EditMuni = (SMSSystem.Munitions)newSelectedMunition.ID;
-                    EditProfile = "1";
+                    EditMuniID = (SMSSystem.Munitions)newSelectedMunition.ID;
+                    EditProfileID = "1";
+                    //
+                    // ClearErrors() here as the assignments in CopyConfigToEditState() won't get the job done as the
+                    // fields are in their last valid state and errors are only cleared in BindableObjects when the
+                    // values are changing.
+                    //
+                    EditSetup.ClearErrors();
+                    CopyConfigToEditState();
                 }
             }
 
@@ -273,11 +405,13 @@ namespace JAFDTC.UI.F16C
         }
 
         /// <summary>
-        /// TODO: document
+        /// reset munition click: reset the current munition/profile and persist the configuration.
         /// </summary>
         private void MuniBtnReset_Click(object sender, RoutedEventArgs args)
         {
-            // TODO: reset munition
+            EditSetup.Reset();
+            SaveEditStateToConfig();
+            UpdateUIFromEditState();
         }
 
         // ---- page-level event handlers -----------------------------------------------------------------------------

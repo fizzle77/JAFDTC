@@ -174,7 +174,12 @@ namespace JAFDTC.Models.F16C.SMS
             Dictionary<string, MunitionSettings> profiles = Settings[muni];
             if (!profiles.ContainsKey(profile))
             {
-                profiles.Add(profile, new());
+                MunitionSettings settings = new()
+                {
+                    ID = muni,
+                    Profile = profile
+                };
+                profiles.Add(profile, settings);
             }
             return profiles[profile];
         }

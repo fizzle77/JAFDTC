@@ -30,6 +30,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
+using System.Threading;
+using Windows.ApplicationModel.Activation;
 
 namespace JAFDTC.UI.Base
 {
@@ -130,7 +132,11 @@ namespace JAFDTC.UI.Base
 
         protected bool IsUIUpdatePending { get; private set; }
 
+        protected bool IsUIRebuilding => (_isUIRebuildingCounter > 0);
+
         // ---- TODO
+
+        private int _isUIRebuildingCounter;
 
         private TextBlock _uiPageBtnTxtLink;
         private TextBlock _uiPageTxtLink;
@@ -158,6 +164,8 @@ namespace JAFDTC.UI.Base
 
             DefaultBorderBrush = setDefaultsFrom.BorderBrush;
             DefaultBkgndBrush = setDefaultsFrom.Background;
+
+            _isUIRebuildingCounter = 0;
 
             _uiPageBtnTxtLink = uiPageBtnTxtLink;
             _uiPageTxtLink = uiPageTxtLink;
@@ -336,6 +344,18 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
+        /// Mark the start of a UI rebuild. During UI rebuilds, events from the managed controls are ignored. Each
+        /// call to StartUIRebuild() should be balanced by a call to FinishUIRebuild(). Calls can be nested.
+        /// </summary>
+        protected void StartUIRebuild() => Interlocked.Increment(ref _isUIRebuildingCounter);
+
+        /// <summary>
+        /// Mark the end of a UI rebuild. During UI rebuilds, events from the managed controls are ignored. Each
+        /// call to FinishUIRebuild() should be balanced by a call to StartUIRebuild(). Calls can be nested.
+        /// </summary>
+        protected void FinishUIRebuild() => Interlocked.Decrement(ref _isUIRebuildingCounter);
+
+        /// <summary>
         /// Iterate over all the settings controls via PageTextBoxes, PageComboBoxes, and PageCheckBoxes. Set the value
         /// for each control based on the corresponding property as GetControlEditStateProperty() identifies (the base
         /// implementation uses EditState).
@@ -430,16 +450,16 @@ namespace JAFDTC.UI.Base
             ComboBox comboBox = (ComboBox)sender;
             GetControlEditStateProperty(comboBox, out PropertyInfo property, out BindableObject editState);
 
-            if ((property != null) && (editState != null))
+            if (!IsUIRebuilding && (property != null) && (editState != null))
             {
                 FrameworkElement item = (FrameworkElement)comboBox.SelectedItem;
                 if ((item != null) && (item.Tag != null))
                     property.SetValue(editState, item.Tag.ToString());
                 else
                     property.SetValue(editState, comboBox.SelectedIndex.ToString());
-            }
 
-            SaveEditStateToConfig();
+                SaveEditStateToConfig();
+            }
         }
 
         /// <summary>
@@ -451,10 +471,12 @@ namespace JAFDTC.UI.Base
             CheckBox checkBox = (CheckBox)sender;
             GetControlEditStateProperty(checkBox, out PropertyInfo property, out BindableObject editState);
 
-            if ((property != null) && (editState != null))
+            if (!IsUIRebuilding && (property != null) && (editState != null))
+            {
                 property.SetValue(editState, (checkBox.IsChecked == true).ToString());
 
-            SaveEditStateToConfig();
+                SaveEditStateToConfig();
+            }
         }
 
         /// <summary>
@@ -466,10 +488,11 @@ namespace JAFDTC.UI.Base
             TextBox textBox = (TextBox)sender;
             GetControlEditStateProperty(textBox, out PropertyInfo property, out BindableObject editState);
 
-            if ((property != null) && (editState != null))
+            if (!IsUIRebuilding && (property != null) && (editState != null))
+            {
                 property.SetValue(editState, textBox.Text);
-
-            SaveEditStateToConfig();
+                SaveEditStateToConfig();
+            }
         }
 
         /// <summary>
@@ -493,8 +516,15 @@ namespace JAFDTC.UI.Base
         protected void ValidateEditState(BindableObject editState, string propertyName)
         {
             List<string> errors = (List<string>)editState.GetErrors(propertyName);
-            if (PageTextBoxes.ContainsKey(propertyName))
-                SetFieldValidVisualState(PageTextBoxes[propertyName], (errors.Count == 0));
+            if (propertyName == null)
+            {
+                foreach (TextBox widget in PageTextBoxes.Values)
+                    SetFieldValidVisualState(widget, (errors.Count == 0));
+            }
+            else if (PageTextBoxes.ContainsKey(propertyName))
+            {
+                    SetFieldValidVisualState(PageTextBoxes[propertyName], (errors.Count == 0));
+            }
         }
 
         protected virtual void BaseField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
@@ -502,8 +532,9 @@ namespace JAFDTC.UI.Base
             ValidateEditState(EditState, args.PropertyName);
         }
 
-        // property changed: rebuild interface state to account for configuration changes.
-        //
+        /// <summary>
+        /// property changed: rebuild interface state to account for configuration changes.
+        /// </summary>
         protected virtual void BaseField_PropertyChanged(object sender, EventArgs args)
         {
             UpdateUIFromEditState();

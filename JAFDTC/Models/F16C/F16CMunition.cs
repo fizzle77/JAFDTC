@@ -19,12 +19,8 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.F16C.SMS;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace JAFDTC.Models.F16C
 {
@@ -41,7 +37,7 @@ namespace JAFDTC.Models.F16C
 
         // ---- following properties are deserialized from DB JSON
 
-        public int ID { get; set; }                             // unique ID used in configuration files
+        public SMSSystem.Munitions ID { get; set; }             // unique ID used in configuration files
 
         public string LabelUI { get; set; }                     // munition label for ui
 
@@ -51,7 +47,7 @@ namespace JAFDTC.Models.F16C
 
         public string Image { get; set; }                       // munition image for ui, relative to Images/
 
-        public string Class { get; set; }                       // CNTL class to set parameters like arming delay
+        public string CntlClass { get; set; }                   // CNTL class to set parameters like arming delay
 
         // TODO
 
