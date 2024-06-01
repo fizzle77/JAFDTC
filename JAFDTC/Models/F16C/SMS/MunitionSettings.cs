@@ -17,7 +17,9 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.Utilities;
+using System.Diagnostics.Metrics;
 using System.Text.Json.Serialization;
 
 namespace JAFDTC.Models.F16C.SMS
@@ -438,10 +440,12 @@ namespace JAFDTC.Models.F16C.SMS
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// reset the instance to defaults. ID and Profile are never reset.
+        /// reset the instance to defaults.
         /// </summary>
         public override void Reset()
         {
+            // ID and Profile are immutable once the object is in use, do not reset them here.
+            //
             IsProfileSelected = "";
             EmplMode = "";
             ReleaseMode = "";
