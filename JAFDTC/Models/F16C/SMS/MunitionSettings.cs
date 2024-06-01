@@ -18,23 +18,22 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Utilities;
-using System.Diagnostics;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.F16C.SMS
 {
     /// <summary>
-    /// TODO: document
+    /// munition settings accessible through the viper sms system in the jet. this class encodes a super set of all
+    /// possible parameters; a given munition will not use (or set) all of the parameters.
     /// </summary>
     public class MunitionSettings : SystemBase
     {
         /// <summary>
-        /// TODO: document
+        /// munition employment methods for a2g weapons. a given munition will support a subset of these modes.
         /// </summary>
         public enum EmploymentModes
         {
-            UNKNOWN = -1,
+            Unknown = -1,
             CCIP = 0,
             CCRP = 1,
             DTOS = 2,
@@ -46,11 +45,11 @@ namespace JAFDTC.Models.F16C.SMS
         }
 
         /// <summary>
-        /// TODO: document
+        /// munition release methods for a2g weapons. a given munition will support a subset of these modes.
         /// </summary>
         public enum ReleaseModes
         {
-            UNKNOWN = -1,
+            Unknown = -1,
             SGL = 0,
             PAIR = 1,
             SGL_TRI = 2,
@@ -66,11 +65,11 @@ namespace JAFDTC.Models.F16C.SMS
         }
 
         /// <summary>
-        /// TODO: document
+        /// munition fuze methods for a2g weapons. a given munition will support a subset of these modes.
         /// </summary>
         public enum FuzeModes
         {
-            UNKNOWN = -1,
+            Unknown = -1,
             NSTL = 0,
             NOSE = 1,
             TAIL = 2,
@@ -80,11 +79,11 @@ namespace JAFDTC.Models.F16C.SMS
         }
 
         /// <summary>
-        /// TODO: document
+        /// munition auto power modes for a2g weapons. a given munition will support a subset of these modes.
         /// </summary>
         public enum AutoPowerModes
         {
-            UNKNOWN = -1,
+            Unknown = -1,
             OFF = 0,
             NORTH_OF = 1,
             SOUTH_OF = 2,
@@ -104,7 +103,7 @@ namespace JAFDTC.Models.F16C.SMS
 
         // ---- following properties post change and validation events
 
-        private string _profile;                                // integer
+        private string _profile;                                // profile tag, typically integer
         public string Profile
         {
             get => _profile;
@@ -166,7 +165,7 @@ namespace JAFDTC.Models.F16C.SMS
             }
         }
 
-        private string _rippleDelayMode;                        // TODO
+        private string _rippleDelayMode;                        // string ripple delay value (ms)
         public string RippleDelayMode
         {
             get => _rippleDelayMode;
@@ -180,34 +179,82 @@ namespace JAFDTC.Models.F16C.SMS
             set => SetProperty(ref _fuzeMode, value, null);
         }
 
-        private string _armDelay;
+        private string _armDelay;                               // decimal [0.0, 99.99]
         public string ArmDelay
         {
-            // TODO: validation?
             get => _armDelay;
-            set => SetProperty(ref _armDelay, value, null);
+            set
+            {
+                string error = (string.IsNullOrEmpty(value)) ? null : "Invalid format";
+                if (IsDecimalFieldValid(value, 0.0, 99.99))
+                {
+                    value = FixupDecimalField(value, "F2");
+                    error = null;
+                }
+                SetProperty(ref _armDelay, value, error);
+            }
         }
 
-        private string _armDelayMode;                               // TODO
+        private string _armDelayMode;                           // string arm delay value
         public string ArmDelayMode
         {
             get => _armDelayMode;
             set => SetProperty(ref _armDelayMode, value, null);
         }
 
-        private string _armDelay2;
+        private string _armDelay2;                              // decimal [0.00, 99.99]
         public string ArmDelay2
         {
-            // TODO: validation?
             get => _armDelay2;
-            set => SetProperty(ref _armDelay2, value, null);
+            set
+            {
+                string error = (string.IsNullOrEmpty(value)) ? null : "Invalid format";
+                if (IsDecimalFieldValid(value, 0.0, 99.99))
+                {
+                    value = FixupDecimalField(value, "F2");
+                    error = null;
+                }
+                SetProperty(ref _armDelay2, value, error);
+            }
         }
 
-        public string BurstAlt { get; set; }
+        private string _burstAlt;                                // integer cbu87/97 [0, 99999], others [300, 3000]
+        public string BurstAlt
+        {
+            get => _burstAlt;
+            set
+            {
+                bool isWide = ((ID == SMSSystem.Munitions.CBU_87) || (ID == SMSSystem.Munitions.CBU_97));
+                string error = (string.IsNullOrEmpty(value)) ? null : "Invalid format";
+                if ((isWide && IsIntegerFieldValid(value, 0, 99999)) ||
+                    (!isWide && IsIntegerFieldValid(value, 300, 3000)))
+                {
+                    value = FixupIntegerField(value);
+                    error = null;
+                }
+                SetProperty(ref _burstAlt, value, error);
+            }
+        }
 
-        public string Spin { get; set; }
+        public string Spin { get; set; }                        // string rpm value
 
-        public string ReleaseAng { get; set; }
+        private string _releaseAng;                             // integer gbu24 [-45, 10], others [0, 45]
+        public string ReleaseAng
+        {
+            get => _releaseAng;
+            set
+            {
+                bool isNeg = (ID == SMSSystem.Munitions.GBU_24);
+                string error = (string.IsNullOrEmpty(value)) ? null : "Invalid format";
+                if ((isNeg && IsIntegerFieldValid(value, -45, 10)) ||
+                    (!isNeg && IsIntegerFieldValid(value, 0, 45)))
+                {
+                    value = FixupIntegerField(value);
+                    error = null;
+                }
+                SetProperty(ref _releaseAng, value, error);
+            }
+        }
 
         private string _impactAng;                              // integer [0, 90]
         public string ImpactAng
@@ -257,14 +304,21 @@ namespace JAFDTC.Models.F16C.SMS
             }
         }
 
-        public string _cueRange;                                // TODO
+        public string _cueRange;                                // decimal [0.000, 98.999]
         public string CueRange
         {
-            // TODO: validate
             get => _cueRange;
-            set => SetProperty(ref _cueRange, value, null);
+            set
+            {
+                string error = (string.IsNullOrEmpty(value)) ? null : "Invalid format";
+                if (IsDecimalFieldValid(value, 0.0, 99.99))
+                {
+                    value = FixupDecimalField(value, "F3");
+                    error = null;
+                }
+                SetProperty(ref _cueRange, value, error);
+            }
         }
-
 
         public string LADDPR { get; set; }                      // TODO: not supported in ui, 0-99900|25000
 
@@ -272,8 +326,8 @@ namespace JAFDTC.Models.F16C.SMS
 
         public string LADDMRA { get; set; }                     // TODO: not supported in ui, 0-99999|1100
 
-        private string _autoPwrMode;
-        public string AutoPwrMode                               // integer, enum AutoPowerModes
+        private string _autoPwrMode;                            // integer, enum AutoPowerModes
+        public string AutoPwrMode
         {
             get => _autoPwrMode;
             set => SetProperty(ref _autoPwrMode, value, null);
@@ -299,19 +353,19 @@ namespace JAFDTC.Models.F16C.SMS
 
         [JsonIgnore]
         public EmploymentModes EmplModeEnum
-            => (string.IsNullOrEmpty(EmplMode)) ? EmploymentModes.UNKNOWN : (EmploymentModes)int.Parse(EmplMode);
+            => (string.IsNullOrEmpty(EmplMode)) ? EmploymentModes.Unknown : (EmploymentModes)int.Parse(EmplMode);
 
         [JsonIgnore]
         public ReleaseModes ReleaseModeEnum
-            => (string.IsNullOrEmpty(ReleaseMode)) ? ReleaseModes.UNKNOWN : (ReleaseModes)int.Parse(ReleaseMode);
+            => (string.IsNullOrEmpty(ReleaseMode)) ? ReleaseModes.Unknown : (ReleaseModes)int.Parse(ReleaseMode);
 
         [JsonIgnore]
         public FuzeModes FuzeEnum
-            => (string.IsNullOrEmpty(FuzeMode)) ? FuzeModes.UNKNOWN : (FuzeModes)int.Parse(FuzeMode);
+            => (string.IsNullOrEmpty(FuzeMode)) ? FuzeModes.Unknown : (FuzeModes)int.Parse(FuzeMode);
 
         [JsonIgnore]
         public AutoPowerModes AutoPwrModeEnum
-            => (string.IsNullOrEmpty(AutoPwrMode)) ? AutoPowerModes.UNKNOWN : (AutoPowerModes)int.Parse(AutoPwrMode);
+            => (string.IsNullOrEmpty(AutoPwrMode)) ? AutoPowerModes.Unknown : (AutoPowerModes)int.Parse(AutoPwrMode);
 
         /// <summary>
         /// returns true if the instance indicates a default setup: either Settings is empty or it contains only
@@ -324,9 +378,16 @@ namespace JAFDTC.Models.F16C.SMS
                                            string.IsNullOrEmpty(RipplePulse) &&
                                            string.IsNullOrEmpty(RippleDelayMode) &&
                                            string.IsNullOrEmpty(FuzeMode) &&
+                                           string.IsNullOrEmpty(ArmDelay) &&
+                                           string.IsNullOrEmpty(ArmDelay2) &&
+                                           string.IsNullOrEmpty(ArmDelayMode) &&
+                                           string.IsNullOrEmpty(BurstAlt) &&
+                                           string.IsNullOrEmpty(Spin) &&
+                                           string.IsNullOrEmpty(ReleaseAng) &&
                                            string.IsNullOrEmpty(ImpactAng) &&
                                            string.IsNullOrEmpty(ImpactAzi) &&
                                            string.IsNullOrEmpty(ImpactVel) &&
+                                           string.IsNullOrEmpty(CueRange) &&
                                            string.IsNullOrEmpty(AutoPwrMode) &&
                                            string.IsNullOrEmpty(AutoPwrSP));
 
@@ -338,12 +399,14 @@ namespace JAFDTC.Models.F16C.SMS
 
         public MunitionSettings()
         {
+            ID = SMSSystem.Munitions.Unknown;
             Profile = "";
             Reset();
         }
 
         public MunitionSettings(MunitionSettings other)
         {
+            ID = other.ID;
             Profile = new(other.Profile);
             IsProfileSelected = new(other.IsProfileSelected);
             EmplMode = new(other.EmplMode);
@@ -352,9 +415,16 @@ namespace JAFDTC.Models.F16C.SMS
             RippleSpacing = new(other.RippleSpacing);
             RippleDelayMode = new(other.RippleDelayMode);
             FuzeMode = new(other.FuzeMode);
+            ArmDelay = new(other.ArmDelay);
+            ArmDelay2 = new(other.ArmDelay2);
+            ArmDelayMode = new(other.ArmDelayMode);
+            BurstAlt = new(other.BurstAlt);
+            Spin = new(other.Spin);
+            ReleaseAng = new(other.ReleaseAng);
             ImpactAng = new(other.ImpactAng);
             ImpactAzi = new(other.ImpactAzi);
             ImpactVel = new(other.ImpactVel);
+            CueRange = new(other.CueRange);
             AutoPwrMode = new(other.AutoPwrMode);
             AutoPwrSP = new(other.AutoPwrSP);
         }
@@ -368,7 +438,7 @@ namespace JAFDTC.Models.F16C.SMS
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// reset the instance to defaults. Profile is never reset.
+        /// reset the instance to defaults. ID and Profile are never reset.
         /// </summary>
         public override void Reset()
         {
@@ -379,9 +449,16 @@ namespace JAFDTC.Models.F16C.SMS
             RippleSpacing = "";
             RippleDelayMode = "";
             FuzeMode = "";
+            ArmDelay = "";
+            ArmDelay2 = "";
+            ArmDelayMode = "";
+            BurstAlt = "";
+            Spin = "";
+            ReleaseAng = "";
             ImpactAng = "";
             ImpactAzi = "";
             ImpactVel = "";
+            CueRange = "";
             AutoPwrMode = "";
             AutoPwrSP = "";
         }

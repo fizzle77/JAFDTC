@@ -69,7 +69,7 @@ https://www.gnu.org/licenses/.
                         <Grid.RowDefinitions>
                             <RowDefinition Height="48"/>
                         </Grid.RowDefinitions>
-                        <FontIcon Grid.Column="0" Tag="icon"
+                        <FontIcon Grid.Column="0" Tag="DefaultBadgeIcon"
                                   VerticalAlignment="Center"
                                   Visibility="Collapsed"
                                   Foreground="{ThemeResource SystemAccentColor}"
@@ -254,8 +254,9 @@ https://www.gnu.org/licenses/.
                 Arm Delay
             </TextBlock>
             <TextBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0" Tag="ArmDelay" x:Name="uiValueArmDelay"
-                       VerticalAlignment="Center"
-                       Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                     VerticalAlignment="Center"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
             <TextBlock Grid.Row="7" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelArmDelayUnits"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
@@ -286,8 +287,10 @@ https://www.gnu.org/licenses/.
                 Arm Delay 2
             </TextBlock>
             <TextBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0" Tag="ArmDelay2" x:Name="uiValueArmDelay2"
-                       VerticalAlignment="Center"
-                       Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                     VerticalAlignment="Center"
+                     MaxLength="5" PlaceholderText="4.00"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
             <TextBlock Grid.Row="9" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelArmDelay2Units"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
@@ -301,8 +304,9 @@ https://www.gnu.org/licenses/.
                 Burst Altitude
             </TextBlock>
             <TextBox Grid.Row="10" Grid.Column="1" Margin="12,12,0,0" Tag="BurstAlt" x:Name="uiValueBurstAlt"
-                       VerticalAlignment="Center"
-                       Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                     VerticalAlignment="Center"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
             <TextBlock Grid.Row="10" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelBurstAltUnits"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
@@ -316,8 +320,9 @@ https://www.gnu.org/licenses/.
                 Release Angle
             </TextBlock>
             <TextBox Grid.Row="11" Grid.Column="1" Margin="12,12,0,0" Tag="ReleaseAng" x:Name="uiValueReleaseAng"
-                       VerticalAlignment="Center"
-                       Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                     VerticalAlignment="Center"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
             <TextBlock Grid.Row="11" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelReleaseAngUnits"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">

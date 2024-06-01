@@ -17,7 +17,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,30 +32,31 @@ namespace JAFDTC.Models.F16C.SMS
         public const string SystemTag = "JAFDTC:F16C:SMS";
 
         /// <summary>
-        /// munition identifiers for f-16c munitions.
+        /// munition identifiers for known f-16c munitions the system can configure.
         /// </summary>
         public enum Munitions
         {
-            CBU_87 = 1,
-            CBU_97 = 2,
-            CBU_103 = 3,
-            CBU_105 = 4,
-            GBU_10 = 5,
-            GBU_12 = 6,
-            GBU_24 = 7,
-            GBU_31 = 8,
-            GBU_31P = 9,
-            GBU_38 = 10,
-            MK_82 = 11,
-            MK_82SE = 12,
-            MK_82AB = 13,
-            MK_84 = 14,
-            MK_84a = 15,
-            MK_84b = 16,
-            AGM_65D = 17,
-            AGM_65G = 18,
-            AGM_65H = 19,
-            AGM_65K = 20
+            Unknown = -1,
+            CBU_87 = 0,
+            CBU_97 = 1,
+            CBU_103 = 2,
+            CBU_105 = 3,
+            GBU_10 = 4,
+            GBU_12 = 5,
+            GBU_24 = 6,
+            GBU_31 = 7,
+            GBU_31P = 8,
+            GBU_38 = 9,
+            MK_82 = 10,
+            MK_82SE = 11,
+            MK_82AB = 12,
+            MK_84 = 13,
+            MK_84a = 14,
+            MK_84b = 15,
+            AGM_65D = 16,
+            AGM_65G = 17,
+            AGM_65H = 18,
+            AGM_65K = 19
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -158,6 +158,15 @@ namespace JAFDTC.Models.F16C.SMS
                 }
             }
             Settings = newSettings;
+        }
+
+        /// <summary>
+        /// return the profiles defined for the specified munition in a dictionary keyed by the profile index.
+        /// the dictionary is empty if there are no non-default profiles defined for the munition.
+        /// </summary>
+        public Dictionary<string, MunitionSettings> GetProfilesForMunition(Munitions muni)
+        {
+            return (Settings.ContainsKey(muni)) ? Settings[muni] : new();
         }
 
         /// <summary>
