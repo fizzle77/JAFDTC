@@ -26,6 +26,7 @@ using JAFDTC.Models.F16C.HTS;
 using JAFDTC.Models.F16C.MFD;
 using JAFDTC.Models.F16C.Misc;
 using JAFDTC.Models.F16C.Radio;
+using JAFDTC.Models.F16C.SMS;
 using JAFDTC.Models.F16C.STPT;
 using JAFDTC.UI.App;
 using Microsoft.UI.Xaml;
@@ -92,6 +93,7 @@ namespace JAFDTC.UI.F16C
                 MFDSystem.SystemTag => ((F16CConfiguration)config).MFD,
                 MiscSystem.SystemTag => ((F16CConfiguration)config).Misc,
                 RadioSystem.SystemTag => ((F16CConfiguration)config).Radio,
+                SMSSystem.SystemTag => ((F16CConfiguration)config).SMS,
                 STPTSystem.SystemTag => ((F16CConfiguration)config).STPT,
                 _ => null,
             };
