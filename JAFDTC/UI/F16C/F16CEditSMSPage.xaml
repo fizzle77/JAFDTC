@@ -436,7 +436,10 @@ https://www.gnu.org/licenses/.
                 <StackPanel Orientation="Horizontal">
                     <FontIcon Margin="0,0,6,0"
                               FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
-                    <TextBlock VerticalAlignment="center">Reset Munition to Defaults</TextBlock>
+                    <TextBlock x:Name="uiMuniBtnResetTitle"
+                               VerticalAlignment="center">
+                        Reset Munition to Defaults
+                    </TextBlock>
                 </StackPanel>
             </Button>
 
