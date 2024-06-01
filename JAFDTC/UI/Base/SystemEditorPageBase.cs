@@ -451,6 +451,10 @@ namespace JAFDTC.UI.Base
             }
         }
 
+        /// <summary>
+        /// Core UI update method enqueued from UpdateUIFromEditState(). This method is called under IsUIUpdatePending
+        /// as well as IsUIRebuilding.
+        /// </summary>
         private void DoUIUpdate()
         {
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(SystemTag));
@@ -548,16 +552,12 @@ namespace JAFDTC.UI.Base
             if (!IsUIRebuilding && (property != null) && (editState != null))
             {
                 FrameworkElement item = (FrameworkElement)comboBox.SelectedItem;
-                string value = comboBox.SelectedIndex.ToString();
                 if ((item != null) && (item.Tag != null))
                 {
                     string tag = item.Tag.ToString();
-                    if (tag[0] == '+')
-                        property.SetValue(editState, tag[1..]);
-                    else
-                        property.SetValue(editState, tag);
+                    property.SetValue(editState, (tag[0] == '+') ? tag[1..] : tag);
                 }
-                else
+                else if (item != null)
                     property.SetValue(editState, comboBox.SelectedIndex.ToString());
 
                 SaveEditStateToConfig();
