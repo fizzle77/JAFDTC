@@ -170,27 +170,23 @@ namespace JAFDTC.Models.F16C.SMS
         }
 
         /// <summary>
-        /// return the munition settings for the specified profile of the specified munition. a new default
-        /// MunitionSettings will be added to the settings (and returned) if the munition and/or profile are not
-        /// present.
+        /// return the munition settings for the specified profile of the specified munition. if isCreate is true,
+        /// a new default MunitionSettings will be added to the settings (and returned) if the munition and/or profile
+        /// are not present. otherwise, the method returns null if the settings are not defined.
         /// </summary>
-        public MunitionSettings GetSettingsForMunitionProfile(Munitions muni, string profile)
+        public MunitionSettings GetSettingsForMunitionProfile(Munitions muni, string profile, bool isCreate = true)
         {
-            if (!Settings.ContainsKey(muni))
+            if (isCreate)
             {
-                Settings.Add(muni, new());
+                if (!Settings.ContainsKey(muni))
+                    Settings.Add(muni, new());
+                if (!Settings[muni].ContainsKey(profile))
+                    Settings[muni].Add(profile, new MunitionSettings() { ID = muni, Profile = profile });
             }
-            Dictionary<string, MunitionSettings> profiles = Settings[muni];
-            if (!profiles.ContainsKey(profile))
-            {
-                MunitionSettings settings = new()
-                {
-                    ID = muni,
-                    Profile = profile
-                };
-                profiles.Add(profile, settings);
-            }
-            return profiles[profile];
+            else if (!Settings.ContainsKey(muni) || !Settings[muni].ContainsKey(profile))
+                return null;
+
+            return Settings[muni][profile];
         }
     }
 }
