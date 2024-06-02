@@ -26,30 +26,33 @@ using System.Text.RegularExpressions;
 namespace JAFDTC.Models.F15E.UFC
 {
     /// <summary>
-    /// TODO: document
+    /// defines the bands for tacan.
     /// </summary>
-    public class UFCSystem : BindableObject, ISystem
+    public enum TACANBands
+    {
+        X = 0,
+        Y = 1
+    }
+
+    /// <summary>
+    /// defines the bands for tacan.
+    /// </summary>
+    public enum TACANModes
+    {
+        A2A = 0,
+        TR = 1,
+        REC = 2
+    }
+
+    // ================================================================================================================
+
+    /// <summary>
+    /// ISystem object to persist the ufc system settings for the mudhen. this includes setup for the tacan, ils,
+    /// and low altitude warning systems in the jet.
+    /// </summary>
+    public class UFCSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:F15E:UFC";
-
-        /// <summary>
-        /// defines the bands for tacan.
-        /// </summary>
-        public enum TACANBands
-        {
-            X = 0,
-            Y = 1
-        }
-
-        /// <summary>
-        /// defines the bands for tacan.
-        /// </summary>
-        public enum TACANModes
-        {
-            A2A = 0,
-            TR = 1,
-            REC = 2
-        }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -96,7 +99,7 @@ namespace JAFDTC.Models.F15E.UFC
             }
         }
 
-        private string _tacanBand;                              // integer [0, 1]
+        private string _tacanBand;                              // integer [0, 1], enum TACANBands
         public string TACANBand
         {
             get => _tacanBand;
@@ -107,7 +110,7 @@ namespace JAFDTC.Models.F15E.UFC
             }
         }
 
-        private string _tacanMode;                              // integer [0, 2]
+        private string _tacanMode;                              // integer [0, 2],enum TACANModes
         public string TACANMode
         {
             get => _tacanMode;
@@ -157,21 +160,21 @@ namespace JAFDTC.Models.F15E.UFC
         /// form, false otherwise.
         /// </summary>
         [JsonIgnore]
-        public bool IsDefault => (IsLowAltDefault && IsTACANDefault && IsILSDefault);
+        public override bool IsDefault => (IsLowAltDefault && IsTACANDefault && IsILSDefault);
 
-        // TODO: technically, could be default with non-empty values...
         [JsonIgnore]
-        public bool IsLowAltDefault => string.IsNullOrEmpty(LowAltWarn);
+        public bool IsLowAltDefault
+            => (string.IsNullOrEmpty(LowAltWarn) || (LowAltWarn == ExplicitDefaults.LowAltWarn));
 
-        // TODO: technically, could be default with non-empty values...
         [JsonIgnore]
-        public bool IsTACANDefault => (string.IsNullOrEmpty(TACANChannel) &&
-                                       string.IsNullOrEmpty(TACANBand) &&
-                                       string.IsNullOrEmpty(TACANMode));
+        public bool IsTACANDefault
+            => ((string.IsNullOrEmpty(TACANChannel) || (TACANChannel == ExplicitDefaults.TACANChannel)) &&
+                (string.IsNullOrEmpty(TACANBand) || (TACANBand == ExplicitDefaults.TACANBand)) &&
+                (string.IsNullOrEmpty(TACANMode) || (TACANMode == ExplicitDefaults.TACANMode)));
 
-        // TODO: technically, could be default with non-empty values...
         [JsonIgnore]
-        public bool IsILSDefault => string.IsNullOrEmpty(ILSFrequency);
+        public bool IsILSDefault
+            => (string.IsNullOrEmpty(ILSFrequency) || (ILSFrequency == ExplicitDefaults.ILSFrequency));
 
         // ---- following accessors get the current value (default or non-default) for various properties
 
@@ -218,7 +221,7 @@ namespace JAFDTC.Models.F15E.UFC
         /// <summary>
         /// reset the instance to defaults (by definition, field value of "" implies default).
         /// </summary>
-        public void Reset()
+        public override void Reset()
         {
             LowAltWarn = "";
             TACANChannel = "";

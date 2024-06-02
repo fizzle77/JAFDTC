@@ -105,14 +105,14 @@ namespace JAFDTC.Models.F15E.Upload
 
                 AddActions(ufc, ActionsForString(_cfg.UFC.TACANChannel.ToString()), new() { "PB1" });
 
-                string band = (_cfg.UFC.TACANBandValue == UFCSystem.TACANBands.X) ? "Y" : "X";
+                string band = (_cfg.UFC.TACANBandValue == TACANBands.X) ? "Y" : "X";
                 AddIfBlock("IsTACANBand", true, new() { ufc.Name, band }, delegate () { AddAction(ufc, "PB1"); });
 
                 string modeButton = _cfg.UFC.TACANModeValue switch
                 {
-                    UFCSystem.TACANModes.A2A => "PB2",
-                    UFCSystem.TACANModes.TR => "PB3",
-                    UFCSystem.TACANModes.REC => "PB4",
+                    TACANModes.A2A => "PB2",
+                    TACANModes.TR => "PB3",
+                    TACANModes.REC => "PB4",
                     _ => "PB2"
                 };
 
