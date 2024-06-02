@@ -10,7 +10,7 @@ application supports the following DCS airframes and systems,
 - *F-14A/B Tomcat* &ndash; Waypoints
 - *F-15E Strike Eagle* &ndash; MPD/MPCD Formats, Radios, Steerpoints, Miscellaneous Systems
 - *F-16C Viper* &ndash; Countermeasures, Datalink, HARM (ALIC, HTS), MFD Formats, Radios,
-  Steerpoints, Miscellaneous Systems
+  SMS Munitions, Steerpoints, Miscellaneous Systems
 - *F/A-18C Hornet* &ndash; Countermeasures, Pre-Planned Weapons, Radios, Waypoints
 - *Mirage M-2000C* &ndash; Waypoints
 

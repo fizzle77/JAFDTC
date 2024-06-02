@@ -537,7 +537,7 @@ there, move on to the airframe guides for airframes of interest,
 | [AV-8B Harrier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_AV8B.md) | Waypoints
 | [F-14A/B Tomcat](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F14AB.md) | Waypoints
 | [F-15E Strike Eagle](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F15E.md) | MPD/MPCD Formats, Radios, Steerpoints, Miscellaneous Systems
-| [F-16C Viper](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F16C.md) | Countermeasures, Datalink, HARM (ALIC, HTS), MFD Formats, Radios, Steerpoints, Miscellaneous Systems
+| [F-16C Viper](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F16C.md) | Countermeasures, Datalink, HARM (ALIC, HTS), MFD Formats, Radios, SMS Munitions, Steerpoints, Miscellaneous Systems
 | [F/A-18C Hornet](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_FA18C.md) | Countermeasures, Pre-Planned Weapons, Radios, Waypoints
 | [Mirage M-2000C](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_M2000C.md) | Waypoints
 

@@ -12,6 +12,7 @@ JAFDTC supports configuration of the following systems in the Viper,
 * Miscellaneous DED systems such as TACAN/ILS, ALOW, BNGO, BULL, LASR, and HMCS DED/UFC
   along with HMCS intensity
 * Radios
+* SMS munitions parameters
 * Steerpoints including OAP, VIP, and VRP reference points
 
 Each of these areas is covered in more depth below. See the
@@ -367,6 +368,10 @@ Most of these settings should be self-apparent.
 The Symbology Intensity control will set the intensity knob to control the HMCS brighness.  The
 common controls implement the link and reset functionality described
 [earlier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#common-editor-controls).
+
+## SMS Munitions
+
+TODO
 
 ## Steerpoints
 
