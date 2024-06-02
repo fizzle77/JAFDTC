@@ -70,6 +70,7 @@ namespace JAFDTC.UI.F16C
         // ---- private read-only properties
 
         private readonly List<F16CMunition> _munitions;
+        private readonly string[] _textForProfile;
         private readonly string[] _textForEmplMode;
         private readonly string[] _textForRippleMode;
         private readonly string[] _textForFuzeMode;
@@ -99,10 +100,11 @@ namespace JAFDTC.UI.F16C
         {
             EditSetup = new MunitionSettings();
             EditMuniID = SMSSystem.Munitions.CBU_87;
-            EditProfileID = "1";
+            EditProfileID = ((int)MunitionSettings.Profiles.PROF1).ToString();
 
             _munitions = FileManager.LoadF16CMunitions();
 
+            _textForProfile = new[] { "PROF1", "PROF2", "PROF3", "PROF4" };
             _textForEmplMode = new[] { "CCIP", "CCRP", "DTOS", "LADD", "MAN", "PRE", "VIS", "BORE" };
             _textForRippleMode = new[] { "SGL", "PAIR", "Single", "Front/Back", "Left/Right", "1", "2",
                                          "SGL", "RP 1", "RP 2", "RP 3", "RP 4" };
@@ -366,7 +368,7 @@ namespace JAFDTC.UI.F16C
             // according to the selected munition.
             //
             MunitionSettings info = newMunition.MunitionInfo;
-            SetComboItemsFromSpec(uiComboProfile, info.Profile, null, Utilities.BulletComboBoxItem);
+            SetComboItemsFromSpec(uiComboProfile, info.Profile, _textForProfile, Utilities.BulletComboBoxItem);
             SetComboItemsFromSpec(uiComboEmploy, info.EmplMode, _textForEmplMode, Utilities.TextComboBoxItem);
             SetComboItemsFromSpec(uiComboRelMode, info.ReleaseMode, _textForRippleMode, Utilities.TextComboBoxItem);
             SetComboItemsFromSpec(uiComboFuzeMode, info.FuzeMode, _textForFuzeMode, Utilities.TextComboBoxItem);
@@ -518,7 +520,7 @@ namespace JAFDTC.UI.F16C
                 if (newSelectedMunition != null)
                 {
                     EditMuniID = (SMSSystem.Munitions)newSelectedMunition.ID;
-                    EditProfileID = "1";
+                    EditProfileID = ((int)MunitionSettings.Profiles.PROF1).ToString();
                     CopyConfigToEditState();
                     UpdateUIForMunitionChange(newSelectedMunition);
                 }

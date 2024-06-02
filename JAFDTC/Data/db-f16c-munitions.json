@@ -8,7 +8,7 @@
     "CntlClass": "2",
     "MunitionInfo": {
       "ID": 0,
-      "Profile": "1;1,2",
+      "Profile": "0;0,1",
       "EmplMode": "0;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
@@ -31,7 +31,7 @@
     "CntlClass": "2",
     "MunitionInfo": {
       "ID": 1,
-      "Profile": "1;1,2",
+      "Profile": "0;0,1",
       "EmplMode": "0;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
@@ -83,7 +83,7 @@
     "CntlClass": "1",
     "MunitionInfo": {
       "ID": 4,
-      "Profile": "1;1,2",
+      "Profile": "0;0,1",
       "EmplMode": "0;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
@@ -106,7 +106,7 @@
     "CntlClass": "1",
     "MunitionInfo": {
       "ID": 5,
-      "Profile": "1;1,2",
+      "Profile": "0;0,1",
       "EmplMode": "0;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
@@ -128,7 +128,7 @@
     "Image": "gbu-24.png",
     "MunitionInfo": {
       "ID": 6,
-      "Profile": "0;1,2,3,4",
+      "Profile": "0;0,1,2,3",
       "EmplMode": "5;5,6",
       "ReleaseMode": "7;7,8,9,10,11",
       "RippleDelayMode": "True",
@@ -238,7 +238,7 @@
     "CntlClass": "1",
     "MunitionInfo": {
       "ID": 12,
-      "Profile": "1;1,2",
+      "Profile": "0;0,1",
       "EmplMode": "0;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
@@ -261,7 +261,7 @@
     "CntlClass": "1",
     "MunitionInfo": {
       "ID": 13,
-      "Profile": "1;1,2",
+      "Profile": "0;0,1",
       "EmplMode": "0;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
@@ -284,7 +284,7 @@
     "CntlClass": "1",
     "MunitionInfo": {
       "ID": 14,
-      "Profile": "1;1,2",
+      "Profile": "0;0,1",
       "EmplMode": "0;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",

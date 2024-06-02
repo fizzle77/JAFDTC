@@ -31,6 +31,19 @@ namespace JAFDTC.Models.F16C.SMS
     public class MunitionSettings : SystemBase
     {
         /// <summary>
+        /// munition employment profiles for a2g weapons. a given munition will support a subset of these modes.
+        /// by convention, use PROF1 for munitions that do not have explicit profiles (like JDAMs).
+        /// </summary>
+        public enum Profiles
+        {
+            Unknown = -1,
+            PROF1 = 0,                                          // used for munitions without explicit profiles
+            PROF2 = 1,
+            PROF3 = 2,
+            PROF4 = 3
+        }
+
+        /// <summary>
         /// munition employment methods for a2g weapons. a given munition will support a subset of these modes.
         /// </summary>
         public enum EmploymentModes
@@ -105,7 +118,7 @@ namespace JAFDTC.Models.F16C.SMS
 
         // ---- following properties post change and validation events
 
-        private string _profile;                                // profile tag, typically integer
+        private string _profile;                                // integer, enum Profiles
         public string Profile
         {
             get => _profile;
