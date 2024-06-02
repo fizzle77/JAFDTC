@@ -21,6 +21,7 @@ using JAFDTC.Models;
 using JAFDTC.UI.App;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
@@ -28,11 +29,6 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Storage.Pickers;
-using Windows.Storage;
-using WinRT.Interop;
-using System.Reflection;
-using JAFDTC.Models.A10C.HMCS;
 
 namespace JAFDTC.UI
 {
@@ -41,8 +37,9 @@ namespace JAFDTC.UI
     /// </summary>
     internal class Utilities
     {
-        /// TODO: DEPRECATE
+        // TODO: DEPRECATE
         private static readonly Regex regexInts = new("^[\\-]{0,1}[0-9]*$");
+        // TODO: DEPRECATE
         private static readonly Regex regexTwoNegs = new("[^\\-]*[\\-][^\\-]*[\\-].*");
 
         // ------------------------------------------------------------------------------------------------------------
@@ -165,13 +162,61 @@ namespace JAFDTC.UI
 
         // ------------------------------------------------------------------------------------------------------------
         //
+        // combobox support
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        public static TextBlock TextComboBoxItem(string text, string tagItem)
+            => new() { Text = text, Tag = tagItem };
+
+        /// <summary>
+        /// returns an instance of Grid for use as a ComboBoxItem. the item consists of a FontIcon bullet (Tag of
+        /// "BadgeIcon") with a TextBlock text element (Tag of "ItemText") to its right. parameters set the text and
+        /// tag of the Grid.
+        /// </summary>
+        public static Grid BulletComboBoxItem(string text, string tagItem)
+        {
+            // OMFG, i so *HATE* WinUI for making even the simple stuff non-intuitive. there seems to be ways to do
+            // everything but they are opaque and mysterious and the obvious path never seems to completely work.
+            //
+            // this sh!t is due to issues getting DataTemplate on ComboBox to show both in the closed as well as
+            // open states. there's stackoverflow goodness on a fix, but instructions are incomplete and beyond my
+            // meager knowledge. and let's not even get started on the asymmetries in C# vs XAML.
+            //
+            // so instead we get this: making the xaml reader slurp up some xaml as a hack.
+            //
+            // can we build jafdtc in UIKit? please?
+            //
+            string xaml = $"<Grid xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"" +
+                          $"      Tag=\"{tagItem}\">" +
+                          $"  <Grid.ColumnDefinitions>" +
+                          $"    <ColumnDefinition Width=\"20\"/>" +
+                          $"    <ColumnDefinition Width=\"Auto\"/>" +
+                          $"  </Grid.ColumnDefinitions>" +
+                          $"  <FontIcon Grid.Column=\"0\"" +
+                          $"            VerticalAlignment=\"Center\"" +
+                          $"            Tag=\"BadgeIcon\"" +
+                          $"            Foreground=\"{{ThemeResource SystemAccentColor}}\"" +
+                          $"            FontFamily=\"Segoe Fluent Icons\"" +
+                          $"            Glyph=\"\xE915\"/>" +
+                          $"  <TextBlock Grid.Column=\"1\"" +
+                          $"             Margin=\"8,0,0,0\"" +
+                          $"             VerticalAlignment=\"Center\"" +
+                          $"             Tag=\"ItemText\"" +
+                          $"             Text = \"{text}\"/>" +
+                          $"</Grid>";
+            return (Grid)XamlReader.Load(xaml);
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
         // functions
         //
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// search the visual tree for a child control of a particular type with a given tag. returns the control
-        /// or null if not found.
+        /// search the visual tree of a parent for a child control of a particular type with a given tag. returns the
+        /// control or null if not found.
         /// 
         /// hat tip to:
         /// https://stackoverflow.com/questions/38110972/how-to-find-a-control-with-a-specific-name-in-an-xaml-ui-with-c-sharp-code
@@ -189,9 +234,7 @@ namespace JAFDTC.UI
                 {
                     UIElement child = VisualTreeHelper.GetChild(parent, i) as UIElement;
                     if (FindControl<T>(child, targetType, tag) != null)
-                    {
                         return FindControl<T>(child, targetType, tag);
-                    }
                 }
             }
             return result;
@@ -222,13 +265,110 @@ namespace JAFDTC.UI
         public static string TruncateAtWord(string input, int length)
         {
             if ((input == null) || (input.Length < length))
-            {
                 return input;
-            }
 
             int iNextSpace = input.LastIndexOf(" ", length);
             return string.Format("{0}...", input[..((iNextSpace > 0) ? iNextSpace : length)].Trim());
         }
+
+        /// TODO: DEPRECATE
+        /// <summary>
+        /// on changes to an integer parameter field in a TextBox (via typing or paste), remove non-integer
+        /// characters so the field contains an integer.
+        /// </summary>
+        public static void TextBoxIntValue_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        {
+            var curPosition = sender.SelectionStart;
+            if (!regexInts.IsMatch(sender.Text))
+            {
+                for (var match = Regex.Match(sender.Text, @"[^0-9\\-]");
+                     match.Success;
+                     match = Regex.Match(sender.Text, @"[^0-9\\-]"))
+                {
+                    sender.Text = sender.Text.Remove(match.Index, 1);
+                    curPosition--;
+                    sender.Select(curPosition, 0);
+                }
+            }
+            for (var match = Regex.Match(sender.Text, @"[\\-]");
+                 match.Success && regexTwoNegs.IsMatch(sender.Text);
+                 match = Regex.Match(sender.Text, @"[\\-]"))
+            {
+                sender.Text = sender.Text.Remove(match.Index, 1);
+                curPosition--;
+                sender.Select(curPosition, 0);
+            }
+        }
+
+        /// <summary>
+        /// return visibility state based on whether or not an ISystem is default or not. returns visible if the
+        /// system is default, collapsed otherwise.
+        /// </summary>
+        public static Visibility HiddenIfDefault(ISystem system)
+            => ((system == null) || system.IsDefault) ? Visibility.Collapsed : Visibility.Visible;
+
+        /// <summary>
+        /// set the enable state of a control, allowing the control to maintain focus.
+        /// 
+        /// HACK: winui appears to move focus to the next control when a control is disabled while it has focus.
+        /// HACK: temporarily allow the control to have focus while disabled as we change its IsEnabled state.
+        /// </summary>
+        public static void SetEnableState(Control cntrl, bool isEnabled)
+        {
+            cntrl.AllowFocusWhenDisabled = true;
+            cntrl.IsEnabled = isEnabled;
+            cntrl.AllowFocusWhenDisabled = false;
+        }
+
+        // TODO: DEPRECATE
+        public static void SetEnableState(bool isEnabled, params Control[] cntrls)
+        {
+            foreach (Control cntrl in cntrls) 
+                SetEnableState(cntrl, isEnabled);
+        }
+
+        public static void SetCheckEnabledAndState(CheckBox check, bool isEnabled, bool isChecked)
+        {
+            SetEnableState(check, isEnabled);
+            check.IsChecked = isChecked;
+        }
+
+        public static void SetComboEnabledAndSelection(ComboBox combo, bool isNotLinked, bool isEnabled,
+                                                       int selectedIndex)
+        {
+            if (!isEnabled)
+            {
+                SetEnableState(combo, false);               // always disable if set to disable
+                combo.SelectedItem = null;                  // always blank if disabled
+            }
+            else
+            {
+                SetEnableState(combo, isNotLinked);         // otherwise disable if linked
+                if (combo.SelectedIndex != selectedIndex)
+                    combo.SelectedIndex = selectedIndex;    // show setting if enabled or linked (if selection changed)
+            }
+        }
+
+        public static void SetTextBoxEnabledAndText(TextBox tb, bool isNotLinked, bool isEnabled, string text,
+                                                    string disabledText = null)
+        {
+            if (!isEnabled)
+            {
+                SetEnableState(tb, false);                  // always disable if set to disable
+                tb.Text = disabledText;                     // always the disabledText if disabled
+            }
+            else
+            {
+                SetEnableState(tb, isNotLinked);            // otherwise disable if linked
+                tb.Text = text;                             // show setting if enabled or linked
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // link/unlink button support
+        //
+        // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// build out the names list and name to uid map for the configurations that can be linked to from the
@@ -265,97 +405,6 @@ namespace JAFDTC.UI
                 }
             }
             names.Sort();
-        }
-
-        /// TODO: DEPRECATE
-        /// <summary>
-        /// on changes to an integer parameter field in a TextBox (via typing or paste), remove non-integer
-        /// characters so the field contains an integer.
-        /// </summary>
-        public static void TextBoxIntValue_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
-        {
-            var curPosition = sender.SelectionStart;
-            if (!regexInts.IsMatch(sender.Text))
-            {
-                for (var match = Regex.Match(sender.Text, @"[^0-9\\-]");
-                     match.Success;
-                     match = Regex.Match(sender.Text, @"[^0-9\\-]"))
-                {
-                    sender.Text = sender.Text.Remove(match.Index, 1);
-                    curPosition--;
-                    sender.Select(curPosition, 0);
-                }
-            }
-            for (var match = Regex.Match(sender.Text, @"[\\-]");
-                 match.Success && regexTwoNegs.IsMatch(sender.Text);
-                 match = Regex.Match(sender.Text, @"[\\-]"))
-            {
-                sender.Text = sender.Text.Remove(match.Index, 1);
-                curPosition--;
-                sender.Select(curPosition, 0);
-            }
-        }
-
-        public static Visibility HiddenIfDefault(ISystem profileSettings) => profileSettings.IsDefault switch
-        {
-            true => Visibility.Collapsed,
-            false => Visibility.Visible
-        };
-
-        /// <summary>
-        /// set the enable state of a control, allowing the control to maintain focus.
-        /// 
-        /// HACK: winui appears to move focus to the next control when a control is disabled while it has focus.
-        /// HACK: temporarily allow the control to have focus while disabled as we change its IsEnabled state.
-        /// </summary>
-        public static void SetEnableState(Control cntrl, bool isEnabled)
-        {
-            cntrl.AllowFocusWhenDisabled = true;
-            cntrl.IsEnabled = isEnabled;
-            cntrl.AllowFocusWhenDisabled = false;
-        }
-
-        public static void SetEnableState(bool isEnabled, params Control[] cntrls)
-        {
-            foreach (Control cntrl in cntrls) 
-                SetEnableState(cntrl, isEnabled);
-        }
-
-        public static void SetCheckEnabledAndState(CheckBox check, bool isEnabled, bool isChecked)
-        {
-            SetEnableState(check, isEnabled);
-            check.IsChecked = isChecked;
-        }
-
-        public static void SetComboEnabledAndSelection(ComboBox combo, bool isNotLinked, bool isEnabled, int selectedIndex)
-        {
-            if (!isEnabled)
-            {
-                SetEnableState(combo, false);               // always disable if set to disable
-                combo.SelectedItem = null;                  // always blank if disabled
-            }
-            else
-            {
-                SetEnableState(combo, isNotLinked);         // otherwise disable if linked
-                if (combo.SelectedIndex != selectedIndex)
-                {
-                    combo.SelectedIndex = selectedIndex;    // show setting if enabled or linked
-                }
-            }
-        }
-
-        public static void SetTextBoxEnabledAndText(TextBox tb, bool isNotLinked, bool isEnabled, string text, string disabledText = null)
-        {
-            if (!isEnabled)
-            {
-                SetEnableState(tb, false); // always disable if set to disable
-                tb.Text = disabledText; // always the disabledText if disabled
-            }
-            else
-            {
-                SetEnableState(tb, isNotLinked); // otherwise disable if linked
-                tb.Text = text; // show setting if enabled or linked
-            }
         }
 
         /// <summary>

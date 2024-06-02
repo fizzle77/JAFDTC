@@ -25,7 +25,6 @@ using JAFDTC.UI.Base;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
@@ -33,7 +32,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using static JAFDTC.Models.F16C.SMS.SMSSystem;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace JAFDTC.UI.F16C
 {
@@ -51,7 +49,7 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // ---- TODO
+        // ---- overrides of base SystemEditorPage properties
 
         protected override SystemBase SystemConfig => ((F16CConfiguration)Config).SMS;
 
@@ -61,7 +59,7 @@ namespace JAFDTC.UI.F16C
 
         protected override bool IsPageSateDefault => ((F16CConfiguration)Config).SMS.IsDefault;
 
-        // ---- TODO
+        // ---- internal properties
 
         private MunitionSettings EditSetup { get; set; }
 
@@ -69,7 +67,7 @@ namespace JAFDTC.UI.F16C
 
         private string EditProfileID { get; set; }
 
-        // ---- TODO
+        // ---- private read-only properties
 
         private readonly List<F16CMunition> _munitions;
         private readonly string[] _textForEmplMode;
@@ -242,30 +240,7 @@ namespace JAFDTC.UI.F16C
         private static string GetDefaultComboItemFromSpec(string spec)
         {
             List<string> fields = (!string.IsNullOrEmpty(spec)) ? spec.Split(';').ToList() : null;
-            return (fields != null) ? fields[0] : null;
-        }
-
-        /// <summary>
-        /// return a list of TextBlock instances to serve as the menu items for a ComboBox. the list is constructed
-        /// from a specification of the form: "{default_tag};{tags_csv}" where {tags_csv} is a csv list of strings
-        /// for item tags and {default_tag} is the tag of the default item. if textMap is given, it is indexed by
-        /// each tag from {tags_csv} to get the text for the item; otherwise, the text and tag are the same.
-        /// </summary>
-        private static IList<TextBlock> BuildComboItemsFromSpec(string spec, string[] textMap)
-        {
-            List<TextBlock> comboItems = new();
-            if (!string.IsNullOrEmpty(spec))
-            {
-                List<string> fields = spec.Split(';').ToList();
-                List<string> items = fields[1].Split(',').ToList();
-                for (int i = 0; i < items.Count; i++)
-                    comboItems.Add(new TextBlock()
-                    {
-                        Text = (textMap != null) ? textMap[int.Parse(items[i])] : items[i],
-                        Tag = (items[i] == fields[0]) ? $"+{items[i]}" : items[i]
-                    });
-            }
-            return comboItems;
+            return fields?[0];
         }
 
         /// <summary>
@@ -295,11 +270,32 @@ namespace JAFDTC.UI.F16C
         }
 
         /// <summary>
+        /// set the items of a ComboBox from a specification of the form: "{default_tag};{tags_csv}" where {tags_csv}
+        /// is a csv list of strings for item tags and {default_tag} is the tag of the default item. if textMap is
+        /// non-null, the text for each item is given by textMap indexed by each tag from {tags_csv} (an integer);
+        /// otherwise the text and tag are the same. individual items are build with the buildItem lambda.
+        /// </summary>
+        private static void SetComboItemsFromSpec(ComboBox combo, string spec, string[] textMap,
+                                                  Func<string, string, FrameworkElement> buildItem)
+        {
+            List<FrameworkElement> items = new();
+            if (!string.IsNullOrEmpty(spec))
+            {
+                List<string> fields = spec.Split(';').ToList();
+                List<string> tags = fields[1].Split(',').ToList();
+                for (int i = 0; i < tags.Count; i++)
+                    items.Add(buildItem((textMap != null) ? textMap[int.Parse(tags[i])] : tags[i],
+                                        (tags[i] == fields[0]) ? $"+{tags[i]}" : tags[i]));
+            }
+            combo.ItemsSource = items;
+        }
+
+        /// <summary>
         /// sets the visibility of FrameworkElements in a list according to the value of a spec string from munition
         /// information. elements are hidden if the spec string is null/empty or they follow a null item in the list,
         /// visible otherwise.
         /// </summary>
-        private static Visibility SetVisibility(List<FrameworkElement> elems, string spec)
+        private static Visibility SetVisibilityFromSpec(List<FrameworkElement> elems, string spec)
         {
             Visibility visible = (!string.IsNullOrEmpty(spec)) ? Visibility.Visible : Visibility.Collapsed;
             foreach (FrameworkElement elem in elems)
@@ -313,10 +309,10 @@ namespace JAFDTC.UI.F16C
         }
 
         /// <summary>
-        /// set the default/non-default icon in the munition list according to whether or not the munitions have a
+        /// set the default/non-default icons in the munition list according to whether or not a munition has a
         /// default configuration. a munition is non-default if it has any non-default profiles.
         /// </summary>
-        private void UpdateNonDefaultMunitionIcons()
+        private void UpdateNonDefaultMunitionItems()
         {
             F16CConfiguration config = (F16CConfiguration)Config;
             foreach (F16CMunition munition in uiListMunition.Items)
@@ -332,6 +328,24 @@ namespace JAFDTC.UI.F16C
                             visibility = Visibility.Visible;
                     icon.Visibility = visibility;
                 }
+            }
+        }
+
+        /// <summary>
+        /// set the default/non-default icons in the profile list according to whether or not the profile has a
+        /// default configuration.
+        /// </summary>
+        private void UpdateNonDefaultProfileItems()
+        {
+            F16CConfiguration config = (F16CConfiguration)Config;
+            foreach (Grid grid in uiComboProfile.Items.Cast<Grid>())
+            {
+                string profileID = grid.Tag.ToString();
+                profileID = (profileID[0] == '+') ? profileID[1..] : profileID;
+                MunitionSettings settings = config.SMS.GetSettingsForMunitionProfile(EditMuniID, profileID, false);
+                FontIcon icon = Utilities.FindControl<FontIcon>(grid, typeof(FontIcon), "BadgeIcon");
+                if (icon != null)
+                    icon.Visibility = Utilities.HiddenIfDefault(settings);
             }
         }
 
@@ -352,37 +366,38 @@ namespace JAFDTC.UI.F16C
             // according to the selected munition.
             //
             MunitionSettings info = newMunition.MunitionInfo;
-            uiComboProfile.ItemsSource = BuildComboItemsFromSpec(info.Profile, null);
-            uiComboEmploy.ItemsSource = BuildComboItemsFromSpec(info.EmplMode, _textForEmplMode);
-            uiComboRelMode.ItemsSource = BuildComboItemsFromSpec(info.ReleaseMode, _textForRippleMode);
-            uiComboFuzeMode.ItemsSource = BuildComboItemsFromSpec(info.FuzeMode, _textForFuzeMode);
-            uiComboSpin.ItemsSource = BuildComboItemsFromSpec(info.Spin, null);
-            uiComboArmDelayMode.ItemsSource = BuildComboItemsFromSpec(info.ArmDelayMode, null);
+            SetComboItemsFromSpec(uiComboProfile, info.Profile, null, Utilities.BulletComboBoxItem);
+            SetComboItemsFromSpec(uiComboEmploy, info.EmplMode, _textForEmplMode, Utilities.TextComboBoxItem);
+            SetComboItemsFromSpec(uiComboRelMode, info.ReleaseMode, _textForRippleMode, Utilities.TextComboBoxItem);
+            SetComboItemsFromSpec(uiComboFuzeMode, info.FuzeMode, _textForFuzeMode, Utilities.TextComboBoxItem);
+            SetComboItemsFromSpec(uiComboSpin, info.Spin, null, Utilities.TextComboBoxItem);
+            SetComboItemsFromSpec(uiComboArmDelayMode, info.ArmDelayMode, null, Utilities.TextComboBoxItem);
 
             // set baseline visibility based on the newly selected munition (eg, hide controls that are not
             // relevant and show those that are). this only handles visibility that is a function of the munition,
             // not visibility that is a function of the settings (UpdateUiCusomt() takes care of that).
             //
-            SetVisibility(_elemsProfile, info.Profile);
-            SetVisibility(_elemsRelease, info.ReleaseMode);
-            SetVisibility(_elemsSpin, info.Spin);
-            SetVisibility(_elemsFuze, info.FuzeMode);
-            SetVisibility(_elemsArmDelay, info.ArmDelay);
-            SetVisibility(_elemsArmDelay2, info.ArmDelay2);
-            SetVisibility(_elemsArmDelayMode, info.ArmDelayMode);
-            SetVisibility(_elemsBurstAlt, info  .BurstAlt);
-            SetVisibility(_elemsReleaseAng, info.ReleaseAng);
-            SetVisibility(_elemsImpactAng, info.ImpactAng);
-            SetVisibility(_elemsImpactAzi, info.ImpactAzi);
-            SetVisibility(_elemsImpactVel, info.ImpactVel);
-            SetVisibility(_elemsCueRange, info.CueRange);
-            SetVisibility(_elemsAutoPwr, info.AutoPwrMode);
+            SetVisibilityFromSpec(_elemsProfile, info.Profile);
+            SetVisibilityFromSpec(_elemsRelease, info.ReleaseMode);
+            SetVisibilityFromSpec(_elemsSpin, info.Spin);
+            SetVisibilityFromSpec(_elemsFuze, info.FuzeMode);
+            SetVisibilityFromSpec(_elemsArmDelay, info.ArmDelay);
+            SetVisibilityFromSpec(_elemsArmDelay2, info.ArmDelay2);
+            SetVisibilityFromSpec(_elemsArmDelayMode, info.ArmDelayMode);
+            SetVisibilityFromSpec(_elemsBurstAlt, info  .BurstAlt);
+            SetVisibilityFromSpec(_elemsReleaseAng, info.ReleaseAng);
+            SetVisibilityFromSpec(_elemsImpactAng, info.ImpactAng);
+            SetVisibilityFromSpec(_elemsImpactAzi, info.ImpactAzi);
+            SetVisibilityFromSpec(_elemsImpactVel, info.ImpactVel);
+            SetVisibilityFromSpec(_elemsCueRange, info.CueRange);
+            SetVisibilityFromSpec(_elemsAutoPwr, info.AutoPwrMode);
 
             // change release mode label to line up with the way mavs handle ripples versus other munitions.
             //
             uiLabelRelMode.Text = (isMav) ? "Ripple Quantity" : "Release Mode";
 
-            // TODO
+            // change text field placeholders and maximum lengths to line up with the parameter ranges for the
+            // selected munition.
             //
             if (!string.IsNullOrEmpty(info.ArmDelay))
             {
@@ -414,22 +429,23 @@ namespace JAFDTC.UI.F16C
         {
             F16CConfiguration config = (F16CConfiguration)Config;
 
-            UpdateNonDefaultMunitionIcons();
+            UpdateNonDefaultMunitionItems();
+            UpdateNonDefaultProfileItems();
 
             F16CMunition muni = (F16CMunition)uiListMunition.SelectedItem;
             uiTextMuniDesc.Text = (muni != null) ? muni.DescrUI : "No Munition Selected";
+            uiMuniBtnResetTitle.Text = (string.IsNullOrEmpty(muni.MunitionInfo.Profile)) ? "Reset Parameters to Defaults"
+                                                                                         : "Reset Profile to Defaults";
 
+            // base class does not manage the profile number since this property is immutable once a set of munition
+            // settings are added to the configuration.
+            //
             SelectComboItemWIthTag(uiComboProfile, EditProfileID);
 
             // set the per-munition reset button's enable state based on whether or not there are any changes to any
-            // of the munition's profiles along with the editable state passed in..
+            // of the munition's profile.
             //
-            Dictionary<string, MunitionSettings> profiles = config.SMS.GetProfilesForMunition(EditMuniID);
-            bool isEnabled = false;
-            foreach (MunitionSettings settings in profiles.Values)
-                if (!settings.IsDefault)
-                    isEnabled = isEditable;
-            Utilities.SetEnableState(uiMuniBtnReset, isEnabled);
+            Utilities.SetEnableState(uiMuniBtnReset, !EditSetup.IsDefault);
 
             // set up visibility of the ripple-related fields (quantity, spacing, and delay) based on the current
             // release mode selected in the settings.
@@ -488,7 +504,8 @@ namespace JAFDTC.UI.F16C
         // ---- munition list -----------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// munition list selection change: save the state of the previously-selected muntion and update the ui to
+        /// display the just-selected munition.
         /// </summary>
         private void ListMunition_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
@@ -513,11 +530,26 @@ namespace JAFDTC.UI.F16C
         // ---- munition parameters -----------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// profile id selection change: save the state of the previously-selected profile and update the ui to
+        /// display the just-selected profile.
         /// </summary>
         private void ComboProfile_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
-            // TODO: save to current profile, move to new profile
+            if (!IsUIRebuilding)
+            {
+                ComboBox comboBox = (ComboBox)sender;
+                FrameworkElement item = (FrameworkElement)comboBox.SelectedItem;
+                if (item != null)
+                {
+                    Debug.Assert(item.Tag != null);
+                    SaveEditStateToConfig();
+
+                    string tag = item.Tag.ToString();
+                    EditProfileID = (tag[0] == '+') ? tag[1..] : tag;
+                    CopyConfigToEditState();
+                    UpdateUIFromEditState();
+                }
+            }
         }
 
         /// <summary>
