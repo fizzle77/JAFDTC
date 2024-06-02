@@ -302,7 +302,7 @@ namespace JAFDTC.UI.App
         private void SetFieldValidState(TextBox field, bool isValid)
         {
             field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
-            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBackgroundBrush"];
         }
 
         private void ValidateAllFields(Dictionary<string, TextBox> fields, IEnumerable errors)

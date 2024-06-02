@@ -123,7 +123,7 @@ namespace JAFDTC.UI.F16C
         private void SetFieldValidState(TextBox field, bool isValid)
         {
             field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
-            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBackgroundBrush"];
         }
 
         /// <summary>

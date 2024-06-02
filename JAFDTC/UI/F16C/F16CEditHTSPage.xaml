@@ -32,7 +32,8 @@ https://www.gnu.org/licenses/.
     <Page.Resources>
 
         <!-- brush for error fields. -->
-        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="PaleVioletRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBackgroundBrush" Color="PaleVioletRed"/>
 
     </Page.Resources>
 

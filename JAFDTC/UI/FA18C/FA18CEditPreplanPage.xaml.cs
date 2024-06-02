@@ -301,9 +301,10 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private void SetFieldValidState(TextBox field, bool isValid)
         {
-            SolidColorBrush errorBrush = (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
-            field.BorderBrush = (isValid || !field.IsEnabled) ? _defaultBorderBrush : errorBrush;
-            field.Background = (isValid || !field.IsEnabled) ? _defaultBkgndBrush : errorBrush;
+            field.BorderBrush = (isValid || !field.IsEnabled) ? _defaultBorderBrush
+                                                              : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
+            field.Background = (isValid || !field.IsEnabled) ? _defaultBkgndBrush
+                                                             : (SolidColorBrush)Resources["ErrorFieldBackgroundBrush"];
         }
 
         private void ValidateAllFields(Dictionary<string, TextBox> fields, IEnumerable errors)
