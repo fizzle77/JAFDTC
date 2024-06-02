@@ -18,17 +18,16 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.F15E.Misc
 {
     /// <summary>
-    /// TODO: document
+    /// ISystem object to persist the miscellaneous system settings for the mudhen. this includes setup for the
+    /// bingo systems in the jet.
     /// </summary>
-    public class MiscSystem : BindableObject, ISystem
+    public class MiscSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:F15E:MISC";
 
@@ -75,11 +74,10 @@ namespace JAFDTC.Models.F15E.Misc
         /// form, false otherwise.
         /// </summary>
         [JsonIgnore]
-        public bool IsDefault => (IsBINGODefault);
+        public override bool IsDefault => (IsBINGODefault);
 
-        // TODO: technically, could be default with non-empty values...
         [JsonIgnore]
-        public bool IsBINGODefault => string.IsNullOrEmpty(Bingo);
+        public bool IsBINGODefault => (string.IsNullOrEmpty(Bingo) || (Bingo == ExplicitDefaults.Bingo));
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -108,7 +106,7 @@ namespace JAFDTC.Models.F15E.Misc
         /// <summary>
         /// reset the instance to defaults (by definition, field value of "" implies default).
         /// </summary>
-        public void Reset()
+        public override void Reset()
         {
             Bingo = "";
         }
