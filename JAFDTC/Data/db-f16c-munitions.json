@@ -9,7 +9,7 @@
     "MunitionInfo": {
       "ID": 0,
       "Profile": "0;0,1",
-      "EmplMode": "0;0,1,2,3,4",
+      "EmplMode": "0,1;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
       "RippleSpacing": "10",
@@ -32,7 +32,7 @@
     "MunitionInfo": {
       "ID": 1,
       "Profile": "0;0,1",
-      "EmplMode": "0;0,1,2,3,4",
+      "EmplMode": "0,1;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
       "RippleSpacing": "10",
@@ -84,7 +84,7 @@
     "MunitionInfo": {
       "ID": 4,
       "Profile": "0;0,1",
-      "EmplMode": "0;0,1,2,3,4",
+      "EmplMode": "0,1;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
       "RippleSpacing": "10",
@@ -107,7 +107,7 @@
     "MunitionInfo": {
       "ID": 5,
       "Profile": "0;0,1",
-      "EmplMode": "0;0,1,2,3,4",
+      "EmplMode": "0,1;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
       "RippleSpacing": "10",
@@ -193,7 +193,7 @@
     "MunitionInfo": {
       "ID": 10,
       "Profile": "0;1,2",
-      "EmplMode": "0;0,1,2,3,4",
+      "EmplMode": "0,1;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
       "RippleSpacing": "10",
@@ -216,7 +216,7 @@
     "MunitionInfo": {
       "ID": 11,
       "Profile": "0;1,2",
-      "EmplMode": "0;0,1,2,3,4",
+      "EmplMode": "0,1;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
       "RippleSpacing": "10",
@@ -239,7 +239,7 @@
     "MunitionInfo": {
       "ID": 12,
       "Profile": "0;0,1",
-      "EmplMode": "0;0,1,2,3,4",
+      "EmplMode": "0,1;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
       "RippleSpacing": "10",
@@ -262,7 +262,7 @@
     "MunitionInfo": {
       "ID": 13,
       "Profile": "0;0,1",
-      "EmplMode": "0;0,1,2,3,4",
+      "EmplMode": "0,1;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
       "RippleSpacing": "10",
@@ -285,7 +285,7 @@
     "MunitionInfo": {
       "ID": 14,
       "Profile": "0;0,1",
-      "EmplMode": "0;0,1,2,3,4",
+      "EmplMode": "0,1;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
       "RippleSpacing": "10",

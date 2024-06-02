@@ -147,14 +147,14 @@ namespace JAFDTC.UI.F16C
             }
         }
 
-        private static void CopyPropertyHonorDefaultComboVal(BindableObject next, BindableObject edit,
-                                                             BindableObject dflt, string propName)
+        private void CopyPropertyHonorDefaultComboVal(BindableObject next, BindableObject edit, BindableObject dflt,
+                                                      string propName)
         {
             if ((propName != null) && (next != null) && (edit != null) && (dflt != null))
             {
                 PropertyInfo prop = next.GetType().GetProperty(propName);
                 string editVal = (string)prop.GetValue(edit);
-                string dfltVal = GetDefaultComboItemFromSpec((string)prop.GetValue(dflt));
+                CrackComboBoxSpec((string)prop.GetValue(dflt), out string dfltVal, out _);
                 prop.SetValue(next, (!string.IsNullOrEmpty(editVal) && (editVal != dfltVal)) ? editVal : "");
             }
         }
@@ -210,6 +210,7 @@ namespace JAFDTC.UI.F16C
 
                 config.SMS.CleanUp();
                 config.Save(this, SystemTag);
+                UpdateUIFromEditState();
             }
         }
 
@@ -237,12 +238,22 @@ namespace JAFDTC.UI.F16C
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// return the the default item in a ComboBox described by a spec of the form "{default_tag};{tags_csv}".
+        /// crack a ComboBox item list spec of the form "{defaults_csv};{tags_csv}" where {tags_csv} is a csv list of
+        /// tags to populate the list and {defaults_csv} is a csv list of the default tags for each profile a munition
+        /// supports (a single entry implies the default tag is independent of profile). method returns the appropriate
+        /// default tag for the current profile from {defaults_csv} (null if unknown) along with the cracked list of
+        /// tags from {tags_csv} (empty list if unknown).
         /// </summary>
-        private static string GetDefaultComboItemFromSpec(string spec)
+        private void CrackComboBoxSpec(string spec, out string defaultTag, out List<string> tags)
         {
-            List<string> fields = (!string.IsNullOrEmpty(spec)) ? spec.Split(';').ToList() : null;
-            return fields?[0];
+            int profileID = int.Parse(EditProfileID);
+            if (string.IsNullOrEmpty(spec))
+                spec = ";";
+            List<string> fields = spec.Split(';').ToList();
+            List<string> defaults = fields[0].Split(',').ToList();
+
+            defaultTag = (defaults.Count > 0) ? defaults[(profileID < defaults.Count) ? profileID : 0] : "";
+            tags = fields[1].Split(',').ToList();
         }
 
         /// <summary>
@@ -272,22 +283,22 @@ namespace JAFDTC.UI.F16C
         }
 
         /// <summary>
-        /// set the items of a ComboBox from a specification of the form: "{default_tag};{tags_csv}" where {tags_csv}
-        /// is a csv list of strings for item tags and {default_tag} is the tag of the default item. if textMap is
-        /// non-null, the text for each item is given by textMap indexed by each tag from {tags_csv} (an integer);
-        /// otherwise the text and tag are the same. individual items are build with the buildItem lambda.
+        /// set the items of a ComboBox for the current profile from a specification of the form
+        /// "{defaults_csv};{tags_csv}" as parsed by CrackComboBoxSpec(). if textMap is specified, the tags are
+        /// assumed to be string-serialized integers suitable for indexing the textMap array to determine the
+        /// text to display in the item.
         /// </summary>
-        private static void SetComboItemsFromSpec(ComboBox combo, string spec, string[] textMap,
-                                                  Func<string, string, FrameworkElement> buildItem)
+        private void SetComboItemsFromSpec(ComboBox combo, string spec, string[] textMap,
+                                           Func<string, string, FrameworkElement> buildItem)
         {
             List<FrameworkElement> items = new();
             if (!string.IsNullOrEmpty(spec))
             {
-                List<string> fields = spec.Split(';').ToList();
-                List<string> tags = fields[1].Split(',').ToList();
+                CrackComboBoxSpec(spec, out string defaultTag, out List<string> tags);
+                Debug.Assert(!string.IsNullOrEmpty(defaultTag) && (tags.Count > 0));
                 for (int i = 0; i < tags.Count; i++)
                     items.Add(buildItem((textMap != null) ? textMap[int.Parse(tags[i])] : tags[i],
-                                        (tags[i] == fields[0]) ? $"+{tags[i]}" : tags[i]));
+                                        (tags[i] == defaultTag) ? $"+{tags[i]}" : tags[i]));
             }
             combo.ItemsSource = items;
         }
@@ -352,11 +363,12 @@ namespace JAFDTC.UI.F16C
         }
 
         /// <summary>
-        /// rebuild the core interface for a munition change. this involves setting up initial visibility on the
-        /// controls relevant to the selected munition. this function sets up munition-specific state that is *not*
-        /// dependent on specific settings (UpdateUICustom() handles state that depends on specific settings).
+        /// rebuild the core interface for a munition or profile change. this involves setting up initial visibility
+        /// on the controls relevant to the selected munition along with regenerating things like ComboBox content,
+        /// placeholder strings, etc. this function sets up munition-specific state that is *not* dependent on
+        /// specific settings (UpdateUICustom() handles state that depends on specific settings).
         /// </summary>
-        private void UpdateUIForMunitionChange(F16CMunition newMunition)
+        private void UpdateUIForCoreChange(F16CMunition newMunition)
         {
             StartUIRebuild();
 
@@ -522,7 +534,7 @@ namespace JAFDTC.UI.F16C
                     EditMuniID = (SMSSystem.Munitions)newSelectedMunition.ID;
                     EditProfileID = ((int)MunitionSettings.Profiles.PROF1).ToString();
                     CopyConfigToEditState();
-                    UpdateUIForMunitionChange(newSelectedMunition);
+                    UpdateUIForCoreChange(newSelectedMunition);
                 }
             }
 
@@ -549,6 +561,7 @@ namespace JAFDTC.UI.F16C
                     string tag = item.Tag.ToString();
                     EditProfileID = (tag[0] == '+') ? tag[1..] : tag;
                     CopyConfigToEditState();
+                    UpdateUIForCoreChange(_munitions[(int)EditMuniID]);
                     UpdateUIFromEditState();
                 }
             }

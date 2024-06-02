@@ -520,7 +520,7 @@ namespace JAFDTC.UI.Base
                 Utilities.SetCheckEnabledAndState(kv.Value, isEditable, isChecked);
             }
 
-            _uiPageBtnReset.IsEnabled = IsPageSateDefault;
+            _uiPageBtnReset.IsEnabled = !IsPageSateDefault;
 
             UpdateUICustom(isEditable);
         }
