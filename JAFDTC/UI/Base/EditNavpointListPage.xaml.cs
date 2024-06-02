@@ -19,7 +19,6 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
-using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
@@ -42,14 +41,14 @@ using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 namespace JAFDTC.UI.Base
 {
     /// <summary>
-    /// page to present a list of navigation points to the user and allow individual navpoints to be edited and
-    /// manipulated. this is a general-purpose class that is instatiated in combination with a IEditNavpointListHelper
-    /// class to provide airframe-specific specialization.
+    /// system editor page to present a list of navigation points to the user and allow individual navpoints to be
+    /// edited and manipulated. this is a general-purpose class that is instatiated in combination with a
+    /// IEditNavpointListHelper class to provide airframe-specific specialization.
     /// 
     /// using IEditNavpointListHelper, this class can support other navigation point systems that go beyond the basic
     /// functionality in NavpointInfoBase and NavpointSystemBase.
     /// </summary>
-    public sealed partial class EditNavpointListPage : Page
+    public sealed partial class EditNavpointListPage : SystemEditorPageBase
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -57,14 +56,19 @@ namespace JAFDTC.UI.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private ConfigEditorPageNavArgs NavArgs { get; set; }
+        // ---- overrides of base SystemEditorPage properties
+
+        protected override SystemBase SystemConfig => null;
+
+        protected override String SystemTag => PageHelper.SystemTag;
+
+        protected override string SystemName => PageHelper.NavptName;
+
+        protected override bool IsPageSateDefault => (EditNavpt.Count == 0);
+
+        // ---- internal properties
 
         private IEditNavpointListPageHelper PageHelper { get; set; }
-
-        // NOTE: changes to the Config object here may only occur through the marshall methods. bindings to and edits
-        // NOTE: by the ui are always directed at the EditNavpt property.
-        //
-        private IConfiguration Config { get; set; }
 
         private ObservableCollection<INavpointInfo> EditNavpt { get; set; }
 
@@ -76,11 +80,6 @@ namespace JAFDTC.UI.Base
 
         private int CaptureIndex { get; set; }
 
-        // ---- read-only properties
-
-        private readonly Dictionary<string, string> _configNameToUID;
-        private readonly List<string> _configNameList;
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction
@@ -89,12 +88,10 @@ namespace JAFDTC.UI.Base
 
         public EditNavpointListPage()
         {
-            InitializeComponent();
-
             EditNavpt = new ObservableCollection<INavpointInfo>();
 
-            _configNameToUID = new Dictionary<string, string>();
-            _configNameList = new List<string>();
+            InitializeComponent();
+            InitializeBase(null, null, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -104,26 +101,29 @@ namespace JAFDTC.UI.Base
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// marshall data from the configuration navpoint system to the local edit state.
+        /// Copy data from the system configuration object to the edit object the page interacts with.
         /// </summary>
-        private void CopyConfigToEdit()
+        protected override void CopyConfigToEditState()
         {
             IsMarshalling = true;
             PageHelper.CopyConfigToEdit(Config, EditNavpt);
             IsMarshalling = false;
+            UpdateUIFromEditState();
         }
 
         /// <summary>
-        /// marshall data from the local edit state to the configuration navpoint system.
+        /// Copy data from the edit object the page interacts with to the system configuration object and persist the
+        /// updated configuration to disk.
         /// </summary>
-        private void CopyEditToConfig(bool isPersist = false)
+        protected override void SaveEditStateToConfig()
         {
             IsMarshalling = true;
-            if (PageHelper.CopyEditToConfig(EditNavpt, Config) && isPersist)
+            if (PageHelper.CopyEditToConfig(EditNavpt, Config))
             {
                 Config.Save(this, PageHelper.SystemTag);
             }
             IsMarshalling = false;
+            UpdateUIFromEditState();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void EditNavpoint(INavpointInfo navpt)
         {
-            CopyEditToConfig(true);
+            SaveEditStateToConfig();
             NavArgs.BackButton.IsEnabled = false;
             this.Frame.Navigate(PageHelper.NavptEditorType, PageHelper.NavptEditorArg(this, Config, EditNavpt.IndexOf(navpt)),
                                 new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
@@ -149,29 +149,18 @@ namespace JAFDTC.UI.Base
         private void RenumberWaypoints()
         {
             for (int i = 0; i < EditNavpt.Count; i++)
-            {
                 EditNavpt[i].Number = StartingNavptNum + i;
-            }
-            CopyEditToConfig(true);
-        }
-
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private void RebuildLinkControls()
-        {
-            Utilities.RebuildLinkControls(Config, PageHelper.SystemTag, NavArgs.UIDtoConfigMap, uiPageBtnTxtLink, uiPageTxtLink);
+            SaveEditStateToConfig();
         }
 
         /// <summary>
         /// update the enable state on the ui elements based on the current settings. link controls must be set up
         /// vi RebuildLinkControls() prior to calling this function.
         /// </summary>
-        private void RebuildEnableState()
+        protected override void UpdateUICustom(bool isEditable)
         {
             JAFDTC.App curApp = Application.Current as JAFDTC.App;
 
-            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(PageHelper.SystemTag));
             bool isFull = EditNavpt.Count >= PageHelper.NavptMaxCount;
             bool isDCSListening = curApp.IsDCSAvailable && (curApp.DCSActiveAirframe == Config.Airframe);
 
@@ -186,21 +175,8 @@ namespace JAFDTC.UI.Base
             Utilities.SetEnableState(uiBarExport, isEditable && (EditNavpt.Count > 0));
             Utilities.SetEnableState(uiBarRenumber, isEditable && (EditNavpt.Count > 0));
 
-            Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
-
-            Utilities.SetEnableState(uiPageBtnResetAll, (EditNavpt.Count > 0));
-
             uiNavptListView.CanReorderItems = isEditable;
             uiNavptListView.ReorderMode = (isEditable) ? ListViewReorderMode.Enabled : ListViewReorderMode.Disabled;
-        }
-
-        /// <summary>
-        /// rebuild the state of controls on the page in response to a change in the configuration.
-        /// </summary>
-        private void RebuildInterfaceState()
-        {
-            RebuildLinkControls();
-            RebuildEnableState();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -208,41 +184,6 @@ namespace JAFDTC.UI.Base
         // ui interactions
         //
         // ------------------------------------------------------------------------------------------------------------
-
-        // ---- buttons -----------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// reset all button click: remove all steerpoints from the configuration and save it.
-        /// </summary>
-        private async void PageBtnResetAll_Click(object sender, RoutedEventArgs e)
-        {
-            if (await NavpointUIHelper.ResetDialog(Content.XamlRoot, PageHelper.NavptName))
-            {
-                Config.UnlinkSystem(PageHelper.SystemTag);
-                PageHelper.ResetSystem(Config);
-                Config.Save(this, PageHelper.SystemTag);
-                CopyConfigToEdit();
-            }
-        }
-
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
-        {
-            string selItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, PageHelper.SystemTag, _configNameList);
-            if (selItem == null)
-            {
-                Config.UnlinkSystem(PageHelper.SystemTag);
-                Config.Save(this);
-            }
-            else if (selItem.Length > 0)
-            {
-                Config.LinkSystemTo(PageHelper.SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selItem]]);
-                Config.Save(this);
-                CopyConfigToEdit();
-            }
-        }
 
         // ---- command bar / commands --------------------------------------------------------------------------------
 
@@ -252,9 +193,7 @@ namespace JAFDTC.UI.Base
         private void CmdOpen_Click(object sender, RoutedEventArgs args)
         {
             if (uiNavptListView.SelectedItem is INavpointInfo navpt)
-            {
                 EditNavpoint(navpt);
-            }
         }
 
         /// <summary>
@@ -264,8 +203,7 @@ namespace JAFDTC.UI.Base
         {
             PageHelper.AddNavpoint(Config);
             Config.Save(this, PageHelper.SystemTag);
-            CopyConfigToEdit();
-            RebuildInterfaceState();
+            CopyConfigToEditState();
         }
 
         /// <summary>
@@ -290,8 +228,7 @@ namespace JAFDTC.UI.Base
             {
                 PageHelper.PasteNavpoints(Config, cboard.Data);
                 Config.Save(this, PageHelper.SystemTag);
-                CopyConfigToEdit();
-                RebuildInterfaceState();
+                CopyConfigToEditState();
             }
         }
 
@@ -308,16 +245,11 @@ namespace JAFDTC.UI.Base
             {
                 List<INavpointInfo> deleteList = new();
                 foreach (INavpointInfo navpt in uiNavptListView.SelectedItems.Cast<INavpointInfo>())
-                {
                     deleteList.Add(navpt);
-                }
                 uiNavptListView.SelectedItems.Clear();
                 foreach (INavpointInfo navpt in deleteList)
-                {
                     EditNavpt.Remove(navpt);
-                }
-                CopyEditToConfig(true);
-                RebuildInterfaceState();
+                SaveEditStateToConfig();
             }
         }
 
@@ -333,7 +265,7 @@ namespace JAFDTC.UI.Base
             {
                 StartingNavptNum = newStartNum;
                 RenumberWaypoints();
-                RebuildInterfaceState();
+                UpdateUIFromEditState();
             }
         }
 
@@ -347,19 +279,14 @@ namespace JAFDTC.UI.Base
             {
                 ContentDialogResult result = await Utilities.CaptureActionDialog(Content.XamlRoot, PageHelper.NavptName);
                 if (result != ContentDialogResult.Primary)
-                {
                     CaptureIndex = (uiNavptListView.SelectedIndex >= 0) ? uiNavptListView.SelectedIndex : 0;
-                }
             }
 
-            CopyEditToConfig(true);
+            SaveEditStateToConfig();
 
             WyptCaptureDataRx.Instance.WyptCaptureDataReceived += CmdCapture_WyptCaptureDataReceived;
             await Utilities.CaptureMultipleDialog(Content.XamlRoot, PageHelper.NavptName);
             WyptCaptureDataRx.Instance.WyptCaptureDataReceived -= CmdCapture_WyptCaptureDataReceived;
-
-            CopyConfigToEdit();
-            RebuildInterfaceState();
         }
 
         /// <summary>
@@ -382,8 +309,7 @@ namespace JAFDTC.UI.Base
                                               PageHelper.NavptSystem(Config), PageHelper.NavptName))
             {
                 Config.Save(this, PageHelper.SystemTag);
-                CopyConfigToEdit();
-                RebuildInterfaceState();
+                CopyConfigToEditState();
             }
         }
 
@@ -404,7 +330,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void NavptList_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
-            RebuildInterfaceState();
+            UpdateUIFromEditState();
         }
 
         /// <summary>
@@ -417,7 +343,7 @@ namespace JAFDTC.UI.Base
             if (!uiNavptListView.SelectedItems.Contains(navpt))
             {
                 listView.SelectedItem = navpt;
-                RebuildInterfaceState();
+                UpdateUIFromEditState();
             }
 
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(PageHelper.SystemTag));
@@ -446,9 +372,7 @@ namespace JAFDTC.UI.Base
         private void NavptList_DoubleTapped(object sender, RoutedEventArgs args)
         {
             if (uiNavptListView.SelectedItems.Count > 0)
-            {
                 EditNavpoint((INavpointInfo)uiNavptListView.SelectedItems[0]);
-            }
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -464,7 +388,7 @@ namespace JAFDTC.UI.Base
         {
             ClipboardData cboard = await General.ClipboardDataAsync();
             IsClipboardValid = ((cboard != null) && (cboard.SystemTag.StartsWith(PageHelper.NavptListTag)));
-            RebuildInterfaceState();
+            UpdateUIFromEditState();
         }
 
         /// <summary>
@@ -477,9 +401,7 @@ namespace JAFDTC.UI.Base
             //
             ObservableCollection<INavpointInfo> list = (ObservableCollection<INavpointInfo>)sender;
             if (!IsMarshalling && (list.Count > 0))
-            {
                 RenumberWaypoints();
-            }
         }
 
         /// <summary>
@@ -490,7 +412,7 @@ namespace JAFDTC.UI.Base
             if ((args.WindowActivationState == WindowActivationState.PointerActivated) ||
                 (args.WindowActivationState == WindowActivationState.CodeActivated))
             {
-                RebuildInterfaceState();
+                UpdateUIFromEditState();
             }
         }
 
@@ -501,45 +423,28 @@ namespace JAFDTC.UI.Base
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// on configuration saved, pull changes from the config if the save was done by someone else. rebuild the
-        /// interface state to align with the latest save (assuming we go here through a CopyEditToConfig).
-        /// </summary>
-        private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
-        {
-            RebuildInterfaceState();
-        }
-
-        /// <summary>
         /// on navigating to this page, set up our internal and ui state based on the configuration we are editing.
         ///
         /// we do not use page caching here as we're just tracking the configuration state.
         /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
-            NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
+            base.OnNavigatedTo(args);
 
             PageHelper = (IEditNavpointListPageHelper)Activator.CreateInstance(NavArgs.EditorHelperType);
 
             PageHelper.SetupUserInterface(NavArgs.Config, uiNavptListView);
 
-            Config = NavArgs.Config;
-            CopyConfigToEdit();
+            CopyConfigToEditState();
             StartingNavptNum = (EditNavpt.Count > 0) ? EditNavpt[0].Number : 1;
 
             NavArgs.BackButton.IsEnabled = true;
 
-            Config.ConfigurationSaved += ConfigurationSavedHandler;
             EditNavpt.CollectionChanged += CollectionChangedHandler;
             Clipboard.ContentChanged += ClipboardChangedHandler;
             ((Application.Current as JAFDTC.App)?.Window).Activated += WindowActivatedHandler;
 
-            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, PageHelper.SystemTag,
-                                           _configNameList, _configNameToUID);
-
             ClipboardChangedHandler(null, null);
-            RebuildInterfaceState();
-
-            base.OnNavigatedTo(args);
         }
 
         /// <summary>
@@ -548,13 +453,11 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected override void OnNavigatedFrom(NavigationEventArgs args)
         {
-            Config.ConfigurationSaved -= ConfigurationSavedHandler;
             EditNavpt.CollectionChanged -= CollectionChangedHandler;
             Clipboard.ContentChanged -= ClipboardChangedHandler;
             ((Application.Current as JAFDTC.App)?.Window).Activated -= WindowActivatedHandler;
 
-            CopyEditToConfig(true);
-            RebuildInterfaceState();
+            SaveEditStateToConfig();
 
             base.OnNavigatedFrom(args);
         }
