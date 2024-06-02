@@ -126,6 +126,7 @@ namespace JAFDTC.Models.F16C
             new MFDBuilder(_cfg, _dcsCmds, sb).Build();
             new HARMBuilder(_cfg, _dcsCmds, sb).Build();
             new DLNKBuilder(_cfg, _dcsCmds, sb).Build();
+            new SMSBuilder(_cfg, _dcsCmds, sb).Build();
             new STPTBuilder(_cfg, _dcsCmds, sb).Build();
         }
 

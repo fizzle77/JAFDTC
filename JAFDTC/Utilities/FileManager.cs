@@ -22,6 +22,7 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.A10C;
+using JAFDTC.Models.F16C;
 using JAFDTC.Models.DCS;
 using System;
 using System.Collections.Generic;
@@ -489,16 +490,30 @@ namespace JAFDTC.Utilities
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // A10C munitions database
+        // A-10C munitions database
         //
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// return the A10C munitions database that provides information on weapons for the hawg.
+        /// return the A-10C munitions database that provides information on weapons for the hawg.
         /// </summary>
         public static List<A10CMunition> LoadA10Munitions()
         {
             return LoadSystemDbase<A10CMunition>("db-a10-munitions.json");
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // F-16C munitions database
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// return the F-16C munitions database that provides information on weapons for the viper.
+        /// </summary>
+        public static List<F16CMunition> LoadF16CMunitions()
+        {
+            return LoadSystemDbase<F16CMunition>("db-f16c-munitions.json");
         }
     }
 }

@@ -26,6 +26,7 @@ using JAFDTC.Models.F16C.HTS;
 using JAFDTC.Models.F16C.MFD;
 using JAFDTC.Models.F16C.Misc;
 using JAFDTC.Models.F16C.Radio;
+using JAFDTC.Models.F16C.SMS;
 using JAFDTC.Models.F16C.STPT;
 using JAFDTC.UI.App;
 using Microsoft.UI.Xaml;
@@ -46,6 +47,7 @@ namespace JAFDTC.UI.F16C
         public const string MFD = "\xE950";
         public const string MISC = "\xE8B7";
         public const string RADIO = "\xE704";
+        public const string SMS = "\xEBD2";
         public const string STPT = "\xE707";
         public const string PILOT_DB = "\xE77B";
     }
@@ -61,6 +63,7 @@ namespace JAFDTC.UI.F16C
                 F16CEditSteerpointListPage.PageInfo,
                 F16CEditMFDPage.PageInfo,
                 F16CEditRadioPageHelper.PageInfo,
+                F16CEditSMSPage.PageInfo,
                 F16CEditCMDSPage.PageInfo,
                 F16CEditHARMPage.PageInfo,
                 F16CEditHTSPage.PageInfo,
@@ -90,6 +93,7 @@ namespace JAFDTC.UI.F16C
                 MFDSystem.SystemTag => ((F16CConfiguration)config).MFD,
                 MiscSystem.SystemTag => ((F16CConfiguration)config).Misc,
                 RadioSystem.SystemTag => ((F16CConfiguration)config).Radio,
+                SMSSystem.SystemTag => ((F16CConfiguration)config).SMS,
                 STPTSystem.SystemTag => ((F16CConfiguration)config).STPT,
                 _ => null,
             };

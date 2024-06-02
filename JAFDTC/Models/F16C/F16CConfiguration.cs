@@ -25,6 +25,7 @@ using JAFDTC.Models.F16C.HTS;
 using JAFDTC.Models.F16C.MFD;
 using JAFDTC.Models.F16C.Misc;
 using JAFDTC.Models.F16C.Radio;
+using JAFDTC.Models.F16C.SMS;
 using JAFDTC.Models.F16C.STPT;
 using JAFDTC.UI.F16C;
 using JAFDTC.Utilities;
@@ -65,6 +66,8 @@ namespace JAFDTC.Models.F16C
 
         public RadioSystem Radio { get; set; }
 
+        public SMSSystem SMS { get; set; }
+
         public STPTSystem STPT { get; set; }
 
         [JsonIgnore]
@@ -86,6 +89,7 @@ namespace JAFDTC.Models.F16C
             MFD = new MFDSystem();
             Misc = new MiscSystem();
             Radio = new RadioSystem();
+            SMS = new SMSSystem();
             STPT = new STPTSystem();
             ConfigurationUpdated();
         }
@@ -106,6 +110,7 @@ namespace JAFDTC.Models.F16C
                 MFD = (MFDSystem)MFD.Clone(),
                 Misc = (MiscSystem)Misc.Clone(),
                 Radio = (RadioSystem)Radio.Clone(),
+                SMS = (SMSSystem)SMS.Clone(),
                 STPT = (STPTSystem)STPT.Clone(),
             };
             clone.ResetUID();
@@ -125,6 +130,7 @@ namespace JAFDTC.Models.F16C
                 case MFDSystem.SystemTag: MFD = otherViper.MFD.Clone() as MFDSystem; break;
                 case MiscSystem.SystemTag: Misc = otherViper.Misc.Clone() as MiscSystem; break;
                 case RadioSystem.SystemTag: Radio = otherViper.Radio.Clone() as RadioSystem; break;
+                case SMSSystem.SystemTag: SMS = otherViper.SMS.Clone() as SMSSystem; break;
                 case STPTSystem.SystemTag: STPT = otherViper.STPT.Clone() as STPTSystem; break;
                 default: break;
             }
@@ -163,6 +169,7 @@ namespace JAFDTC.Models.F16C
                 MFDSystem.SystemTag  => JsonSerializer.Serialize(MFD, Configuration.JsonOptions),
                 MiscSystem.SystemTag => JsonSerializer.Serialize(Misc, Configuration.JsonOptions),
                 RadioSystem.SystemTag => JsonSerializer.Serialize(Radio, Configuration.JsonOptions),
+                SMSSystem.SystemTag => JsonSerializer.Serialize(SMS, Configuration.JsonOptions),
                 STPTSystem.SystemTag => JsonSerializer.Serialize(STPT, Configuration.JsonOptions),
                 _                    => null
             };
@@ -177,6 +184,7 @@ namespace JAFDTC.Models.F16C
             MFD   ??= new MFDSystem();
             Misc  ??= new MiscSystem();
             Radio ??= new RadioSystem();
+            SMS   ??= new SMSSystem();
             STPT  ??= new STPTSystem();
 
             // TODO: if the version number is older than current, may need to update object
@@ -197,6 +205,7 @@ namespace JAFDTC.Models.F16C
                                               (cboardTag == MFDSystem.SystemTag) ||
                                               (cboardTag == MiscSystem.SystemTag) ||
                                               (cboardTag == RadioSystem.SystemTag) ||
+                                              (cboardTag == SMSSystem.SystemTag) ||
                                               (cboardTag == STPTSystem.SystemTag) ||
                                               (cboardTag == STPTSystem.STPTListTag)))));
         }
@@ -216,6 +225,7 @@ namespace JAFDTC.Models.F16C
                     case MFDSystem.SystemTag: MFD = JsonSerializer.Deserialize<MFDSystem>(json); break;
                     case MiscSystem.SystemTag: Misc = JsonSerializer.Deserialize<MiscSystem>(json); break;
                     case RadioSystem.SystemTag: Radio = JsonSerializer.Deserialize<RadioSystem>(json); break;
+                    case SMSSystem.SystemTag: SMS = JsonSerializer.Deserialize<SMSSystem>(json); break;
                     case STPTSystem.SystemTag: STPT = JsonSerializer.Deserialize<STPTSystem>(json); break;
                     case STPTSystem.STPTListTag: STPT.ImportSerializedNavpoints(json, false); break;
                     default: isHandled = false;  break;

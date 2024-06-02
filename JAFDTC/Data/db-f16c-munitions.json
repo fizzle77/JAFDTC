@@ -1,0 +1,353 @@
+﻿[
+  {
+    "ID": 0,
+    "LabelUI": "CBU-87",
+    "DescrUI": "CBU-87 Cluster Bomb with 202 BLU-97B (CEM) Submunitions",
+    "LabelSMS": [ "CB87B" ],
+    "Image": "cbu-87-105.png",
+    "CntlClass": "2",
+    "MunitionInfo": {
+      "ID": 0,
+      "Profile": "0;0,1",
+      "EmplMode": "0,1;0,1,2,3,4",
+      "ReleaseMode": "0;0,1",
+      "RipplePulse": "1",
+      "RippleSpacing": "10",
+      "FuzeMode": "0;0,1,2",
+      "ArmDelay": "0.62",
+      "BurstAlt": "300",
+      "ReleaseAng": "45",
+      "LADDPR": "25000",
+      "LADDToF": "28.00",
+      "LADDMRA": "1100"
+    }
+  },
+  {
+    "ID": 1,
+    "LabelUI": "CBU-97",
+    "DescrUI": "CBU-97 Cluster Bomb with 10 BLU-108 (SFW) Submunitions",
+    "LabelSMS": [ "CB97B" ],
+    "Image": "cbu-87-105.png",
+    "CntlClass": "2",
+    "MunitionInfo": {
+      "ID": 1,
+      "Profile": "0;0,1",
+      "EmplMode": "0,1;0,1,2,3,4",
+      "ReleaseMode": "0;0,1",
+      "RipplePulse": "1",
+      "RippleSpacing": "10",
+      "FuzeMode": "0;0,1,2",
+      "ArmDelay": "0.62",
+      "BurstAlt": "300",
+      "ReleaseAng": "45",
+      "LADDPR": "25000",
+      "LADDToF": "28.00",
+      "LADDMRA": "1100"
+    }
+  },
+  {
+    "ID": 2,
+    "LabelUI": "CBU-103",
+    "DescrUI": "CBU-103 INS/GPS-Guided Cluster Bomb with 202 BLU-97B (CEM) Submunitions",
+    "LabelSMS": [ "CB103" ],
+    "Image": "cbu-87-105.png",
+    "MunitionInfo": {
+      "ID": 2,
+      "EmplMode": "5;5,6",
+      "ReleaseMode": "2;2,3,4",
+      "RippleSpacing": "1000",
+      "BurstAlt": "300",
+      "Spin": "1000;0,500,1000,1500,2000,2500"
+    }
+  },
+  {
+    "ID": 3,
+    "LabelUI": "CBU-105",
+    "DescrUI": "CBU-105 INS/GPS-Guided Cluster Bomb with 10 BLU-108 (SFW) Submunitions",
+    "LabelSMS": [ "CB105" ],
+    "Image": "cbu-87-105.png",
+    "MunitionInfo": {
+      "ID": 3,
+      "EmplMode": "5;5,6",
+      "ReleaseMode": "2;2,3,4",
+      "RippleSpacing": "1000",
+      "BurstAlt": "300"
+    }
+  },
+  {
+    "ID": 4,
+    "LabelUI": "GBU-10",
+    "DescrUI": "GBU-10 Paveway II Laser-Guided bomb, 2000lb",
+    "LabelSMS": [ "GB10C" ],
+    "Image": "gbu-10-12.png",
+    "CntlClass": "1",
+    "MunitionInfo": {
+      "ID": 4,
+      "Profile": "0;0,1",
+      "EmplMode": "0,1;0,1,2,3,4",
+      "ReleaseMode": "0;0,1",
+      "RipplePulse": "1",
+      "RippleSpacing": "10",
+      "FuzeMode": "0;0,1,2",
+      "ArmDelay": "2.00",
+      "ArmDelay2": "4.00",
+      "ReleaseAng": "45",
+      "LADDPR": "25000",
+      "LADDToF": "28.00",
+      "LADDMRA": "1100"
+    }
+  },
+  {
+    "ID": 5,
+    "LabelUI": "GBU-12",
+    "DescrUI": "GBU-12 Paveway II Laser-Guided bomb, 500lb",
+    "LabelSMS": [ "GB12" ],
+    "Image": "gbu-10-12.png",
+    "CntlClass": "1",
+    "MunitionInfo": {
+      "ID": 5,
+      "Profile": "0;0,1",
+      "EmplMode": "0,1;0,1,2,3,4",
+      "ReleaseMode": "0;0,1",
+      "RipplePulse": "1",
+      "RippleSpacing": "10",
+      "FuzeMode": "0;0,1,2",
+      "ArmDelay": "2.00",
+      "ArmDelay2": "4.00",
+      "ReleaseAng": "45",
+      "LADDPR": "25000",
+      "LADDToF": "28.00",
+      "LADDMRA": "1100"
+    }
+  },
+  {
+    "ID": 6,
+    "LabelUI": "GBU-24",
+    "DescrUI": "GBU-24 Paveway III Laser-Guided bomb, 2000lb",
+    "LabelSMS": [ "GB24A" ],
+    "Image": "gbu-24.png",
+    "MunitionInfo": {
+      "ID": 6,
+      "Profile": "0;0,1,2,3",
+      "EmplMode": "5;5,6",
+      "ReleaseMode": "7;7,8,9,10,11",
+      "RippleDelayMode": "True",
+      "FuzeMode": "0;0,1,2",
+      "ArmDelayMode": "4;4,5,6,7,8,10,14,21",
+      "CueRange": "4.000",
+      "ReleaseAng": "-45"
+    }
+  },
+  {
+    "ID": 7,
+    "LabelUI": "GBU-31 (1/B)",
+    "DescrUI": "GBU-31(V)1/B JDAM INS/GPS-Guided Bomb, 2000lb",
+    "LabelSMS": [ "GB31A" ],
+    "Image": "gbu-31.png",
+    "MunitionInfo": {
+      "ID": 7,
+      "EmplMode": "5;5,6",
+      "ArmDelayMode": "4.5;4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,14,21,25",
+      "ImpactAng": "60",
+      "ImpactAzi": "0",
+      "ImpactVel": "700"
+    }
+  },
+  {
+    "ID": 8,
+    "LabelUI": "GBU-31 (3/B)",
+    "DescrUI": "GBU-31(V)3/B JDAM INS/GPS-Guided Penetrator Bomb, 2000lb",
+    "LabelSMS": [ "GB31B" ],
+    "Image": "gbu-31.png",
+    "MunitionInfo": {
+      "ID": 8,
+      "EmplMode": "5;5,6",
+      "ArmDelayMode": "4;4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,14,21,25",
+      "ImpactAng": "60",
+      "ImpactAzi": "0",
+      "ImpactVel": "700"
+    }
+  },
+  {
+    "ID": 9,
+    "LabelUI": "GBU-38",
+    "DescrUI": "GBU-38(V)1/B JDAM INS/GPS-Guided Bomb, 500lb",
+    "LabelSMS": [ "GB38" ],
+    "Image": "gbu-38.png",
+    "MunitionInfo": {
+      "ID": 9,
+      "EmplMode": "5;5,6",
+      "ArmDelayMode": "4;4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,14,21,25",
+      "ImpactAng": "60",
+      "ImpactAzi": "0",
+      "ImpactVel": "700"
+    }
+  },
+  {
+    "ID": 10,
+    "LabelUI": "Mk-82 LD",
+    "DescrUI": "Mk-82 Low Drag General Purpose Bomb, 500lb",
+    "LabelSMS": [ "M82" ],
+    "Image": "mk-82.png",
+    "CntlClass": "1",
+    "MunitionInfo": {
+      "ID": 10,
+      "Profile": "0;1,2",
+      "EmplMode": "0,1;0,1,2,3,4",
+      "ReleaseMode": "0;0,1",
+      "RipplePulse": "1",
+      "RippleSpacing": "10",
+      "FuzeMode": "0;0,1,2",
+      "ArmDelay": "2.00",
+      "ArmDelay2": "4.00",
+      "ReleaseAng": "45",
+      "LADDPR": "25000",
+      "LADDToF": "28.00",
+      "LADDMRA": "1100"
+    }
+  },
+  {
+    "ID": 11,
+    "LabelUI": "Mk-82 HD",
+    "DescrUI": "Mk-82 with Mk15 Snakeye High Drag General Purpose Bomb, 500lb",
+    "LabelSMS": [ "M82S" ],
+    "Image": "mk-82se.png",
+    "CntlClass": "1",
+    "MunitionInfo": {
+      "ID": 11,
+      "Profile": "0;1,2",
+      "EmplMode": "0,1;0,1,2,3,4",
+      "ReleaseMode": "0;0,1",
+      "RipplePulse": "1",
+      "RippleSpacing": "10",
+      "FuzeMode": "3;3,4,5",
+      "ArmDelay": "2.00",
+      "ArmDelay2": "4.00",
+      "ReleaseAng": "45",
+      "LADDPR": "25000",
+      "LADDToF": "28.00",
+      "LADDMRA": "1100"
+    }
+  },
+  {
+    "ID": 12,
+    "LabelUI": "Mk-82 HD",
+    "DescrUI": "Mk-82 with BSU-49 High Drag General Purpose Bomb, 500lb",
+    "LabelSMS": [ "B49" ],
+    "Image": "mk-82ab.png",
+    "CntlClass": "1",
+    "MunitionInfo": {
+      "ID": 12,
+      "Profile": "0;0,1",
+      "EmplMode": "0,1;0,1,2,3,4",
+      "ReleaseMode": "0;0,1",
+      "RipplePulse": "1",
+      "RippleSpacing": "10",
+      "FuzeMode": "3;3,4,5",
+      "ArmDelay": "2.00",
+      "ArmDelay2": "4.00",
+      "ReleaseAng": "45",
+      "LADDPR": "25000",
+      "LADDToF": "28.00",
+      "LADDMRA": "1100"
+    }
+  },
+  {
+    "ID": 13,
+    "LabelUI": "Mk-84 LD",
+    "DescrUI": "Mk-84 Low Drag General Purpose Bomb, 2000lb",
+    "LabelSMS": [ "M84" ],
+    "Image": "mk-84.png",
+    "CntlClass": "1",
+    "MunitionInfo": {
+      "ID": 13,
+      "Profile": "0;0,1",
+      "EmplMode": "0,1;0,1,2,3,4",
+      "ReleaseMode": "0;0,1",
+      "RipplePulse": "1",
+      "RippleSpacing": "10",
+      "FuzeMode": "0;0,1,2",
+      "ArmDelay": "2.00",
+      "ArmDelay2": "4.00",
+      "ReleaseAng": "45",
+      "LADDPR": "25000",
+      "LADDToF": "28.00",
+      "LADDMRA": "1100"
+    }
+  },
+  {
+    "ID": 14,
+    "LabelUI": "Mk-84 HD",
+    "DescrUI": "Mk-84 with BSU-50 High Drag General Purpose Bomb, 2000lb",
+    "LabelSMS": [ "B50", "BD50" ],
+    "Image": "mk-84hd.png",
+    "CntlClass": "1",
+    "MunitionInfo": {
+      "ID": 14,
+      "Profile": "0;0,1",
+      "EmplMode": "0,1;0,1,2,3,4",
+      "ReleaseMode": "0;0,1",
+      "RipplePulse": "1",
+      "RippleSpacing": "10",
+      "FuzeMode": "3;3,4,5",
+      "ArmDelay": "2.00",
+      "ArmDelay2": "4.00",
+      "ReleaseAng": "45",
+      "LADDPR": "25000",
+      "LADDToF": "28.00",
+      "LADDMRA": "1100"
+    }
+  },
+  {
+    "ID": 15,
+    "LabelUI": "AGM-65D",
+    "DescrUI": "AGM-65D Maverick IR-guided Missile, 125lb Warhead",
+    "LabelSMS": [ "A65D" ],
+    "Image": "agm-65d.png",
+    "MunitionInfo": {
+      "ID": 15,
+      "EmplMode": "5;5,6,7",
+      "ReleaseMode": "5;5,6",
+      "AutoPwrMode": "True"
+    }
+  },
+  {
+    "ID": 16,
+    "LabelUI": "AGM-65G",
+    "DescrUI": "AGM-65G Maverick IR-guided AG Missile, 300lb Warhead",
+    "LabelSMS": [ "A65G" ],
+    "Image": "agm-65g.png",
+    "MunitionInfo": {
+      "ID": 16,
+      "EmplMode": "5;5,6,7",
+      "ReleaseMode": "5;5,6",
+      "AutoPwrMode": "True"
+    }
+  },
+  {
+    "ID": 17,
+    "LabelUI": "AGM-65H",
+    "DescrUI": "AGM-65H Maverick TV-guided AG Missile, 125lb Warhead",
+    "LabelSMS": [ "A65H" ],
+    "Image": "agm-65h.png",
+    "MunitionInfo": {
+      "ID": 17,
+      "EmplMode": "5;5,6,7",
+      "ReleaseMode": "5;5,6",
+      "AutoPwrMode": "True"
+    }
+  },
+  {
+    "ID": 18,
+    "LabelUI": "AGM-65K",
+    "DescrUI": "AGM-65K Maverick TV-guided AG Missile, 300lb Warhead",
+    "LabelSMS": [ "A65K" ],
+    "Image": "agm-65k.png",
+    "MunitionInfo": {
+      "ID": 18,
+      "EmplMode": "5;5,6,7",
+      "ReleaseMode": "5;5,6",
+      "AutoPwrMode": "True"
+    }
+  }
+]
