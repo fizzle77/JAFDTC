@@ -3,7 +3,7 @@
 // MiscSystem.cs -- f-16c miscellaneous system
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,26 +18,24 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using static JAFDTC.Models.F15E.UFC.UFCSystem;
 
 namespace JAFDTC.Models.F16C.Misc
 {
     /// <summary>
-    /// tacan modes.
+    /// miscellaneous system, tacan modes.
     /// </summary>
     public enum TACANModes
     {
-        REC = 0,
-        TR = 1,
-        AA_TR = 2
+        REC = 0,                // receive only
+        TR = 1,                 // transmit/receive
+        AA_TR = 2               // air-to-air transmit/receive
     }
 
     /// <summary>
-    /// tacan bands.
+    /// miscellaneous system, tacan bands.
     /// </summary>
     public enum TACANBands
     {
@@ -46,19 +44,22 @@ namespace JAFDTC.Models.F16C.Misc
     }
 
     /// <summary>
-    /// declutter levels for the hmcs.
+    /// miscellaneous system, declutter levels for the jhmcs.
     /// </summary>
     public enum HMCSDeclutterLevels
     {
-        LVL1 = 0,
+        LVL1 = 0,               // least declutter
         LVL2 = 1,
-        LVL3 = 2
+        LVL3 = 2                // most declutter
     }
 
+    // ================================================================================================================
+
     /// <summary>
-    /// TODO: document
+    /// ISystem object to persist the miscellaneous system settings for the viper. this includes setup for the
+    /// tacan, bingo, alow, bullseye, ils, laser, and jhmcs systems in the jet.
     /// </summary>
-    public class MiscSystem : BindableObject, ISystem
+    public class MiscSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:F16C:MISC";
 
@@ -302,7 +303,7 @@ namespace JAFDTC.Models.F16C.Misc
             }
         }
 
-        private string _hmcsDeclutterLvl;                       // integer [0, 2]
+        private string _hmcsDeclutterLvl;                       // integer [0, 2], HMCSDeclutterLevels
         public string HMCSDeclutterLvl
         {
             get => _hmcsDeclutterLvl;
@@ -352,7 +353,7 @@ namespace JAFDTC.Models.F16C.Misc
         // form, false otherwise.
         //
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get => (IsBINGODefault && IsBULLDefault && IsALOWDefault && IsLaserDefault && IsTACANDefault &&
                     IsILSDefault && IsHMCSDefault);
@@ -361,61 +362,54 @@ namespace JAFDTC.Models.F16C.Misc
         [JsonIgnore]
         public bool IsBINGODefault
         {
-            // TODO: technically, could be default with non-empty values...
-            get => string.IsNullOrEmpty(Bingo);
+            get => (string.IsNullOrEmpty(Bingo) || (Bingo == ExplicitDefaults.Bingo));
         }
 
         [JsonIgnore]
         public bool IsBULLDefault
         {
-            // TODO: technically, could be default with non-empty values...
-            get => (string.IsNullOrEmpty(BullseyeWP) &&
-                    string.IsNullOrEmpty(BullseyeMode));
+            get => ((string.IsNullOrEmpty(BullseyeWP) || (BullseyeWP == ExplicitDefaults.BullseyeWP)) &&
+                    (string.IsNullOrEmpty(BullseyeMode) || (BullseyeMode == ExplicitDefaults.BullseyeMode)));
         }
 
         [JsonIgnore]
         public bool IsALOWDefault
         {
-            // TODO: technically, could be default with non-empty values...
-            get => (string.IsNullOrEmpty(ALOWCARAALOW) &&
-                    string.IsNullOrEmpty(ALOWMSLFloor));
+            get => ((string.IsNullOrEmpty(ALOWCARAALOW) || (ALOWCARAALOW == ExplicitDefaults.ALOWCARAALOW)) &&
+                    (string.IsNullOrEmpty(ALOWMSLFloor)) || (ALOWMSLFloor == ExplicitDefaults.ALOWMSLFloor));
         }
 
         [JsonIgnore]
         public bool IsLaserDefault
         {
-            // TODO: technically, could be default with non-empty values...
-            get => (string.IsNullOrEmpty(LaserTGPCode) &&
-                    string.IsNullOrEmpty(LaserLSTCode) &&
-                    string.IsNullOrEmpty(LaserStartTime));
+            get => ((string.IsNullOrEmpty(LaserTGPCode) || (LaserTGPCode == ExplicitDefaults.LaserTGPCode)) &&
+                    (string.IsNullOrEmpty(LaserLSTCode) || (LaserLSTCode == ExplicitDefaults.LaserLSTCode)) &&
+                    (string.IsNullOrEmpty(LaserStartTime) || (LaserStartTime == ExplicitDefaults.LaserStartTime)));
         }
 
         [JsonIgnore]
         public bool IsTACANDefault
         {
-            // TODO: technically, could be default with non-empty values...
-            get => (string.IsNullOrEmpty(TACANChannel) &&
-                    string.IsNullOrEmpty(TACANBand) &&
-                    string.IsNullOrEmpty(TACANMode));
+            get => ((string.IsNullOrEmpty(TACANChannel) || (TACANChannel == ExplicitDefaults.TACANChannel)) &&
+                    (string.IsNullOrEmpty(TACANBand) || (TACANBand == ExplicitDefaults.TACANBand)) &&
+                    (string.IsNullOrEmpty(TACANMode) || (TACANMode == ExplicitDefaults.TACANMode)));
         }
 
         [JsonIgnore]
         public bool IsILSDefault
         {
-            // TODO: technically, could be default with non-empty values...
-            get => (string.IsNullOrEmpty(ILSFrequency) &&
-                    string.IsNullOrEmpty(ILSCourse));
+            get => ((string.IsNullOrEmpty(ILSFrequency) || (ILSFrequency == ExplicitDefaults.ILSFrequency)) &&
+                    (string.IsNullOrEmpty(ILSCourse) || (ILSCourse == ExplicitDefaults.ILSCourse)));
         }
 
         [JsonIgnore]
         public bool IsHMCSDefault
         {
-            // TODO: technically, could be default with non-empty values...
-            get => (string.IsNullOrEmpty(HMCSBlankHUD) &&
-                    string.IsNullOrEmpty(HMCSBlankCockpit) &&
-                    string.IsNullOrEmpty(HMCSDisplayRWR) &&
-                    string.IsNullOrEmpty(HMCSDeclutterLvl) &&
-                    string.IsNullOrEmpty(HMCSIntensity));
+            get => ((string.IsNullOrEmpty(HMCSBlankHUD) || (HMCSBlankHUD == ExplicitDefaults.HMCSBlankHUD)) &&
+                    (string.IsNullOrEmpty(HMCSBlankCockpit) || (HMCSBlankCockpit == ExplicitDefaults.HMCSBlankCockpit)) &&
+                    (string.IsNullOrEmpty(HMCSDisplayRWR) || (HMCSDisplayRWR == ExplicitDefaults.HMCSDisplayRWR)) &&
+                    (string.IsNullOrEmpty(HMCSDeclutterLvl) || (HMCSDeclutterLvl == ExplicitDefaults.HMCSDeclutterLvl)) &&
+                    (string.IsNullOrEmpty(HMCSIntensity) || (HMCSIntensity == ExplicitDefaults.HMCSIntensity)));
         }
 
         // ---- following accessors get the current value (default or non-default) for various properties
@@ -497,7 +491,7 @@ namespace JAFDTC.Models.F16C.Misc
 
         // reset the instance to defaults (by definition, field value of "" implies default).
         //
-        public void Reset()
+        public override void Reset()
         {
             Bingo = "";
             BullseyeWP = "";
