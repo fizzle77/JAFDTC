@@ -43,7 +43,7 @@ namespace JAFDTC.Models.F16C
 
         public string DescrUI { get; set; }                     // munition long (ish) description for ui
 
-        public string LabelSMS { get; set; }                    // munition label for sms page
+        public string[] LabelSMS { get; set; }                  // munition labels for sms page
 
         public string Image { get; set; }                       // munition image for ui, relative to Images/
 
