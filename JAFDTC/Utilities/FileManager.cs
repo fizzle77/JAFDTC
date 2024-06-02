@@ -499,7 +499,7 @@ namespace JAFDTC.Utilities
         /// </summary>
         public static List<A10CMunition> LoadA10Munitions()
         {
-            return LoadSystemDbase<A10CMunition>("db-a10-munitions.json");
+            return LoadSystemDbase<A10CMunition>("db-a10c-munitions.json");
         }
 
         // ------------------------------------------------------------------------------------------------------------
