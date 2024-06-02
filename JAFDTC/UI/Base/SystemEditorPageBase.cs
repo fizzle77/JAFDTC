@@ -177,11 +177,17 @@ namespace JAFDTC.UI.Base
                                       TextBlock uiPageTxtLink, Button uiPageBtnReset)
         {
             EditState = editState;
-            EditState.ErrorsChanged += EditState_DataValidationError;
-            EditState.PropertyChanged += EditState_PropertyChanged;
+            if (editState != null)
+            {
+                EditState.ErrorsChanged += EditState_DataValidationError;
+                EditState.PropertyChanged += EditState_PropertyChanged;
+            }
 
-            DefaultBorderBrush = setDefaultsFrom.BorderBrush;
-            DefaultBkgndBrush = setDefaultsFrom.Background;
+            if (setDefaultsFrom != null)
+            {
+                DefaultBorderBrush = setDefaultsFrom.BorderBrush;
+                DefaultBkgndBrush = setDefaultsFrom.Background;
+            }
 
             _isUIRebuildingCounter = 0;
 
