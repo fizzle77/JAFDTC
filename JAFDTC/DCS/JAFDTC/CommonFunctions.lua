@@ -152,7 +152,7 @@ function JAFDTC_SerializeDisplay(val, name, skipnewlines, depth)
 
     local tmp = string.rep(" ", depth)
 
-    if name then tmp = tmp .. name .. " = " end
+    if name then tmp = tmp .. "<" .. name .. "> = " end
 
     if type(val) == "table" then
         tmp = tmp .. "{" .. (not skipnewlines and "\n" or "")
