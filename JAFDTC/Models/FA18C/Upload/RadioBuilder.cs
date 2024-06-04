@@ -21,6 +21,7 @@
 using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.FA18C.Radio;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
@@ -63,7 +64,7 @@ namespace JAFDTC.Models.FA18C.Upload
         /// settings (this function is safe to call with a configuration with default settings: defaults are skipped as
         /// necessary).
         /// <summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 

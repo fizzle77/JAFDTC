@@ -20,6 +20,7 @@
 using JAFDTC.Models.A10C.Misc;
 using JAFDTC.Models.DCS;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace JAFDTC.Models.A10C.Upload
@@ -48,7 +49,7 @@ namespace JAFDTC.Models.A10C.Upload
         /// configure misc systems via the cdu and ffds according to the non-default programming settings (this function is
         /// safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// </summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
             AirframeDevice ufc = _aircraft.GetDevice("UFC");

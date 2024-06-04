@@ -22,6 +22,7 @@ using JAFDTC.Models.A10C.Radio;
 using System;
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Collections.Generic;
 
 namespace JAFDTC.Models.A10C.Upload
 {
@@ -49,7 +50,7 @@ namespace JAFDTC.Models.A10C.Upload
         /// configure radio system via the cdu according to the non-default programming settings (this function is
         /// safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// </summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
             AirframeDevice lmfd = _aircraft.GetDevice("LMFD");

@@ -20,6 +20,7 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.FA18C.CMS;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
@@ -49,7 +50,7 @@ namespace JAFDTC.Models.FA18C.Upload
         /// configure cms system via the lmfd/cmds according to the non-default programming settings (this function is
         /// safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
             AirframeDevice cmds = _aircraft.GetDevice("CMDS");

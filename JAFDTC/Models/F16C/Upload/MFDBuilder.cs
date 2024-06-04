@@ -86,7 +86,7 @@ namespace JAFDTC.Models.F16C.Upload
         /// configure mfd formats via the icp/ded according to the non-default programming settings (this function
         /// is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice hotas = _aircraft.GetDevice("HOTAS");

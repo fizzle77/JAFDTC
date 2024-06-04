@@ -21,6 +21,7 @@
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F15E.MPD;
 using JAFDTC.Models.F15E.Radio;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
@@ -52,7 +53,7 @@ namespace JAFDTC.Models.F15E.Upload
         /// settings (this function is safe to call with a configuration with default settings: defaults are skipped as
         /// necessary).
         /// <summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             AirframeDevice ufcPilot = _aircraft.GetDevice("UFC_PILOT");
             AirframeDevice ufcWizzo = _aircraft.GetDevice("UFC_WSO");

@@ -23,11 +23,9 @@
 #define DEBUG_LOG_BOGUS_ACTIONS
 
 using JAFDTC.Utilities;
-using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -53,7 +51,7 @@ namespace JAFDTC.Models.DCS
         /// </summary>
         public delegate void AddBlockCommandsDelegate();
 
-        // common wait durations (ms) for AddWait().
+        // common wait durations (ms) for AddWait() and other delay parameters.
         //
         protected const int WAIT_NONE = 0;
         protected const int WAIT_SHORT = 100;
@@ -86,7 +84,11 @@ namespace JAFDTC.Models.DCS
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public BuilderBase(IAirframeDeviceManager aircraft, StringBuilder sb) => (_aircraft, _sb) = (aircraft, sb);
+        public BuilderBase(IAirframeDeviceManager aircraft, StringBuilder sb)
+        {
+            _aircraft = aircraft;
+            _sb = sb ?? new StringBuilder();
+        }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -103,7 +105,7 @@ namespace JAFDTC.Models.DCS
             return (value.Length > 0) ? value.Remove(value.Length - 1, 1) : value;
         }
 
-        public abstract void Build();
+        public abstract void Build(Dictionary<string, object> state = null);
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -157,6 +159,16 @@ namespace JAFDTC.Models.DCS
         protected void ClearCommands()
         {
             _sb.Clear();
+        }
+
+        /// <summary>
+        /// add the results of a buid to the builder. the method invokes Build() on the IBuilder instance and then
+        /// appends the resulting command stream to this builder.
+        /// </summary>
+        protected void AddBuild(IBuilder builder, Dictionary<string, object> state = null)
+        {
+            builder.Build(state);
+            AddCommand(builder.ToString());
         }
 
         /// <summary>

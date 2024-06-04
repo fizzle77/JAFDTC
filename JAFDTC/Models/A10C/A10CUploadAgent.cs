@@ -51,7 +51,7 @@ namespace JAFDTC.Models.A10C
                 _cfg = cfg;
             }
 
-            public override void Build()
+            public override void Build(Dictionary<string, object> state = null)
             {
                 base.Build();
 

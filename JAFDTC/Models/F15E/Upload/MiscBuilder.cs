@@ -20,6 +20,7 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F15E.Misc;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
@@ -49,7 +50,7 @@ namespace JAFDTC.Models.F15E.Upload
         /// configure miscellaneous system (bingo) via the ufc according to the non-default programming settings (this
         /// function is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             AirframeDevice fltInst = _aircraft.GetDevice("FLTINST");
 

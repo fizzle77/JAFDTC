@@ -21,6 +21,7 @@
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C.Upload;
 using JAFDTC.Utilities;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
@@ -46,7 +47,7 @@ namespace JAFDTC.Models.F16C
         {
             public F16CSetupBuilder(F16CDeviceManager dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
 
-            public override void Build()
+            public override void Build(Dictionary<string, object> state = null)
             {
                 base.Build();
 
@@ -75,7 +76,7 @@ namespace JAFDTC.Models.F16C
                 _cfg = cfg;
             }
 
-            public override void Build()
+            public override void Build(Dictionary<string, object> state = null)
             {
                 base.Build();
 

@@ -19,6 +19,7 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.M2000C.WYPT;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
@@ -49,7 +50,7 @@ namespace JAFDTC.Models.M2000C.Upload
         /// configure waypoint system via the pcn according to the non-default programming settings (this function is
         /// safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// </summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
             AirframeDevice pcn = _aircraft.GetDevice("PCN");

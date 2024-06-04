@@ -54,7 +54,7 @@ namespace JAFDTC.Models.A10C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             if (_cfg.DSMS.IsDefault)
                 return;

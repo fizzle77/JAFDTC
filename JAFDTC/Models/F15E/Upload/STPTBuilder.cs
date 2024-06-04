@@ -50,7 +50,7 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         /// TODO: document
         /// <summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             AirframeDevice ufcPilot = _aircraft.GetDevice("UFC_PILOT");
             AirframeDevice ufcWizzo = _aircraft.GetDevice("UFC_WSO");

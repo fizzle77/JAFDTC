@@ -79,7 +79,7 @@ namespace JAFDTC.Models.FA18C.Upload
         /// configure pre-planned system via the lmfd/ufc according to the non-default programming settings (this
         /// function is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
             AirframeDevice ufc = _aircraft.GetDevice("UFC");

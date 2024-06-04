@@ -19,6 +19,7 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C.SMS;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
@@ -48,7 +49,7 @@ namespace JAFDTC.Models.F16C.Upload
         /// configure sms system via the icp/ded according to the non-default programming settings (this function is
         /// safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             if (!_cfg.SMS.IsDefault)
             {

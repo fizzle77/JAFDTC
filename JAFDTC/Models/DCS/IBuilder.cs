@@ -17,6 +17,7 @@
 //
 // ********************************************************************************************************************
 
+using System.Collections.Generic;
 
 namespace JAFDTC.Models.DCS
 {
@@ -32,8 +33,10 @@ namespace JAFDTC.Models.DCS
         public string ToString();
 
         /// <summary>
-        /// build the command stream appropriate for the object and add it to internal object state.
+        /// build the command stream appropriate for the object and add it to internal object state. the method takes
+        /// an optional state dictionary that maps a state tag (string) onto a state value (object). the airframe and
+        /// system defines the contents, interpretation, and use of this dictionary.
         /// </summary>
-        public void Build();
+        public void Build(Dictionary<string, object> state = null);
     }
 }

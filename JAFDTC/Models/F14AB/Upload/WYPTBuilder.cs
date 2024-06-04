@@ -51,7 +51,7 @@ namespace JAFDTC.Models.F14AB.Upload
         /// configure waypoint system via the cdu according to the non-default programming settings (this function is
         /// safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// </summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
             AirframeDevice cap = _aircraft.GetDevice("PCN");

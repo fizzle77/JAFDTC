@@ -24,6 +24,7 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Utilities.Networking;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,7 +59,7 @@ namespace JAFDTC.Models
         {
             public CoreSetupBuilder(IAirframeDeviceManager adm, StringBuilder sb) : base(adm, sb) { }
 
-            public override void Build()
+            public override void Build(Dictionary<string, object> state = null)
             {
                 AddMarker("<upload_prog>");
             }
@@ -75,7 +76,7 @@ namespace JAFDTC.Models
         {
             public CoreTeardownBuilder(IAirframeDeviceManager adm, StringBuilder sb) : base(adm, sb) { }
 
-            public override void Build()
+            public override void Build(Dictionary<string, object> state = null)
             {
                 AddMarker("");
             }

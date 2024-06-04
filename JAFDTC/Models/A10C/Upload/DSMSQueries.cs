@@ -61,7 +61,7 @@ namespace JAFDTC.Models.A10C.Upload
             public LoadoutQueryBuilder(IAirframeDeviceManager adm, StringBuilder sb, string query, List<string> argsQuery)
                 : base(adm, sb, query, argsQuery) { }
 
-            public override void Build()
+            public override void Build(Dictionary<string, object> state = null)
             {
                 AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
                 AddActions(lmfd, new() { "LMFD_14", "LMFD_05" }, null, WAIT_BASE); // Go to DSMS INV
@@ -128,7 +128,7 @@ namespace JAFDTC.Models.A10C.Upload
             public DSMSProfileQueryBuilder(IAirframeDeviceManager adm, StringBuilder sb, string query, List<string> argsQuery)
                 : base(adm, sb, query, argsQuery) { }
 
-            public override void Build()
+            public override void Build(Dictionary<string, object> state = null)
             {
                 AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
                 AddActions(lmfd, new() { "LMFD_14", "LMFD_01" }, null, WAIT_BASE); // Go to DSMS Profile

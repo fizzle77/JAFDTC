@@ -20,6 +20,7 @@
 using JAFDTC.Models.A10C.TAD;
 using JAFDTC.Models.DCS;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace JAFDTC.Models.A10C.Upload
@@ -40,7 +41,7 @@ namespace JAFDTC.Models.A10C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             if (_cfg.TAD.IsDefault)
                 return;

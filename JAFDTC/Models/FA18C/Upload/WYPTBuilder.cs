@@ -21,6 +21,7 @@ using JAFDTC.Models.DCS;
 using JAFDTC.Models.FA18C.WYPT;
 using System.Text;
 using JAFDTC.Utilities;
+using System.Collections.Generic;
 
 namespace JAFDTC.Models.FA18C.Upload
 {
@@ -47,7 +48,7 @@ namespace JAFDTC.Models.FA18C.Upload
         /// configure steerpoint system via the ufc/rmfd according to the non-default programming settings (this
         /// function is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice rmfd = _aircraft.GetDevice("RMFD");

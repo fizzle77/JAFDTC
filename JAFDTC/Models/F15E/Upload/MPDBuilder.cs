@@ -51,7 +51,7 @@ namespace JAFDTC.Models.F15E.Upload
         /// (this function is safe to call with a configuration with default settings: defaults are skipped as
         /// necessary).
         /// <summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             Dictionary<MPDSystem.CockpitDisplays, AirframeDevice> devMap = new()
             {

@@ -78,7 +78,7 @@ namespace JAFDTC.Models
         /// set up at construction time. derived classes may override this method to generate different sequences.
         /// sequences should always end with a query command.
         /// </summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             AddQuery(_fnQuery, _argsQuery);
         }

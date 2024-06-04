@@ -51,7 +51,7 @@ namespace JAFDTC.Models.F16C.Upload
         /// non-default programming settings (this function is safe to call with a configuration with default settings:
         /// defaults are skipped as necessary).
         /// <summary>
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice ehsi = _aircraft.GetDevice("EHSI");

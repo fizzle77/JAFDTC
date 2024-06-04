@@ -20,6 +20,7 @@
 using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.Models.DCS;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
@@ -41,7 +42,7 @@ namespace JAFDTC.Models.A10C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public override void Build()
+        public override void Build(Dictionary<string, object> state = null)
         {
             if (_cfg.HMCS.IsDefault)
                 return;

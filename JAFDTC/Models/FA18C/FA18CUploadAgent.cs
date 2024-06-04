@@ -21,6 +21,7 @@
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.FA18C.Upload;
 using JAFDTC.Utilities;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
@@ -52,7 +53,7 @@ namespace JAFDTC.Models.FA18C
                 _cfg = cfg;
             }
 
-            public override void Build()
+            public override void Build(Dictionary<string, object> state = null)
             {
                 base.Build();
 
