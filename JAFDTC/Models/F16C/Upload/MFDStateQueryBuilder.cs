@@ -82,7 +82,8 @@ namespace JAFDTC.Models.F16C.Upload
 
         /// <summary>
         /// query the current mfd setups including formats programmed on osb12-14 and the currently selected format
-        /// for a given master mode. assumes jet is in nav on entry. configuartion returned via MFDModeConfiguration.
+        /// for a given master mode. assumes jet is in nav on entry and returns with jet in nav. configuartion
+        /// returned via MFDModeConfiguration.
         /// </summary>
         private void QueryCurrentMFDState(AirframeDevice ufc, AirframeDevice hotas,
                                           MFDSystem.MasterModes mode, MFDModeConfiguration modeFmtss)
@@ -120,7 +121,8 @@ namespace JAFDTC.Models.F16C.Upload
 
         /// <summary>
         /// gather the current mfd setups including formats programmed on osb12-14 and the currently selected format
-        /// for all master modes. results are returned through the modFmtss[] indexed by mode.
+        /// for all master modes. results are returned through the modFmtss[] indexed by mode with jet in nav master
+        /// mode.
         /// </summary>
         public void QueryCurrentMFDStateForAllModes(MFDModeConfiguration[] modeFmtss)
         {
@@ -129,8 +131,8 @@ namespace JAFDTC.Models.F16C.Upload
 
             AddWhileBlock("IsInNAVMode", false, null, delegate ()
             {
-                AddAction(ufc, "AA");
-                AddAction(hotas, "CENTER");
+                AddAction(ufc, "AA", WAIT_BASE);
+                AddAction(hotas, "CENTER", WAIT_BASE);
             });
 
             for (int mode = 0; mode < (int)MFDSystem.MasterModes.NUM_MODES; mode++)
@@ -139,7 +141,7 @@ namespace JAFDTC.Models.F16C.Upload
 
         /// <summary>
         /// gather the current mfd setups including formats programmed on osb12-14 and the currently selected format
-        /// for a specific master mode. results are returned through the modFmtss.
+        /// for a specific master mode. results are returned through the modFmtss with jet in nav master mode.
         /// </summary>
         public void QueryCurrentMFDStateForMode(MFDSystem.MasterModes mode, MFDModeConfiguration modeFmtss)
         {
@@ -148,8 +150,8 @@ namespace JAFDTC.Models.F16C.Upload
 
             AddWhileBlock("IsInNAVMode", false, null, delegate ()
             {
-                AddAction(ufc, "AA");
-                AddAction(hotas, "CENTER");
+                AddAction(ufc, "AA", WAIT_BASE);
+                AddAction(hotas, "CENTER", WAIT_BASE);
             });
 
             QueryCurrentMFDState(ufc, hotas, mode, modeFmtss);
