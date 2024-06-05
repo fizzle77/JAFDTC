@@ -308,7 +308,7 @@
       "ID": 15,
       "EmplMode": "5;5,6,7",
       "ReleaseMode": "5;5,6",
-      "AutoPwrMode": "True"
+      "AutoPwrMode": "0;0,1,2,3,4"
     }
   },
   {
@@ -321,7 +321,7 @@
       "ID": 16,
       "EmplMode": "5;5,6,7",
       "ReleaseMode": "5;5,6",
-      "AutoPwrMode": "True"
+      "AutoPwrMode": "0;0,1,2,3,4"
     }
   },
   {
@@ -334,7 +334,7 @@
       "ID": 17,
       "EmplMode": "5;5,6,7",
       "ReleaseMode": "5;5,6",
-      "AutoPwrMode": "True"
+      "AutoPwrMode": "0;0,1,2,3,4"
     }
   },
   {
@@ -347,7 +347,7 @@
       "ID": 18,
       "EmplMode": "5;5,6,7",
       "ReleaseMode": "5;5,6",
-      "AutoPwrMode": "True"
+      "AutoPwrMode": "0;0,1,2,3,4"
     }
   }
 ]
