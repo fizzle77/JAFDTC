@@ -32,6 +32,32 @@ using System.Text.RegularExpressions;
 namespace JAFDTC.Models.DCS
 {
     /// <summary>
+    /// Dictionary extension to provide TryGetValueAs() on Dictionary instances. this allows the use of generic
+    /// value types (say, object) that can be cast to the right known type inline. this might be handy for state
+    /// dictionaries in BuilderBase...
+    /// 
+    /// hat tip to: https://stackoverflow.com/a/63203652
+    /// 
+    /// </summary>
+    public static class DictionaryExtensions
+    {
+        public static bool TryGetValueAs<Key, Value, ValueAs>(this IDictionary<Key, Value> dict,
+                                                              Key key, out ValueAs valueAs) where ValueAs : Value
+        {
+            if (dict.TryGetValue(key, out Value value))
+            {
+                valueAs = (ValueAs)value;
+                return true;
+            }
+
+            valueAs = default;
+            return false;
+        }
+    }
+
+    // ================================================================================================================
+
+    /// <summary>
     /// abstract base class for a command builder. command builders generate a list of commands to send to dcs that
     /// effect actions on airframe devices within the clickable cockpit to arrive at a desired configuration.
     /// derived classes may extend the base to handle airframe- or system-specific needs (for example, to generate
