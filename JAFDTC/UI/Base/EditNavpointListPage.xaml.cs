@@ -64,7 +64,7 @@ namespace JAFDTC.UI.Base
 
         protected override string SystemName => PageHelper.NavptName;
 
-        protected override bool IsPageSateDefault => (EditNavpt.Count == 0);
+        protected override bool IsPageStateDefault => (EditNavpt.Count == 0);
 
         // ---- internal properties
 

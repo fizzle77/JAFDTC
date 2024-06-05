@@ -51,7 +51,7 @@ namespace JAFDTC.UI.F15E
 
         protected override string SystemName => "miscellaneous";
 
-        protected override bool IsPageSateDefault => ((F15EConfiguration)Config).Misc.IsDefault;
+        protected override bool IsPageStateDefault => ((F15EConfiguration)Config).Misc.IsDefault;
 
         // ---- internal properties
 

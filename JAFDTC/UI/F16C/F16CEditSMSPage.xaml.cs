@@ -57,7 +57,7 @@ namespace JAFDTC.UI.F16C
 
         protected override string SystemName => "SMS munition setup";
 
-        protected override bool IsPageSateDefault => ((F16CConfiguration)Config).SMS.IsDefault;
+        protected override bool IsPageStateDefault => ((F16CConfiguration)Config).SMS.IsDefault;
 
         // ---- internal properties
 

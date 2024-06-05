@@ -131,7 +131,7 @@ namespace JAFDTC.UI.Base
         /// <summary>
         /// Derived classes must override this method to return a bool indicating whether or not page state is default.
         /// </summary>
-        protected abstract bool IsPageSateDefault { get; }
+        protected abstract bool IsPageStateDefault { get; }
 
         // ---- protected properties
 
@@ -526,7 +526,7 @@ namespace JAFDTC.UI.Base
                 Utilities.SetCheckEnabledAndState(kv.Value, isEditable, isChecked);
             }
 
-            _uiPageBtnReset.IsEnabled = !IsPageSateDefault;
+            _uiPageBtnReset.IsEnabled = !IsPageStateDefault;
 
             UpdateUICustom(isEditable);
         }

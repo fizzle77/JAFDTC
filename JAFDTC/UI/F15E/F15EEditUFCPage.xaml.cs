@@ -49,7 +49,7 @@ namespace JAFDTC.UI.F15E
 
         protected override string SystemName => "UFC";
 
-        protected override bool IsPageSateDefault => ((F15EConfiguration)Config).UFC.IsDefault;
+        protected override bool IsPageStateDefault => ((F15EConfiguration)Config).UFC.IsDefault;
 
         // ---- private properties
 
