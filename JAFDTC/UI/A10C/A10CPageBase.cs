@@ -494,8 +494,6 @@ namespace JAFDTC.UI.A10C
             if (property != null && editState != null)
                 property.SetValue(editState, comboBox.SelectedIndex.ToString());
 
-            _linkResetBtnsControl?.SetResetButtonEnabled(!_editState.IsDefault);
-
             SaveEditStateToConfig();
         }
 
@@ -511,8 +509,6 @@ namespace JAFDTC.UI.A10C
             if (property != null && editState != null)
                 property.SetValue(editState, textBox.Text);
 
-            _linkResetBtnsControl?.SetResetButtonEnabled(!_editState.IsDefault);
-
             SaveEditStateToConfig();
         }
 
@@ -524,8 +520,6 @@ namespace JAFDTC.UI.A10C
 
             if (property != null && editState != null)
                 property.SetValue(editState, textBox.Text);
-
-            _linkResetBtnsControl?.SetResetButtonEnabled(!_editState.IsDefault);
 
             SaveEditStateToConfig();
         }
