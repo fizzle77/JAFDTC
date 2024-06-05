@@ -17,6 +17,7 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Controls;
@@ -77,7 +78,7 @@ namespace JAFDTC.UI.A10C
 
         protected ConfigEditorPageNavArgs _navArgs;
         protected A10CConfiguration _config;
-        protected A10CSystemBase _editState;
+        protected SystemBase _editState;
 
         protected Brush _defaultBorderBrush;
         protected Brush _defaultBkgndBrush;
@@ -85,7 +86,7 @@ namespace JAFDTC.UI.A10C
         private bool _isUIUpdatePending = false;
         private bool _isUIUpdateInProgress = false;
 
-        public abstract A10CSystemBase SystemConfig { get; }
+        public abstract SystemBase SystemConfig { get; }
 
 
         // ------------------------------------------------------------------------------------------------------------
@@ -109,7 +110,7 @@ namespace JAFDTC.UI.A10C
         /// Must be called from derived class constructor after InitializeComponent().
         /// </summary>
         protected void InitializeBase(
-            A10CSystemBase editState,
+            SystemBase editState,
             TextBox setDefaultsFrom = null,
             LinkResetBtnsControl linkResetBtnsControl = null)
         {

@@ -17,7 +17,7 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.A10C;
+using JAFDTC.Models;
 using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
@@ -37,7 +37,7 @@ namespace JAFDTC.UI.A10C
         private const string SYSTEM_NAME = "HMCS";
 
         private HMCSSystem EditState => (HMCSSystem)_editState;
-        public override A10CSystemBase SystemConfig => _config.HMCS;
+        public override SystemBase SystemConfig => _config.HMCS;
 
         public static ConfigEditorPageInfo PageInfo
             => new(HMCSSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.HMCS, typeof(A10CEditHMCSPage));

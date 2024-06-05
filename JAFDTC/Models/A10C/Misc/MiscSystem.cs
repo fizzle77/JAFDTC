@@ -108,7 +108,7 @@ namespace JAFDTC.Models.A10C.Misc
     /// <summary>
     /// TODO: document
     /// </summary>
-    public class MiscSystem : A10CSystemBase
+    public class MiscSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:A10C:MISC";
 

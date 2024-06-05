@@ -17,7 +17,7 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.A10C;
+using JAFDTC.Models;
 using JAFDTC.Models.A10C.TAD;
 using JAFDTC.UI.App;
 
@@ -30,7 +30,7 @@ namespace JAFDTC.UI.A10C
     {
         private const string SYSTEM_NAME = "TAD";
 
-        public override A10CSystemBase SystemConfig => _config.TAD;
+        public override SystemBase SystemConfig => _config.TAD;
 
         public static ConfigEditorPageInfo PageInfo
             => new(TADSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.TAD, typeof(A10CEditTADPage));

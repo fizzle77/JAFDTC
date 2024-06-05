@@ -17,9 +17,9 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.DSMS;
-using JAFDTC.UI.App;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System.Collections.Generic;
@@ -36,7 +36,7 @@ namespace JAFDTC.UI.A10C
     {
         private const string SYSTEM_NAME = "DSMS";
 
-        public override A10CSystemBase SystemConfig => _config.DSMS;
+        public override SystemBase SystemConfig => _config.DSMS;
 
         private DSMSEditorNavArgs _dsmsEditorNavArgs;
         private ObservableCollection<A10CMunition> _munitions;

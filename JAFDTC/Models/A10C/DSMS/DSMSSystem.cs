@@ -26,7 +26,7 @@ using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.A10C.DSMS
 {
-    public class DSMSSystem : A10CSystemBase
+    public class DSMSSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:A10C:DSMS";
 

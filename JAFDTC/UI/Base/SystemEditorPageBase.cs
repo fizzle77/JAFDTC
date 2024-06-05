@@ -128,12 +128,12 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected abstract string SystemName { get; }
 
-        /// <summary>
-        /// Derived classes must override this method to return a bool indicating whether or not page state is default.
-        /// </summary>
-        protected abstract bool IsPageStateDefault { get; }
-
         // ---- protected properties
+
+        /// <summary>
+        /// Derived classes may override this method to return a bool indicating whether or not page state is default.
+        /// </summary>
+        protected virtual bool IsPageStateDefault => SystemConfig.IsDefault;
 
         protected ConfigEditorPageNavArgs NavArgs { get; private set; }
 

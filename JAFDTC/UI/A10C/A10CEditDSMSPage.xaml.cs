@@ -49,7 +49,7 @@ namespace JAFDTC.UI.A10C
 
         private const string SYSTEM_NAME = "DSMS";
 
-        public override A10CSystemBase SystemConfig => _config.DSMS;
+        public override SystemBase SystemConfig => _config.DSMS;
 
         private DSMSEditorNavArgs _dsmsEditorNavArgs;
 

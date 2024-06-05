@@ -17,9 +17,9 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.UI.App;
-using JAFDTC.Models.A10C;
+using JAFDTC.Models;
 using JAFDTC.Models.A10C.Misc;
+using JAFDTC.UI.App;
 
 namespace JAFDTC.UI.A10C
 {
@@ -30,7 +30,7 @@ namespace JAFDTC.UI.A10C
     {
         private const string SYSTEM_NAME = "Miscellaneous";
 
-        public override A10CSystemBase SystemConfig => _config.Misc;
+        public override SystemBase SystemConfig => _config.Misc;
 
         public static ConfigEditorPageInfo PageInfo
             => new(MiscSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.MISC, typeof(A10CEditMiscPage));

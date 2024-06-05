@@ -43,7 +43,7 @@ namespace JAFDTC.Models.A10C.HMCS
     /// <summary>
     /// Defines the settings that exist under each of the 3 HMCS profiles.
     /// </summary>
-    public class HMCSProfileSettings : A10CSystemBase
+    public class HMCSProfileSettings : SystemBase
     {
         // ------------------------------------------------------------------------------------------------------------
         //
