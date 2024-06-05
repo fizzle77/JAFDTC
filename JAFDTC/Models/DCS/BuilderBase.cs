@@ -194,7 +194,12 @@ namespace JAFDTC.Models.DCS
         protected void AddBuild(IBuilder builder, Dictionary<string, object> state = null)
         {
             builder.Build(state);
-            AddCommand(builder.ToString());
+            //
+            // NOTE: adds always leave a trailing "," on the build string as it is constructed. ToString() pulls this,
+            // NOTE: so we put an extra one here so that following the AddCommand() the build string will still meet
+            // NOTE: expectations.
+            //
+            AddCommand($"{builder.ToString()},");
         }
 
         /// <summary>
