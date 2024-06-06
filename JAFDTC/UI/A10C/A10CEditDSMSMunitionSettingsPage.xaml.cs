@@ -25,7 +25,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System.Collections.Generic;
-using static JAFDTC.Models.A10C.DSMS.DSMSSystem;
 using static JAFDTC.UI.A10C.A10CEditDSMSPage;
 using System.Reflection;
 using System.ComponentModel;
@@ -37,18 +36,23 @@ namespace JAFDTC.UI.A10C
     /// </summary>
     public sealed partial class A10CEditDSMSMunitionSettingsPage : A10CPageBase
     {
-        private const string SYSTEM_NAME = "DSMS";
 
-        private DSMSSystem EditState => (DSMSSystem)_editState;
-        public override SystemBase SystemConfig => _config.DSMS;
+        public override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
+        protected override string SystemTag => DSMSSystem.SystemTag;
+        protected override string SystemName => "DSMS";
+
+        private DSMSSystem DSMSEditState => (DSMSSystem)EditState;
+        private DSMSSystem DSMSConfig => (DSMSSystem)SystemConfig;
 
         private DSMSEditorNavArgs _dsmsEditorNavArgs;
         private readonly List<A10CMunition> _munitions;
 
-        public A10CEditDSMSMunitionSettingsPage() : base(SYSTEM_NAME, DSMSSystem.SystemTag)
+        public A10CEditDSMSMunitionSettingsPage()
         {
+            EditState = new DSMSSystem();
+
             InitializeComponent();
-            InitializeBase(new DSMSSystem(), uiTextLaserCode, null);
+            InitializeBase(EditState, uiTextLaserCode, null);
 
             _munitions = FileManager.LoadA10Munitions();
         }
@@ -72,9 +76,9 @@ namespace JAFDTC.UI.A10C
                 if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
                 {
                     if (settingLocation == SettingLocation.Edit)
-                        configOrEdit = EditState.GetMunitionSettings(selectedMunition);
+                        configOrEdit = DSMSEditState.GetMunitionSettings(selectedMunition);
                     else
-                        configOrEdit = _config.DSMS.GetMunitionSettings(selectedMunition);
+                        configOrEdit = DSMSConfig.GetMunitionSettings(selectedMunition);
                 }
                 else
                     configOrEdit = null;
@@ -85,7 +89,7 @@ namespace JAFDTC.UI.A10C
         /// The base UI update will correctly set values and link-related enablement, but this editor has 
         /// unique visibility and enablement behavior we need to perform here.
         /// </summary>
-        protected override void UpdateUI()
+        protected override void UpdateUICustom(bool isEditable)
         {
             if (!IsMunitionSelectionValid(out A10CMunition selectedMunition))
                return;
@@ -93,7 +97,7 @@ namespace JAFDTC.UI.A10C
             SetLabelColorMatchingControlEnabledState(uiLabelLaserCode, uiTextLaserCode);
 
             Visibility autoLaseVisible = (selectedMunition.AutoLase) ? Visibility.Visible : Visibility.Collapsed;
-            Visibility autoLaseFieldVisible = (selectedMunition.AutoLase && EditState.GetAutoLaseValue(selectedMunition)) 
+            Visibility autoLaseFieldVisible = (selectedMunition.AutoLase && DSMSEditState.GetAutoLaseValue(selectedMunition)) 
                 ? Visibility.Visible : Visibility.Collapsed;
             uiLabelAutoLase.Visibility = autoLaseVisible;
             uiStackAutoLase.Visibility = autoLaseVisible;
@@ -156,8 +160,8 @@ namespace JAFDTC.UI.A10C
 
             UpdateNonDefaultMunitionIcons();
 
-            MunitionSettings newSettings = EditState.GetMunitionSettings(selectedMunition);
-            bool isNotLinked = !_config.IsLinked(SystemTag);
+            MunitionSettings newSettings = DSMSEditState.GetMunitionSettings(selectedMunition);
+            bool isNotLinked = !Config.IsLinked(SystemTag);
             Utilities.SetEnableState(uiMuniBtnReset, isNotLinked && !newSettings.IsDefault);
         }
 
@@ -186,7 +190,7 @@ namespace JAFDTC.UI.A10C
                 FontIcon icon = Utilities.FindControl<FontIcon>(container, typeof(FontIcon), "icon");
                 if (icon != null)
                 {
-                    ISystem system = _config.DSMS.GetMunitionSettings(munition);
+                    ISystem system = DSMSConfig.GetMunitionSettings(munition);
                     icon.Visibility = Utilities.HiddenIfDefault(system);
                 }
             }
@@ -201,7 +205,7 @@ namespace JAFDTC.UI.A10C
                 A10CMunition oldSelectedMunition = (A10CMunition)e.RemovedItems[0];
                 if (oldSelectedMunition != null)
                 {
-                    MunitionSettings oldSettings = EditState.GetMunitionSettings(oldSelectedMunition);
+                    MunitionSettings oldSettings = DSMSEditState.GetMunitionSettings(oldSelectedMunition);
                     // Unnecessary because munition settings have no text boxes so no possible errors.
                     // oldSettings.ErrorsChanged -= EditState_ErrorsChanged;
                     oldSettings.PropertyChanged -= EditState_PropertyChanged;
@@ -215,7 +219,7 @@ namespace JAFDTC.UI.A10C
                 {
                     CopyConfigToEditState();
 
-                    MunitionSettings newSettings = EditState.GetMunitionSettings(newSelectedMunition);
+                    MunitionSettings newSettings = DSMSEditState.GetMunitionSettings(newSelectedMunition);
                     // Unnecessary because munition settings have no text boxes so no possible errors.
                     // newSettings.ErrorsChanged += EditState_ErrorsChanged;
                     newSettings.PropertyChanged += EditState_PropertyChanged;
@@ -227,7 +231,7 @@ namespace JAFDTC.UI.A10C
         {
             if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
             {
-                EditState.GetMunitionSettings(selectedMunition).Reset();
+                DSMSEditState.GetMunitionSettings(selectedMunition).Reset();
                 SaveEditStateToConfig();
                 UpdateUIFromEditState();
             }
@@ -253,7 +257,7 @@ namespace JAFDTC.UI.A10C
         {
             if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
             {
-                MunitionSettings settings = EditState.GetMunitionSettings(selectedMunition);
+                MunitionSettings settings = DSMSEditState.GetMunitionSettings(selectedMunition);
                 settings.ErrorsChanged -= EditState_ErrorsChanged;
                 settings.PropertyChanged -= EditState_PropertyChanged;
             }

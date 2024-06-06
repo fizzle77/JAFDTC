@@ -18,6 +18,8 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
+using JAFDTC.Models.A10C.DSMS;
+using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.Misc;
 using JAFDTC.UI.App;
 
@@ -30,12 +32,14 @@ namespace JAFDTC.UI.A10C
     {
         private const string SYSTEM_NAME = "Miscellaneous";
 
-        public override SystemBase SystemConfig => _config.Misc;
+        public override SystemBase SystemConfig => ((A10CConfiguration)Config).Misc;
+        protected override string SystemTag => MiscSystem.SystemTag;
+        protected override string SystemName => SYSTEM_NAME;
 
         public static ConfigEditorPageInfo PageInfo
             => new(MiscSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.MISC, typeof(A10CEditMiscPage));
 
-        public A10CEditMiscPage() : base(SYSTEM_NAME, MiscSystem.SystemTag)
+        public A10CEditMiscPage()
         {
             InitializeComponent();
             InitializeBase(new MiscSystem(), uiTextTACANChannel, uiCtlLinkResetBtns);

@@ -34,19 +34,23 @@ namespace JAFDTC.UI.A10C
     /// </summary>
     public sealed partial class A10CEditDSMSProfileOrderPage : A10CPageBase
     {
-        private const string SYSTEM_NAME = "DSMS";
+        public override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
+        protected override string SystemTag => DSMSSystem.SystemTag;
+        protected override string SystemName => "DSMS";
 
-        public override SystemBase SystemConfig => _config.DSMS;
+        private DSMSSystem DSMSEditState => (DSMSSystem)EditState;
+        private DSMSSystem DSMSConfig => (DSMSSystem)SystemConfig;
 
         private DSMSEditorNavArgs _dsmsEditorNavArgs;
         private ObservableCollection<A10CMunition> _munitions;
 
-        public A10CEditDSMSProfileOrderPage() : base(SYSTEM_NAME, DSMSSystem.SystemTag)
+        public A10CEditDSMSProfileOrderPage()
         {
             _munitions = new ObservableCollection<A10CMunition>(A10CMunition.GetUniqueProfileMunitions());
+            EditState = new DSMSSystem();
 
             InitializeComponent();
-            InitializeBase(new DSMSSystem());
+            InitializeBase(EditState, null, null);
         }
 
         protected override void SaveEditStateToConfig()
@@ -54,13 +58,13 @@ namespace JAFDTC.UI.A10C
             List<int> newOrder = new List<int>(_munitions.Count);
             foreach (A10CMunition m in _munitions)
                 newOrder.Add(m.ID);
-            _config.DSMS.ProfileOrder = newOrder;
-            _config.Save(_dsmsEditorNavArgs.ParentPage, SystemTag);
+            DSMSConfig.ProfileOrder = newOrder;
+            Config.Save(_dsmsEditorNavArgs.ParentPage, SystemTag);
         }
 
         public override void CopyConfigToEditState()
         {
-            if (_config.DSMS.ProfileOrder == null)
+            if (DSMSConfig.ProfileOrder == null)
             {
                 _munitions = new ObservableCollection<A10CMunition>(A10CMunition.GetUniqueProfileMunitions());
                 uiListProfiles.ItemsSource = _munitions;
@@ -69,7 +73,7 @@ namespace JAFDTC.UI.A10C
             {
                 for (int newIndex = 0; newIndex < _munitions.Count; newIndex++)
                 {
-                    int munitionID = _config.DSMS.ProfileOrder[newIndex];
+                    int munitionID = DSMSConfig.ProfileOrder[newIndex];
                     A10CMunition m = A10CMunition.GetMunitionFromID(munitionID);
                     if (m != null)
                     {
@@ -79,8 +83,7 @@ namespace JAFDTC.UI.A10C
                 }
             }
 
-            bool isNotLinked = string.IsNullOrEmpty(_config.SystemLinkedTo(SystemTag));
-            uiListProfiles.IsEnabled = isNotLinked;
+            uiListProfiles.IsEnabled = !Config.IsLinked(SystemTag);
         }
 
         private void uiListProfiles_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)

@@ -1,7 +1,5 @@
-using CommunityToolkit.WinUI.UI;
 using JAFDTC.Models;
-using JAFDTC.Models.A10C;
-using JAFDTC.UI.A10C;
+using JAFDTC.UI.Base;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -11,8 +9,8 @@ namespace JAFDTC.UI.Controls
 {
     public sealed partial class LinkResetBtnsControl : UserControl
     {
-        private A10CPageBase _parentPage;
-        private A10CConfiguration _config;
+        private SystemEditorPageBase _parentPage;
+        private IConfiguration _config;
 
         private string _systemTag;
 
@@ -33,7 +31,7 @@ namespace JAFDTC.UI.Controls
             InitializeComponent();
         }
 
-        public void Initialize(string systemName, string systemTag, A10CPageBase parentPage, A10CConfiguration config)
+        public void Initialize(string systemName, string systemTag, SystemEditorPageBase parentPage, IConfiguration config)
         {
             _config = config;
             _parentPage = parentPage;

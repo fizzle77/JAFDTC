@@ -45,13 +45,11 @@ namespace JAFDTC.UI.F16C
 
         // ---- overrides of base SystemEditorPage properties
 
-        protected override SystemBase SystemConfig => ((F16CConfiguration)Config).Misc;
+        public override SystemBase SystemConfig => ((F16CConfiguration)Config).Misc;
 
-        protected override String SystemTag => MiscSystem.SystemTag;
+        protected override string SystemTag => MiscSystem.SystemTag;
 
         protected override string SystemName => "miscellaneous";
-
-        protected override bool IsPageStateDefault => ((F16CConfiguration)Config).Misc.IsDefault;
 
         // ---- internal properties
 
@@ -68,7 +66,7 @@ namespace JAFDTC.UI.F16C
             EditMisc = new MiscSystem();
 
             InitializeComponent();
-            InitializeBase(EditMisc, uiBINGOValueBINGO, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            InitializeBase(EditMisc, uiBINGOValueBINGO, uiCtlLinkResetBtns);
 
             MiscSystem miscSysDefault = MiscSystem.ExplicitDefaults;
             uiBINGOValueBINGO.PlaceholderText = miscSysDefault.Bingo;

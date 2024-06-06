@@ -45,13 +45,11 @@ namespace JAFDTC.UI.F15E
 
         // ---- overrides of base SystemEditorPage properties
 
-        protected override SystemBase SystemConfig => ((F15EConfiguration)Config).Misc;
+        public override SystemBase SystemConfig => ((F15EConfiguration)Config).Misc;
 
         protected override String SystemTag => MiscSystem.SystemTag;
 
         protected override string SystemName => "miscellaneous";
-
-        protected override bool IsPageStateDefault => ((F15EConfiguration)Config).Misc.IsDefault;
 
         // ---- internal properties
 
@@ -70,7 +68,7 @@ namespace JAFDTC.UI.F15E
             EditMisc = new MiscSystem();
 
             InitializeComponent();
-            InitializeBase(EditMisc, uiBINGOValueBINGO, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            InitializeBase(EditMisc, uiBINGOValueBINGO, uiCtlLinkResetBtns);
 
             uiBINGOValueBINGO.PlaceholderText = MiscSystem.ExplicitDefaults.Bingo;
         }
@@ -84,7 +82,7 @@ namespace JAFDTC.UI.F15E
         /// <summary>
         /// Copy data from the system configuration object to the edit object the page interacts with.
         /// </summary>
-        protected override void CopyConfigToEditState()
+        public override void CopyConfigToEditState()
         {
             if (EditState != null)
             {

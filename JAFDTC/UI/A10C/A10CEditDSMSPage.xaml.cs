@@ -49,14 +49,18 @@ namespace JAFDTC.UI.A10C
 
         private const string SYSTEM_NAME = "DSMS";
 
-        public override SystemBase SystemConfig => _config.DSMS;
+        public override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
+        protected override string SystemTag => DSMSSystem.SystemTag;
+        protected override string SystemName => SYSTEM_NAME;
+
+        private DSMSSystem DSMSConfig => (DSMSSystem)SystemConfig;
 
         private DSMSEditorNavArgs _dsmsEditorNavArgs;
 
         public static ConfigEditorPageInfo PageInfo
             => new(DSMSSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.DSMS, typeof(A10CEditDSMSPage));
 
-        public A10CEditDSMSPage() : base(SYSTEM_NAME, DSMSSystem.SystemTag)
+        public A10CEditDSMSPage()
         {
             InitializeComponent();
             InitializeBase(null, null, uiCtlLinkResetBtns);
@@ -73,18 +77,18 @@ namespace JAFDTC.UI.A10C
 
         private void UpdateDefaultStateIndicators()
         {
-            bool munitionsTabIsDefault = _config.DSMS.IsLaserCodeDefault && _config.DSMS.AreAllMunitionSettingsDefault;
+            bool munitionsTabIsDefault = DSMSConfig.IsLaserCodeDefault && DSMSConfig.AreAllMunitionSettingsDefault;
             if (munitionsTabIsDefault)
                 uiIconMunitionTab.Visibility = Visibility.Collapsed;
             else
                 uiIconMunitionTab.Visibility = Visibility.Visible;
 
-            if (_config.DSMS.IsProfileOrderDefault)
+            if (DSMSConfig.IsProfileOrderDefault)
                 uiIconProfileTab.Visibility = Visibility.Collapsed;
             else
                 uiIconProfileTab.Visibility = Visibility.Visible;
 
-            uiCtlLinkResetBtns.SetResetButtonEnabled(!munitionsTabIsDefault || !_config.DSMS.IsProfileOrderDefault);
+            uiCtlLinkResetBtns.SetResetButtonEnabled(!munitionsTabIsDefault || !DSMSConfig.IsProfileOrderDefault);
         }
 
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
@@ -110,13 +114,13 @@ namespace JAFDTC.UI.A10C
          
             _dsmsEditorNavArgs = new DSMSEditorNavArgs(args, this);
 
-            _config.ConfigurationSaved += ConfigurationSavedHandler;
+            Config.ConfigurationSaved += ConfigurationSavedHandler;
             UpdateDefaultStateIndicators();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            _config.ConfigurationSaved -= ConfigurationSavedHandler;
+            Config.ConfigurationSaved -= ConfigurationSavedHandler;
 
             base.OnNavigatedFrom(e);
         }

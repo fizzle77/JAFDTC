@@ -43,13 +43,11 @@ namespace JAFDTC.UI.F15E
 
         // ---- overrides of base SystemEditorPage properties
 
-        protected override SystemBase SystemConfig => ((F15EConfiguration)Config).UFC;
+        public override SystemBase SystemConfig => ((F15EConfiguration)Config).UFC;
 
         protected override String SystemTag => UFCSystem.SystemTag;
 
         protected override string SystemName => "UFC";
-
-        protected override bool IsPageStateDefault => ((F15EConfiguration)Config).UFC.IsDefault;
 
         // ---- private properties
 
@@ -66,7 +64,7 @@ namespace JAFDTC.UI.F15E
             EditUFC = new UFCSystem();
 
             InitializeComponent();
-            InitializeBase(EditUFC, uiTACANValueChan, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            InitializeBase(EditUFC, uiTACANValueChan, uiCtlLinkResetBtns);
 
             UFCSystem ufcSysDefault = UFCSystem.ExplicitDefaults;
             uiLaltValueWarn.PlaceholderText = ufcSysDefault.LowAltWarn;

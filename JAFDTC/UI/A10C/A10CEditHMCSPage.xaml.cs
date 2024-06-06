@@ -18,6 +18,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
+using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
@@ -36,13 +37,17 @@ namespace JAFDTC.UI.A10C
     {
         private const string SYSTEM_NAME = "HMCS";
 
-        private HMCSSystem EditState => (HMCSSystem)_editState;
-        public override SystemBase SystemConfig => _config.HMCS;
+        public override SystemBase SystemConfig => ((A10CConfiguration)Config).HMCS;
+        protected override string SystemTag => HMCSSystem.SystemTag;
+        protected override string SystemName => SYSTEM_NAME;
+
+        private HMCSSystem HMCSEditState => (HMCSSystem)EditState;
+        private HMCSSystem HMCSConfig => (HMCSSystem)SystemConfig;
 
         public static ConfigEditorPageInfo PageInfo
             => new(HMCSSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.HMCS, typeof(A10CEditHMCSPage));
 
-        public A10CEditHMCSPage() : base(SYSTEM_NAME, HMCSSystem.SystemTag)
+        public A10CEditHMCSPage()
         {
             InitializeComponent();
             InitializeBase(new HMCSSystem(), uiTextFlightMembers, uiCtlLinkResetBtns);
@@ -66,7 +71,7 @@ namespace JAFDTC.UI.A10C
                     if (settingLocation == SettingLocation.Edit)
                         configOrEdit = profileSettingsEditState;
                     else
-                        configOrEdit = _config.HMCS.GetProfileSettings(profileSettingsEditState.Profile);
+                        configOrEdit = HMCSConfig.GetProfileSettings(profileSettingsEditState.Profile);
                 }
                 else
                     configOrEdit = null;
@@ -82,15 +87,15 @@ namespace JAFDTC.UI.A10C
             if (g == null)
                 selectedProfileEditState = null;
             else
-                selectedProfileEditState = EditState.GetProfileSettings((string)g.Tag);
+                selectedProfileEditState = HMCSEditState.GetProfileSettings((string)g.Tag);
             return selectedProfileEditState != null;
         }
 
-        protected override void UpdateUI()
+        protected override void UpdateUICustom(bool isEditable)
         {
-            uiProfile1SelectIcon.Visibility = Utilities.HiddenIfDefault(_config.HMCS.GetProfileSettings(Profiles.PRO1));
-            uiProfile2SelectIcon.Visibility = Utilities.HiddenIfDefault(_config.HMCS.GetProfileSettings(Profiles.PRO2));
-            uiProfile3SelectIcon.Visibility = Utilities.HiddenIfDefault(_config.HMCS.GetProfileSettings(Profiles.PRO3));
+            uiProfile1SelectIcon.Visibility = Utilities.HiddenIfDefault(HMCSConfig.GetProfileSettings(Profiles.PRO1));
+            uiProfile2SelectIcon.Visibility = Utilities.HiddenIfDefault(HMCSConfig.GetProfileSettings(Profiles.PRO2));
+            uiProfile3SelectIcon.Visibility = Utilities.HiddenIfDefault(HMCSConfig.GetProfileSettings(Profiles.PRO3));
         }
 
         // ---- control event handlers --------------------------------------------------------------------------------
@@ -99,7 +104,7 @@ namespace JAFDTC.UI.A10C
         {
             if (e.RemovedItems.Count > 0)
             {
-                HMCSProfileSettings oldSettings = EditState.GetProfileSettings((string)((Grid)e.RemovedItems[0]).Tag);
+                HMCSProfileSettings oldSettings = HMCSEditState.GetProfileSettings((string)((Grid)e.RemovedItems[0]).Tag);
                 if (oldSettings != null)
                 {
                     oldSettings.ErrorsChanged -= EditState_ErrorsChanged;
@@ -114,7 +119,7 @@ namespace JAFDTC.UI.A10C
 
             if (e.AddedItems.Count > 0)
             {
-                HMCSProfileSettings newSettings = EditState.GetProfileSettings((string)((Grid)e.AddedItems[0]).Tag);
+                HMCSProfileSettings newSettings = HMCSEditState.GetProfileSettings((string)((Grid)e.AddedItems[0]).Tag);
                 if (newSettings != null)
                 {
                     newSettings.ErrorsChanged += EditState_ErrorsChanged;

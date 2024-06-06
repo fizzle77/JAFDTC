@@ -51,7 +51,7 @@ namespace JAFDTC.UI.F16C
 
         // ---- overrides of base SystemEditorPage properties
 
-        protected override SystemBase SystemConfig => ((F16CConfiguration)Config).SMS;
+        public override SystemBase SystemConfig => ((F16CConfiguration)Config).SMS;
 
         protected override String SystemTag => SMSSystem.SystemTag;
 
@@ -111,7 +111,7 @@ namespace JAFDTC.UI.F16C
             _textForFuzeMode = new[] { "NSTL", "NOSE", "TAIL", "NSTL (HI)", "NOSE (LO)", "TAIL (HI)" };
 
             InitializeComponent();
-            InitializeBase(EditSetup, uiValueRippleQty, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            InitializeBase(EditSetup, uiValueRippleQty, uiCtlLinkResetBtns);
 
             _elemsProfile = new() { uiLabelProfile, uiComboProfile, uiCkboxProfileEnb };
             _elemsRelease = new() { uiLabelRelMode, uiComboRelMode, null, uiStackRelMode };
