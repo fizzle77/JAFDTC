@@ -67,7 +67,7 @@ namespace JAFDTC.Models.F16C.SMS
             Unknown = -1,
             SGL = 0,
             PAIR = 1,
-            SGL_TRI = 2,
+            TRI_SGL = 2,
             TRI_PAIR_F2B = 3,
             TRI_PAIR_L2R = 4,
             MAV_SGL = 5,
