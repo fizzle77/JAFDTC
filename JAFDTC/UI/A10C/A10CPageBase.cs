@@ -156,19 +156,5 @@ namespace JAFDTC.UI.A10C
                 CopyProperty(property, source, destination, checkErrorsInSource);
             }
         }
-
-        // ---- control event handlers --------------------------------------------------------------------------------
-
-        // use this everywhere?
-        protected void TextBox_LosingFocus(UIElement sender, LosingFocusEventArgs _)
-        {
-            TextBox textBox = (TextBox)sender;
-            GetControlEditStateProperty(textBox, out PropertyInfo property, out BindableObject editState);
-
-            if (property != null && editState != null)
-                property.SetValue(editState, textBox.Text);
-
-            SaveEditStateToConfig();
-        }
     }
 }

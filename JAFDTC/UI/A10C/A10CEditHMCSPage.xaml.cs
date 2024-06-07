@@ -21,6 +21,7 @@ using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.HMCS;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Base;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -33,7 +34,7 @@ namespace JAFDTC.UI.A10C
     /// <summary>
     /// Code-behind class for the A10 HMCS editor.
     /// </summary>
-    public sealed partial class A10CEditHMCSPage : A10CPageBase
+    public sealed partial class A10CEditHMCSPage : SystemEditorPageBase
     {
         private const string SYSTEM_NAME = "HMCS";
 
@@ -55,26 +56,44 @@ namespace JAFDTC.UI.A10C
 
         // ---- UI helpers  -------------------------------------------------------------------------------------------
 
-        protected override void GetControlPropertyHelper(
-            SettingLocation settingLocation,
-            FrameworkElement control,
-            out PropertyInfo property,
-            out BindableObject configOrEdit)
+        protected override void GetControlEditStateProperty(FrameworkElement ctrl,
+                                                           out PropertyInfo prop, out BindableObject obj)
         {
-            base.GetControlPropertyHelper(settingLocation, control, out property, out configOrEdit);
-            if (property == null)
+            GetControlPropertyHelper(SettingLocation.Edit, ctrl, out prop, out obj);
+        }
+
+        protected override void GetControlConfigProperty(FrameworkElement ctrl,
+                                                         out PropertyInfo prop, out BindableObject obj)
+        {
+            GetControlPropertyHelper(SettingLocation.Config, ctrl, out prop, out obj);
+        }
+
+        private void GetControlPropertyHelper(SettingLocation settingLocation, FrameworkElement ctrl,
+                                              out PropertyInfo prop, out BindableObject obj)
+        {
+            if (settingLocation == SettingLocation.Edit)
             {
-                string propName = control.Tag.ToString();
-                property = typeof(HMCSProfileSettings).GetProperty(propName);
+                prop = EditState.GetType().GetProperty(ctrl.Tag.ToString());
+                obj = EditState;
+            }
+            else
+            {
+                prop = SystemConfig.GetType().GetProperty(ctrl.Tag.ToString());
+                obj = SystemConfig;
+            }
+
+            if (prop == null)
+            {
+                prop = typeof(HMCSProfileSettings).GetProperty(ctrl.Tag.ToString());
                 if (IsProfileSelectionValid(out HMCSProfileSettings profileSettingsEditState))
                 {
                     if (settingLocation == SettingLocation.Edit)
-                        configOrEdit = profileSettingsEditState;
+                        obj = profileSettingsEditState;
                     else
-                        configOrEdit = HMCSConfig.GetProfileSettings(profileSettingsEditState.Profile);
+                        obj = HMCSConfig.GetProfileSettings(profileSettingsEditState.Profile);
                 }
                 else
-                    configOrEdit = null;
+                    obj = null;
             }
         }
 

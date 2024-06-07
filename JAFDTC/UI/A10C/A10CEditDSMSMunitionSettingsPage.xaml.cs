@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using static JAFDTC.UI.A10C.A10CEditDSMSPage;
 using System.Reflection;
 using System.ComponentModel;
+using Microsoft.UI.Xaml.Input;
 
 namespace JAFDTC.UI.A10C
 {
@@ -235,6 +236,11 @@ namespace JAFDTC.UI.A10C
                 SaveEditStateToConfig();
                 UpdateUIFromEditState();
             }
+        }
+
+        private void TextBox_LosingFocus(UIElement sender, LosingFocusEventArgs args)
+        {
+            TextBox_LostFocus(sender, args);
         }
 
         protected override void EditState_PropertyChanged(object sender, PropertyChangedEventArgs e)
