@@ -179,7 +179,7 @@ https://www.gnu.org/licenses/.
                          MaxLength="2" PlaceholderText="1"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                          ToolTipService.ToolTip="Number of munitions to release per weapons release depression"/>
-                <TextBlock Margin="6,0,0,0"
+                <TextBlock Margin="6,0,0,0" x:Name="uiLabelRippleFtAt"
                            VerticalAlignment="Center"
                            Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                     at

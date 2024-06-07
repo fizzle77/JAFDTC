@@ -221,6 +221,12 @@ namespace JAFDTC.UI.F16C
                 CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "Spin");
                 CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "AutoPwrMode");
 
+                // MAN employment mode has different RippleSpacing defaults than other modes. we'll just unilaterally
+                // slam RippleSpaing to "" here for MAN employment just to be safe.
+                //
+                if (settings.EmplMode == ((int)MunitionSettings.EmploymentModes.MAN).ToString())
+                    settings.RippleSpacing = "";
+
                 config.SMS.CleanUp();
                 config.Save(this, SystemTag);
                 UpdateUIFromEditState();
@@ -483,8 +489,18 @@ namespace JAFDTC.UI.F16C
                     uiStackRelMode.Visibility = Visibility.Visible;
                     uiLabelRippleQty.Visibility = Visibility.Visible;
                     uiValueRippleQty.Visibility = Visibility.Visible;
-                    uiValueRippleFt.Visibility = Visibility.Visible;
-                    uiLabelRippleFtUnits.Visibility = Visibility.Visible;
+                    if (EditSetup.EmplMode == ((int)MunitionSettings.EmploymentModes.MAN).ToString())
+                    {
+                        uiLabelRippleFtAt.Visibility = Visibility.Collapsed;
+                        uiValueRippleFt.Visibility = Visibility.Collapsed;
+                        uiLabelRippleFtUnits.Visibility = Visibility.Collapsed;
+                    }
+                    else if (!string.IsNullOrEmpty(muni.MunitionInfo.ReleaseMode))
+                    {
+                        uiLabelRippleFtAt.Visibility = Visibility.Visible;
+                        uiValueRippleFt.Visibility = Visibility.Visible;
+                        uiLabelRippleFtUnits.Visibility = Visibility.Visible;
+                    }
                     uiComboRippleDt.Visibility = Visibility.Collapsed;
                     uiLabelRippleDtUnits.Visibility = Visibility.Collapsed;
                     break;
