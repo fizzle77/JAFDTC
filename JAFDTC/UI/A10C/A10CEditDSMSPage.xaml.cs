@@ -25,13 +25,14 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using JAFDTC.Models;
+using JAFDTC.UI.Base;
 
 namespace JAFDTC.UI.A10C
 {
     /// <summary>
     /// Code-behind class for the A10 DSMS editor.
     /// </summary>
-    public sealed partial class A10CEditDSMSPage : A10CPageBase
+    public sealed partial class A10CEditDSMSPage : SystemEditorPageBase
     {
         internal class DSMSEditorNavArgs
         {
@@ -71,7 +72,7 @@ namespace JAFDTC.UI.A10C
         public override void CopyConfigToEditState()
         {
             if (DSMSContentFrame.Content != null)
-                ((A10CPageBase)DSMSContentFrame.Content).CopyConfigToEditState();
+                ((SystemEditorPageBase)DSMSContentFrame.Content).CopyConfigToEditState();
             UpdateDefaultStateIndicators();
         }
 

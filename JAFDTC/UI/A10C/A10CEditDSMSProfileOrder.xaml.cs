@@ -20,11 +20,11 @@
 using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.DSMS;
+using JAFDTC.UI.Base;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using static JAFDTC.Models.A10C.DSMS.DSMSSystem;
 using static JAFDTC.UI.A10C.A10CEditDSMSPage;
 
 namespace JAFDTC.UI.A10C
@@ -32,7 +32,7 @@ namespace JAFDTC.UI.A10C
     /// <summary>
     /// Content pane for setting A-10 default weapon profile order.
     /// </summary>
-    public sealed partial class A10CEditDSMSProfileOrderPage : A10CPageBase
+    public sealed partial class A10CEditDSMSProfileOrderPage : SystemEditorPageBase
     {
         public override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
         protected override string SystemTag => DSMSSystem.SystemTag;

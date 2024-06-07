@@ -18,9 +18,9 @@ https://www.gnu.org/licenses/.
 
 **********************************************************************************************************************
 -->
-<ui:A10CPageBase
+<base:SystemEditorPageBase
     x:Class="JAFDTC.UI.A10C.A10CEditDSMSProfileOrderPage"
-    xmlns:ui="using:JAFDTC.UI.A10C"
+    xmlns:base="using:JAFDTC.UI.Base"
     xmlns:models="using:JAFDTC.Models.A10C"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -65,4 +65,4 @@ https://www.gnu.org/licenses/.
             Drag to adjust the order of default weapon profiles in the jet.
         </TextBlock>
     </Grid>
-</ui:A10CPageBase>
+</base:SystemEditorPageBase>

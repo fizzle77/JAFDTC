@@ -29,13 +29,14 @@ using static JAFDTC.UI.A10C.A10CEditDSMSPage;
 using System.Reflection;
 using System.ComponentModel;
 using Microsoft.UI.Xaml.Input;
+using JAFDTC.UI.Base;
 
 namespace JAFDTC.UI.A10C
 {
     /// <summary>
     /// UI Code for the A-10 DSMS A10CMunition Settings Frame
     /// </summary>
-    public sealed partial class A10CEditDSMSMunitionSettingsPage : A10CPageBase
+    public sealed partial class A10CEditDSMSMunitionSettingsPage : SystemEditorPageBase
     {
 
         public override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
@@ -60,29 +61,48 @@ namespace JAFDTC.UI.A10C
 
         // ---- UI helpers  -------------------------------------------------------------------------------------------
 
-        protected override void GetControlPropertyHelper(
-            SettingLocation settingLocation,
-            FrameworkElement control,
-            out PropertyInfo property,
-            out BindableObject configOrEdit)
+        protected override void GetControlEditStateProperty(FrameworkElement ctrl,
+                                                           out PropertyInfo prop, out BindableObject obj)
         {
-            // base will check the "normal" DSMSSystem class properties first.
-            base.GetControlPropertyHelper(settingLocation, control, out property, out configOrEdit);
+            GetControlPropertyHelper(SettingLocation.Edit, ctrl, out prop, out obj);
+        }
+
+        protected override void GetControlConfigProperty(FrameworkElement ctrl,
+                                                         out PropertyInfo prop, out BindableObject obj)
+        {
+            GetControlPropertyHelper(SettingLocation.Config, ctrl, out prop, out obj);
+        }
+
+        private void GetControlPropertyHelper(SettingLocation settingLocation, FrameworkElement ctrl,
+                                              out PropertyInfo prop, out BindableObject obj)
+        {
+            string propName = ctrl.Tag.ToString();
+
+            // check the "normal" DSMSSystem class properties first.
+            if (settingLocation == SettingLocation.Edit)
+            {
+                prop = EditState.GetType().GetProperty(propName);
+                obj = EditState;
+            }
+            else
+            {
+                prop = SystemConfig.GetType().GetProperty(propName);
+                obj = SystemConfig;
+            }
 
             // if it comes up empty, use the MunitionSettings class for the selected munition.
-            if (property == null)
+            if (prop == null)
             {
-                string propName = control.Tag.ToString();
-                property = typeof(MunitionSettings).GetProperty(propName);
+                prop = typeof(MunitionSettings).GetProperty(propName);
                 if (IsMunitionSelectionValid(out A10CMunition selectedMunition))
                 {
                     if (settingLocation == SettingLocation.Edit)
-                        configOrEdit = DSMSEditState.GetMunitionSettings(selectedMunition);
+                        obj = DSMSEditState.GetMunitionSettings(selectedMunition);
                     else
-                        configOrEdit = DSMSConfig.GetMunitionSettings(selectedMunition);
+                        obj = DSMSConfig.GetMunitionSettings(selectedMunition);
                 }
                 else
-                    configOrEdit = null;
+                    obj = null;
             }
         }
 
