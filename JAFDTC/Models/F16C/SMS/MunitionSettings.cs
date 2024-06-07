@@ -326,9 +326,9 @@ namespace JAFDTC.Models.F16C.SMS
             set
             {
                 string error = (string.IsNullOrEmpty(value)) ? null : "Invalid format";
-                if (IsDecimalFieldValid(value, 0.0, 99.99))
+                if (IsDecimalFieldValid(value, 0.0, 98.0))
                 {
-                    value = FixupDecimalField(value, "F3");
+                    value = FixupDecimalField(value, "F4");
                     error = null;
                 }
                 SetProperty(ref _cueRange, value, error);

@@ -388,7 +388,7 @@ https://www.gnu.org/licenses/.
             </TextBlock>
             <TextBox Grid.Row="15" Grid.Column="1" Margin="12,12,0,0" Tag="CueRange" x:Name="uiValueCueRng"
                      VerticalAlignment="Center"
-                     MaxLength="4" PlaceholderText="4.000"
+                     MaxLength="7" PlaceholderText="4.0000"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
             <TextBlock Grid.Row="15" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelCueRngUnits"
