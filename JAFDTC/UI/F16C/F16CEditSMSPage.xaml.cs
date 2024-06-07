@@ -160,6 +160,19 @@ namespace JAFDTC.UI.F16C
         }
 
         /// <summary>
+        /// Copy data from the system configuration object to the edit object the page interacts with.
+        /// </summary>
+        protected override void CopyConfigToEditState()
+        {
+            if (EditState != null)
+            {
+                EditSetup.ID = EditMuniID;
+                EditSetup.Profile = EditProfileID;
+                base.CopyConfigToEditState();
+            }
+        }
+
+        /// <summary>
         /// Copy data from the edit object the page interacts with to the system configuration object and persist the
         /// updated configuration to disk.
         /// </summary>
