@@ -262,6 +262,7 @@ function JAFDTC_Cmd_Query(list, index)
 
     local fnName = "JAFDTC_" .. JAFDTC_GetPlayerAircraftType() .. "_Fn_" .. fn;
     responseVal = _G[fnName](unpack(fnPrm))
+    JAFDTC_Log(string.format("[%.3f] Query returns '%s'", socket.gettime(), tostring(responseVal)))
     return 1, 0
 end
 
