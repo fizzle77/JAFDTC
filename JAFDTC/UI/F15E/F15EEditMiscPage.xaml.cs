@@ -82,7 +82,7 @@ namespace JAFDTC.UI.F15E
         /// <summary>
         /// Copy data from the system configuration object to the edit object the page interacts with.
         /// </summary>
-        public override void CopyConfigToEditState()
+        protected override void CopyConfigToEditState()
         {
             if (EditState != null)
             {

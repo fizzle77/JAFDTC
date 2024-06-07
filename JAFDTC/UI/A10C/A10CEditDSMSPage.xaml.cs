@@ -29,6 +29,11 @@ using JAFDTC.UI.Base;
 
 namespace JAFDTC.UI.A10C
 {
+    public interface IA10CDSMSEditorTab
+    {
+        public void DSMSEditorCopyConfigToEditState();
+    }
+
     /// <summary>
     /// Code-behind class for the A10 DSMS editor.
     /// </summary>
@@ -69,10 +74,10 @@ namespace JAFDTC.UI.A10C
 
         // ---- UI helpers -----------------------------------------------------------------------------------------
 
-        public override void CopyConfigToEditState()
+        protected override void CopyConfigToEditState()
         {
             if (DSMSContentFrame.Content != null)
-                ((SystemEditorPageBase)DSMSContentFrame.Content).CopyConfigToEditState();
+                ((IA10CDSMSEditorTab)DSMSContentFrame.Content).DSMSEditorCopyConfigToEditState();
             UpdateDefaultStateIndicators();
         }
 

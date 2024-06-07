@@ -104,7 +104,7 @@ namespace JAFDTC.UI.Base
         /// <summary>
         /// Copy data from the system configuration object to the edit object the page interacts with.
         /// </summary>
-        public override void CopyConfigToEditState()
+        protected override void CopyConfigToEditState()
         {
             IsMarshalling = true;
             PageHelper.CopyConfigToEdit(Config, EditNavpt);

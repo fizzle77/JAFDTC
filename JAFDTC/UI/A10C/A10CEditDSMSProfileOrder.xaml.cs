@@ -32,7 +32,7 @@ namespace JAFDTC.UI.A10C
     /// <summary>
     /// Content pane for setting A-10 default weapon profile order.
     /// </summary>
-    public sealed partial class A10CEditDSMSProfileOrderPage : SystemEditorPageBase
+    public sealed partial class A10CEditDSMSProfileOrderPage : SystemEditorPageBase, IA10CDSMSEditorTab
     {
         public override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
         protected override string SystemTag => DSMSSystem.SystemTag;
@@ -62,7 +62,9 @@ namespace JAFDTC.UI.A10C
             Config.Save(_dsmsEditorNavArgs.ParentPage, SystemTag);
         }
 
-        public override void CopyConfigToEditState()
+        public void DSMSEditorCopyConfigToEditState() => CopyConfigToEditState();
+        
+        protected override void CopyConfigToEditState()
         {
             if (DSMSConfig.ProfileOrder == null)
             {

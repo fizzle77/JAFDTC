@@ -36,7 +36,7 @@ namespace JAFDTC.UI.A10C
     /// <summary>
     /// UI Code for the A-10 DSMS A10CMunition Settings Frame
     /// </summary>
-    public sealed partial class A10CEditDSMSMunitionSettingsPage : SystemEditorPageBase
+    public sealed partial class A10CEditDSMSMunitionSettingsPage : SystemEditorPageBase, IA10CDSMSEditorTab
     {
 
         public override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
@@ -60,6 +60,8 @@ namespace JAFDTC.UI.A10C
         }
 
         // ---- UI helpers  -------------------------------------------------------------------------------------------
+
+        public void DSMSEditorCopyConfigToEditState() => CopyConfigToEditState();
 
         protected override void GetControlEditStateProperty(FrameworkElement ctrl,
                                                            out PropertyInfo prop, out BindableObject obj)

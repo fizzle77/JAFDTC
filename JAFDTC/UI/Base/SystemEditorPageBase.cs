@@ -339,7 +339,7 @@ namespace JAFDTC.UI.Base
         /// should override if not all relevant settings are included in the EditState and SystemConfig classes
         /// managed by this base class or if the EditState and SystemConfig objects are not symmetric.
         /// </summary>
-        public virtual void CopyConfigToEditState()
+        protected virtual void CopyConfigToEditState()
         {
             if (EditState != null)
             {
