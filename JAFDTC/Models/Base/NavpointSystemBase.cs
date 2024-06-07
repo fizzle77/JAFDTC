@@ -17,13 +17,11 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Collections.Generic;
-using System.Xml.Linq;
+using JAFDTC.Models.DCS;
 
 namespace JAFDTC.Models.Base
 {
@@ -33,7 +31,7 @@ namespace JAFDTC.Models.Base
     /// typically derived from the NavpointInfoBase abstract base class).
     /// </summary>
     public abstract class NavpointSystemBase<T> : SystemBase, INavpointSystemImport
-                                                  where T : class, INavpointInfo
+                                                  where T : class, INavpointInfo, new()
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -99,6 +97,52 @@ namespace JAFDTC.Models.Base
                 Points = prevPoints;
             }
             return false;
+        }
+
+        /// <summary>
+        /// deserialize an array of POIs from .json and incorporate them into the navpoint list. the deserialized
+        /// navpoints can either replace the existing navpoints or be appended to the end of the navpoint list. returns
+        /// true on success, false on error (previous navpoints preserved on errors).
+        /// </summary>
+        public virtual bool ImportSerializedPOIs(string json, bool isReplace = true)
+        {
+            ObservableCollection<T> prevPoints = Points;
+            try
+            {
+                List<PointOfInterest> pois = JsonSerializer.Deserialize<List<PointOfInterest>>(json);
+                if (isReplace)
+                {
+                    Points.Clear();
+                }
+                foreach (PointOfInterest poi in pois)
+                {
+                    Add(ConvertPOIToNavPt(poi));
+                }
+                return true;
+            }
+            catch
+            {
+                Points = prevPoints;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Convert the provided PointOfInterest into a nav point.
+        /// 
+        /// Derived classes should override if their navpoints require specialized conversion from a PointOfInterest.
+        /// </summary>
+        /// <param name="poi"></param>
+        /// <returns></returns>
+        protected virtual T ConvertPOIToNavPt(PointOfInterest poi)
+        {
+            return new()
+            {
+                Name = poi.Name,
+                Lat = poi.Latitude,
+                Lon = poi.Longitude,
+                Alt = poi.Elevation
+            };
         }
 
         /// <summary>
