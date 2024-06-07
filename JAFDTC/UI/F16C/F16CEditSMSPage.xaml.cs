@@ -515,6 +515,15 @@ namespace JAFDTC.UI.F16C
                     uiLabelRippleDtUnits.Visibility = Visibility.Collapsed;
                     break;
                 case MunitionSettings.ReleaseModes.GBU24_RP1:
+                    uiStackRelMode.Visibility = Visibility.Visible;
+                    uiLabelRippleQty.Visibility = Visibility.Collapsed;
+                    uiValueRippleQty.Visibility = Visibility.Collapsed;
+                    uiValueRippleFt.Visibility = Visibility.Collapsed;
+                    uiLabelRippleFtUnits.Visibility = Visibility.Collapsed;
+                    uiLabelRippleFtAt.Visibility = Visibility.Collapsed;
+                    uiComboRippleDt.Visibility = Visibility.Collapsed;
+                    uiLabelRippleDtUnits.Visibility = Visibility.Collapsed;
+                    break;
                 case MunitionSettings.ReleaseModes.GBU24_RP2:
                 case MunitionSettings.ReleaseModes.GBU24_RP3:
                 case MunitionSettings.ReleaseModes.GBU24_RP4:
@@ -523,6 +532,7 @@ namespace JAFDTC.UI.F16C
                     uiValueRippleQty.Visibility = Visibility.Collapsed;
                     uiValueRippleFt.Visibility = Visibility.Collapsed;
                     uiLabelRippleFtUnits.Visibility = Visibility.Collapsed;
+                    uiLabelRippleFtAt.Visibility = Visibility.Visible;
                     uiComboRippleDt.Visibility = Visibility.Visible;
                     uiLabelRippleDtUnits.Visibility = Visibility.Visible;
                     break;
