@@ -19,7 +19,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
@@ -238,14 +237,7 @@ namespace JAFDTC.Models.A10C.TGP
 
         public override void Reset()
         {
-            CoordDisplay = "0"; // LL
-            VideoMode = "0";    // CCD
-            LaserCode = "1688";
-            LSS = "1688";
-            Latch = "True";     // ON
-            TAAF = "0";
-            FRND = "True";      // ON
-            Yardstick = "0";    // METRIC
+            Reset(this);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -254,16 +246,30 @@ namespace JAFDTC.Models.A10C.TGP
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public readonly static TGPSystem ExplicitDefaults = new()
+        private static TGPSystem _default;
+        public static TGPSystem ExplicitDefaults
         {
-            CoordDisplay = "0", // LL
-            VideoMode = "0",    // CCD
-            LaserCode = "1688",
-            LSS = "1688",
-            Latch = "True",     // ON
-            TAAF = "0",
-            FRND = "True",      // ON
-            Yardstick = "0",    // METRIC
-        };
+            get
+            {
+                if (_default == null)
+                {
+                    _default = new TGPSystem();
+                    Reset(_default);
+                }
+                return _default;
+            }
+        }
+
+        private static void Reset(TGPSystem tgp)
+        {
+            tgp.CoordDisplay = "0"; // LL
+            tgp.VideoMode = "0";    // CCD
+            tgp.LaserCode = "1688";
+            tgp.LSS = "1688";
+            tgp.Latch = "True";     // ON
+            tgp.TAAF = "0";
+            tgp.FRND = "True";      // ON
+            tgp.Yardstick = "0";    // METRIC
+        }
     }
 }

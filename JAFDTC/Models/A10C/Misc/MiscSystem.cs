@@ -311,25 +311,19 @@ namespace JAFDTC.Models.A10C.Misc
         //
         // defaults are as of DCS v2.9.0.47168.
         //
-        public readonly static MiscSystem ExplicitDefaults = new()
+        private static MiscSystem _default;
+        public static MiscSystem ExplicitDefaults
         {
-            CoordSystem = "0",                  // Lat/Long
-            BullseyeOnHUD = false.ToString(),
-            FlightPlan1Manual = "0",            // Auto
-            SpeedDisplay = "0",                 // IAS
-            AapSteerPt = "0",                   // Flt Plan
-            AapPage = "0",                      // Other
-            AutopilotMode = "1",                // Alt/Hdg
-            TACANMode = "0",                    // Off
-            TACANBand = "0",                    // X
-            TACANChannel = "0",
-            IFFMasterMode = "0",                // Off
-            IFFMode3Code = "0000",
-            IFFMode4On = false.ToString(),
-            AGLFloor = "500",
-            MSLFloor = "0",
-            MSLCeiling = "0"
-        };
+            get
+            {
+                if (_default == null)
+                {
+                    _default = new MiscSystem();
+                    Reset(_default);
+                }
+                return _default;
+            }
+        }
 
         // returns true if the instance indicates a default setup (all fields are "") or the object is in explicit
         // form, false otherwise.
@@ -563,22 +557,27 @@ namespace JAFDTC.Models.A10C.Misc
         //
         public override void Reset()
         {
-            CoordSystem = "0";                  // LL
-            BullseyeOnHUD = false.ToString();
-            FlightPlan1Manual = "0";            // Auto
-            SpeedDisplay = "0";                 // IAS
-            AapSteerPt = "0";                   // FltPlan
-            AapPage = "0";                      // Other
-            AutopilotMode = "1";                // Alt/Hdg
-            TACANMode = "0";                    // Off
-            TACANBand = "0";                    // X
-            TACANChannel = "0";
-            IFFMasterMode = "0";                // Off
-            IFFMode3Code = "";
-            IFFMode4On = false.ToString();
-            AGLFloor = "500";
-            MSLFloor = "0";
-            MSLCeiling = "0";
+            Reset(this);
+        }
+
+        private static void Reset(MiscSystem misc)
+        {
+            misc.CoordSystem = "0";                  // LL
+            misc.BullseyeOnHUD = false.ToString();
+            misc.FlightPlan1Manual = "0";            // Auto
+            misc.SpeedDisplay = "0";                 // IAS
+            misc.AapSteerPt = "0";                   // FltPlan
+            misc.AapPage = "0";                      // Other
+            misc.AutopilotMode = "1";                // Alt/Hdg
+            misc.TACANMode = "0";                    // Off
+            misc.TACANBand = "0";                    // X
+            misc.TACANChannel = "0";
+            misc.IFFMasterMode = "0";                // Off
+            misc.IFFMode3Code = "0000";
+            misc.IFFMode4On = false.ToString();
+            misc.AGLFloor = "500";
+            misc.MSLFloor = "0";
+            misc.MSLCeiling = "0";
         }
     }
 }

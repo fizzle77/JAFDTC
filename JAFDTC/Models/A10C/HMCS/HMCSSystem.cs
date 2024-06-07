@@ -174,9 +174,7 @@ namespace JAFDTC.Models.A10C.HMCS
 
         public override void Reset()
         {
-            ActiveProfile = "0";
-            TGPTrack = "0";
-            BrightnessSetting = "0";
+            Reset(this);
 
             _profileSettingMap = new Dictionary<Profiles, HMCSProfileSettings>
             {
@@ -208,12 +206,26 @@ namespace JAFDTC.Models.A10C.HMCS
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public readonly static HMCSSystem ExplicitDefaults = new()
+        private static HMCSSystem _default;
+        public static HMCSSystem ExplicitDefaults
         {
-            ActiveProfile = "0",
-            TGPTrack = "0",
-            BrightnessSetting = "0"
-        };
+            get
+            {
+                if (_default == null)
+                {
+                    _default = new HMCSSystem();
+                    Reset(_default);
+                }
+                return _default;
+            }
+        }
+
+        private static void Reset(HMCSSystem hmcs)
+        {
+            hmcs.ActiveProfile = "0";
+            hmcs.TGPTrack = "0";
+            hmcs.BrightnessSetting = "0";
+        }
 
     }
 }

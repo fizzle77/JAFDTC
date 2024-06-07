@@ -401,24 +401,8 @@ namespace JAFDTC.Models.A10C.TAD
 
         public override void Reset()
         {
-            CoordDisplay = "0";
-            GrpID = "";
-            OwnID = "";
-            Callsign = "";
-            HookOption = "0";
-            HookOwnship = "False";
-            MapRange = "0";
-            CenterDepress = "0";
-            MapOption = "0";
-            ProfileBullseye = "0";
-            ProfileRangeRings = "0";
-            ProfileHookInfo = "0";
-            ProfileWaypointLines = "0";
-            ProfileWaypointLabel = "0";
-            ProfileWaypoints = "0";
-            ProfileSPIDisplay = "0";
+            Reset(this);
         }
-
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -426,24 +410,39 @@ namespace JAFDTC.Models.A10C.TAD
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public readonly static TADSystem ExplicitDefaults = new()
+        private static TADSystem _default;
+        public static TADSystem ExplicitDefaults
         {
-            CoordDisplay = "0",
-            GrpID = "",
-            OwnID = "",
-            Callsign = "",
-            HookOption = "0",
-            HookOwnship = "false",
-            MapRange = "0",
-            CenterDepress = "0",
-            MapOption = "0",
-            ProfileBullseye = "0",
-            ProfileRangeRings = "0",
-            ProfileHookInfo = "0",
-            ProfileWaypointLines = "0",
-            ProfileWaypointLabel = "0",
-            ProfileWaypoints = "0",
-            ProfileSPIDisplay = "0",
-        };
+            get
+            {
+                if (_default == null)
+                {
+                    _default = new TADSystem();
+                    Reset(_default);
+                }
+                return _default;
+            }
+        }
+
+        static private void Reset(TADSystem tad)
+        {
+            tad.CoordDisplay = "0";
+            tad.GrpID = "";
+            tad.OwnID = "";
+            tad.Callsign = "";
+            tad.HookOption = "0";
+            tad.HookOwnship = "False";
+            tad.MapRange = "0";
+            tad.CenterDepress = "0";
+            tad.MapOption = "0";
+            tad.ProfileBullseye = "0";
+            tad.ProfileRangeRings = "0";
+            tad.ProfileHookInfo = "0";
+            tad.ProfileWaypointLines = "0";
+            tad.ProfileWaypointLabel = "0";
+            tad.ProfileWaypoints = "0";
+            tad.ProfileSPIDisplay = "0";
+        }
+
     }
 }

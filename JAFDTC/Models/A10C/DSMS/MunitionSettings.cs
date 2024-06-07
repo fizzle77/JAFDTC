@@ -19,7 +19,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Text.Json.Serialization;
 
 namespace JAFDTC.Models.A10C.DSMS
@@ -278,19 +277,34 @@ namespace JAFDTC.Models.A10C.DSMS
             }
         }
 
-        public readonly static MunitionSettings ExplicitDefaults = new()
+        private static MunitionSettings _default;
+        public static MunitionSettings ExplicitDefaults
         {
-            AutoLase = "False",
-            LaseSeconds = "0",
-            DeliveryMode = "",
-            EscapeManeuver = "1",   // CLB
-            ReleaseMode = "0",      // SGL
-            RippleQty = "1",
-            RippleFt = "75",
-            HOFOption = "6",        // 1800
-            RPMOption = "3",        // 1500
-            FuzeOption = "0"        // N/T
-        };
+            get
+            {
+                if (_default == null)
+                {
+                    _default = new MunitionSettings();
+                    Reset(_default);
+                }
+                return _default;
+            }
+        }
+
+        private static void Reset(MunitionSettings settings)
+        {
+            settings.AutoLase = "False";
+            settings.LaseSeconds = "0";
+            settings.DeliveryMode = "";
+            settings.EscapeManeuver = "1";   // CLB
+            settings.ReleaseMode = "0";      // SGL
+            settings.RippleQty = "1";
+            settings.RippleFt = "75";
+            settings.HOFOption = "6";        // 1800
+            settings.RPMOption = "3";        // 1500
+            settings.FuzeOption = "0";       // N/T
+        }
+
 
         private MunitionSettings()
         {
@@ -304,16 +318,7 @@ namespace JAFDTC.Models.A10C.DSMS
 
         public override void Reset()
         {
-            AutoLase = "False";
-            LaseSeconds = "0";
-            DeliveryMode = "";
-            EscapeManeuver = "1";   // CLB
-            ReleaseMode = "0";      // SGL
-            RippleQty = "1";
-            RippleFt = "75";
-            HOFOption = "6";        // 1800
-            RPMOption = "3";        // 1500
-            FuzeOption = "0";       // N/T
+            Reset(this);
         }
     }
 }

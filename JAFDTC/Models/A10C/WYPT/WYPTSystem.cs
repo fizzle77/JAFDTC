@@ -20,7 +20,6 @@
 using JAFDTC.Models.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 
 namespace JAFDTC.Models.A10C.WYPT
 {
