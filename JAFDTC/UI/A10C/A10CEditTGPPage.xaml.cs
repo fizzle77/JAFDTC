@@ -21,13 +21,14 @@ using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.TGP;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Base;
 
 namespace JAFDTC.UI.A10C
 {
     /// <summary>
     /// Code-behind class for the A10 TGP editor.
     /// </summary>
-    public sealed partial class A10CEditTGPPage : A10CPageBase
+    public sealed partial class A10CEditTGPPage : SystemEditorPageBase
     {
         private const string SYSTEM_NAME = "TGP";
 

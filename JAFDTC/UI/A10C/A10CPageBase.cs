@@ -17,21 +17,12 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models;
-using JAFDTC.Models.A10C;
-using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
-using JAFDTC.UI.Controls;
 using JAFDTC.Utilities;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Reflection;
 
 namespace JAFDTC.UI.A10C

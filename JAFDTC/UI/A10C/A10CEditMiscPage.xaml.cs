@@ -18,17 +18,17 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
-using JAFDTC.Models.A10C.DSMS;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.Misc;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Base;
 
 namespace JAFDTC.UI.A10C
 {
     /// <summary>
     /// Code-behind class for the A10 Miscellaneous editor.
     /// </summary>
-    public sealed partial class A10CEditMiscPage : A10CPageBase
+    public sealed partial class A10CEditMiscPage : SystemEditorPageBase
     {
         private const string SYSTEM_NAME = "Miscellaneous";
 
