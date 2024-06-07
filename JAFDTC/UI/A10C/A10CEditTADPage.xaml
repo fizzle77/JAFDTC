@@ -114,6 +114,7 @@ https://www.gnu.org/licenses/.
                      HorizontalAlignment="Left" VerticalAlignment="Center"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      MaxLength="4"
+                     ToolTipService.ToolTip="Four character reference for ownship, e.g. HG11"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="Callsign"/>
 
             
