@@ -117,7 +117,7 @@ namespace JAFDTC.UI.Base
         /// Derived classes must override this method to return the system configuration object that is persisted
         /// to disk for the system the page edits.
         /// </summary>
-        public abstract SystemBase SystemConfig { get; }
+        protected abstract SystemBase SystemConfig { get; }
 
         /// <summary>
         /// Derived classes must override this method to return the system tag for the system the page edits.
@@ -374,7 +374,7 @@ namespace JAFDTC.UI.Base
         /// Derived classes should override if not all controls can be mapped to a property on the EditState and 
         /// SystemConfig classes managed by this base class.
         /// </summary>
-        protected virtual void CopyAllSettings(SettingLocation srcLoc, SettingLocation destLoc, bool checkSrcErr = false)
+        protected void CopyAllSettings(SettingLocation srcLoc, SettingLocation destLoc, bool checkSrcErr = false)
         {
             Debug.Assert(srcLoc != destLoc);
 

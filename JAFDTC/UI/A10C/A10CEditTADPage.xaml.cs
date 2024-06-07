@@ -32,7 +32,7 @@ namespace JAFDTC.UI.A10C
     {
         private const string SYSTEM_NAME = "TAD";
 
-        public override SystemBase SystemConfig => ((A10CConfiguration)Config).TAD;
+        protected override SystemBase SystemConfig => ((A10CConfiguration)Config).TAD;
         protected override string SystemTag => TADSystem.SystemTag;
         protected override string SystemName => SYSTEM_NAME;
 

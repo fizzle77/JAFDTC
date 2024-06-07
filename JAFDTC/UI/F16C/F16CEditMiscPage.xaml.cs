@@ -45,7 +45,7 @@ namespace JAFDTC.UI.F16C
 
         // ---- overrides of base SystemEditorPage properties
 
-        public override SystemBase SystemConfig => ((F16CConfiguration)Config).Misc;
+        protected override SystemBase SystemConfig => ((F16CConfiguration)Config).Misc;
 
         protected override string SystemTag => MiscSystem.SystemTag;
 

@@ -32,7 +32,7 @@ namespace JAFDTC.UI.A10C
     {
         private const string SYSTEM_NAME = "TGP";
 
-        public override SystemBase SystemConfig => ((A10CConfiguration)Config).TGP;
+        protected override SystemBase SystemConfig => ((A10CConfiguration)Config).TGP;
         protected override string SystemTag => TGPSystem.SystemTag;
         protected override string SystemName => SYSTEM_NAME;
 

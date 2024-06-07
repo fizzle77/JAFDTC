@@ -32,7 +32,7 @@ namespace JAFDTC.UI.A10C
     {
         private const string SYSTEM_NAME = "Miscellaneous";
 
-        public override SystemBase SystemConfig => ((A10CConfiguration)Config).Misc;
+        protected override SystemBase SystemConfig => ((A10CConfiguration)Config).Misc;
         protected override string SystemTag => MiscSystem.SystemTag;
         protected override string SystemName => SYSTEM_NAME;
 

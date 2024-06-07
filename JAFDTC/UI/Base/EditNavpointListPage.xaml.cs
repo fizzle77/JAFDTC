@@ -59,7 +59,7 @@ namespace JAFDTC.UI.Base
 
         // ---- overrides of base SystemEditorPage properties
 
-        public override SystemBase SystemConfig => null;
+        protected override SystemBase SystemConfig => null;
 
         protected override String SystemTag => PageHelper.SystemTag;
 

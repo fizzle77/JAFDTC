@@ -38,7 +38,7 @@ namespace JAFDTC.UI.A10C
     {
         private const string SYSTEM_NAME = "HMCS";
 
-        public override SystemBase SystemConfig => ((A10CConfiguration)Config).HMCS;
+        protected override SystemBase SystemConfig => ((A10CConfiguration)Config).HMCS;
         protected override string SystemTag => HMCSSystem.SystemTag;
         protected override string SystemName => SYSTEM_NAME;
 

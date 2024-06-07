@@ -45,7 +45,7 @@ namespace JAFDTC.UI.F15E
 
         // ---- overrides of base SystemEditorPage properties
 
-        public override SystemBase SystemConfig => ((F15EConfiguration)Config).Misc;
+        protected override SystemBase SystemConfig => ((F15EConfiguration)Config).Misc;
 
         protected override String SystemTag => MiscSystem.SystemTag;
 

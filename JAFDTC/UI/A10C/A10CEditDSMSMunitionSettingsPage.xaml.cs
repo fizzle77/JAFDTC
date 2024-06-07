@@ -39,7 +39,7 @@ namespace JAFDTC.UI.A10C
     public sealed partial class A10CEditDSMSMunitionSettingsPage : SystemEditorPageBase, IA10CDSMSEditorTab
     {
 
-        public override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
+        protected override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
         protected override string SystemTag => DSMSSystem.SystemTag;
         protected override string SystemName => "DSMS";
 

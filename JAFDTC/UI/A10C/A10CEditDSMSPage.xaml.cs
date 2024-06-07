@@ -55,7 +55,7 @@ namespace JAFDTC.UI.A10C
 
         private const string SYSTEM_NAME = "DSMS";
 
-        public override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
+        protected override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
         protected override string SystemTag => DSMSSystem.SystemTag;
         protected override string SystemName => SYSTEM_NAME;
 

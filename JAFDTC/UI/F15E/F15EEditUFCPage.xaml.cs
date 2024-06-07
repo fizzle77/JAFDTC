@@ -43,7 +43,7 @@ namespace JAFDTC.UI.F15E
 
         // ---- overrides of base SystemEditorPage properties
 
-        public override SystemBase SystemConfig => ((F15EConfiguration)Config).UFC;
+        protected override SystemBase SystemConfig => ((F15EConfiguration)Config).UFC;
 
         protected override String SystemTag => UFCSystem.SystemTag;
 
