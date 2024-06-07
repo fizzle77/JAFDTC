@@ -20,11 +20,19 @@ namespace JAFDTC.UI.Controls
         private string _systemName;
         private Dictionary<string, IConfiguration> _uidToConfigMap;
 
-        public event Action ConfigLinkedOrReset;
-        private void OnConfigLinkedOrReset()
-        {
-            ConfigLinkedOrReset?.Invoke();
-        }
+        // ---- events --------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Event that fires after configuration has changed due to linking or reset.
+        /// </summary>
+        public event Action AfterConfigLinkedOrReset;
+        private void OnAfterConfigLinkedOrReset() => AfterConfigLinkedOrReset?.Invoke();
+
+        /// <summary>
+        /// Event that fires indicating the contining page should reset the config to default.
+        /// </summary>
+        public event Action DoReset;
+        private void OnDoReset() => DoReset?.Invoke();
 
         public LinkResetBtnsControl()
         {
@@ -68,9 +76,9 @@ namespace JAFDTC.UI.Controls
             {
                 _config.UnlinkSystem(_systemTag);
                 UpdateLinkControls();
-                _parentPage.SystemConfig.Reset();
+                OnDoReset();
                 _config.Save(_parentPage, _systemTag);
-                OnConfigLinkedOrReset();
+                OnAfterConfigLinkedOrReset();
             }
         }
 
@@ -88,7 +96,7 @@ namespace JAFDTC.UI.Controls
                 _config.Save(_parentPage);
             }
 
-            OnConfigLinkedOrReset();
+            OnAfterConfigLinkedOrReset();
             UpdateLinkControls();
         }
     }

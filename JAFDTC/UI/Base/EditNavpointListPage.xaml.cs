@@ -180,6 +180,11 @@ namespace JAFDTC.UI.Base
             uiNavptListView.ReorderMode = (isEditable) ? ListViewReorderMode.Enabled : ListViewReorderMode.Disabled;
         }
 
+        protected override void ResetConfigToDefault()
+        {
+            PageHelper.ResetSystem(Config);
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // ui interactions

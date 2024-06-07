@@ -544,6 +544,14 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected virtual void UpdateUICustom(bool isEditable) { }
 
+        /// <summary>
+        /// Derived classes may override this method if they require custom behavior to reset to defaults.
+        /// </summary>
+        protected virtual void ResetConfigToDefault()
+        {
+            SystemConfig.Reset();
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // events
@@ -673,7 +681,8 @@ namespace JAFDTC.UI.Base
             if (_linkResetBtnsControl != null)
             {
                 _linkResetBtnsControl.Initialize(SystemName, SystemTag, this, Config);
-                _linkResetBtnsControl.ConfigLinkedOrReset += CopyConfigToEditState;
+                _linkResetBtnsControl.DoReset += ResetConfigToDefault;
+                _linkResetBtnsControl.AfterConfigLinkedOrReset += CopyConfigToEditState;
                 _linkResetBtnsControl.NavigatedTo(NavArgs.UIDtoConfigMap);
             }
             CopyConfigToEditState();
@@ -690,7 +699,10 @@ namespace JAFDTC.UI.Base
             }
 
             if (_linkResetBtnsControl != null)
-                _linkResetBtnsControl.ConfigLinkedOrReset -= CopyConfigToEditState;
+            {
+                _linkResetBtnsControl.DoReset -= ResetConfigToDefault;
+                _linkResetBtnsControl.AfterConfigLinkedOrReset -= CopyConfigToEditState;
+            }
 
             base.OnNavigatingFrom(e);
         }
