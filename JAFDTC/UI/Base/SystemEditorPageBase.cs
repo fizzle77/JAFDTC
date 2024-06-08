@@ -97,6 +97,13 @@ namespace JAFDTC.UI.Base
     public abstract class SystemEditorPageBase : Page
     {
         /// <summary>
+        /// an empty object to stand in for the EditState object the page operates on. this can be used as the
+        /// editState parameter to InitializeBase() in the event the derived class does not need SystemEditorPage to
+        /// manage the editor state as SystemEditorPageBase frequently assumes there is a valid EditState object.
+        /// </summary>
+        protected class PrivateEditState : BindableObject { }
+
+        /// <summary>
         /// location of setting state for GetControlProperty(), CopyAllSettings(), and friends.
         /// </summary>
         protected enum SettingLocation
