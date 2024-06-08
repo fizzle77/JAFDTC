@@ -192,7 +192,7 @@
     "CntlClass": "1",
     "MunitionInfo": {
       "ID": 10,
-      "Profile": "0;1,2",
+      "Profile": "0;0,1",
       "EmplMode": "0,1;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
@@ -215,7 +215,7 @@
     "CntlClass": "1",
     "MunitionInfo": {
       "ID": 11,
-      "Profile": "0;1,2",
+      "Profile": "0;0,1",
       "EmplMode": "0,1;0,1,2,3,4",
       "ReleaseMode": "0;0,1",
       "RipplePulse": "1",
