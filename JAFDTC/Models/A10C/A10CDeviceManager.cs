@@ -42,6 +42,7 @@ namespace JAFDTC.Models.A10C
             // ---- cdu
 
             AirframeDevice cdu = new(9, "CDU");
+
             cdu.AddAction(3015, "1", delayChar, 1);
             cdu.AddAction(3016, "2", delayChar, 1);
             cdu.AddAction(3017, "3", delayChar, 1);
@@ -80,7 +81,8 @@ namespace JAFDTC.Models.A10C
             cdu.AddAction(3051, "Y", delayChar, 1);
             cdu.AddAction(3052, "Z", delayChar, 1);
             cdu.AddAction(3057, " ", delayChar, 1);
-            cdu.AddAction(3058, "CLR", delay, 1);
+            cdu.AddAction(3058, "CLR", delayChar, 1);
+
             cdu.AddAction(3001, "LSK_3L", delay, 1);
             cdu.AddAction(3002, "LSK_5L", delay, 1);
             cdu.AddAction(3003, "LSK_7L", delay, 1);
@@ -89,9 +91,11 @@ namespace JAFDTC.Models.A10C
             cdu.AddAction(3006, "LSK_5R", delay, 1);
             cdu.AddAction(3007, "LSK_7R", delay, 1);
             cdu.AddAction(3008, "LSK_9R", delay, 1);
+
             cdu.AddAction(3010, "NAV", delay, 1);
             cdu.AddAction(3011, "WP", delay, 1);
             cdu.AddAction(3013, "FPM", delay, 1);
+
             AddDevice(cdu);
 
             // ---- auxiliary avionics panel

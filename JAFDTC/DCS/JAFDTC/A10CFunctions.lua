@@ -131,6 +131,10 @@ function JAFDTC_A10C_GetCDU_value(key)
     return value;
 end
 
+function JAFDTC_A10C_Fn_IsWyptElevationDifferent(set_elevation)
+    return tonumber(set_elevation) ~= tonumber(JAFDTC_A10C_GetCDU_value("WAYPT_EL3"));
+end
+
 function JAFDTC_A10C_Fn_IsCoordFmtLL()
     local value = JAFDTC_A10C_GetCDU_value("WAYPTCoordFormat");
     return string.sub(value, 1, 3) == "L/L"

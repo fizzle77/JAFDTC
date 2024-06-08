@@ -120,9 +120,15 @@ namespace JAFDTC.Models.A10C.Upload
                     // If no altitude was entered, leave it at the A-10's ground level altitude.
                     if (!string.IsNullOrEmpty(wypt.Alt))
                     {
-                        AddActions(cdu, ActionsForString(Math.Max(int.Parse(wypt.Alt), 0).ToString()), new() { "LSK_5L" });
-                        AddWait(WAIT_BASE);
-                        AddActions(cdu, new() { "CLR", "CLR" });
+                        // JAFDTC navpoints created from e.g. POIs always have an altitude.
+                        // For speed, only set altitude if it's different from the A-10's ground map elevation.
+                        AddIfBlock("IsWyptElevationDifferent", true, new() { wypt.Alt }, delegate ()
+                        {
+                            AddActions(cdu, ActionsForString(Math.Max(int.Parse(wypt.Alt), 0).ToString()), new() { "LSK_5L" });
+                            AddWait(WAIT_BASE);
+                            AddActions(cdu, new() { "CLR", "CLR" });
+                        });
+
                     }
                 }
             }
