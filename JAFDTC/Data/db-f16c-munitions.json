@@ -302,7 +302,7 @@
     "ID": 15,
     "LabelUI": "AGM-65D",
     "DescrUI": "AGM-65D Maverick IR-guided Missile, 125lb Warhead",
-    "LabelSMS": [ "A65D" ],
+    "LabelSMS": [ "AG65D" ],
     "Image": "agm-65d.png",
     "MunitionInfo": {
       "ID": 15,
@@ -315,7 +315,7 @@
     "ID": 16,
     "LabelUI": "AGM-65G",
     "DescrUI": "AGM-65G Maverick IR-guided AG Missile, 300lb Warhead",
-    "LabelSMS": [ "A65G" ],
+    "LabelSMS": [ "AG65G" ],
     "Image": "agm-65g.png",
     "MunitionInfo": {
       "ID": 16,
@@ -328,7 +328,7 @@
     "ID": 17,
     "LabelUI": "AGM-65H",
     "DescrUI": "AGM-65H Maverick TV-guided AG Missile, 125lb Warhead",
-    "LabelSMS": [ "A65H" ],
+    "LabelSMS": [ "AG65H" ],
     "Image": "agm-65h.png",
     "MunitionInfo": {
       "ID": 17,
@@ -341,7 +341,7 @@
     "ID": 18,
     "LabelUI": "AGM-65K",
     "DescrUI": "AGM-65K Maverick TV-guided AG Missile, 300lb Warhead",
-    "LabelSMS": [ "A65K" ],
+    "LabelSMS": [ "AG65K" ],
     "Image": "agm-65k.png",
     "MunitionInfo": {
       "ID": 18,
