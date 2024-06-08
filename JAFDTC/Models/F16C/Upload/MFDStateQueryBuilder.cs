@@ -26,8 +26,15 @@ using System.Text;
 namespace JAFDTC.Models.F16C.Upload
 {
     /// <summary>
-    /// dcs query builder for a query on current mfd state across specified modes. the QueryCurrentMFDState() method
-    /// generates a stream of queries to gather current mfd format congfiguration across all master modes.
+    /// dcs query builder for a query on current mfd state across specified modes. QueryCurrentMFDStateForAllModes()
+    /// method generates a stream of queries to gather current mfd format congfiguration (formats on osb 12-14 along
+    /// with selected format) across all master modes. this class produces a state dictionary with,
+    /// 
+    ///     MFDModeConfig.{mode}: MFDModeConfiguration
+    ///         value carries current mfd formats for master mode "mode" (MFDSystem.MasterModes)
+    /// 
+    /// entries for each master mode. if unable to establish the setup on the jet for a given mode, the default setup
+    /// is returned.
     /// </summary>
     internal class MFDStateQueryBuilder : QueryBuilderBase, IBuilder
     {
@@ -73,11 +80,27 @@ namespace JAFDTC.Models.F16C.Upload
         /// </summary>
         private void PackCurrentState(string mfdState, MFDConfiguration mfdConfig)
         {
-            List<string> elems = new(mfdState.Split(','));
-            mfdConfig.SelectedOSB = (elems.Count > 0) ? elems[0] : "12";
-            mfdConfig.OSB12 = (elems.Count > 1) ? _mapDCSFmtToDispFmt[elems[1]] : "";
-            mfdConfig.OSB13 = (elems.Count > 2) ? _mapDCSFmtToDispFmt[elems[2]] : "";
-            mfdConfig.OSB14 = (elems.Count > 3) ? _mapDCSFmtToDispFmt[elems[3]] : "";
+            if (!string.IsNullOrEmpty(mfdState))
+            {
+                List<string> elems = new(mfdState.Split(','));
+                mfdConfig.SelectedOSB = (elems.Count > 0) ? elems[0] : "12";
+                mfdConfig.OSB12 = (elems.Count > 1) ? _mapDCSFmtToDispFmt[elems[1]] : "";
+                mfdConfig.OSB13 = (elems.Count > 2) ? _mapDCSFmtToDispFmt[elems[2]] : "";
+                mfdConfig.OSB14 = (elems.Count > 3) ? _mapDCSFmtToDispFmt[elems[3]] : "";
+            }
+        }
+
+        /// <summary>
+        /// set up a MFDConfiguration in accordance with the defaults for the mode.
+        /// </summary>
+        private static void PackDefaultState(MFDSystem.MasterModes mode, bool isLeftMFD, MFDConfiguration mfdConfig)
+        {
+            MFDConfiguration dflt = (isLeftMFD) ? MFDSystem.ExplicitDefaults.ModeConfigs[(int)mode].LeftMFD
+                                                : MFDSystem.ExplicitDefaults.ModeConfigs[(int)mode].RightMFD;
+            mfdConfig.SelectedOSB = dflt.SelectedOSB;
+            mfdConfig.OSB12 = dflt.OSB12;
+            mfdConfig.OSB13 = dflt.OSB13;
+            mfdConfig.OSB14 = dflt.OSB14;
         }
 
         /// <summary>
@@ -101,7 +124,10 @@ namespace JAFDTC.Models.F16C.Upload
             AddQuery("QueryMFDFormatState", new() { "left" });
 
             string mfdStateLeft = Query();
-            PackCurrentState(mfdStateLeft, modeFmtss.LeftMFD);
+            if (!string.IsNullOrEmpty(mfdStateLeft))
+                PackCurrentState(mfdStateLeft, modeFmtss.LeftMFD);
+            else
+                PackDefaultState(mode, true, modeFmtss.LeftMFD);
             ClearCommands();
 
             // build a command stream that queries the right mfd state (should be in the target master mode), then
@@ -115,19 +141,26 @@ namespace JAFDTC.Models.F16C.Upload
                 AddAction(ufc, masterMode);
 
             string mfdStateRight = Query();
-            PackCurrentState(mfdStateRight, modeFmtss.RightMFD);
+            if (!string.IsNullOrEmpty(mfdStateLeft))
+                PackCurrentState(mfdStateRight, modeFmtss.RightMFD);
+            else
+                PackDefaultState(mode, false, modeFmtss.RightMFD);
             ClearCommands();
         }
 
         /// <summary>
         /// gather the current mfd setups including formats programmed on osb12-14 and the currently selected format
-        /// for all master modes. results are returned through the modFmtss[] indexed by mode with jet in nav master
-        /// mode.
+        /// for all master modes along with munition loadouts from AA and AG master modes. returns a state dictionary
+        /// with [ "MFDModeConfig.{MFDSystem.MasterModes}", MFDModeConfiguration ] tuples added for each master mode.
+        /// 
+        /// returns avionics to nav master mode with no other changes.
         /// </summary>
-        public void QueryCurrentMFDStateForAllModes(MFDModeConfiguration[] modeFmtss)
+        public Dictionary<string, object> QueryCurrentMFDStateForAllModes(Dictionary<string, object> state = null)
         {
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice hotas = _aircraft.GetDevice("HOTAS");
+
+            ClearCommands();
 
             AddWhileBlock("IsInNAVMode", false, null, delegate ()
             {
@@ -135,26 +168,15 @@ namespace JAFDTC.Models.F16C.Upload
                 AddAction(hotas, "CENTER", WAIT_BASE);
             });
 
+            state ??= new();
             for (int mode = 0; mode < (int)MFDSystem.MasterModes.NUM_MODES; mode++)
-                QueryCurrentMFDState(ufc, hotas, (MFDSystem.MasterModes)mode, modeFmtss[mode]);
-        }
-
-        /// <summary>
-        /// gather the current mfd setups including formats programmed on osb12-14 and the currently selected format
-        /// for a specific master mode. results are returned through the modFmtss with jet in nav master mode.
-        /// </summary>
-        public void QueryCurrentMFDStateForMode(MFDSystem.MasterModes mode, MFDModeConfiguration modeFmtss)
-        {
-            AirframeDevice ufc = _aircraft.GetDevice("UFC");
-            AirframeDevice hotas = _aircraft.GetDevice("HOTAS");
-
-            AddWhileBlock("IsInNAVMode", false, null, delegate ()
             {
-                AddAction(ufc, "AA", WAIT_BASE);
-                AddAction(hotas, "CENTER", WAIT_BASE);
-            });
+                MFDModeConfiguration modeFmtss = new();
+                QueryCurrentMFDState(ufc, hotas, (MFDSystem.MasterModes)mode, modeFmtss);
+                state.Add($"MFDModeConfig.{(MFDSystem.MasterModes)mode}", modeFmtss);
+            }
 
-            QueryCurrentMFDState(ufc, hotas, mode, modeFmtss);
+            return state;
         }
     }
 }

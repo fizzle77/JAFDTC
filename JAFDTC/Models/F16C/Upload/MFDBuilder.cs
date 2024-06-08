@@ -27,8 +27,13 @@ using System.Text;
 namespace JAFDTC.Models.F16C.Upload
 {
     /// <summary>
-    /// command builder for the mfd format setup in the viper. translates cmds setup in F16CConfiguration into commands
-    /// that drive the dcs clickable cockpit.
+    /// builder to generate the command stream to configure mfd formats mapped to osbs based on the desired target
+    /// configuration along with the current setup in the avionics. the builder requires the following state:
+    /// 
+    ///     MFDModeConfig.{mode}: MFDModeConfiguration
+    ///         value carries current mfd formats for master mode "mode" (MFDSystem.MasterModes)
+    ///
+    /// see MFDStateQueryBuilder for further details.
     /// </summary>
     internal class MFDBuilder : F16CBuilderBase, IBuilder
     {
@@ -38,8 +43,9 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        private Dictionary<string, object> _state;
+
         private readonly Dictionary<MFDConfiguration.DisplayFormats, string> _mapFormatToOSB;
-        private readonly string[] _htsThreatToOSB;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -68,12 +74,6 @@ namespace JAFDTC.Models.F16C.Upload
                 // case Formats.RCCE:      // OSB 4
                 // case Formats.TFR:       // OSB 17
             };
-
-            _htsThreatToOSB = new string[]
-            {
-                "OSB-02", "OSB-20", "OSB-19", "OSB-18", "OSB-17", "OSB-16",     // MAN, TC1-TC5
-                "OSB-06", "OSB-07", "OSB-08", "OSB-09", "OSB-10", "OSB-01"      // TC6-TC11
-            };
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -85,62 +85,81 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         /// configure mfd formats via the icp/ded according to the non-default programming settings (this function
         /// is safe to call with a configuration with default settings: defaults are skipped as necessary).
+        /// 
+        ///     MFDModeConfig.{mode}, MFDModeConfiguration
+        ///         value carries current mfd formats for master mode "mode" (MFDSystem.MasterModes)
+        /// 
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            if (_cfg.MFD.IsDefault)
+                return;
+
+            AddExecFunction("NOP", new() { "MFDBuilder:Build()" });
+
+            _state = state;
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice hotas = _aircraft.GetDevice("HOTAS");
             AirframeDevice mfdL = _aircraft.GetDevice("LMFD");
             AirframeDevice mfdR = _aircraft.GetDevice("RMFD");
 
-            if (!_cfg.MFD.IsDefault)
+            MFDSystem tgtMFD = (MFDSystem)_cfg.MFD.Clone();
+            MFDSystem dflMFD = MFDSystem.ExplicitDefaults;
+
+            AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" }, null, WAIT_BASE);
+            AddIfBlock("IsInAAMode", true, null, delegate ()
             {
-                MFDSystem tgtMFD = (MFDSystem)_cfg.MFD.Clone();
-                MFDSystem dflMFD = MFDSystem.ExplicitDefaults;
-                MFDSystem curMFD = new();
-
-                MFDStateQueryBuilder query = new(_aircraft, new StringBuilder());
-                query.QueryCurrentMFDStateForAllModes(curMFD.ModeConfigs);
-
-                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" }, null, WAIT_BASE);
-                AddIfBlock("IsInAAMode", true, null, delegate ()
+                AddAction(ufc, "SEQ");
+                AddIfBlock("IsInAGMode", true, null, delegate ()
                 {
-                    AddAction(ufc, "SEQ");
-                    AddIfBlock("IsInAGMode", true, null, delegate ()
-                    {
-                        for (int mode = 0; mode < (int)MFDSystem.MasterModes.NUM_MODES; mode++)
+                    for (int mode = 0; mode < (int)MFDSystem.MasterModes.NUM_MODES; mode++)
+                        if (state.TryGetValueAs($"MFDModeConfig.{(MFDSystem.MasterModes)mode}",
+                                                out MFDModeConfiguration curMFD))
                         {
-                            MergeConfigs(tgtMFD.ModeConfigs[mode].LeftMFD,
-                                         curMFD.ModeConfigs[mode].LeftMFD, dflMFD.ModeConfigs[mode].LeftMFD);
-                            MergeConfigs(tgtMFD.ModeConfigs[mode].RightMFD,
-                                         curMFD.ModeConfigs[mode].RightMFD, dflMFD.ModeConfigs[mode].RightMFD);
+                            MergeConfigs((MFDSystem.MasterModes) mode, tgtMFD.ModeConfigs[mode].LeftMFD,
+                                         curMFD.LeftMFD, dflMFD.ModeConfigs[mode].LeftMFD);
+                            MergeConfigs((MFDSystem.MasterModes) mode, tgtMFD.ModeConfigs[mode].RightMFD,
+                                         curMFD.RightMFD, dflMFD.ModeConfigs[mode].RightMFD);
 
                             BuildMFDsForMode((MFDSystem.MasterModes)mode, ufc, hotas, mfdL, mfdR,
-                                             tgtMFD.ModeConfigs[mode],
-                                             curMFD.ModeConfigs[mode].LeftMFD.SelectedOSB,
-                                             curMFD.ModeConfigs[mode].RightMFD.SelectedOSB);
+                                             tgtMFD.ModeConfigs[mode], curMFD.LeftMFD.SelectedOSB,
+                                             curMFD.RightMFD.SelectedOSB);
                         }
-                    });
-                    AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
                 });
-                AddAction(ufc, "RTN");
-            }
+                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
+            });
+            AddAction(ufc, "RTN");
         }
 
         /// <summary>
-        /// merge the target, current, and default configurations to determine the target configuration we are trying
-        /// to load. target configuration is updated with defaults expanded (ie, not "").
+        /// returns true if the format should always be configured (even if it is already set up on a particular osb),
+        /// false otherwise. currently, had and sms formats are always set as they may link to other configuration.
         /// </summary>
-        private static void MergeConfigs(MFDConfiguration cfgTgt, MFDConfiguration cfgCur, MFDConfiguration cfgDft)
+        private static bool IsFormatAlwaysConfigured(MFDSystem.MasterModes mode, string format)
+            => ((format == ((int)MFDConfiguration.DisplayFormats.HAD).ToString()) ||
+                //
+                // TODO: currently only sms setup is for a2g, consider other modes here if a2a sms support added?
+                //
+                ((mode == MFDSystem.MasterModes.ICP_AG) &&
+                 (format == ((int)MFDConfiguration.DisplayFormats.SMS).ToString())));
+
+        /// <summary>
+        /// merge the target, current, and default configurations to determine the target configuration we are trying
+        /// to load. target configuration is updated with defaults expanded and defaults set where setup agrees with
+        /// the current settings (except for IsFormatAlwaysConfigured formats).
+        /// </summary>
+        private static void MergeConfigs(MFDSystem.MasterModes mode, MFDConfiguration cfgTgt, MFDConfiguration cfgCur,
+                                         MFDConfiguration cfgDft)
         {
             string osb12 = (!string.IsNullOrEmpty(cfgTgt.OSB12)) ? cfgTgt.OSB12 : cfgDft.OSB12;
             string osb13 = (!string.IsNullOrEmpty(cfgTgt.OSB13)) ? cfgTgt.OSB13 : cfgDft.OSB13;
             string osb14 = (!string.IsNullOrEmpty(cfgTgt.OSB14)) ? cfgTgt.OSB14 : cfgDft.OSB14;
 
             cfgTgt.SelectedOSB = (!string.IsNullOrEmpty(cfgTgt.SelectedOSB)) ? cfgTgt.SelectedOSB : cfgDft.SelectedOSB;
-            cfgTgt.OSB12 = (cfgCur.OSB12 != osb12) ? osb12 : null;
-            cfgTgt.OSB13 = (cfgCur.OSB13 != osb13) ? osb13 : null;
-            cfgTgt.OSB14 = (cfgCur.OSB14 != osb14) ? osb14 : null;
+            cfgTgt.OSB12 = ((cfgCur.OSB12 != osb12) || IsFormatAlwaysConfigured(mode, osb12)) ? osb12 : null;
+            cfgTgt.OSB13 = ((cfgCur.OSB13 != osb13) || IsFormatAlwaysConfigured(mode, osb13)) ? osb13 : null;
+            cfgTgt.OSB14 = ((cfgCur.OSB14 != osb14) || IsFormatAlwaysConfigured(mode, osb14)) ? osb14 : null;
         }
 
         /// <summary>
@@ -166,8 +185,8 @@ namespace JAFDTC.Models.F16C.Upload
                 AddAction(ufc, masterMode);
             }
 
-            BuildMFD(mfdL, "left", $"OSB-{curLeftOSB}", tgtMFD.LeftMFD);
-            BuildMFD(mfdR, "right", $"OSB-{curRightOSB}", tgtMFD.RightMFD);
+            BuildMFD(mode, mfdL, "left", $"OSB-{curLeftOSB}", tgtMFD.LeftMFD);
+            BuildMFD(mode, mfdR, "right", $"OSB-{curRightOSB}", tgtMFD.RightMFD);
 
             if ((mode == MFDSystem.MasterModes.DGFT_DGFT) || (mode == MFDSystem.MasterModes.DGFT_MSL))
             {
@@ -183,14 +202,15 @@ namespace JAFDTC.Models.F16C.Upload
         /// builds the mfd format set ups for a single mfd in the current master mode and sets the initial selected
         /// format based on configuration.
         /// </summary>
-        private void BuildMFD(AirframeDevice mfd, string mfdSide, string curSelOSB, MFDConfiguration tgtMFD)
+        private void BuildMFD(MFDSystem.MasterModes mode, AirframeDevice mfd, string mfdSide, string curSelOSB,
+                              MFDConfiguration tgtMFD)
         {
             // update the format assignments to osb12-14. note that this will leave osb14 selected after format
             // assignments are finished.
             //
-            curSelOSB = BuildPage(mfd, mfdSide, curSelOSB, "OSB-12", tgtMFD.OSB12);
-            curSelOSB = BuildPage(mfd, mfdSide, curSelOSB, "OSB-13", tgtMFD.OSB13);
-            curSelOSB = BuildPage(mfd, mfdSide, curSelOSB, "OSB-14", tgtMFD.OSB14);
+            curSelOSB = BuildPage(mode, mfd, mfdSide, curSelOSB, "OSB-12", tgtMFD.OSB12);
+            curSelOSB = BuildPage(mode, mfd, mfdSide, curSelOSB, "OSB-13", tgtMFD.OSB13);
+            curSelOSB = BuildPage(mode, mfd, mfdSide, curSelOSB, "OSB-14", tgtMFD.OSB14);
 
             if ($"OSB-{tgtMFD.SelectedOSB}" != curSelOSB)
             {
@@ -201,9 +221,11 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         /// sets up a particular osb to map to a particular format on an mfd in the current master mode. if the hts
         /// format is specified, the enabled threat classes (per the hts system configuration) will also be set up.
-        /// returns selected osb post operation (will either be the current selection or the new selection.
+        /// returns selected osb post operation: either be the current selection (if we're setting the page tied
+        /// to the currently selected osb) or the new selection (otherwise).
         /// </summary>
-        private string BuildPage(AirframeDevice mfd, string mfdSide, string osbSel, string osbTgt, string page)
+        private string BuildPage(MFDSystem.MasterModes mode, AirframeDevice mfd, string mfdSide, string osbSel,
+                                 string osbTgt, string page)
         {
             if (!string.IsNullOrEmpty(page) && (osbSel != osbTgt))
             {
@@ -215,14 +237,12 @@ namespace JAFDTC.Models.F16C.Upload
                 AddActions(mfd, new() { osbTgt, _mapFormatToOSB[format] });
                 if (format == MFDConfiguration.DisplayFormats.HAD)
                 {
-                    AddIfBlock("IsHTSOnMFD", true, new() { mfdSide }, delegate ()
-                    {
-                        BuildHTSOnMFDIfOn(mfd, mfdSide);
-                    });
+                    ConfigureHADFormatThreats(mfdSide);
                 }
-                else if (format == MFDConfiguration.DisplayFormats.SMS)
+                else if ((format == MFDConfiguration.DisplayFormats.SMS) &&
+                         ((mode == MFDSystem.MasterModes.ICP_AG) /* TODO: ||(mode == MFDSystem.MasterModes.ICP_AG) */))
                 {
-                    AddAction(mfd, "OSB-04");
+                    ConfigureSMSFormat(mfd, mfdSide);
                 }
                 return osbTgt;
             }
@@ -230,38 +250,27 @@ namespace JAFDTC.Models.F16C.Upload
         }
 
         /// <summary>
-        /// sets up the hts threat classes on the hts mfd format. had format should be displayed at the time
-        /// these commands execute.
+        /// configure the enabled threats in the had format. assumes the had format is selected on the indicated mfd.
         /// </summary>
-        private void BuildHTSOnMFDIfOn(AirframeDevice mfd, string mfdSide)
+        private void ConfigureHADFormatThreats(string mfdSide)
         {
-            // ASSUMES: HTS enables TC1-TC11 and disables MAN threats by default. OSB-5 (ALL) used to flip that
-            // ASSUMES: around so we start from TC1-11 disabled and MAN enabled.
-            //
-            AddAction(mfd, "OSB-04");
+            HTSThreatEnableBuilder builder = new(_cfg, (F16CDeviceManager)_aircraft, null);
+            AddBuild(builder, new() { ["mfdSide"] = mfdSide });
+        }
 
-            AddIfBlock("HTSAllNotSelected", true, new() { mfdSide }, delegate ()
+        /// <summary>
+        /// clear inv mode and configure the munitions in the sms format. assumes the sms format is selected on the
+        /// indicated mfd.
+        /// </summary>
+        private void ConfigureSMSFormat(AirframeDevice mfd, string mfdSide)
+        {
+            AddIfBlock("IsSMSOnINV", true, new() { mfdSide }, delegate ()
             {
-                AddAction(mfd, "OSB-05");
+                AddAction(mfd, "OSB-04", WAIT_BASE);
             });
-            AddAction(mfd, "OSB-05");
-
-            // TODO: would be nice to do the button presses conditionally based on current state. this will
-            // TODO: require some post-setup command sequencing though.
-            //
-            if (!_cfg.HTS.EnabledThreats[0])
-            {
-                AddAction(mfd, _htsThreatToOSB[0]);
-            }
-            for (int i = 1; i < _htsThreatToOSB.Length; i++)
-            {
-                if (_cfg.HTS.EnabledThreats[i])
-                {
-                    AddAction(mfd, _htsThreatToOSB[i]);
-                }
-            }
-
-            AddAction(mfd, "OSB-04");
+            SMSBuilder builder = new(_cfg, (F16CDeviceManager)_aircraft, null);
+            AddBuild(builder, _state);
+            // TODO: allow configuration of "to inv, or not to inv? that is the question..."
         }
     }
 }
