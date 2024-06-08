@@ -18,18 +18,20 @@ https://www.gnu.org/licenses/.
 
 **********************************************************************************************************************
 -->
-<Page
+<ui_base:SystemEditorPageBase
     x:Class="JAFDTC.UI.F15E.F15EEditSteerpointListPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:JAFDTC.Models.F15E.STPT"
+    xmlns:ui_base="using:JAFDTC.UI.Base"
+    xmlns:ui_ctrl="using:JAFDTC.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
     NavigationCacheMode="Enabled">
 
-    <Grid Margin="16,8,16,8">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -44,7 +46,7 @@ https://www.gnu.org/licenses/.
         row 0 : command bar
         ===============================================================================================================
         -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal"
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="16,8,16,8"
                     VerticalAlignment="Center">
             <ComboBox x:Name="uiCmdComboSelRoute"
                       VerticalAlignment="Center"
@@ -209,51 +211,10 @@ https://www.gnu.org/licenses/.
 
         <!--
         ===============================================================================================================
-        row 2 : link / reset
+        common editor controls 
         ===============================================================================================================
         -->
-        <Grid Grid.Row="2" Margin="0,12,0,4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <ui_ctrl:LinkResetBtnsControl Grid.Row="3" Grid.Column="0" x:Name="uiCtlLinkResetBtns"/>
 
-            <StackPanel Grid.Column="0"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
-                <Button Width="140"
-                        x:Name="uiPageBtnLink"
-                        Click="PageBtnLink_Click"
-                        ToolTipService.ToolTip="Link or unlink this system to/from another configuration">
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE71B;"/>
-                        <TextBlock VerticalAlignment="center"
-                                   x:Name="uiPageBtnTxtLink">
-                            FIXUP
-                        </TextBlock>
-                    </StackPanel>
-                </Button>
-                <TextBlock Margin="12,0,24,0"
-                           x:Name="uiPageTxtLink"
-                           VerticalAlignment="center">
-                    FIXUP
-                </TextBlock>
-            </StackPanel>
-
-            <StackPanel Grid.Column="1"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
-                <Button x:Name="uiPageBtnResetAll"
-                        Click="PageBtnResetAll_Click"
-                        ToolTipService.ToolTip="Reset the configuration of this system to its defaults">
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
-                        <TextBlock VerticalAlignment="center">Reset System to Defaults</TextBlock>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Grid>
     </Grid>
-</Page>
+</ui_base:SystemEditorPageBase>
