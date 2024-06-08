@@ -98,13 +98,6 @@ namespace JAFDTC.UI.Base
     public abstract class SystemEditorPageBase : Page
     {
         /// <summary>
-        /// an empty object to stand in for the EditState object the page operates on. this can be used as the
-        /// editState parameter to InitializeBase() in the event the derived class does not need SystemEditorPage to
-        /// manage the editor state as SystemEditorPageBase frequently assumes there is a valid EditState object.
-        /// </summary>
-        protected class PrivateEditState : BindableObject { }
-
-        /// <summary>
         /// location of setting state for GetControlProperty(), CopyAllSettings(), and friends.
         /// </summary>
         protected enum SettingLocation
@@ -194,7 +187,7 @@ namespace JAFDTC.UI.Base
             if (linkResetBtnsControl != null)
                 _linkResetBtnsControl = linkResetBtnsControl;
 
-            // TODO: need api to manage whitelist post-construction, maybe?
+            // TODO: consider adding apis to manage whitelist post-construction?
             if (tagWhitelist != null)
                 _tagWhiteList = new HashSet<string>(tagWhitelist);
         }
@@ -356,6 +349,8 @@ namespace JAFDTC.UI.Base
         /// Copy data from the system configuration object to the edit object the page interacts with. Derived classes
         /// should override if not all relevant settings are included in the EditState and SystemConfig classes
         /// managed by this base class or if the EditState and SystemConfig objects are not symmetric.
+        /// 
+        /// NOTE: derived classes that use null EditState must override this method if they implement copy to edit.
         /// </summary>
         protected virtual void CopyConfigToEditState()
         {
@@ -372,6 +367,8 @@ namespace JAFDTC.UI.Base
         /// updated configuration to disk. Derived classes should override if not all relevant settings are included
         /// in the EditState and SystemConfig classes managed by this base class or if the EditState and SystemConfig
         /// objects are not symmetric.
+        /// 
+        /// NOTE: derived classes that use null EditState must override this method if they implement save to config.
         /// </summary>
         protected virtual void SaveEditStateToConfig()
         {

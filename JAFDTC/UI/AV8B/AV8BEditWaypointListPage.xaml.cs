@@ -89,7 +89,7 @@ namespace JAFDTC.UI.AV8B
             EditNavpt = new ObservableCollection<INavpointInfo>();
 
             InitializeComponent();
-            InitializeBase(new PrivateEditState(), null, uiCtlLinkResetBtns);
+            InitializeBase(null, null, uiCtlLinkResetBtns);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -107,6 +107,7 @@ namespace JAFDTC.UI.AV8B
             PageHelper.CopyConfigToEdit(Config, EditNavpt);
             uiMiscCkbxAddMode.IsChecked = ((AV8BConfiguration)Config).WYPT.IsAppendMode;
             IsMarshalling = false;
+            UpdateUIFromEditState();
         }
 
         /// <summary>
@@ -121,6 +122,7 @@ namespace JAFDTC.UI.AV8B
                 Config.Save(this, PageHelper.SystemTag);
             }
             IsMarshalling = false;
+            UpdateUIFromEditState();
         }
 
         // ------------------------------------------------------------------------------------------------------------
