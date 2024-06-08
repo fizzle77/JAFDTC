@@ -60,8 +60,9 @@ namespace JAFDTC.UI.Base
     ///    For example, a system editor checkbox that manages the "Latch" setting that corresponds to a MySystem.Latch
     ///    property in the persisted/UI objects would set Tag="Latch" in its XAML definition.
     ///    
-    ///    NOTE: SystemEditorPageBase does not currently support non-null Tags on TextBox, ComboBox, or CheckBox
-    ///    NOTE: controls that will not be managed by the base class.
+    ///    NOTE: SystemEditorPageBase supports an optional tag whitelist to allow controls not managed by the base
+    ///    NOTE: class to use tags. When the whitelist is specified, SystemEditorPageBase only manages TextBox,
+    ///    NOTE: ComboBox, or CheckBox controls with non-null tags if the tag appears on the whitelist.
     /// 
     /// 4. The base class provides change handlers for TextBox, ComboBox, or CheckBox controls that specify
     ///    configuration parameters (TextBox_LostFocus, ComboBox_SelectionChanged, or CheckBox_Clicked,
@@ -166,6 +167,8 @@ namespace JAFDTC.UI.Base
 
         private LinkResetBtnsControl _linkResetBtnsControl;
 
+        private HashSet<string> _tagWhiteList;
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // Construction
@@ -175,7 +178,8 @@ namespace JAFDTC.UI.Base
         /// <summary>
         /// Must be called from derived class constructor after InitializeComponent().
         /// </summary>
-        protected void InitializeBase(BindableObject editState, TextBox setDefaultsFrom, LinkResetBtnsControl linkResetBtnsControl)
+        protected void InitializeBase(BindableObject editState, TextBox setDefaultsFrom,
+                                      LinkResetBtnsControl linkResetBtnsControl, List<string> tagWhitelist = null)
         {
             EditState = editState;
 
@@ -189,6 +193,10 @@ namespace JAFDTC.UI.Base
 
             if (linkResetBtnsControl != null)
                 _linkResetBtnsControl = linkResetBtnsControl;
+
+            // TODO: need api to manage whitelist post-construction, maybe?
+            if (tagWhitelist != null)
+                _tagWhiteList = new HashSet<string>(tagWhitelist);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -213,10 +221,11 @@ namespace JAFDTC.UI.Base
 
                     _pageTextBoxes = new Dictionary<string, TextBox>(allTextBoxes.Count);
                     foreach (TextBox textBox in allTextBoxes)
-                    {
-                        if (textBox.Tag != null)
+                        if ((textBox.Tag != null) && ((_tagWhiteList == null) ||
+                                                      (_tagWhiteList.Contains(textBox.Tag.ToString()))))
+                        {
                             _pageTextBoxes[textBox.Tag.ToString()] = textBox;
-                    }
+                        }
                 }
                 return _pageTextBoxes;
             }
@@ -239,10 +248,11 @@ namespace JAFDTC.UI.Base
 
                     _pageComboBoxes = new Dictionary<string, ComboBox>(allComboBoxes.Count);
                     foreach (ComboBox comboBox in allComboBoxes)
-                    {
-                        if (comboBox.Tag != null)
+                        if ((comboBox.Tag != null) && ((_tagWhiteList == null) ||
+                                                       (_tagWhiteList.Contains(comboBox.Tag.ToString()))))
+                        {
                             _pageComboBoxes[comboBox.Tag.ToString()] = comboBox;
-                    }
+                        }
                 }
                 return _pageComboBoxes;
             }
@@ -265,10 +275,11 @@ namespace JAFDTC.UI.Base
 
                     _pageCheckBoxes = new Dictionary<string, CheckBox>(allCheckBoxes.Count);
                     foreach (CheckBox checkBox in allCheckBoxes)
-                    {
-                        if (checkBox.Tag != null)
+                        if ((checkBox.Tag != null) && ((_tagWhiteList == null) ||
+                                                       (_tagWhiteList.Contains(checkBox.Tag.ToString()))))
+                        {
                             _pageCheckBoxes[checkBox.Tag.ToString()] = checkBox;
-                    }
+                        }
                 }
                 return _pageCheckBoxes;
             }
