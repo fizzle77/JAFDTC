@@ -318,7 +318,7 @@
   {
     "ID": 17,
     "LabelUI": "AGM-65H",
-    "DescrUI": "AGM-65H Maverick TV-guided AG Missile, 125lb Warhead",
+    "DescrUI": "AGM-65H Maverick CCD-guided AG Missile, 125lb Warhead",
     "LabelSMS": [ "AG65H" ],
     "Image": "agm-65h.png",
     "MunitionInfo": {
@@ -331,7 +331,7 @@
   {
     "ID": 18,
     "LabelUI": "AGM-65K",
-    "DescrUI": "AGM-65K Maverick TV-guided AG Missile, 300lb Warhead",
+    "DescrUI": "AGM-65K Maverick CCD-guided AG Missile, 300lb Warhead",
     "LabelSMS": [ "AG65K" ],
     "Image": "agm-65k.png",
     "MunitionInfo": {
