@@ -47,8 +47,6 @@ namespace JAFDTC.Models.F16C
 
         public string Image { get; set; }                       // munition image for ui, relative to Images/
 
-        public string CntlClass { get; set; }                   // CNTL class to set parameters like arming delay
-
         // TODO
 
         public MunitionSettings MunitionInfo { get; set; }      // munition information

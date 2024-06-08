@@ -5,7 +5,6 @@
     "DescrUI": "CBU-87 Cluster Bomb with 202 BLU-97B (CEM) Submunitions",
     "LabelSMS": [ "CB87B" ],
     "Image": "cbu-87-105.png",
-    "CntlClass": "2",
     "MunitionInfo": {
       "ID": 0,
       "Profile": "0;0,1",
@@ -28,7 +27,6 @@
     "DescrUI": "CBU-97 Cluster Bomb with 10 BLU-108 (SFW) Submunitions",
     "LabelSMS": [ "CB97B" ],
     "Image": "cbu-87-105.png",
-    "CntlClass": "2",
     "MunitionInfo": {
       "ID": 1,
       "Profile": "0;0,1",
@@ -80,7 +78,6 @@
     "DescrUI": "GBU-10 Paveway II Laser-Guided bomb, 2000lb",
     "LabelSMS": [ "GB10C" ],
     "Image": "gbu-10-12.png",
-    "CntlClass": "1",
     "MunitionInfo": {
       "ID": 4,
       "Profile": "0;0,1",
@@ -103,7 +100,6 @@
     "DescrUI": "GBU-12 Paveway II Laser-Guided bomb, 500lb",
     "LabelSMS": [ "GB12" ],
     "Image": "gbu-10-12.png",
-    "CntlClass": "1",
     "MunitionInfo": {
       "ID": 5,
       "Profile": "0;0,1",
@@ -189,7 +185,6 @@
     "DescrUI": "Mk-82 Low Drag General Purpose Bomb, 500lb",
     "LabelSMS": [ "M82" ],
     "Image": "mk-82.png",
-    "CntlClass": "1",
     "MunitionInfo": {
       "ID": 10,
       "Profile": "0;0,1",
@@ -212,7 +207,6 @@
     "DescrUI": "Mk-82 with Mk15 Snakeye High Drag General Purpose Bomb, 500lb",
     "LabelSMS": [ "M82S" ],
     "Image": "mk-82se.png",
-    "CntlClass": "1",
     "MunitionInfo": {
       "ID": 11,
       "Profile": "0;0,1",
@@ -235,7 +229,6 @@
     "DescrUI": "Mk-82 with BSU-49 High Drag General Purpose Bomb, 500lb",
     "LabelSMS": [ "B49" ],
     "Image": "mk-82ab.png",
-    "CntlClass": "1",
     "MunitionInfo": {
       "ID": 12,
       "Profile": "0;0,1",
@@ -258,7 +251,6 @@
     "DescrUI": "Mk-84 Low Drag General Purpose Bomb, 2000lb",
     "LabelSMS": [ "M84" ],
     "Image": "mk-84.png",
-    "CntlClass": "1",
     "MunitionInfo": {
       "ID": 13,
       "Profile": "0;0,1",
@@ -281,7 +273,6 @@
     "DescrUI": "Mk-84 with BSU-50 High Drag General Purpose Bomb, 2000lb",
     "LabelSMS": [ "B50", "BD50" ],
     "Image": "mk-84hd.png",
-    "CntlClass": "1",
     "MunitionInfo": {
       "ID": 14,
       "Profile": "0;0,1",
