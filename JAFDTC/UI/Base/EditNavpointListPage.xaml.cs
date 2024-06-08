@@ -61,7 +61,7 @@ namespace JAFDTC.UI.Base
 
         protected override SystemBase SystemConfig => null;
 
-        protected override String SystemTag => PageHelper.SystemTag;
+        protected override string SystemTag => PageHelper.SystemTag;
 
         protected override string SystemName => PageHelper.NavptName;
 
@@ -443,7 +443,6 @@ namespace JAFDTC.UI.Base
 
             base.OnNavigatedTo(args);
 
-            CopyConfigToEditState();
             StartingNavptNum = (EditNavpt.Count > 0) ? EditNavpt[0].Number : 1;
 
             NavArgs.BackButton.IsEnabled = true;

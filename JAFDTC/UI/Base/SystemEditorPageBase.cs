@@ -446,7 +446,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected void UpdateUIFromEditState()
         {
-            if (!IsUIUpdatePending && (EditState != null))
+            if (!IsUIUpdatePending)
             {
                 IsUIUpdatePending = true;
                 DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
@@ -473,63 +473,68 @@ namespace JAFDTC.UI.Base
         {
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(SystemTag));
 
-            foreach (KeyValuePair<string, TextBox> kv in PageTextBoxes)
+            // We want UIUpdateCustom() to be called even if EditState is null, so we only
+            // prevent the base UI updates that rely on it here, rather than just returning.
+            if (EditState != null)
             {
-                GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
-                if ((property == null) || (editState == null) || editState.PropertyHasErrors(property.Name))
-                    continue;
-
-                // Don't re-set a text box with errors, because that will set it back to its pre-error value.
-                Utilities.SetTextBoxEnabledAndText(kv.Value, isEditable, true, (string)property.GetValue(editState));
-            }
-
-            foreach (KeyValuePair<string, ComboBox> kv in PageComboBoxes)
-            {
-                GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
-                if (property == null)
-                    continue;
-
-                string value = (string)property.GetValue(editState);
-                int selectedIndex = -1;
-                int defaultIndex = 0;
-                for (int i = 0; i < kv.Value.Items.Count; i++)
+                foreach (KeyValuePair<string, TextBox> kv in PageTextBoxes)
                 {
-                    FrameworkElement elem = (FrameworkElement)kv.Value.Items[i];
-                    if ((elem != null) && (elem.Tag != null))
+                    GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
+                    if ((property == null) || (editState == null) || editState.PropertyHasErrors(property.Name))
+                        continue;
+
+                    // Don't re-set a text box with errors, because that will set it back to its pre-error value.
+                    Utilities.SetTextBoxEnabledAndText(kv.Value, isEditable, true, (string)property.GetValue(editState));
+                }
+
+                foreach (KeyValuePair<string, ComboBox> kv in PageComboBoxes)
+                {
+                    GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
+                    if (property == null)
+                        continue;
+
+                    string value = (string)property.GetValue(editState);
+                    int selectedIndex = -1;
+                    int defaultIndex = 0;
+                    for (int i = 0; i < kv.Value.Items.Count; i++)
                     {
-                        string tag = elem.Tag.ToString();
-                        if (tag[0] == '+')
-                        { 
-                            defaultIndex = i;
-                            tag = tag[1..];
-                        }
-                        if (tag.ToString() == value)
+                        FrameworkElement elem = (FrameworkElement)kv.Value.Items[i];
+                        if ((elem != null) && (elem.Tag != null))
                         {
-                            selectedIndex = i;
-                            break;
+                            string tag = elem.Tag.ToString();
+                            if (tag[0] == '+')
+                            {
+                                defaultIndex = i;
+                                tag = tag[1..];
+                            }
+                            if (tag.ToString() == value)
+                            {
+                                selectedIndex = i;
+                                break;
+                            }
                         }
                     }
+                    if ((selectedIndex == -1) && !int.TryParse(value, out selectedIndex))
+                        selectedIndex = defaultIndex;
+
+                    Utilities.SetComboEnabledAndSelection(kv.Value, isEditable, true, selectedIndex);
                 }
-                if ((selectedIndex == -1) && !int.TryParse(value, out selectedIndex))
-                    selectedIndex = defaultIndex;
 
-                Utilities.SetComboEnabledAndSelection(kv.Value, isEditable, true, selectedIndex);
-            }
-
-            foreach (KeyValuePair<string, CheckBox> kv in PageCheckBoxes)
-            {
-                GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
-                if (property == null)
-                    continue;
-
-                if (!bool.TryParse((string)property.GetValue(editState), out bool isChecked))
+                foreach (KeyValuePair<string, CheckBox> kv in PageCheckBoxes)
                 {
-                    FileManager.Log(string.Format("Unparseable bool ({0}) in {1}. {2} replaced with false.",
-                                                  property.GetValue(editState), editState.GetType(), property.Name));
-                    isChecked = false;
-                }
+                    GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
+                    if (property == null)
+                        continue;
 
-                Utilities.SetCheckEnabledAndState(kv.Value, isEditable, isChecked);
+                    if (!bool.TryParse((string)property.GetValue(editState), out bool isChecked))
+                    {
+                        FileManager.Log(string.Format("Unparseable bool ({0}) in {1}. {2} replaced with false.",
+                                                      property.GetValue(editState), editState.GetType(), property.Name));
+                        isChecked = false;
+                    }
+
+                    Utilities.SetCheckEnabledAndState(kv.Value, isEditable, isChecked);
+                }
             }
 
             _linkResetBtnsControl?.SetResetButtonEnabled(!IsPageStateDefault);
@@ -541,6 +546,8 @@ namespace JAFDTC.UI.Base
         /// Derived classes may override this method to perform custom UI update steps inside the queued dispatcher
         /// delegate UpdateUIFromEditState(). This method is called after the base code has set up the content and
         /// enable state (based on linked status) of all controls that are mapped to configuration parameters.
+        /// 
+        /// Derived classes must check EditState for null before accessing it.
         /// </summary>
         protected virtual void UpdateUICustom(bool isEditable) { }
 
