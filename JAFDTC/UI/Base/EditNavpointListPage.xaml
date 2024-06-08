@@ -30,7 +30,7 @@ https://www.gnu.org/licenses/.
     mc:Ignorable="d"
     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
 
-    <Grid Margin="16,8,16,8">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -44,7 +44,7 @@ https://www.gnu.org/licenses/.
              row 0 : command bar
              =======================================================================================
           -->
-        <CommandBar Grid.Row="0"
+        <CommandBar Grid.Row="0" Margin="0,8,0,0"
                     HorizontalAlignment="Center">
             <AppBarButton x:Name="uiBarAdd" Icon="Add" Label="Add"
                           Click="CmdAdd_Click"
@@ -175,7 +175,7 @@ https://www.gnu.org/licenses/.
         ===============================================================================================================
         -->
         <controls:LinkResetBtnsControl x:Name="uiCtlLinkResetBtns" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-              Margin="12,12,12,12"/>
+              Margin="0,0,0,0"/>
 
     </Grid>
 </ui_base:SystemEditorPageBase>
