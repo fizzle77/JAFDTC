@@ -195,8 +195,8 @@ https://www.gnu.org/licenses/.
                 <ComboBox.Items>
                     <!-- Must match enum order -->
                     <TextBlock Text="OFF"/>
-                    <TextBlock Text="3/9"/>
                     <TextBlock Text="5 MIL"/>
+                    <TextBlock Text="3/9"/>
                 </ComboBox.Items>
             </ComboBox>
 

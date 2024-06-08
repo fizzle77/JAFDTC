@@ -25,8 +25,8 @@ namespace JAFDTC.Models.A10C.IFFCC
     public enum CCIPConsentOptions
     {
         OFF = 0,
-        THREE_NINE,
-        FIVE_MIL
+        FIVE_MIL,
+        THREE_NINE
     }
 
     public enum AirspeedOptions
@@ -228,22 +228,31 @@ namespace JAFDTC.Models.A10C.IFFCC
                                           IsDisplayModesDefault;
 
         [JsonIgnore]
-        public bool IsAASDefault => IsA10EnabledDefault &&
-                                    IsF15EnabledDefault &&
-                                    IsF16EnabledDefault &&
-                                    IsF18EnabledDefault &&
-                                    IsMig29EnabledDefault &&
-                                    IsSu27EnabledDefault &&
-                                    IsSu25EnabledDefault &&
-                                    IsAH64EnabledDefault &&
-                                    IsUH60EnabledDefault &&
-                                    IsMi8EnabledDefault &&
-                                    IsFxdWingspanDefault &&
-                                    IsFxdLengthDefault &&
-                                    IsFxdTgtSpeedDefault &&
-                                    IsRtyWingspanDefault &&
-                                    IsRtyLengthDefault &&
-                                    IsRtyTgtSpeedDefault;
+        public bool IsAASDefault => AreAircraftPresetsDefault &&
+                                    IsManFxdDefault &&
+                                    IsManRtyDefault;
+
+        [JsonIgnore]
+        public bool AreAircraftPresetsDefault => IsA10EnabledDefault &&
+                                                 IsF15EnabledDefault &&
+                                                 IsF16EnabledDefault &&
+                                                 IsF18EnabledDefault &&
+                                                 IsMig29EnabledDefault &&
+                                                 IsSu27EnabledDefault &&
+                                                 IsSu25EnabledDefault &&
+                                                 IsAH64EnabledDefault &&
+                                                 IsUH60EnabledDefault &&
+                                                 IsMi8EnabledDefault;
+
+        [JsonIgnore]
+        public bool IsManFxdDefault => IsFxdWingspanDefault &&
+                                       IsFxdLengthDefault &&
+                                       IsFxdTgtSpeedDefault;
+
+        [JsonIgnore]
+        public bool IsManRtyDefault => IsRtyWingspanDefault &&
+                                       IsRtyLengthDefault &&
+                                       IsRtyTgtSpeedDefault;
 
         [JsonIgnore]
         public bool IsDisplayModesDefault => IsAutoDataDisplayDefault &&

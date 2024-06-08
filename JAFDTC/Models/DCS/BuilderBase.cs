@@ -267,6 +267,20 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
+        /// Perform the action count number of times, followed by a wait of dtWaitPost milliseconds.
+        /// </summary>
+        protected void AddActions(AirframeDevice device, string action, int count, int dtWaitPost = WAIT_NONE)
+        {
+            if (count < 1)
+                return;
+
+            for (int i = 0; i < count; i++)
+                AddAction(device, action);
+
+            AddWait(dtWaitPost);
+        }
+
+        /// <summary>
         /// add a wait command to the command stream the builder is building.
         /// </summary>
         protected void AddWait(int dt)
