@@ -18,17 +18,19 @@ https://www.gnu.org/licenses/.
 
 **********************************************************************************************************************
 -->
-<Page
+<ui_base:SystemEditorPageBase
     x:Class="JAFDTC.UI.AV8B.AV8BEditWaypointListPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:JAFDTC.Models.Base"
+    xmlns:ui_base="using:JAFDTC.UI.Base"
+    xmlns:ui_ctrl="using:JAFDTC.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
 
-    <Grid Margin="16,8,16,8">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -43,7 +45,7 @@ https://www.gnu.org/licenses/.
              row 0 : command bar
              =======================================================================================
           -->
-        <CommandBar Grid.Row="0"
+        <CommandBar Grid.Row="0" Margin="0,8,0,0"
                     HorizontalAlignment="Center">
             <AppBarButton x:Name="uiBarAdd" Icon="Add" Label="Add"
                           Click="CmdAdd_Click"
@@ -173,7 +175,7 @@ https://www.gnu.org/licenses/.
         row 2 : link / reset
         ===============================================================================================================
         -->
-        <Grid Grid.Row="2" Margin="0,12,0,4">
+        <Grid Grid.Row="2" Margin="12,8,12,12">
             <CheckBox x:Name="uiMiscCkbxAddMode"
                       VerticalAlignment="Center"
                       Click="MiscCkbxAddMode_Clicked">
@@ -186,48 +188,6 @@ https://www.gnu.org/licenses/.
         row 3 : link / reset
         ===============================================================================================================
         -->
-        <Grid Grid.Row="3" Margin="0,12,0,4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Column="0"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
-                <Button Width="140"
-                        x:Name="uiPageBtnLink"
-                        Click="PageBtnLink_Click"
-                        ToolTipService.ToolTip="Link or unlink this system to/from another configuration">
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE71B;"/>
-                        <TextBlock VerticalAlignment="center"
-                                   x:Name="uiPageBtnTxtLink">
-                            FIXUP
-                        </TextBlock>
-                    </StackPanel>
-                </Button>
-                <TextBlock Margin="12,0,24,0"
-                           x:Name="uiPageTxtLink"
-                           VerticalAlignment="center">
-                    FIXUP
-                </TextBlock>
-            </StackPanel>
-
-            <StackPanel Grid.Column="1"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
-                <Button x:Name="uiPageBtnResetAll"
-                        Click="PageBtnResetAll_Click"
-                        ToolTipService.ToolTip="Reset the configuration of this system to its defaults">
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
-                        <TextBlock VerticalAlignment="center">Reset Page to Defaults</TextBlock>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Grid>
+        <ui_ctrl:LinkResetBtnsControl Grid.Row="3" Grid.Column="0" Margin="0,0,0,0" x:Name="uiCtlLinkResetBtns"/>
     </Grid>
-</Page>
+</ui_base:SystemEditorPageBase>
