@@ -27,8 +27,34 @@ namespace JAFDTC.Models
     /// </summary>
     public abstract class SystemBase : BindableObject, ISystem
     {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // abstract definitions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
         public abstract bool IsDefault { get; }
 
         public abstract void Reset();
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // property validate and set methods
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        private const string INVALID_FORMAT = "Invalid format";
+
+        protected void ValidateAndSetIntProp(string value, int min, int max, ref string property)
+        {
+            string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, min, max)) ? null : INVALID_FORMAT;
+            SetProperty(ref property, value, error);
+        }
+
+        protected void ValidateAndSetBoolProp(string value, ref string property)
+        {
+            string error = (string.IsNullOrEmpty(value) || IsBooleanFieldValid(value)) ? null : INVALID_FORMAT;
+            SetProperty(ref property, value, error);
+        }
     }
 }
