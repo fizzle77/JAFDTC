@@ -650,7 +650,7 @@ namespace JAFDTC.UI.Base
 
         // ---- field validation --------------------------------------------------------------------------------------
 
-        private void SetFieldValidVisualState(TextBox field, bool isValid)
+        protected void SetFieldValidVisualState(TextBox field, bool isValid)
         {
             field.BorderBrush = (isValid) ? DefaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
             field.Background = (isValid) ? DefaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBackgroundBrush"];
