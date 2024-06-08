@@ -22,7 +22,6 @@ using JAFDTC.Models.DCS;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -57,6 +56,7 @@ namespace JAFDTC.Models.A10C.Upload
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
             AirframeDevice aap = _aircraft.GetDevice("AAP");
+            AirframeDevice rmfd = _aircraft.GetDevice("RMFD");
 
             if (wypts.Count > 0)
             {
@@ -73,13 +73,30 @@ namespace JAFDTC.Models.A10C.Upload
 
                 AddIfBlock("IsCoordFmtLL", true, null, delegate ()
                 {
-                    BuildWaypoints(cdu, wypts);
+                    AddIfBlock("IsCDUInDefaultMFDPosition", true, null, delegate ()
+                    {
+                        AddAction(rmfd, "RMFD_13");
+                        BuildWaypoints(cdu, wypts);
+                    });
+                    AddIfBlock("IsCDUInDefaultMFDPosition", false, null, delegate ()
+                    {
+                        BuildWaypoints(cdu, wypts);
+                    });
                 });
-                AddIfBlock("IsCoordFmtNotLL", true, null, delegate ()
+                AddIfBlock("IsCoordFmtLL", false, null, delegate ()
                 {
                     AddActions(cdu, new() { "LSK_9R" }); // Change to LL
-                    BuildWaypoints(cdu, wypts);
-                    AddActions(cdu, new() { "LSK_9R" }); // Go back to UTM
+                    AddIfBlock("IsCDUInDefaultMFDPosition", true, null, delegate ()
+                    {
+                        AddAction(rmfd, "RMFD_13");
+                        BuildWaypoints(cdu, wypts);
+                        AddActions(cdu, new() { "LSK_9R" }); // Go back to UTM
+                    });
+                    AddIfBlock("IsCDUInDefaultMFDPosition", false, null, delegate ()
+                    {
+                        BuildWaypoints(cdu, wypts);
+                        AddActions(cdu, new() { "LSK_9R" }); // Go back to UTM
+                    });
                 });
             }
         }

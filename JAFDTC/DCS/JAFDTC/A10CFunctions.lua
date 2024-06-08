@@ -113,6 +113,11 @@ end
 
 -- CDU Routines
 
+function JAFDTC_A10C_Fn_IsCDUInDefaultMFDPosition()
+    local value = JAFDTC_A10C_GetRMFD_value("label_12");
+    return value == "CDU";
+end
+
 function JAFDTC_A10C_GetCDU()
     local table = JAFDTC_ParseDisplay(3);
     JAFDTC_DebugDisplay(table);
@@ -128,18 +133,7 @@ end
 
 function JAFDTC_A10C_Fn_IsCoordFmtLL()
     local value = JAFDTC_A10C_GetCDU_value("WAYPTCoordFormat");
-    if string.sub(value, 1, 3) == "L/L" then
-        return true
-    end
-    return false
-end
-
-function JAFDTC_A10C_Fn_IsCoordFmtNotLL()
-    local value = JAFDTC_A10C_GetCDU_value("WAYPTCoordFormat");
-    if string.sub(value, 1, 3) ~= "L/L" then
-        return true
-    end
-    return false
+    return string.sub(value, 1, 3) == "L/L"
 end
 
 function JAFDTC_A10C_Fn_IsBullsNotOnHUD()
