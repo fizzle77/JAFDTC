@@ -18,9 +18,10 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.Base;
+using JAFDTC.Models.DCS;
 using JAFDTC.Utilities;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Text.Json;
 
 namespace JAFDTC.Models.Import
 {
@@ -67,9 +68,36 @@ namespace JAFDTC.Models.Import
             string json = FileManager.ReadFile(Path);
             if (json != null)
             {
-                return navptSys.ImportSerializedNavpoints(json, isReplace);
+                if (ImportIsPOIs(json))
+                    return navptSys.ImportSerializedPOIs(json);
+                else
+                    return navptSys.ImportSerializedNavpoints(json, isReplace);
             }
             return false;
+        }
+
+        /// <summary>
+        /// Examine the JSON string and determine if it is actually a point of interest export.
+        /// 
+        /// Returns true if the JSON looks like POIs, false if not.
+        /// </summary>
+        protected virtual bool ImportIsPOIs(string json)
+        {
+            try
+            {
+                List<PointOfInterest> pois = JsonSerializer.Deserialize<List<PointOfInterest>>(json);
+
+                return pois.Count > 1 &&
+                    pois[0].Type != PointOfInterestType.UNKNOWN &&
+                    !string.IsNullOrEmpty(pois[0].Theater) &&
+                    !string.IsNullOrEmpty(pois[0].Elevation) &&
+                    !string.IsNullOrEmpty(pois[0].Latitude) &&
+                    !string.IsNullOrEmpty(pois[0].Longitude);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

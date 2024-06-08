@@ -36,6 +36,15 @@ namespace JAFDTC.Models.Base
         public bool ImportSerializedNavpoints(string json, bool isReplace = true);
 
         /// <summary>
+        /// deserialize an array of POIs from .json and incorporate them into the navpoint list. the deserialized
+        /// navpoints can either replace the existing navpoints or be appended to the end of the navpoint list. returns
+        /// true on success, false on error (previous navpoints preserved on errors).
+        /// 
+        /// imports from serialized POIs support all navpoint properties.
+        /// </summary>
+        public bool ImportSerializedPOIs(string json, bool isReplace = true);
+
+        /// <summary>
         /// incorporate a list of navpoints specified by navpoint info dictionaries (see navptInfoList) into the
         /// navpoint list. the new navpoints can either replace the existing navpoints or be appended to the end of
         /// the navpoing list. returns true on success, false on error (previous navpoints preserved on errors).
