@@ -22,7 +22,6 @@ using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
@@ -30,7 +29,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.UI.Dispatching;
-using Windows.Devices.Radios;
 
 namespace JAFDTC.UI.Base
 {
@@ -41,7 +39,7 @@ namespace JAFDTC.UI.Base
     /// </summary>
     public sealed class RadioPresetItem : BindableObject
     {
-        public IEditRadioPageHelper NavHelper { get; }
+        public IEditRadioPageHelper PageHelper { get; }
 
         public object Tag { get; set; }
 
@@ -64,7 +62,7 @@ namespace JAFDTC.UI.Base
             get => _preset;
             set
             {
-                string error = (NavHelper.ValidatePreset(Radio, value, false)) ? null : "Invalid preset";
+                string error = (PageHelper.ValidatePreset(Radio, value, false)) ? null : "Invalid preset";
                 SetProperty(ref _preset, value, error);
             }
         }
@@ -76,9 +74,9 @@ namespace JAFDTC.UI.Base
             set
             {
                 string error = "Invalid frequency";
-                if (NavHelper.ValidateFrequency(Radio, value, false))
+                if (PageHelper.ValidateFrequency(Radio, value, false))
                 {
-                    value = NavHelper.FixupFrequency(Radio, value);
+                    value = PageHelper.FixupFrequency(Radio, value);
                     error = null;
                 }
                 SetProperty(ref _frequency, value, error);
@@ -100,10 +98,10 @@ namespace JAFDTC.UI.Base
         }
 
         public Visibility ModulationVisibility
-            => NavHelper.RadioCanProgramModulation(Radio) ? Visibility.Visible : Visibility.Collapsed;
+            => PageHelper.RadioCanProgramModulation(Radio) ? Visibility.Visible : Visibility.Collapsed;
 
         public RadioPresetItem(IEditRadioPageHelper helper, int tag, int radio)
-            => (NavHelper, Tag, Radio, Preset, Frequency, Description, IsEnabled) = (helper, tag, radio, "", "", "", true);
+            => (PageHelper, Tag, Radio, Preset, Frequency, Description, IsEnabled) = (helper, tag, radio, "", "", "", true);
     }
 
     // ================================================================================================================
@@ -113,7 +111,7 @@ namespace JAFDTC.UI.Base
     /// </summary>
     public sealed class RadioMiscItem : BindableObject
     {
-        public IEditRadioPageHelper NavHelper { get; }
+        public IEditRadioPageHelper PageHelper { get; }
 
         public int Radio { get; set; }
 
@@ -124,7 +122,7 @@ namespace JAFDTC.UI.Base
             set
             {
                 string error = "Invalid default tuning";
-                string newValue = NavHelper.ValidateDefaultTuning(Radio, value);
+                string newValue = PageHelper.ValidateDefaultTuning(Radio, value);
                 if (newValue != null)
                 {
                     value = newValue;
@@ -156,7 +154,7 @@ namespace JAFDTC.UI.Base
         }
 
         public RadioMiscItem(IEditRadioPageHelper helper, int radio)
-            => (NavHelper, Radio, DefaultTuning, IsAux1Enabled, IsAux2Enabled, IsAux3Enabled)
+            => (PageHelper, Radio, DefaultTuning, IsAux1Enabled, IsAux2Enabled, IsAux3Enabled)
                 = (helper, radio, "", false, false, false);
     }
 
@@ -165,7 +163,7 @@ namespace JAFDTC.UI.Base
     /// <summary>
     /// TODO: document
     /// </summary>
-    public sealed partial class EditRadioPage : Page
+    public sealed partial class EditRadioPage : SystemEditorPageBase
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -173,14 +171,19 @@ namespace JAFDTC.UI.Base
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private ConfigEditorPageNavArgs NavArgs { get; set; }
+        // ---- overrides of base SystemEditorPage properties
 
-        private IEditRadioPageHelper NavHelper { get; set; }
+        protected override SystemBase SystemConfig => null;
 
-        // NOTE: changes to the Config object may only occur through the marshall methods. bindings to and edits by
-        // NOTE: the ui are always directed at the EditPresets/EditRadio properties.
-        //
-        private IConfiguration Config { get; set; }
+        protected override String SystemTag => PageHelper.SystemTag;
+
+        protected override string SystemName => "radio";
+
+        protected override bool IsPageStateDefault => (EditPresets.Count == 0);
+
+        // ---- internal properties
+
+        private IEditRadioPageHelper PageHelper { get; set; }
 
         private ObservableCollection<RadioPresetItem> EditPresets { get; set; }
 
@@ -190,17 +193,10 @@ namespace JAFDTC.UI.Base
 
         private int EditItemTag { get; set; }
 
-        private bool IsRebuildPending { get; set; }
-
         // ---- read-only properties
-
-        private readonly Dictionary<string, string> _configNameToUID;
-        private readonly List<string> _configNameList;
 
         private readonly List<TextBlock> _radioSelComboText;
         private readonly List<FontIcon> _radioSelComboIcons;
-        private readonly Brush _defaultBorderBrush;
-        private readonly Brush _defaultBkgndBrush;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -210,14 +206,12 @@ namespace JAFDTC.UI.Base
 
         public EditRadioPage()
         {
-            InitializeComponent();
-
             EditPresets = new ObservableCollection<RadioPresetItem>();
             EditRadio = 0;
             EditItemTag = 1;
 
-            _configNameToUID = new Dictionary<string, string>();
-            _configNameList = new List<string>();
+            InitializeComponent();
+            InitializeBase(null, uiMiscValueDefaultFreq, uiCtlLinkResetBtns, new List<string>() { });
 
             _radioSelComboText = new List<TextBlock>()
             {
@@ -227,8 +221,6 @@ namespace JAFDTC.UI.Base
             {
                 uiRadSelectItem0Icon, uiRadSelectItem1Icon, uiRadSelectItem2Icon, uiRadSelectItem3Icon
             };
-            _defaultBorderBrush = uiRadPrevBtn.BorderBrush;
-            _defaultBkgndBrush = uiRadPrevBtn.Background;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -240,7 +232,7 @@ namespace JAFDTC.UI.Base
         /// <summary>
         /// marshall data between the appropriate preset set in the radio configuration and our local radio state.
         /// </summary>
-        private void CopyConfigToEdit(int radio)
+        protected override void CopyConfigToEditState()
         {
             foreach (RadioPresetItem item in EditPresets)
             {
@@ -248,44 +240,41 @@ namespace JAFDTC.UI.Base
                 item.PropertyChanged -= PreField_PropertyChanged;
             }
 
-            NavHelper.CopyConfigToEdit(radio, Config, EditPresets, EditMisc);
+            PageHelper.CopyConfigToEdit(EditRadio, Config, EditPresets, EditMisc);
             SortEditPresets();
             
             foreach (RadioPresetItem item in EditPresets)
             {
                 item.Tag = EditItemTag++;
-                item.ModulationItems = NavHelper.RadioModulationItems(radio, item.Frequency);
+                item.ModulationItems = PageHelper.RadioModulationItems(EditRadio, item.Frequency);
                 item.ModulationIndex = ModulationIndexForModulation(item);
 
                 item.ErrorsChanged += PreField_DataValidationError;
                 item.PropertyChanged += PreField_PropertyChanged;
             }
+
+            UpdateUIFromEditState();
         }
 
         /// <summary>
         /// marshall data between our local radio state and the appropriate preset set in the radio configuration.
         /// </summary>
-        private void CopyEditToConfig(int radio, bool isPersist = false)
+        protected override void SaveEditStateToConfig()
         {
             if (!CurStateHasErrors() && !EditMisc.HasErrors)
             {
                 foreach (RadioPresetItem item in EditPresets)
-                {
                     if (item.ModulationItems != null)
                     {
                         int index = item.ModulationIndex;
                         if ((index < 0) || (index >= item.ModulationItems.Count))
-                        {
                             index = 0;
-                        }
                         item.Modulation = (string)item.ModulationItems[index].Tag;
                     }
-                }
-                NavHelper.CopyEditToConfig(radio, EditPresets, EditMisc, Config);
-                if (isPersist)
-                {
-                    Config.Save(this, NavHelper.SystemTag);
-                }
+
+                PageHelper.CopyEditToConfig(EditRadio, EditPresets, EditMisc, Config);
+                Config.Save(this, PageHelper.SystemTag);
+                UpdateUIFromEditState();
             }
         }
 
@@ -294,16 +283,6 @@ namespace JAFDTC.UI.Base
         // field validation
         //
         // ------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// set the border brush and background for a TextBox based on validity. valid fields use the defaults, invalid
-        /// fields use ErrorFieldBorderBrush from the resources.
-        /// </summary>
-        private void SetFieldValidState(TextBox field, bool isValid)
-        {
-            field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
-            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBackgroundBrush"];
-        }
 
         private TextBox FindFieldForPresetItem(RadioPresetItem item, string name)
         {
@@ -323,16 +302,13 @@ namespace JAFDTC.UI.Base
             {
                 TextBox fieldPreset = FindFieldForPresetItem(item, "Preset");
                 if (fieldPreset != null)
-                {
-                    SetFieldValidState(fieldPreset, ((List<string>)item.GetErrors("Preset")).Count == 0);
-                }
+                    SetFieldValidVisualState(fieldPreset, ((List<string>)item.GetErrors("Preset")).Count == 0);
                 TextBox fieldFreq = FindFieldForPresetItem(item, "Frequency");
                 if (fieldFreq != null)
-                {
-                    SetFieldValidState(fieldFreq, ((List<string>)item.GetErrors("Frequency")).Count == 0);
-                }
+                    SetFieldValidVisualState(fieldFreq, ((List<string>)item.GetErrors("Frequency")).Count == 0);
             }
-            SetFieldValidState(uiMiscValueDefaultFreq, ((List<string>)EditMisc.GetErrors("DefaultTuning")).Count == 0);
+            SetFieldValidVisualState(uiMiscValueDefaultFreq,
+                                     ((List<string>)EditMisc.GetErrors("DefaultTuning")).Count == 0);
         }
 
         /// <summary>
@@ -350,9 +326,9 @@ namespace JAFDTC.UI.Base
             {
                 List<string> errors = (List<string>)item.GetErrors(args.PropertyName);
                 TextBox field = Utilities.FindControl<TextBox>(listRowGrid, typeof(TextBox), args.PropertyName);
-                SetFieldValidState(field, (errors.Count == 0));
+                SetFieldValidVisualState(field, (errors.Count == 0));
             }
-            RebuildInterfaceState();
+            UpdateUIFromEditState();
         }
 
         private void MiscField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
@@ -365,9 +341,9 @@ namespace JAFDTC.UI.Base
             else if (args.PropertyName == "DefaultTuning")
             {
                 List<string> errors = (List<string>)item.GetErrors(args.PropertyName);
-                SetFieldValidState(uiMiscValueDefaultFreq, (errors.Count == 0));
+                SetFieldValidVisualState(uiMiscValueDefaultFreq, (errors.Count == 0));
             }
-            RebuildInterfaceState();
+            UpdateUIFromEditState();
         }
 
         /// <summary>
@@ -383,12 +359,12 @@ namespace JAFDTC.UI.Base
             else if (args.PropertyName == "Frequency")
             {
                 RadioPresetItem item = (RadioPresetItem)sender;
-                item.ModulationItems = NavHelper.RadioModulationItems(EditRadio, item.Frequency);
+                item.ModulationItems = PageHelper.RadioModulationItems(EditRadio, item.Frequency);
                 item.ModulationIndex = ModulationIndexForModulation(item);
             }
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
-                CopyEditToConfig(EditRadio, true);
+                SaveEditStateToConfig();
             });
         }
 
@@ -398,12 +374,8 @@ namespace JAFDTC.UI.Base
         private bool CurStateHasErrors()
         {
             foreach (RadioPresetItem item in EditPresets)
-            {
                 if (item.HasErrors)
-                {
                     return true;
-                }
-            }
             return false;
         }
 
@@ -422,7 +394,7 @@ namespace JAFDTC.UI.Base
         {
             Int64 mask = 0;
             int newPreset = 1;
-            int maxPreset = NavHelper.RadioMaxPresets(radio);
+            int maxPreset = PageHelper.RadioMaxPresets(radio);
             int newIndex = EditPresets.Count;
             foreach (RadioPresetItem item in EditPresets)
             {
@@ -437,12 +409,12 @@ namespace JAFDTC.UI.Base
                     newIndex++;
             }
 
-            RadioPresetItem newItem = new(NavHelper, EditItemTag++, radio);
+            RadioPresetItem newItem = new(PageHelper, EditItemTag++, radio);
             newItem.ErrorsChanged += PreField_DataValidationError;
             newItem.PropertyChanged += PreField_PropertyChanged;
             newItem.Preset = newPreset.ToString();
-            newItem.Frequency = NavHelper.RadioDefaultFrequency(radio);
-            newItem.ModulationItems = NavHelper.RadioModulationItems(radio, newItem.Frequency);
+            newItem.Frequency = PageHelper.RadioDefaultFrequency(radio);
+            newItem.ModulationItems = PageHelper.RadioModulationItems(radio, newItem.Frequency);
             EditPresets.Insert(newIndex, newItem);
         }
 
@@ -455,9 +427,7 @@ namespace JAFDTC.UI.Base
             sortableList.Sort((a, b) => int.Parse(a.Preset).CompareTo(int.Parse(b.Preset)));
             EditPresets = new ObservableCollection<RadioPresetItem>();
             for (int i = 0; i < sortableList.Count; i++)
-            {
                 EditPresets.Add(sortableList[i]);
-            }
         }
 
         /// <summary>
@@ -467,10 +437,9 @@ namespace JAFDTC.UI.Base
         {
             if (radio != EditRadio)
             {
-                CopyEditToConfig(EditRadio, true);
+                SaveEditStateToConfig();
                 EditRadio = radio;
-                CopyConfigToEdit(EditRadio);
-                RebuildInterfaceState();
+                CopyConfigToEditState();
             }
         }
 
@@ -480,12 +449,8 @@ namespace JAFDTC.UI.Base
         private RadioPresetItem FindPresetItemByTag(object tag)
         {
             foreach (RadioPresetItem item in EditPresets)
-            {
                 if (item.Tag.Equals(tag))
-                {
                     return item;
-                }
-            }
             return null;
         }
 
@@ -495,31 +460,23 @@ namespace JAFDTC.UI.Base
         private static int ModulationIndexForModulation(RadioPresetItem item)
         {
             for (int i = 0; (item.ModulationItems != null) && (i < item.ModulationItems.Count); i++)
-            {
                 if (item.Modulation == (string)item.ModulationItems[i].Tag)
-                {
                     return i;
-                }
-            }
             return 0;
         }
 
         /// <summary>
         /// TODO: document
         /// </summary>
-        private bool IsModulationItemsEqual(ComboBox combo, RadioPresetItem item)
+        private static bool IsModulationItemsEqual(ComboBox combo, RadioPresetItem item)
         {
             if ((combo.ItemsSource != null) &&
                 (item.ModulationItems != null) &&
                 (combo.Items.Count == item.ModulationItems.Count))
             {
                 for (int i = 0; i < combo.Items.Count; i++)
-                {
                     if (((TextBlock)combo.Items[i]).Text != item.ModulationItems[i].Text)
-                    {
                         return false;
-                    }
-                }
                 return true;
             }
             return false;
@@ -531,20 +488,9 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void RebuildRadioSelectMenu()
         {
-            for (int i = 0; i < NavHelper.RadioNames.Count; i++)
-            {
-                _radioSelComboIcons[i].Visibility = (NavHelper.RadioModuleIsDefault(Config, i)) ? Visibility.Collapsed
-                                                                                                : Visibility.Visible;
-            }
-        }
-
-        /// <summary>
-        /// rebuild the link controls on the page based on where the configuration is linked to.
-        /// </summary>
-        private void RebuildLinkControls()
-        {
-            Utilities.RebuildLinkControls(Config, NavHelper.SystemTag, NavArgs.UIDtoConfigMap,
-                                          uiPageBtnTxtLink, uiPageTxtLink);
+            for (int i = 0; i < PageHelper.RadioNames.Count; i++)
+                _radioSelComboIcons[i].Visibility = (PageHelper.RadioModuleIsDefault(Config, i)) ? Visibility.Collapsed
+                                                                                                 : Visibility.Visible;
         }
 
         /// <summary>
@@ -564,26 +510,20 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
-        /// TODO: document
+        /// rebuild the radio misc controls based on current setup.
         /// </summary>
         private void RebuildPerRadioMiscControls()
         {
-            RebuildPerRadioMiscAuxControl(uiMiscCkbxAux1, uiMiscTextAux1, NavHelper.RadioAux1Title(EditRadio));
-            RebuildPerRadioMiscAuxControl(uiMiscCkbxAux2, uiMiscTextAux2, NavHelper.RadioAux2Title(EditRadio));
-            RebuildPerRadioMiscAuxControl(uiMiscCkbxAux3, uiMiscTextAux3, NavHelper.RadioAux3Title(EditRadio));
+            RebuildPerRadioMiscAuxControl(uiMiscCkbxAux1, uiMiscTextAux1, PageHelper.RadioAux1Title(EditRadio));
+            RebuildPerRadioMiscAuxControl(uiMiscCkbxAux2, uiMiscTextAux2, PageHelper.RadioAux2Title(EditRadio));
+            RebuildPerRadioMiscAuxControl(uiMiscCkbxAux3, uiMiscTextAux3, PageHelper.RadioAux3Title(EditRadio));
 
             if (string.IsNullOrEmpty(EditMisc.DefaultTuning) || EditMisc.HasErrors)
-            {
                 uiMiscTextDefaultLabel.Text = "";
-            }
             else if (int.TryParse(EditMisc.DefaultTuning, out _))
-            {
                 uiMiscTextDefaultLabel.Text = "Preset";
-            }
             else
-            {
                 uiMiscTextDefaultLabel.Text = "MHz";
-            }
         }
 
         /// <summary>
@@ -634,19 +574,19 @@ namespace JAFDTC.UI.Base
         /// update the enable state on the ui elements based on the current settings. link controls must be set up via
         /// RebuildLinkControls() prior to calling this function.
         /// </summary>
-        private void RebuildEnableState()
+        protected override void UpdateUICustom(bool isEditable)
         {
-            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(NavHelper.SystemTag));
+            uiPreListView.ItemsSource = EditPresets;
+
+            RebuildRadioSelectMenu();
+            RebuildPerRadioMiscControls();
+            RebuildModulationSelections();
 
             if ((EditPresets.Count > 0) && (EditPresets[0].IsEnabled != isEditable))
-            {
                 foreach (RadioPresetItem item in EditPresets)
-                {
                     item.IsEnabled = isEditable;
-                }
-            }
 
-            Utilities.SetEnableState(uiBarAdd, isEditable && (EditPresets.Count < NavHelper.RadioMaxPresets(EditRadio)));
+            Utilities.SetEnableState(uiBarAdd, isEditable && (EditPresets.Count < PageHelper.RadioMaxPresets(EditRadio)));
             Utilities.SetEnableState(uiBarImport, isEditable);
             Utilities.SetEnableState(uiBarExport, isEditable && (EditPresets.Count > 0));
 
@@ -655,36 +595,15 @@ namespace JAFDTC.UI.Base
             Utilities.SetEnableState(uiMiscCkbxAux2, isEditable);
             Utilities.SetEnableState(uiMiscCkbxAux3, isEditable);
 
-            bool isDefault = NavHelper.RadioSysIsDefault(Config) && (EditPresets.Count == 0);
-            Utilities.SetEnableState(uiPageBtnResetAll, !isDefault);
-
-            Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
-
             bool isNoErrs = !CurStateHasErrors();
             Utilities.SetEnableState(uiRadSelectCombo, isNoErrs);
-            Utilities.SetEnableState(uiRadNextBtn, (isNoErrs && (EditRadio < (NavHelper.RadioNames.Count - 1))));
+            Utilities.SetEnableState(uiRadNextBtn, (isNoErrs && (EditRadio < (PageHelper.RadioNames.Count - 1))));
             Utilities.SetEnableState(uiRadPrevBtn, (isNoErrs && (EditRadio > 0)));
         }
 
-        /// <summary>
-        /// rebuild the state of controls on the page in response to a change in the configuration.
-        /// </summary>
-        private void RebuildInterfaceState()
+        protected override void ResetConfigToDefault()
         {
-            if (!IsRebuildPending)
-            {
-                IsRebuildPending = true;
-                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-                {
-                    uiPreListView.ItemsSource = EditPresets;
-                    RebuildRadioSelectMenu();
-                    RebuildPerRadioMiscControls();
-                    RebuildLinkControls();
-                    RebuildModulationSelections();
-                    RebuildEnableState();
-                    IsRebuildPending = false;
-                });
-            }
+            PageHelper.RadioSysReset(Config);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -692,48 +611,6 @@ namespace JAFDTC.UI.Base
         // ui interactions
         //
         // ------------------------------------------------------------------------------------------------------------
-
-        // ---- page buttons ------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// reset all button click: reset all radio settings back to their defaults.
-        /// </summary>
-        private async void PageBtnResetAll_Click(object sender, RoutedEventArgs args)
-        {
-            ContentDialogResult result = await Utilities.Message2BDialog(
-                Content.XamlRoot,
-                "Reset Configuration?",
-                "Are you sure you want to reset the radio configurations to avionics defaults? This action cannot be undone.",
-                "Reset"
-            );
-            if (result == ContentDialogResult.Primary)
-            {
-                Config.UnlinkSystem(NavHelper.SystemTag);
-                NavHelper.RadioSysReset(Config);
-                Config.Save(this, NavHelper.SystemTag);
-                CopyConfigToEdit(EditRadio);
-            }
-        }
-
-        /// <summary>
-        /// system link click: manage the ui to link this configuration to another radio configuration.
-        /// </summary>
-        private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
-        {
-            string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, NavHelper.SystemTag,
-                                                                    _configNameList);
-            if (selectedItem == null)
-            {
-                Config.UnlinkSystem(NavHelper.SystemTag);
-                Config.Save(this);
-            }
-            else if (selectedItem.Length > 0)
-            {
-                Config.LinkSystemTo(NavHelper.SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selectedItem]]);
-                Config.Save(this);
-                CopyConfigToEdit(EditRadio);
-            }
-        }
 
         // ---- commands ----------------------------------------------------------------------------------------------
 
@@ -744,7 +621,7 @@ namespace JAFDTC.UI.Base
         {
             // TODO: scroll to visible after adding new preset?
             AddNewPreset(EditRadio);
-            CopyEditToConfig(EditRadio, true);
+            SaveEditStateToConfig();
         }
 
         /// <summary>
@@ -820,7 +697,7 @@ namespace JAFDTC.UI.Base
             //
             CheckBox cbox = (CheckBox)sender;
             EditMisc.IsAux1Enabled = (bool)cbox.IsChecked;
-            CopyEditToConfig(EditRadio, true);
+            SaveEditStateToConfig();
         }
 
         /// <summary>
@@ -832,7 +709,7 @@ namespace JAFDTC.UI.Base
             //
             CheckBox cbox = (CheckBox)sender;
             EditMisc.IsAux2Enabled = (bool)cbox.IsChecked;
-            CopyEditToConfig(EditRadio, true);
+            SaveEditStateToConfig();
         }
 
         /// <summary>
@@ -844,7 +721,7 @@ namespace JAFDTC.UI.Base
             //
             CheckBox cbox = (CheckBox)sender;
             EditMisc.IsAux3Enabled = (bool)cbox.IsChecked;
-            CopyEditToConfig(EditRadio, true);
+            SaveEditStateToConfig();
         }
 
         // ---- preset list -------------------------------------------------------------------------------------------
@@ -859,7 +736,7 @@ namespace JAFDTC.UI.Base
             if (item != null)
             {
                 EditPresets.Remove(item);
-                CopyEditToConfig(EditRadio, true);
+                SaveEditStateToConfig();
             }
         }
 
@@ -873,7 +750,7 @@ namespace JAFDTC.UI.Base
             if ((item != null) && (cbox.SelectedIndex != -1))
             {
                 item.ModulationIndex = cbox.SelectedIndex;
-                CopyEditToConfig(EditRadio, true);
+                SaveEditStateToConfig();
             }
         }
 
@@ -884,14 +761,6 @@ namespace JAFDTC.UI.Base
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configuration saved: rebuild interface state to align with the latest save.
-        /// </summary>
-        private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
-        {
-            RebuildInterfaceState();
-        }
-
-        /// <summary>
         /// on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
         /// we are editing.
         /// 
@@ -899,40 +768,28 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
-            NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
+            // HACK: fixes circular dependency where base.OnNavigatedTo needs PageHelper, but PageHelper needs
+            // NavArgs which are built inside base.OnNavigatedTo.
+            ConfigEditorPageNavArgs navArgs = (ConfigEditorPageNavArgs)args.Parameter;
+            PageHelper = (IEditRadioPageHelper)Activator.CreateInstance(navArgs.EditorHelperType);
 
-            NavHelper = (IEditRadioPageHelper)Activator.CreateInstance(NavArgs.EditorHelperType);
-
-            EditMisc = new RadioMiscItem(NavHelper, 0);
+            EditMisc = new RadioMiscItem(PageHelper, 0);
             EditMisc.ErrorsChanged += MiscField_DataValidationError;
 
-            while (uiRadSelectCombo.Items.Count > NavHelper.RadioNames.Count)
+            base.OnNavigatedTo(args);
+
+            while (uiRadSelectCombo.Items.Count > PageHelper.RadioNames.Count)
             {
                 uiRadSelectCombo.Items.RemoveAt(uiRadSelectCombo.Items.Count - 1);
             }
-            for (int i = 0; i < NavHelper.RadioNames.Count; i++)
+            for (int i = 0; i < PageHelper.RadioNames.Count; i++)
             {
-                _radioSelComboText[i].Text = NavHelper.RadioNames[i];
+                _radioSelComboText[i].Text = PageHelper.RadioNames[i];
             }
 
-            Config = NavArgs.Config;
-            Config.ConfigurationSaved += ConfigurationSavedHandler;
-            CopyConfigToEdit(EditRadio);
-
-            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, NavHelper.SystemTag,
-                                           _configNameList, _configNameToUID);
+            CopyConfigToEditState();
 
             uiRadSelectCombo.SelectedIndex = EditRadio;
-            RebuildInterfaceState();
-
-            base.OnNavigatedTo(args);
-        }
-
-        protected override void OnNavigatedFrom(NavigationEventArgs args)
-        {
-            Config.ConfigurationSaved -= ConfigurationSavedHandler;
-
-            base.OnNavigatedFrom(args);
         }
     }
 }
