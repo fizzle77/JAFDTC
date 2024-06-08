@@ -114,7 +114,7 @@ namespace JAFDTC.UI.A10C
         /// </summary>
         protected override void UpdateUICustom(bool isEditable)
         {
-            if (!IsMunitionSelectionValid(out A10CMunition selectedMunition))
+            if (!IsMunitionSelectionValid(out A10CMunition selectedMunition) || EditState == null)
                return;
 
             uiTextMuniDesc.Text = selectedMunition.DescrUI;

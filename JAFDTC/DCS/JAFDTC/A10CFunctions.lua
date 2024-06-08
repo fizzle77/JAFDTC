@@ -113,6 +113,11 @@ end
 
 -- CDU Routines
 
+function JAFDTC_A10C_Fn_IsCDUInDefaultMFDPosition()
+    local value = JAFDTC_A10C_GetRMFD_value("label_12");
+    return value == "CDU";
+end
+
 function JAFDTC_A10C_GetCDU()
     local table = JAFDTC_ParseDisplay(3);
     JAFDTC_DebugDisplay(table);
@@ -126,20 +131,13 @@ function JAFDTC_A10C_GetCDU_value(key)
     return value;
 end
 
-function JAFDTC_A10C_Fn_IsCoordFmtLL()
-    local value = JAFDTC_A10C_GetCDU_value("WAYPTCoordFormat");
-    if string.sub(value, 1, 3) == "L/L" then
-        return true
-    end
-    return false
+function JAFDTC_A10C_Fn_IsWyptElevationDifferent(set_elevation)
+    return tonumber(set_elevation) ~= tonumber(JAFDTC_A10C_GetCDU_value("WAYPT_EL3"));
 end
 
-function JAFDTC_A10C_Fn_IsCoordFmtNotLL()
+function JAFDTC_A10C_Fn_IsCoordFmtLL()
     local value = JAFDTC_A10C_GetCDU_value("WAYPTCoordFormat");
-    if string.sub(value, 1, 3) ~= "L/L" then
-        return true
-    end
-    return false
+    return string.sub(value, 1, 3) == "L/L"
 end
 
 function JAFDTC_A10C_Fn_IsBullsNotOnHUD()
@@ -158,14 +156,9 @@ function JAFDTC_A10C_Fn_IsFlightPlanNotManual()
     return false
 end
 
-function JAFDTC_A10C_Fn_SpeedIsAvailable()
+function JAFDTC_A10C_Fn_IsSpeedAvailable()
     local table = JAFDTC_A10C_GetCDU();
     return table["STRSpeedMode4"] == "IAS" or table["STRSpeedMode5"] == "TAS" or table["STRSpeedMode6"] == "GS"
-end
-
-function JAFDTC_A10C_Fn_SpeedIsNotAvailable()
-    local table = JAFDTC_A10C_GetCDU();
-    return table["STRSpeedMode4"] ~= "IAS" and table["STRSpeedMode5"] ~= "TAS" and table["STRSpeedMode6"] ~= "GS"
 end
 
 function JAFDTC_A10C_Fn_SpeedIsNot(speed)

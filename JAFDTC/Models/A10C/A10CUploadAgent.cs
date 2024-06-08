@@ -92,6 +92,7 @@ namespace JAFDTC.Models.A10C
         public override void BuildSystems(StringBuilder sb)
         {
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
+            new IFFCCBuilder(_cfg, _dcsCmds, sb).Build();
             new DSMSBuilder(_cfg, _dcsCmds, sb).Build();
             new HMCSBuilder(_cfg, _dcsCmds, sb).Build();
             new TADBuilder(_cfg, _dcsCmds, sb).Build();

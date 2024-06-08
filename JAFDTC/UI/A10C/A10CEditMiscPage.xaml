@@ -33,6 +33,11 @@ https://www.gnu.org/licenses/.
         <!-- brush for error fields. -->
         <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
         <SolidColorBrush x:Key="ErrorFieldBackgroundBrush" Color="PaleVioletRed"/>
+
+        <Style BasedOn="{StaticResource DefaultCheckBoxStyle}" TargetType="CheckBox">
+            <Setter Property="MinWidth" Value="20" />
+            <Setter Property="Width" Value="20" />
+        </Style>
     </Page.Resources>
 
     <Grid>

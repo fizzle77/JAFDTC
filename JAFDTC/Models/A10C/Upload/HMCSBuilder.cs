@@ -105,57 +105,58 @@ namespace JAFDTC.Models.A10C.Upload
 
             // Do each setting, top to bottom.
             // This must be in the same order as the jet's list of settings.
+            const string BUTTON = "RMFD_18_SHORT";
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "Crosshair", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "Crosshair", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "OwnSPI", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "OwnSPI", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "SPIIndicator", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "SPIIndicator", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "HorizonLine", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "HorizonLine", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "HDC", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "HDC", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "Hookship", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "Hookship", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "TGPDiamond", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "TGPDiamond", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "TGPFOV", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "TGPFOV", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "FlightMembers", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "FlightMembers", profile);
             AddActionsForRangeProperty(cdu, rmfd, "FlightMembersRange", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "FMSPI", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "FMSPI", profile);
             AddActionsForRangeProperty(cdu, rmfd, "FMSPIRange", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "DonorAirPPLI", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "DonorAirPPLI", profile);
             AddActionsForRangeProperty(cdu, rmfd, "DonorAirPPLIRange", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "DonorSPI", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "DonorSPI", profile);
             AddActionsForRangeProperty(cdu, rmfd, "DonorSPIRange", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "CurrentMA", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "CurrentMA", profile);
             AddActionsForRangeProperty(cdu, rmfd, "CurrentMARange", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "AirEnvir", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "AirEnvir", profile);
             QueueContingentArrowDownAction();
 
             QueueContingentArrowDownAction(); // Skipped because no function in DCS: AIR VMF FRIEND
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "AirPPLINonDonor", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "AirPPLINonDonor", profile);
             AddActionsForRangeProperty(cdu, rmfd, "AirPPLINonDonorRange", profile);
             QueueContingentArrowDownAction();
 
@@ -165,10 +166,10 @@ namespace JAFDTC.Models.A10C.Upload
             QueueContingentArrowDownAction(); // Skipped because no function in DCS: AIR HOSTILE
             QueueContingentArrowDownAction(); // Skipped because no function in DCS: AIR OTHER
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "GndEnvir", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "GndEnvir", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "GndVMFFriend", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "GndVMFFriend", profile);
             AddActionsForRangeProperty(cdu, rmfd, "GndVMFFriendRange", profile);
             QueueContingentArrowDownAction();
 
@@ -180,33 +181,33 @@ namespace JAFDTC.Models.A10C.Upload
             QueueContingentArrowDownAction(); // Skipped because no function in DCS: GND OTHER
             QueueContingentArrowDownAction(); // Skipped because no function in DCS: EMER POINT
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "Steerpoint", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "Steerpoint", profile);
             AddActionsForRangeProperty(cdu, rmfd, "SteerpointRange", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "MsnMarkpoints", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "MsnMarkpoints", profile);
             AddActionsForRangeProperty(cdu, rmfd, "MsnMarkpointsRange", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "MsnMarkLabels", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "MsnMarkLabels", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "Airspeed", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "Airspeed", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "RadarAltitude", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "RadarAltitude", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "BaroAltitude", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "BaroAltitude", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "ACHeading", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "ACHeading", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "HelmetHeading", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "HelmetHeading", profile);
             QueueContingentArrowDownAction();
 
-            AddActionsForSettingProperty(rmfd, "RMFD_18", "HMDElevLines", profile);
+            AddActionsForSettingProperty(rmfd, BUTTON, "HMDElevLines", profile);
             QueueContingentArrowDownAction();
         }
 
@@ -248,7 +249,7 @@ namespace JAFDTC.Models.A10C.Upload
         private void AddAllContingentArrowDownActions(AirframeDevice rmfd)
         {
             for (int i = 0; i < _numContingentArrowDownActions; i++)
-                AddAction(rmfd, "RMFD_19");
+                AddAction(rmfd, "RMFD_19_SHORT");
             ClearAllContingentArrowDownActions();
         }
         int _numContingentArrowDownActions = 0;
@@ -267,7 +268,7 @@ namespace JAFDTC.Models.A10C.Upload
 
             // Add the actual setting changes.
             for (int i = 0; i < numClicks; i++)
-                AddAction(rmfd, button, WAIT_BASE);
+                AddAction(rmfd, button);
         }
 
         /// <summary>

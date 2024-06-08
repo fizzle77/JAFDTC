@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using JAFDTC.Models.A10C.IFFCC;
 
 namespace JAFDTC.Models.A10C
 {
@@ -52,8 +53,10 @@ namespace JAFDTC.Models.A10C
 
         public HMCSSystem HMCS { get; set; }
 
+        public IFFCCSystem IFFCC { get; set; }
+
         public MiscSystem Misc { get; set; }
-        
+
         public RadioSystem Radio { get; set; }
 
         public TADSystem TAD { get; set; }
@@ -76,6 +79,7 @@ namespace JAFDTC.Models.A10C
         {
             DSMS = new DSMSSystem();
             HMCS = new HMCSSystem();
+            IFFCC = new IFFCCSystem();
             Misc = new MiscSystem();
             Radio = new RadioSystem();
             TAD = new TADSystem();
@@ -95,6 +99,7 @@ namespace JAFDTC.Models.A10C
             {
                 DSMS = (DSMSSystem)DSMS.Clone(),
                 HMCS = (HMCSSystem)HMCS.Clone(),
+                IFFCC = (IFFCCSystem)IFFCC.Clone(),
                 Misc = (MiscSystem)Misc.Clone(),
                 Radio = (RadioSystem)Radio.Clone(),
                 TAD = (TADSystem)TAD.Clone(),
@@ -112,6 +117,7 @@ namespace JAFDTC.Models.A10C
             {
                 case DSMSSystem.SystemTag: DSMS = (DSMSSystem)otherHawg.DSMS.Clone(); break;
                 case HMCSSystem.SystemTag: HMCS = (HMCSSystem)otherHawg.HMCS.Clone(); break;
+                case IFFCCSystem.SystemTag: IFFCC = (IFFCCSystem)otherHawg.IFFCC.Clone(); break;
                 case MiscSystem.SystemTag: Misc = (MiscSystem)otherHawg.Misc.Clone(); break;
                 case RadioSystem.SystemTag: Radio = (RadioSystem)otherHawg.Radio.Clone(); break;
                 case TADSystem.SystemTag: TAD = (TADSystem)otherHawg.TAD.Clone(); break;
@@ -149,6 +155,7 @@ namespace JAFDTC.Models.A10C
                 null => JsonSerializer.Serialize(this, Configuration.JsonOptions),
                 DSMSSystem.SystemTag => JsonSerializer.Serialize(DSMS, Configuration.JsonOptions),
                 HMCSSystem.SystemTag => JsonSerializer.Serialize(HMCS, Configuration.JsonOptions),
+                IFFCCSystem.SystemTag => JsonSerializer.Serialize(IFFCC, Configuration.JsonOptions),
                 MiscSystem.SystemTag => JsonSerializer.Serialize(Misc, Configuration.JsonOptions),
                 RadioSystem.SystemTag => JsonSerializer.Serialize(Radio, Configuration.JsonOptions),
                 TADSystem.SystemTag => JsonSerializer.Serialize(TAD, Configuration.JsonOptions),
@@ -162,6 +169,7 @@ namespace JAFDTC.Models.A10C
         {
             DSMS ??= new DSMSSystem();
             HMCS ??= new HMCSSystem();
+            IFFCC ??= new IFFCCSystem();
             Misc ??= new MiscSystem();
             Radio ??= new RadioSystem();
             TAD ??= new TADSystem();
@@ -182,6 +190,7 @@ namespace JAFDTC.Models.A10C
                    (((systemTag != null) && (cboardTag.StartsWith(systemTag))) ||
                    ((systemTag == null) && (cboardTag == DSMSSystem.SystemTag)) ||
                    ((systemTag == null) && (cboardTag == HMCSSystem.SystemTag)) ||
+                   ((systemTag == null) && (cboardTag == IFFCCSystem.SystemTag)) ||
                    ((systemTag == null) && (cboardTag == MiscSystem.SystemTag)) ||
                    ((systemTag == null) && (cboardTag == RadioSystem.SystemTag)) ||
                    ((systemTag == null) && (cboardTag == TADSystem.SystemTag)) ||
@@ -199,6 +208,7 @@ namespace JAFDTC.Models.A10C
                 {
                     case DSMSSystem.SystemTag: DSMS = JsonSerializer.Deserialize<DSMSSystem>(json); break;
                     case HMCSSystem.SystemTag: HMCS = JsonSerializer.Deserialize<HMCSSystem>(json); break;
+                    case IFFCCSystem.SystemTag: IFFCC = JsonSerializer.Deserialize<IFFCCSystem>(json); break;
                     case MiscSystem.SystemTag: Misc = JsonSerializer.Deserialize<MiscSystem>(json); break;
                     case RadioSystem.SystemTag: Radio = JsonSerializer.Deserialize<RadioSystem>(json); break;
                     case TADSystem.SystemTag: TAD = JsonSerializer.Deserialize<TADSystem>(json); break;

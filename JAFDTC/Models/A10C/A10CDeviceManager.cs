@@ -37,10 +37,12 @@ namespace JAFDTC.Models.A10C
         {
             int delay = Settings.CommandDelaysMs[AirframeTypes.A10C];
             int delayChar = delay / 2;
+            int delayData = delay / 4;
 
             // ---- cdu
 
             AirframeDevice cdu = new(9, "CDU");
+
             cdu.AddAction(3015, "1", delayChar, 1);
             cdu.AddAction(3016, "2", delayChar, 1);
             cdu.AddAction(3017, "3", delayChar, 1);
@@ -79,7 +81,8 @@ namespace JAFDTC.Models.A10C
             cdu.AddAction(3051, "Y", delayChar, 1);
             cdu.AddAction(3052, "Z", delayChar, 1);
             cdu.AddAction(3057, " ", delayChar, 1);
-            cdu.AddAction(3058, "CLR", delay, 1);
+            cdu.AddAction(3058, "CLR", delayChar, 1);
+
             cdu.AddAction(3001, "LSK_3L", delay, 1);
             cdu.AddAction(3002, "LSK_5L", delay, 1);
             cdu.AddAction(3003, "LSK_7L", delay, 1);
@@ -88,9 +91,11 @@ namespace JAFDTC.Models.A10C
             cdu.AddAction(3006, "LSK_5R", delay, 1);
             cdu.AddAction(3007, "LSK_7R", delay, 1);
             cdu.AddAction(3008, "LSK_9R", delay, 1);
+
             cdu.AddAction(3010, "NAV", delay, 1);
             cdu.AddAction(3011, "WP", delay, 1);
             cdu.AddAction(3013, "FPM", delay, 1);
+
             AddDevice(cdu);
 
             // ---- auxiliary avionics panel
@@ -188,31 +193,45 @@ namespace JAFDTC.Models.A10C
             rmfd.AddAction(3018, "RMFD_18", delay, 1);
             rmfd.AddAction(3019, "RMFD_19", delay, 1);
             rmfd.AddAction(3020, "RMFD_20", delay, 1);
+
             rmfd.AddAction(3012, "RMFD_12_LONG", 2500, 1);
+            rmfd.AddAction(3018, "RMFD_18_SHORT", delayChar, 1); // for HMCS profile setting change
+            rmfd.AddAction(3019, "RMFD_19_SHORT", delayChar, 1); // for HMCS down arrow
+
             AddDevice(rmfd);
 
             // ---- up-front controls
 
             AirframeDevice ufc = new(8, "UFC");
+
+            ufc.AddAction(3001, "1", delayChar, 1);
+            ufc.AddAction(3002, "2", delayChar, 1);
+            ufc.AddAction(3003, "3", delayChar, 1);
+            ufc.AddAction(3004, "4", delayChar, 1);
+            ufc.AddAction(3005, "5", delayChar, 1);
+            ufc.AddAction(3006, "6", delayChar, 1);
+            ufc.AddAction(3007, "7", delayChar, 1);
+            ufc.AddAction(3008, "8", delayChar, 1);
+            ufc.AddAction(3009, "9", delayChar, 1);
+            ufc.AddAction(3010, "0", delayChar, 1);
+            ufc.AddAction(3011, "SPC", delayChar, 1);
+
+            ufc.AddAction(3013, "FN", delay, 1);
+            ufc.AddAction(3015, "CLR", delay, 1);
+            ufc.AddAction(3016, "ENTER", delay, 1);
+
+            ufc.AddAction(3018, "ALT_ALRT", delay, 1);
+
+            ufc.AddAction(3022, "DATA_UP", delayData, 1);
+            ufc.AddAction(3023, "DATA_DN", delayData, 1);
+            ufc.AddAction(3024, "SEL_UP", delayChar, 1);
+            ufc.AddAction(3025, "SEL_DN", delayChar, 1);
+
             ufc.AddAction(3030, "UFC_COM1", delay, 1);
             ufc.AddAction(3030, "UFC_COM1_LONG", 1500, 1);
             ufc.AddAction(3033, "UFC_COM2", delay, 1);
             ufc.AddAction(3033, "UFC_COM2_LONG", 1500, 1);
-            ufc.AddAction(3001, "1", delay, 1);
-            ufc.AddAction(3002, "2", delay, 1);
-            ufc.AddAction(3003, "3", delay, 1);
-            ufc.AddAction(3004, "4", delay, 1);
-            ufc.AddAction(3005, "5", delay, 1);
-            ufc.AddAction(3006, "6", delay, 1);
-            ufc.AddAction(3007, "7", delay, 1);
-            ufc.AddAction(3008, "8", delay, 1);
-            ufc.AddAction(3009, "9", delay, 1);
-            ufc.AddAction(3010, "0", delay, 1);
-            ufc.AddAction(3011, "SPC", delay, 1);
-            ufc.AddAction(3013, "FN", delay, 1);
-            ufc.AddAction(3015, "CLR", delay, 1);
-            ufc.AddAction(3016, "ENTER", delay, 1);
-            ufc.AddAction(3018, "ALT_ALRT", delay, 1);
+
             AddDevice(ufc);
 
             // ---- IFF
@@ -333,6 +352,14 @@ namespace JAFDTC.Models.A10C
             hotas.AddAction(548, "TMS_OFF", delay, 1);
 
             AddDevice(hotas);
+
+            // ---- AHCP (armament HUD control panel)
+
+            AirframeDevice ahcp = new(7, "AHCP");
+            ahcp.AddAction(3010, "IFFCC_OFF", delay, 0, 0);
+            ahcp.AddAction(3010, "IFFCC_TEST", delay, 0.1, 0.1);
+            ahcp.AddAction(3010, "IFFCC_ON", delay, 0.2, 0.2);
+            AddDevice(ahcp);
 
             // ---- aux light control
 

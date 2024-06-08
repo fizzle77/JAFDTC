@@ -155,7 +155,7 @@ namespace JAFDTC.Models.A10C.Upload
             // During startup, before alignment, the speed setting is not yet visible but you can still change it
             // with button presses. In this state we assume it's still at the default IAS and press the button
             // once for TAS, twice for GS.
-            AddIfBlock("SpeedIsNotAvailable", true, null, delegate ()
+            AddIfBlock("IsSpeedAvailable", false, null, delegate ()
             {
                 AddAction(cdu, "LSK_9R"); // TAS
                 if (miscSystem.SpeedDisplayValue == SpeedDisplayOptions.GS)
@@ -165,7 +165,7 @@ namespace JAFDTC.Models.A10C.Upload
             // TODO consider an "else" delegate for if blocks?
 
             // If we're aligned and can see the setting, we can just press the button until it says what we want.
-            AddIfBlock("SpeedIsAvailable", true, null, delegate ()
+            AddIfBlock("IsSpeedAvailable", true, null, delegate ()
             {
                 AddWhileBlock("SpeedIsNot", true, new() { $"{miscSystem.SpeedDisplayValue}" }, delegate ()
                 {
