@@ -156,14 +156,9 @@ function JAFDTC_A10C_Fn_IsFlightPlanNotManual()
     return false
 end
 
-function JAFDTC_A10C_Fn_SpeedIsAvailable()
+function JAFDTC_A10C_Fn_IsSpeedAvailable()
     local table = JAFDTC_A10C_GetCDU();
     return table["STRSpeedMode4"] == "IAS" or table["STRSpeedMode5"] == "TAS" or table["STRSpeedMode6"] == "GS"
-end
-
-function JAFDTC_A10C_Fn_SpeedIsNotAvailable()
-    local table = JAFDTC_A10C_GetCDU();
-    return table["STRSpeedMode4"] ~= "IAS" and table["STRSpeedMode5"] ~= "TAS" and table["STRSpeedMode6"] ~= "GS"
 end
 
 function JAFDTC_A10C_Fn_SpeedIsNot(speed)
