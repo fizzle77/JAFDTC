@@ -70,14 +70,14 @@ https://www.gnu.org/licenses/.
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="50"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" MinWidth="50"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!--
@@ -151,7 +151,7 @@ https://www.gnu.org/licenses/.
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                 AIRSPEED
             </TextBlock>
-            <ComboBox Grid.Row="6" Grid.Column="1" Margin="12,12,0,0"
+            <ComboBox Grid.Row="6" Grid.Column="1" Margin="12,12,0,0" Width="120"
                       x:Name="uiComboAirspeed"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Left"
