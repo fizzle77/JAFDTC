@@ -19,6 +19,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.DCS;
+using JAFDTC.Models.F16C.MFD;
 using JAFDTC.Models.F16C.Upload;
 using JAFDTC.Utilities;
 using System.Collections.Generic;
@@ -116,19 +117,34 @@ namespace JAFDTC.Models.F16C
 
         public override void BuildSystems(StringBuilder sb)
         {
-            new RadioBuilder(_cfg, _dcsCmds, sb).Build();
-            new MiscBuilder(_cfg, _dcsCmds, sb).Build();
-            new CMDSBuilder(_cfg, _dcsCmds, sb).Build();
+            // perform state queries to capture current avionics state that we are interested in including the mfd
+            // format setup and the munitions on jet according to sms pages.
             //
-            // NOTE: hts must be done before mfd as mfd might set the man threat class which is only available if the
-            // NOTE: hts manual table has been set up.
+            MFDStateQueryBuilder queryMFD = new(_dcsCmds, null);
+            Dictionary<string, object> state = queryMFD.QueryCurrentMFDStateForAllModes();
+
+            SMSStateQueryBuilder querySMS = new(_dcsCmds, null);
+            state = querySMS.QuerySMSMunitionsForMode(MFDSystem.MasterModes.ICP_AG, state);
+            // TODO: maybe add this when munitions handle a2a weapons too?
+            // state = querySMS.QuerySMSMunitionsForMode(MFDSystem.MasterModes.ICP_AA, state);
+
+            // build the command stream to set up the jet. we will use the query state collected above to drive
+            // decisions around how to twiddle the buttons in the jet.
             //
-            new HTSBuilder(_cfg, _dcsCmds, sb).Build();
-            new MFDBuilder(_cfg, _dcsCmds, sb).Build();
-            new HARMBuilder(_cfg, _dcsCmds, sb).Build();
-            new DLNKBuilder(_cfg, _dcsCmds, sb).Build();
-            new SMSBuilder(_cfg, _dcsCmds, sb).Build();
-            new STPTBuilder(_cfg, _dcsCmds, sb).Build();
+            new RadioBuilder(_cfg, _dcsCmds, sb).Build(state);
+            new MiscBuilder(_cfg, _dcsCmds, sb).Build(state);
+            new CMDSBuilder(_cfg, _dcsCmds, sb).Build(state);
+            //
+            // NOTE: hts must be done before mfd as mfd can set the man hts threat class which is only available if
+            // NOTE: the hts manual table has been set up.
+            //
+            // NOTE: mfd will invoke the sms builder if there are sms changes and the sms page is selected
+            //
+            new HTSBuilder(_cfg, _dcsCmds, sb).Build(state);
+            new MFDBuilder(_cfg, _dcsCmds, sb).Build(state);
+            new HARMBuilder(_cfg, _dcsCmds, sb).Build(state);
+            new DLNKBuilder(_cfg, _dcsCmds, sb).Build(state);
+            new STPTBuilder(_cfg, _dcsCmds, sb).Build(state);
         }
 
         public override IBuilder SetupBuilder(StringBuilder sb) => new F16CSetupBuilder(_dcsCmds, sb);
