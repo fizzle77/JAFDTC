@@ -92,7 +92,7 @@ namespace JAFDTC.UI.Base
             EditNavpt = new ObservableCollection<INavpointInfo>();
 
             InitializeComponent();
-            InitializeBase(null, null, uiCtlLinkResetBtns);
+            InitializeBase(new PrivateEditState(), null, uiCtlLinkResetBtns);
         }
 
         // ------------------------------------------------------------------------------------------------------------
