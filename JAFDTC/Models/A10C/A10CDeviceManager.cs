@@ -189,7 +189,11 @@ namespace JAFDTC.Models.A10C
             rmfd.AddAction(3018, "RMFD_18", delay, 1);
             rmfd.AddAction(3019, "RMFD_19", delay, 1);
             rmfd.AddAction(3020, "RMFD_20", delay, 1);
+
             rmfd.AddAction(3012, "RMFD_12_LONG", 2500, 1);
+            rmfd.AddAction(3018, "RMFD_18_SHORT", delayChar, 1); // for HMCS profile setting change
+            rmfd.AddAction(3019, "RMFD_19_SHORT", delayChar, 1); // for HMCS down arrow
+
             AddDevice(rmfd);
 
             // ---- up-front controls
