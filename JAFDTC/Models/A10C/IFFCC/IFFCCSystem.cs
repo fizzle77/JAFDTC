@@ -177,7 +177,7 @@ namespace JAFDTC.Models.A10C.IFFCC
 
         // Pretty sure this is a funny translation failure. This should almost certainly be
         // "occlude" not "occult" but it appears this way everywhere in both the manual and
-        // in-pit.
+        // in-pit. Leaving it this way here, but I can't stand to leave "occult" in the UI.
         private string _ccipGunCrossOccult;
         public string CCIPGunCrossOccult
         {
@@ -453,16 +453,16 @@ namespace JAFDTC.Models.A10C.IFFCC
         {
             iffcc.CCIPConsent = "0";
 
-            iffcc.IsA10Enabled = "1";
-            iffcc.IsF15Enabled = "1";
-            iffcc.IsF16Enabled = "0";
-            iffcc.IsF18Enabled = "0";
-            iffcc.IsMig29Enabled = "0";
-            iffcc.IsSu27Enabled = "0";
-            iffcc.IsSu25Enabled = "1";
-            iffcc.IsAH64Enabled = "1";
-            iffcc.IsUH60Enabled = "0";
-            iffcc.IsMi8Enabled = "0";
+            iffcc.IsA10Enabled = true.ToString();
+            iffcc.IsF15Enabled = true.ToString();
+            iffcc.IsF16Enabled = false.ToString();
+            iffcc.IsF18Enabled = false.ToString();
+            iffcc.IsMig29Enabled = false.ToString();
+            iffcc.IsSu27Enabled = false.ToString();
+            iffcc.IsSu25Enabled = true.ToString();
+            iffcc.IsAH64Enabled = true.ToString();
+            iffcc.IsUH60Enabled = false.ToString();
+            iffcc.IsMi8Enabled = false.ToString();
 
             iffcc.FxdWingspan = "0";
             iffcc.FxdLength = "10";

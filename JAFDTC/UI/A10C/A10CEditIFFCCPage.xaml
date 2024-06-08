@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+A10CEditIFFCCPage.xaml : ui xaml for warthog iffcc page
+
+Copyright(C) 2024 fizzle
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<base:SystemEditorPageBase
+    x:Class="JAFDTC.UI.A10C.A10CEditIFFCCPage"
+    xmlns:base="using:JAFDTC.UI.Base"
+    xmlns:controls="using:JAFDTC.UI.Controls"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.A10C"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <!-- brushes for error fields. -->
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBackgroundBrush" Color="PaleVioletRed"/>
+
+        <Style BasedOn="{StaticResource DefaultCheckBoxStyle}" TargetType="CheckBox">
+            <Setter Property="MinWidth" Value="20" />
+            <Setter Property="Width" Value="20" />
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0 : iffcc settings
+        ===============================================================================================================
+        -->
+
+        <Grid Grid.Row="0" Margin="16,8,12,8" VerticalAlignment="Top" HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!--
+            ==========================================
+            left column
+            ==========================================
+            -->
+            
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                Display Modes:
+            </TextBlock>
+
+            <!-- AUTO DATA DISP -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                AUTO DATA DISP
+            </TextBlock>
+            <CheckBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
+                    x:Name="uiCheckAutoDataDisplay"
+                    Click="CheckBox_Clicked"
+                    Tag="AutoDataDisplay"
+                    ToolTipService.ToolTip="Briefly display release data on the HUD"/>
+
+            <!-- CCIP GUN CROSS OCCLUDE -->
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                CCIP GUN CROSS OCCLUDE
+            </TextBlock>
+            <CheckBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0"
+                    x:Name="uiCheckCCIPGunCrossOccult"
+                    Click="CheckBox_Clicked"
+                    Tag="CCIPGunCrossOccult"
+                    ToolTipService.ToolTip="Occlude the TVV behind the CCIP gun cross"/>
+
+            <!-- TAPES -->
+            <TextBlock Grid.Row="3" Grid.Column="0" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                TAPES
+            </TextBlock>
+            <CheckBox Grid.Row="3" Grid.Column="1" Margin="12,12,0,0"
+                    x:Name="uiCheckTapes"
+                    Click="CheckBox_Clicked"
+                    Tag="Tapes"
+                    ToolTipService.ToolTip="Display speed and altitude tapes instead of digital values"/>
+
+            <!-- METRIC -->
+            <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                METRIC
+            </TextBlock>
+            <CheckBox Grid.Row="4" Grid.Column="1" Margin="12,12,0,0"
+                    x:Name="uiCheckMetric"
+                    Click="CheckBox_Clicked"
+                    Tag="Metric"
+                    ToolTipService.ToolTip="Display HUD data values in metric"/>
+
+            <!-- RDRALT TAPE -->
+            <TextBlock Grid.Row="5" Grid.Column="0" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                RDRALT TAPE
+            </TextBlock>
+            <CheckBox Grid.Row="5" Grid.Column="1" Margin="12,12,0,0"
+                    x:Name="uiCheckRdrAltTape"
+                    Click="CheckBox_Clicked"
+                    Tag="RdrAltTape"
+                    ToolTipService.ToolTip="Display a vertical tape indicating radar altitude"/>
+
+            <!-- AIRSPEED -->
+            <TextBlock Grid.Row="6" Grid.Column="0" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                AIRSPEED
+            </TextBlock>
+            <ComboBox Grid.Row="6" Grid.Column="1" Margin="12,12,0,0"
+                      x:Name="uiComboAirspeed"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="Airspeed">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="IAS"/>
+                    <TextBlock Text="MACH/IAS"/>
+                    <TextBlock Text="GS"/>
+                    <TextBlock Text="TRUE"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!-- VERT VEL -->
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                VERT VEL
+            </TextBlock>
+            <CheckBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0"
+                    x:Name="uiCheckVertVel"
+                    Click="CheckBox_Clicked"
+                    Tag="VertVel"
+                    ToolTipService.ToolTip="Display vertical velocity on the left side of the HUD"/>
+
+            <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,24,0,0"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                Other:
+            </TextBlock>
+
+            <!-- CCIP Consent -->
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0"
+                       Style="{StaticResource EditorParamStaticTextBlockStyle}"
+                       HorizontalTextAlignment="Right">
+                       CCIP CONSENT OPT
+            </TextBlock>
+            <ComboBox Grid.Row="9" Grid.Column="1" Margin="12,12,0,0"
+                      x:Name="uiComboCCIPConsent"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      SelectionChanged="ComboBox_SelectionChanged" Tag="CCIPConsent">
+                <ComboBox.Items>
+                    <!-- Must match enum order -->
+                    <TextBlock Text="OFF"/>
+                    <TextBlock Text="3/9"/>
+                    <TextBlock Text="5 MIL"/>
+                </ComboBox.Items>
+            </ComboBox>
+
+            <!--
+            ==========================================
+            right column
+            ==========================================
+            -->
+
+            <TextBlock Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="2"
+                       Style="{StaticResource EditorTitleTextBlockStyle}">
+                AAS:
+            </TextBlock>
+
+            <!-- A-10 -->
+            <TextBlock Grid.Row="1" Grid.Column="3" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                A-10
+            </TextBlock>
+            <CheckBox Grid.Row="1" Grid.Column="4" Margin="12,12,0,0"
+                    x:Name="uiCheckA10"
+                    Click="CheckBox_Clicked"
+                    Tag="IsA10Enabled"
+                    ToolTipService.ToolTip="Include air-to-air funnel preset for the A-10"/>
+
+            <!-- F-15 -->
+            <TextBlock Grid.Row="2" Grid.Column="3" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                F-15
+            </TextBlock>
+            <CheckBox Grid.Row="2" Grid.Column="4" Margin="12,12,0,0"
+                    x:Name="uiCheckF15"
+                    Click="CheckBox_Clicked"
+                    Tag="IsF15Enabled"
+                    ToolTipService.ToolTip="Include air-to-air funnel preset for the F-15"/>
+
+            <!-- F-16 -->
+            <TextBlock Grid.Row="3" Grid.Column="3" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                F-16
+            </TextBlock>
+            <CheckBox Grid.Row="3" Grid.Column="4" Margin="12,12,0,0"
+                    x:Name="uiCheckF16"
+                    Click="CheckBox_Clicked"
+                    Tag="IsF16Enabled"
+                    ToolTipService.ToolTip="Include air-to-air funnel preset for the F-16"/>
+
+            <!-- F-18 -->
+            <TextBlock Grid.Row="4" Grid.Column="3" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                F-18
+            </TextBlock>
+            <CheckBox Grid.Row="4" Grid.Column="4" Margin="12,12,0,0"
+                    x:Name="uiCheckF18"
+                    Click="CheckBox_Clicked"
+                    Tag="IsF18Enabled"
+                    ToolTipService.ToolTip="Include air-to-air funnel preset for the F-18"/>
+
+            <!-- MIG-29 -->
+            <TextBlock Grid.Row="5" Grid.Column="3" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                MIG-29
+            </TextBlock>
+            <CheckBox Grid.Row="5" Grid.Column="4" Margin="12,12,0,0"
+                    x:Name="uiCheckMig29"
+                    Click="CheckBox_Clicked"
+                    Tag="IsMig29Enabled"
+                    ToolTipService.ToolTip="Include air-to-air funnel preset for the MIG-29"/>
+
+            <!-- SU-27 -->
+            <TextBlock Grid.Row="1" Grid.Column="6" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                SU-27
+            </TextBlock>
+            <CheckBox Grid.Row="1" Grid.Column="7" Margin="12,12,0,0"
+                    x:Name="uiCheckSu27"
+                    Click="CheckBox_Clicked"
+                    Tag="IsSu27Enabled"
+                    ToolTipService.ToolTip="Include air-to-air funnel preset for the SU-27"/>
+
+            <!-- SU-25 -->
+            <TextBlock Grid.Row="2" Grid.Column="6" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                SU-25
+            </TextBlock>
+            <CheckBox Grid.Row="2" Grid.Column="7" Margin="12,12,0,0"
+                    x:Name="uiCheckSu25"
+                    Click="CheckBox_Clicked"
+                    Tag="IsSu25Enabled"
+                    ToolTipService.ToolTip="Include air-to-air funnel preset for the SU-25"/>
+
+            <!-- AH-64 -->
+            <TextBlock Grid.Row="3" Grid.Column="6" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                AH-64
+            </TextBlock>
+            <CheckBox Grid.Row="3" Grid.Column="7" Margin="12,12,0,0"
+                    x:Name="uiCheckAH64"
+                    Click="CheckBox_Clicked"
+                    Tag="IsAH64Enabled"
+                    ToolTipService.ToolTip="Include air-to-air funnel preset for the AH-64"/>
+
+            <!-- UH-60 -->
+            <TextBlock Grid.Row="4" Grid.Column="6" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                UH-60
+            </TextBlock>
+            <CheckBox Grid.Row="4" Grid.Column="7" Margin="12,12,0,0"
+                    x:Name="uiCheckUH60"
+                    Click="CheckBox_Clicked"
+                    Tag="IsUH60Enabled"
+                    ToolTipService.ToolTip="Include air-to-air funnel preset for the UH-60"/>
+
+            <!-- MI-8 HIP -->
+            <TextBlock Grid.Row="5" Grid.Column="6" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                MI-8 HIP
+            </TextBlock>
+            <CheckBox Grid.Row="5" Grid.Column="7" Margin="12,12,0,0"
+                    x:Name="uiCheckMI8"
+                    Click="CheckBox_Clicked"
+                    Tag="IsMi8Enabled"
+                    ToolTipService.ToolTip="Include air-to-air funnel preset for the MI-8 HIP"/>
+
+            <!-- FXD WNGSPN -->
+            <TextBlock Grid.Row="6" Grid.Column="3" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                FXD WNGSPN
+            </TextBlock>
+            <TextBox Grid.Row="6" Grid.Column="4" Margin="12,12,0,0" x:Name="uiTextFxdWingspan"
+                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="2"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="FxdWingspan"/>
+
+            <!-- FXD LENGTH -->
+            <TextBlock Grid.Row="7" Grid.Column="3" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                FXD LENGTH
+            </TextBlock>
+            <TextBox Grid.Row="7" Grid.Column="4" Margin="12,12,0,0" x:Name="uiTextFxdLength"
+                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="3"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="FxdLength"/>
+
+            <!-- FXD TGTSPEED -->
+            <TextBlock Grid.Row="8" Grid.Column="3" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                FXD TGTSPEED
+            </TextBlock>
+            <TextBox Grid.Row="8" Grid.Column="4" Margin="12,12,0,0" x:Name="uiTextFxdTgtSpeed"
+                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="3"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="FxdTgtSpeed"/>
+
+            <!-- RTY WNGSPN -->
+            <TextBlock Grid.Row="6" Grid.Column="6" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                RTY WNGSPN
+            </TextBlock>
+            <TextBox Grid.Row="6" Grid.Column="7" Margin="12,12,0,0" x:Name="uiTextRtyWingspan"
+                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="2"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="RtyWingspan"/>
+
+            <!-- RTY LENGTH -->
+            <TextBlock Grid.Row="7" Grid.Column="6" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                RTY LENGTH
+            </TextBlock>
+            <TextBox Grid.Row="7" Grid.Column="7" 
+                     Margin="12,12,0,0" x:Name="uiTextRtyLength"
+                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="3"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="RtyLength"/>
+
+            <!-- RTY TGTSPEED -->
+            <TextBlock Grid.Row="8" Grid.Column="6" Margin="12,12,0,0" VerticalAlignment="Center"
+                       Style="{ThemeResource EditorParamStaticTextBlockStyle}">
+                RTY TGTSPEED
+            </TextBlock>
+            <TextBox Grid.Row="8" Grid.Column="7" Margin="12,12,0,0" x:Name="uiTextRtyTgtSpeed"
+                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}"
+                     MaxLength="3"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="RtyTgtSpeed"/>
+
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 1: link / reset
+        ===============================================================================================================
+        -->
+
+        <controls:LinkResetBtnsControl x:Name="uiCtlLinkResetBtns" Grid.Row="1"/>
+
+    </Grid>
+</base:SystemEditorPageBase>

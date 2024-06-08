@@ -524,7 +524,7 @@ namespace JAFDTC.UI.Base
 
                 if (!bool.TryParse((string)property.GetValue(editState), out bool isChecked))
                 {
-                    FileManager.Log(string.Format("Unparseable bool ({0}) in {1}.{2} replaced with false.",
+                    FileManager.Log(string.Format("Unparseable bool ({0}) in {1}. {2} replaced with false.",
                                                   property.GetValue(editState), editState.GetType(), property.Name));
                     isChecked = false;
                 }

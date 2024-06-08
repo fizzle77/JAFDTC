@@ -21,6 +21,7 @@ using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.DSMS;
 using JAFDTC.Models.A10C.HMCS;
+using JAFDTC.Models.A10C.IFFCC;
 using JAFDTC.Models.A10C.Misc;
 using JAFDTC.Models.A10C.Radio;
 using JAFDTC.Models.A10C.TAD;
@@ -37,6 +38,7 @@ namespace JAFDTC.UI.A10C
     {
         public const string DSMS =  "\xEBD2";
         public const string HMCS =  "\xEA4A";
+        public const string IFFCC = "\xE70A";
         public const string MISC =  "\xE8B7";
         public const string RADIO = "\xE704";
         public const string TAD =   "\xE8B9";
@@ -61,6 +63,7 @@ namespace JAFDTC.UI.A10C
                 A10CEditTADPage.PageInfo,
                 A10CEditTGPPage.PageInfo,
                 A10CEditHMCSPage.PageInfo,
+                A10CEditIFFCCPage.PageInfo,
                 A10CEditMiscPage.PageInfo
             };
 
@@ -70,6 +73,7 @@ namespace JAFDTC.UI.A10C
             {
                 DSMSSystem.SystemTag => ((A10CConfiguration)config).DSMS,
                 HMCSSystem.SystemTag => ((A10CConfiguration)config).HMCS,
+                IFFCCSystem.SystemTag => ((A10CConfiguration)config).IFFCC,
                 MiscSystem.SystemTag => ((A10CConfiguration)config).Misc,
                 RadioSystem.SystemTag => ((A10CConfiguration)config).Radio,
                 TADSystem.SystemTag => ((A10CConfiguration)config).TAD,

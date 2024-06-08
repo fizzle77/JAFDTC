@@ -53,6 +53,7 @@
     <None Remove="UI\A10C\A10CEditDSMSMunitionSettingsPage.xaml" />
     <None Remove="UI\A10C\A10CEditDSMSProfileOrder.xaml" />
     <None Remove="UI\A10C\A10CEditHMCSPage.xaml" />
+    <None Remove="UI\A10C\A10CEditIFFCCPage.xaml" />
     <None Remove="UI\A10C\A10CEditMiscPage.xaml" />
     <None Remove="UI\A10C\A10CEditTADPage.xaml" />
     <None Remove="UI\A10C\A10CEditTGPPage.xaml" />
@@ -315,5 +316,13 @@
     <Page Update="UI\Base\EditNavpointListPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <CustomAdditionalCompileInputs Remove="UI\A10C\A10CEditIFFCCPage.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Remove="UI\A10C\A10CEditIFFCCPage.xaml" />
   </ItemGroup>
 </Project>

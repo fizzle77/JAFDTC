@@ -18,6 +18,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Utilities;
+using System.Runtime.CompilerServices;
 
 namespace JAFDTC.Models
 {
@@ -45,16 +46,16 @@ namespace JAFDTC.Models
 
         private const string INVALID_FORMAT = "Invalid format";
 
-        protected void ValidateAndSetIntProp(string value, int min, int max, ref string property)
+        protected void ValidateAndSetIntProp(string value, int min, int max, ref string property, [CallerMemberName] string propertyName = null)
         {
             string error = (string.IsNullOrEmpty(value) || IsIntegerFieldValid(value, min, max)) ? null : INVALID_FORMAT;
-            SetProperty(ref property, value, error);
+            SetProperty(ref property, value, error, propertyName);
         }
 
-        protected void ValidateAndSetBoolProp(string value, ref string property)
+        protected void ValidateAndSetBoolProp(string value, ref string property, [CallerMemberName] string propertyName = null)
         {
             string error = (string.IsNullOrEmpty(value) || IsBooleanFieldValid(value)) ? null : INVALID_FORMAT;
-            SetProperty(ref property, value, error);
+            SetProperty(ref property, value, error, propertyName);
         }
     }
 }
