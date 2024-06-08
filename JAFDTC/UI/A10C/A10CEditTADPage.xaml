@@ -51,7 +51,7 @@ https://www.gnu.org/licenses/.
         ===============================================================================================================
         -->
 
-        <Grid Grid.Row="0" Margin="16,8,12,8" VerticalAlignment="Top" HorizontalAlignment="Center">
+        <Grid Grid.Row="0" Margin="0,8,16,8" VerticalAlignment="Top" HorizontalAlignment="Center">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -68,7 +68,7 @@ https://www.gnu.org/licenses/.
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="128"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -89,7 +89,7 @@ https://www.gnu.org/licenses/.
                 Group ID
             </TextBlock>
             <TextBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" x:Name="uiTextGroupID"
-                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      MaxLength="2"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="GrpID"/>
@@ -100,7 +100,7 @@ https://www.gnu.org/licenses/.
                 Own ID
             </TextBlock>
             <TextBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0" x:Name="uiTextOwnID"
-                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      MaxLength="2"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="OwnID"/>
@@ -111,7 +111,7 @@ https://www.gnu.org/licenses/.
                 Callsign
             </TextBlock>
             <TextBox Grid.Row="3" Grid.Column="1" Margin="12,12,0,0" x:Name="uiTextCallsign"
-                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      MaxLength="4"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Tag="Callsign"/>
@@ -131,7 +131,7 @@ https://www.gnu.org/licenses/.
             <ComboBox Grid.Row="5" Grid.Column="1" Margin="12,12,0,0"
                       x:Name="uiComboCoordDisplay"
                       VerticalAlignment="Center"
-                      HorizontalAlignment="Left"
+                      HorizontalAlignment="Stretch"
                       SelectionChanged="ComboBox_SelectionChanged" Tag="CoordDisplay">
                 <ComboBox.Items>
                     <!-- Must match enum order -->
@@ -148,9 +148,8 @@ https://www.gnu.org/licenses/.
                        Range
             </TextBlock>
             <ComboBox x:Name="uiComboRange" Grid.Row="6" Grid.Column="1" Margin="12,12,0,0"
-                      Width="100"
                       VerticalAlignment="Center" 
-                      HorizontalAlignment="Left" 
+                      HorizontalAlignment="Stretch" 
                       SelectionChanged="ComboBox_SelectionChanged" 
                       Tag="MapRange">
                 <ComboBox.Items>
@@ -171,10 +170,9 @@ https://www.gnu.org/licenses/.
                        Map
             </TextBlock>
             <ComboBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0"
-                      Width="90"
                       x:Name="uiComboMapOption"
                       VerticalAlignment="Center"
-                      HorizontalAlignment="Left"
+                      HorizontalAlignment="Stretch"
                       SelectionChanged="ComboBox_SelectionChanged"
                       Tag="MapOption">
                 <ComboBox.Items>
@@ -195,9 +193,8 @@ https://www.gnu.org/licenses/.
                       Grid.Row="8" 
                       Grid.Column="1" 
                       Margin="12,12,0,0" 
-                      Width="110" 
                       VerticalAlignment="Center" 
-                      HorizontalAlignment="Left" 
+                      HorizontalAlignment="Stretch" 
                       SelectionChanged="ComboBox_SelectionChanged"
                       Tag="CenterDepress">
                 <ComboBox.Items>
