@@ -77,7 +77,7 @@ namespace JAFDTC.Models.A10C.Upload
                                  RadioSystem radios)
         {
             // Nice to do this first, so you can e.g. monitor guard and the initial freq while preset programming is happening.
-            BuildARC210Initial(ufc, arc210, radios); 
+            BuildARC210Initial(ufc, arc210, radios);
 
             if (radios.Presets[(int)RadioSystem.Radios.COMM1].Count > 0)
             {
@@ -102,7 +102,7 @@ namespace JAFDTC.Models.A10C.Upload
         /// <summary>
         /// configure the primary ARC-164 UHF radio according to the non-default programming settings (this
         /// function is safe to call with a configuration with default settings: defaults are skipped as necessary).
-        /// this includes presets, default freq/preset, preset mode, guard monitor, and HUD status display.
+        /// this includes presets, default freq/preset, preset mode, and guard monitor,.
         /// </summary>
         private void BuildARC164(AirframeDevice arc164, RadioSystem radios)
         {
@@ -150,11 +150,35 @@ namespace JAFDTC.Models.A10C.Upload
         /// </summary>
         private void BuildARC186(AirframeDevice arc186, RadioSystem radios)
         {
+            // Ensure radio is on. No Guard on the ARC-186.
+            AddAction(arc186, "VHFFM_MODE_TR");
+
+            ARC186Tuner tuner = new ARC186Tuner(this, arc186);
+
             if (radios.Presets[(int)RadioSystem.Radios.COMM3].Count > 0)
             {
-                // TODO: implement, will need to read radio settings on lua side with while or custom function
-                // TODO: that turns wheels enough...
+                // Have to be in manual mode to set presets on the ARC-186.
+                AddAction(arc186, "VHFFM_FREQEMER_MAN");
+
+                foreach (RadioPreset preset in radios.Presets[(int)RadioSystem.Radios.COMM3])
+                {
+                    tuner.TuneTo(preset.Frequency);
+                    tuner.SetPresetWheel(preset.Preset);
+                    AddAction(arc186, "VHFFM_LOAD");
+                }
             }
+
+            string defSetting = radios.DefaultSetting[(int)RadioSystem.Radios.COMM3];
+            if (!string.IsNullOrEmpty(radios.DefaultSetting[(int)RadioSystem.Radios.COMM3]))
+            {
+                if (int.TryParse(defSetting, out int defPreset))
+                    tuner.SetPresetWheel(defPreset);
+                else
+                    tuner.TuneTo(defSetting);
+            }
+
+            AddAction(arc186, (radios.IsPresetMode[(int)RadioSystem.Radios.COMM3]) ? "VHFFM_FREQEMER_PRE"
+                                                                                   : "VHFFM_FREQEMER_MAN");
         }
 
         /// <summary>
@@ -317,6 +341,109 @@ namespace JAFDTC.Models.A10C.Upload
                 AddDynamicAction(arc164, "UHF_1MHZ_SEL", (double)val001MHz * 0.1, (double)val001MHz * 0.1);
                 AddDynamicAction(arc164, "UHF_POINT1MHZ_SEL", (double)val100KHz * 0.1, (double)val100KHz * 0.1);
                 AddDynamicAction(arc164, "UHF_POINT025_SEL", (double)val025KHz * 0.1, (double)val025KHz * 0.1);
+            }
+        }
+
+        /// <summary>
+        /// Helper class to remember the state of the ARC-186 FM radio's wheels.
+        /// </summary>
+        private class ARC186Tuner
+        {
+            private readonly RadioBuilder _builder;
+            private readonly AirframeDevice _arc186;
+
+            private int _freqWheel1 = 3;
+            private int _freqWheel2 = 0;
+            private int _freqWheel3 = 0;
+            private int _freqWheel4 = 0;
+
+            private int _presetWheel = 1;
+
+            public ARC186Tuner(RadioBuilder builder, AirframeDevice arc186) 
+            {
+                _arc186 = arc186;
+                _builder = builder;
+            }
+
+            public void TuneTo(string freq)
+            {
+                if (double.TryParse(freq, out double val))
+                {
+                    int val010MHz = (int)(val / 10.0);
+                    SetFreqWheel1(val010MHz);
+                    val -= val010MHz * 10.0;
+
+                    int val001MHz = (int)(val);
+                    SetFreqWheel2(val001MHz);
+                    val = Math.Round((val - val001MHz) * 1000.0, 0);
+
+                    int val100KHz = (int)(val / 100.0);
+                    SetFreqWheel3(val100KHz);
+                    val -= val100KHz * 100.0;
+
+                    int val025KHz = (int)(val / 25.0) % 4;
+                    SetFreqWheel4(val025KHz);
+                }
+            }
+
+            public void SetPresetWheel(int val)
+            {
+                if (val < 1 || val > 20) 
+                    throw new ArgumentOutOfRangeException(nameof(val));
+
+                if (val < _presetWheel)
+                    _builder.AddActions(_arc186, "VHFFM_PRESET_DN", _presetWheel - val);
+                else if (val > _presetWheel)
+                    _builder.AddActions(_arc186, "VHFFM_PRESET_UP", val - _presetWheel);
+                _presetWheel = val;
+            }
+
+            private void SetFreqWheel1(int val)
+            {
+                if (val < 3 || val > 15) 
+                    throw new ArgumentOutOfRangeException(nameof(val));
+
+                if (val < _freqWheel1)
+                    _builder.AddActions(_arc186, "VHFFM_FREQ1_DN", _freqWheel1 - val);
+                else if (val > _freqWheel1)
+                    _builder.AddActions(_arc186, "VHFFM_FREQ1_UP", val - _freqWheel1);
+                _freqWheel1 = val;
+            }
+
+            private void SetFreqWheel2(int val)
+            {
+                if (val < 0 || val > 9) 
+                    throw new ArgumentOutOfRangeException(nameof(val));
+
+                if (val < _freqWheel2)
+                    _builder.AddActions(_arc186, "VHFFM_FREQ2_DN", _freqWheel2 - val);
+                else if (val > _freqWheel2)
+                    _builder.AddActions(_arc186, "VHFFM_FREQ2_UP", val - _freqWheel2);
+                _freqWheel2 = val;
+            }
+
+            private void SetFreqWheel3(int val)
+            {
+                if (val < 0 || val > 9) 
+                    throw new ArgumentOutOfRangeException(nameof(val));
+
+                if (val < _freqWheel3)
+                    _builder.AddActions(_arc186, "VHFFM_FREQ3_DN", _freqWheel3 - val);
+                else if (val > _freqWheel3)
+                    _builder.AddActions(_arc186, "VHFFM_FREQ3_UP", val - _freqWheel3);
+                _freqWheel3 = val;
+            }
+
+            private void SetFreqWheel4(int val)
+            {
+                if (val < 0 || val > 3) 
+                    throw new ArgumentOutOfRangeException(nameof(val));
+
+                if (val < _freqWheel4)
+                    _builder.AddActions(_arc186, "VHFFM_FREQ4_DN", _freqWheel4 - val);
+                else if (val > _freqWheel4)
+                    _builder.AddActions(_arc186, "VHFFM_FREQ4_UP", val - _freqWheel4);
+                _freqWheel4 = val;
             }
         }
     }
