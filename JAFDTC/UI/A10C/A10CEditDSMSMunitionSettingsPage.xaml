@@ -36,8 +36,7 @@ https://www.gnu.org/licenses/.
     </Page.Resources>
 
     <Grid Grid.Row="0" Grid.Column="0"
-        VerticalAlignment="Top"
-        HorizontalAlignment="Left">
+          HorizontalAlignment="Stretch" VerticalAlignment="Top">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -81,8 +80,10 @@ https://www.gnu.org/licenses/.
 
         <!-- Munition Settings
           -->
-        <Grid Grid.Row="0" Grid.Column="1" Margin="12,0,0,0">
+        <Grid Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="12,0,0,0"
+              HorizontalAlignment="Stretch">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -129,14 +130,19 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorTitleTextBlockStyle}">
                 Selected Munition Settings:
             </TextBlock>
+            <TextBlock Grid.Row="3" Grid.ColumnSpan="3" Margin="0,12,0,0" x:Name="uiTextMuniDesc"
+                       HorizontalAlignment="Stretch"
+                       Style="{StaticResource TableHeaderTextStyle}">
+                FIXUP
+            </TextBlock>
 
             <!-- Delivery Mode (CCIP/CCRP) -->
-            <TextBlock Grid.Row="3" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelDeliveryMode"
+            <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelDeliveryMode"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                 Delivery Mode
             </TextBlock>
-            <ComboBox Grid.Row="3" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboDeliveryMode"
+            <ComboBox Grid.Row="4" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboDeliveryMode"
                       HorizontalAlignment="Stretch" VerticalAlignment="Center"
                       SelectionChanged="ComboBox_SelectionChanged"
                       Tag="DeliveryMode">
@@ -146,12 +152,12 @@ https://www.gnu.org/licenses/.
             </ComboBox>
 
             <!-- Release Mode -->
-            <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelReleaseMode"
+            <TextBlock Grid.Row="5" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelReleaseMode"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                 Release
             </TextBlock>
-            <ComboBox Grid.Row="4" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboReleaseMode"
+            <ComboBox Grid.Row="5" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboReleaseMode"
                       HorizontalAlignment="Stretch" VerticalAlignment="Center"
                       SelectionChanged="ComboBox_SelectionChanged"
                       Tag="ReleaseMode">
@@ -160,7 +166,7 @@ https://www.gnu.org/licenses/.
                 <ComboBoxItem>RIP SGL</ComboBoxItem>
                 <ComboBoxItem>RIP PRS</ComboBoxItem>
             </ComboBox>
-            <StackPanel Grid.Row="4" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStackRipple"
+            <StackPanel Grid.Row="5" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStackRipple"
                         Orientation="Horizontal">
                 <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" VerticalAlignment="Center" x:Name="uiLabelRipple">
                     Ripple
@@ -192,12 +198,12 @@ https://www.gnu.org/licenses/.
             </StackPanel>
 
             <!-- Escape Maneuver -->
-            <TextBlock Grid.Row="5" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelEscMnvr"
+            <TextBlock Grid.Row="6" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelEscMnvr"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                 Escape Manuever
             </TextBlock>
-            <ComboBox Grid.Row="5" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboEscMnvr"
+            <ComboBox Grid.Row="6" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboEscMnvr"
                       HorizontalAlignment="Stretch" VerticalAlignment="Center"
                       SelectionChanged="ComboBox_SelectionChanged"
                       Tag="EscapeManeuver">
@@ -209,12 +215,12 @@ https://www.gnu.org/licenses/.
             </ComboBox>
 
             <!-- HOF -->
-            <TextBlock Grid.Row="6" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelHOF"
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelHOF"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                 HOF
             </TextBlock>
-            <ComboBox Grid.Row="6" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboHOF"
+            <ComboBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboHOF"
                       HorizontalAlignment="Stretch" VerticalAlignment="Center"
                       SelectionChanged="ComboBox_SelectionChanged"
                       Tag="HOFOption">
@@ -229,7 +235,7 @@ https://www.gnu.org/licenses/.
                 <ComboBoxItem>2600</ComboBoxItem>
                 <ComboBoxItem>3000</ComboBoxItem>
             </ComboBox>
-            <StackPanel Grid.Row="6" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStackRPM"
+            <StackPanel Grid.Row="7" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStackRPM"
                         Orientation="Horizontal">
                 <TextBlock x:Name="uiLabelRPM"
                            HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -250,12 +256,12 @@ https://www.gnu.org/licenses/.
             </StackPanel>
 
             <!-- Fuze -->
-            <TextBlock Grid.Row="7" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelFuse"
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelFuse"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}" >
                 Fuze
             </TextBlock>
-            <ComboBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboFuze"
+            <ComboBox Grid.Row="8" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboFuze"
                       HorizontalAlignment="Stretch" VerticalAlignment="Center"
                       SelectionChanged="ComboBox_SelectionChanged"
                       Tag="FuzeOption">
@@ -265,12 +271,12 @@ https://www.gnu.org/licenses/.
             </ComboBox>
 
             <!-- Auto Lase -->
-            <TextBlock Grid.Row="8" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelAutoLase"
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="12,12,0,0" x:Name="uiLabelAutoLase"
                        VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}" >
                 Auto Lase
             </TextBlock>
-            <StackPanel Grid.Row="8" Grid.Column="1" Margin="12,12,0,0" x:Name="uiStackAutoLase"
+            <StackPanel Grid.Row="9" Grid.Column="1" Margin="12,12,0,0" x:Name="uiStackAutoLase"
                         Orientation="Horizontal">
                 <CheckBox Width="32" MinWidth="32" x:Name="uiCheckAutoLase"
                           Click="CheckBox_Clicked"
@@ -284,14 +290,14 @@ https://www.gnu.org/licenses/.
                          Tag="LaseSeconds"
                          ToolTipService.ToolTip="Seconds before impact to automatically start the laser firing"/>
             </StackPanel>
-            <TextBlock Grid.Row="8" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelLaseTimeUnits"
+            <TextBlock Grid.Row="9" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelLaseTimeUnits"
                        HorizontalAlignment="Left" VerticalAlignment="Center"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                 seconds
             </TextBlock>
 
             <!-- Reset Munition -->
-            <Button Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="12,24,0,0" x:Name="uiMuniBtnReset"
+            <Button Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Margin="12,24,0,0" x:Name="uiMuniBtnReset"
                     HorizontalAlignment="Stretch"
                     Click="MuniBtnReset_Click"
                     ToolTipService.ToolTip="Reset the configuration of this munition to its defaults">

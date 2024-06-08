@@ -32,6 +32,7 @@ namespace JAFDTC.Models.A10C
         public int ID { get; set; } // ID used in configuration files. Must be unique.
         public string Name { get; set; } // name as it will appear in UI.
         public string Profile { get; set; } // name of the weapon's default profile
+        public string DescrUI { get; set; } // descriptive text for the user interface
         public string Image { get; set; } // name of the weapon's image file
 
         // values to enable/disable settings UI

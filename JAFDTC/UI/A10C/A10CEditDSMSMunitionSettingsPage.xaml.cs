@@ -117,6 +117,8 @@ namespace JAFDTC.UI.A10C
             if (!IsMunitionSelectionValid(out A10CMunition selectedMunition))
                return;
 
+            uiTextMuniDesc.Text = selectedMunition.DescrUI;
+
             SetLabelColorMatchingControlEnabledState(uiLabelLaserCode, uiTextLaserCode);
 
             Visibility autoLaseVisible = (selectedMunition.AutoLase) ? Visibility.Visible : Visibility.Collapsed;
