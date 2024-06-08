@@ -48,7 +48,7 @@ namespace JAFDTC.Models.A10C.HMCS
         NIGHT = 2
     }
 
-    public class HMCSSystem : A10CSystemBase
+    public class HMCSSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:A10C:HMCS";
 

@@ -51,8 +51,6 @@ namespace JAFDTC.UI.F15E
 
         protected override string SystemName => "miscellaneous";
 
-        protected override bool IsPageSateDefault => ((F15EConfiguration)Config).Misc.IsDefault;
-
         // ---- internal properties
 
         private MiscSystem EditMisc { get; set; }
@@ -70,7 +68,7 @@ namespace JAFDTC.UI.F15E
             EditMisc = new MiscSystem();
 
             InitializeComponent();
-            InitializeBase(EditMisc, uiBINGOValueBINGO, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            InitializeBase(EditMisc, uiBINGOValueBINGO, uiCtlLinkResetBtns);
 
             uiBINGOValueBINGO.PlaceholderText = MiscSystem.ExplicitDefaults.Bingo;
         }

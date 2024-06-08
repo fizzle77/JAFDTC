@@ -17,14 +17,14 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.DSMS;
-using JAFDTC.UI.App;
+using JAFDTC.UI.Base;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using static JAFDTC.Models.A10C.DSMS.DSMSSystem;
 using static JAFDTC.UI.A10C.A10CEditDSMSPage;
 
 namespace JAFDTC.UI.A10C
@@ -32,21 +32,25 @@ namespace JAFDTC.UI.A10C
     /// <summary>
     /// Content pane for setting A-10 default weapon profile order.
     /// </summary>
-    public sealed partial class A10CEditDSMSProfileOrderPage : A10CPageBase
+    public sealed partial class A10CEditDSMSProfileOrderPage : SystemEditorPageBase, IA10CDSMSEditorTab
     {
-        private const string SYSTEM_NAME = "DSMS";
+        protected override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
+        protected override string SystemTag => DSMSSystem.SystemTag;
+        protected override string SystemName => "DSMS";
 
-        public override A10CSystemBase SystemConfig => _config.DSMS;
+        private DSMSSystem DSMSEditState => (DSMSSystem)EditState;
+        private DSMSSystem DSMSConfig => (DSMSSystem)SystemConfig;
 
         private DSMSEditorNavArgs _dsmsEditorNavArgs;
         private ObservableCollection<A10CMunition> _munitions;
 
-        public A10CEditDSMSProfileOrderPage() : base(SYSTEM_NAME, DSMSSystem.SystemTag)
+        public A10CEditDSMSProfileOrderPage()
         {
             _munitions = new ObservableCollection<A10CMunition>(A10CMunition.GetUniqueProfileMunitions());
+            EditState = new DSMSSystem();
 
             InitializeComponent();
-            InitializeBase(new DSMSSystem());
+            InitializeBase(EditState, null, null);
         }
 
         protected override void SaveEditStateToConfig()
@@ -54,13 +58,15 @@ namespace JAFDTC.UI.A10C
             List<int> newOrder = new List<int>(_munitions.Count);
             foreach (A10CMunition m in _munitions)
                 newOrder.Add(m.ID);
-            _config.DSMS.ProfileOrder = newOrder;
-            _config.Save(_dsmsEditorNavArgs.ParentPage, SystemTag);
+            DSMSConfig.ProfileOrder = newOrder;
+            Config.Save(_dsmsEditorNavArgs.ParentPage, SystemTag);
         }
 
-        public override void CopyConfigToEditState()
+        public void DSMSEditorCopyConfigToEditState() => CopyConfigToEditState();
+        
+        protected override void CopyConfigToEditState()
         {
-            if (_config.DSMS.ProfileOrder == null)
+            if (DSMSConfig.ProfileOrder == null)
             {
                 _munitions = new ObservableCollection<A10CMunition>(A10CMunition.GetUniqueProfileMunitions());
                 uiListProfiles.ItemsSource = _munitions;
@@ -69,7 +75,7 @@ namespace JAFDTC.UI.A10C
             {
                 for (int newIndex = 0; newIndex < _munitions.Count; newIndex++)
                 {
-                    int munitionID = _config.DSMS.ProfileOrder[newIndex];
+                    int munitionID = DSMSConfig.ProfileOrder[newIndex];
                     A10CMunition m = A10CMunition.GetMunitionFromID(munitionID);
                     if (m != null)
                     {
@@ -79,8 +85,7 @@ namespace JAFDTC.UI.A10C
                 }
             }
 
-            bool isNotLinked = string.IsNullOrEmpty(_config.SystemLinkedTo(SystemTag));
-            uiListProfiles.IsEnabled = isNotLinked;
+            uiListProfiles.IsEnabled = !Config.IsLinked(SystemTag);
         }
 
         private void uiListProfiles_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)

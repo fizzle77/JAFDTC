@@ -57,7 +57,7 @@ namespace JAFDTC.UI.F16C
 
         protected override string SystemName => "SMS munition setup";
 
-        protected override bool IsPageSateDefault => ((F16CConfiguration)Config).SMS.IsDefault;
+        protected override bool IsPageStateDefault => ((F16CConfiguration)Config).SMS.IsDefault;
 
         // ---- internal properties
 
@@ -111,7 +111,7 @@ namespace JAFDTC.UI.F16C
             _textForFuzeMode = new[] { "NSTL", "NOSE", "TAIL", "NSTL (HI)", "NOSE (LO)", "TAIL (HI)" };
 
             InitializeComponent();
-            InitializeBase(EditSetup, uiValueRippleQty, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            InitializeBase(EditSetup, uiValueRippleQty, uiCtlLinkResetBtns);
 
             _elemsProfile = new() { uiLabelProfile, uiComboProfile, uiCkboxProfileEnb };
             _elemsRelease = new() { uiLabelRelMode, uiComboRelMode, null, uiStackRelMode };

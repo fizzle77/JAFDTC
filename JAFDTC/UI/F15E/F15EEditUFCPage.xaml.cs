@@ -49,8 +49,6 @@ namespace JAFDTC.UI.F15E
 
         protected override string SystemName => "UFC";
 
-        protected override bool IsPageSateDefault => ((F15EConfiguration)Config).UFC.IsDefault;
-
         // ---- private properties
 
         private UFCSystem EditUFC { get; set; }
@@ -66,7 +64,7 @@ namespace JAFDTC.UI.F15E
             EditUFC = new UFCSystem();
 
             InitializeComponent();
-            InitializeBase(EditUFC, uiTACANValueChan, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            InitializeBase(EditUFC, uiTACANValueChan, uiCtlLinkResetBtns);
 
             UFCSystem ufcSysDefault = UFCSystem.ExplicitDefaults;
             uiLaltValueWarn.PlaceholderText = ufcSysDefault.LowAltWarn;

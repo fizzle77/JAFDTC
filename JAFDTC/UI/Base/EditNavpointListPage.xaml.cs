@@ -19,6 +19,7 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
+using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
@@ -64,7 +65,7 @@ namespace JAFDTC.UI.Base
 
         protected override string SystemName => PageHelper.NavptName;
 
-        protected override bool IsPageSateDefault => (EditNavpt.Count == 0);
+        protected override bool IsPageStateDefault => (EditNavpt.Count == 0);
 
         // ---- internal properties
 
@@ -91,7 +92,7 @@ namespace JAFDTC.UI.Base
             EditNavpt = new ObservableCollection<INavpointInfo>();
 
             InitializeComponent();
-            InitializeBase(null, null, uiPageBtnTxtLink, uiPageTxtLink, uiPageBtnReset);
+            InitializeBase(null, null, uiCtlLinkResetBtns);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -177,6 +178,11 @@ namespace JAFDTC.UI.Base
 
             uiNavptListView.CanReorderItems = isEditable;
             uiNavptListView.ReorderMode = (isEditable) ? ListViewReorderMode.Enabled : ListViewReorderMode.Disabled;
+        }
+
+        protected override void ResetConfigToDefault()
+        {
+            PageHelper.ResetSystem(Config);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -429,11 +435,13 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
+            // HACK: fixes circular dependency where base.OnNavigatedTo needs PageHelper, but PageHelper needs
+            // NavArgs which are built inside base.OnNavigatedTo.
+            ConfigEditorPageNavArgs navArgs = (ConfigEditorPageNavArgs)args.Parameter;
+            PageHelper = (IEditNavpointListPageHelper)Activator.CreateInstance(navArgs.EditorHelperType);
+            PageHelper.SetupUserInterface(navArgs.Config, uiNavptListView);
+
             base.OnNavigatedTo(args);
-
-            PageHelper = (IEditNavpointListPageHelper)Activator.CreateInstance(NavArgs.EditorHelperType);
-
-            PageHelper.SetupUserInterface(NavArgs.Config, uiNavptListView);
 
             CopyConfigToEditState();
             StartingNavptNum = (EditNavpt.Count > 0) ? EditNavpt[0].Number : 1;

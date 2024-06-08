@@ -32,7 +32,7 @@ namespace JAFDTC.Models.Base
     /// array of navigation points of type T (where T should be conform to INavpointInfo, provide new(), and is
     /// typically derived from the NavpointInfoBase abstract base class).
     /// </summary>
-    public abstract class NavpointSystemBase<T> : BindableObject, ISystem, INavpointSystemImport
+    public abstract class NavpointSystemBase<T> : SystemBase, INavpointSystemImport
                                                   where T : class, INavpointInfo
     {
         // ------------------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ namespace JAFDTC.Models.Base
         /// returns true if the instance indicates a default setup (no navpoints are defined), false otherwise.
         /// </summary>
         [JsonIgnore]
-        public bool IsDefault => (Points.Count == 0);
+        public override bool IsDefault => (Points.Count == 0);
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -62,7 +62,7 @@ namespace JAFDTC.Models.Base
         /// <summary>
         /// reset the navpoint system to defaults by removing all navpoints.
         /// </summary>
-        public virtual void Reset()
+        public override void Reset()
         {
             Points.Clear();
         }

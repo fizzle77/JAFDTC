@@ -25,13 +25,19 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using JAFDTC.Models;
+using JAFDTC.UI.Base;
 
 namespace JAFDTC.UI.A10C
 {
+    public interface IA10CDSMSEditorTab
+    {
+        public void DSMSEditorCopyConfigToEditState();
+    }
+
     /// <summary>
     /// Code-behind class for the A10 DSMS editor.
     /// </summary>
-    public sealed partial class A10CEditDSMSPage : A10CPageBase
+    public sealed partial class A10CEditDSMSPage : SystemEditorPageBase
     {
         internal class DSMSEditorNavArgs
         {
@@ -49,14 +55,18 @@ namespace JAFDTC.UI.A10C
 
         private const string SYSTEM_NAME = "DSMS";
 
-        public override A10CSystemBase SystemConfig => _config.DSMS;
+        protected override SystemBase SystemConfig => ((A10CConfiguration)Config).DSMS;
+        protected override string SystemTag => DSMSSystem.SystemTag;
+        protected override string SystemName => SYSTEM_NAME;
+
+        private DSMSSystem DSMSConfig => (DSMSSystem)SystemConfig;
 
         private DSMSEditorNavArgs _dsmsEditorNavArgs;
 
         public static ConfigEditorPageInfo PageInfo
             => new(DSMSSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.DSMS, typeof(A10CEditDSMSPage));
 
-        public A10CEditDSMSPage() : base(SYSTEM_NAME, DSMSSystem.SystemTag)
+        public A10CEditDSMSPage()
         {
             InitializeComponent();
             InitializeBase(null, null, uiCtlLinkResetBtns);
@@ -64,27 +74,27 @@ namespace JAFDTC.UI.A10C
 
         // ---- UI helpers -----------------------------------------------------------------------------------------
 
-        public override void CopyConfigToEditState()
+        protected override void CopyConfigToEditState()
         {
             if (DSMSContentFrame.Content != null)
-                ((A10CPageBase)DSMSContentFrame.Content).CopyConfigToEditState();
+                ((IA10CDSMSEditorTab)DSMSContentFrame.Content).DSMSEditorCopyConfigToEditState();
             UpdateDefaultStateIndicators();
         }
 
         private void UpdateDefaultStateIndicators()
         {
-            bool munitionsTabIsDefault = _config.DSMS.IsLaserCodeDefault && _config.DSMS.AreAllMunitionSettingsDefault;
+            bool munitionsTabIsDefault = DSMSConfig.IsLaserCodeDefault && DSMSConfig.AreAllMunitionSettingsDefault;
             if (munitionsTabIsDefault)
                 uiIconMunitionTab.Visibility = Visibility.Collapsed;
             else
                 uiIconMunitionTab.Visibility = Visibility.Visible;
 
-            if (_config.DSMS.IsProfileOrderDefault)
+            if (DSMSConfig.IsProfileOrderDefault)
                 uiIconProfileTab.Visibility = Visibility.Collapsed;
             else
                 uiIconProfileTab.Visibility = Visibility.Visible;
 
-            uiCtlLinkResetBtns.SetResetButtonEnabled(!munitionsTabIsDefault || !_config.DSMS.IsProfileOrderDefault);
+            uiCtlLinkResetBtns.SetResetButtonEnabled(!munitionsTabIsDefault || !DSMSConfig.IsProfileOrderDefault);
         }
 
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
@@ -110,13 +120,13 @@ namespace JAFDTC.UI.A10C
          
             _dsmsEditorNavArgs = new DSMSEditorNavArgs(args, this);
 
-            _config.ConfigurationSaved += ConfigurationSavedHandler;
+            Config.ConfigurationSaved += ConfigurationSavedHandler;
             UpdateDefaultStateIndicators();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            _config.ConfigurationSaved -= ConfigurationSavedHandler;
+            Config.ConfigurationSaved -= ConfigurationSavedHandler;
 
             base.OnNavigatedFrom(e);
         }

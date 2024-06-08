@@ -52,7 +52,7 @@ namespace JAFDTC.Models.A10C.TGP
         OFF = 2
     }
 
-    public class TGPSystem : A10CSystemBase
+    public class TGPSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:A10C:TGP";
 

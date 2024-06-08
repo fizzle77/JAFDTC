@@ -17,25 +17,29 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.UI.App;
+using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.Misc;
+using JAFDTC.UI.App;
+using JAFDTC.UI.Base;
 
 namespace JAFDTC.UI.A10C
 {
     /// <summary>
     /// Code-behind class for the A10 Miscellaneous editor.
     /// </summary>
-    public sealed partial class A10CEditMiscPage : A10CPageBase
+    public sealed partial class A10CEditMiscPage : SystemEditorPageBase
     {
         private const string SYSTEM_NAME = "Miscellaneous";
 
-        public override A10CSystemBase SystemConfig => _config.Misc;
+        protected override SystemBase SystemConfig => ((A10CConfiguration)Config).Misc;
+        protected override string SystemTag => MiscSystem.SystemTag;
+        protected override string SystemName => SYSTEM_NAME;
 
         public static ConfigEditorPageInfo PageInfo
             => new(MiscSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.MISC, typeof(A10CEditMiscPage));
 
-        public A10CEditMiscPage() : base(SYSTEM_NAME, MiscSystem.SystemTag)
+        public A10CEditMiscPage()
         {
             InitializeComponent();
             InitializeBase(new MiscSystem(), uiTextTACANChannel, uiCtlLinkResetBtns);

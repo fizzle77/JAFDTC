@@ -1,7 +1,5 @@
-using CommunityToolkit.WinUI.UI;
 using JAFDTC.Models;
-using JAFDTC.Models.A10C;
-using JAFDTC.UI.A10C;
+using JAFDTC.UI.Base;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -11,8 +9,8 @@ namespace JAFDTC.UI.Controls
 {
     public sealed partial class LinkResetBtnsControl : UserControl
     {
-        private A10CPageBase _parentPage;
-        private A10CConfiguration _config;
+        private SystemEditorPageBase _parentPage;
+        private IConfiguration _config;
 
         private string _systemTag;
 
@@ -22,18 +20,26 @@ namespace JAFDTC.UI.Controls
         private string _systemName;
         private Dictionary<string, IConfiguration> _uidToConfigMap;
 
-        public event Action ConfigLinkedOrReset;
-        private void OnConfigLinkedOrReset()
-        {
-            ConfigLinkedOrReset?.Invoke();
-        }
+        // ---- events --------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Event that fires after configuration has changed due to linking or reset.
+        /// </summary>
+        public event Action AfterConfigLinkedOrReset;
+        private void OnAfterConfigLinkedOrReset() => AfterConfigLinkedOrReset?.Invoke();
+
+        /// <summary>
+        /// Event that fires indicating the contining page should reset the config to default.
+        /// </summary>
+        public event Action DoReset;
+        private void OnDoReset() => DoReset?.Invoke();
 
         public LinkResetBtnsControl()
         {
             InitializeComponent();
         }
 
-        public void Initialize(string systemName, string systemTag, A10CPageBase parentPage, A10CConfiguration config)
+        public void Initialize(string systemName, string systemTag, SystemEditorPageBase parentPage, IConfiguration config)
         {
             _config = config;
             _parentPage = parentPage;
@@ -70,9 +76,9 @@ namespace JAFDTC.UI.Controls
             {
                 _config.UnlinkSystem(_systemTag);
                 UpdateLinkControls();
-                _parentPage.SystemConfig.Reset();
+                OnDoReset();
                 _config.Save(_parentPage, _systemTag);
-                OnConfigLinkedOrReset();
+                OnAfterConfigLinkedOrReset();
             }
         }
 
@@ -90,7 +96,7 @@ namespace JAFDTC.UI.Controls
                 _config.Save(_parentPage);
             }
 
-            OnConfigLinkedOrReset();
+            OnAfterConfigLinkedOrReset();
             UpdateLinkControls();
         }
     }

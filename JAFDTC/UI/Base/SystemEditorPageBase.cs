@@ -19,6 +19,7 @@
 
 using JAFDTC.Models;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Controls;
 using JAFDTC.Utilities;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -128,12 +129,12 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected abstract string SystemName { get; }
 
-        /// <summary>
-        /// Derived classes must override this method to return a bool indicating whether or not page state is default.
-        /// </summary>
-        protected abstract bool IsPageSateDefault { get; }
-
         // ---- protected properties
+
+        /// <summary>
+        /// Derived classes may override this method to return a bool indicating whether or not page state is default.
+        /// </summary>
+        protected virtual bool IsPageStateDefault => SystemConfig.IsDefault;
 
         protected ConfigEditorPageNavArgs NavArgs { get; private set; }
 
@@ -156,13 +157,7 @@ namespace JAFDTC.UI.Base
 
         private int _isUIRebuildingCounter;
 
-        private TextBlock _uiPageBtnTxtLink;
-        private TextBlock _uiPageTxtLink;
-        private Button _uiPageBtnReset;
-
-        // For the configuration linking UI.
-        private readonly Dictionary<string, string> _configNameToUID = new();
-        private readonly List<string> _configNameList = new();
+        private LinkResetBtnsControl _linkResetBtnsControl;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -173,15 +168,9 @@ namespace JAFDTC.UI.Base
         /// <summary>
         /// Must be called from derived class constructor after InitializeComponent().
         /// </summary>
-        protected void InitializeBase(BindableObject editState, TextBox setDefaultsFrom, TextBlock uiPageBtnTxtLink,
-                                      TextBlock uiPageTxtLink, Button uiPageBtnReset)
+        protected void InitializeBase(BindableObject editState, TextBox setDefaultsFrom, LinkResetBtnsControl linkResetBtnsControl)
         {
             EditState = editState;
-            if (editState != null)
-            {
-                EditState.ErrorsChanged += EditState_DataValidationError;
-                EditState.PropertyChanged += EditState_PropertyChanged;
-            }
 
             if (setDefaultsFrom != null)
             {
@@ -191,9 +180,8 @@ namespace JAFDTC.UI.Base
 
             _isUIRebuildingCounter = 0;
 
-            _uiPageBtnTxtLink = uiPageBtnTxtLink;
-            _uiPageTxtLink = uiPageTxtLink;
-            _uiPageBtnReset = uiPageBtnReset;
+            if (linkResetBtnsControl != null)
+                _linkResetBtnsControl = linkResetBtnsControl;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -281,6 +269,21 @@ namespace JAFDTC.UI.Base
         private Dictionary<string, CheckBox> _pageCheckBoxes;
 
         /// <summary>
+        /// OnNavigatedTo populates all the controls, which performs the lazy load for these maps.
+        /// On most editors, that is the right thing to do. On some (noteably the A-10 HMCS editor)
+        /// it needs to be done later, in Page_Loaded. This allows those control maps to be rebuilt
+        /// and is much easier than trying to carefully control when the initial UI build happens.
+        /// Possibly a better understanding of the event model down the line will allow this to be
+        /// removed.
+        /// </summary>
+        protected void ResetControlMaps()
+        {
+            _pageTextBoxes = null;
+            _pageComboBoxes = null;
+            _pageCheckBoxes = null;
+        }
+
+        /// <summary>
         /// Find and return the property information and encapsulating object corresponding to the provided control
         /// in the EditState object. Base implementation returns data on the property named by the control's Tag in
         /// the EditState object. Derived classes may override this method if they require a more complex mapping
@@ -365,6 +368,11 @@ namespace JAFDTC.UI.Base
         /// <summary>
         /// Iterate over all the settings controls via PageTextBoxes, PageComboBoxes, and PageCheckBoxes. For each
         /// control, get the corresponding property and copy its value from source to destination.
+        /// 
+        /// When checkSrcErr is true, an error in the source parameter will skip copying only that value.
+        /// 
+        /// Derived classes should override if not all controls can be mapped to a property on the EditState and 
+        /// SystemConfig classes managed by this base class.
         /// </summary>
         protected void CopyAllSettings(SettingLocation srcLoc, SettingLocation destLoc, bool checkSrcErr = false)
         {
@@ -464,13 +472,11 @@ namespace JAFDTC.UI.Base
         private void DoUIUpdate()
         {
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(SystemTag));
-            Utilities.RebuildLinkControls(Config, SystemTag, NavArgs.UIDtoConfigMap, _uiPageBtnTxtLink,
-                                          _uiPageTxtLink);
 
             foreach (KeyValuePair<string, TextBox> kv in PageTextBoxes)
             {
                 GetControlEditStateProperty(kv.Value, out PropertyInfo property, out BindableObject editState);
-                if ((property == null) || editState.PropertyHasErrors(property.Name))
+                if ((property == null) || (editState == null) || editState.PropertyHasErrors(property.Name))
                     continue;
 
                 // Don't re-set a text box with errors, because that will set it back to its pre-error value.
@@ -526,7 +532,7 @@ namespace JAFDTC.UI.Base
                 Utilities.SetCheckEnabledAndState(kv.Value, isEditable, isChecked);
             }
 
-            _uiPageBtnReset.IsEnabled = !IsPageSateDefault;
+            _linkResetBtnsControl?.SetResetButtonEnabled(!IsPageStateDefault);
 
             UpdateUICustom(isEditable);
         }
@@ -537,6 +543,14 @@ namespace JAFDTC.UI.Base
         /// enable state (based on linked status) of all controls that are mapped to configuration parameters.
         /// </summary>
         protected virtual void UpdateUICustom(bool isEditable) { }
+
+        /// <summary>
+        /// Derived classes may override this method if they require custom behavior to reset to defaults.
+        /// </summary>
+        protected virtual void ResetConfigToDefault()
+        {
+            SystemConfig.Reset();
+        }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -620,7 +634,7 @@ namespace JAFDTC.UI.Base
             field.Background = (isValid) ? DefaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBackgroundBrush"];
         }
 
-        private void ValidateEditState(BindableObject editState, string propertyName)
+        protected void ValidateEditState(BindableObject editState, string propertyName)
         {
             List<string> errors = (List<string>)editState.GetErrors(propertyName);
             if (propertyName == null)
@@ -630,70 +644,26 @@ namespace JAFDTC.UI.Base
             }
             else if (PageTextBoxes.ContainsKey(propertyName))
             {
-                    SetFieldValidVisualState(PageTextBoxes[propertyName], (errors.Count == 0));
+                SetFieldValidVisualState(PageTextBoxes[propertyName], (errors.Count == 0));
             }
         }
 
         /// <summary>
-        /// property flagged an error: rebuild interface state to flag the error.
+        /// Override to perform custom logic when a property changes.
+        /// 
+        /// Editors having additional custom edit states should subscribe error change events to this handler.
         /// </summary>
-        protected virtual void EditState_DataValidationError(object sender, DataErrorsChangedEventArgs args)
+        protected virtual void EditState_ErrorsChanged(object sender, DataErrorsChangedEventArgs args)
         {
             ValidateEditState(EditState, args.PropertyName);
         }
 
         /// <summary>
-        /// property changed: rebuild interface state to account for configuration changes.
+        /// Override to perform custom logic when a property changes.
+        /// 
+        /// Editors having additional custom edit states should subscribe property change events to this handler.
         /// </summary>
-        protected virtual void EditState_PropertyChanged(object sender, EventArgs args)
-        {
-            UpdateUIFromEditState();
-        }
-
-        // ---- common editor controls event handlers -----------------------------------------------------------------
-
-        /// <summary>
-        /// reset all button click: reset all system settings back to their defaults if the user consents. saves the
-        /// system can copies configuration state into edit state.
-        /// </summary>
-        protected async void PageBtnReset_Click(object sender, RoutedEventArgs _)
-        {
-            ContentDialogResult result = await Utilities.Message2BDialog(
-                Content.XamlRoot,
-                $"Reset Configuration?",
-                $"Are you sure you want to reset the {SystemName} configuration to avionics defaults? This action cannot be undone.",
-                "Reset"
-            );
-            if (result == ContentDialogResult.Primary)
-            {
-                Config.UnlinkSystem(SystemTag);
-                SystemConfig.Reset();
-                Config.Save(this, SystemTag);
-                CopyConfigToEditState();
-            }
-        }
-
-        /// <summary>
-        /// link system button click: link or unlink the system based on the current link state, interacting with the
-        /// user as necessary. saves the system and copies configuration state into edit state.
-        /// </summary>
-        protected async void PageBtnLink_Click(object sender, RoutedEventArgs _)
-        {
-            string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, SystemTag,
-                                                                    _configNameList);
-            if (selectedItem == null)
-            {
-                Config.UnlinkSystem(SystemTag);
-                Config.Save(this);
-            }
-            else if (selectedItem.Length > 0)
-            {
-                Config.LinkSystemTo(SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selectedItem]]);
-                Config.Save(this);
-            }
-
-            CopyConfigToEditState();
-        }
+        protected virtual void EditState_PropertyChanged(object sender, PropertyChangedEventArgs e) { }
 
         // ---- page-level event handlers -----------------------------------------------------------------------------
 
@@ -702,12 +672,39 @@ namespace JAFDTC.UI.Base
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
             Config = NavArgs.Config;
 
-            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, SystemTag, _configNameList,
-                                           _configNameToUID);
+            if (EditState != null)
+            {
+                EditState.ErrorsChanged += EditState_ErrorsChanged;
+                EditState.PropertyChanged += EditState_PropertyChanged;
+            }
 
+            if (_linkResetBtnsControl != null)
+            {
+                _linkResetBtnsControl.Initialize(SystemName, SystemTag, this, Config);
+                _linkResetBtnsControl.DoReset += ResetConfigToDefault;
+                _linkResetBtnsControl.AfterConfigLinkedOrReset += CopyConfigToEditState;
+                _linkResetBtnsControl.NavigatedTo(NavArgs.UIDtoConfigMap);
+            }
             CopyConfigToEditState();
 
             base.OnNavigatedTo(args);
+        }
+
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            if (EditState != null)
+            {
+                EditState.ErrorsChanged -= EditState_ErrorsChanged;
+                EditState.PropertyChanged -= EditState_PropertyChanged;
+            }
+
+            if (_linkResetBtnsControl != null)
+            {
+                _linkResetBtnsControl.DoReset -= ResetConfigToDefault;
+                _linkResetBtnsControl.AfterConfigLinkedOrReset -= CopyConfigToEditState;
+            }
+
+            base.OnNavigatingFrom(e);
         }
     }
 }

@@ -89,7 +89,7 @@ namespace JAFDTC.Models.A10C.DSMS
         Tail = 2
     }
 
-    public class MunitionSettings : A10CSystemBase
+    public class MunitionSettings : SystemBase
     {
         private string _autoLase;                              // string (boolean)
         public string AutoLase

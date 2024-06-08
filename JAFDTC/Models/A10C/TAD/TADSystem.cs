@@ -79,7 +79,7 @@ namespace JAFDTC.Models.A10C.TAD
         Depress
     }
 
-    public class TADSystem : A10CSystemBase
+    public class TADSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:A10C:TAD";
 

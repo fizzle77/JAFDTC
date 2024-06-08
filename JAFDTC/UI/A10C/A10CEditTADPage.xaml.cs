@@ -17,25 +17,29 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.TAD;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Base;
 
 namespace JAFDTC.UI.A10C
 {
     /// <summary>
     /// Code-behind class for the A10 TAD editor.
     /// </summary>
-    public sealed partial class A10CEditTADPage : A10CPageBase
+    public sealed partial class A10CEditTADPage : SystemEditorPageBase
     {
         private const string SYSTEM_NAME = "TAD";
 
-        public override A10CSystemBase SystemConfig => _config.TAD;
+        protected override SystemBase SystemConfig => ((A10CConfiguration)Config).TAD;
+        protected override string SystemTag => TADSystem.SystemTag;
+        protected override string SystemName => SYSTEM_NAME;
 
         public static ConfigEditorPageInfo PageInfo
             => new(TADSystem.SystemTag, SYSTEM_NAME, SYSTEM_NAME, Glyphs.TAD, typeof(A10CEditTADPage));
 
-        public A10CEditTADPage() : base(SYSTEM_NAME, TADSystem.SystemTag)
+        public A10CEditTADPage()
         {
             InitializeComponent();
             InitializeBase(new TADSystem(), uiTextGroupID, uiCtlLinkResetBtns);
