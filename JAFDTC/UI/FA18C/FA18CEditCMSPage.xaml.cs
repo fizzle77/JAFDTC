@@ -22,23 +22,21 @@ using JAFDTC.Models.FA18C;
 using JAFDTC.Models.FA18C.CMS;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
-using Microsoft.UI.Dispatching;
+using JAFDTC.Utilities;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace JAFDTC.UI.FA18C
 {
     /// <summary>
     /// TODO: document
     /// </summary>
-    public sealed partial class FA18CEditCMSPage : Page
+    public sealed partial class FA18CEditCMSPage : SystemEditorPageBase
     {
         public static ConfigEditorPageInfo PageInfo
             => new(CMSSystem.SystemTag, "Countermeasures", "CMS", Glyphs.CMS, typeof(FA18CEditCMSPage));
@@ -49,34 +47,28 @@ namespace JAFDTC.UI.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private ConfigEditorPageNavArgs NavArgs { get; set; }
+        // ---- overrides of base SystemEditorPage properties
 
-        // NOTE: changes to the Config object may only occur through the marshall methods. bindings to and edits by
-        // NOTE: the ui are always directed at the EditCMDS/EditProgram properties.
+        protected override SystemBase SystemConfig => ((FA18CConfiguration)Config).CMS;
+
+        protected override String SystemTag => CMSSystem.SystemTag;
+
+        protected override string SystemName => "countermeasure management";
+
+        protected override bool IsPageStateDefault => CurStateIsDefault();
+
+        // ---- internal properties
+
+        // NOTE: the ui always interacts with EditProg when editing program values, EditProgNum defines which program
+        // NOTE: the ui is currently editing.
         //
-        private FA18CConfiguration Config { get; set; }
+        private CMProgram EditProg { get; set; }
 
-        // NOTE: the ui always interacts with EditCMS.Programs[0] when editing program values, EditProgram defines
-        // NOTE: which program the ui is currently editing.
-        //
-        private CMSSystem EditCMS { get; set; }
-
-        private int EditProgram { get; set; }
-
-        private bool IsRebuildPending { get; set; }
-
-        private bool IsRebuildingUI { get; set; }
+        private int EditProgNum { get; set; }
 
         // ---- read-only properties
 
         private readonly CMSSystem _cmdsSysDefaults;
-
-        private readonly Dictionary<string, string> _configNameToUID;
-        private readonly List<string> _configNameList;
-
-        private readonly Dictionary<string, TextBox> _baseFieldValueMap;
-        private readonly Brush _defaultBorderBrush;
-        private readonly Brush _defaultBkgndBrush;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -86,37 +78,13 @@ namespace JAFDTC.UI.FA18C
 
         public FA18CEditCMSPage()
         {
-            InitializeComponent();
-
-            EditCMS = new CMSSystem();
-
-            // NOTE: ui will operate on Programs[0], regardless of which program is actually selected.
-            //
-            EditCMS.Programs[0].ErrorsChanged += EditField_DataValidationError;
-            EditCMS.Programs[0].PropertyChanged += EditField_PropertyChanged;
-
-            EditProgram = (int)ProgramNumbers.PROG1;
-
-            IsRebuildPending = false;
-            IsRebuildingUI = false;
+            EditProg = new CMProgram();
+            EditProgNum = (int)ProgramNumbers.PROG1;
 
             _cmdsSysDefaults = CMSSystem.ExplicitDefaults;
 
-            _configNameToUID = new Dictionary<string, string>();
-            _configNameList = new List<string>();
-
-            _baseFieldValueMap = new Dictionary<string, TextBox>()
-            {
-                ["ChaffQ"] = uiPgmValueChaffQ,
-                ["flareQ"] = uiPgmValueFlareQ,
-                ["SQ"] = uiPgmValueSQ,
-                ["SI"] = uiPgmValueSI,
-            };
-            _defaultBorderBrush = uiPgmValueChaffQ.BorderBrush;
-            _defaultBkgndBrush = uiPgmValueChaffQ.Background;
-
-            // wait for final setup of the ui until we navigate to the page (at which point we will have a
-            // configuration to display).
+            InitializeComponent();
+            InitializeBase(EditProg, uiPgmValueChaffQ, uiCtlLinkResetBtns);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -125,38 +93,22 @@ namespace JAFDTC.UI.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // marshall data between our local cmds state and the appropriate program in the cmds configuration. to
-        // simplify bindings, note that the local copy of the program being edited is always in EditCMDS.Programs[0]
-        // regardless of which program we are editing.
-        //
-        private void CopyConfigToEdit(int program)
+        /// <summary>
+        /// Find and return the property information and encapsulating object corresponding to the provided control
+        /// in the persisted configuration object.
+        /// </summary>
+        protected override void GetControlConfigProperty(FrameworkElement ctrl,
+                                                         out PropertyInfo prop, out BindableObject obj)
         {
-            // NOTE: we don't marshall the program number here, it shouldn't change
+            // ui state corresponds to one of several programs in the config state. do that mapping here based on the
+            // value in EditProgNum.
+            //
+            CMSSystem cms = (CMSSystem)SystemConfig;
+            prop = cms.Programs[EditProgNum].GetType().GetProperty(ctrl.Tag.ToString());
+            obj = cms.Programs[EditProgNum];
 
-            EditCMS.Programs[0].ChaffQ = Config.CMS.Programs[program].ChaffQ;
-            EditCMS.Programs[0].FlareQ = Config.CMS.Programs[program].FlareQ;
-            EditCMS.Programs[0].SQ = Config.CMS.Programs[program].SQ;
-            EditCMS.Programs[0].SI = Config.CMS.Programs[program].SI;
-        }
-
-        private void CopyEditToConfig(int program, bool isPersist = false)
-        {
-            Debug.Assert(program == Config.CMS.Programs[program].Number);
-
-            if (!CurStateHasErrors())
-            {
-                // NOTE: we don't marshall the program number here, it shouldn't change
-
-                Config.CMS.Programs[program].ChaffQ = EditCMS.Programs[0].ChaffQ;
-                Config.CMS.Programs[program].FlareQ = EditCMS.Programs[0].FlareQ;
-                Config.CMS.Programs[program].SQ = EditCMS.Programs[0].SQ;
-                Config.CMS.Programs[program].SI = EditCMS.Programs[0].SI;
-
-                if (isPersist)
-                {
-                    Config.Save(this, CMSSystem.SystemTag);
-                }
-            }
+            if (prop == null)
+                throw new ApplicationException($"Unexpected {ctrl.GetType()}: Tag {ctrl.Tag}");
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -165,53 +117,16 @@ namespace JAFDTC.UI.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        /// <summary>
-        /// set the border brush and background for a TextBox based on validity. valid fields use the defaults, invalid
-        /// fields use ErrorFieldBorderBrush from the resources.
-        /// </summary>
-        private void SetFieldValidState(TextBox field, bool isValid)
+        private bool CurStateIsDefault()
         {
-            field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
-            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBackgroundBrush"];
-        }
-
-        private void ValidateAllFields(Dictionary<string, TextBox> fields, IEnumerable errors)
-        {
-            Dictionary<string, bool> map = new();
-            foreach (string error in errors)
-            {
-                map[error] = true;
-            }
-            foreach (KeyValuePair<string, TextBox> kvp in fields)
-            {
-                SetFieldValidState(kvp.Value, !map.ContainsKey(kvp.Key));
-            }
-        }
-
-        /// <summary>
-        /// validation error: update ui state for the various components (base, chaff program, flare program)
-        /// that may have errors.
-        /// </summary>
-        private void EditField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
-        {
-            if (args.PropertyName == null)
-            {
-                ValidateAllFields(_baseFieldValueMap, EditCMS.Programs[0].GetErrors(null));
-            }
-            else
-            {
-                List<string> errors = (List<string>)EditCMS.Programs[0].GetErrors(args.PropertyName);
-                SetFieldValidState(_baseFieldValueMap[args.PropertyName], (errors.Count == 0));
-            }
-            RebuildInterfaceState();
-        }
-
-        /// <summary>
-        /// property changed: rebuild interface state to account for configuration changes.
-        /// </summary>
-        private void EditField_PropertyChanged(object sender, EventArgs args)
-        {
-            RebuildInterfaceState();
+            FA18CConfiguration config = (FA18CConfiguration)Config;
+            for (int i = (int)ProgramNumbers.PROG1; i <= (int)ProgramNumbers.PROG5; i++)
+                if (((EditProgNum == i) && !EditProg.IsDefault) ||
+                    ((EditProgNum != i) && !config.CMS.Programs[i].IsDefault))
+                {
+                    return false;
+                }
+            return true;
         }
 
         /// <summary>
@@ -219,7 +134,7 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private bool CurStateHasErrors()
         {
-            return EditCMS.HasErrors || EditCMS.Programs[0].HasErrors;
+            return EditProg.HasErrors || ((FA18CConfiguration)Config).CMS.HasErrors;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -233,12 +148,12 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private void SelectProgram(int program)
         {
-            if (program != EditProgram)
+            if (program != EditProgNum)
             {
-                CopyEditToConfig(EditProgram, true);
-                EditProgram = program;
-                CopyConfigToEdit(EditProgram);
-                RebuildInterfaceState();
+                SaveEditStateToConfig();
+                EditProgNum = program;
+                CopyConfigToEditState();
+                UpdateUIFromEditState();
             }
         }
 
@@ -247,9 +162,10 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private void RebuildProgramSelectMenu()
         {
+            FA18CConfiguration config = (FA18CConfiguration)Config;
             Utilities.SetBulletsInBulletComboBox(uiPgmSelectCombo,
-                                                 (int i) => (((EditProgram == i) && !EditCMS.Programs[0].IsDefault) ||
-                                                             ((EditProgram != i) && !Config.CMS.Programs[i].IsDefault)));
+                                                 (int i) => (((EditProgNum == i) && !EditProg.IsDefault) ||
+                                                             ((EditProgNum != i) && !config.CMS.Programs[i].IsDefault)));
         }
 
         /// <summary>
@@ -287,7 +203,7 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private void RebuildFieldPlaceholders()
         {
-            CMProgram pgm = _cmdsSysDefaults.Programs[EditProgram];
+            CMProgram pgm = _cmdsSysDefaults.Programs[EditProgNum];
             uiPgmValueChaffQ.PlaceholderText = pgm.ChaffQ;
             uiPgmValueFlareQ.PlaceholderText = pgm.FlareQ;
             uiPgmValueSQ.PlaceholderText = pgm.SQ;
@@ -299,78 +215,40 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private void RebuildProgramCanvi()
         {
-            CMProgram pgm = _cmdsSysDefaults.Programs[EditProgram];
-            CMProgramCanvasParams chaff = ConvertCfgCMDStoCMCanvas(EditCMS.Programs[0], pgm, true);
-            CMProgramCanvasParams flare = ConvertCfgCMDStoCMCanvas(EditCMS.Programs[0], pgm, false);
+            CMProgram pgm = _cmdsSysDefaults.Programs[EditProgNum];
+            CMProgramCanvasParams chaff = ConvertCfgCMDStoCMCanvas(EditProg, pgm, true);
+            CMProgramCanvasParams flare = ConvertCfgCMDStoCMCanvas(EditProg, pgm, false);
 
             uiCMPgmFlareCanvas.SetProgram(flare, chaff);
             uiCMPgmChaffCanvas.SetProgram(chaff, flare);
         }
 
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private void RebuildLinkControls()
-        {
-            Utilities.RebuildLinkControls(Config, CMSSystem.SystemTag, NavArgs.UIDtoConfigMap,
-                                          uiPageBtnTxtLink, uiPageTxtLink);
-        }
-
         // update the enable state on the ui elements based on the current settings. link controls must be set up
         // vi RebuildLinkControls() prior to calling this function.
         //
-        private void RebuildEnableState()
+        protected override void UpdateUICustom(bool isEditable)
         {
-            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(CMSSystem.SystemTag));
+            RebuildProgramSelectMenu();
+            RebuildFieldPlaceholders();
+            RebuildProgramCanvi();
 
             Utilities.SetEnableState(uiPgmValueChaffQ, isEditable);
             Utilities.SetEnableState(uiPgmValueFlareQ, isEditable);
             Utilities.SetEnableState(uiPgmValueSQ, isEditable);
             Utilities.SetEnableState(uiPgmValueSI, isEditable);
 
-            Utilities.SetEnableState(uiPgmBtnReset, isEditable && !EditCMS.Programs[0].IsDefault);
-
-            bool isDefault = EditCMS.IsDefault;
-            for (int i = 0; i < EditCMS.Programs.Length; i++)
-            {
-                if (((EditProgram == i) && !EditCMS.Programs[0].IsDefault) ||
-                    ((EditProgram != i) && !Config.CMS.Programs[i].IsDefault))
-                {
-                    isDefault = false;
-                    break;
-                }
-            }
-            Utilities.SetEnableState(uiPageBtnResetAll, !isDefault);
-
-            Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
+            Utilities.SetEnableState(uiPgmBtnReset, isEditable && !EditProg.IsDefault);
 
             bool isNoErrs = !CurStateHasErrors();
-            Utilities.SetEnableState(uiPgmNextBtn, (isNoErrs && (EditProgram != (int)ProgramNumbers.PROG5)));
-            Utilities.SetEnableState(uiPgmPrevBtn, (isNoErrs && (EditProgram != (int)ProgramNumbers.PROG1)));
+            Utilities.SetEnableState(uiPgmNextBtn, (isNoErrs && (EditProgNum != (int)ProgramNumbers.PROG5)));
+            Utilities.SetEnableState(uiPgmPrevBtn, (isNoErrs && (EditProgNum != (int)ProgramNumbers.PROG1)));
 
             Utilities.SetEnableState(uiPgmSelectCombo, isNoErrs);
         }
 
-        /// <summary>
-        /// rebuild the state of controls on the page in response to a change in the configuration.
-        /// </summary>
-        private void RebuildInterfaceState()
+        protected override void ResetConfigToDefault()
         {
-            if (!IsRebuildPending)
-            {
-                IsRebuildPending = true;
-                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-                {
-                    IsRebuildingUI = true;
-                    RebuildProgramSelectMenu();
-                    RebuildFieldPlaceholders();
-                    RebuildProgramCanvi();
-                    RebuildLinkControls();
-                    RebuildEnableState();
-                    IsRebuildingUI = false;
-                    IsRebuildPending = false;
-                });
-            }
+            ((FA18CConfiguration)Config).CMS.Reset();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -382,52 +260,12 @@ namespace JAFDTC.UI.FA18C
         // ---- page buttons ------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// reset all button click: reset all cmds settings back to their defaults.
-        /// </summary>
-        private async void PageBtnResetAll_Click(object sender, RoutedEventArgs args)
-        {
-            ContentDialogResult result = await Utilities.Message2BDialog(
-                Content.XamlRoot,
-                "Reset Configuration?",
-                "Are you sure you want to reset the CMS configurations to avionics defaults? This action cannot be undone.",
-                "Reset"
-            );
-            if (result == ContentDialogResult.Primary)
-            {
-                Config.UnlinkSystem(CMSSystem.SystemTag);
-                Config.CMS.Reset();
-                Config.Save(this, CMSSystem.SystemTag);
-                CopyConfigToEdit(EditProgram);
-            }
-        }
-
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
-        {
-            string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, CMSSystem.SystemTag,
-                                                                    _configNameList);
-            if (selectedItem == null)
-            {
-                Config.UnlinkSystem(CMSSystem.SystemTag);
-                Config.Save(this);
-            }
-            else if (selectedItem.Length > 0)
-            {
-                Config.LinkSystemTo(CMSSystem.SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selectedItem]]);
-                Config.Save(this);
-                CopyConfigToEdit(EditProgram);
-            }
-        }
-
-        /// <summary>
         /// reset chaff program click: set all chaff program values to default.
         /// </summary>
         private void PgmBtnReset_Click(object sender, RoutedEventArgs args)
         {
-            EditCMS.Programs[0].Reset();
-            CopyEditToConfig(EditProgram, true);
+            EditProg.Reset();
+            SaveEditStateToConfig();
         }
 
         // ---- program selection -------------------------------------------------------------------------------------
@@ -437,8 +275,8 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private void PgmBtnPrev_Click(object sender, RoutedEventArgs args)
         {
-            SelectProgram(EditProgram - 1);
-            uiPgmSelectCombo.SelectedIndex = EditProgram;
+            SelectProgram(EditProgNum - 1);
+            uiPgmSelectCombo.SelectedIndex = EditProgNum;
         }
 
         /// <summary>
@@ -446,8 +284,8 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private void PgmBtnNext_Click(object sender, RoutedEventArgs args)
         {
-            SelectProgram(EditProgram + 1);
-            uiPgmSelectCombo.SelectedIndex = EditProgram;
+            SelectProgram(EditProgNum + 1);
+            uiPgmSelectCombo.SelectedIndex = EditProgNum;
         }
 
         /// <summary>
@@ -457,30 +295,11 @@ namespace JAFDTC.UI.FA18C
         private void PgmSelectCombo_SelectionChanged(object sender, RoutedEventArgs args)
         {
             Grid item = (Grid)((ComboBox)sender).SelectedItem;
-            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            if (!IsUIRebuilding && (item != null) && (item.Tag != null))
             {
                 // NOTE: assume tag == index here...
                 SelectProgram(int.Parse((string)item.Tag));
             }
-        }
-
-        // ---- text field changes ------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// text box lost focus: copy the local backing values to the configuration (note this is predicated on error
-        /// status) and rebuild the interface state.
-        ///
-        /// NOTE: though the text box has lost focus, the update may not yet have propagated into state. use the
-        /// NOTE: dispatch queue to give in-flight state updates time to complete.
-        /// 
-        /// </summary>
-        private void CMSTextBox_LostFocus(object sender, RoutedEventArgs args)
-        {
-            // CONSIDER: may be better here to handle this in a property changed handler rather than here?
-            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-            {
-                CopyEditToConfig(EditProgram, true);
-            });
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -489,49 +308,20 @@ namespace JAFDTC.UI.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // on configuration saved, rebuild the interface state to align with the latest save (assuming we go here
-        // through a CopyEditToConfig).
-        //
-        private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
-        {
-            RebuildInterfaceState();
-        }
-
         // on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
         // we are editing.
         //
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
-            NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
-            Config = (FA18CConfiguration)NavArgs.Config;
-
-            Config.ConfigurationSaved += ConfigurationSavedHandler;
-
-            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, CMSSystem.SystemTag,
-                                           _configNameList, _configNameToUID);
-
             List<FrameworkElement> items = new();
             for (int i = (int)ProgramNumbers.PROG1; i <= (int)ProgramNumbers.PROG5 ; i++)
                 items.Add(Utilities.BulletComboBoxItem($"PROG {i+1}", i.ToString()));
             uiPgmSelectCombo.ItemsSource = items;
 
-            CopyConfigToEdit(EditProgram);
-
-            ValidateAllFields(_baseFieldValueMap, EditCMS.Programs[0].GetErrors(null));
-
-            uiPgmSelectCombo.SelectedIndex = EditProgram;
-            SelectProgram(EditProgram);
-
-            RebuildInterfaceState();
-
             base.OnNavigatedTo(args);
-        }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs args)
-        {
-            Config.ConfigurationSaved -= ConfigurationSavedHandler;
-
-            base.OnNavigatedFrom(args);
+            uiPgmSelectCombo.SelectedIndex = EditProgNum;
+            SelectProgram(EditProgNum);
         }
     }
 }

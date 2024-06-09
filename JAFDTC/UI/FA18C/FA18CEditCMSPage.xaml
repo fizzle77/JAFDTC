@@ -18,12 +18,13 @@ https://www.gnu.org/licenses/.
 
 **********************************************************************************************************************
 -->
-<Page
+<ui_base:SystemEditorPageBase
     x:Class="JAFDTC.UI.FA18C.FA18CEditCMSPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:JAFDTC.UI.FA18C"
     xmlns:ui_base="using:JAFDTC.UI.Base"
+    xmlns:ui_ctrl="using:JAFDTC.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -51,7 +52,7 @@ https://www.gnu.org/licenses/.
 
     </Page.Resources>
 
-    <Grid Margin="16,12,16,8">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -68,9 +69,8 @@ https://www.gnu.org/licenses/.
         row 0 : program select
         ===============================================================================================================
         -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
+        <StackPanel Grid.Row="0" Margin="0,12,0,12" Orientation="Horizontal"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Margin="0,0,12,0" VerticalAlignment="Center">
                 CMS CM Program
             </TextBlock>
@@ -100,7 +100,7 @@ https://www.gnu.org/licenses/.
         row 1 : program parameters
         ===============================================================================================================
         -->
-        <Grid Grid.Row="1" Margin="4,18,0,0">
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -116,18 +116,14 @@ https://www.gnu.org/licenses/.
             </Grid.ColumnDefinitions>
 
             <!-- CHAFF Q -->
-            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,24,12,0"
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,12,12,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Chaff CM Quantity
             </TextBlock>
-            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,12,0,0"
-                     x:Name="uiPgmValueChaffQ"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMS.Programs[0].ChaffQ, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
-                     LostFocus="CMSTextBox_LostFocus"
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,12,0,0" Tag="ChaffQ" x:Name="uiPgmValueChaffQ"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
             <TextBlock Grid.Row="1" Grid.Column="2" Margin="12,12,0,0" VerticalAlignment="Center">chaff</TextBlock>
 
@@ -136,14 +132,10 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Flare CM Quantity
             </TextBlock>
-            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,12,0,0"
-                     x:Name="uiPgmValueFlareQ"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMS.Programs[0].FlareQ, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
-                     LostFocus="CMSTextBox_LostFocus"
+            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,12,0,0" Tag="FlareQ" x:Name="uiPgmValueFlareQ"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
             <TextBlock Grid.Row="2" Grid.Column="2" Margin="12,12,0,0" VerticalAlignment="Center">flares</TextBlock>
 
@@ -152,14 +144,10 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Program Repeat Count
             </TextBlock>
-            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,12,0,0"
-                     x:Name="uiPgmValueSQ"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMS.Programs[0].SQ, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
-                     LostFocus="CMSTextBox_LostFocus"
+            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,12,0,0" Tag="SQ" x:Name="uiPgmValueSQ"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
             <TextBlock Grid.Row="3" Grid.Column="2" Margin="12,12,0,0" VerticalAlignment="Center">bursts</TextBlock>
 
@@ -168,14 +156,10 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Program Repeat Interval
             </TextBlock>
-            <TextBox Grid.Row="4" Grid.Column="1" Margin="0,12,0,0"
-                     x:Name="uiPgmValueSI"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMS.Programs[0].SI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
-                     LostFocus="CMSTextBox_LostFocus"
+            <TextBox Grid.Row="4" Grid.Column="1" Margin="0,12,0,0" Tag="SI" x:Name="uiPgmValueSI"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
             <TextBlock Grid.Row="4" Grid.Column="2" Margin="12,12,0,0" VerticalAlignment="Center">seconds</TextBlock>
 
@@ -199,7 +183,7 @@ https://www.gnu.org/licenses/.
         row 2 : program visual display
         ===============================================================================================================
         -->
-        <Grid Grid.Row="2" Margin="12,12,12,24">
+        <Grid Grid.Row="2" Margin="18,24,18,24">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -237,53 +221,10 @@ https://www.gnu.org/licenses/.
 
         <!--
         ===============================================================================================================
-        row 4 : link / reset
+        common editor controls 
         ===============================================================================================================
         -->
-        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <ui_ctrl:LinkResetBtnsControl Grid.Row="3" Grid.Column="0" Margin="0,0,0,0" x:Name="uiCtlLinkResetBtns"/>
 
-            <StackPanel Grid.Column="0"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
-                <Button Width="140"
-                        x:Name="uiPageBtnLink"
-                        Click="PageBtnLink_Click"
-                        ToolTipService.ToolTip="Link or unlink this system to/from another configuration">
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE71B;"/>
-                        <TextBlock VerticalAlignment="center"
-                                   x:Name="uiPageBtnTxtLink">
-                            FIXUP
-                        </TextBlock>
-                    </StackPanel>
-                </Button>
-                <TextBlock Margin="12,0,24,0"
-                           x:Name="uiPageTxtLink"
-                           VerticalAlignment="center">
-                    FIXUP
-                </TextBlock>
-            </StackPanel>
-
-            <StackPanel Grid.Column="1"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
-                <Button x:Name="uiPageBtnResetAll"
-                        Click="PageBtnResetAll_Click"
-                        ToolTipService.ToolTip="Reset the configuration of this system to its defaults">
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
-                        <TextBlock VerticalAlignment="center">
-                            Reset Page to Defaults
-                        </TextBlock>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Grid>
     </Grid>
-</Page>
+</ui_base:SystemEditorPageBase>

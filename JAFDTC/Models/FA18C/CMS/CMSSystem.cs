@@ -3,7 +3,7 @@
 // CMSSystem.cs -- fa-18c cmds system configuration
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,7 +18,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 
@@ -36,7 +35,7 @@ namespace JAFDTC.Models.FA18C.CMS
     /// <summary>
     /// TODO: document
     /// </summary>
-    public class CMSSystem : BindableObject, ISystem
+    public class CMSSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:FA18C:CMD";
 
@@ -54,6 +53,7 @@ namespace JAFDTC.Models.FA18C.CMS
             get => _programs;
             set => _programs = value;
         }
+
         // ---- following properties are synthesized.
 
         /// <summary>
@@ -79,17 +79,13 @@ namespace JAFDTC.Models.FA18C.CMS
         /// returns true if the instance indicates a default setup (all fields are ""), false otherwise.
         /// </summary>
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get
             {
                 for (int i = 0; i < Programs.Length; i++)
-                {
                     if (!Programs[i].IsDefault)
-                    {
                         return false;
-                    }
-                }
                 return true;
             }
         }
@@ -136,12 +132,10 @@ namespace JAFDTC.Models.FA18C.CMS
         /// reset the instance to defaults (by definition, field value of "" implies default). table numbers are not
         /// changed by this operation.
         /// </summary>
-        public void Reset()
+        public override void Reset()
         {
             foreach (CMProgram program in Programs)
-            {
                 program.Reset();
-            }
         }
     }
 }
