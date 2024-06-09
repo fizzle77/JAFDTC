@@ -358,8 +358,8 @@ namespace JAFDTC.UI.Base
             {
                 EditState.ClearErrors();
                 CopyAllSettings(SettingLocation.Config, SettingLocation.Edit);
-                UpdateUIFromEditState();
             }
+            UpdateUIFromEditState();
         }
 
         /// <summary>
@@ -376,8 +376,8 @@ namespace JAFDTC.UI.Base
             {
                 CopyAllSettings(SettingLocation.Edit, SettingLocation.Config, true);
                 Config.Save(this, SystemTag);
-                UpdateUIFromEditState();
             }
+            UpdateUIFromEditState();
         }
 
         /// <summary>
