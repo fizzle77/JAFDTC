@@ -25,6 +25,7 @@ using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -206,6 +207,20 @@ namespace JAFDTC.UI
                           $"             Text = \"{text}\"/>" +
                           $"</Grid>";
             return (Grid)XamlReader.Load(xaml);
+        }
+
+        /// <summary>
+        /// handle visiblity of the bullets in a ComboBox that uses bullet items built by BulletComboBoxItem() or
+        /// items that are simillarly structured and tagged. the bullets are set according to the return value of
+        /// fnIsBulletAtIndexVisible(i) : true => visible, where i is the index of the item in the menu.
+        /// </summary>
+        public static void SetBulletsInBulletComboBox(ComboBox combo, Func<int, bool> fnIsBulletAtIndexVisible)
+        {
+            for (int i = 0; i < combo.Items.Count; i++)
+            {
+                FontIcon icon = FindControl<FontIcon>((Grid)combo.Items[i], typeof(FontIcon), "BadgeIcon");
+                icon.Visibility = (fnIsBulletAtIndexVisible(i) ? Visibility.Visible : Visibility.Collapsed);
+            }
         }
 
         // ------------------------------------------------------------------------------------------------------------
