@@ -1,6 +1,6 @@
 # JAFDTC: Configuring F-16C Viper Airframes
 
-*Version 1.0.0-B.31 of 5-May-24*
+*Version 1.0.0-B.34 of 8-June-24*
 
 JAFDTC supports configuration of the following systems in the Viper,
 

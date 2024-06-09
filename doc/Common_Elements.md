@@ -1,6 +1,6 @@
 # JAFDTC: Common Elements Guide
 
-*Version 1.0.0-B.31 of 5-May-24*
+*Version 1.0.0-B.34 of 8-June-24*
 
 Though systems differ from airframe to airframe, based on the preculariites of the airframe,
 there are many concepts, layouts, and tasks in the JAFDTC user interface that share general

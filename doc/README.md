@@ -1,6 +1,6 @@
 # JAFDTC: User’s Guide
 
-*Version 1.0.0-B.31 of 5-May-24*
+*Version 1.0.0-B.34 of 8-June-24*
 
 _Just Another #%*@^!% DTC_ (JAFDTC) is a native Windows application that allows you to upload
 data typically saved on a data cartridge in real life, such as steerpoints/waypoints and other
