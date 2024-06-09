@@ -199,7 +199,9 @@ namespace JAFDTC.Models.DCS
             // NOTE: so we put an extra one here so that following the AddCommand() the build string will still meet
             // NOTE: expectations.
             //
-            AddCommand($"{builder.ToString()},");
+            string commandStream = builder.ToString();
+            if (commandStream.Length > 0)
+                AddCommand($"{commandStream},");
         }
 
         /// <summary>
