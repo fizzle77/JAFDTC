@@ -77,7 +77,6 @@ namespace JAFDTC.UI.F16C
         private readonly Dictionary<string, TextBox> _baseFieldValueMap;
         private readonly Dictionary<string, TextBox> _pgmChaffFieldValueMap;
         private readonly Dictionary<string, TextBox> _pgmFlareFieldValueMap;
-        private readonly List<FontIcon> _pgmSelComboIcons;
         private readonly Brush _defaultBorderBrush;
         private readonly Brush _defaultBkgndBrush;
 
@@ -131,11 +130,6 @@ namespace JAFDTC.UI.F16C
                 ["BI"] = uiPgmFlareValueBI,
                 ["SQ"] = uiPgmFlareValueSQ,
                 ["SI"] = uiPgmFlareValueSI,
-            };
-            _pgmSelComboIcons = new List<FontIcon>()
-            {
-                uiPgmSelectItem1Icon, uiPgmSelectItem2Icon, uiPgmSelectItem3Icon,
-                uiPgmSelectItem4Icon, uiPgmSelectItem5Icon, uiPgmSelectItem6Icon
             };
             _defaultBorderBrush = uiPgmChaffValueBQ.BorderBrush;
             _defaultBkgndBrush = uiPgmChaffValueBQ.Background;
@@ -300,16 +294,9 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void RebuildProgramSelectMenu()
         {
-            for (int i = 0; i < Config.CMDS.Programs.Length; i++)
-            {
-                Visibility viz = Visibility.Collapsed;
-                if (((EditProgram == i) && !EditCMDS.Programs[0].IsDefault) ||
-                    ((EditProgram != i) && !Config.CMDS.Programs[i].IsDefault))
-                {
-                    viz = Visibility.Visible;
-                }
-                _pgmSelComboIcons[i].Visibility = viz;
-            }
+            Utilities.SetBulletsInBulletComboBox(uiPgmSelectCombo,
+                                                 (int i) => (((EditProgram == i) && !EditCMDS.Programs[0].IsDefault) ||
+                                                             ((EditProgram != i) && !Config.CMDS.Programs[i].IsDefault)));
         }
 
         /// <summary>
@@ -580,6 +567,13 @@ namespace JAFDTC.UI.F16C
         //
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
+            List<FrameworkElement> items = new();
+            for (int i = (int)ProgramNumbers.MAN1; i <= (int)ProgramNumbers.MAN4; i++)
+                items.Add(Utilities.BulletComboBoxItem($"PROG {i + 1}", i.ToString()));
+            items.Add(Utilities.BulletComboBoxItem("PANIC", ((int)ProgramNumbers.PANIC).ToString()));
+            items.Add(Utilities.BulletComboBoxItem("BYPASS", ((int)ProgramNumbers.BYPASS).ToString()));
+            uiPgmSelectCombo.ItemsSource = items;
+
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
             Config = (F16CConfiguration)NavArgs.Config;
 
