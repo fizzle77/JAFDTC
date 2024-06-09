@@ -24,6 +24,7 @@ using JAFDTC.Models.A10C.Radio;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using static JAFDTC.Models.A10C.Radio.RadioSystem;
@@ -51,10 +52,7 @@ namespace JAFDTC.UI.A10C
         {
             "COM 1 – UHF/VHF AN/ARC-210",
             "COM 2 – UHF AN/ARC-164",
-            //
-            // TODO: enable com 3 once we have support for pushing settings to jet
-            //
-            // "COM 3 – UHF AN/ARC-186",
+            "COM 3 – UHF AN/ARC-186",
         };
 
         // ------------------------------------------------------------------------------------------------------------
@@ -203,7 +201,7 @@ namespace JAFDTC.UI.A10C
                 (int)RadioSystem.Radios.COMM1 => "251.000",
                 (int)RadioSystem.Radios.COMM2 => "305.000",
                 (int)RadioSystem.Radios.COMM3 => "30.000",
-                _ => "100.000"
+                _ => throw new NotImplementedException($"Unexpected radio {radio}")
             };
 
         public int RadioPresetCount(int radio, IConfiguration config)

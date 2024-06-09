@@ -52,7 +52,7 @@ namespace JAFDTC.Models.A10C.Upload
 
             BuildIFFCC(ufc);
 
-            //AddAction(ahcp, "IFFCC_ON");
+            AddAction(ahcp, "IFFCC_ON");
         }
 
         private void BuildIFFCC(AirframeDevice ufc)

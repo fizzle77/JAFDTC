@@ -38,6 +38,7 @@ namespace JAFDTC.Models.A10C
             int delay = Settings.CommandDelaysMs[AirframeTypes.A10C];
             int delayChar = delay / 2;
             int delayData = delay / 4;
+            int delayArc186 = delay * 2;
 
             // ---- cdu
 
@@ -260,7 +261,7 @@ namespace JAFDTC.Models.A10C
 
             AddDevice(iff);
 
-            // ---- an/arc-210 uhf radio
+            // ---- an/arc-210 vhf/uhf radio
 
             AirframeDevice arc210 = new(55, "UHF_ARC210");
             arc210.AddAction(3043, "ARC210_MASTER_TR_G", delay, 0.1, 0.1);
@@ -302,23 +303,23 @@ namespace JAFDTC.Models.A10C
             arc164.AddAction(3006, "UHF_POINT025_SEL", delay, 0.0, 0.0);        // 0.0-0.3, 0/25/50/75 KHz
             AddDevice(arc164);
 
-            // ---- an/arc-186 vhf radio
+            // ---- an/arc-186 vhf fm radio
 
             AirframeDevice arc186 = new(56, "VHF_ARC186");
-            arc186.AddAction(3004, "VHFFM_MODE_TR", delay, 0.2, 0.2);
-            arc186.AddAction(3004, "VHFFM_FREQEMER_MAN", delay, 0.2, 0.3);
+            arc186.AddAction(3003, "VHFFM_MODE_TR", delay, 0.1, 0.1);
+            arc186.AddAction(3004, "VHFFM_FREQEMER_MAN", delay, 0.2, 0.2);
             arc186.AddAction(3004, "VHFFM_FREQEMER_PRE", delay, 0.3, 0.3);
             arc186.AddAction(3006, "VHFFM_LOAD", delay, 1);
             arc186.AddAction(3001, "VHFFM_PRESET_UP", delay, 0.01);
-            arc186.AddAction(3009, "VHFFM_FREQ1_UP", delay, 0.05);
-            arc186.AddAction(3011, "VHFFM_FREQ2_UP", delay, 0.1);
-            arc186.AddAction(3013, "VHFFM_FREQ3_UP", delay, 0.1);
-            arc186.AddAction(3015, "VHFFM_FREQ4_UP", delay, 0.25);
+            arc186.AddAction(3009, "VHFFM_FREQ1_UP", delayArc186, 0.1);
+            arc186.AddAction(3011, "VHFFM_FREQ2_UP", delayArc186, 0.1);
+            arc186.AddAction(3013, "VHFFM_FREQ3_UP", delayArc186, 0.1);
+            arc186.AddAction(3015, "VHFFM_FREQ4_UP", delayArc186 * 2, 0.25);
             arc186.AddAction(3001, "VHFFM_PRESET_DN", delay, -0.01);
-            arc186.AddAction(3009, "VHFFM_FREQ1_DN", delay, -0.05);
-            arc186.AddAction(3011, "VHFFM_FREQ2_DN", delay, -0.1);
-            arc186.AddAction(3013, "VHFFM_FREQ3_DN", delay, -0.1);
-            arc186.AddAction(3015, "VHFFM_FREQ4_DN", delay, -0.25);
+            arc186.AddAction(3009, "VHFFM_FREQ1_DN", delayArc186, -0.1);
+            arc186.AddAction(3011, "VHFFM_FREQ2_DN", delayArc186, -0.1);
+            arc186.AddAction(3013, "VHFFM_FREQ3_DN", delayArc186, -0.1);
+            arc186.AddAction(3015, "VHFFM_FREQ4_DN", delayArc186 * 2, -0.25);
             AddDevice(arc186);
 
             // ---- HOTAS

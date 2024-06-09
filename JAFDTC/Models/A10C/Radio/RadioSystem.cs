@@ -36,9 +36,9 @@ namespace JAFDTC.Models.A10C.Radio
         //
         public enum Radios
         {
-            COMM1 = 0,              // AN/ARC-210
-            COMM2 = 1,              // AN/ARC-164
-            COMM3 = 2,              // AN/ARC-186
+            COMM1 = 0,              // AN/ARC-210 all bands, "front"
+            COMM2 = 1,              // AN/ARC-164 UHF, "mid"
+            COMM3 = 2,              // AN/ARC-186 VHF FM, "aft"
             NUM_RADIOS = 3
         };
 
