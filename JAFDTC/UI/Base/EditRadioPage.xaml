@@ -62,73 +62,7 @@ https://www.gnu.org/licenses/.
                       VerticalAlignment="Center"
                       SelectionChanged="RadSelectCombo_SelectionChanged"
                       ToolTipService.ToolTip="Selects Radio to Edit">
-                <!-- provide 4 items for up to 4 radios, cut back based on actual needs -->
-                <ComboBox.Items>
-                    <Grid Tag="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0"
-                                  x:Name="uiRadSelectItem0Icon"
-                                  VerticalAlignment="Center"
-                                  Foreground="{ThemeResource SystemAccentColor}"
-                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-                        <TextBlock Grid.Column="1" Margin="8,0,0,0"
-                                   x:Name="uiRadSelectItem0Text"
-                                   VerticalAlignment="Center">
-                            COM 1: FIXUP
-                        </TextBlock>
-                    </Grid>
-                    <Grid Tag="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0"
-                                  x:Name="uiRadSelectItem1Icon"
-                                  VerticalAlignment="Center"
-                                  Foreground="{ThemeResource SystemAccentColor}"
-                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-                        <TextBlock Grid.Column="1" Margin="8,0,0,0"
-                                   x:Name="uiRadSelectItem1Text"
-                                   VerticalAlignment="Center">
-                            COM 2: FIXUP
-                        </TextBlock>
-                    </Grid>
-                    <Grid Tag="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0"
-                                  x:Name="uiRadSelectItem2Icon"
-                                  VerticalAlignment="Center"
-                                  Foreground="{ThemeResource SystemAccentColor}"
-                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-                        <TextBlock Grid.Column="1" Margin="8,0,0,0"
-                                   x:Name="uiRadSelectItem2Text"
-                                   VerticalAlignment="Center">
-                            COM 3: FIXUP
-                        </TextBlock>
-                    </Grid>
-                    <Grid Tag="3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0"
-                                  x:Name="uiRadSelectItem3Icon"
-                                  VerticalAlignment="Center"
-                                  Foreground="{ThemeResource SystemAccentColor}"
-                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-                        <TextBlock Grid.Column="1" Margin="8,0,0,0"
-                                   x:Name="uiRadSelectItem3Text"
-                                   VerticalAlignment="Center">
-                            COM 4: FIXUP
-                        </TextBlock>
-                    </Grid>
-                </ComboBox.Items>
+                <!-- ComboBox items are built when the page is displayed according to the radio -->
             </ComboBox>
             <Button Margin="24,0,6,0" VerticalAlignment="Center"
                     x:Name="uiRadPrevBtn"

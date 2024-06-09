@@ -194,11 +194,6 @@ namespace JAFDTC.UI.Base
 
         private int EditItemTag { get; set; }
 
-        // ---- read-only properties
-
-        private readonly List<TextBlock> _radioSelComboText;
-        private readonly List<FontIcon> _radioSelComboIcons;
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction
@@ -213,15 +208,6 @@ namespace JAFDTC.UI.Base
 
             InitializeComponent();
             InitializeBase(null, uiMiscValueDefaultFreq, uiCtlLinkResetBtns, new List<string>() { });
-
-            _radioSelComboText = new List<TextBlock>()
-            {
-                uiRadSelectItem0Text, uiRadSelectItem1Text, uiRadSelectItem2Text, uiRadSelectItem3Text
-            };
-            _radioSelComboIcons = new List<FontIcon>()
-            {
-                uiRadSelectItem0Icon, uiRadSelectItem1Icon, uiRadSelectItem2Icon, uiRadSelectItem3Icon
-            };
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -489,9 +475,8 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void RebuildRadioSelectMenu()
         {
-            for (int i = 0; i < PageHelper.RadioNames.Count; i++)
-                _radioSelComboIcons[i].Visibility = (PageHelper.RadioModuleIsDefault(Config, i)) ? Visibility.Collapsed
-                                                                                                 : Visibility.Visible;
+            Utilities.SetBulletsInBulletComboBox(uiRadSelectCombo,
+                                                 (int i) => !PageHelper.RadioModuleIsDefault(Config, i));
         }
 
         /// <summary>
@@ -781,14 +766,10 @@ namespace JAFDTC.UI.Base
 
             base.OnNavigatedTo(args);
 
-            while (uiRadSelectCombo.Items.Count > PageHelper.RadioNames.Count)
-            {
-                uiRadSelectCombo.Items.RemoveAt(uiRadSelectCombo.Items.Count - 1);
-            }
+            List<FrameworkElement> items = new();
             for (int i = 0; i < PageHelper.RadioNames.Count; i++)
-            {
-                _radioSelComboText[i].Text = PageHelper.RadioNames[i];
-            }
+                    items.Add(Utilities.BulletComboBoxItem(PageHelper.RadioNames[i], i.ToString()));
+            uiRadSelectCombo.ItemsSource = items;
 
             CopyConfigToEditState();
 
