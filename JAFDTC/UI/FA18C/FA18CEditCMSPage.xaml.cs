@@ -75,7 +75,6 @@ namespace JAFDTC.UI.FA18C
         private readonly List<string> _configNameList;
 
         private readonly Dictionary<string, TextBox> _baseFieldValueMap;
-        private readonly List<FontIcon> _pgmSelComboIcons;
         private readonly Brush _defaultBorderBrush;
         private readonly Brush _defaultBkgndBrush;
 
@@ -112,11 +111,6 @@ namespace JAFDTC.UI.FA18C
                 ["flareQ"] = uiPgmValueFlareQ,
                 ["SQ"] = uiPgmValueSQ,
                 ["SI"] = uiPgmValueSI,
-            };
-            _pgmSelComboIcons = new List<FontIcon>()
-            {
-                uiPgmSelectItem1Icon, uiPgmSelectItem2Icon, uiPgmSelectItem3Icon,
-                uiPgmSelectItem4Icon, uiPgmSelectItem5Icon
             };
             _defaultBorderBrush = uiPgmValueChaffQ.BorderBrush;
             _defaultBkgndBrush = uiPgmValueChaffQ.Background;
@@ -253,16 +247,9 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private void RebuildProgramSelectMenu()
         {
-            for (int i = 0; i < Config.CMS.Programs.Length; i++)
-            {
-                Visibility viz = Visibility.Collapsed;
-                if (((EditProgram == i) && !EditCMS.Programs[0].IsDefault) ||
-                    ((EditProgram != i) && !Config.CMS.Programs[i].IsDefault))
-                {
-                    viz = Visibility.Visible;
-                }
-                _pgmSelComboIcons[i].Visibility = viz;
-            }
+            Utilities.SetBulletsInBulletComboBox(uiPgmSelectCombo,
+                                                 (int i) => (((EditProgram == i) && !EditCMS.Programs[0].IsDefault) ||
+                                                             ((EditProgram != i) && !Config.CMS.Programs[i].IsDefault)));
         }
 
         /// <summary>
@@ -522,6 +509,11 @@ namespace JAFDTC.UI.FA18C
 
             Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, CMSSystem.SystemTag,
                                            _configNameList, _configNameToUID);
+
+            List<FrameworkElement> items = new();
+            for (int i = (int)ProgramNumbers.PROG1; i <= (int)ProgramNumbers.PROG5 ; i++)
+                items.Add(Utilities.BulletComboBoxItem($"PROG {i+1}", i.ToString()));
+            uiPgmSelectCombo.ItemsSource = items;
 
             CopyConfigToEdit(EditProgram);
 
