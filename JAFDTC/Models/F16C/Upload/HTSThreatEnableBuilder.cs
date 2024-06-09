@@ -26,14 +26,14 @@ using System.Text;
 namespace JAFDTC.Models.F16C.Upload
 {
     /// <summary>
-    /// builder to generate the command stream to configure hts enabled threat tables via the hts format. the command
-    /// stream is built assuming the hts format is selected on one of the viper's mfds. the builder requires the
-    /// following state:
+    /// builder to generate the command stream to configure the hts enabled threat tables via the hts format on the
+    /// mfd. the command stream is built assuming the hts format is selected on one of the viper's mfds. the builder
+    /// requires the following state:
     /// 
     ///     mfdSide: string
     ///         identifies the mfd that displays the hts page, legal values are "left" or "right"
     ///
-    /// builder will restore the hts format to the base hts page.
+    /// builder restores the hts format to the base hts page.
     /// </summary>
     internal class HTSThreatEnableBuilder : F16CBuilderBase, IBuilder
     {
@@ -51,8 +51,8 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public HTSThreatEnableBuilder(F16CConfiguration cfg, F16CDeviceManager dcsCmds, StringBuilder sb)
-            : base(cfg, dcsCmds, sb)
+        public HTSThreatEnableBuilder(F16CConfiguration cfg, F16CDeviceManager dm, StringBuilder sb)
+            : base(cfg, dm, sb)
         {
             _htsThreatToOSB = new string[]
             {

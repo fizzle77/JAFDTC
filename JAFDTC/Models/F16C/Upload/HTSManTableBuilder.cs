@@ -26,8 +26,9 @@ using System.Text;
 namespace JAFDTC.Models.F16C.Upload
 {
     /// <summary>
-    /// builder to generate the command stream to configure hts manual table through the ded. the builder does not
-    /// require any state to function.
+    /// builder to generate the command stream to configure the hts manual table through the ded/ufc according to an
+    /// F16CConfiguration. the stream returns the ded to its default page. the builder does not require any state to
+    /// function.
     /// </summary>
     internal class HTSManTableBuilder : F16CBuilderBase, IBuilder
     {
@@ -37,8 +38,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public HTSManTableBuilder(F16CConfiguration cfg, F16CDeviceManager dcsCmds, StringBuilder sb)
-            : base(cfg, dcsCmds, sb) { }
+        public HTSManTableBuilder(F16CConfiguration cfg, F16CDeviceManager dm, StringBuilder sb) : base(cfg, dm, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //

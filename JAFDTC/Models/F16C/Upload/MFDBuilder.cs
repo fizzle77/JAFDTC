@@ -27,11 +27,12 @@ using System.Text;
 namespace JAFDTC.Models.F16C.Upload
 {
     /// <summary>
-    /// builder to generate the command stream to configure mfd formats mapped to osbs based on the desired target
-    /// configuration along with the current setup in the avionics. the builder requires the following state:
+    /// builder to generate the command stream to configure the mfd formats mapped to osb 12-14 along with the
+    /// selected format for each master mode through the mfds according to an F16CConfiguration. the stream returns
+    /// the master mode to nav. the builder requires the following state:
     /// 
     ///     MFDModeConfig.{mode}: MFDModeConfiguration
-    ///         value carries current mfd formats for master mode "mode" (MFDSystem.MasterModes)
+    ///         default format and current mfd formats for master mode "mode" (MFDSystem.MasterModes)
     ///
     /// see MFDStateQueryBuilder for further details.
     /// </summary>
@@ -87,7 +88,7 @@ namespace JAFDTC.Models.F16C.Upload
         /// is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// 
         ///     MFDModeConfig.{mode}, MFDModeConfiguration
-        ///         value carries current mfd formats for master mode "mode" (MFDSystem.MasterModes)
+        ///         default format and current mfd formats for master mode "mode" (MFDSystem.MasterModes)
         /// 
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)

@@ -29,8 +29,9 @@ using System.Text;
 namespace JAFDTC.Models.F16C.Upload
 {
     /// <summary>
-    /// command builder for the radio system (com1/com2 uhf/vhf radios) in the viper. translates radio setup in
-    /// F16CConfiguration into commands that drive the dcs clickable cockpit.
+    /// builder to generate the command stream to configure the radios through the ded/ufc (com1/2 uhf/vhf) according
+    /// to an F16CConfiguration. the stream returns the ded to its default page. the builder does not require any
+    /// state to function.
     /// </summary>
     internal class RadioBuilder : F16CBuilderBase, IBuilder
     {
@@ -40,7 +41,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public RadioBuilder(F16CConfiguration cfg, F16CDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public RadioBuilder(F16CConfiguration cfg, F16CDeviceManager dm, StringBuilder sb) : base(cfg, dm, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //

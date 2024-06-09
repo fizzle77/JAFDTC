@@ -99,7 +99,7 @@ namespace JAFDTC.Models.F16C
         // ------------------------------------------------------------------------------------------------------------
 
         private readonly F16CConfiguration _cfg;
-        private readonly F16CDeviceManager _dcsCmds;
+        private readonly F16CDeviceManager _dm;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -107,7 +107,7 @@ namespace JAFDTC.Models.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F16CUploadAgent(F16CConfiguration cfg) => (_cfg, _dcsCmds) = (cfg, new F16CDeviceManager());
+        public F16CUploadAgent(F16CConfiguration cfg) => (_cfg, _dm) = (cfg, new F16CDeviceManager());
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -120,10 +120,10 @@ namespace JAFDTC.Models.F16C
             // perform state queries to capture current avionics state that we are interested in including the mfd
             // format setup and the munitions on jet according to sms pages.
             //
-            MFDStateQueryBuilder queryMFD = new(_dcsCmds, null);
+            MFDStateQueryBuilder queryMFD = new(_dm, null);
             Dictionary<string, object> state = queryMFD.QueryCurrentMFDStateForAllModes();
 
-            SMSStateQueryBuilder querySMS = new(_dcsCmds, null);
+            SMSStateQueryBuilder querySMS = new(_dm, null);
             state = querySMS.QuerySMSMunitionsForMode(MFDSystem.MasterModes.ICP_AG, state);
             // TODO: maybe add this when munitions handle a2a weapons too?
             // state = querySMS.QuerySMSMunitionsForMode(MFDSystem.MasterModes.ICP_AA, state);
@@ -131,24 +131,24 @@ namespace JAFDTC.Models.F16C
             // build the command stream to set up the jet. we will use the query state collected above to drive
             // decisions around how to twiddle the buttons in the jet.
             //
-            new RadioBuilder(_cfg, _dcsCmds, sb).Build(state);
-            new MiscBuilder(_cfg, _dcsCmds, sb).Build(state);
-            new CMDSBuilder(_cfg, _dcsCmds, sb).Build(state);
+            new RadioBuilder(_cfg, _dm, sb).Build(state);
+            new MiscBuilder(_cfg, _dm, sb).Build(state);
+            new CMDSBuilder(_cfg, _dm, sb).Build(state);
             //
             // NOTE: hts must be done before mfd as mfd can set the man hts threat class which is only available if
             // NOTE: the hts manual table has been set up.
             //
             // NOTE: mfd will invoke the sms builder if there are sms changes and the sms page is selected
             //
-            new HTSManTableBuilder(_cfg, _dcsCmds, sb).Build(state);
-            new MFDBuilder(_cfg, _dcsCmds, sb).Build(state);
-            new HARMBuilder(_cfg, _dcsCmds, sb).Build(state);
-            new DLNKBuilder(_cfg, _dcsCmds, sb).Build(state);
-            new STPTBuilder(_cfg, _dcsCmds, sb).Build(state);
+            new HTSManTableBuilder(_cfg, _dm, sb).Build(state);
+            new MFDBuilder(_cfg, _dm, sb).Build(state);
+            new HARMBuilder(_cfg, _dm, sb).Build(state);
+            new DLNKBuilder(_cfg, _dm, sb).Build(state);
+            new STPTBuilder(_cfg, _dm, sb).Build(state);
         }
 
-        public override IBuilder SetupBuilder(StringBuilder sb) => new F16CSetupBuilder(_dcsCmds, sb);
+        public override IBuilder SetupBuilder(StringBuilder sb) => new F16CSetupBuilder(_dm, sb);
 
-        public override IBuilder TeardownBuilder(StringBuilder sb) => new F16CTeardownBuilder(_cfg, _dcsCmds, sb);
+        public override IBuilder TeardownBuilder(StringBuilder sb) => new F16CTeardownBuilder(_cfg, _dm, sb);
     }
 }

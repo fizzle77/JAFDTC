@@ -26,8 +26,8 @@ using System.Text;
 namespace JAFDTC.Models.F16C.Upload
 {
     /// <summary>
-    /// abstract base class for the viper command builder functionality. all system-specific viper command builders
-    /// derive from this class.
+    /// abstract base class for the viper command builder functionality. this class provides support for common
+    /// interactions with the avionics. all system-specific viper command builders derive from this class.
     /// </summary>
     internal abstract class F16CBuilderBase : BuilderBase, IBuilder
     {
@@ -45,7 +45,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public F16CBuilderBase(F16CConfiguration cfg, F16CDeviceManager dcsCmds, StringBuilder sb) : base(dcsCmds, sb)
+        public F16CBuilderBase(F16CConfiguration cfg, F16CDeviceManager dm, StringBuilder sb) : base(dm, sb)
             => (_cfg) = (cfg);
 
         // ------------------------------------------------------------------------------------------------------------

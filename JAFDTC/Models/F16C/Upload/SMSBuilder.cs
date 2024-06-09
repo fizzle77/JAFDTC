@@ -29,9 +29,9 @@ using static JAFDTC.Models.F16C.SMS.SMSSystem;
 namespace JAFDTC.Models.F16C.Upload
 {
     /// <summary>
-    /// builder to generate the command stream to configure sms munitions. the command stream is built assuming the
-    /// avionics are on the sms page that owns the munitions at the point the stream begins. the builder requires
-    /// the following state:
+    /// builder to generate the command stream to configure the sms munitions via the sms format on the mfd. the
+    /// command stream is built assuming the sms format is selected on one of the viper's mfds. the builder
+    /// requires the following state:
     ///
     ///     SMSMuni.{mode}.mfdSide: string
     ///         identifies mfd that displays the hts page in "mode", legal values are "left" or "right"
@@ -122,7 +122,8 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public SMSBuilder(F16CConfiguration cfg, F16CDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb)
+        public SMSBuilder(F16CConfiguration cfg, F16CDeviceManager dm, StringBuilder sb)
+            : base(cfg, dm, sb)
         {
             _munitionDb = FileManager.LoadF16CMunitions();
         }

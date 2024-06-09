@@ -27,8 +27,9 @@ using System.Text;
 namespace JAFDTC.Models.F16C.Upload
 {
     /// <summary>
-    /// command builder for the miscellaneous setups in the viper (TACAN/ILS, ALOW, BINDO, LASR, BULLS, and HMCS).
-    /// translates cmds setup in F16CConfiguration into commands that drive the dcs clickable cockpit.
+    /// builder to generate the command stream to configure the miscellaneous systems through the ded/ufc (TACAN/ILS,
+    /// ALOW, BINDO, LASR, BULLS, and HMCS) according to an F16CConfiguration. the stream returns the ded to its
+    /// default page. the builder does not require any state to function.
     /// </summary>
     internal class MiscBuilder : F16CBuilderBase, IBuilder
     {
@@ -38,7 +39,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public MiscBuilder(F16CConfiguration cfg, F16CDeviceManager dcsCmds, StringBuilder sb) : base(cfg, dcsCmds, sb) { }
+        public MiscBuilder(F16CConfiguration cfg, F16CDeviceManager dm, StringBuilder sb) : base(cfg, dm, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //

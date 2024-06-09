@@ -51,7 +51,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public SMSStateQueryBuilder(IAirframeDeviceManager dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
+        public SMSStateQueryBuilder(IAirframeDeviceManager dm, StringBuilder sb) : base(dm, sb) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //

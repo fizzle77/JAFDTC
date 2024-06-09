@@ -31,10 +31,10 @@ namespace JAFDTC.Models.F16C.Upload
     /// with selected format) across all master modes. this class produces a state dictionary with,
     /// 
     ///     MFDModeConfig.{mode}: MFDModeConfiguration
-    ///         value carries current mfd formats for master mode "mode" (MFDSystem.MasterModes)
+    ///         default format and current mfd formats for master mode "mode" (MFDSystem.MasterModes)
     /// 
     /// entries for each master mode. if unable to establish the setup on the jet for a given mode, the default setup
-    /// is returned.
+    /// for the master mode is returned.
     /// </summary>
     internal class MFDStateQueryBuilder : QueryBuilderBase, IBuilder
     {
@@ -52,7 +52,7 @@ namespace JAFDTC.Models.F16C.Upload
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public MFDStateQueryBuilder(IAirframeDeviceManager dcsCmds, StringBuilder sb) : base(dcsCmds, sb)
+        public MFDStateQueryBuilder(IAirframeDeviceManager dm, StringBuilder sb) : base(dm, sb)
         {
             _mapDCSFmtToDispFmt = new()
             {
