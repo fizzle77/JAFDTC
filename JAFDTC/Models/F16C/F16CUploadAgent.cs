@@ -140,7 +140,7 @@ namespace JAFDTC.Models.F16C
             //
             // NOTE: mfd will invoke the sms builder if there are sms changes and the sms page is selected
             //
-            new HTSBuilder(_cfg, _dcsCmds, sb).Build(state);
+            new HTSManTableBuilder(_cfg, _dcsCmds, sb).Build(state);
             new MFDBuilder(_cfg, _dcsCmds, sb).Build(state);
             new HARMBuilder(_cfg, _dcsCmds, sb).Build(state);
             new DLNKBuilder(_cfg, _dcsCmds, sb).Build(state);
