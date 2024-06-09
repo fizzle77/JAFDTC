@@ -115,8 +115,12 @@ namespace JAFDTC.Models.F16C.Upload
             {
                 AddQuery("QuerySMSMuniState", new() { mfdSide });
                 munition = Query();
-                if (!string.IsNullOrEmpty(munition) && ((munitions.Count == 0) || (munition != munitions[0])))
+                if (!string.IsNullOrEmpty(munition) &&
+                    (munition != "0") &&
+                    ((munitions.Count == 0) || (munition != munitions[0])))
+                {
                     munitions.Add(munition);
+                }
                 else
                     break;
 
