@@ -29,6 +29,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.UI.Dispatching;
+using System.Threading.Tasks;
 
 namespace JAFDTC.UI.Base
 {
@@ -559,10 +560,12 @@ namespace JAFDTC.UI.Base
                 else if (combo == null)
                 {
                     // list view's view hierarchy hasn't been built out yet, revisit this setup later once the
-                    // hierarchy is built.
+                    // hierarchy is built (which it will be, eventually). we'll wait a jiffy before trying again to
+                    // avoid pestering the framework too much: "ARE WE THERE YET?!?".
                     //
-                    DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+                    DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, async () =>
                     {
+                        await Task.Delay(250);
                         RebuildModulationSelections();
                     });
                     break;
