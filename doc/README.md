@@ -64,6 +64,19 @@ supports sharing and exchanging information through various UI functions.
 > As with all things, there are exceptions. A good general rule is if the JAFDTC UI can do
 > something, use the UI and don't try to work around it.
 
+### Avionics Defaults
+
+A configurable parameter has a "default" state that corresponds to the state DCS models when
+the jet comes out of a cold start in the absence of specific input by the pilot. Pilot
+actions may change these values. Generally, JAFDTC has knowledge of default values for a
+parameter, but may lack visibility into its "current" value.
+
+Because of this, setting a parameter to a "default" value generally implies that JAFDTC will
+not change the parameter from its *current* value in the avionics even if the current value
+does not match the cold start value. Throughout this document, we will use "default" under
+the assumption that the pilot has not changed parameters (so "default" and "current" are the
+same value.
+
 ## Linking Systems
 
 JAFDTC allows you to link *System Configurations* between different *Configurations* for the
@@ -73,12 +86,15 @@ reflected in all linked systems.
 > Links allow you to "compose" configurations from shared setups.
 
 Links are tracked per system. That is, Systems X and Y in Configuration A can be linked
-to different configurations if desired. Once linked, changes to a system are pushed to all
-linked systems regardless of whehter they are linked directly or indirectly.
+to those systems in a different configurations if desired. Once linked, changes to a system
+are pushed to all linked systems regardless of whehter they are linked directly or
+indirectly.
 
 > For example, say System X in Configuration A is linked to Configuration B and System X in
-> Configuration B is linked to Configuration C. Changes to System X in Configuration
-> C will be reflected in both the Configraution A and B setups for System X.
+> Configuration B is linked to Configuration C.
+>
+> Changes to System X in Configuration C will be reflected in System X in both Configraution
+> A and B.
 
 Breaking a link preserves the configuration of a linked system at the time the link is
 broken. This is, if systems in Configuration A are linked to Configuration B and you delete
@@ -87,8 +103,9 @@ deleted.
 
 > Links are **not** preserved across configuration exports and imports.
 
-While linked, edits to the system configuration are disabled (the system configuration is
-edited through the source configuration).
+Linked systems are always edited in the source configuration. The system editors in linked
+configurations will be read-only while the editor in the source configuration will allow
+changes to be made.
 
 Links are particularly useful when you have setups that you tend to reuse often. For example,
 you might want to always configure your cockpit displays one way for A2G sorties and another
@@ -283,9 +300,10 @@ The command bar includes the following commands,
 
 > Importing a configuration breaks any
 > [links](#linking-systems)
-> to other configurations that may have been in place at the time of export. The configuration
-> will match the linked configuration at export, but will no longer update when changes are
-> made to the source.
+> to other configurations that may have been in place at the time of export as
+> [mentioned earlier](#linking-systems).
+> The configuration will match the linked configuration at export, but will no longer update
+> when changes are made to the source.
 
 The overflow menu (exposed by clicking on the "`...`" button) holds three commands,
 
@@ -533,7 +551,7 @@ there, move on to the airframe guides for airframes of interest,
 
 | Airframe | Systems JAFDTC Can Configure |
 |:--------:|------------------------------|
-| [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | DSMS, HMCS, Radios, TAD, TGP, Waypoints, Miscellaneous Systems
+| [A-10C Warthog](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_A10C.md) | DSMS, HMCS, IFFCC, Radios, TAD, TGP, Waypoints, Miscellaneous Systems
 | [AV-8B Harrier](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_AV8B.md) | Waypoints
 | [F-14A/B Tomcat](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F14AB.md) | Waypoints
 | [F-15E Strike Eagle](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Airframe_F15E.md) | MPD/MPCD Formats, Radios, Steerpoints, Miscellaneous Systems

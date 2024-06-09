@@ -65,7 +65,7 @@ The communications configuration allow you to update the presets and initial con
 the COM1/COM1 radios in the Viper. This configuration includes the presets as well as the
 initial radio frequency and guard monitor.
 This editor extends the interface of the common communication system editor the
-[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#communications-system-editors)
+[_User's Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#communications-system-editors)
 describes.
 
 ![](images/Viper_Sys_COMM.png)
@@ -371,6 +371,13 @@ common controls implement the link and reset functionality described
 
 ## SMS Munitions
 
+The SMS munitions configuration allows you to specify munition parameters (for example, the
+employment mode or arming delay) for munitions loaded on the jet.
+
+TODO
+
+![](images/Viper_Sys_SMS.png)
+
 TODO
 
 ## Steerpoints
@@ -378,14 +385,14 @@ TODO
 The steerpoint configuration allows you to update the navigation system on the Viper. This
 configuration includes steerpoints as well as OAP, VIP, and VRP points relative to a
 steerpoint. This editor extends the interface of the common navigation system editor the
-[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#navigation-system-editors)
+[_User's Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#navigation-system-editors)
 describes.
 
 ### Steerpoint List User Interface
 
 The *Steerpoint List* editor lists the steerpoints currently known to the configuration.
 This editor extends the interface of the common *Navigation Point List* the
-[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#navigation-point-list)
+[_User's Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#navigation-point-list)
 describes.
 
 ![](images/Viper_Sys_STPT_List.png)
@@ -412,7 +419,7 @@ the same as the common navigation point list.
 The *Steerpoint* editor edits a steerpoint currently known to the configuration along with any
 associated referenced points. This editor extends the interface of the common
 *Navigation Point Editor* the
-[user's guide](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#navigation-point-editor)
+[_User's Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#navigation-point-editor)
 describes.
 
 ![](images/Viper_Sys_STPT.png)

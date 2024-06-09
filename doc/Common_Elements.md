@@ -33,10 +33,18 @@ do so, four conditions must hold,
 
 The
 [status area](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#status-area)
-in the lower left corner of the *Configuration List Page* indicates the status of these
-conditions.
+in the lower left corner of the
+[*Configuration List Page*](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#configuration-list-page)
+indicates the status of these conditions.
 Once these conditions are met, you can use any of the **Load to Jet** buttons in the interface
-to load the currently selected configuration to the jet.
+to load the currently selected configuration to the jet. These buttons use a jet icon and
+indicate the status of the operation as below,
+
+![](images/Core_Base_Upload_Icons.png)
+
+The outline version shows when the jet is unavailable (dimmed) or ready to accept a
+configuration (not dimmed). If the icon is dimmed and filled in, an upload is currently in
+progress.
 
 Generally, the upload should take place before any changes are made to the avionics with all
 relevant systems powered up. Typically, shortly before taxi.

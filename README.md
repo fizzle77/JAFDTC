@@ -5,7 +5,7 @@ Windows 11 that allows you to upload data typically saved on a data cartridge, s
 steerpoints/waypoints and other avionics setup, into a DCS module at the start of a flight. The
 application supports the following DCS airframes and systems,
 
-- *A-10C Warthog* &ndash; DSMS, HMCS, Radios, TGP, Waypoints, Miscellaneous Systems
+- *A-10C Warthog* &ndash; DSMS, HMCS, IFFCC, Radios, TGP, Waypoints, Miscellaneous Systems
 - *AV-8B Harrier* &ndash; Waypoints
 - *F-14A/B Tomcat* &ndash; Waypoints
 - *F-15E Strike Eagle* &ndash; MPD/MPCD Formats, Radios, Steerpoints, Miscellaneous Systems

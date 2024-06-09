@@ -6,6 +6,7 @@ JAFDTC supports configuration of the following systems in the A-10C II Warthog,
 
 * DSMS
 * HMCS
+* IFFCC
 * Radios
 * TAD
 * TGP
@@ -66,6 +67,8 @@ Most of the A-10 systems (everything except the COMM page for the ARC-210) must 
 
 The HMCS system allows modification of every HMCS setting that has a DCS function. If you notice some that are missing, they were omitted for this reason.
 
+![](images/Hawg_Sys_HMCS.png)
+
 Each of the the HMCS profiles' settings can be modified in the middle section of this screen. The tooltips shown by hovering the mouse cursor over each field gives an explanation from the flight manual of each setting's purpose.
 
 Common settings that apply to all profiles are at the bottom of this editor.
@@ -73,6 +76,14 @@ Common settings that apply to all profiles are at the bottom of this editor.
 - **TGP Track** selectss the type of track the TGP will use when initiated from the HMCS with DMS-right-long.
 - **Active Profile** will set one of the three HMCS profiles active when done configuring.
 - **Brightness** selects either DAY or NIGHT brightness levels.
+
+## IFFCC
+
+TODO
+
+![](images/Hawg_Sys_IFFCC.png)
+
+TODO
 
 ## Radios
 
@@ -133,6 +144,8 @@ documentation.
 
 **TAD NET Settings** allow for changing the Group ID, Own, ID, and Callsign used for SADL and datalink. Leaving them blank makes no changes, leaving the mission editor's configuration. Note that given the buggy state of datalink in May 2024, leaving them blank is often the better choice.
 
+![](images/Hawg_Sys_TAD.png)
+
 Most of the display options should be self-evident. **Hook Ownship** will hook your own ship to leave the hook option coordinate display visible. This is useful for e.g. the BULL CURS option, displaying a bullseye reference to your cursor even with nothing else hooked.
 
 JAFDTC does not support creation of additional TAD display profiles, but allows changes to the default, initial profile with settings in the right column.
@@ -140,6 +153,8 @@ JAFDTC does not support creation of additional TAD display profiles, but allows 
 ## TGP
 
 In addition to being on the default right MFD button, the TGP must be fully timed out when its settings are loaded from JAFDTC, or it will be skipped.
+
+![](images/Hawg_Sys_TGP.png)
 
 The settings available in the TGP system editor are mostly self-explanatory, exactly matching commonly set options in the jet. Some less commonly known settings include:
 
