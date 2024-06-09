@@ -696,7 +696,7 @@ namespace JAFDTC.UI.App
                              $"\n" +
                              $"On borrowed time until ED releases their native solution (2 weeks!)...\n" +
                              $"\n" +
-                             $"A Raven / 51st VFW fork";
+                             $"A Raven & fizzle / 51st VFW fork";
             await Utilities.Message1BDialog(Content.XamlRoot, $"JAFDTC {Settings.VersionJAFDTC}", content);
         }
 
