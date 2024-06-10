@@ -18,12 +18,13 @@ https://www.gnu.org/licenses/.
 
 **********************************************************************************************************************
 -->
-<Page
+<ui_base:SystemEditorPageBase
     x:Class="JAFDTC.UI.F16C.F16CEditCMDSPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:JAFDTC.UI.F16C"
     xmlns:ui_base="using:JAFDTC.UI.Base"
+    xmlns:ui_ctrl="using:JAFDTC.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -52,7 +53,7 @@ https://www.gnu.org/licenses/.
 
     </Page.Resources>
 
-    <Grid Margin="16,8,16,8">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -71,12 +72,12 @@ https://www.gnu.org/licenses/.
         row 0-1 : title, bingo fields
         ===============================================================================================================
         -->
-        <TextBlock Grid.Row="0" Grid.Column="0"
+        <TextBlock Grid.Row="0" Grid.Column="0" Margin="12,12,12,0"
                    Style="{StaticResource EditorTitleTextBlockStyle}">
             CM BINGO Thresholds:
         </TextBlock>
         
-        <Grid Grid.Row="1" Grid.Column="0" Margin="12,0,0,0">
+        <Grid Grid.Row="1" Grid.Column="0" Margin="12,0,12,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -95,14 +96,11 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 BINGO for Chaff
             </TextBlock>
-            <TextBox Grid.Row="0" Grid.Column="1" Margin="0,12,0,0"
-                     x:Name="uiChaffValueBingo"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMDS.BingoChaff, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
+            <TextBox Grid.Row="0" Grid.Column="1" Margin="0,12,0,0" Tag="BingoChaff" x:Name="uiChaffValueBingo"
                      HorizontalAlignment="Stretch"
-                     LostFocus="CMDSTextBox_LostFocus"
-                    ToolTipService.ToolTip="TODO"/>
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
+                     ToolTipService.ToolTip="TODO"/>
             <TextBlock Grid.Row="0" Grid.Column="2" Margin="12,12,0,0"
                        VerticalAlignment="Center">
                 chaff
@@ -113,13 +111,10 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 BINGO for Flares
             </TextBlock>
-            <TextBox Grid.Row="0" Grid.Column="5" Margin="0,12,0,0"
-                     x:Name="uiFlareValueBingo"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMDS.BingoFlare, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
+            <TextBox Grid.Row="0" Grid.Column="5" Margin="0,12,0,0" Tag="BingoFlare" x:Name="uiFlareValueBingo"
                      HorizontalAlignment="Stretch"
-                     LostFocus="CMDSTextBox_LostFocus"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
             <TextBlock Grid.Row="0" Grid.Column="6" Margin="12,12,0,0"
                        VerticalAlignment="Center">
@@ -132,29 +127,28 @@ https://www.gnu.org/licenses/.
         row 2 : program select
         ===============================================================================================================
         -->
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="3" Margin="0,40,0,0" Orientation="Horizontal"
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="3" Margin="12,32,12,0" Orientation="Horizontal"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">
             <TextBlock Margin="0,0,12,0" VerticalAlignment="Center">
                 CMDS CM Program
             </TextBlock>
-            <ComboBox Margin="0,0,0,0" Width="150"
-                      x:Name="uiPgmSelectCombo"
+            <ComboBox Margin="0,0,0,0" Width="150" x:Name="uiPgmSelectCombo"
                       VerticalAlignment="Center"
                       SelectionChanged="PgmSelectCombo_SelectionChanged"
                       ToolTipService.ToolTip="Selects CMDS Program to Edit">
                 <!-- ComboBox items are built when page is displayed, Tag is enum ProgramNumbers -->
             </ComboBox>
-            <Button Margin="24,0,6,0" VerticalAlignment="Center"
-                    x:Name="uiPgmPrevBtn"
-                    ToolTipService.ToolTip="Selects Previous CMDS Program"
-                    Click="PgmBtnPrev_Click">
+            <Button Margin="24,0,6,0" x:Name="uiPgmPrevBtn"
+                    VerticalAlignment="Center"
+                    Click="PgmBtnPrev_Click"
+                    ToolTipService.ToolTip="Selects Previous CMDS Program">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
             </Button>
-            <Button VerticalAlignment="Center"
-                    x:Name="uiPgmNextBtn"
-                    ToolTipService.ToolTip="Selects Next CMDS Program"
-                    Click="PgmBtnNext_Click">
+            <Button x:Name="uiPgmNextBtn"
+                    VerticalAlignment="Center"
+                    Click="PgmBtnNext_Click"
+                    ToolTipService.ToolTip="Selects Next CMDS Program">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
             </Button>
         </StackPanel>
@@ -164,7 +158,7 @@ https://www.gnu.org/licenses/.
         row 3 : program parameters
         ===============================================================================================================
         -->
-        <Grid Grid.Row="3" Margin="0,0,0,0">
+        <Grid Grid.Row="3" Margin="12,0,12,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -194,70 +188,52 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Program Burst Quantity
             </TextBlock>
-            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,12,0,0"
-                     x:Name="uiPgmChaffValueBQ"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMDS.Programs[0].Chaff.BQ, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
-                     LostFocus="CMDSTextBox_LostFocus"
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,12,0,0" Tag="Chaff.BQ" x:Name="uiPgmChaffValueBQ"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
-            <TextBlock Grid.Row="1" Grid.Column="2" Margin="12,12,0,0" VerticalAlignment="Center">chaff</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="2" Margin="6,12,0,0" VerticalAlignment="Center">chaff</TextBlock>
 
             <!-- CHAFF BI -->
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,12,12,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Program Burst Interval
             </TextBlock>
-            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,12,0,0"
-                     x:Name="uiPgmChaffValueBI"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMDS.Programs[0].Chaff.BI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
-                     LostFocus="CMDSTextBox_LostFocus"
+            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,12,0,0" Tag="Chaff.BI" x:Name="uiPgmChaffValueBI"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
-            <TextBlock Grid.Row="2" Grid.Column="2" Margin="12,12,0,0" VerticalAlignment="Center">seconds</TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="2" Margin="6,12,0,0" VerticalAlignment="Center">seconds</TextBlock>
 
             <!-- CHAFF SQ -->
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,12,12,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Program Salvo Quanity
             </TextBlock>
-            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,12,0,0"
-                     x:Name="uiPgmChaffValueSQ"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMDS.Programs[0].Chaff.SQ, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
-                     LostFocus="CMDSTextBox_LostFocus"
+            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,12,0,0" Tag="Chaff.SQ" x:Name="uiPgmChaffValueSQ"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
-            <TextBlock Grid.Row="3" Grid.Column="2" Margin="12,12,0,0" VerticalAlignment="Center">bursts</TextBlock>
+            <TextBlock Grid.Row="3" Grid.Column="2" Margin="6,12,0,0" VerticalAlignment="Center">bursts</TextBlock>
 
             <!-- CHAFF SI -->
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="0,12,12,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Program Salvo Interval
             </TextBlock>
-            <TextBox Grid.Row="4" Grid.Column="1" Margin="0,12,0,0"
-                     x:Name="uiPgmChaffValueSI"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMDS.Programs[0].Chaff.SI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
-                     LostFocus="CMDSTextBox_LostFocus"
+            <TextBox Grid.Row="4" Grid.Column="1" Margin="0,12,0,0" Tag="Chaff.SI" x:Name="uiPgmChaffValueSI"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
-            <TextBlock Grid.Row="4" Grid.Column="2" Margin="12,12,0,0" VerticalAlignment="Center">seconds</TextBlock>
+            <TextBlock Grid.Row="4" Grid.Column="2" Margin="6,12,0,0" VerticalAlignment="Center">seconds</TextBlock>
 
             <!-- CHAFF program reset -->
-            <Button Grid.Row="5" Grid.Column="1" Margin="0,12,0,0"
-                    x:Name="uiPgmChaffBtnReset"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Stretch"
+            <Button Grid.Row="5" Grid.Column="1" Margin="0,12,0,0" x:Name="uiPgmChaffBtnReset"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Center"
                     Click="PgmChaffBtnReset_Click"
                     ToolTipService.ToolTip="TODO">
                 <StackPanel Orientation="Horizontal">
@@ -278,70 +254,52 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Program Burst Quantity
             </TextBlock>
-            <TextBox Grid.Row="1" Grid.Column="5" Margin="0,12,0,0"
-                     x:Name="uiPgmFlareValueBQ"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMDS.Programs[0].Flare.BQ, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
-                     LostFocus="CMDSTextBox_LostFocus"
+            <TextBox Grid.Row="1" Grid.Column="5" Margin="0,12,0,0" Tag="Flare.BQ" x:Name="uiPgmFlareValueBQ"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
-            <TextBlock Grid.Row="1" Grid.Column="6" Margin="12,12,0,0" VerticalAlignment="Center">flares</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="6" Margin="6,12,0,0" VerticalAlignment="Center">flares</TextBlock>
 
             <!-- FLARE BI -->
             <TextBlock Grid.Row="2" Grid.Column="4" Margin="0,12,12,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Program Burst Interval
             </TextBlock>
-            <TextBox Grid.Row="2" Grid.Column="5" Margin="0,12,0,0"
-                     x:Name="uiPgmFlareValueBI"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMDS.Programs[0].Flare.BI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
-                     LostFocus="CMDSTextBox_LostFocus"
+            <TextBox Grid.Row="2" Grid.Column="5" Margin="0,12,0,0" Tag="Flare.BI" x:Name="uiPgmFlareValueBI"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
-            <TextBlock Grid.Row="2" Grid.Column="6" Margin="12,12,0,0" VerticalAlignment="Center">seconds</TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="6" Margin="6,12,0,0" VerticalAlignment="Center">seconds</TextBlock>
 
             <!-- FLARE SQ -->
             <TextBlock Grid.Row="3" Grid.Column="4" Margin="0,12,12,0"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                  Program Salvo Quanity
             </TextBlock>
-            <TextBox Grid.Row="3" Grid.Column="5" Margin="0,12,0,0"
-                     x:Name="uiPgmFlareValueSQ"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMDS.Programs[0].Flare.SQ, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
-                     LostFocus="CMDSTextBox_LostFocus"
+            <TextBox Grid.Row="3" Grid.Column="5" Margin="0,12,0,0" Tag="Flare.SQ" x:Name="uiPgmFlareValueSQ"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
-            <TextBlock Grid.Row="3" Grid.Column="6" Margin="12,12,0,0" VerticalAlignment="Center">bursts</TextBlock>
+            <TextBlock Grid.Row="3" Grid.Column="6" Margin="6,12,0,0" VerticalAlignment="Center">bursts</TextBlock>
 
             <!-- FLARE SI -->
             <TextBlock Grid.Row="4" Grid.Column="4" Margin="0,12,12,0" 
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Program Salvo Interval
             </TextBlock>
-            <TextBox Grid.Row="4" Grid.Column="5" Margin="0,12,0,0"
-                     x:Name="uiPgmFlareValueSI"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditCMDS.Programs[0].Flare.SI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     MaxLength="8"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
-                     LostFocus="CMDSTextBox_LostFocus"
+            <TextBox Grid.Row="4" Grid.Column="5" Margin="0,12,0,0" Tag="Flare.SI" x:Name="uiPgmFlareValueSI"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="8"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="TODO"/>
-            <TextBlock Grid.Row="4" Grid.Column="6" Margin="12,12,0,0" VerticalAlignment="Center">seconds</TextBlock>
+            <TextBlock Grid.Row="4" Grid.Column="6" Margin="6,12,0,0" VerticalAlignment="Center">seconds</TextBlock>
 
             <!-- FLARE program reset -->
-            <Button Grid.Row="5" Grid.Column="5" Margin="0,12,0,0"
-                    x:Name="uiPgmFlareBtnReset"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Stretch"
+            <Button Grid.Row="5" Grid.Column="5" Margin="0,12,0,0" x:Name="uiPgmFlareBtnReset"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Center"
                     Click="PgmFlareBtnReset_Click"
                     ToolTipService.ToolTip="TODO">
                 <StackPanel Orientation="Horizontal">
@@ -396,53 +354,10 @@ https://www.gnu.org/licenses/.
 
         <!--
         ===============================================================================================================
-        row 6 : link / reset
+        common editor controls 
         ===============================================================================================================
         -->
-        <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <ui_ctrl:LinkResetBtnsControl Grid.Row="6" Grid.Column="0" Margin="0,0,0,0" x:Name="uiCtlLinkResetBtns"/>
 
-            <StackPanel Grid.Column="0"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
-                <Button Width="140"
-                        x:Name="uiPageBtnLink"
-                        Click="PageBtnLink_Click"
-                        ToolTipService.ToolTip="Link or unlink this system to/from another configuration">
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE71B;"/>
-                        <TextBlock VerticalAlignment="center"
-                                   x:Name="uiPageBtnTxtLink">
-                            FIXUP
-                        </TextBlock>
-                    </StackPanel>
-                </Button>
-                <TextBlock Margin="12,0,24,0"
-                           x:Name="uiPageTxtLink"
-                           VerticalAlignment="center">
-                    FIXUP
-                </TextBlock>
-            </StackPanel>
-
-            <StackPanel Grid.Column="1"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
-                <Button x:Name="uiPageBtnResetAll"
-                        Click="PageBtnResetAll_Click"
-                        ToolTipService.ToolTip="Reset the configuration of this system to its defaults">
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
-                        <TextBlock VerticalAlignment="center">
-                            Reset Page to Defaults
-                        </TextBlock>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Grid>
     </Grid>
-</Page>
+</ui_base:SystemEditorPageBase>

@@ -38,7 +38,7 @@ namespace JAFDTC.Models.F16C.CMDS
     /// class to capture the settings of the CMDS system. most CMDS fields are encoded as strings. a field value of
     /// "" implies that the field is set to the default value in the avionics.
     /// </summary>
-    public class CMDSSystem : BindableObject, ISystem
+    public class CMDSSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:F16C:CMDS";
 
@@ -117,7 +117,7 @@ namespace JAFDTC.Models.F16C.CMDS
         // returns true if the instance indicates a default setup (all fields are ""), false otherwise.
         //
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get
             {
@@ -145,12 +145,12 @@ namespace JAFDTC.Models.F16C.CMDS
             BingoFlare = "";
             Programs = new CMDSProgram[6]
             {
-                new CMDSProgram((int) ProgramNumbers.MAN1),
-                new CMDSProgram((int) ProgramNumbers.MAN2),
-                new CMDSProgram((int) ProgramNumbers.MAN3),
-                new CMDSProgram((int) ProgramNumbers.MAN4),
-                new CMDSProgram((int) ProgramNumbers.PANIC),
-                new CMDSProgram((int) ProgramNumbers.BYPASS),
+                new((int)ProgramNumbers.MAN1),
+                new((int)ProgramNumbers.MAN2),
+                new((int)ProgramNumbers.MAN3),
+                new((int)ProgramNumbers.MAN4),
+                new((int)ProgramNumbers.PANIC),
+                new((int)ProgramNumbers.BYPASS),
             };
         }
 
@@ -160,12 +160,12 @@ namespace JAFDTC.Models.F16C.CMDS
             BingoFlare = new(other.BingoFlare);
             Programs = new CMDSProgram[6]
             {
-                new CMDSProgram(other.Programs[(int)ProgramNumbers.MAN1]),
-                new CMDSProgram(other.Programs[(int)ProgramNumbers.MAN2]),
-                new CMDSProgram(other.Programs[(int)ProgramNumbers.MAN3]),
-                new CMDSProgram(other.Programs[(int)ProgramNumbers.MAN4]),
-                new CMDSProgram(other.Programs[(int)ProgramNumbers.PANIC]),
-                new CMDSProgram(other.Programs[(int)ProgramNumbers.BYPASS]),
+                new(other.Programs[(int)ProgramNumbers.MAN1]),
+                new(other.Programs[(int)ProgramNumbers.MAN2]),
+                new(other.Programs[(int)ProgramNumbers.MAN3]),
+                new(other.Programs[(int)ProgramNumbers.MAN4]),
+                new(other.Programs[(int)ProgramNumbers.PANIC]),
+                new(other.Programs[(int)ProgramNumbers.BYPASS]),
             };
         }
 
@@ -180,7 +180,7 @@ namespace JAFDTC.Models.F16C.CMDS
         // reset the instance to defaults (by definition, field value of "" implies default). table numbers are not
         // changed by this operation.
         //
-        public void Reset()
+        public override void Reset()
         {
             BingoChaff = "";
             BingoFlare = "";
