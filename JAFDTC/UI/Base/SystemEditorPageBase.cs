@@ -372,13 +372,19 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected virtual void SaveEditStateToConfig()
         {
-            if ((EditState != null) && !EditState.HasErrors && !IsUIRebuilding)
+            if ((EditState != null) && !EditStateHasErrors() && !IsUIRebuilding)
             {
                 CopyAllSettings(SettingLocation.Edit, SettingLocation.Config, true);
                 Config.Save(this, SystemTag);
             }
             UpdateUIFromEditState();
         }
+
+        /// <summary>
+        /// return true if the current editor state has errors, false otherwise. base class simply checks HasErrors
+        /// on the edit state. derived classes may override this to do more complex checking as needed.
+        /// </summary>
+        protected virtual bool EditStateHasErrors() => EditState.HasErrors;
 
         /// <summary>
         /// Iterate over all the settings controls via PageTextBoxes, PageComboBoxes, and PageCheckBoxes. For each
