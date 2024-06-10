@@ -257,7 +257,7 @@ https://www.gnu.org/licenses/.
             <TextBox Grid.Row="7" Grid.Column="1" Margin="12,12,0,0" Tag="ArmDelay" x:Name="uiValueArmDelay"
                      VerticalAlignment="Center"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
-                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                     Style="{ThemeResource EditorParamEditTextBoxStyle}"/>
             <TextBlock Grid.Row="7" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelArmDelayUnits"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
@@ -291,7 +291,7 @@ https://www.gnu.org/licenses/.
                      VerticalAlignment="Center"
                      MaxLength="5" PlaceholderText="4.00"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
-                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                     Style="{ThemeResource EditorParamEditTextBoxStyle}"/>
             <TextBlock Grid.Row="9" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelArmDelay2Units"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
@@ -307,7 +307,7 @@ https://www.gnu.org/licenses/.
             <TextBox Grid.Row="10" Grid.Column="1" Margin="12,12,0,0" Tag="BurstAlt" x:Name="uiValueBurstAlt"
                      VerticalAlignment="Center"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
-                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                     Style="{ThemeResource EditorParamEditTextBoxStyle}"/>
             <TextBlock Grid.Row="10" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelBurstAltUnits"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
@@ -323,7 +323,7 @@ https://www.gnu.org/licenses/.
             <TextBox Grid.Row="11" Grid.Column="1" Margin="12,12,0,0" Tag="ReleaseAng" x:Name="uiValueReleaseAng"
                      VerticalAlignment="Center"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
-                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                     Style="{ThemeResource EditorParamEditTextBoxStyle}"/>
             <TextBlock Grid.Row="11" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelReleaseAngUnits"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
@@ -340,7 +340,7 @@ https://www.gnu.org/licenses/.
                      VerticalAlignment="Center"
                      MaxLength="2" PlaceholderText="60" 
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
-                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                     Style="{ThemeResource EditorParamEditTextBoxStyle}"/>
             <TextBlock Grid.Row="12" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelImpactAngUnits"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
@@ -357,7 +357,7 @@ https://www.gnu.org/licenses/.
                      VerticalAlignment="Center"
                      MaxLength="3" PlaceholderText="0"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
-                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                     Style="{ThemeResource EditorParamEditTextBoxStyle}"/>
             <TextBlock Grid.Row="13" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelImpactAziUnits"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
@@ -374,7 +374,7 @@ https://www.gnu.org/licenses/.
                      VerticalAlignment="Center"
                      MaxLength="4" PlaceholderText="700"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
-                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                     Style="{ThemeResource EditorParamEditTextBoxStyle}"/>
             <TextBlock Grid.Row="14" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelImpactVelUnits"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
@@ -391,7 +391,7 @@ https://www.gnu.org/licenses/.
                      VerticalAlignment="Center"
                      MaxLength="7" PlaceholderText="4.0000"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
-                     Style="{ThemeResource EditorParamStaticTextBlockStyle}"/>
+                     Style="{ThemeResource EditorParamEditTextBoxStyle}"/>
             <TextBlock Grid.Row="15" Grid.Column="2" Margin="6,12,0,0" x:Name="uiLabelCueRngUnits"
                        VerticalAlignment="Center" HorizontalAlignment="Left"
                        Style="{ThemeResource EditorParamStaticTextBlockStyle}">
