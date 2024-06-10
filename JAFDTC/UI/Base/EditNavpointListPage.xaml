@@ -40,10 +40,11 @@ https://www.gnu.org/licenses/.
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- =======================================================================================
-             row 0 : command bar
-             =======================================================================================
-          -->
+        <!--
+        ===============================================================================================================
+        row 0 : command bar
+        ===============================================================================================================
+        -->
         <CommandBar Grid.Row="0" Margin="0,8,0,0"
                     HorizontalAlignment="Center">
             <AppBarButton x:Name="uiBarAdd" Icon="Add" Label="Add"
@@ -83,11 +84,11 @@ https://www.gnu.org/licenses/.
             <AppBarSeparator/>
         </CommandBar>
 
-        <!-- =======================================================================================
-             row 1 : list view
-             =======================================================================================
-          -->
-
+        <!--
+        ===============================================================================================================
+        row 1 : list view
+        ===============================================================================================================
+        -->
         <Grid Grid.Row="1" Margin="0,12,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -174,8 +175,7 @@ https://www.gnu.org/licenses/.
         common editor controls 
         ===============================================================================================================
         -->
-        <controls:LinkResetBtnsControl x:Name="uiCtlLinkResetBtns" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-              Margin="0,0,0,0"/>
+        <controls:LinkResetBtnsControl x:Name="uiCtlLinkResetBtns" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
 
     </Grid>
 </ui_base:SystemEditorPageBase>
