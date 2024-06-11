@@ -3,7 +3,7 @@
 // HARMSystem.cs -- f-16c harm (alic) system configuration
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,7 +18,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 
@@ -34,7 +33,7 @@ namespace JAFDTC.Models.F16C.HARM
     /// <summary>
     /// TODO: document
     /// </summary>
-	public class HARMSystem : BindableObject, ISystem
+	public class HARMSystem : SystemBase
 	{
         public const string SystemTag = "JAFDTC:F16C:HARM";
 
@@ -64,17 +63,13 @@ namespace JAFDTC.Models.F16C.HARM
         // returns true if the instance indicates a default setup (all fields are ""), false otherwise.
         //
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get
             {
 				foreach (ALICTable table in Tables)
-				{
                     if (!table.IsDefault)
-                    {
 						return false;
-                    }
-                }
 				return true;
             }
         }
@@ -89,9 +84,9 @@ namespace JAFDTC.Models.F16C.HARM
 		{
             Tables = new ALICTable[3]
             {
-                new((int) TableNumbers.TABLE1),
-                new((int) TableNumbers.TABLE2),
-                new((int) TableNumbers.TABLE3),
+                new((int)TableNumbers.TABLE1),
+                new((int)TableNumbers.TABLE2),
+                new((int)TableNumbers.TABLE3),
             };
         }
 
@@ -99,9 +94,9 @@ namespace JAFDTC.Models.F16C.HARM
         {
             Tables = new ALICTable[3]
             {
-                new(other.Tables[(int) TableNumbers.TABLE1]),
-                new(other.Tables[(int) TableNumbers.TABLE2]),
-                new(other.Tables[(int) TableNumbers.TABLE3])
+                new(other.Tables[(int)TableNumbers.TABLE1]),
+                new(other.Tables[(int)TableNumbers.TABLE2]),
+                new(other.Tables[(int)TableNumbers.TABLE3])
             };
         }
 
@@ -116,14 +111,13 @@ namespace JAFDTC.Models.F16C.HARM
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // reset the instance to defaults (by definition, field value of "" implies default).
-        //
-        public void Reset()
+        /// <summary>
+        /// reset the instance to defaults (by definition, field value of "" implies default).
+        /// </summary>
+        public override void Reset()
         {
             foreach (ALICTable table in Tables)
-            {
                 table.Reset();
-            }
         }
     }
 }

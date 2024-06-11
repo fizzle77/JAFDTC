@@ -22,24 +22,26 @@ using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.HARM;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Base;
+using JAFDTC.Utilities;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 
 namespace JAFDTC.UI.F16C
 {
     /// <summary>
     /// TODO: document
     /// </summary>
-    public sealed partial class F16CEditHARMPage : Page
+    public sealed partial class F16CEditHARMPage : SystemEditorPageBase
     {
         public static ConfigEditorPageInfo PageInfo
             => new(HARMSystem.SystemTag, "HARM ALIC Tables", "HARM ALIC", Glyphs.HARM, typeof(F16CEditHARMPage));
@@ -50,38 +52,36 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private ConfigEditorPageNavArgs NavArgs { get; set; }
+        // ---- overrides of base SystemEditorPage properties
 
-        // NOTE: changes to the Config object may only occur through the marshall methods. bindings to and edits by
-        // NOTE: the ui are always directed at the EditHARM/EditTable properties.
+        protected override SystemBase SystemConfig => ((F16CConfiguration)Config).HARM;
+
+        protected override String SystemTag => HARMSystem.SystemTag;
+
+        protected override string SystemName => "HARM ALIC table";
+
+        protected override bool IsPageStateDefault => CurStateIsDefault();
+
+        // ---- internal properties
+
+        // NOTE: the ui always interacts with EditTable when editing program values, EditTableNum defines which
+        // NOTE: table the ui is currently editing.
         //
-        private F16CConfiguration Config { get; set; }
+        private ALICTable EditTable { get; set; }
 
-        // NOTE: the ui always interacts with EditHARM.Tables[0] when editing ALIC, EditTable defines which table the ui is currently
-        // NOTE: editing.
-        //
-        private HARMSystem EditHARM { get; set; }
-
-        private int EditTable { get; set; }
-
-        private bool IsRebuildPending { get; set; }
+        private int EditTableNum { get; set; }
 
         // ---- readonly properties
 
         private readonly HARMSystem _harmSysDefaults;
 
-        private readonly Dictionary<string, string> _configNameToUID;
-        private readonly List<string> _configNameList;
 
         private readonly List<string> _emitterTitles;
         private readonly Dictionary<string, Emitter> _emitterTitleMap;
 
-        private readonly Dictionary<string, TextBox> _baseFieldValueMap;
         private readonly List<TextBox> _tableCodeFields;
         private readonly List<FontIcon> _tableEditFields;
         private readonly List<List<TextBlock>> _tableFields;
-        private readonly Brush _defaultBorderBrush;
-        private readonly Brush _defaultBkgndBrush;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -91,23 +91,10 @@ namespace JAFDTC.UI.F16C
 
         public F16CEditHARMPage()
         {
-            InitializeComponent();
-
-            EditHARM = new HARMSystem();
-
-            // NOTE: ui will operate on Tables[0], regardless of which table is actually selected.
-            //
-            EditHARM.Tables[0].ErrorsChanged += CodeField_DataValidationError;
-            EditHARM.Tables[0].PropertyChanged += CodeField_PropertyChanged;
-
-            EditTable = (int)TableNumbers.TABLE1;
-
-            IsRebuildPending = false;
+            EditTable = new ALICTable();
+            EditTableNum = (int)TableNumbers.TABLE1;
 
             _harmSysDefaults = HARMSystem.ExplicitDefaults;
-
-            _configNameToUID = new Dictionary<string, string>();
-            _configNameList = new List<string>();
 
             _emitterTitles = new();
             _emitterTitleMap = new();
@@ -115,21 +102,14 @@ namespace JAFDTC.UI.F16C
             {
                 string item = $"{emitter.Country} – {emitter.Type} – {emitter.Name}";
                 if (!string.IsNullOrEmpty(emitter.NATO))
-                {
                     item += $" ({emitter.NATO})";
-                }
                 _emitterTitles.Add(item);
                 _emitterTitleMap[item] = emitter;
             }
 
-            _baseFieldValueMap = new Dictionary<string, TextBox>()
-            {
-                ["CodeT1"] = uiT1ValueCode,
-                ["CodeT2"] = uiT2ValueCode,
-                ["CodeT3"] = uiT3ValueCode,
-                ["CodeT4"] = uiT4ValueCode,
-                ["CodeT5"] = uiT5ValueCode
-            };
+            InitializeComponent();
+            InitializeBase(EditTable, uiT1ValueCode, uiCtlLinkResetBtns);
+
             _tableCodeFields = new List<TextBox>()
             {
                 uiT1ValueCode, uiT2ValueCode, uiT3ValueCode, uiT4ValueCode, uiT5ValueCode
@@ -146,8 +126,6 @@ namespace JAFDTC.UI.F16C
                 new() { uiT4RWRText, uiT4ValueCountry, uiT4ValueType, uiT4ValueName },
                 new() { uiT5RWRText, uiT5ValueCountry, uiT5ValueType, uiT5ValueName }
             };
-            _defaultBorderBrush = uiT1ValueCode.BorderBrush;
-            _defaultBkgndBrush = uiT1ValueCode.Background;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -156,49 +134,45 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // marshall data between our local alic table and the appropriate table in the harm configuration. to
-        // simplify bindings, note that the local copy of the program being edited is always in EditHARM.Table[0]
-        // regardless of which table we are editing. note that data is kept in EditHARM in "explict" form (where the
-        // actual values are placed in fields, not "" for defaults). we must use care when using IsDefault and
-        // friends on our state.
-        //
-        private void CopyConfigToEdit(int table)
+        /// <summary>
+        /// Find and return the property information and encapsulating object corresponding to the provided control
+        /// in the EditState object. Base implementation returns data on the property named by the control's Tag in
+        /// the EditState object. Derived classes may override this method if they require a more complex mapping
+        /// between the tag and the returned (property, encapsulating object) tuple.
+        /// </summary>
+        protected override void GetControlEditStateProperty(FrameworkElement ctrl,
+                                                            out PropertyInfo prop, out BindableObject obj)
         {
-            // NOTE: we don't marshall the program number here, it shouldn't change
+            // ui state corresponds to one of several entries in the config state. do that mapping here based on the
+            // value in EditTableNum and the property of the form "<entry>.<property>"
+            //
+            string propName = ctrl.Tag.ToString();
+            int entryNum = int.Parse(propName[..1]);
+            prop = EditTable.Table[entryNum].GetType().GetProperty(propName[2..]);
+            obj = EditTable.Table[entryNum];
 
-            for (int i = 0; i < EditHARM.Tables[0].Table.Count; i++)
-            {
-                EditHARM.Tables[0].Table[i].Code = Config.HARM.Tables[table].Table[i].Code;
-            }
-
-            ALICTable curTable = EditHARM.Tables[0];
-            ALICTable dfltTable = _harmSysDefaults.Tables[table];
-            for (int i = 0; i < curTable.Table.Count; i++)
-            {
-                curTable.Table[i].Code = (curTable.Table[i].Code != "") ? curTable.Table[i].Code : dfltTable.Table[i].Code;
-            }
+            if (prop == null)
+                throw new ApplicationException($"Unexpected {ctrl.GetType()}: Tag {ctrl.Tag}");
         }
 
-        private void CopyEditToConfig(int table, bool isPersist = false)
+        /// <summary>
+        /// Find and return the property information and encapsulating object corresponding to the provided control
+        /// in the persisted configuration object.
+        /// </summary>
+        protected override void GetControlConfigProperty(FrameworkElement ctrl,
+                                                         out PropertyInfo prop, out BindableObject obj)
         {
-            Debug.Assert(table == Config.HARM.Tables[table].Number);
+            // ui state corresponds to one of several entries in the config state. do that mapping here based on the
+            // value in EditTableNum and the property of the form "<entry>.<property>"
+            //
+            HARMSystem alic = (HARMSystem)SystemConfig;
+            string propName = ctrl.Tag.ToString();
+            int entryNum = int.Parse(propName[..1]);
+            prop = alic.Tables[EditTableNum].Table[entryNum].GetType().GetProperty(propName[2..]);
+            obj = alic.Tables[EditTableNum].Table[entryNum];
 
-            if (!CurStateHasErrors())
-            {
-                // NOTE: we don't marshall the program number here, it shouldn't change
-
-                ALICTable curTable = EditHARM.Tables[0];
-                ALICTable dfltTable = _harmSysDefaults.Tables[table];
-                for (int i = 0; i < curTable.Table.Count; i++)
-                {
-                    Config.HARM.Tables[table].Table[i].Code = (curTable.Table[i].Code != dfltTable.Table[i].Code) ? curTable.Table[i].Code : "";
-                }
-
-                if (isPersist)
-                {
-                    Config.Save(this, HARMSystem.SystemTag);
-                }
-            }
+            if (prop == null)
+                throw new ApplicationException($"Unexpected {ctrl.GetType()}: Tag {ctrl.Tag}");
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -207,86 +181,58 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private void SetFieldValidState(TextBox field, bool isValid)
+        /// <summary>
+        /// Override to perform custom logic when a property changes.
+        /// </summary>
+        protected override void EditState_ErrorsChanged(object sender, DataErrorsChangedEventArgs args)
         {
-            field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
-            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBackgroundBrush"];
-        }
-
-        private void ValidateAllFields(Dictionary<string, TextBox> fields, IEnumerable errors)
-        {
-            Dictionary<string, bool> map = new();
-            foreach (string error in errors)
+            if (args.PropertyName != null)
             {
-                map[error] = true;
-            }
-            foreach (KeyValuePair<string, TextBox> kvp in fields)
-            {
-                SetFieldValidState(kvp.Value, !map.ContainsKey(kvp.Key));
-            }
-        }
-
-        // validation error: update ui state for the various components (base, chaff program, flare program)
-        // that may have errors.
-        //
-        private void CodeField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
-        {
-            if (args.PropertyName == null)
-            {
-                ValidateAllFields(_baseFieldValueMap, EditHARM.Tables[0].GetErrors(null));
-            }
-            else
-            {
-                List<string> errors = (List<string>)EditHARM.Tables[0].GetErrors(args.PropertyName);
-                SetFieldValidState(_baseFieldValueMap[args.PropertyName], (errors.Count == 0));
-            }
-            RebuildInterfaceState();
-        }
-
-        // property changed: rebuild interface state to account for configuration changes.
-        //
-        private void CodeField_PropertyChanged(object sender, EventArgs args)
-        {
-            for (int row = 0; row < 5; row++)
-            {
-                RebuildTableRowContent(row);
-            }
-        }
-
-        // returns true if the current state has errors, false otherwise.
-        //
-        private bool CurStateHasErrors()
-        {
-            return EditHARM.Tables[0].HasErrors;
-        }
-
-        // returns true if the current table being edited is default, false otherwise.
-        private bool EditTableIsDefault()
-        {
-            ObservableCollection<TableCode> table = EditHARM.Tables[0].Table;
-            ObservableCollection<TableCode> defaultTable = _harmSysDefaults.Tables[EditTable].Table;
-            for (int i = 0; i < table.Count; i++)
-            {
-                if (!string.IsNullOrEmpty(table[i].Code) && (table[i].Code != defaultTable[i].Code))
+                for (int i = 0; i < EditTable.Table.Count; i++)
                 {
-                    return false;
+                    List<string> errors = (List<string>)EditTable.Table[i].GetErrors(args.PropertyName);
+                    SetFieldValidVisualState(PageTextBoxes[$"{i}.Code"], (errors.Count == 0));
                 }
             }
+        }
+
+        /// <summary>
+        /// returns true if the current state has errors, false otherwise.
+        /// </summary>
+        private bool CurStateHasErrors()
+        {
+            for (int i = 0; i < EditTable.Table.Count; i++)
+                if (EditTable.Table[i].HasErrors)
+                    return true;
+            return false;
+        }
+
+        /// <summary>
+        /// returns true if the current table being edited is default, false otherwise.
+        /// </summary>
+        private bool EditTableIsDefault()
+        {
+            ObservableCollection<TableCode> table = EditTable.Table;
+            ObservableCollection<TableCode> defaultTable = _harmSysDefaults.Tables[EditTableNum].Table;
+            for (int i = 0; i < table.Count; i++)
+                if (!string.IsNullOrEmpty(table[i].Code) && (table[i].Code != defaultTable[i].Code))
+                    return false;
             return true;
         }
 
-        // returns true if the current state is default, false otherwise.
-        private bool PageIsDefault()
+        /// <summary>
+        /// returns true if the current state is default, false otherwise.
+        /// </summary>
+        private bool CurStateIsDefault()
         {
-            ObservableCollection<TableCode> table = EditHARM.Tables[0].Table;
-            for (int i = 0; i < EditHARM.Tables.Length; i++)
-            {
-                if (((EditTable == i) && !EditTableIsDefault()) ||
-                    ((EditTable != i) && !Config.HARM.Tables[i].IsDefault))
+            F16CConfiguration config = (F16CConfiguration)Config;
+            ObservableCollection<TableCode> table = EditTable.Table;
+            for (int i = 0; i < config.HARM.Tables.Length; i++)
+                if (((EditTableNum == i) && !EditTableIsDefault()) ||
+                    ((EditTableNum != i) && !config.HARM.Tables[i].IsDefault))
                 {
                     return false;
                 }
-            }
             return true;
         }
 
@@ -296,32 +242,37 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // change the selected alic table and update various ui and model state.
-        //
+        /// <summary>
+        /// change the selected alic table and update various ui and model state.
+        /// </summary>
         private void SelectTable(int table)
         {
-            if (table != EditTable)
+            if (table != EditTableNum)
             {
-                CopyEditToConfig(EditTable, true);
-                EditTable = table;
-                CopyConfigToEdit(EditTable);
-                RebuildInterfaceState();
+                SaveEditStateToConfig();
+                EditTableNum = table;
+                CopyConfigToEditState();
             }
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void RebuildTableSelectMenu()
         {
+            F16CConfiguration config = (F16CConfiguration)Config;
             Utilities.SetBulletsInBulletComboBox(uiALICSelectCombo,
-                                     (int i) => (((EditTable == i) && !EditTableIsDefault()) ||
-                                                 ((EditTable != i) && !Config.HARM.Tables[i].IsDefault)));
+                                                 (int i) => (((EditTableNum == i) && !EditTableIsDefault()) ||
+                                                             ((EditTableNum != i) && !config.HARM.Tables[i].IsDefault)));
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void RebuildTableRowContent(int tableRow)
         {
             string curCode = _tableCodeFields[tableRow].Text;
-            string dfltCode = _harmSysDefaults.Tables[EditTable].Table[tableRow].Code;
+            string dfltCode = _harmSysDefaults.Tables[EditTableNum].Table[tableRow].Code;
 
             if (int.TryParse((string.IsNullOrEmpty(curCode)) ? dfltCode : curCode, out int alicCode))
             {
@@ -339,38 +290,33 @@ namespace JAFDTC.UI.F16C
                 {
                     name = emitterList[0].Name;
                     if (!string.IsNullOrEmpty(emitterList[0].NATO))
-                    {
                         name += $" ({emitterList[0].NATO})";
-                    }
                 }
                 fields[3].Text = name;
             }
         }
 
-        // update the placeholder text to match the defaults for the selected table.
-        //
+        /// <summary>
+        /// update the placeholder text to match the defaults for the selected table.
+        /// </summary>
         private void RebuildFieldPlaceholders()
         {
-            var table = _harmSysDefaults.Tables[EditTable];
+            var table = _harmSysDefaults.Tables[EditTableNum];
             for (int i = 0; i < table.Table.Count; i++)
-            {
                 _tableCodeFields[i].PlaceholderText = table.Table[i].Code;
-            }
         }
 
-        // TODO: document
-        private void RebuildLinkControls()
+        /// <summary>
+        /// update the ui state based on current setup.
+        /// </summary>
+        protected override void UpdateUICustom(bool isEditable)
         {
-            Utilities.RebuildLinkControls(Config, HARMSystem.SystemTag, NavArgs.UIDtoConfigMap,
-                                          uiPageBtnTxtLink, uiPageTxtLink);
-        }
+            RebuildTableSelectMenu();
+            for (int row = 0; row < 5; row++)
+                RebuildTableRowContent(row);
 
-        // update the enable state on the ui elements based on the current settings. link controls must be set up
-        // vi RebuildLinkControls() prior to calling this function.
-        //
-        private void RebuildEnableState()
-        {
-            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(HARMSystem.SystemTag));
+            RebuildFieldPlaceholders();
+
             Utilities.SetEnableState(uiT1ValueCode, isEditable);
             Utilities.SetEnableState(uiT2ValueCode, isEditable);
             Utilities.SetEnableState(uiT3ValueCode, isEditable);
@@ -383,47 +329,17 @@ namespace JAFDTC.UI.F16C
             Utilities.SetEnableState(uiT4BtnAdd, isEditable);
             Utilities.SetEnableState(uiT5BtnAdd, isEditable);
 
-            bool isEditTableDefault = true;
-            for (int i = 0; i < EditHARM.Tables[0].Table.Count; i++)
-            {
-                if (EditHARM.Tables[0].Table[i].Code != _harmSysDefaults.Tables[EditTable].Table[i].Code)
-                {
-                    isEditTableDefault = false;
-                    break;
-                }
-            }
-            Utilities.SetEnableState(uiALICBtnResetTable, !isEditTableDefault && isEditable);
-
-            Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
-
-            Utilities.SetEnableState(uiPageBtnResetAll, !PageIsDefault());
+            Utilities.SetEnableState(uiALICBtnResetTable, isEditable && !EditTableIsDefault());
 
             bool isNoErrs = !CurStateHasErrors();
             Utilities.SetEnableState(uiALICSelectCombo, isNoErrs);
-            Utilities.SetEnableState(uiALICBtnNext, (isNoErrs && (EditTable != (int)TableNumbers.TABLE3)));
-            Utilities.SetEnableState(uiALICBtnPrev, (isNoErrs && (EditTable != (int)TableNumbers.TABLE1)));
+            Utilities.SetEnableState(uiALICBtnNext, (isNoErrs && (EditTableNum != (int)TableNumbers.TABLE3)));
+            Utilities.SetEnableState(uiALICBtnPrev, (isNoErrs && (EditTableNum != (int)TableNumbers.TABLE1)));
         }
 
-        // rebuild the state of controls on the page in response to a change in the configuration.
-        //
-        private void RebuildInterfaceState()
+        protected override void ResetConfigToDefault()
         {
-            if (!IsRebuildPending)
-            {
-                IsRebuildPending = true;
-                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-                {
-                    RebuildTableSelectMenu();
-                    for (int row = 0; row < 5; row++)
-                    {
-                        RebuildTableRowContent(row);
-                    }
-                    RebuildFieldPlaceholders();
-                    RebuildLinkControls();
-                    RebuildEnableState();
-                    IsRebuildPending = false;
-                });
-            }
+            ((F16CConfiguration)Config).HARM.Reset();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -434,56 +350,22 @@ namespace JAFDTC.UI.F16C
 
         // ---- page buttons ------------------------------------------------------------------------------------------
 
-        // reset all button click: reset all harm alic settings back to their defaults.
-        //
-        private async void PageBtnResetAll_Click(object sender, RoutedEventArgs args)
-        {
-            ContentDialogResult result = await Utilities.Message2BDialog(
-                Content.XamlRoot,
-                "Reset Configuration?",
-                "Are you sure you want to reset the HARM ALIC configurations to avionics defaults? This action cannot be undone.",
-                "Reset"
-            );
-            if (result == ContentDialogResult.Primary)
-            {
-                Config.UnlinkSystem(HARMSystem.SystemTag);
-                Config.HARM.Reset();
-                Config.Save(this, HARMSystem.SystemTag);
-                CopyConfigToEdit(EditTable);
-            }
-        }
-
-        // TODO: document
-        private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
-        {
-            string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, HARMSystem.SystemTag,
-                                                                    _configNameList);
-            if (selectedItem == null)
-            {
-                Config.UnlinkSystem(HARMSystem.SystemTag);
-                Config.Save(this);
-            }
-            else if (selectedItem.Length > 0)
-            {
-                Config.LinkSystemTo(HARMSystem.SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selectedItem]]);
-                Config.Save(this);
-                CopyConfigToEdit(EditTable);
-            }
-        }
-
-        // reset table click: reset table to defaults.
-        //
+        /// <summary>
+        /// reset table click: reset table to defaults.
+        /// </summary>
         private void ALICBtnResetTable_Click(object sender, RoutedEventArgs args)
         {
-            Config.HARM.Tables[EditTable].Reset();
-            Config.Save(this, HARMSystem.SystemTag);
-            CopyConfigToEdit(EditTable);
+            F16CConfiguration config = (F16CConfiguration)Config;
+            config.HARM.Tables[EditTableNum].Reset();
+            config.Save(this, HARMSystem.SystemTag);
+            CopyConfigToEditState();
         }
 
         // --- add emitter --------------------------------------------------------------------------------------------
 
-        // add button click: open the ui to prompt to select an emitter.
-        //
+        /// <summary>
+        /// add button click: open the ui to prompt to select an emitter.
+        /// </summary>
         private async void ALICBtnAdd_Click(object sender, RoutedEventArgs args)
         {
             Button btnAdd = (Button)sender;
@@ -501,74 +383,50 @@ namespace JAFDTC.UI.F16C
                 Button button = (Button)sender;
                 Emitter emitter = _emitterTitleMap[(string)dialog.SelectedItem];
                 int entry = int.Parse((string)button.Tag);
-                EditHARM.Tables[0].Table[entry].Code = emitter.ALICCode.ToString("000");
+                EditTable.Table[entry].Code = emitter.ALICCode.ToString("000");
 
-                CopyEditToConfig(EditTable, true);
+                SaveEditStateToConfig();
             }
         }
 
         // --- table selection ----------------------------------------------------------------------------------------
 
-        // previous program button click: advance to the previous table.
-        //
-        private void ALICBtnPrev_Click(object sender, RoutedEventArgs args)
+        /// <summary>
+        /// previous program button click: advance to the previous table.
+        /// </summary>
+        private void ALICBtnPrev_Click(object sender, RoutedEventArgs _)
         {
-            SelectTable(EditTable - 1);
-            uiALICSelectCombo.SelectedIndex = EditTable;
+            SelectTable(EditTableNum - 1);
+            uiALICSelectCombo.SelectedIndex = EditTableNum;
         }
 
-        // next program button click: advance to the next table.
-        //
-        private void ALICBtnNext_Click(object sender, RoutedEventArgs args)
+        /// <summary>
+        /// next program button click: advance to the next table.
+        /// </summary>
+        private void ALICBtnNext_Click(object sender, RoutedEventArgs _)
         {
-            SelectTable(EditTable + 1);
-            uiALICSelectCombo.SelectedIndex = EditTable;
+            SelectTable(EditTableNum + 1);
+            uiALICSelectCombo.SelectedIndex = EditTableNum;
         }
 
-        // on selection changed in the table select combo, switch alic tables and update the ui.
-        //
-        private void ALICSelectCombo_SelectionChanged(object sender, RoutedEventArgs args)
+        /// <summary>
+        /// on selection changed in the table select combo, switch alic tables and update the ui.
+        /// </summary>
+        private void ALICSelectCombo_SelectionChanged(object sender, RoutedEventArgs _)
         {
             Grid item = (Grid)((ComboBox)sender).SelectedItem;
-            if ((item != null) && (item.Tag != null))
+            if (!IsUIRebuilding && (item != null) && (item.Tag != null))
             {
-                SelectTable (int.Parse((string)item.Tag));
+                // NOTE: assume tag == index here...
+                SelectTable(int.Parse((string)item.Tag));
             }
         }
-        // ---- text field changes ------------------------------------------------------------------------------------
-
-        // text box lost focus: copy the local backing values to the configuration (note this is predicated on error
-        // status) and rebuild the interface state.
-        //
-        // NOTE: though the text box has lost focus, the update may not yet have propagated into state. use the
-        // NOTE: dispatch queue to give in-flight state updates time to complete.
-        //
-        private void ALICTextBox_LostFocus(object sender, RoutedEventArgs args)
-        {
-            // CONSIDER: may be better here to handle this in a property changed handler rather than here?
-            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-            {
-                CopyEditToConfig(EditTable, true);
-            });
-        }
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // events
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // on configuration saved, rebuild the interface state to align with the latest save (assuming we go here
-        // through a CopyEditToConfig).
-        //
-        private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
-        {
-            RebuildInterfaceState();
-        }
-
-        // on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
-        // we are editing.
-        //
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             List<FrameworkElement> items = new();
@@ -576,29 +434,27 @@ namespace JAFDTC.UI.F16C
                 items.Add(Utilities.BulletComboBoxItem($"Table {i + 1}", i.ToString()));
             uiALICSelectCombo.ItemsSource = items;
 
-            NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
-            Config = (F16CConfiguration)NavArgs.Config;
-
-            Config.ConfigurationSaved += ConfigurationSavedHandler;
-
-            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, HARMSystem.SystemTag,
-                                           _configNameList, _configNameToUID);
-
-            CopyConfigToEdit(EditTable);
-
-            uiALICSelectCombo.SelectedIndex = EditTable;
-            SelectTable(EditTable);
-
-            RebuildInterfaceState();
-
             base.OnNavigatedTo(args);
+
+            for (int i = 0; i < EditTable.Table.Count; i++)
+            {
+                EditTable.Table[i].ErrorsChanged += EditState_ErrorsChanged;
+                EditTable.Table[i].PropertyChanged += EditState_PropertyChanged;
+            }
+
+            uiALICSelectCombo.SelectedIndex = EditTableNum;
+            SelectTable(EditTableNum);
         }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs args)
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            Config.ConfigurationSaved -= ConfigurationSavedHandler;
+            for (int i = 0; i < EditTable.Table.Count; i++)
+            {
+                EditTable.Table[i].ErrorsChanged -= EditState_ErrorsChanged;
+                EditTable.Table[i].PropertyChanged -= EditState_PropertyChanged;
+            }
 
-            base.OnNavigatedFrom(args);
+            base.OnNavigatedFrom(e);
         }
     }
 }
