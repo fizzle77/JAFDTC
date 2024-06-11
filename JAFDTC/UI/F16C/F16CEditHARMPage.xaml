@@ -63,45 +63,7 @@ https://www.gnu.org/licenses/.
                       VerticalAlignment="Center"
                       ToolTipService.ToolTip="Selects ALIC Table to Edit"
                       SelectionChanged="ALICSelectCombo_SelectionChanged">
-                <!-- Tag is table index on [0,2] as string -->
-                <ComboBox.Items>
-                    <Grid Tag="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0"
-                                  x:Name="uiALICSelectItem1Icon"
-                                  VerticalAlignment="Center"
-                                  Foreground="{ThemeResource SystemAccentColor}"
-                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Text="Table 1"/>
-                    </Grid>
-                    <Grid Tag="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0"
-                                  x:Name="uiALICSelectItem2Icon"
-                                  VerticalAlignment="Center"
-                                  Foreground="{ThemeResource SystemAccentColor}"
-                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Text="Table 2"/>
-                    </Grid>
-                    <Grid Tag="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0"
-                                  x:Name="uiALICSelectItem3Icon"
-                                  VerticalAlignment="Center"
-                                  Foreground="{ThemeResource SystemAccentColor}"
-                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-                        <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Text="Table 3"/>
-                    </Grid>
-                </ComboBox.Items>
+                <!-- ComboBox items are built when page is displayed, Tag is enum TableNumbers -->
             </ComboBox>
             <Button Margin="24,0,6,0" VerticalAlignment="Center"
                     x:Name="uiALICBtnPrev"

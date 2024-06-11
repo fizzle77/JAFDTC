@@ -78,7 +78,6 @@ namespace JAFDTC.UI.F16C
 
         private readonly Dictionary<string, TextBox> _baseFieldValueMap;
         private readonly List<TextBox> _tableCodeFields;
-        private readonly List<FontIcon> _tableSelComboIcons;
         private readonly List<FontIcon> _tableEditFields;
         private readonly List<List<TextBlock>> _tableFields;
         private readonly Brush _defaultBorderBrush;
@@ -134,10 +133,6 @@ namespace JAFDTC.UI.F16C
             _tableCodeFields = new List<TextBox>()
             {
                 uiT1ValueCode, uiT2ValueCode, uiT3ValueCode, uiT4ValueCode, uiT5ValueCode
-            };
-            _tableSelComboIcons = new List<FontIcon>()
-            {
-                uiALICSelectItem1Icon, uiALICSelectItem2Icon, uiALICSelectItem3Icon
             };
             _tableEditFields = new List<FontIcon>()
             {
@@ -317,17 +312,9 @@ namespace JAFDTC.UI.F16C
         // TODO: document
         private void RebuildTableSelectMenu()
         {
-            ObservableCollection<TableCode> table = EditHARM.Tables[0].Table;
-            for (int i = 0; i < Config.HARM.Tables.Length; i++)
-            {
-                Visibility viz = Visibility.Collapsed;
-                if (((EditTable == i) && !EditTableIsDefault()) ||
-                    ((EditTable != i) && !Config.HARM.Tables[i].IsDefault))
-                {
-                    viz = Visibility.Visible;
-                }
-                _tableSelComboIcons[i].Visibility = viz;
-            }
+            Utilities.SetBulletsInBulletComboBox(uiALICSelectCombo,
+                                     (int i) => (((EditTable == i) && !EditTableIsDefault()) ||
+                                                 ((EditTable != i) && !Config.HARM.Tables[i].IsDefault)));
         }
 
         // TODO: document
@@ -584,6 +571,11 @@ namespace JAFDTC.UI.F16C
         //
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
+            List<FrameworkElement> items = new();
+            for (int i = (int)TableNumbers.TABLE1; i <= (int)TableNumbers.TABLE3; i++)
+                items.Add(Utilities.BulletComboBoxItem($"Table {i + 1}", i.ToString()));
+            uiALICSelectCombo.ItemsSource = items;
+
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
             Config = (F16CConfiguration)NavArgs.Config;
 
