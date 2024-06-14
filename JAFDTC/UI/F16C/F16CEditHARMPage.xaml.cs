@@ -24,7 +24,6 @@ using JAFDTC.Models.F16C.HARM;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
 using JAFDTC.Utilities;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -33,13 +32,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 
 namespace JAFDTC.UI.F16C
 {
     /// <summary>
-    /// TODO: document
+    /// Page obejct for the system editor page that handles the ui for the viper harm alic table editor. this handles
+    /// setup for each of the alic tables in the avionics.
     /// </summary>
     public sealed partial class F16CEditHARMPage : SystemEditorPageBase
     {
@@ -136,15 +135,13 @@ namespace JAFDTC.UI.F16C
 
         /// <summary>
         /// Find and return the property information and encapsulating object corresponding to the provided control
-        /// in the EditState object. Base implementation returns data on the property named by the control's Tag in
-        /// the EditState object. Derived classes may override this method if they require a more complex mapping
-        /// between the tag and the returned (property, encapsulating object) tuple.
+        /// in the EditState object.
         /// </summary>
         protected override void GetControlEditStateProperty(FrameworkElement ctrl,
                                                             out PropertyInfo prop, out BindableObject obj)
         {
             // ui state corresponds to one of several entries in the config state. do that mapping here based on the
-            // value in EditTableNum and the property of the form "<entry>.<property>"
+            // property of the form "<entry>.<property>"
             //
             string propName = ctrl.Tag.ToString();
             int entryNum = int.Parse(propName[..1]);
@@ -226,7 +223,6 @@ namespace JAFDTC.UI.F16C
         private bool CurStateIsDefault()
         {
             F16CConfiguration config = (F16CConfiguration)Config;
-            ObservableCollection<TableCode> table = EditTable.Table;
             for (int i = 0; i < config.HARM.Tables.Length; i++)
                 if (((EditTableNum == i) && !EditTableIsDefault()) ||
                     ((EditTableNum != i) && !config.HARM.Tables[i].IsDefault))

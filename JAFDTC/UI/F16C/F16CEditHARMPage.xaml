@@ -98,7 +98,7 @@ https://www.gnu.org/licenses/.
         row 2 : table
         ===============================================================================================================
         -->
-        <Grid Grid.Row="2" Margin="12,12,12,12">
+        <Grid Grid.Row="2" Margin="24,12,12,12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -149,36 +149,44 @@ https://www.gnu.org/licenses/.
                 Unit Designation
             </TextBlock>
 
+            <!--
+            NOTE: alic entries map to an array of TableCode instances (each of which has a single Code property).
+            NOTE: to use these with SystemEditorPageBase, we set the tags of the editor text box to a string of
+            NOTE: the form [{index}.{property}] where {index} is the index in the array and {property} is the
+            NOTE: name of the property (only "Code" as of now). the ui handles decoding this and mapping it onto
+            NOTE: the right object in the configuration.
+            -->
+
             <!-- alic entry 1/5 -->
-            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,12,0,0"
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,6,0,0"
                        Style="{StaticResource TableHeaderTextStyle}">
                 T1
             </TextBlock>
-            <FontIcon Grid.Row="1" Grid.Column="1" Margin="0,12,0,0" x:Name="uiT1IconEdit"
+            <FontIcon Grid.Row="1" Grid.Column="1" Margin="0,6,0,0" x:Name="uiT1IconEdit"
                       HorizontalAlignment="Center" VerticalAlignment="Center"
                       Foreground="{ThemeResource SystemAccentColor}"
                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-            <TextBox Grid.Row="1" Grid.Column="2" Margin="6,12,0,0" Tag="0.Code" x:Name="uiT1ValueCode"
+            <TextBox Grid.Row="1" Grid.Column="2" Margin="6,6,0,0" Tag="0.Code" x:Name="uiT1ValueCode"
                      Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="3"
                      LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="Set the Code for Entry T1 of the ALIC Table"/>
-            <TextBlock Grid.Row="1" Grid.Column="3" Margin="6,12,0,0" x:Name="uiT1RWRText"
+            <TextBlock Grid.Row="1" Grid.Column="3" Margin="6,6,0,0" x:Name="uiT1RWRText"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="4" Margin="6,12,0,0" x:Name="uiT1ValueCountry"
+            <TextBlock Grid.Row="1" Grid.Column="4" Margin="6,6,0,0" x:Name="uiT1ValueCountry"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="5" Margin="6,12,0,0" x:Name="uiT1ValueType"
+            <TextBlock Grid.Row="1" Grid.Column="5" Margin="6,6,0,0" x:Name="uiT1ValueType"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FIXU
             </TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="6" Margin="6,12,0,0" x:Name="uiT1ValueName"
+            <TextBlock Grid.Row="1" Grid.Column="6" Margin="6,6,0,0" x:Name="uiT1ValueName"
                        Style="{StaticResource EditorParamStaticLeftTextBlockStyle}">
                 FIXUP
             </TextBlock>
-            <Button Grid.Row="1" Grid.Column="7" Margin="24,12,0,0" Tag="0" x:Name="uiT1BtnAdd"
+            <Button Grid.Row="1" Grid.Column="7" Margin="24,6,0,0" Tag="0" x:Name="uiT1BtnAdd"
                     VerticalAlignment="Center"
                     Click="ALICBtnAdd_Click"
                     ToolTipService.ToolTip="Set the Entry in T1 of the ALIC Table from the Emitter List">
@@ -350,7 +358,7 @@ https://www.gnu.org/licenses/.
         common editor controls 
         ===============================================================================================================
         -->
-        <ui_ctrl:LinkResetBtnsControl Grid.Row="6" Grid.Column="0" Margin="0,0,0,0" x:Name="uiCtlLinkResetBtns"/>
+        <ui_ctrl:LinkResetBtnsControl Grid.Row="6" Grid.Column="0" x:Name="uiCtlLinkResetBtns"/>
 
     </Grid>
 </ui_base:SystemEditorPageBase>
