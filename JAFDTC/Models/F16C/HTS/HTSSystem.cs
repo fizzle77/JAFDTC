@@ -3,7 +3,7 @@
 // HTSSystem.cs -- f-16c hts system configuration
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2024 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -28,7 +28,7 @@ namespace JAFDTC.Models.F16C.HTS
     /// <summary>
     /// TODO: document
     /// </summary>
-    public class HTSSystem : BindableObject, ISystem
+    public class HTSSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:F16C:HTS";
 
@@ -49,42 +49,35 @@ namespace JAFDTC.Models.F16C.HTS
 
         // ---- following properties are synthesized.
 
-        // returns true if the instance indicates a default setup (all fields are ""), false otherwise.
-        //
+        /// <summary>
+        /// returns true if the instance indicates a default setup (all fields are ""), false otherwise.
+        /// </summary>
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get
             {
                 if (IsMANTablePopulated || EnabledThreats[0])
-                {
                     return false;
-                }
+
                 for (int i = 1; i < EnabledThreats.Length; i++)
-                {
                     if (!EnabledThreats[i])
-                    {
                         return false;
-                    }
-                }
                 return true;
             }
         }
 
-        // returns true if the MAN table is populated with any entries, false otherwise.
-        //
+        /// <summary>
+        /// returns true if the MAN table is populated with any entries, false otherwise.
+        /// </summary>
         [JsonIgnore]
         public bool IsMANTablePopulated
         {
             get
             {
                 for (int i = 0; i < MANTable.Count; i++)
-                {
                     if (!MANTable[i].IsDefault)
-                    {
                         return true;
-                    }
-                }
                 return false;
             }
         }
@@ -99,29 +92,21 @@ namespace JAFDTC.Models.F16C.HTS
         {
             MANTable = new ObservableCollection<TableCode>();
             for (int i = 0; i < NUM_MANTABLE_ENTRIES; i++)
-            {
                 MANTable.Add(new TableCode());
-            }
             EnabledThreats = new bool[NUM_ENABLED_THREATS];
             EnabledThreats[0] = false;
             for (int i = 1; i < EnabledThreats.Length; i++)
-            {
                 EnabledThreats[i] = true;
-            }
         }
 
         public HTSSystem(HTSSystem other)
         {
             MANTable = new ObservableCollection<TableCode>();
             for (int i = 0; i < other.MANTable.Count; i++)
-            {
                 MANTable.Add(new(other.MANTable[i]));
-            }
             EnabledThreats = new bool[NUM_ENABLED_THREATS];
             for (int i = 0; i < EnabledThreats.Length; i++)
-            {
                 EnabledThreats[i] = other.EnabledThreats[i];
-            }
         }
 
         public virtual object Clone()
@@ -129,16 +114,12 @@ namespace JAFDTC.Models.F16C.HTS
             return new HTSSystem(this);
         }
 
-        public void Reset()
+        public override void Reset()
         {
             for (int i = 0; i < MANTable.Count; i++)
-            {
                 MANTable[i].Reset();
-            }
             for (int i = 1; i < EnabledThreats.Length; i++)
-            {
                 EnabledThreats[i] = true;
-            }
             EnabledThreats[0] = false;
         }
     }

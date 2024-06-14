@@ -18,11 +18,13 @@ https://www.gnu.org/licenses/.
 
 **********************************************************************************************************************
 -->
-<Page
+<ui_base:SystemEditorPageBase
     x:Class="JAFDTC.UI.F16C.F16CEditHTSPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:JAFDTC.UI.F16C"
+    xmlns:ui_base="using:JAFDTC.UI.Base"
+    xmlns:ui_ctrl="using:JAFDTC.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -37,7 +39,7 @@ https://www.gnu.org/licenses/.
 
     </Page.Resources>
 
-    <Grid Margin="16,8,16,8">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -54,19 +56,18 @@ https://www.gnu.org/licenses/.
         row 0 : title
         ===============================================================================================================
         -->
-        <StackPanel Grid.Row="0">
-            <TextBlock Style="{StaticResource EditorTitleTextBlockStyle}"
-                       VerticalAlignment="Center">
-                HTS Manual Threat Table Programming:
-            </TextBlock>
-        </StackPanel>
+        <TextBlock Grid.Row="0" Margin="12,12,12,0"
+                   VerticalAlignment="Center"
+                   Style="{StaticResource EditorTitleTextBlockStyle}">
+            HTS Manual Threat Table Programming:
+        </TextBlock>
 
         <!--
         ===============================================================================================================
         row 1 : hts manual table programming
         ===============================================================================================================
         -->
-        <Grid Grid.Row="1" Margin="12,12,0,0">
+        <Grid Grid.Row="1" Margin="24,12,12,12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -95,7 +96,7 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource TableHeaderTextStyle}">
                 Entry
             </TextBlock>
-            <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,0,0"
+            <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" x:Name="uiHeaderText"
                        Style="{StaticResource TableHeaderTextStyle}">
                 Edit
             </TextBlock>
@@ -120,51 +121,47 @@ https://www.gnu.org/licenses/.
                 Unit Designation
             </TextBlock>
 
+            <!--
+            NOTE: hts man entries map to an array of TableCode instances (each of which has a single Code property).
+            NOTE: to use these with SystemEditorPageBase, we set the tags of the editor text box to a string of
+            NOTE: the form [{index}.{property}] where {index} is the index in the array and {property} is the
+            NOTE: name of the property (only "Code" as of now). the ui handles decoding this and mapping it onto
+            NOTE: the right object in the configuration.
+            -->
+
             <!-- hts manual entry 1/8 -->
-            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,12,0,0"
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,6,0,0"
                        Style="{StaticResource TableHeaderTextStyle}">
                 T1
             </TextBlock>
-            <FontIcon Grid.Row="1" Grid.Column="1" Margin="0,12,0,0"
-                      x:Name="uiT1IconEdit"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Center"
+            <FontIcon Grid.Row="1" Grid.Column="1" Margin="0,6,0,0" x:Name="uiT1IconEdit"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
                       Foreground="{ThemeResource SystemAccentColor}"
                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-            <TextBox Grid.Row="1" Grid.Column="2" Margin="6,12,0,0"
-                     x:Name="uiT1ValueCode"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditHTS.MANTable[0].Code, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Tag="0"
-                     MaxLength="4"
-                     LostFocus ="MANTextBox_LostFocus"
+            <TextBox Grid.Row="1" Grid.Column="2" Margin="6,6,0,0" Tag="0.Code"  x:Name="uiT1ValueCode"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="4"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="Set the Code for Entry T1 of the HTS MAN Table"/>
-            <TextBlock Grid.Row="1" Grid.Column="3" Margin="6,12,0,0"
-                       x:Name="uiT1RWRText"
+            <TextBlock Grid.Row="1" Grid.Column="3" Margin="6,6,0,0" x:Name="uiT1RWRText"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="4" Margin="6,12,0,0"
-                       x:Name="uiT1ValueCountry"
+            <TextBlock Grid.Row="1" Grid.Column="4" Margin="6,6,0,0" x:Name="uiT1ValueCountry"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="5" Margin="6,12,0,0"
-                       x:Name="uiT1ValueType"
+            <TextBlock Grid.Row="1" Grid.Column="5" Margin="6,6,0,0" x:Name="uiT1ValueType"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FIXU
             </TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="6" Margin="6,12,0,0"
-                       x:Name="uiT1ValueName"
+            <TextBlock Grid.Row="1" Grid.Column="6" Margin="6,6,0,0" x:Name="uiT1ValueName"
                        Style="{StaticResource EditorParamStaticLeftTextBlockStyle}">
                 FIXUP
             </TextBlock>
-            <Button Grid.Row="1" Grid.Column="7" Margin="24,12,0,0"
-                    x:Name="uiT1BtnAdd"
-                    Tag="0"
+            <Button Grid.Row="1" Grid.Column="7" Margin="24,6,0,0" Tag="0" x:Name="uiT1BtnAdd"
                     VerticalAlignment="Center"
-                    ToolTipService.ToolTip="Set the Entry in T1 of the HTS MAN Table from the Emitter List"
-                    Click="MANBtnAdd_Click">
+                    Click="MANBtnAdd_Click"
+                    ToolTipService.ToolTip="Set the Entry in T1 of the HTS MAN Table from the Emitter List">
                 <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
@@ -173,46 +170,34 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource TableHeaderTextStyle}">
                 T2
             </TextBlock>
-            <FontIcon Grid.Row="2" Grid.Column="1" Margin="0,12,0,0"
-                      x:Name="uiT2IconEdit"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Center"
+            <FontIcon Grid.Row="2" Grid.Column="1" Margin="0,12,0,0" x:Name="uiT2IconEdit"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
                       Foreground="{ThemeResource SystemAccentColor}"
                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-            <TextBox Grid.Row="2" Grid.Column="2" Margin="6,12,0,0"
-                     x:Name="uiT2ValueCode"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditHTS.MANTable[1].Code, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Tag="1"
-                     MaxLength="4"
-                     LostFocus ="MANTextBox_LostFocus"
+            <TextBox Grid.Row="2" Grid.Column="2" Margin="6,12,0,0" Tag="1.Code" x:Name="uiT2ValueCode"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="4"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="Set the Code for Entry T2 of the HTS MAN Table"/>
-            <TextBlock Grid.Row="2" Grid.Column="3" Margin="6,12,0,0"
-                       x:Name="uiT2RWRText"
+            <TextBlock Grid.Row="2" Grid.Column="3" Margin="6,12,0,0" x:Name="uiT2RWRText"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="2" Grid.Column="4" Margin="6,12,0,0"
-                       x:Name="uiT2ValueCountry"
+            <TextBlock Grid.Row="2" Grid.Column="4" Margin="6,12,0,0" x:Name="uiT2ValueCountry"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="2" Grid.Column="5" Margin="6,12,0,0"
-                       x:Name="uiT2ValueType"
+            <TextBlock Grid.Row="2" Grid.Column="5" Margin="6,12,0,0" x:Name="uiT2ValueType"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FIXU
             </TextBlock>
-            <TextBlock Grid.Row="2" Grid.Column="6" Margin="6,12,0,0"
-                       x:Name="uiT2ValueName"
+            <TextBlock Grid.Row="2" Grid.Column="6" Margin="6,12,0,0" x:Name="uiT2ValueName"
                        Style="{StaticResource EditorParamStaticLeftTextBlockStyle}">
                 FIXUP
             </TextBlock>
-            <Button Grid.Row="2" Grid.Column="7" Margin="24,12,0,0"
-                    x:Name="uiT2BtnAdd"
-                    Tag="1"
+            <Button Grid.Row="2" Grid.Column="7" Margin="24,12,0,0" Tag="1" x:Name="uiT2BtnAdd"
                     VerticalAlignment="Center"
-                    ToolTipService.ToolTip="Set the Entry in T2 of the HTS MAN Table from the Emitter List"
-                    Click="MANBtnAdd_Click">
+                    Click="MANBtnAdd_Click"
+                    ToolTipService.ToolTip="Set the Entry in T2 of the HTS MAN Table from the Emitter List">
                 <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
@@ -221,46 +206,34 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource TableHeaderTextStyle}">
                 T3
             </TextBlock>
-            <FontIcon Grid.Row="3" Grid.Column="1" Margin="0,12,0,0"
-                      x:Name="uiT3IconEdit"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Center"
+            <FontIcon Grid.Row="3" Grid.Column="1" Margin="0,12,0,0" x:Name="uiT3IconEdit"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
                       Foreground="{ThemeResource SystemAccentColor}"
                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-            <TextBox Grid.Row="3" Grid.Column="2" Margin="6,12,0,0"
-                     x:Name="uiT3ValueCode"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditHTS.MANTable[2].Code, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Tag="2"
-                     MaxLength="4"
-                     LostFocus ="MANTextBox_LostFocus"
+            <TextBox Grid.Row="3" Grid.Column="2" Margin="6,12,0,0" Tag="2.Code" x:Name="uiT3ValueCode"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="4"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="Set the Code for Entry T3 of the HTS MAN Table"/>
-            <TextBlock Grid.Row="3" Grid.Column="3" Margin="6,12,0,0"
-                       x:Name="uiT3RWRText"
+            <TextBlock Grid.Row="3" Grid.Column="3" Margin="6,12,0,0" x:Name="uiT3RWRText"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="3" Grid.Column="4" Margin="6,12,0,0"
-                       x:Name="uiT3ValueCountry"
+            <TextBlock Grid.Row="3" Grid.Column="4" Margin="6,12,0,0" x:Name="uiT3ValueCountry"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="3" Grid.Column="5" Margin="6,12,0,0"
-                       x:Name="uiT3ValueType"
+            <TextBlock Grid.Row="3" Grid.Column="5" Margin="6,12,0,0" x:Name="uiT3ValueType"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FIXU
             </TextBlock>
-            <TextBlock Grid.Row="3" Grid.Column="6" Margin="6,12,0,0"
-                       x:Name="uiT3ValueName"
+            <TextBlock Grid.Row="3" Grid.Column="6" Margin="6,12,0,0" x:Name="uiT3ValueName"
                        Style="{StaticResource EditorParamStaticLeftTextBlockStyle}">
                 FIXUP
             </TextBlock>
-            <Button Grid.Row="3" Grid.Column="7" Margin="24,12,0,0"
-                    x:Name="uiT3BtnAdd"
-                    Tag="2"
+            <Button Grid.Row="3" Grid.Column="7" Margin="24,12,0,0" Tag="2" x:Name="uiT3BtnAdd"
                     VerticalAlignment="Center"
-                    ToolTipService.ToolTip="Set the Entry in T3 of the HTS MAN Table from the Emitter List"
-                    Click="MANBtnAdd_Click">
+                    Click="MANBtnAdd_Click"
+                    ToolTipService.ToolTip="Set the Entry in T3 of the HTS MAN Table from the Emitter List">
                 <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
@@ -269,46 +242,34 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource TableHeaderTextStyle}">
                 T4
             </TextBlock>
-            <FontIcon Grid.Row="4" Grid.Column="1" Margin="0,12,0,0"
-                      x:Name="uiT4IconEdit"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Center"
+            <FontIcon Grid.Row="4" Grid.Column="1" Margin="0,12,0,0" x:Name="uiT4IconEdit"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
                       Foreground="{ThemeResource SystemAccentColor}"
                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-            <TextBox Grid.Row="4" Grid.Column="2" Margin="6,12,0,0"
-                     x:Name="uiT4ValueCode"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditHTS.MANTable[3].Code, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Tag="3"
-                     MaxLength="4"
-                     LostFocus ="MANTextBox_LostFocus"
+            <TextBox Grid.Row="4" Grid.Column="2" Margin="6,12,0,0" Tag="3.Code" x:Name="uiT4ValueCode"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="4"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="Set the Code for Entry T4 of the HTS MAN Table"/>
-            <TextBlock Grid.Row="4" Grid.Column="3" Margin="6,12,0,0"
-                       x:Name="uiT4RWRText"
+            <TextBlock Grid.Row="4" Grid.Column="3" Margin="6,12,0,0" x:Name="uiT4RWRText"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="4" Grid.Column="4" Margin="6,12,0,0"
-                       x:Name="uiT4ValueCountry"
+            <TextBlock Grid.Row="4" Grid.Column="4" Margin="6,12,0,0" x:Name="uiT4ValueCountry"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="4" Grid.Column="5" Margin="6,12,0,0"
-                       x:Name="uiT4ValueType"
+            <TextBlock Grid.Row="4" Grid.Column="5" Margin="6,12,0,0" x:Name="uiT4ValueType"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FIXU
             </TextBlock>
-            <TextBlock Grid.Row="4" Grid.Column="6" Margin="6,12,0,0"
-                       x:Name="uiT4ValueName"
+            <TextBlock Grid.Row="4" Grid.Column="6" Margin="6,12,0,0" x:Name="uiT4ValueName"
                        Style="{StaticResource EditorParamStaticLeftTextBlockStyle}">
                 FIXUP
             </TextBlock>
-            <Button Grid.Row="4" Grid.Column="7" Margin="24,12,0,0"
-                    x:Name="uiT4BtnAdd"
-                    Tag="3"
+            <Button Grid.Row="4" Grid.Column="7" Margin="24,12,0,0" Tag="3" x:Name="uiT4BtnAdd"
                     VerticalAlignment="Center"
-                    ToolTipService.ToolTip="Set the Entry in T4 of the HTS MAN Table from the Emitter List"
-                    Click="MANBtnAdd_Click">
+                    Click="MANBtnAdd_Click"
+                    ToolTipService.ToolTip="Set the Entry in T4 of the HTS MAN Table from the Emitter List">
                 <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
@@ -317,46 +278,34 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource TableHeaderTextStyle}">
                 T5
             </TextBlock>
-            <FontIcon Grid.Row="5" Grid.Column="1" Margin="0,12,0,0"
-                      x:Name="uiT5IconEdit"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Center"
+            <FontIcon Grid.Row="5" Grid.Column="1" Margin="0,12,0,0" x:Name="uiT5IconEdit"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
                       Foreground="{ThemeResource SystemAccentColor}"
                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-            <TextBox Grid.Row="5" Grid.Column="2" Margin="6,12,0,0"
-                     x:Name="uiT5ValueCode"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditHTS.MANTable[4].Code, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Tag="4"
-                     MaxLength="4"
-                     LostFocus ="MANTextBox_LostFocus"
+            <TextBox Grid.Row="5" Grid.Column="2" Margin="6,12,0,0" Tag="4.Code" x:Name="uiT5ValueCode"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="4"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="Set the Code for Entry T5 of the HTS MAN Table"/>
-            <TextBlock Grid.Row="5" Grid.Column="3" Margin="6,12,0,0"
-                       x:Name="uiT5RWRText"
+            <TextBlock Grid.Row="5" Grid.Column="3" Margin="6,12,0,0" x:Name="uiT5RWRText"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="5" Grid.Column="4" Margin="6,12,0,0"
-                       x:Name="uiT5ValueCountry"
+            <TextBlock Grid.Row="5" Grid.Column="4" Margin="6,12,0,0" x:Name="uiT5ValueCountry"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="5" Grid.Column="5" Margin="6,12,0,0"
-                       x:Name="uiT5ValueType"
+            <TextBlock Grid.Row="5" Grid.Column="5" Margin="6,12,0,0" x:Name="uiT5ValueType"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FIXU
             </TextBlock>
-            <TextBlock Grid.Row="5" Grid.Column="6" Margin="6,12,0,0"
-                       x:Name="uiT5ValueName"
+            <TextBlock Grid.Row="5" Grid.Column="6" Margin="6,12,0,0" x:Name="uiT5ValueName"
                        Style="{StaticResource EditorParamStaticLeftTextBlockStyle}">
                 FIXUP
             </TextBlock>
-            <Button Grid.Row="5" Grid.Column="7" Margin="24,12,0,0"
-                    x:Name="uiT5BtnAdd"
-                    Tag="4"
+            <Button Grid.Row="5" Grid.Column="7" Margin="24,12,0,0" Tag="4" x:Name="uiT5BtnAdd"
                     VerticalAlignment="Center"
-                    ToolTipService.ToolTip="Set the Entry in T5 of the HTS MAN Table from the Emitter List"
-                    Click="MANBtnAdd_Click">
+                    Click="MANBtnAdd_Click"
+                    ToolTipService.ToolTip="Set the Entry in T5 of the HTS MAN Table from the Emitter List">
                 <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
@@ -365,46 +314,34 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource TableHeaderTextStyle}">
                 T6
             </TextBlock>
-            <FontIcon Grid.Row="6" Grid.Column="1" Margin="0,12,0,0"
-                      x:Name="uiT6IconEdit"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Center"
+            <FontIcon Grid.Row="6" Grid.Column="1" Margin="0,12,0,0" x:Name="uiT6IconEdit"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
                       Foreground="{ThemeResource SystemAccentColor}"
                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-            <TextBox Grid.Row="6" Grid.Column="2" Margin="6,12,0,0"
-                     x:Name="uiT6ValueCode"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditHTS.MANTable[5].Code, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Tag="5"
-                     MaxLength="4"
-                     LostFocus ="MANTextBox_LostFocus"
+            <TextBox Grid.Row="6" Grid.Column="2" Margin="6,12,0,0" Tag="5.Code" x:Name="uiT6ValueCode"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="4"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="Set the Code for Entry T6 of the HTS MAN Table"/>
-            <TextBlock Grid.Row="6" Grid.Column="3" Margin="6,12,0,0"
-                       x:Name="uiT6RWRText"
+            <TextBlock Grid.Row="6" Grid.Column="3" Margin="6,12,0,0" x:Name="uiT6RWRText"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="6" Grid.Column="4" Margin="6,12,0,0"
-                       x:Name="uiT6ValueCountry"
+            <TextBlock Grid.Row="6" Grid.Column="4" Margin="6,12,0,0" x:Name="uiT6ValueCountry"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="6" Grid.Column="5" Margin="6,12,0,0"
-                       x:Name="uiT6ValueType"
+            <TextBlock Grid.Row="6" Grid.Column="5" Margin="6,12,0,0" x:Name="uiT6ValueType"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FIXU
             </TextBlock>
-            <TextBlock Grid.Row="6" Grid.Column="6" Margin="6,12,0,0"
-                       x:Name="uiT6ValueName"
+            <TextBlock Grid.Row="6" Grid.Column="6" Margin="6,12,0,0" x:Name="uiT6ValueName"
                        Style="{StaticResource EditorParamStaticLeftTextBlockStyle}">
                 FIXUP
             </TextBlock>
-            <Button Grid.Row="6" Grid.Column="7" Margin="24,12,0,0"
-                    x:Name="uiT6BtnAdd"
-                    Tag="5"
+            <Button Grid.Row="6" Grid.Column="7" Margin="24,12,0,0" Tag="5" x:Name="uiT6BtnAdd"
                     VerticalAlignment="Center"
-                    ToolTipService.ToolTip="Set the Entry in T6 of the HTS MAN Table from the Emitter List"
-                    Click="MANBtnAdd_Click">
+                    Click="MANBtnAdd_Click"
+                    ToolTipService.ToolTip="Set the Entry in T6 of the HTS MAN Table from the Emitter List">
                 <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
@@ -413,46 +350,34 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource TableHeaderTextStyle}">
                 T7
             </TextBlock>
-            <FontIcon Grid.Row="7" Grid.Column="1" Margin="0,12,0,0"
-                      x:Name="uiT7IconEdit"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Center"
+            <FontIcon Grid.Row="7" Grid.Column="1" Margin="0,12,0,0" x:Name="uiT7IconEdit"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
                       Foreground="{ThemeResource SystemAccentColor}"
                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-            <TextBox Grid.Row="7" Grid.Column="2" Margin="6,12,0,0"
-                     x:Name="uiT7ValueCode"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditHTS.MANTable[6].Code, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Tag="6"
-                     MaxLength="4"
-                     LostFocus ="MANTextBox_LostFocus"
+            <TextBox Grid.Row="7" Grid.Column="2" Margin="6,12,0,0" Tag="6.Code" x:Name="uiT7ValueCode"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="4"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="Set the Code for Entry T7 of the HTS MAN Table"/>
-            <TextBlock Grid.Row="7" Grid.Column="3" Margin="6,12,0,0"
-                       x:Name="uiT7RWRText"
+            <TextBlock Grid.Row="7" Grid.Column="3" Margin="6,12,0,0" x:Name="uiT7RWRText"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="7" Grid.Column="4" Margin="6,12,0,0"
-                       x:Name="uiT7ValueCountry"
+            <TextBlock Grid.Row="7" Grid.Column="4" Margin="6,12,0,0" x:Name="uiT7ValueCountry"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="7" Grid.Column="5" Margin="6,12,0,0"
-                       x:Name="uiT7ValueType"
+            <TextBlock Grid.Row="7" Grid.Column="5" Margin="6,12,0,0" x:Name="uiT7ValueType"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FIXU
             </TextBlock>
-            <TextBlock Grid.Row="7" Grid.Column="6" Margin="6,12,0,0"
-                       x:Name="uiT7ValueName"
+            <TextBlock Grid.Row="7" Grid.Column="6" Margin="6,12,0,0" x:Name="uiT7ValueName"
                        Style="{StaticResource EditorParamStaticLeftTextBlockStyle}">
                 FIXUP
             </TextBlock>
-            <Button Grid.Row="7" Grid.Column="7" Margin="24,12,0,0"
-                    x:Name="uiT7BtnAdd"
-                    Tag="6"
+            <Button Grid.Row="7" Grid.Column="7" Margin="24,12,0,0" Tag="6" x:Name="uiT7BtnAdd"
                     VerticalAlignment="Center"
-                    ToolTipService.ToolTip="Set the Entry in T7 of the HTS MAN Table from the Emitter List"
-                    Click="MANBtnAdd_Click">
+                    Click="MANBtnAdd_Click"
+                    ToolTipService.ToolTip="Set the Entry in T7 of the HTS MAN Table from the Emitter List">
                 <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
@@ -461,58 +386,44 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource TableHeaderTextStyle}">
                 T8
             </TextBlock>
-            <FontIcon Grid.Row="8" Grid.Column="1" Margin="0,12,0,0"
-                      x:Name="uiT8IconEdit"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Center"
+            <FontIcon Grid.Row="8" Grid.Column="1" Margin="0,12,0,0" x:Name="uiT8IconEdit"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
                       Foreground="{ThemeResource SystemAccentColor}"
                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
-            <TextBox Grid.Row="8" Grid.Column="2" Margin="6,12,0,0"
-                     x:Name="uiT8ValueCode"
-                     Style="{StaticResource EditorParamEditTextBoxStyle}"
-                     Text="{x:Bind EditHTS.MANTable[7].Code, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Tag="7"
-                     MaxLength="4"
-                     LostFocus ="MANTextBox_LostFocus"
+            <TextBox Grid.Row="8" Grid.Column="2" Margin="6,12,0,0" Tag="7.Code" x:Name="uiT8ValueCode"
+                     Style="{StaticResource EditorParamEditTextBoxStyle}" MaxLength="4"
+                     LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                      ToolTipService.ToolTip="Set the Code for Entry T8 of the HTS MAN Table"/>
-            <TextBlock Grid.Row="8" Grid.Column="3" Margin="6,12,0,0"
-                       x:Name="uiT8RWRText"
+            <TextBlock Grid.Row="8" Grid.Column="3" Margin="6,12,0,0" x:Name="uiT8RWRText"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="8" Grid.Column="4" Margin="6,12,0,0"
-                       x:Name="uiT8ValueCountry"
+            <TextBlock Grid.Row="8" Grid.Column="4" Margin="6,12,0,0" x:Name="uiT8ValueCountry"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FX
             </TextBlock>
-            <TextBlock Grid.Row="8" Grid.Column="5" Margin="6,12,0,0"
-                       x:Name="uiT8ValueType"
+            <TextBlock Grid.Row="8" Grid.Column="5" Margin="6,12,0,0" x:Name="uiT8ValueType"
                        Style="{StaticResource EditorParamStaticCenterTextBlockStyle}">
                 FIXU
             </TextBlock>
-            <TextBlock Grid.Row="8" Grid.Column="6" Margin="6,12,0,0"
-                       x:Name="uiT8ValueName"
+            <TextBlock Grid.Row="8" Grid.Column="6" Margin="6,12,0,0" x:Name="uiT8ValueName"
                        Style="{StaticResource EditorParamStaticLeftTextBlockStyle}">
                 FIXUP
             </TextBlock>
-            <Button Grid.Row="8" Grid.Column="7" Margin="24,12,0,0"
-                    x:Name="uiT8BtnAdd"
-                    Tag="7"
+            <Button Grid.Row="8" Grid.Column="7" Margin="24,12,0,0" Tag="7" x:Name="uiT8BtnAdd"
                     VerticalAlignment="Center"
-                    ToolTipService.ToolTip="Set the Entry in T8 of the HTS MAN Table from the Emitter List"
-                    Click="MANBtnAdd_Click">
+                    Click="MANBtnAdd_Click"
+                    ToolTipService.ToolTip="Set the Entry in T8 of the HTS MAN Table from the Emitter List">
                 <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE701;"/>
             </Button>
 
             <!-- reset table -->
-            <StackPanel Grid.Row="9" Grid.Column="6" Grid.ColumnSpan="2" Margin="0,24,0,0"
-                        HorizontalAlignment="stretch">
-                <Button Width ="190"
-                        x:Name="uiMANBtnResetTable"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        ToolTipService.ToolTip="Clear the Entries in the HTS Manual Table"
-                        Click="MANBtnResetTable_Click">
+            <StackPanel Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="8" Margin="0,24,0,0"
+                        HorizontalAlignment="Center">
+                <Button Width ="190" x:Name="uiMANBtnResetTable"
+                        HorizontalAlignment="Right" VerticalAlignment="Center"
+                        Click="MANBtnResetTable_Click"
+                        ToolTipService.ToolTip="Clear the Entries in the HTS Manual Table">
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Margin="0,0,6,0"
                                   FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
@@ -527,7 +438,7 @@ https://www.gnu.org/licenses/.
         row 3 : hts threat selection
         ===============================================================================================================
         -->
-        <Grid Grid.Row="3" Margin="0,8,0,0">
+        <Grid Grid.Row="3" Margin="12,0,12,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -536,73 +447,30 @@ https://www.gnu.org/licenses/.
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
+
             <TextBlock Grid.Column="0"
                        VerticalAlignment="Center"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
                 Enabled HTS Threat Classes:
             </TextBlock>
-            <TextBlock Grid.Column="1" Margin="12,4,0,0"
-                       x:Name="uiThreatTextList"
+            <TextBlock Grid.Column="1" Margin="12,4,0,0" x:Name="uiThreatTextList"
                        VerticalAlignment="Center">
                 FIXUP
             </TextBlock>
-            <Button Grid.Column="2" Width="190" Margin="0,12,0,0"
-                    x:Name="uiThreatBtnSelect"
-                    HorizontalAlignment="left"
-                    VerticalAlignment="Center"
-                    ToolTipService.ToolTip="Select HTS Threat Classes to Enable"
-                    Click="ThreatBtnSelect_Click">
+            <Button Grid.Column="2" Width="184" Margin="0,8,0,0" x:Name="uiThreatBtnSelect"
+                    HorizontalAlignment="left" VerticalAlignment="Center"
+                    Click="ThreatBtnSelect_Click"
+                    ToolTipService.ToolTip="Select HTS Threat Classes to Enable">
                 Select Threat Classes...
             </Button>
         </Grid>
 
         <!--
         ===============================================================================================================
-        row 4 : link / reset
+        common editor controls 
         ===============================================================================================================
         -->
-        <Grid Grid.Row="4" Margin="0,0,0,4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <ui_ctrl:LinkResetBtnsControl Grid.Row="6" Grid.Column="0" x:Name="uiCtlLinkResetBtns"/>
 
-            <StackPanel Grid.Column="0"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
-                <Button Width="140"
-                        x:Name="uiPageBtnLink"
-                        Click="PageBtnLink_Click"
-                        ToolTipService.ToolTip="Link or unlink this system to/from another configuration">
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE71B;"/>
-                        <TextBlock VerticalAlignment="center"
-                                   x:Name="uiPageBtnTxtLink">
-                            FIXUP
-                        </TextBlock>
-                    </StackPanel>
-                </Button>
-                <TextBlock Margin="12,0,24,0"
-                           x:Name="uiPageTxtLink"
-                           VerticalAlignment="center">
-                    FIXUP
-                </TextBlock>
-            </StackPanel>
-
-            <StackPanel Grid.Column="1"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
-                <Button x:Name="uiPageBtnResetAll"
-                        Click="PageBtnResetAll_Click"
-                        ToolTipService.ToolTip="Reset the configuration of this system to its defaults">
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Margin="0,0,6,0"
-                                  FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
-                        <TextBlock VerticalAlignment="center">Reset Page to Defaults</TextBlock>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Grid>
     </Grid>
-</Page>
+</ui_base:SystemEditorPageBase>

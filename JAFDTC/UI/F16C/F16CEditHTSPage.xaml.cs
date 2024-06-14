@@ -22,6 +22,7 @@ using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.HTS;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Base;
 using JAFDTC.Utilities;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -33,13 +34,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace JAFDTC.UI.F16C
 {
     /// <summary>
-    /// TODO: document
+    /// Page obejct for the system editor page that handles the ui for the viper hts man table editor. this handles
+    /// setup for the manual table as well as the threat classes enabled in the hts.
     /// </summary>
-    public sealed partial class F16CEditHTSPage : Page
+    public sealed partial class F16CEditHTSPage : SystemEditorPageBase
     {
         public static ConfigEditorPageInfo PageInfo
             => new(HTSSystem.SystemTag, "HTS Threats", "HTS", Glyphs.HTS, typeof(F16CEditHTSPage));
@@ -49,30 +52,32 @@ namespace JAFDTC.UI.F16C
         // properties
         //
         // ------------------------------------------------------------------------------------------------------------
-        private ConfigEditorPageNavArgs NavArgs { get; set; }
 
-        // NOTE: changes to the Config object may only occur through the marshall methods. bindings to and edits by
-        // NOTE: the ui are always directed at the EditHTS property.
+        // ---- overrides of base SystemEditorPage properties
+
+        protected override SystemBase SystemConfig => ((F16CConfiguration)Config).HTS;
+
+        protected override String SystemTag => HTSSystem.SystemTag;
+
+        protected override string SystemName => "HTS manual table";
+
+        protected override bool IsPageStateDefault => CurStateIsDefault();
+
+        // ---- internal properties
+
+        // NOTE: the ui always interacts with EditHTS when editing program values.
         //
-        private F16CConfiguration Config { get; set; }
-
         private HTSSystem EditHTS { get; set; }
 
-        private bool IsRebuildPending { get; set; }
-
         // ---- readonly properties
-
-        private readonly Dictionary<string, string> _configNameToUID;
-        private readonly List<string> _configNameList;
 
         private readonly List<string> _emitterTitles;
         private readonly Dictionary<string, Emitter> _emitterTitleMap;
 
-        private readonly List<TextBox> _tableCodeFields;
         private readonly List<FontIcon> _tableEditFields;
         private readonly List<List<TextBlock>> _tableFields;
-        private readonly Brush _defaultBorderBrush;
-        private readonly Brush _defaultBkgndBrush;
+        private readonly Brush _brushEnabledText;
+        private readonly Brush _brushDisabledText;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -82,23 +87,10 @@ namespace JAFDTC.UI.F16C
 
         public F16CEditHTSPage()
         {
-            InitializeComponent();
-
             EditHTS = new HTSSystem();
 
-            // NOTE: for this to work here, we need to not change the instances in MANTable[]. changes should
-            // NOTE: be done by modifying fields in the MANTable[] instnaces.
-            //
-            for (int row = 0; row < EditHTS.MANTable.Count; row++)
-            {
-                EditHTS.MANTable[row].ErrorsChanged += CodeField_DataValidationError;
-                EditHTS.MANTable[row].PropertyChanged += CodeField_PropertyChanged;
-            }
-
-            IsRebuildPending = false;
-
-            _configNameToUID = new Dictionary<string, string>();
-            _configNameList = new List<string>();
+            InitializeComponent();
+            InitializeBase(EditHTS, uiT1ValueCode, uiCtlLinkResetBtns);
 
             _emitterTitles = new();
             _emitterTitleMap = new();
@@ -106,18 +98,11 @@ namespace JAFDTC.UI.F16C
             {
                 string item = $"{emitter.Country} – {emitter.Type} – {emitter.Name}";
                 if (!string.IsNullOrEmpty(emitter.NATO))
-                {
                     item += $" ({emitter.NATO})";
-                }
                 _emitterTitles.Add(item);
                 _emitterTitleMap[item] = emitter;
             }
 
-            _tableCodeFields = new List<TextBox>()
-            {
-                uiT1ValueCode, uiT2ValueCode, uiT3ValueCode, uiT4ValueCode,
-                uiT5ValueCode, uiT6ValueCode, uiT7ValueCode, uiT8ValueCode
-            };
             _tableEditFields = new List<FontIcon>()
             {
                 uiT1IconEdit, uiT2IconEdit, uiT3IconEdit, uiT4IconEdit,
@@ -125,17 +110,21 @@ namespace JAFDTC.UI.F16C
             };
             _tableFields = new List<List<TextBlock>>()
             {
-                new List<TextBlock>() { uiT1RWRText, uiT1ValueCountry, uiT1ValueType, uiT1ValueName },
-                new List<TextBlock>() { uiT2RWRText, uiT2ValueCountry, uiT2ValueType, uiT2ValueName },
-                new List<TextBlock>() { uiT3RWRText, uiT3ValueCountry, uiT3ValueType, uiT3ValueName },
-                new List<TextBlock>() { uiT4RWRText, uiT4ValueCountry, uiT4ValueType, uiT4ValueName },
-                new List<TextBlock>() { uiT5RWRText, uiT5ValueCountry, uiT5ValueType, uiT5ValueName },
-                new List<TextBlock>() { uiT6RWRText, uiT6ValueCountry, uiT6ValueType, uiT6ValueName },
-                new List<TextBlock>() { uiT7RWRText, uiT7ValueCountry, uiT7ValueType, uiT7ValueName },
-                new List<TextBlock>() { uiT8RWRText, uiT8ValueCountry, uiT8ValueType, uiT8ValueName }
+                new() { uiT1RWRText, uiT1ValueCountry, uiT1ValueType, uiT1ValueName },
+                new() { uiT2RWRText, uiT2ValueCountry, uiT2ValueType, uiT2ValueName },
+                new() { uiT3RWRText, uiT3ValueCountry, uiT3ValueType, uiT3ValueName },
+                new() { uiT4RWRText, uiT4ValueCountry, uiT4ValueType, uiT4ValueName },
+                new() { uiT5RWRText, uiT5ValueCountry, uiT5ValueType, uiT5ValueName },
+                new() { uiT6RWRText, uiT6ValueCountry, uiT6ValueType, uiT6ValueName },
+                new() { uiT7RWRText, uiT7ValueCountry, uiT7ValueType, uiT7ValueName },
+                new() { uiT8RWRText, uiT8ValueCountry, uiT8ValueType, uiT8ValueName }
             };
-            _defaultBorderBrush = uiT1ValueCode.BorderBrush;
-            _defaultBkgndBrush = uiT1ValueCode.Background;
+
+            // HACK: this is a stupid hack because i'm too lazy to figure out how to get this from a resource. fix
+            // HACK: this at some point...
+            //
+            _brushEnabledText = uiT1ValueCode.Foreground;
+            _brushDisabledText = uiHeaderText.Foreground;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -144,39 +133,43 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // marshall data between our local state and the hts configuration. note we do not replace the TableCode
-        // instance in MANTable[] to avoid disrupting bindings.
-        //
-        private void CopyConfigToEdit()
+        /// <summary>
+        /// Find and return the property information and encapsulating object corresponding to the provided control
+        /// in the EditState object.
+        /// </summary>
+        protected override void GetControlEditStateProperty(FrameworkElement ctrl,
+                                                            out PropertyInfo prop, out BindableObject obj)
         {
-            for (int i = 0; i < EditHTS.EnabledThreats.Length; i++)
-            {
-                EditHTS.EnabledThreats[i] = Config.HTS.EnabledThreats[i];
-            }
-            for (int i = 0; i < EditHTS.MANTable.Count; i++)
-            {
-                EditHTS.MANTable[i].Code = new(Config.HTS.MANTable[i].Code);
-            }
+            // ui state corresponds to one of several entries in the config state. do that mapping here based on the
+            // property of the form "<entry>.<property>"
+            //
+            string propName = ctrl.Tag.ToString();
+            int entryNum = int.Parse(propName[..1]);
+            prop = EditHTS.MANTable[entryNum].GetType().GetProperty(propName[2..]);
+            obj = EditHTS.MANTable[entryNum];
+
+            if (prop == null)
+                throw new ApplicationException($"Unexpected {ctrl.GetType()}: Tag {ctrl.Tag}");
         }
 
-        private void CopyEditToConfig(bool isPersist = false)
+        /// <summary>
+        /// Find and return the property information and encapsulating object corresponding to the provided control
+        /// in the persisted configuration object.
+        /// </summary>
+        protected override void GetControlConfigProperty(FrameworkElement ctrl,
+                                                         out PropertyInfo prop, out BindableObject obj)
         {
-            if (!CurStateHasErrors())
-            {
-                for (int i = 0; i < Config.HTS.EnabledThreats.Length; i++)
-                {
-                    Config.HTS.EnabledThreats[i] = EditHTS.EnabledThreats[i];
-                }
-                for (int row = 0; row < Config.HTS.MANTable.Count; row++)
-                {
-                    Config.HTS.MANTable[row].Code = new(EditHTS.MANTable[row].Code);
-                }
+            // ui state corresponds to one of several entries in the config state. do that mapping here based on the
+            // property of the form "<entry>.<property>"
+            //
+            HTSSystem hts = (HTSSystem)SystemConfig;
+            string propName = ctrl.Tag.ToString();
+            int entryNum = int.Parse(propName[..1]);
+            prop = hts.MANTable[entryNum].GetType().GetProperty(propName[2..]);
+            obj = hts.MANTable[entryNum];
 
-                if (isPersist)
-                {
-                    Config.Save(this, HTSSystem.SystemTag);
-                }
-            }
+            if (prop == null)
+                throw new ApplicationException($"Unexpected {ctrl.GetType()}: Tag {ctrl.Tag}");
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -186,67 +179,29 @@ namespace JAFDTC.UI.F16C
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// set the border brush and background for a TextBox based on validity. valid fields use the defaults, invalid
-        /// fields use ErrorFieldBorderBrush from the resources.
+        /// Override to perform custom logic when a property changes.
         /// </summary>
-        private void SetFieldValidState(TextBox field, bool isValid)
+        protected override void EditState_ErrorsChanged(object sender, DataErrorsChangedEventArgs args)
         {
-            field.BorderBrush = (isValid) ? _defaultBorderBrush : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
-            field.Background = (isValid) ? _defaultBkgndBrush : (SolidColorBrush)Resources["ErrorFieldBackgroundBrush"];
-        }
-
-        // validation error: update ui state for the various components (base, chaff program, flare program)
-        // that may have errors.
-        //
-        private void CodeField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
-        {
-            int row = EditHTS.MANTable.IndexOf((TableCode)sender);
-            if ((row != -1) && (args.PropertyName != null))
+            if (args.PropertyName != null)
             {
-                List<string> errors = (List<string>)EditHTS.MANTable[row].GetErrors(args.PropertyName);
-                SetFieldValidState(_tableCodeFields[row], (errors.Count == 0));
-            }
-            RebuildInterfaceState();
-        }
-
-        // property changed: rebuild interface state to account for configuration changes.
-        //
-        private void CodeField_PropertyChanged(object sender, EventArgs args)
-        {
-            for (int row = 0; row < EditHTS.MANTable.Count; row++)
-            {
-                RebuildTableRowContent(row);
-            }
-        }
-
-        // returns true if the current state has errors, false otherwise.
-        //
-        private bool CurStateHasErrors()
-        {
-            for (int row = 0; row < EditHTS.MANTable.Count; row++)
-            {
-                if (EditHTS.MANTable[row].HasErrors)
+                for (int i = 0; i < EditHTS.MANTable.Count; i++)
                 {
-                    return true;
+                    List<string> errors = (List<string>)EditHTS.MANTable[i].GetErrors(args.PropertyName);
+                    SetFieldValidVisualState(PageTextBoxes[$"{i}.Code"], (errors.Count == 0));
                 }
             }
-            return false;
         }
 
-        // returns true if the current state is default, false otherwise.
-        //
-        private bool PageIsDefault()
+        /// <summary>
+        /// returns true if the current state is default, false otherwise.
+        /// </summary>
+        private bool CurStateIsDefault()
         {
-            bool isDefault = !EditHTS.IsMANTablePopulated && !EditHTS.EnabledThreats[0];
-            for (int threat = 1; threat < EditHTS.EnabledThreats.Length; threat++)
-            {
-                if (!EditHTS.EnabledThreats[threat])
-                {
-                    isDefault = false;
-                    break;
-                }
-            }
-            return isDefault;
+            for (int i = 0; i < EditHTS.MANTable.Count; i++)
+                if (!EditHTS.MANTable[i].IsDefault)
+                    return false;
+            return true;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -255,9 +210,10 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // rebuild the content in the man threat table definition using the emitter database to lookup the details
-        // on the programmed emitters.
-        //
+        /// <summary>
+        /// rebuild the content in the man threat table definition using the emitter database to lookup the details
+        /// on the programmed emitters.
+        /// </summary>
         private void RebuildTableRowContent(int tableRow)
         {
             string curCode = EditHTS.MANTable[tableRow].Code;
@@ -278,46 +234,38 @@ namespace JAFDTC.UI.F16C
                 {
                     name = emitterList[0].Name;
                     if (!string.IsNullOrEmpty(emitterList[0].NATO))
-                    {
                         name += $" ({emitterList[0].NATO})";
-                    }
                 }
                 fields[3].Text = name;
+
+                for (int i = 0; i < fields.Count; i++)
+                    fields[i].Foreground = (emitterList.Count != 0) ? _brushEnabledText : _brushDisabledText;
             }
         }
 
-        // update the summary content in the threat list based on the selected threat tables.
-        //
+        /// <summary>
+        /// update the summary content in the threat list based on the selected threat tables.
+        /// </summary>
         private void RebuildThreatListContent()
         {
             List<string> threats = new();
             for (int threat = 1; threat < EditHTS.EnabledThreats.Length; threat++)
-            {
                 if (EditHTS.EnabledThreats[threat])
-                {
                     threats.Add($"T{threat}");
-                }
-            }
             if (EditHTS.EnabledThreats[0])
-            {
                 threats.Add("MAN");
-            }
             uiThreatTextList.Text = (threats.Count > 0) ? General.JoinList(threats) : "No HTS threat classes are enabled.";
         }
 
-        // TODO: document
-        private void RebuildLinkControls()
+        /// <summary>
+        /// update the ui state based on current setup.
+        /// </summary>
+        protected override void UpdateUICustom(bool isEditable)
         {
-            Utilities.RebuildLinkControls(Config, HTSSystem.SystemTag, NavArgs.UIDtoConfigMap,
-                                          uiPageBtnTxtLink, uiPageTxtLink);
-        }
+            for (int row = 0; row < EditHTS.MANTable.Count; row++)
+                RebuildTableRowContent(row);
+            RebuildThreatListContent();
 
-        // update the enable state on the ui elements based on the current settings. link controls must be set up
-        // vi RebuildLinkControls() prior to calling this function.
-        //
-        private void RebuildEnableState()
-        {
-            bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(HTSSystem.SystemTag));
             Utilities.SetEnableState(uiT1ValueCode, isEditable);
             Utilities.SetEnableState(uiT2ValueCode, isEditable);
             Utilities.SetEnableState(uiT3ValueCode, isEditable);
@@ -336,33 +284,14 @@ namespace JAFDTC.UI.F16C
             Utilities.SetEnableState(uiT7BtnAdd, isEditable);
             Utilities.SetEnableState(uiT8BtnAdd, isEditable);
 
-            Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
-
-            Utilities.SetEnableState(uiPageBtnResetAll, !PageIsDefault());
             Utilities.SetEnableState(uiMANBtnResetTable, EditHTS.IsMANTablePopulated && isEditable);
         }
 
-        // rebuild the state of controls on the page in response to a change in the configuration.
-        //
-        private void RebuildInterfaceState()
+        protected override void ResetConfigToDefault()
         {
-            if (!IsRebuildPending)
-            {
-                IsRebuildPending = true;
-                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-                {
-                    for (int row = 0; row < EditHTS.MANTable.Count; row++)
-                    {
-                        RebuildTableRowContent(row);
-                    }
-                    RebuildThreatListContent();
-                    RebuildLinkControls();
-                    RebuildEnableState();
-                    IsRebuildPending = false;
-                });
-            }
+            ((F16CConfiguration)Config).HTS.Reset();
         }
-        
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // ui interactions
@@ -371,78 +300,44 @@ namespace JAFDTC.UI.F16C
 
         // ---- page buttons ------------------------------------------------------------------------------------------
 
-        // reset all button click: reset all hts settings back to their defaults.
-        //
-        private async void PageBtnResetAll_Click(object sender, RoutedEventArgs args)
+        /// <summary>
+        /// reset table click: reset table to defaults. this implicitly disables man table enable as without a man
+        /// table, the option to enable man table threats is not available in the hts format.
+        /// </summary>
+        private void MANBtnResetTable_Click(object sender, RoutedEventArgs _)
         {
-            ContentDialogResult result = await Utilities.Message2BDialog(
-                Content.XamlRoot,
-                "Reset Configuration?",
-                "Are you sure you want to reset the HTS configurations to avionics defaults? This action cannot be undone.",
-                "Reset"
-            );
-            if (result == ContentDialogResult.Primary)
-            {
-                Config.UnlinkSystem(HTSSystem.SystemTag);
-                Config.HTS.Reset();
-                Config.Save(this, HTSSystem.SystemTag);
-                CopyConfigToEdit();
-            }
-        }
-
-        // TODO: document
-        private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
-        {
-            string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, HTSSystem.SystemTag,
-                                                                    _configNameList);
-            if (selectedItem == null)
-            {
-                Config.UnlinkSystem(HTSSystem.SystemTag);
-                Config.Save(this);
-            }
-            else if (selectedItem.Length > 0)
-            {
-                Config.LinkSystemTo(HTSSystem.SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selectedItem]]);
-                Config.Save(this);
-                CopyConfigToEdit();
-            }
-        }
-
-        // reset table click: reset table to defaults. this implicitly disables man table enable as without a man
-        // table, the option to enable man table threats is not available in the hts format.
-        //
-        private void MANBtnResetTable_Click(object sender, RoutedEventArgs args)
-        {
-            for (int row = 0; row < Config.HTS.MANTable.Count; row++)
-            {
-                Config.HTS.MANTable[row].Reset();
-            }
-            Config.HTS.EnabledThreats[0] = false;
-            Config.Save(this, HTSSystem.SystemTag);
-            CopyConfigToEdit();
+            F16CConfiguration config = (F16CConfiguration)Config;
+            for (int row = 0; row < config.HTS.MANTable.Count; row++)
+                config.HTS.MANTable[row].Reset();
+            config.HTS.EnabledThreats[0] = false;
+            config.Save(this, HTSSystem.SystemTag);
+            CopyConfigToEditState();
         }
 
         // --- threat selection ---------------------------------------------------------------------------------------
 
-        // select threat click: push changes to the configuration and navigate to the threat selection page to update
-        // that state in the configuration.
-        //
-        private void ThreatBtnSelect_Click(object sender, RoutedEventArgs args)
+        /// <summary>
+        /// select threat click: push changes to the configuration and navigate to the threat selection page to update
+        /// that state in the configuration.
+        /// </summary>
+        private void ThreatBtnSelect_Click(object sender, RoutedEventArgs _)
         {
-            CopyEditToConfig(true);
-            RebuildInterfaceState();
+            SaveEditStateToConfig();
+            UpdateUIFromEditState();
 
+            F16CConfiguration config = (F16CConfiguration)Config;
             NavArgs.BackButton.IsEnabled = false;
             bool isUnlinked = string.IsNullOrEmpty(Config.SystemLinkedTo(HTSSystem.SystemTag));
-            Frame.Navigate(typeof(F16CEditHTSThreatsPage), new F16CEditHTSThreatsPageNavArgs(this, Config, isUnlinked),
+            Frame.Navigate(typeof(F16CEditHTSThreatsPage), new F16CEditHTSThreatsPageNavArgs(this, config, isUnlinked),
                            new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
         }
 
         // --- add emitter --------------------------------------------------------------------------------------------
 
-        // add button click: open the ui to prompt to select an emitter.
-        //
-        private async void MANBtnAdd_Click(object sender, RoutedEventArgs args)
+        /// <summary>
+        /// add button click: open the ui to prompt to select an emitter.
+        /// </summary>
+        private async void MANBtnAdd_Click(object sender, RoutedEventArgs _)
         {
             Button btnAdd = (Button)sender;
             GetListDialog dialog = new(_emitterTitles, "Emitter", 425)
@@ -460,25 +355,8 @@ namespace JAFDTC.UI.F16C
                 int row = int.Parse((string)button.Tag);
                 EditHTS.MANTable[row].Code = emitter.ALICCode.ToString("0");
 
-                CopyEditToConfig(true);
+                SaveEditStateToConfig();
             }
-        }
-
-        // ---- text field changes ------------------------------------------------------------------------------------
-
-        // text box lost focus: copy the local backing values to the configuration (note this is predicated on error
-        // status) and rebuild the interface state.
-        //
-        // NOTE: though the text box has lost focus, the update may not yet have propagated into state. use the
-        // NOTE: dispatch queue to give in-flight state updates time to complete.
-        //
-        private void MANTextBox_LostFocus(object sender, RoutedEventArgs args)
-        {
-            // CONSIDER: may be better here to handle this in a property changed handler rather than here?
-            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-            {
-                CopyEditToConfig(true);
-            });
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -487,38 +365,24 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // on configuration saved, rebuild the interface state to align with the latest save (assuming we go here
-        // through a CopyEditToConfig).
-        //
-        private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
-        {
-            RebuildInterfaceState();
-        }
-
-        // on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
-        // we are editing.
-        //
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
-            NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
-            Config = (F16CConfiguration)NavArgs.Config;
-
-            Config.ConfigurationSaved += ConfigurationSavedHandler;
-
-            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, HTSSystem.SystemTag,
-                                           _configNameList, _configNameToUID);
-
-            CopyConfigToEdit();
-
-            NavArgs.BackButton.IsEnabled = true;
-            RebuildInterfaceState();
-
             base.OnNavigatedTo(args);
+
+            for (int i = 0; i < EditHTS.MANTable.Count; i++)
+            {
+                EditHTS.MANTable[i].ErrorsChanged += EditState_ErrorsChanged;
+                EditHTS.MANTable[i].PropertyChanged += EditState_PropertyChanged;
+            }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs args)
         {
-            Config.ConfigurationSaved -= ConfigurationSavedHandler;
+            for (int i = 0; i < EditHTS.MANTable.Count; i++)
+            {
+                EditHTS.MANTable[i].ErrorsChanged -= EditState_ErrorsChanged;
+                EditHTS.MANTable[i].PropertyChanged -= EditState_PropertyChanged;
+            }
 
             base.OnNavigatedFrom(args);
         }
