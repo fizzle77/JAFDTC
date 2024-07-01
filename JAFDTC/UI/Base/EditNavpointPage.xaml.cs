@@ -199,6 +199,17 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
+        /// If the PageHelper specifies a non-zero maximum name length, indicate
+        /// when it is exceeded with a warning-yellow background and border.
+        /// </summary>
+        private void ValidateNavptNameLength()
+        {
+            bool isTooLong = PageHelper.MaxNameLength > 0 && uiNavptValueName.Text.Length > PageHelper.MaxNameLength;
+            uiNavptValueName.BorderBrush = (isTooLong) ? (SolidColorBrush)Resources["WarningFieldBorderBrush"] : _defaultBorderBrush;
+            uiNavptValueName.Background = (isTooLong) ? (SolidColorBrush)Resources["WarningFieldBackgroundBrush"] : _defaultBkgndBrush;
+        }
+
+        /// <summary>
         /// TODO: document
         /// </summary>
         private void EditNavpt_DataValidationError(object sender, DataErrorsChangedEventArgs args)
@@ -508,6 +519,7 @@ namespace JAFDTC.UI.Base
             EditNavptIndex -= 1;
             CopyConfigToEdit(EditNavptIndex);
             RebuildInterfaceState();
+            uiNavptValueName.Focus(FocusState.Programmatic);
         }
 
         /// <summary>
@@ -521,6 +533,7 @@ namespace JAFDTC.UI.Base
             EditNavptIndex += 1;
             CopyConfigToEdit(EditNavptIndex);
             RebuildInterfaceState();
+            uiNavptValueName.Focus(FocusState.Programmatic);
         }
 
         /// <summary>
@@ -542,6 +555,36 @@ namespace JAFDTC.UI.Base
         private void NavptTextBoxExt_TextChanged(object sender, TextChangedEventArgs args)
         {
             RebuildInterfaceState();
+        }
+
+
+        private void uiNavptValueName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ValidateNavptNameLength();
+        }
+
+        private void uiNavptValueName_GotFocus(object sender, RoutedEventArgs e)
+        {
+            uiNavptValueName.SelectAll();
+            
+            // This doesn't actually work to give the text box the warning appearance,
+            // presumably because the WinUI default focus styling happens later. This is fixable
+            // but I don't know how to do it yet. Leaving this here as a reminder.
+            //ValidateNavptNameLength();
+        }
+
+        private void uiNavptValueName_KeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            // If <Enter> is pressed and the "Next" button is enabled, treat it as a click on the "Next" button.
+            if (e.Key == Windows.System.VirtualKey.Enter && uiNavptBtnNext.IsEnabled)
+            {
+                // Explicit property set is necessary because the binding updates
+                // on lost focus, which doesn't occur here.
+                EditNavpt.Name = uiNavptValueName.Text; 
+                NavptBtnNext_Click(sender, e);
+                uiNavptValueName.SelectAll();
+                e.Handled = true;
+            }
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -601,6 +644,14 @@ namespace JAFDTC.UI.Base
             RebuildInterfaceState();
 
             base.OnNavigatedTo(args);
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Focus the name field when the page is loaded. Must be done here,
+            // rather than in OnNavigatedTo, because the visual tree is not yet
+            // available at that point.
+            uiNavptValueName.Focus(FocusState.Programmatic);
         }
     }
 }

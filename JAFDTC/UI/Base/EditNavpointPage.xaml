@@ -28,6 +28,7 @@ https://www.gnu.org/licenses/.
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    Loaded="Page_Loaded"
     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
 
     <Page.Resources>
@@ -49,6 +50,8 @@ https://www.gnu.org/licenses/.
         <!-- brush for error fields. -->
         <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
         <SolidColorBrush x:Key="ErrorFieldBackgroundBrush" Color="PaleVioletRed"/>
+        <SolidColorBrush x:Key="WarningFieldBorderBrush" Color="Orange"/>
+        <SolidColorBrush x:Key="WarningFieldBackgroundBrush" Color="LightYellow"/>
 
         <!-- style for ComboBoxSeparated -->
         <Style TargetType="ui_app:ComboBoxSeparated" BasedOn="{StaticResource DefaultComboBoxStyle}" />
@@ -239,6 +242,9 @@ https://www.gnu.org/licenses/.
                      x:Name="uiNavptValueName"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      Text="{x:Bind EditNavpt.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     GotFocus="uiNavptValueName_GotFocus"
+                     TextChanged="uiNavptValueName_TextChanged"
+                     KeyUp="uiNavptValueName_KeyUp"
                      MaxLength="48"
                      ToolTipService.ToolTip="Name of navpoint"/>
 

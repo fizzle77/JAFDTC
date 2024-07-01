@@ -44,6 +44,8 @@ namespace JAFDTC.UI.A10C
 
         public LLFormat NavptCoordFmt => LLFormat.DDM_P3ZF;
 
+        public int MaxNameLength => 12;
+
         public Dictionary<string, string> LatExtProperties
             => new()
             {
