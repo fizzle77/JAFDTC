@@ -212,8 +212,11 @@ https://www.gnu.org/licenses/.
                         x:Name="uiNavptBtnPrev"
                         VerticalAlignment="Center"
                         Click="NavptBtnPrev_Click"
-                        ToolTipService.ToolTip="Move to previous navpoint for editing">
+                        ToolTipService.ToolTip="Move to previous navpoint for editing (Control+Shift+Enter)">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Enter" Modifiers="Control,Shift"/>
+                    </Button.KeyboardAccelerators>
                 </Button>
                 <Button Grid.Column="5" Margin="0,0,6,0"
                         x:Name="uiNavptBtnAdd"
@@ -226,8 +229,11 @@ https://www.gnu.org/licenses/.
                         x:Name="uiNavptBtnNext"
                         VerticalAlignment="Center"
                         Click="NavptBtnNext_Click"
-                        ToolTipService.ToolTip="Move to next navpoint for editing">
+                        ToolTipService.ToolTip="Move to next navpoint for editing (Control+Enter)">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Enter" Modifiers="Control"/>
+                    </Button.KeyboardAccelerators>
                 </Button>
             </Grid>
 
@@ -242,9 +248,9 @@ https://www.gnu.org/licenses/.
                      x:Name="uiNavptValueName"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      Text="{x:Bind EditNavpt.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     GotFocus="uiNavptValueName_GotFocus"
-                     TextChanged="uiNavptValueName_TextChanged"
-                     KeyUp="uiNavptValueName_KeyUp"
+                     GotFocus="NavptValueName_GotFocus"
+                     TextChanged="NavptValueName_TextChanged"
+                     PreviewKeyDown="TextBox_PreviewKeyDown"
                      MaxLength="48"
                      ToolTipService.ToolTip="Name of navpoint"/>
 
@@ -274,6 +280,7 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.CustomMask="N:[nNsS]"
                          ui_ctk:TextBoxExtensions.Mask="N 99° 99’ 99’’"
                          TextChanged="NavptTextBoxExt_TextChanged"
+                         PreviewKeyDown="TextBox_PreviewKeyDown"
                          ToolTipService.ToolTip="Latitude of navpoint"/>
                 <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
                          x:Name="uiNavptValueLon"
@@ -285,6 +292,7 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.CustomMask="E:[eEwW]"
                          ui_ctk:TextBoxExtensions.Mask="E 999° 99’ 99’’"
                          TextChanged="NavptTextBoxExt_TextChanged"
+                         PreviewKeyDown="TextBox_PreviewKeyDown"
                          ToolTipService.ToolTip="Longitude of navpoint"/>
                 <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"
                          x:Name="uiNavptValueAlt"
@@ -292,6 +300,7 @@ https://www.gnu.org/licenses/.
                          Text="{x:Bind EditNavpt.Alt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          PlaceholderText="0"
                          MaxLength="8"
+                         PreviewKeyDown="TextBox_PreviewKeyDown"
                          ToolTipService.ToolTip="Elevation of navpoint in feet"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
                            x:Name="uiNavptAltitudeUnitsText"
