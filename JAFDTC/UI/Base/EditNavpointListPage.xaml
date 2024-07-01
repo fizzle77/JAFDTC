@@ -175,7 +175,7 @@ https://www.gnu.org/licenses/.
         common editor controls 
         ===============================================================================================================
         -->
-        <controls:LinkResetBtnsControl x:Name="uiCtlLinkResetBtns" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
+        <controls:LinkResetBtnsControl x:Name="uiCtlLinkResetBtns" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"/>
 
     </Grid>
 </ui_base:SystemEditorPageBase>
