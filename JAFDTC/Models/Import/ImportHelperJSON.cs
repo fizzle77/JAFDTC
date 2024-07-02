@@ -69,7 +69,7 @@ namespace JAFDTC.Models.Import
             if (json != null)
             {
                 if (ImportIsPOIs(json))
-                    return navptSys.ImportSerializedPOIs(json);
+                    return navptSys.ImportSerializedPOIs(json, isReplace);
                 else
                     return navptSys.ImportSerializedNavpoints(json, isReplace);
             }

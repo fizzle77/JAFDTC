@@ -303,6 +303,8 @@ namespace JAFDTC.UI.Base
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
             {
                 PageHelper.CaptureNavpoints(Config, wypts, CaptureIndex);
+                Config.Save(this, PageHelper.SystemTag);
+                CopyConfigToEditState();
             });
         }
 

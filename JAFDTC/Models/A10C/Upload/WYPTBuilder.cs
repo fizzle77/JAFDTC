@@ -106,6 +106,10 @@ namespace JAFDTC.Models.A10C.Upload
         /// </summary>
         private void BuildWaypoints(AirframeDevice cdu, ObservableCollection<WaypointInfo> jetWypts)
         {
+            // Ensure CDU scratchpad is clear before we start.
+            AddActions(cdu, new() { "CLR", "CLR" });
+            AddWait(WAIT_BASE);
+
             for (var i = 0; i < jetWypts.Count; i++)
             {
                 string wyptID = jetWypts[i].Number.ToString();
@@ -149,7 +153,7 @@ namespace JAFDTC.Models.A10C.Upload
             {
                 wyptName = wyptName[..12];
             }
-            AddActions(cdu, ActionsForString(wyptName), new(){ "LSK_7R" });
+            AddActions(cdu, ActionsForString(wyptName), new() { "LSK_7R" });
             AddWait(WAIT_BASE);
             AddActions(cdu, new() { "CLR", "CLR" });
         }

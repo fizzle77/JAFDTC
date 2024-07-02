@@ -24,6 +24,7 @@ using JAFDTC.Models.DCS;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -33,7 +34,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
+using Windows.System;
+using Windows.UI.Core;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
@@ -199,6 +201,18 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
+        /// If the PageHelper specifies a non-zero maximum name length,
+        /// indicate when it is exceeded with the warning style.
+        /// </summary>
+        private void ValidateNavptNameLength()
+        {
+            if (PageHelper.MaxNameLength > 0 && uiNavptValueName.Text.Length > PageHelper.MaxNameLength)
+                uiNavptValueName.Style = (Style)Application.Current.Resources["WarningTextBoxStyle"];
+            else
+                uiNavptValueName.Style = (Style)Application.Current.Resources["EditorParamEditTextBoxStyle"];
+        }
+
+        /// <summary>
         /// TODO: document
         /// </summary>
         private void EditNavpt_DataValidationError(object sender, DataErrorsChangedEventArgs args)
@@ -323,7 +337,7 @@ namespace JAFDTC.UI.Base
             if (!IsRebuildPending)
             {
                 IsRebuildPending = true;
-                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+                DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
                 {
                     uiPoITextTitle.Text = $"{PageHelper.NavptName} Initial Setup";
                     uiNavptTextNum.Text = $"{PageHelper.NavptName} {EditNavpt.Number} Information";
@@ -475,7 +489,7 @@ namespace JAFDTC.UI.Base
         {
             if ((wypts.Length > 0) && !wypts[0].IsTarget)
             {
-                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () =>
                 {
                     PageHelper.ApplyCapture(EditNavpt, wypts[0]);
                 });
@@ -508,6 +522,7 @@ namespace JAFDTC.UI.Base
             EditNavptIndex -= 1;
             CopyConfigToEdit(EditNavptIndex);
             RebuildInterfaceState();
+            uiNavptValueName.Focus(FocusState.Programmatic);
         }
 
         /// <summary>
@@ -521,6 +536,7 @@ namespace JAFDTC.UI.Base
             EditNavptIndex += 1;
             CopyConfigToEdit(EditNavptIndex);
             RebuildInterfaceState();
+            uiNavptValueName.Focus(FocusState.Programmatic);
         }
 
         /// <summary>
@@ -537,11 +553,74 @@ namespace JAFDTC.UI.Base
         // ---- text field changes ------------------------------------------------------------------------------------
 
         /// <summary>
-        /// navpoint text box text changed: rebuild the interface state to update based on current valid/invalid stae.
+        /// navpoint text box text changed: rebuild the interface state to update based on current valid/invalid state.
         /// </summary>
         private void NavptTextBoxExt_TextChanged(object sender, TextChangedEventArgs args)
         {
             RebuildInterfaceState();
+        }
+
+
+        private void NavptValueName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ValidateNavptNameLength();
+        }
+
+        private void NavptValueName_GotFocus(object sender, RoutedEventArgs e)
+        {
+            uiNavptValueName.SelectAll();
+        }
+
+        /// <summary>
+        /// Handle keyboard shortcuts for navigating to next/prev navpoint when a textbox is focused.
+        /// </summary>
+        private void TextBox_PreviewKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.Enter)
+            {
+                getModifierKeyStates(out bool isShiftDown, out bool isCtrlDown);
+                if (isCtrlDown)
+                {
+                    // Explicit property set is necessary because the binding update
+                    // is on lost focus, which doesn't occur here.
+                    EditNavpt.Name = uiNavptValueName.Text;
+
+                    if (!isShiftDown && uiNavptBtnNext.IsEnabled)
+                    {
+                        NavptBtnNext_Click(sender, e);
+                        uiNavptValueName.SelectAll();
+                        e.Handled = true;
+                    }
+                    if (isShiftDown && uiNavptBtnPrev.IsEnabled)
+                    {
+                        NavptBtnPrev_Click(sender, e);
+                        uiNavptValueName.SelectAll();
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
+
+        private bool IsModifierKeyDown(CoreVirtualKeyStates leftKeyState, CoreVirtualKeyStates rightKeyState)
+        {
+            // Odd that this is so convoluted, but checking for (Down | Locked) does appear necessary to reliably detect key state.
+            // Doc source: https://learn.microsoft.com/en-us/windows/apps/design/input/keyboard-accelerators#override-default-keyboard-behavior
+            if (leftKeyState == CoreVirtualKeyStates.Down || leftKeyState == (CoreVirtualKeyStates.Down | CoreVirtualKeyStates.Locked))
+                return true;
+            if (rightKeyState == CoreVirtualKeyStates.Down || rightKeyState == (CoreVirtualKeyStates.Down | CoreVirtualKeyStates.Locked))
+                return true;
+            return false;
+        }
+
+        private void getModifierKeyStates(out bool isShiftDown, out bool isCtrlDown)
+        {
+            CoreVirtualKeyStates leftKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.LeftShift);
+            CoreVirtualKeyStates rightKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.RightShift);
+            isShiftDown = IsModifierKeyDown(leftKeyState, rightKeyState);
+
+            leftKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.LeftControl);
+            rightKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.RightControl);
+            isCtrlDown = IsModifierKeyDown(leftKeyState, rightKeyState);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -601,6 +680,14 @@ namespace JAFDTC.UI.Base
             RebuildInterfaceState();
 
             base.OnNavigatedTo(args);
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            // We do this here (and not in OnNavigatedTo) for two reasons:
+            // 1. The visual tree is done loading here.
+            // 2. We want this to happen every time you click a WP from the list.
+            uiNavptValueName.Focus(FocusState.Programmatic);
         }
     }
 }

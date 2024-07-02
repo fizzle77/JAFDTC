@@ -45,6 +45,8 @@ namespace JAFDTC.UI.AV8B
 
         public LLFormat NavptCoordFmt => LLFormat.DMS;
 
+        public int MaxNameLength => 0;
+
         public Dictionary<string, string> LatExtProperties => null;
 
         public Dictionary<string, string> LonExtProperties => null;

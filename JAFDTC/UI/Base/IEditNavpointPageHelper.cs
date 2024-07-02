@@ -51,6 +51,12 @@ namespace JAFDTC.UI.Base
         public LLFormat NavptCoordFmt { get; }
 
         /// <summary>
+        /// Returns the maximum number of characters the jet will allow for a navpoint name.
+        /// If zero, the UI will not indicate a limit.
+        /// </summary>
+        public int MaxNameLength { get; }
+
+        /// <summary>
         /// returns a dictionary with the TextBoxExtensions to apply to the latitude field. the keys are property
         /// names for the extensions ("MaskPlaceholder", "Regex", "CustomMask", and "Mask"), values are the strings
         /// to set these to. null or an empty dictionary indicates the DMS coordinate defaults are used.
