@@ -201,14 +201,15 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
-        /// If the PageHelper specifies a non-zero maximum name length, indicate
-        /// when it is exceeded with a warning-yellow background and border.
+        /// If the PageHelper specifies a non-zero maximum name length,
+        /// indicate when it is exceeded with the warning style.
         /// </summary>
         private void ValidateNavptNameLength()
         {
-            bool isTooLong = PageHelper.MaxNameLength > 0 && uiNavptValueName.Text.Length > PageHelper.MaxNameLength;
-            uiNavptValueName.BorderBrush = (isTooLong) ? (SolidColorBrush)Resources["WarningFieldBorderBrush"] : _defaultBorderBrush;
-            uiNavptValueName.Background = (isTooLong) ? (SolidColorBrush)Resources["WarningFieldBackgroundBrush"] : _defaultBkgndBrush;
+            if (PageHelper.MaxNameLength > 0 && uiNavptValueName.Text.Length > PageHelper.MaxNameLength)
+                uiNavptValueName.Style = (Style)Application.Current.Resources["WarningTextBoxStyle"];
+            else
+                uiNavptValueName.Style = (Style)Application.Current.Resources["EditorParamEditTextBoxStyle"];
         }
 
         /// <summary>
@@ -568,11 +569,6 @@ namespace JAFDTC.UI.Base
         private void NavptValueName_GotFocus(object sender, RoutedEventArgs e)
         {
             uiNavptValueName.SelectAll();
-            
-            // This doesn't actually work to give the text box the warning appearance,
-            // presumably because the WinUI default focus styling happens later. This is fixable
-            // but I don't know how to do it yet. Leaving this here as a reminder.
-            //ValidateNavptNameLength();
         }
 
         /// <summary>
@@ -688,9 +684,9 @@ namespace JAFDTC.UI.Base
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // Focus the name field when the page is loaded. Must be done here,
-            // rather than in OnNavigatedTo, because the visual tree is not yet
-            // available at that point.
+            // We do this here (and not in OnNavigatedTo) for two reasons:
+            // 1. The visual tree is done loading here.
+            // 2. We want this to happen every time you click a WP from the list.
             uiNavptValueName.Focus(FocusState.Programmatic);
         }
     }

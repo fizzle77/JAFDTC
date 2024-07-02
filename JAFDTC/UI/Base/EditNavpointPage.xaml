@@ -50,8 +50,6 @@ https://www.gnu.org/licenses/.
         <!-- brush for error fields. -->
         <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
         <SolidColorBrush x:Key="ErrorFieldBackgroundBrush" Color="PaleVioletRed"/>
-        <SolidColorBrush x:Key="WarningFieldBorderBrush" Color="Orange"/>
-        <SolidColorBrush x:Key="WarningFieldBackgroundBrush" Color="LightYellow"/>
 
         <!-- style for ComboBoxSeparated -->
         <Style TargetType="ui_app:ComboBoxSeparated" BasedOn="{StaticResource DefaultComboBoxStyle}" />
