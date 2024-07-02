@@ -133,6 +133,7 @@ namespace JAFDTC.Models.DCS
         {
             return new()
             {
+                "Afghanistan",
                 "Caucasus",
                 "Kola",
                 "Marianas",

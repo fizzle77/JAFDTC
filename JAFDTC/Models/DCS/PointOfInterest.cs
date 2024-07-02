@@ -122,7 +122,11 @@ namespace JAFDTC.Models.DCS
         /// </summary>
         public static string TheaterForCoords(double lat, double lon)
         {
-            if (InRange(40.0, lat, 46.0) && InRange(33.0, lon, 46.0))
+            if (InRange(29.0, lat, 39.0) && InRange(59.0, lon, 76.0))
+            {
+                return "Afghanistan";
+            }
+            else if (InRange(40.0, lat, 46.0) && InRange(33.0, lon, 46.0))
             {
                 return "Caucasus";
             }
@@ -177,14 +181,10 @@ namespace JAFDTC.Models.DCS
                 {
                     string newValue = value.Trim();
                     if (newValue.Length > 0)
-                    {
                         cleanTags += $"; {newValue}";
-                    }
                 }
                 if (cleanTags.Length >= 3)
-                {
                     cleanTags = cleanTags[2..];
-                }
             }
             return cleanTags;
         }
