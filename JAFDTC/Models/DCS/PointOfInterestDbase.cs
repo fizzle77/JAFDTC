@@ -392,7 +392,7 @@ namespace JAFDTC.Models.DCS
         public bool Save(string campaign = null, bool isCullEmptyCampaign = false)
         {
             PointOfInterestDbQuery query;
-            if (campaign == null)
+            if (string.IsNullOrEmpty(campaign))
             {
                 query = new PointOfInterestDbQuery(PointOfInterestTypeMask.USER);
                 return FileManager.SaveUserPointsOfInterest(Find(query));
