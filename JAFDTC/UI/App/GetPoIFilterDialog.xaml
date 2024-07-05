@@ -77,19 +77,19 @@ https://www.gnu.org/licenses/.
         <CheckBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="1" Margin="0,18,0,0"
                   x:Name="uiCkbxDCSPoI"
                   HorizontalAlignment="Left">
-            Include DCS Points of Interest
+            Shows DCS Points of Interest
         </CheckBox>
 
         <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="1"
                   x:Name="uiCkbxUserPoI"
                   HorizontalAlignment="Left">
-            Include User Points of Interest
+            Shows User Points of Interest
         </CheckBox>
 
         <CheckBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="1"
                   x:Name="uiCkbxCampaignPoI"
                   HorizontalAlignment="Left">
-            Include Campaign Points of Interest
+            Shows Campaign Points of Interest
         </CheckBox>
     </Grid>
 </ContentDialog>
