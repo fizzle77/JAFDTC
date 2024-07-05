@@ -65,11 +65,15 @@ namespace JAFDTC.Utilities
 
         public string LastStptFilterTheater { get; set; }
 
+        public string LastStptFilterCampaign { get; set; }
+
         public string LastStptFilterTags { get; set; }
 
         public PointOfInterestTypeMask LastStptFilterIncludeTypes { get; set; }
 
         public string LastPoIFilterTheater { get; set; }
+
+        public string LastPoIFilterCampaign { get; set; }
 
         public string LastPoIFilterTags { get; set; }
 
@@ -116,9 +120,11 @@ namespace JAFDTC.Utilities
             LastAirframeSelection = 0;
             LastConfigSelection = -1;
             LastStptFilterTheater = "";
+            LastStptFilterCampaign = "";
             LastStptFilterTags = "";
             LastStptFilterIncludeTypes = PointOfInterestTypeMask.ANY;
             LastPoIFilterTheater = "";
+            LastPoIFilterCampaign = "";
             LastPoIFilterTags = "";
             LastPoIFilterIncludeTypes = PointOfInterestTypeMask.ANY;
             LastPoICoordFmtSelection = LLFormat.DDM_P3ZF;
@@ -336,7 +342,6 @@ namespace JAFDTC.Utilities
             }
         }
 
-
         public static string LastStptFilterTheater
         {
             get => _currentSettings.LastStptFilterTheater;
@@ -345,6 +350,19 @@ namespace JAFDTC.Utilities
                 if (_currentSettings.LastStptFilterTheater != value)
                 {
                     _currentSettings.LastStptFilterTheater = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static string LastStptFilterCampaign
+        {
+            get => _currentSettings.LastStptFilterCampaign;
+            set
+            {
+                if (_currentSettings.LastStptFilterCampaign != value)
+                {
+                    _currentSettings.LastStptFilterCampaign = value;
                     FileManager.WriteSettings(_currentSettings);
                 }
             }
@@ -384,6 +402,19 @@ namespace JAFDTC.Utilities
                 if (_currentSettings.LastPoIFilterTheater != value)
                 {
                     _currentSettings.LastPoIFilterTheater = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static string LastPoIFilterCampaign
+        {
+            get => _currentSettings.LastPoIFilterCampaign;
+            set
+            {
+                if (_currentSettings.LastPoIFilterCampaign != value)
+                {
+                    _currentSettings.LastPoIFilterCampaign = value;
                     FileManager.WriteSettings(_currentSettings);
                 }
             }
