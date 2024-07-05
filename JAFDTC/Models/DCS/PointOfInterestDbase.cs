@@ -115,8 +115,27 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// return a list of the names of known campaigns.
         /// </summary>
-        public List<string> Campaigns => ((_dbase != null) && _dbase.ContainsKey(PointOfInterestType.CAMPAIGN))
-                                         ? _dbase[PointOfInterestType.CAMPAIGN].Keys.ToList<string>() : new();
+        public List<string> KnownCampaigns => ((_dbase != null) && _dbase.ContainsKey(PointOfInterestType.CAMPAIGN))
+                                              ? _dbase[PointOfInterestType.CAMPAIGN].Keys.ToList<string>() : new();
+
+        /// <summary>
+        /// return a list of strings for all of the theaters represented in the database.
+        /// 
+        /// TODO: consider allowing user-defined theaters.
+        /// </summary>
+        public static List<string> KnownTheaters => new()
+        {
+            "Afghanistan",
+            "Caucasus",
+            "Kola",
+            "Marianas",
+            "Nevada",
+            "Persian Gulf",
+            "Sinai",
+            "South Atlantic",
+            "Syria",
+            "Other"
+        };
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -141,28 +160,6 @@ namespace JAFDTC.Models.DCS
         /// </summary>
         private static string AuxKey(PointOfInterest poi)
             => (poi.Type == PointOfInterestType.CAMPAIGN) ? poi.Campaign : poi.Theater;
-
-        /// <summary>
-        /// return a list of strings for all of the theaters represented in the database.
-        /// 
-        /// TODO: consider allowing user-defined theaters.
-        /// </summary>
-        public static List<string> KnownTheaters()
-        {
-            return new()
-            {
-                "Afghanistan",
-                "Caucasus",
-                "Kola",
-                "Marianas",
-                "Nevada",
-                "Persian Gulf",
-                "Sinai",
-                "South Atlantic",
-                "Syria",
-                "Other"
-            };
-        }
 
         /// <summary>
         /// return list of points of interest containing all points of interest that match the specified query

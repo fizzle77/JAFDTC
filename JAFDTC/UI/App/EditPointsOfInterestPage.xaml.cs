@@ -395,7 +395,7 @@ namespace JAFDTC.UI.App
                 result = await nameDialog.ShowAsync();
                 campaignName = nameDialog.Value.Trim(' ');
                 string message = null;
-                foreach (string campaign in PointOfInterestDbase.Instance.Campaigns)
+                foreach (string campaign in PointOfInterestDbase.Instance.KnownCampaigns)
                 {
                     if (campaignName.ToLower() == campaign.ToLower())
                     {
@@ -425,7 +425,7 @@ namespace JAFDTC.UI.App
         /// </summary>
         private async void CoreApplyFuncToExistingCampaign(string what, Func<string, bool> operation)
         {
-            GetListDialog listDialog = new(PointOfInterestDbase.Instance.Campaigns, "Campaign")
+            GetListDialog listDialog = new(PointOfInterestDbase.Instance.KnownCampaigns, "Campaign")
             {
                 XamlRoot = Content.XamlRoot,
                 Title = $"{what} Campaign",
@@ -580,7 +580,7 @@ namespace JAFDTC.UI.App
                 uiPoITextBtnAdd.Text = "Add";
             }
 
-            bool isCampaigns = (PointOfInterestDbase.Instance.Campaigns.Count > 0);
+            bool isCampaigns = (PointOfInterestDbase.Instance.KnownCampaigns.Count > 0);
 
             Utilities.SetEnableState(uiBarBtnEdit, uiPoIListView.SelectedItems.Count == 1);
             Utilities.SetEnableState(uiBarBtnCopyCampaign, isCampaigns && (uiPoIListView.SelectedItems.Count > 0));

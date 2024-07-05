@@ -51,7 +51,7 @@ namespace JAFDTC.UI.App
             {
                 uiComboTheater.Items.Add("Any Theater");
             }
-            foreach (string name in PointOfInterestDbase.KnownTheaters())
+            foreach (string name in PointOfInterestDbase.KnownTheaters)
             {
                 uiComboTheater.Items.Add(name);
             }
