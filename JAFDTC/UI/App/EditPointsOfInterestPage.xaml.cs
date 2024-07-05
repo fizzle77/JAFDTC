@@ -58,7 +58,7 @@ namespace JAFDTC.UI.App
         {
             get
             {
-                string tags = (string.IsNullOrEmpty(PoI.Tags)) ? "—" : PoI.Tags;
+                string tags = (string.IsNullOrEmpty(PoI.Tags)) ? "—" : PoI.Tags.Replace(";", ", ");
                 return (string.IsNullOrEmpty(PoI.Campaign)) ? tags : $"{PoI.Campaign} : {tags}";
             }
         }

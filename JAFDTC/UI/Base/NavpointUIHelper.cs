@@ -45,10 +45,18 @@ namespace JAFDTC.UI.Base
 
         public string Name => PoI.Name;
 
-        public string Info => (string.IsNullOrEmpty(PoI.Tags)) ? PoI.Theater : $"{PoI.Theater} — {PoI.Tags}";
+        public string Info
+        {
+            get
+            {
+                string tags = (string.IsNullOrEmpty(PoI.Tags)) ? "—" : PoI.Tags.Replace(";", ", ");
+                return (string.IsNullOrEmpty(PoI.Campaign)) ? $"{PoI.Theater} : {tags}"
+                                                            : $"{PoI.Theater} [{PoI.Campaign}] : {tags}";
+            }
+        }
 
         public string Glyph => (PoI.Type == PointOfInterestType.USER)
-                       ? "\xE718" : ((PoI.Type == PointOfInterestType.CAMPAIGN) ? "\xE7C1" : "");
+                           ? "\xE718" : ((PoI.Type == PointOfInterestType.CAMPAIGN) ? "\xE7C1" : "");
 
         public PoIListItem(PointOfInterest poi) => (PoI) = (poi);
     }
