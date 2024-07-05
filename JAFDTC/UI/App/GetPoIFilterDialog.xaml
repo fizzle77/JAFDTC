@@ -46,48 +46,52 @@ https://www.gnu.org/licenses/.
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <!-- theater drop-down selection -->
         <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,12,0,0"
                    VerticalAlignment="Center"
                    HorizontalTextAlignment="Right">
             Theater
         </TextBlock>
-        <ComboBox Grid.Row="0" Grid.Column="1" Margin="12,12,0,0"
-                  x:Name="uiComboTheater"
-                  VerticalAlignment="Center"
-                  HorizontalAlignment="Stretch">
+        <ComboBox Grid.Row="0" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboTheater"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Center">
         </ComboBox>
-        
-        <!-- tags text field -->
+
+        <!-- campaign drop-down selection -->
         <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,12,0,0"
+                   VerticalAlignment="Center"
+                   HorizontalTextAlignment="Right">
+            Campaign
+        </TextBlock>
+        <ComboBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" x:Name="uiComboCampaign"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Center">
+        </ComboBox>
+
+        <!-- tags text field -->
+        <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,12,0,0"
                    VerticalAlignment="Center"
                    HorizontalTextAlignment="Right">
             Tags
         </TextBlock>
-        <TextBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
-                 x:Name="uiTextBoxTags"
-                 VerticalAlignment="Center"
-                 HorizontalAlignment="Stretch"
+        <TextBox Grid.Row="2" Grid.Column="1" Margin="12,12,0,0" x:Name="uiTextBoxTags"
+                 HorizontalAlignment="Stretch" VerticalAlignment="Center"
                  PlaceholderText="&quot;;&quot; Separated List">
         </TextBox>
 
         <!-- type checkboxen -->
-        <CheckBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="1" Margin="0,18,0,0"
-                  x:Name="uiCkbxDCSPoI"
+        <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="1" Margin="0,18,0,0" x:Name="uiCkbxDCSPoI"
                   HorizontalAlignment="Left">
             Shows DCS Points of Interest
         </CheckBox>
 
-        <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="1"
-                  x:Name="uiCkbxUserPoI"
+        <CheckBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="1" x:Name="uiCkbxUserPoI"
                   HorizontalAlignment="Left">
             Shows User Points of Interest
         </CheckBox>
 
-        <CheckBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="1"
-                  x:Name="uiCkbxCampaignPoI"
+        <CheckBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="1" x:Name="uiCkbxCampaignPoI"
                   HorizontalAlignment="Left">
             Shows Campaign Points of Interest
         </CheckBox>

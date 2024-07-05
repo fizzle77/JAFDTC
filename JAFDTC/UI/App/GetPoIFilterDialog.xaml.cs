@@ -28,8 +28,15 @@ namespace JAFDTC.UI.App
     /// </summary>
     public sealed partial class GetPoIFilterDialog : ContentDialog
     {
-        public string Theater
-            => (_isAnyAllowed && uiComboTheater.SelectedIndex == 0) ? null : uiComboTheater.SelectedItem.ToString();
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // properties
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        public string Theater => (uiComboTheater.SelectedIndex == 0) ? null : uiComboTheater.SelectedItem.ToString();
+
+        public string Campaign => (uiComboCampaign.SelectedIndex == 0) ? null : uiComboCampaign.SelectedItem.ToString();
 
         public string Tags => uiTextBoxTags.Text;
 
@@ -38,31 +45,33 @@ namespace JAFDTC.UI.App
                 (((bool)uiCkbxUserPoI.IsChecked) ? PointOfInterestTypeMask.USER : PointOfInterestTypeMask.NONE) |
                 (((bool)uiCkbxCampaignPoI.IsChecked) ? PointOfInterestTypeMask.CAMPAIGN : PointOfInterestTypeMask.NONE));
 
-        private readonly bool _isAnyAllowed;
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // construction
+        //
+        // ------------------------------------------------------------------------------------------------------------
 
-        public GetPoIFilterDialog(string theater = null, bool isAnyAllowed = true, string tags = null,
+        public GetPoIFilterDialog(string theater = null, string campaign = null, string tags = null,
                                   PointOfInterestTypeMask includeTypes = PointOfInterestTypeMask.ANY)
         {
-            _isAnyAllowed = isAnyAllowed;
-
             InitializeComponent();
 
-            if (isAnyAllowed)
-            {
-                uiComboTheater.Items.Add("Any Theater");
-            }
+            uiComboTheater.Items.Add("Any Theater");
             foreach (string name in PointOfInterestDbase.KnownTheaters)
-            {
                 uiComboTheater.Items.Add(name);
-            }
-            if (isAnyAllowed && string.IsNullOrEmpty(theater))
-            {
+            if (string.IsNullOrEmpty(theater))
                 uiComboTheater.SelectedIndex = 0;
-            }
             else
-            {
                 uiComboTheater.SelectedItem = theater;
-            }
+
+            uiComboCampaign.Items.Add("Any Campaign");
+            foreach (string name in PointOfInterestDbase.Instance.KnownCampaigns)
+                uiComboCampaign.Items.Add(name);
+            if (string.IsNullOrEmpty(campaign) || !PointOfInterestDbase.Instance.KnownCampaigns.Contains(campaign))
+                uiComboCampaign.SelectedIndex = 0;
+            else
+                uiComboCampaign.SelectedItem = campaign;
+
             uiTextBoxTags.Text = tags;
             uiCkbxDCSPoI.IsChecked = ((includeTypes & PointOfInterestTypeMask.DCS_CORE) != 0);
             uiCkbxUserPoI.IsChecked = ((includeTypes & PointOfInterestTypeMask.USER) != 0);

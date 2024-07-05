@@ -858,8 +858,8 @@ namespace JAFDTC.UI.F16C
 
             IsCancelInFlight = false;
 
-            FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterTags,
-                             Settings.LastStptFilterIncludeTypes);
+            FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterCampaign,
+                             Settings.LastStptFilterTags, Settings.LastStptFilterIncludeTypes);
 
             ValidateAllFields(_curStptFieldValueMap, EditStpt.GetErrors(null));
             ValidateAllFields(_oap0FieldValueMap, EditStpt.OAP[0].GetErrors(null));

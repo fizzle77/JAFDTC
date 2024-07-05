@@ -62,19 +62,22 @@ namespace JAFDTC.UI.Base
     {
         public string Theater { get; set; }
 
+        public string Campaign { get; set; }
+
         public string Tags { get; set; }
 
         public PointOfInterestTypeMask IncludeTypes { get; set; }
 
         public bool IsFiltered => !(string.IsNullOrEmpty(Theater) &&
+                                    string.IsNullOrEmpty(Campaign) &&
                                     string.IsNullOrEmpty(Tags) &&
                                     IncludeTypes.HasFlag(PointOfInterestTypeMask.DCS_CORE) &&
                                     IncludeTypes.HasFlag(PointOfInterestTypeMask.USER) &&
                                     IncludeTypes.HasFlag(PointOfInterestTypeMask.CAMPAIGN));
 
-        public PoIFilterSpec(string theater = null, string tags = null,
+        public PoIFilterSpec(string theater = null, string campaign = null, string tags = null,
                              PointOfInterestTypeMask types = PointOfInterestTypeMask.ANY)
-            => (Theater, Tags, IncludeTypes) = (theater, tags, types);
+            => (Theater, Campaign, Tags, IncludeTypes) = (theater, campaign, tags, types);
     }
 
     // ================================================================================================================
@@ -101,7 +104,7 @@ namespace JAFDTC.UI.Base
                 button.IsChecked = spec.IsFiltered;
             }
 
-            GetPoIFilterDialog filterDialog = new(spec.Theater, true, spec.Tags, spec.IncludeTypes)
+            GetPoIFilterDialog filterDialog = new(spec.Theater, spec.Campaign, spec.Tags, spec.IncludeTypes)
             {
                 XamlRoot = root,
                 Title = $"Set a Filter for Points of Interest",

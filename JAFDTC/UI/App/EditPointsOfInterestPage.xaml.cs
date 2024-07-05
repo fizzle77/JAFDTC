@@ -41,7 +41,6 @@ using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
-using System.Xml.Linq;
 
 namespace JAFDTC.UI.App
 {
@@ -223,11 +222,14 @@ namespace JAFDTC.UI.App
 
         private string FilterTheater { get; set; }
 
+        private string FilterCampaign { get; set; }
+
         private string FilterTags { get; set; }
 
         private PointOfInterestTypeMask FilterIncludeTypes { get; set; }
 
         private bool IsFiltered => !(string.IsNullOrEmpty(FilterTheater) &&
+                                     string.IsNullOrEmpty(FilterCampaign) && 
                                      string.IsNullOrEmpty(FilterTags) &&
                                      FilterIncludeTypes.HasFlag(PointOfInterestTypeMask.DCS_CORE) &&
                                      FilterIncludeTypes.HasFlag(PointOfInterestTypeMask.USER) &&
@@ -477,7 +479,7 @@ namespace JAFDTC.UI.App
         /// </summary>
         private List<PointOfInterest> GetPoIsMatchingFilter(string name = null)
         {
-            PointOfInterestDbQuery query = new(FilterIncludeTypes, FilterTheater, null, name, FilterTags,
+            PointOfInterestDbQuery query = new(FilterIncludeTypes, FilterTheater, FilterCampaign, name, FilterTags,
                                                PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH);
             return PointOfInterestDbase.Instance.Find(query, true);
         }
@@ -663,7 +665,7 @@ namespace JAFDTC.UI.App
             if (button.IsChecked != IsFiltered)
                 button.IsChecked = IsFiltered;
 
-            GetPoIFilterDialog filterDialog = new(FilterTheater, true, FilterTags, FilterIncludeTypes)
+            GetPoIFilterDialog filterDialog = new(FilterTheater, FilterCampaign, FilterTags, FilterIncludeTypes)
             {
                 XamlRoot = Content.XamlRoot,
                 Title = $"Set a Filter for Points of Interest",
@@ -675,12 +677,14 @@ namespace JAFDTC.UI.App
             if (result == ContentDialogResult.Primary)
             {
                 FilterTheater = filterDialog.Theater;
+                FilterCampaign = filterDialog.Campaign;
                 FilterTags = PointOfInterest.SanitizedTags(filterDialog.Tags);
                 FilterIncludeTypes = filterDialog.IncludeTypes;
             }
             else if (result == ContentDialogResult.Secondary)
             {
                 FilterTheater = "";
+                FilterCampaign = "";
                 FilterTags = "";
                 FilterIncludeTypes = PointOfInterestTypeMask.ANY;
             }
@@ -692,6 +696,7 @@ namespace JAFDTC.UI.App
             button.IsChecked = IsFiltered;
 
             Settings.LastPoIFilterTheater = FilterTheater;
+            Settings.LastPoIFilterCampaign = FilterCampaign;
             Settings.LastPoIFilterTags = FilterTags;
             Settings.LastPoIFilterIncludeTypes = FilterIncludeTypes;
 
@@ -1214,6 +1219,7 @@ namespace JAFDTC.UI.App
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             FilterTheater = Settings.LastPoIFilterTheater;
+            FilterCampaign = Settings.LastPoIFilterCampaign;
             FilterTags = Settings.LastPoIFilterTags;
             FilterIncludeTypes = Settings.LastPoIFilterIncludeTypes;
 

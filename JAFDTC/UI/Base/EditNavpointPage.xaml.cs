@@ -672,8 +672,8 @@ namespace JAFDTC.UI.Base
             EditNavptIndex = NavArgs.IndexNavpt;
             CopyConfigToEdit(EditNavptIndex);
 
-            FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterTags,
-                             Settings.LastStptFilterIncludeTypes);
+            FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterCampaign,
+                             Settings.LastStptFilterTags, Settings.LastStptFilterIncludeTypes);
 
             ValidateAllFields(_curNavptFieldValueMap, PageHelper.GetErrors(EditNavpt, null));
             RebuildPointsOfInterest();
