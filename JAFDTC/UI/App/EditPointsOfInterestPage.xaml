@@ -57,21 +57,18 @@ https://www.gnu.org/licenses/.
         -->
         <StackPanel Grid.Row="0" Margin="8,4,8,4"
                     Orientation="Horizontal"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center">
+                    HorizontalAlignment="Left" VerticalAlignment="Center">
 
             <!-- Style="{StaticResource NavigationBackButtonSmallStyle}" -->
 
-            <AppBarButton Height="48" Margin="0,2,0,0"
-                          x:Name="uiHdrBtnBack"
+            <AppBarButton Margin="0,2,0,0" Height="48" x:Name="uiHdrBtnBack"
                           VerticalAlignment="Center"
                           IsEnabled="True"
                           Click="HdrBtnBack_Click"
                           ToolTipService.ToolTip="Return to Configuration List">
                 <SymbolIcon Symbol="Back"/>
             </AppBarButton>
-            <TextBlock Margin="4,0,0,4"
-                       x:Name="uiHdrTxtConfigName"
+            <TextBlock Margin="4,0,0,4" x:Name="uiHdrTxtConfigName"
                        VerticalAlignment="Center"
                        FontSize="20"
                        FontWeight="SemiBold">
@@ -85,16 +82,14 @@ https://www.gnu.org/licenses/.
         ===============================================================================================================
         -->
         <Grid Grid.Row="1"
-              VerticalAlignment="Center"
-              HorizontalAlignment="Center">
+              HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- poi search box -->
-            <AutoSuggestBox Grid.Column="0" Width="375"
-                            x:Name="uiPoINameFilterBox"
+            <AutoSuggestBox Grid.Column="0" Width="375" x:Name="uiPoINameFilterBox"
                             VerticalAlignment="Center"
                             PlaceholderText="Filter Points of Interest by Name"
                             QueryIcon="Find"
@@ -103,8 +98,7 @@ https://www.gnu.org/licenses/.
 
             <!-- command bar -->
             <CommandBar Grid.Column="1" Margin="6,0,0,0"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left">
+                        HorizontalAlignment="Left" VerticalAlignment="Center">
                 <AppBarToggleButton x:Name="uiBarBtnFilter" Label="Filter Points"
                                     Click="CmdFilter_Click"
                                     ToolTipService.ToolTip="Set filter to apply to points of interest">
@@ -116,6 +110,13 @@ https://www.gnu.org/licenses/.
                 <AppBarButton x:Name="uiBarBtnEdit" Icon="Edit" Label="Edit"
                               Click="CmdEdit_Click"
                               ToolTipService.ToolTip="Edit point of interest"/>
+                <AppBarButton x:Name="uiBarBtnCopyCampaign" Label="Copy to Campaign"
+                              Click="CmdCopyCampaign_Click"
+                              ToolTipService.ToolTip="Copy selected points of interest to campaign">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7C1;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
                 <AppBarButton x:Name="uiBarBtnDelete" Icon="Delete" Label="Delete"
                               Click="CmdDelete_Click"
                               ToolTipService.ToolTip="Delete selected point of interest"/>
@@ -126,14 +127,30 @@ https://www.gnu.org/licenses/.
                 <AppBarButton x:Name="uiBarBtnExport" Icon="Upload" Label="Export"
                               Click="CmdExport_Click"
                               ToolTipService.ToolTip="Export points of interest to file"/>
-                <AppBarSeparator/>
-                <AppBarButton x:Name="uiBarBtnCoords" Label="Coordinates"
-                              Click="CmdCoords_Click"
-                              ToolTipService.ToolTip="Select format for coordinates">
-                    <AppBarButton.Icon>
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE909;"/>
-                    </AppBarButton.Icon>
-                </AppBarButton>
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton x:Name="uiBarBtnAddCamp" Label="Add Campaign..."
+                                  Click="CmdAddCampaign_Click"
+                                  ToolTipService.ToolTip="TODO">
+                        <AppBarButton.Icon>
+                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                    <AppBarButton x:Name="uiBarBtnDeleteCamp" Label="Delete Campaign..."
+                                  Click="CmdDeleteCampaign_Click"
+                                  ToolTipService.ToolTip="TODO">
+                        <AppBarButton.Icon>
+                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74D;"/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                    <AppBarSeparator/>
+                    <AppBarButton x:Name="uiBarBtnCoords" Label="Coordinate Format"
+                                  Click="CmdCoords_Click"
+                                  ToolTipService.ToolTip="Select format for coordinates">
+                        <AppBarButton.Icon>
+                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE909;"/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                </CommandBar.SecondaryCommands>
             </CommandBar>
         </Grid>
 
@@ -195,6 +212,13 @@ https://www.gnu.org/licenses/.
                         <MenuFlyout.Items>
                             <MenuFlyoutItem Text="Edit" Icon="Edit" Click="CmdEdit_Click"/>
                             <MenuFlyoutItem Text="Export" Icon="Upload" Click="CmdExport_Click"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Text="Copy to Campaign..." 
+                                            Click="CmdCopyCampaign_Click">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7C1;"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
                             <MenuFlyoutSeparator/>
                             <MenuFlyoutItem Text="Delete" Icon="Delete" Click="CmdDelete_Click"/>
                         </MenuFlyout.Items>

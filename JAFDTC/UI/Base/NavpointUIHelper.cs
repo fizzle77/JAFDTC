@@ -138,7 +138,7 @@ namespace JAFDTC.UI.Base
         public static List<PoIListItem> RebuildPointsOfInterest(PoIFilterSpec spec, string name = null)
         {
             List<PoIListItem> suitableItems = new();
-            PointOfInterestDbQuery query = new(spec.IncludeTypes, spec.Theater, name, spec.Tags,
+            PointOfInterestDbQuery query = new(spec.IncludeTypes, spec.Theater, null, name, spec.Tags,
                                                PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH);
             foreach (PointOfInterest poi in PointOfInterestDbase.Instance.Find(query, true))
             {
@@ -169,8 +169,8 @@ namespace JAFDTC.UI.Base
                 List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
                 if (pois.Count == 0)
                 {
-                    PointOfInterest poi = new(PointOfInterestType.USER, theater, name, "", lat, lon, elev);
-                    PointOfInterestDbase.Instance.Add(poi);
+                    PointOfInterest poi = new(PointOfInterestType.USER, theater, "", name, "", lat, lon, elev);
+                    PointOfInterestDbase.Instance.AddPointOfInterest(poi);
                     return true;
                 }
                 else if ((pois.Count == 1) && (pois[0].IsMatchTypeMask(PointOfInterestTypeMask.USER)))
