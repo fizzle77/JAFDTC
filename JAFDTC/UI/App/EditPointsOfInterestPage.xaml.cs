@@ -78,7 +78,7 @@ namespace JAFDTC.UI.App
 
     /// <summary>
     /// point of interest lat/lon helper. this provides for translation between the user-facing presentation of the
-    /// lat/lon and the internal decimal degress format.
+    /// lat/lon (where settings in the ui specify the lat/lon display format) and the internal decimal degress format.
     /// </summary>
     internal class PoILL : BindableObject
     {
@@ -95,7 +95,7 @@ namespace JAFDTC.UI.App
             set
             {
                 string error = "Invalid latitude format";
-                if (IsRegexFieldValid(value, Coord.LatRegexFor(Format), false))
+                if (IsRegexFieldValid(value, Coord.LatRegexFor(Format)))
                 {
                     value = value.ToUpper();
                     error = null;
@@ -112,7 +112,7 @@ namespace JAFDTC.UI.App
             set
             {
                 string error = "Invalid longitude format";
-                if (IsRegexFieldValid(value, Coord.LonRegexFor(Format), false))
+                if (IsRegexFieldValid(value, Coord.LonRegexFor(Format)))
                 {
                     value = value.ToUpper();
                     error = null;
@@ -122,7 +122,19 @@ namespace JAFDTC.UI.App
             }
         }
 
+        public bool IsEmpty => (string.IsNullOrEmpty(Lat) && string.IsNullOrEmpty(Lon));
+
         public PoILL(LLFormat format) => (Format) = (format);
+
+        public List<string> GetErrorsWithEmpty(bool isEmptyOK)
+        {
+            List<string> errors = new();
+            if (!IsRegexFieldValid(LatUI, Coord.LatRegexFor(Format), isEmptyOK))
+                errors.Add("LatUI");
+            if (!IsRegexFieldValid(LonUI, Coord.LonRegexFor(Format), isEmptyOK))
+                errors.Add("LonUI");
+            return errors;
+        }
 
         public void Reset()
         {
@@ -138,6 +150,8 @@ namespace JAFDTC.UI.App
     /// </summary>
     internal class PoIDetails : BindableObject
     {
+        public int CurIndexLL { get; set; }
+
         // HACK: we will use per-format PoILL instances to avoid binding multiple controls to the same property (which
         // HACK: doesn't seem to work well). should be a way to dynamically bind/unbind properties that we could use
         // HACK: to avoid this, but...
@@ -165,7 +179,7 @@ namespace JAFDTC.UI.App
             set
             {
                 string error = "Invalid altitude format";
-                if (IsIntegerFieldValid(value, -1500, 80000, false))
+                if (IsIntegerFieldValid(value, -1500, 80000))
                 {
                     value = FixupIntegerField(value);
                     error = null;
@@ -174,14 +188,22 @@ namespace JAFDTC.UI.App
             }
         }
 
-// TODO: this is broken LL needs to be an all empty check...
-        public bool IsEmpty => (string.IsNullOrEmpty(Name) && string.IsNullOrEmpty(Tags) && string.IsNullOrEmpty(Alt) &&
-                                string.IsNullOrEmpty(LL[0].Lat) && string.IsNullOrEmpty(LL[0].Lon));
+        public bool IsEmpty
+            => (string.IsNullOrEmpty(Name) && string.IsNullOrEmpty(Tags) && string.IsNullOrEmpty(Alt) &&
+                LL[CurIndexLL].IsEmpty);
 
         // NOTE: format order of PoILL must be kept in sync with EditPointsOfInterestPage and xaml.
         //
         public PoIDetails()
-            => (LL) = (new PoILL[3] { new(LLFormat.DDU), new(LLFormat.DMS), new(LLFormat.DDM_P3ZF) });
+            => (CurIndexLL, LL) = (0, new PoILL[3] { new(LLFormat.DDU), new(LLFormat.DMS), new(LLFormat.DDM_P3ZF) });
+
+        public List<string> GetErrorsWithEmpty(bool isEmptyOK)
+        {
+            List<string> errors = LL[CurIndexLL].GetErrorsWithEmpty(isEmptyOK);
+            if (!IsIntegerFieldValid(Alt, -1500, 80000, isEmptyOK))
+                errors.Add("Alt");
+            return errors;
+        }
 
         public void Reset()
         {
@@ -259,16 +281,10 @@ namespace JAFDTC.UI.App
 
             EditPoI = new PoIDetails();
             EditPoI.ErrorsChanged += PoIField_DataValidationError;
-            EditPoI.PropertyChanged += PoIField_PropertyChanged;
             for (int i = 0; i < EditPoI.LL.Length; i++)
-            {
                 EditPoI.LL[i].ErrorsChanged += PoIField_DataValidationError;
-                EditPoI.LL[i].PropertyChanged += PoIField_PropertyChanged;
-            }
 
             IsEditPoINew = true;
-
-            LLDisplayFmt = LLFormat.DDM_P3ZF;
 
             // NOTE: these need to be kept in sync with PoIDetails and the xaml.
             //
@@ -299,6 +315,9 @@ namespace JAFDTC.UI.App
             };
             _defaultBorderBrush = uiPoIValueLatDDM.BorderBrush;
             _defaultBkgndBrush = uiPoIValueLatDDM.Background;
+
+            LLDisplayFmt = LLFormat.DDM_P3ZF;
+            EditPoI.CurIndexLL = _llFmtToIndexMap[LLDisplayFmt];
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -321,13 +340,10 @@ namespace JAFDTC.UI.App
         {
             Dictionary<string, bool> map = new();
             foreach (string error in errors)
-            {
                 map[error] = true;
-            }
             foreach (KeyValuePair<string, TextBox> kvp in fields)
-            {
-                SetFieldValidState(kvp.Value, !map.ContainsKey(kvp.Key));
-            }
+                SetFieldValidState(kvp.Value,
+                                   !map.ContainsKey(kvp.Key) || EditPoI.IsEmpty);
         }
 
         /// <summary>
@@ -349,18 +365,9 @@ namespace JAFDTC.UI.App
                     isValid = ((List<string>)EditPoI.LL[index].GetErrors(args.PropertyName)).Count == 0;
                 }
                 if (_curPoIFieldValueMap.ContainsKey(args.PropertyName))
-                {
-                    SetFieldValidState(_curPoIFieldValueMap[args.PropertyName], isValid);
-                }
+                    SetFieldValidState(_curPoIFieldValueMap[args.PropertyName],
+                                       isValid || EditPoI.IsEmpty);
             }
-            RebuildInterfaceState();
-        }
-
-        /// <summary>
-        /// property changed: rebuild interface state to account for configuration changes.
-        /// </summary>
-        private void PoIField_PropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
             RebuildInterfaceState();
         }
 
@@ -513,6 +520,7 @@ namespace JAFDTC.UI.App
             _curPoIFieldValueMap["LonUI"].Visibility = Visibility.Visible;
 
             LLDisplayFmt = fmt;
+            EditPoI.CurIndexLL = _llFmtToIndexMap[LLDisplayFmt];
         }
 
         /// <summary>
@@ -579,9 +587,7 @@ namespace JAFDTC.UI.App
             Utilities.SetEnableState(uiPoIBtnCapture, curApp.IsDCSAvailable);
 
             if (!isPoIValid)
-            {
                 uiPoITextBtnAdd.Text = "Add";
-            }
 
             bool isCampaigns = (PointOfInterestDbase.Instance.KnownCampaigns.Count > 0);
 
@@ -592,6 +598,9 @@ namespace JAFDTC.UI.App
             Utilities.SetEnableState(uiBarBtnExport, (uiPoIListView.SelectedItems.Count > 0));
 
             Utilities.SetEnableState(uiBarBtnDeleteCamp, isCampaigns);
+
+            List<string> errors = EditPoI.GetErrorsWithEmpty(EditPoI.IsEmpty);
+            ValidateAllFields(_curPoIFieldValueMap, errors);
         }
 
         /// <summary>
