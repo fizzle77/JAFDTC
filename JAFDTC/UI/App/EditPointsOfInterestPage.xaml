@@ -110,6 +110,13 @@ https://www.gnu.org/licenses/.
                 <AppBarButton x:Name="uiBarBtnEdit" Icon="Edit" Label="Edit"
                               Click="CmdEdit_Click"
                               ToolTipService.ToolTip="Edit point of interest"/>
+                <AppBarButton x:Name="uiBarBtnDuplicate" Label="Duplicate to User"
+                              Click="CmdDuplicate_Click"
+                              ToolTipService.ToolTip="Duplicate as user point of interest">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7C4;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
                 <AppBarButton x:Name="uiBarBtnCopyCampaign" Label="Copy to Campaign"
                               Click="CmdCopyCampaign_Click"
                               ToolTipService.ToolTip="Copy selected points of interest to campaign">
@@ -200,8 +207,7 @@ https://www.gnu.org/licenses/.
                            Text="Elevation (ft)"/>
             </Grid>
 
-            <ListView Grid.Row="1"
-                      x:Name="uiPoIListView"
+            <ListView Grid.Row="1" x:Name="uiPoIListView"
                       SelectionMode="Extended"
                       SelectionChanged="PoIListView_SelectionChanged"
                       RightTapped="PoIListView_RightTapped"
@@ -211,6 +217,11 @@ https://www.gnu.org/licenses/.
                     <MenuFlyout x:Name="uiPoiListCtxMenuFlyout">
                         <MenuFlyout.Items>
                             <MenuFlyoutItem Text="Edit" Icon="Edit" Click="CmdEdit_Click"/>
+                            <MenuFlyoutItem Text="Duplicate" Click="CmdDuplicate_Click">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7C4;"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
                             <MenuFlyoutItem Text="Export" Icon="Upload" Click="CmdExport_Click"/>
                             <MenuFlyoutSeparator/>
                             <MenuFlyoutItem Text="Copy to Campaign..." 
@@ -308,30 +319,24 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Row="0" Grid.Column="0"
-                     x:Name="uiPoIValueName"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
+                <TextBox Grid.Row="0" Grid.Column="0" x:Name="uiPoIValueName"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      Text="{x:Bind EditPoI.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      MaxLength="48"
                      TextChanged="PoITextBox_TextChanged"
                      LostFocus="PoITextBox_LostFocus"
                      ToolTipService.ToolTip="Name of point of interest"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
-                     x:Name="uiPoIValueTags"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Stretch"
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" x:Name="uiPoIValueTags"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      Text="{x:Bind EditPoI.Tags, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      TextChanged="PoITextBox_TextChanged"
                      LostFocus="PoITextBox_LostFocus"
                      ToolTipService.ToolTip="Tags for point of interest"/>
             </Grid>
-            <Button Grid.Row="0" Grid.Column="2" Margin="24,12,0,0"
-                    x:Name="uiPoIBtnAdd"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Stretch"
+            <Button Grid.Row="0" Grid.Column="2" Margin="24,12,0,0" x:Name="uiPoIBtnAdd"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Center"
                     Click="PoIBtnAdd_Click">
                 <TextBlock x:Name="uiPoITextBtnAdd">
                     Update
@@ -359,16 +364,14 @@ https://www.gnu.org/licenses/.
 
                 <!-- three different lat fields: one for each format (dd, ddm, dms), only one visible at a time
                   -->
-                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0"
-                         x:Name="uiPoIValueLatDD"
+                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0" x:Name="uiPoIValueLatDD"
                          Visibility="Collapsed"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditPoI.LL[0].LatUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          Tag="0"
                          LostFocus="PoITextBox_LostFocus"
                          ToolTipService.ToolTip="Latitude of point of interest, DD format"/>
-                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0"
-                         x:Name="uiPoIValueLatDMS"
+                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0" x:Name="uiPoIValueLatDMS"
                          Visibility="Collapsed"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditPoI.LL[1].LatUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -379,8 +382,7 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.Mask="N 99° 99’ 99’’"
                          LostFocus="PoITextBox_LostFocus"
                          ToolTipService.ToolTip="Latitude of point of interest, DMS format"/>
-                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0"
-                         x:Name="uiPoIValueLatDDM"
+                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0" x:Name="uiPoIValueLatDDM"
                          Visibility="Collapsed"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditPoI.LL[2].LatUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -394,16 +396,14 @@ https://www.gnu.org/licenses/.
 
                 <!-- three different lon fields: one for each format (dd, ddm, dms), only one visible at a time
                   -->
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
-                         x:Name="uiPoIValueLonDD"
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" x:Name="uiPoIValueLonDD"
                          Visibility="Collapsed"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditPoI.LL[0].LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          Tag="0"
                          LostFocus="PoITextBox_LostFocus"
                          ToolTipService.ToolTip="Longitude of point of interest, DD format"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
-                         x:Name="uiPoIValueLonDMS"
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" x:Name="uiPoIValueLonDMS"
                          Visibility="Collapsed"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditPoI.LL[1].LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -414,8 +414,7 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.Mask="E 999° 99’ 99’’"
                          LostFocus="PoITextBox_LostFocus"
                          ToolTipService.ToolTip="Longitude of point of interest, DMS format"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
-                         x:Name="uiPoIValueLonDDM"
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" x:Name="uiPoIValueLonDDM"
                          Visibility="Collapsed"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditPoI.LL[2].LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -427,29 +426,23 @@ https://www.gnu.org/licenses/.
                          LostFocus="PoITextBox_LostFocus"
                          ToolTipService.ToolTip="Longitude of point of interest, DDM format"/>
 
-                <TextBox Grid.Row="0" Grid.Column="2" Margin="12,0,0,0"
-                         x:Name="uiPoIValueAlt"
+                <TextBox Grid.Row="0" Grid.Column="2" Margin="12,0,0,0" x:Name="uiPoIValueAlt"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditPoI.Alt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          LostFocus="PoITextBox_LostFocus"
                          ToolTipService.ToolTip="Elevation of point of interest (feet)"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,0,0"
-                           x:Name="uiPoITextAltUnits"
+                <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,0,0" x:Name="uiPoITextAltUnits"
                            Style="{StaticResource EditorParamStaticTextBlockStyle}">
                     ft
                 </TextBlock>
 
-                <TextBlock Grid.Row="0" Grid.Column="4" Margin="16,0,0,0"
-                           x:Name="uiPoITextTheater"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Center">
+                <TextBlock Grid.Row="0" Grid.Column="4" Margin="16,0,0,0" x:Name="uiPoITextTheater"
+                           HorizontalAlignment="Left" VerticalAlignment="Center">
                     Unknown Theater
                 </TextBlock>
-                <Button Grid.Column="5" Height="34" Margin="12,0,24,0"
-                        x:Name="uiPoIBtnCapture"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
+                <Button Grid.Column="5" Height="34" Margin="12,0,24,0" x:Name="uiPoIBtnCapture"
+                        HorizontalAlignment="Right" VerticalAlignment="Center"
                         Click="PoIBtnCapture_Click"
                         ToolTipService.ToolTip="Capture point of interest LAT, LON, ALT from DCS">
                     <StackPanel Orientation="Horizontal">
@@ -461,10 +454,8 @@ https://www.gnu.org/licenses/.
                     </StackPanel>
                 </Button>
             </Grid>
-            <Button Grid.Row="1" Grid.Column="2" Margin="24,12,0,0"
-                    x:Name="uiPoIBtnClear"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Stretch"
+            <Button Grid.Row="1" Grid.Column="2" Margin="24,12,0,0" x:Name="uiPoIBtnClear"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Center"
                     Click="PoIBtnClear_Click">
                 Clear
             </Button>

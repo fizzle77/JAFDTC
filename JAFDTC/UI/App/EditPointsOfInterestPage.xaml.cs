@@ -537,7 +537,8 @@ namespace JAFDTC.UI.App
             string theater = GetTheaterFromEditor();
             uiPoITextTheater.Text = (string.IsNullOrEmpty(theater)) ? "Unknown Theater" : theater;
 
-            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, uiPoIValueName.Text);
+            string test = uiPoIValueName.Text;
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, null, uiPoIValueName.Text);
             List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
             IsEditPoINew = pois.Count == 0;
             uiPoITextBtnAdd.Text = (IsEditPoINew) ? "Add" : "Update";
@@ -584,7 +585,8 @@ namespace JAFDTC.UI.App
 
             bool isCampaigns = (PointOfInterestDbase.Instance.KnownCampaigns.Count > 0);
 
-            Utilities.SetEnableState(uiBarBtnEdit, uiPoIListView.SelectedItems.Count == 1);
+            Utilities.SetEnableState(uiBarBtnEdit, (uiPoIListView.SelectedItems.Count == 1) && isUserInSel);
+            Utilities.SetEnableState(uiBarBtnDuplicate, uiPoIListView.SelectedItems.Count == 1);
             Utilities.SetEnableState(uiBarBtnCopyCampaign, isCampaigns && (uiPoIListView.SelectedItems.Count > 0));
             Utilities.SetEnableState(uiBarBtnDelete, isUserInSel || isCampaignInSel);
             Utilities.SetEnableState(uiBarBtnExport, (uiPoIListView.SelectedItems.Count > 0));
@@ -707,22 +709,36 @@ namespace JAFDTC.UI.App
 
         /// <summary>
         /// edit command click: copy the name, latitude, longitude, and elevation of the currnetly selected point of
-        /// interest into the poi editor fields and rebuild the interface state to reflect the change.
+        /// interest into the poi editor fields and rebuild the interface state to reflect the change. this should
+        /// only be called on editable user pois.
         /// </summary>
         private void CmdEdit_Click(object sender, RoutedEventArgs args)
         {
-            if (uiPoIListView.SelectedItems.Count > 0)
-            {
-                PoIListItem poiListItem = (PoIListItem)(uiPoIListView.SelectedItems[0]);
-                string suffix = (poiListItem.PoI.Type == PointOfInterestType.USER) ? "" : " (User Copy)";
-                int index = _llFmtToIndexMap[LLDisplayFmt];
-                EditPoI.Name = $"{poiListItem.PoI.Name}{suffix}";
-                EditPoI.Tags = PointOfInterest.SanitizedTags(poiListItem.PoI.Tags);
-                EditPoI.LL[index].LatUI = Coord.ConvertFromLatDD(poiListItem.PoI.Latitude, LLDisplayFmt);
-                EditPoI.LL[index].LonUI = Coord.ConvertFromLonDD(poiListItem.PoI.Longitude, LLDisplayFmt);
-                EditPoI.Alt = poiListItem.PoI.Elevation;
-                RebuildInterfaceState();
-            }
+            PoIListItem poiListItem = (PoIListItem)(uiPoIListView.SelectedItems[0]);
+            int index = _llFmtToIndexMap[LLDisplayFmt];
+            EditPoI.Name = poiListItem.PoI.Name;
+            EditPoI.Tags = PointOfInterest.SanitizedTags(poiListItem.PoI.Tags);
+            EditPoI.LL[index].LatUI = Coord.ConvertFromLatDD(poiListItem.PoI.Latitude, LLDisplayFmt);
+            EditPoI.LL[index].LonUI = Coord.ConvertFromLonDD(poiListItem.PoI.Longitude, LLDisplayFmt);
+            EditPoI.Alt = poiListItem.PoI.Elevation;
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// edit command click: copy the name, latitude, longitude, and elevation of the currnetly selected point of
+        /// interest into the poi editor fields and rebuild the interface state to reflect the change. this should
+        /// only be called on read-only campaign and system pois.
+        /// </summary>
+        private void CmdDuplicate_Click(object sender, RoutedEventArgs args)
+        {
+            PoIListItem poiListItem = (PoIListItem)(uiPoIListView.SelectedItems[0]);
+            int index = _llFmtToIndexMap[LLDisplayFmt];
+            EditPoI.Name = $"{poiListItem.PoI.Name} (User Copy)";
+            EditPoI.Tags = PointOfInterest.SanitizedTags(poiListItem.PoI.Tags);
+            EditPoI.LL[index].LatUI = Coord.ConvertFromLatDD(poiListItem.PoI.Latitude, LLDisplayFmt);
+            EditPoI.LL[index].LonUI = Coord.ConvertFromLonDD(poiListItem.PoI.Longitude, LLDisplayFmt);
+            EditPoI.Alt = poiListItem.PoI.Elevation;
+            RebuildInterfaceState();
         }
 
         /// <summary>
@@ -1088,11 +1104,22 @@ namespace JAFDTC.UI.App
                 listView.SelectedIndex = CurPoIItems.IndexOf(poi);
                 RebuildInterfaceState();
             }
+
             bool isSelect = (uiPoIListView.SelectedItems.Count > 0);
-            uiPoiListCtxMenuFlyout.Items[0].IsEnabled = isSelect;                                   // edit
-            uiPoiListCtxMenuFlyout.Items[1].IsEnabled = isSelect;                                   // export
-            uiPoiListCtxMenuFlyout.Items[3].IsEnabled = isSelect;                                   // copy to campaign
-            uiPoiListCtxMenuFlyout.Items[5].IsEnabled = isSelect;                                   // delete
+            bool isOneUsrSel = false;
+            bool isOneNonUsrSel = false;
+            if (uiPoIListView.SelectedItems.Count == 1)
+            {
+                isOneUsrSel = (poi.PoI.Type == PointOfInterestType.USER);
+                isOneNonUsrSel = !isOneUsrSel;
+            }
+
+            uiPoiListCtxMenuFlyout.Items[0].IsEnabled = isOneUsrSel;                                // edit
+            uiPoiListCtxMenuFlyout.Items[1].IsEnabled = isOneNonUsrSel;                             // duplicate
+            uiPoiListCtxMenuFlyout.Items[2].IsEnabled = isSelect;                                   // export
+            uiPoiListCtxMenuFlyout.Items[4].IsEnabled = isSelect;                                   // copy to campaign
+            uiPoiListCtxMenuFlyout.Items[6].IsEnabled = isSelect;                                   // delete
+
             uiPoiListCtxMenuFlyout.ShowAt((ListView)sender, args.GetPosition(listView));
         }
 
