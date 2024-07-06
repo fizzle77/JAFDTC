@@ -555,7 +555,7 @@ namespace JAFDTC.UI.App
             bool isUserInSel = selectionByType.ContainsKey(PointOfInterestType.USER);
             bool isCampaignInSel = selectionByType.ContainsKey(PointOfInterestType.CAMPAIGN);
 
-            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, null, uiPoIValueName.Text);
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, null, null, uiPoIValueName.Text);
             bool isPoIMatching = false;
             foreach (PointOfInterest poi in PointOfInterestDbase.Instance.Find(query))
             {
@@ -990,7 +990,7 @@ namespace JAFDTC.UI.App
                 {
                     foreach (string name in campaigns.Keys)
                     {
-                        PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, null, name);
+                        PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, null, null, name);
                         foreach (PointOfInterest poi in PointOfInterestDbase.Instance.Find(query))
                             pois.Add(poi);
                     }
@@ -1146,7 +1146,7 @@ namespace JAFDTC.UI.App
         {
             string theater = GetTheaterFromEditor();
             int index = _llFmtToIndexMap[LLDisplayFmt];
-            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, EditPoI.Name);
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, null, EditPoI.Name);
             List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
             if (IsEditPoINew || (pois.Count == 0))
             {

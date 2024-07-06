@@ -273,7 +273,7 @@ namespace JAFDTC.UI.Base
                 return false;
             }
             string theater = PointOfInterest.TheaterForCoords(lat, lon);
-            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, EditNavpt.Name);
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, null, EditNavpt.Name);
             List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
             foreach (PointOfInterest poi in pois)
             {

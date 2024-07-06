@@ -176,7 +176,7 @@ namespace JAFDTC.UI.Base
             }
             else
             {
-                PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, null, name);
+                PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, null, null, name);
                 List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
                 if (pois.Count == 0)
                 {
