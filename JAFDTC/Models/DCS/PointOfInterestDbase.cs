@@ -375,7 +375,7 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// remove a point of interest from the database, persisting the database to storage if requested.
         /// </summary>
-        public void Remove(PointOfInterest poi, bool isPersist = true)
+        public void RemovePointOfInterest(PointOfInterest poi, bool isPersist = true)
         {
             string campaign = poi.Campaign;
             _dbase[poi.Type][AuxKey(poi)].Remove(poi);

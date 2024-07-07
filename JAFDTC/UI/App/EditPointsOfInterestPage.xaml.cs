@@ -804,7 +804,7 @@ namespace JAFDTC.UI.App
                             else
                             {
                                 // TODO: ideally, save at end after delete is done, rather than doing N saves
-                                PointOfInterestDbase.Instance.Remove(item.PoI);
+                                PointOfInterestDbase.Instance.RemovePointOfInterest(item.PoI);
                             }
                         }
                     if (isCampaignDeleted)
@@ -907,7 +907,7 @@ namespace JAFDTC.UI.App
                 if (result != ContentDialogResult.Primary)
                     return;                                     // EXIT: cancelled
                 foreach (PointOfInterest poi in poisDup)
-                    PointOfInterestDbase.Instance.Remove(poi, false);
+                    PointOfInterestDbase.Instance.RemovePointOfInterest(poi, false);
             }
 
             // add the pois to the database. user pois are added as is. campaign pois that match an existing campaign
