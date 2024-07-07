@@ -1,5 +1,7 @@
 # JAFDTC: Just Another #%*@^!& DTC
 
+*Version 1.0.0-B.37 of 6-July-24*
+
 Just Another #%*@^!% DTC (JAFDTC) is a native C# WinUI Windows application for Windows 10 and
 Windows 11 that allows you to upload data typically saved on a data cartridge, such as
 steerpoints/waypoints and other avionics setup, into a DCS module at the start of a flight. The
