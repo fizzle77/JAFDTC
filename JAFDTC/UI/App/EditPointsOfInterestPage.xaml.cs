@@ -864,11 +864,13 @@ namespace JAFDTC.UI.App
 
             // catalog the pois just read from the file to determine how many campaign and user pois were
             // in the import along with which pois map to which campaign. this information is used to drive
-            // user prompts on how to handle the import.
+            // user prompts on how to handle the import. we'll handle duplicates here as well (import will
+            // over-write them).
             //
             Dictionary<PointOfInterestType, int> poiTypes = new();
             Dictionary<string, List<PointOfInterest>> poisCampaign = new();
             List<PointOfInterest> poisUser = new();
+            List<PointOfInterest> poisDup = new();
             foreach (PointOfInterest poi in pois)
             {
                 if (poiTypes.ContainsKey(poi.Type))
@@ -876,13 +878,36 @@ namespace JAFDTC.UI.App
                 else
                     poiTypes[poi.Type] = 1;
                 if (poi.Type == PointOfInterestType.USER)
+                {
                     poisUser.Add(poi);
+                    PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, poi.Theater, null, poi.Name);
+                    foreach (PointOfInterest poiDup in PointOfInterestDbase.Instance.Find(query))
+                        poisDup.Add(poiDup);
+                }
                 else if ((poi.Type == PointOfInterestType.CAMPAIGN) && !string.IsNullOrEmpty(poi.Campaign))
                 {
                     if (!poisCampaign.ContainsKey(poi.Campaign))
                         poisCampaign[poi.Campaign] = new List<PointOfInterest>();
                     poisCampaign[poi.Campaign].Add(poi);
+                    PointOfInterestDbQuery query = new(PointOfInterestTypeMask.CAMPAIGN, poi.Theater, poi.Campaign,
+                                                       poi.Name);
+                    foreach (PointOfInterest poiDup in PointOfInterestDbase.Instance.Find(query))
+                        poisDup.Add(poi);
                 }
+            }
+            if (poisDup.Count > 0)
+            {
+                ContentDialogResult result = await Utilities.Message2BDialog(
+                    Content.XamlRoot,
+                    "Duplicate Points of Interest?",
+                    $"The import contains points of interest that are already in the database. Do you want to update" +
+                    $" these points of interest from the import or cancel?",
+                    "Update"
+                );
+                if (result != ContentDialogResult.Primary)
+                    return;                                     // EXIT: cancelled
+                foreach (PointOfInterest poi in poisDup)
+                    PointOfInterestDbase.Instance.Remove(poi, false);
             }
 
             // add the pois to the database. user pois are added as is. campaign pois that match an existing campaign
@@ -900,8 +925,8 @@ namespace JAFDTC.UI.App
                         Content.XamlRoot,
                         $"Campaign Exists",
                         $"Import file contains points of interest for a campaign '{campaign}' that is already in" +
-                        $" the database. Would you like to add the points of interest to this existing campaign or" +
-                        $" replace the points of interest in this existing campaign?",
+                        $" the database. Would you like to merge the points of interest to this existing campaign or" +
+                        $" replace the points of interest in this existing campaign with the imported points?",
                         "Add",
                         "Replace",
                         "Cancel");
