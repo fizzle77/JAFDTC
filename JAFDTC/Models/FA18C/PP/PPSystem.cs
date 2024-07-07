@@ -70,12 +70,8 @@ namespace JAFDTC.Models.FA18C.PP
             get
             {
                 foreach (PPStation station in Stations.Values)
-                {
                     if (!station.IsDefault)
-                    {
                         return false;
-                    }
-                }
                 return true;
             }
         }
@@ -117,15 +113,12 @@ namespace JAFDTC.Models.FA18C.PP
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// reset the instance to defaults (by definition, field value of "" implies default). table numbers are not
-        /// changed by this operation.
+        /// reset the instance to defaults.
         /// </summary>
         public void Reset()
         {
             foreach (PPStation station in Stations.Values)
-            {
                 station.Reset();
-            }
         }
     }
 }

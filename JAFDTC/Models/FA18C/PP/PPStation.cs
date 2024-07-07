@@ -65,12 +65,8 @@ namespace JAFDTC.Models.FA18C.PP
             get
             {
                 for (int i = 0; i < _pp.Length; i++)
-                {
                     if (PP[i].IsValid)
-                    {
                         return false;
-                    }
-                }
                 return (Weapon == Weapons.NONE);
             }
         }
@@ -106,14 +102,10 @@ namespace JAFDTC.Models.FA18C.PP
             Weapon = other.Weapon;
             PP = new PPCoordinateInfo[6];
             for (int i = 0; i < PP.Length; i++)
-            {
                 PP[i] = new(other.PP[i]);
-            }
             STP = new List<PPCoordinateInfo>();
             for (int i = 0; i < other.STP.Count; i++)
-            {
                 STP.Add(new(other.STP[i]));
-            }
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -131,17 +123,14 @@ namespace JAFDTC.Models.FA18C.PP
         }
 
         /// <summary>
-        /// reset the instance to defaults (by definition, field value of "" implies default). table numbers are not
-        /// changed by this operation.
+        /// reset the instance to defaults.
         /// </summary>
         public void Reset()
         {
             BoxedPP = 0;
             Weapon = Weapons.NONE;
             foreach (PPCoordinateInfo pp in PP)
-            {
                 pp.Reset();
-            }
             STP.Clear();
         }
     }
