@@ -30,6 +30,9 @@ namespace JAFDTC.Models.FA18C.PP
     /// at a given lat/lon/elev or tied to a waypoint set through the navigation system. the WaypointNumber field
     /// distinguishes these cases (0 => position, >0 => waypoint number). this class is used both for target points
     /// (pp) as well as slam-er steerpionts (stp)
+    ///
+    /// a PPCoordinateInfo can only be set to valid coordinates, it can be reset to an invalid/empty state using the
+    /// Reset() method.
     /// </summary>
     public class PPCoordinateInfo : NavpointInfoBase
     {
@@ -128,14 +131,18 @@ namespace JAFDTC.Models.FA18C.PP
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // reset the steerpoint to default values. the Number field is not changed.
+        // reset the steerpoint to default values.
         //
         public override void Reset()
         {
             base.Reset();
-            LatUI = "";
-            LonUI = "";
             WaypointNumber = 0;
+
+            // force the underlying backing store for lat/lon to null to avoid the error checking through the standard
+            // set accessors (which treat an empty value as legal) to restore to an "empty" state.
+            //
+            SetProperty(ref _latUI, "", null, nameof(LatUI));
+            SetProperty(ref _lonUI, "", null, nameof(LonUI));
         }
     }
 }

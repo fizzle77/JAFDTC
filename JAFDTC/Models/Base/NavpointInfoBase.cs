@@ -28,6 +28,9 @@ namespace JAFDTC.Models.Base
     /// the lat and lon are always given in decimal degrees. derived classes are responsible for converting between
     /// dd and the airframe-appropriate format by over-riding LatUI, LonUI as necessary. the class provides functions
     /// to convert between common formats.
+    /// 
+    /// a NavpointInfoBase can only be set to valid coordinates, it can be reset to an invalid/empty state using the
+    /// Reset() method.
     /// </summary>
     public abstract class NavpointInfoBase : BindableObject, INavpointInfo
     {
@@ -149,6 +152,16 @@ namespace JAFDTC.Models.Base
         /// <summary>
         /// reset the steerpoint to default values. the Number field is not changed.
         /// </summary>
-        public virtual void Reset() => (Name, Lat, Lon, Alt) = ("", "", "", "");
+        public virtual void Reset()
+        {
+            Name = "";
+
+            // force the underlying backing store for lat/lon/alt to null to avoid the error checking through the
+            // standard set accessors (which treat an empty value as legal) to restore to an "empty" state.
+            //
+            SetProperty(ref _lat, "", null, nameof(Lat));
+            SetProperty(ref _lon, "", null, nameof(Lon));
+            SetProperty(ref _alt, "", null, nameof(Alt));
+        }
     }
 }
