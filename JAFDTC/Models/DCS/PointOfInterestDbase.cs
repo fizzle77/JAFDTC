@@ -23,7 +23,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace JAFDTC.Models.DCS
 {
@@ -45,16 +44,17 @@ namespace JAFDTC.Models.DCS
     /// parameters for a query of the point of interest database via Find(). for a poi to match a query,
     /// the following must hold:
     /// 
-    ///     1) Types contains the point of interest Type
-    ///     2) Theater matches the point of interest Theater exactly
-    ///     3) Name matches the point of interest Name per Flags, given poi Name "abcdef"
+    ///     1) query.Types contains poi.Type
+    ///     2) query.Theater matches poi.Theater exactly
+    ///     3) query.Campaign matches poi.Campaign exactly
+    ///     4) query.Name matches poi.Name per query.Flags, given poi.Name "abcdef"
     ///             NAME_PARTIAL_MATCH => Name "bcd" matches
     ///            !NAME_PARTIAL_MATCH => Name "bcd" does not match
-    ///     4) Tags matches the point of interest tags per Flags, given poi Tags "aa ; bb"
-    ///             TAGS_ANY_MATCH => to match, at least one tag in poi Tags must match a tag in poi Tags
-    ///            !TAGS_ANY_MATCH => to match, all tags in poi Tags must match a tag in poi Tags
-    ///             TAG_PARTIAL_MATCH => allows partial matches, "a" matches "aa"
-    ///            !TAG_PARTIAL_MATCH => disallows partial matches, "a" does not match "aa"
+    ///     4) query.Tags matches poi.Tags per query.Flags, given poi.Tags "aa ; bb"
+    ///             TAGS_ANY_MATCH => to match, at least one tag in query.Tags must match a tag in poi.Tags
+    ///            !TAGS_ANY_MATCH => to match, all tags in query.Tags must match a tag in poi.Tags
+    ///             TAG_PARTIAL_MATCH => allows partial tag matches, "a" matches "aa"
+    ///            !TAG_PARTIAL_MATCH => disallows partial tag matches, "a" does not match "aa"
     ///
     /// string comparisons are always case-insensitive.
     /// </summary>
@@ -64,6 +64,8 @@ namespace JAFDTC.Models.DCS
 
         public readonly string Theater;                         // theater (null => match any)
 
+        public readonly string Campaign;                        // campaign name (null => match any)
+
         public readonly string Name;                            // name (null => match any)
 
         public readonly string Tags;                            // tags (";"-separated list, null => match any)
@@ -71,9 +73,9 @@ namespace JAFDTC.Models.DCS
         public readonly PointOfInterestDbQueryFlags Flags;      // query flags
 
         public PointOfInterestDbQuery(PointOfInterestTypeMask types = PointOfInterestTypeMask.ANY, string theater = null,
-                                      string name = null, string tags = null,
+                                      string campaign = null, string name = null, string tags = null,
                                       PointOfInterestDbQueryFlags flags = PointOfInterestDbQueryFlags.NONE)
-            => (Types, Theater, Name, Tags, Flags) = (types, theater, name, tags, flags);
+            => (Types, Theater, Campaign, Name, Tags, Flags) = (types, theater, campaign, name, tags, flags);
     }
 
     // ================================================================================================================
@@ -101,10 +103,39 @@ namespace JAFDTC.Models.DCS
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // database is organized as a dictionary where keys are theater names and values are lists of PointOfInterest
-        // instances for points of interest in that theater.
+        // the point of interest database is a dictionary that maps PointOfInterestType keys (the primary key) to
+        // dictionary values. the dictionary value maps string keys (the auxiliary key) onto a list of
+        // PointOfInterest. the auxiliary key is either a campaign name (for CAMPAIGN types) or theater names (for
+        // all other types).
+        //
+        // note that auxiliary keys are case-insensitive. callers are responsible for managing capitalization.
 
-        private readonly Dictionary<string, List<PointOfInterest>> _dbase;
+        private readonly Dictionary<PointOfInterestType, Dictionary<string, List<PointOfInterest>>> _dbase;
+
+        /// <summary>
+        /// return a list of the names of known campaigns.
+        /// </summary>
+        public List<string> KnownCampaigns => ((_dbase != null) && _dbase.ContainsKey(PointOfInterestType.CAMPAIGN))
+                                              ? _dbase[PointOfInterestType.CAMPAIGN].Keys.ToList<string>() : new();
+
+        /// <summary>
+        /// return a list of strings for all of the theaters represented in the database.
+        /// 
+        /// TODO: consider allowing user-defined theaters.
+        /// </summary>
+        public static List<string> KnownTheaters => new()
+        {
+            "Afghanistan",
+            "Caucasus",
+            "Kola",
+            "Marianas",
+            "Nevada",
+            "Persian Gulf",
+            "Sinai",
+            "South Atlantic",
+            "Syria",
+            "Other"
+        };
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -125,120 +156,101 @@ namespace JAFDTC.Models.DCS
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// return a list of strings for all of the theaters represented in the database.
-        /// 
-        /// TODO: consider allowing user-defined theaters.
+        /// return the auxiliary key (key for the second level dictionary) for a point of interest.
         /// </summary>
-        public static List<string> KnownTheaters()
-        {
-            return new()
-            {
-                "Afghanistan",
-                "Caucasus",
-                "Kola",
-                "Marianas",
-                "Nevada",
-                "Persian Gulf",
-                "Sinai",
-                "South Atlantic",
-                "Syria",
-                "Other"
-            };
-        }
+        private static string AuxKey(PointOfInterest poi)
+            => (poi.Type == PointOfInterestType.CAMPAIGN) ? poi.Campaign : poi.Theater;
 
         /// <summary>
-        /// return list of points of interest matching the specified criteria in the query: theater name, tags,
-        /// type, and poi name. using the default values for these parameters matches "any". database seraches
-        /// are always case insensitive. results are optionally sorted.
+        /// return list of points of interest containing all points of interest that match the specified query
+        /// criteria: theater name, tags, type, and poi name. using the default values for these parameters
+        /// matches "any". database seraches are always case insensitive. results are optionally sorted using
+        /// SortPoIs().
         /// </summary>
         public List<PointOfInterest> Find(PointOfInterestDbQuery query, bool isSorted = false)
         {
             string theater = query.Theater?.ToLower();
+            string campaign = query.Campaign?.ToLower();
             string tags = query.Tags?.ToLower();
             string name = query.Name?.ToLower();
             PointOfInterestDbQueryFlags flags = query.Flags;
             PointOfInterestTypeMask types = query.Types;
 
+            bool isNamePartial = flags.HasFlag(PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH);
+            bool isTagsAny = flags.HasFlag(PointOfInterestDbQueryFlags.TAGS_ANY_MATCH);
+            bool isTagsPartial = flags.HasFlag(PointOfInterestDbQueryFlags.TAG_PARTIAL_MATCH);
+
             List<PointOfInterest> results = new();
-            foreach (KeyValuePair<string, List<PointOfInterest>> kvp in _dbase)
+            foreach (KeyValuePair<PointOfInterestType, Dictionary<string, List<PointOfInterest>>> kvpMain in _dbase)
             {
-                if (!string.IsNullOrEmpty(theater) && (theater != kvp.Key.ToLower()))
-                {
+                if (!types.HasFlag((PointOfInterestTypeMask)(1 << (int)kvpMain.Key)))
                     continue;
-                }
 
-                foreach (PointOfInterest poi in kvp.Value)
+                foreach (KeyValuePair<string, List<PointOfInterest>> kvpAux in kvpMain.Value)
                 {
-                    if (!poi.IsMatchTypeMask(types))
+                    foreach (PointOfInterest poi in kvpAux.Value)
                     {
-                        continue;
-                    }
+                        string poiName = poi.Name.ToLower();
 
-                    string poiName = poi.Name.ToLower();
-                    if (!string.IsNullOrEmpty(name) &&
-                        ((!flags.HasFlag(PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH) && (name != poiName)) ||
-                         ( flags.HasFlag(PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH) && !poiName.Contains(name))))
-                    {
-                        continue;
-                    }
-
-                    bool isMatch = true;
-                    if (!string.IsNullOrEmpty(tags))
-                    {
-                        List<string> tagVals = (string.IsNullOrEmpty(tags))
-                            ? new() : tags.Split(';').ToList<string>();
-                        List<string> poiTagVals = (string.IsNullOrEmpty(poi.Tags))
-                            ? new() : poi.Tags.ToLower().Split(';').ToList<string>();
-
-                        if (flags.HasFlag(PointOfInterestDbQueryFlags.TAGS_ANY_MATCH))
+                        if ((!string.IsNullOrEmpty(theater) && (theater != poi.Theater.ToLower())) ||
+                            (!string.IsNullOrEmpty(name) && ((!isNamePartial && (name != poiName)) ||
+                                                             (isNamePartial && !poiName.Contains(name)))) ||
+                            (!string.IsNullOrEmpty(campaign) && (campaign != poi.Campaign.ToLower())))
                         {
-                            isMatch = false;
-                            foreach (string tagVal in tagVals)
+                            continue;
+                        }
+
+                        bool isMatch = true;
+                        if (!string.IsNullOrEmpty(tags))
+                        {
+                            List<string> tagVals = tags.Split(';').ToList<string>();
+                            List<string> poiTagVals = (string.IsNullOrEmpty(poi.Tags))
+                                ? new() : poi.Tags.ToLower().Split(';').ToList<string>();
+
+                            if (isTagsAny)
                             {
-                                foreach (string poiTagVal in poiTagVals)
+                                isMatch = false;
+                                foreach (string tagVal in tagVals)
                                 {
-                                    if ((flags.HasFlag(PointOfInterestDbQueryFlags.TAG_PARTIAL_MATCH) &&
-                                         (tagVal.Trim().Contains(poiTagVal.Trim()))) ||
-                                        (tagVal.Trim() == poiTagVal.Trim()))
+                                    foreach (string poiTagVal in poiTagVals)
                                     {
-                                        isMatch = true;
+                                        if ((isTagsPartial && (tagVal.Trim().Contains(poiTagVal.Trim()))) ||
+                                            (tagVal.Trim() == poiTagVal.Trim()))
+                                        {
+                                            isMatch = true;
+                                            break;
+                                        }
+                                    }
+                                    if (isMatch)
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                isMatch = true;
+                                foreach (string tagVal in tagVals)
+                                {
+                                    bool isFound = false;
+                                    foreach (string poiTagVal in poiTagVals)
+                                    {
+                                        if ((isTagsPartial && (tagVal.Trim().Contains(poiTagVal.Trim()))) ||
+                                            (tagVal.Trim() == poiTagVal.Trim()))
+                                        {
+                                            isFound = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!isFound)
+                                    {
+                                        isMatch = false;
                                         break;
                                     }
                                 }
-                                if (isMatch)
-                                {
-                                    break;
-                                }
                             }
                         }
-                        else
-                        {
-                            isMatch = true;
-                            foreach (string tagVal in tagVals)
-                            {
-                                bool isFound = false;
-                                foreach (string poiTagVal in poiTagVals)
-                                {
-                                    if ((flags.HasFlag(PointOfInterestDbQueryFlags.TAG_PARTIAL_MATCH) &&
-                                         (tagVal.Trim().Contains(poiTagVal.Trim()))) ||
-                                        (tagVal.Trim() == poiTagVal.Trim()))
-                                    {
-                                        isFound = true;
-                                        break;
-                                    }
-                                }
-                                if (!isFound)
-                                {
-                                    isMatch = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
 
-                    if (isMatch)
-                    {
-                        results.Add(poi);
+                        if (isMatch)
+                            results.Add(poi);
                     }
                 }
             }
@@ -246,65 +258,49 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// sort the poi list by theater, type, then name. returns the sorted list.
+        /// sort the poi list by theater, type, campaign, then name. returns the sorted list.
         /// </summary>
         public static List<PointOfInterest> SortPoIs(List<PointOfInterest> pois)
         {
             pois.Sort((a, b) =>
             {
-                int theaterCmp = a.Theater.CompareTo(b.Theater);
-                if ((theaterCmp == 0) && (a.Type == b.Type))
+                int cmp = a.Theater.CompareTo(b.Theater);
+                if (cmp != 0)
+                    return cmp;
+                else if (a.Type != b.Type)
                 {
-                    return a.Name.CompareTo(b.Name);
-                }
-                else if ((theaterCmp == 0) && (a.Type == PointOfInterestType.USER))
-                {
+                    if (a.Type == PointOfInterestType.USER)
+                        return -1;
+                    else if (a.Type == PointOfInterestType.DCS_CORE)
+                        return 1;
+                    else if (b.Type == PointOfInterestType.USER)
+                        return 1;
                     return -1;
                 }
-                else if ((theaterCmp == 0) && (a.Type == PointOfInterestType.CAMPAIGN))
+                else if (a.Type == PointOfInterestType.CAMPAIGN)
                 {
-                    return (b.Type == PointOfInterestType.USER) ? 1 : -1;
+                    cmp = a.Campaign.CompareTo(b.Campaign);
+                    if (cmp != 0)
+                        return cmp;
                 }
-                else if ((theaterCmp == 0) && (a.Type == PointOfInterestType.DCS_CORE))
-                {
-                    return 1;
-                }
-                return theaterCmp;
+                return a.Name.CompareTo(b.Name);
             });
             return pois;
         }
 
         /// <summary>
-        /// parse a multi-line tab-separated value string to build a list of points of interest. the format of each
-        /// line is as follows
-        ///
-        ///     [Name]\t[tags]\t[latitude]\t[longitude]\t[elevation]
-        ///
-        /// where "\t" is a tab character.
+        /// parse a multi-line comma-separated value string to build a list of points of interest.
         /// </summary>
-        public static List<PointOfInterest> ParseTSV(string tsv)
+        public static List<PointOfInterest> ParseCSV(string csv)
         {
+            // TODO: this needs to change to csv...
             List<PointOfInterest> pois = new();
-            string[] lines = (string.IsNullOrEmpty(tsv)) ? Array.Empty<string>() : tsv.Replace("\r", "").Split('\n');
+            string[] lines = (string.IsNullOrEmpty(csv)) ? Array.Empty<string>() : csv.Replace("\r", "").Split('\n');
             foreach (string line in lines)
             {
-                string[] cols = line.Split("\t");
-                if (cols.Length == 5)
-                {
-                    PointOfInterest poi = new()
-                    {
-                        Name = cols[0].Trim(),
-                        Tags = PointOfInterest.SanitizedTags(cols[1].Trim()),
-                        Latitude = cols[2].Trim(),
-                        Longitude = cols[3].Trim(),
-                        Elevation = cols[4].Trim()
-                    };
-                    poi.Theater = PointOfInterest.TheaterForCoords(poi.Latitude, poi.Longitude);
-                    if (poi.Theater != null )
-                    {
-                        pois.Add(poi);
-                    }
-                }
+                PointOfInterest poi = new PointOfInterest(line);
+                if (poi.Type != PointOfInterestType.UNKNOWN)
+                    pois.Add(poi);
             }
             return pois;
         }
@@ -318,45 +314,97 @@ namespace JAFDTC.Models.DCS
 
             List<PointOfInterest> pois = FileManager.LoadPointsOfInterest();
             foreach (PointOfInterest poi in pois)
-            {
-                Add(poi, false);
-            }
+                AddPointOfInterest(poi, false);
+        }
+
+        /// <summary>
+        /// add a campaign to the database if one with a matching name is not already present, persisting the database
+        /// to storage if requested.
+        /// </summary>
+        public void AddCampaign(string campaign, bool isPersist = true)
+        {
+            if (!_dbase.ContainsKey(PointOfInterestType.CAMPAIGN))
+                _dbase[PointOfInterestType.CAMPAIGN] = new Dictionary<string, List<PointOfInterest>>();
+            if (!_dbase[PointOfInterestType.CAMPAIGN].ContainsKey(campaign))
+                _dbase[PointOfInterestType.CAMPAIGN][campaign] = new List<PointOfInterest>();
+
+            if (isPersist)
+                Save(campaign);
+        }
+
+        /// <summary>
+        /// add a campaign to the database if one with a matching name is not already present, persisting the database
+        /// to storage if requested.
+        /// </summary>
+        public void DeleteCampaign(string campaign, bool isPersist = true)
+        {
+            PointOfInterestType type = PointOfInterestType.CAMPAIGN;
+            if (_dbase.ContainsKey(type) && _dbase[type].ContainsKey(campaign))
+                _dbase[type].Remove(campaign);
+
+            if (isPersist)
+                Save(campaign, true);
+        }
+
+        /// <summary>
+        /// return the number of points of interest in a campaign.
+        /// </summary>
+        public int CountPoIInCampaign(string campaign)
+        {
+            PointOfInterestType type = PointOfInterestType.CAMPAIGN;
+            return (_dbase.ContainsKey(type) && _dbase[type].ContainsKey(campaign)) ? _dbase[type][campaign].Count : 0;
         }
 
         /// <summary>
         /// add a point of interest to the database, persisting the database to storage if requested.
         /// </summary>
-        public void Add(PointOfInterest poi, bool isPersist = true)
+        public void AddPointOfInterest(PointOfInterest poi, bool isPersist = true)
         {
-            if (!_dbase.ContainsKey(poi.Theater))
-            {
-                _dbase[poi.Theater] = new List<PointOfInterest>();
-            }
-            _dbase[poi.Theater].Add(poi);
+            string auxKey = AuxKey(poi);
+
+            if (!_dbase.ContainsKey(poi.Type))
+                _dbase[poi.Type] = new Dictionary<string, List<PointOfInterest>>();
+            if (!_dbase[poi.Type].ContainsKey(auxKey))
+                _dbase[poi.Type][auxKey] = new List<PointOfInterest>();
+            _dbase[poi.Type][auxKey].Add(poi);
+
             if (isPersist)
-            {
-                Save();
-            }
+                Save(poi.Campaign);
         }
 
         /// <summary>
-        /// remove a point of interest to the database, persisting the database to storage if requested.
+        /// remove a point of interest from the database, persisting the database to storage if requested.
         /// </summary>
-        public void Remove(PointOfInterest poi, bool isPersist = true)
+        public void RemovePointOfInterest(PointOfInterest poi, bool isPersist = true)
         {
-            _dbase[poi.Theater].Remove(poi);
+            string campaign = poi.Campaign;
+            _dbase[poi.Type][AuxKey(poi)].Remove(poi);
+
             if (isPersist)
-            {
-                Save();
-            }
+                Save(campaign);
         }
 
         /// <summary>
-        /// persist the user points of interest to storage.
+        /// persist points of interest to storage. a null campaign persists the user pois, a non-null campaign persists
+        /// the pois for the specified campaign. the isCullCampaign parameter controls whether or not empty campaigns
+        /// are removed from storage.
         /// </summary>
-        public bool Save()
+        public bool Save(string campaign = null, bool isCullEmptyCampaign = false)
         {
-            return FileManager.SaveUserPointsOfInterest(Find(new PointOfInterestDbQuery(PointOfInterestTypeMask.USER)));
+            PointOfInterestDbQuery query;
+            if (string.IsNullOrEmpty(campaign))
+            {
+                query = new PointOfInterestDbQuery(PointOfInterestTypeMask.USER);
+                return FileManager.SaveUserPointsOfInterest(Find(query));
+            }
+            else
+            {
+                query = new PointOfInterestDbQuery(PointOfInterestTypeMask.CAMPAIGN, null, campaign);
+                List<PointOfInterest> pois = Find(query);
+                if (isCullEmptyCampaign && (pois.Count == 0))
+                    FileManager.DeleteCampaignPointsOfInterest(campaign);
+                return (isCullEmptyCampaign) ? true : FileManager.SaveCampaignPointsOfInterest(campaign, pois);
+            }
         }
     }
 }

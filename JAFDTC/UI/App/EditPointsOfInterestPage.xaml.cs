@@ -20,9 +20,11 @@
 using JAFDTC.Models;
 using JAFDTC.Models.DCS;
 using JAFDTC.Utilities;
+using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
@@ -34,18 +36,17 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
-using System.Data.SqlTypes;
-using JAFDTC.Utilities.Networking;
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.App
 {
     /// <summary>
     /// item class for an item in the point of interest list view. this provides ui-friendly views of properties
-    /// suitable for display in the ui.
+    /// suitable for display in the ui via bindings.
     /// </summary>
     internal class PoIListItem
     {
@@ -53,14 +54,22 @@ namespace JAFDTC.UI.App
 
         public LLFormat LLDisplayFmt { get; set; }
 
-        public string TagsUI => (string.IsNullOrEmpty(PoI.Tags)) ? "—" : PoI.Tags;
+        public string TagsUI
+        {
+            get
+            {
+                string tags = (string.IsNullOrEmpty(PoI.Tags)) ? "—" : PoI.Tags.Replace(";", ", ");
+                return (string.IsNullOrEmpty(PoI.Campaign)) ? tags : $"{PoI.Campaign} : {tags}";
+            }
+        }
 
         public string LatUI => Coord.RemoveLLDegZeroFill(Coord.ConvertFromLatDD(PoI.Latitude, LLDisplayFmt));
 
         public string LonUI => Coord.RemoveLLDegZeroFill(Coord.ConvertFromLonDD(PoI.Longitude, LLDisplayFmt));
 
-        public string Glyph => (PoI.Type == PointOfInterestType.USER)
-                               ? "\xE718" : ((PoI.Type == PointOfInterestType.CAMPAIGN) ? "\xE7C1" : "");
+        public string Glyph
+            => (PoI.Type == PointOfInterestType.USER) ? "\xE718"
+                                                      : ((PoI.Type == PointOfInterestType.CAMPAIGN) ? "\xE7C1" : "");
 
         public PoIListItem(PointOfInterest poi, LLFormat fmt) => (PoI, LLDisplayFmt) = (poi, fmt);
     }
@@ -69,7 +78,7 @@ namespace JAFDTC.UI.App
 
     /// <summary>
     /// point of interest lat/lon helper. this provides for translation between the user-facing presentation of the
-    /// lat/lon and the internal decimal degress format.
+    /// lat/lon (where settings in the ui specify the lat/lon display format) and the internal decimal degress format.
     /// </summary>
     internal class PoILL : BindableObject
     {
@@ -86,7 +95,7 @@ namespace JAFDTC.UI.App
             set
             {
                 string error = "Invalid latitude format";
-                if (IsRegexFieldValid(value, Coord.LatRegexFor(Format), false))
+                if (IsRegexFieldValid(value, Coord.LatRegexFor(Format)))
                 {
                     value = value.ToUpper();
                     error = null;
@@ -103,7 +112,7 @@ namespace JAFDTC.UI.App
             set
             {
                 string error = "Invalid longitude format";
-                if (IsRegexFieldValid(value, Coord.LonRegexFor(Format), false))
+                if (IsRegexFieldValid(value, Coord.LonRegexFor(Format)))
                 {
                     value = value.ToUpper();
                     error = null;
@@ -113,7 +122,19 @@ namespace JAFDTC.UI.App
             }
         }
 
+        public bool IsEmpty => (string.IsNullOrEmpty(Lat) && string.IsNullOrEmpty(Lon));
+
         public PoILL(LLFormat format) => (Format) = (format);
+
+        public List<string> GetErrorsWithEmpty(bool isEmptyOK)
+        {
+            List<string> errors = new();
+            if (!IsRegexFieldValid(LatUI, Coord.LatRegexFor(Format), isEmptyOK))
+                errors.Add("LatUI");
+            if (!IsRegexFieldValid(LonUI, Coord.LonRegexFor(Format), isEmptyOK))
+                errors.Add("LonUI");
+            return errors;
+        }
 
         public void Reset()
         {
@@ -125,10 +146,12 @@ namespace JAFDTC.UI.App
     // ================================================================================================================
 
     /// <summary>
-    /// TODO: document
+    /// backing object for editing a point of interest.
     /// </summary>
     internal class PoIDetails : BindableObject
     {
+        public int CurIndexLL { get; set; }
+
         // HACK: we will use per-format PoILL instances to avoid binding multiple controls to the same property (which
         // HACK: doesn't seem to work well). should be a way to dynamically bind/unbind properties that we could use
         // HACK: to avoid this, but...
@@ -156,7 +179,7 @@ namespace JAFDTC.UI.App
             set
             {
                 string error = "Invalid altitude format";
-                if (IsIntegerFieldValid(value, -1500, 80000, false))
+                if (IsIntegerFieldValid(value, -1500, 80000))
                 {
                     value = FixupIntegerField(value);
                     error = null;
@@ -165,14 +188,22 @@ namespace JAFDTC.UI.App
             }
         }
 
-// TODO: this is broken LL needs to be an all empty check...
-        public bool IsEmpty => (string.IsNullOrEmpty(Name) && string.IsNullOrEmpty(Tags) && string.IsNullOrEmpty(Alt) &&
-                                string.IsNullOrEmpty(LL[0].Lat) && string.IsNullOrEmpty(LL[0].Lon));
+        public bool IsEmpty
+            => (string.IsNullOrEmpty(Name) && string.IsNullOrEmpty(Tags) && string.IsNullOrEmpty(Alt) &&
+                LL[CurIndexLL].IsEmpty);
 
         // NOTE: format order of PoILL must be kept in sync with EditPointsOfInterestPage and xaml.
         //
         public PoIDetails()
-            => (LL) = (new PoILL[3] { new(LLFormat.DDU), new(LLFormat.DMS), new(LLFormat.DDM_P3ZF) });
+            => (CurIndexLL, LL) = (0, new PoILL[3] { new(LLFormat.DDU), new(LLFormat.DMS), new(LLFormat.DDM_P3ZF) });
+
+        public List<string> GetErrorsWithEmpty(bool isEmptyOK)
+        {
+            List<string> errors = LL[CurIndexLL].GetErrorsWithEmpty(isEmptyOK);
+            if (!IsIntegerFieldValid(Alt, -1500, 80000, isEmptyOK))
+                errors.Add("Alt");
+            return errors;
+        }
 
         public void Reset()
         {
@@ -180,9 +211,7 @@ namespace JAFDTC.UI.App
             Tags = "";
             Alt = "";
             for (int i = 0; i < LL.Length; i++)
-            {
                 LL[i].Reset();
-            }
         }
     }
 
@@ -199,6 +228,8 @@ namespace JAFDTC.UI.App
         //
         // ------------------------------------------------------------------------------------------------------------
 
+        private static readonly Regex _campaignNameRegex = new(@"^[a-zA-Z0-9 ]+$");
+
         private ObservableCollection<PoIListItem> CurPoIItems { get; set; }
 
         private List<PointOfInterest> CurPoI { get; set; }
@@ -213,11 +244,14 @@ namespace JAFDTC.UI.App
 
         private string FilterTheater { get; set; }
 
+        private string FilterCampaign { get; set; }
+
         private string FilterTags { get; set; }
 
         private PointOfInterestTypeMask FilterIncludeTypes { get; set; }
 
         private bool IsFiltered => !(string.IsNullOrEmpty(FilterTheater) &&
+                                     string.IsNullOrEmpty(FilterCampaign) && 
                                      string.IsNullOrEmpty(FilterTags) &&
                                      FilterIncludeTypes.HasFlag(PointOfInterestTypeMask.DCS_CORE) &&
                                      FilterIncludeTypes.HasFlag(PointOfInterestTypeMask.USER) &&
@@ -247,16 +281,10 @@ namespace JAFDTC.UI.App
 
             EditPoI = new PoIDetails();
             EditPoI.ErrorsChanged += PoIField_DataValidationError;
-            EditPoI.PropertyChanged += PoIField_PropertyChanged;
             for (int i = 0; i < EditPoI.LL.Length; i++)
-            {
                 EditPoI.LL[i].ErrorsChanged += PoIField_DataValidationError;
-                EditPoI.LL[i].PropertyChanged += PoIField_PropertyChanged;
-            }
 
             IsEditPoINew = true;
-
-            LLDisplayFmt = LLFormat.DDM_P3ZF;
 
             // NOTE: these need to be kept in sync with PoIDetails and the xaml.
             //
@@ -287,6 +315,9 @@ namespace JAFDTC.UI.App
             };
             _defaultBorderBrush = uiPoIValueLatDDM.BorderBrush;
             _defaultBkgndBrush = uiPoIValueLatDDM.Background;
+
+            LLDisplayFmt = LLFormat.DDM_P3ZF;
+            EditPoI.CurIndexLL = _llFmtToIndexMap[LLDisplayFmt];
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -309,13 +340,10 @@ namespace JAFDTC.UI.App
         {
             Dictionary<string, bool> map = new();
             foreach (string error in errors)
-            {
                 map[error] = true;
-            }
             foreach (KeyValuePair<string, TextBox> kvp in fields)
-            {
-                SetFieldValidState(kvp.Value, !map.ContainsKey(kvp.Key));
-            }
+                SetFieldValidState(kvp.Value,
+                                   !map.ContainsKey(kvp.Key) || EditPoI.IsEmpty);
         }
 
         /// <summary>
@@ -337,18 +365,9 @@ namespace JAFDTC.UI.App
                     isValid = ((List<string>)EditPoI.LL[index].GetErrors(args.PropertyName)).Count == 0;
                 }
                 if (_curPoIFieldValueMap.ContainsKey(args.PropertyName))
-                {
-                    SetFieldValidState(_curPoIFieldValueMap[args.PropertyName], isValid);
-                }
+                    SetFieldValidState(_curPoIFieldValueMap[args.PropertyName],
+                                       isValid || EditPoI.IsEmpty);
             }
-            RebuildInterfaceState();
-        }
-
-        /// <summary>
-        /// property changed: rebuild interface state to account for configuration changes.
-        /// </summary>
-        private void PoIField_PropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
             RebuildInterfaceState();
         }
 
@@ -359,20 +378,90 @@ namespace JAFDTC.UI.App
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// returns a list of points of interest from the database that cover the points of interest of a given type
-        /// that are currently selected in the point of interest list.
+        /// apply a function to a new campaign. prompt the user for a camapign name and then perform the operation
+        /// given by a lambda when the user provides/accepts a valid name. the lambda takes a single string argument
+        /// (the campaign name) and returns true on success, false on error. the what parameter should be uppercase
+        /// description of what the function does ("Add", "Import").
         /// </summary>
-        private List<PointOfInterest> GetPoIsOfTypeInSelection(PointOfInterestType type)
+        private async void CoreApplyFuncToNewCampaign(string what, Func<string, bool> operation)
         {
-            List<PointOfInterest> pois = new();
-            foreach (PoIListItem poiItem in uiPoIListView.SelectedItems.Cast<PoIListItem>())
+            GetNameDialog nameDialog = new(null, $"Select a Name for the Campaign to {what}")
             {
-                if (poiItem.PoI.Type == type)
+                XamlRoot = Content.XamlRoot,
+                Title = $"{what} Campaign"
+            };
+            ContentDialog errDialog = new()
+            {
+                XamlRoot = Content.XamlRoot,
+                Title = "Invalid Name",
+                PrimaryButtonText = "OK",
+            };
+
+            string campaignName;
+            ContentDialogResult result;
+            while (true)
+            {
+                result = await nameDialog.ShowAsync();
+                campaignName = nameDialog.Value.Trim(' ');
+                string message = null;
+                foreach (string campaign in PointOfInterestDbase.Instance.KnownCampaigns)
                 {
-                    pois.Add(CurPoI[CurPoIItems.IndexOf(poiItem)]);
+                    if (campaignName.ToLower() == campaign.ToLower())
+                    {
+                        message = $"There is already a campaign named '{campaignName}'. Please select a different name.";
+                        break;
+                    }
                 }
+                if (!_campaignNameRegex.IsMatch(campaignName))
+                    message = $"Campaign name '{campaignName}' may only contain alphanumeric characters. Please select a different name.";
+                if ((result == ContentDialogResult.None) || (message == null))
+                    break;
+                errDialog.Content = message;
+                await errDialog.ShowAsync();
             }
-            return pois;
+            if (result == ContentDialogResult.Primary)
+            {
+                operation(campaignName);
+                RebuildInterfaceState();
+            }
+        }
+
+        /// <summary>
+        /// apply a function to an existing campaign. prompt the user to select an existing camapign and then perform
+        /// the operation given by a lambda when the user provides/accepts a valid campaign. the lambda takes a single
+        /// string argument (the campaign name) and returns true on success, false on error. the what parameter should
+        /// be uppercase description of what the function does ("Delete", "Export").
+        /// </summary>
+        private async void CoreApplyFuncToExistingCampaign(string what, Func<string, bool> operation)
+        {
+            GetListDialog listDialog = new(PointOfInterestDbase.Instance.KnownCampaigns, "Campaign")
+            {
+                XamlRoot = Content.XamlRoot,
+                Title = $"{what} Campaign",
+                PrimaryButtonText = what
+            };
+            if (await listDialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                operation(listDialog.SelectedItem);
+                RebuildInterfaceState();
+            }
+        }
+
+        /// <summary>
+        /// return a dictionary, keyed by PointOfInterestType that breaks the selection up by point of interest type.
+        /// the dictionary will only contain a key of a given type if there were points of interest of that type in
+        /// the selection.
+        /// </summary>
+        private Dictionary<PointOfInterestType, List<PointOfInterest>> CrackSelectedPoIsByType()
+        {
+            Dictionary<PointOfInterestType, List<PointOfInterest>> cracked = new();
+            foreach (PoIListItem item in uiPoIListView.SelectedItems.Cast<PoIListItem>())
+            {
+                if (!cracked.ContainsKey(item.PoI.Type))
+                    cracked[item.PoI.Type] = new List<PointOfInterest>();
+                cracked[item.PoI.Type].Add(item.PoI);
+            }
+            return cracked;
         }
 
         /// <summary>
@@ -397,7 +486,7 @@ namespace JAFDTC.UI.App
         /// </summary>
         private List<PointOfInterest> GetPoIsMatchingFilter(string name = null)
         {
-            PointOfInterestDbQuery query = new(FilterIncludeTypes, FilterTheater, name, FilterTags,
+            PointOfInterestDbQuery query = new(FilterIncludeTypes, FilterTheater, FilterCampaign, name, FilterTags,
                                                PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH);
             return PointOfInterestDbase.Instance.Find(query, true);
         }
@@ -426,13 +515,12 @@ namespace JAFDTC.UI.App
             }
 
             foreach (TextBox tbox in _poiFieldValues)
-            {
                 tbox.Visibility = Visibility.Collapsed;
-            }
             _curPoIFieldValueMap["LatUI"].Visibility = Visibility.Visible;
             _curPoIFieldValueMap["LonUI"].Visibility = Visibility.Visible;
 
             LLDisplayFmt = fmt;
+            EditPoI.CurIndexLL = _llFmtToIndexMap[LLDisplayFmt];
         }
 
         /// <summary>
@@ -445,9 +533,7 @@ namespace JAFDTC.UI.App
             CurPoI = GetPoIsMatchingFilter(name);
             CurPoIItems.Clear();
             foreach (PointOfInterest poi in CurPoI)
-            {
                 CurPoIItems.Add(new PoIListItem(poi, LLDisplayFmt));
-            }
         }
 
         /// <summary>
@@ -459,7 +545,8 @@ namespace JAFDTC.UI.App
             string theater = GetTheaterFromEditor();
             uiPoITextTheater.Text = (string.IsNullOrEmpty(theater)) ? "Unknown Theater" : theater;
 
-            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, uiPoIValueName.Text);
+            string test = uiPoIValueName.Text;
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, null, uiPoIValueName.Text);
             List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
             IsEditPoINew = pois.Count == 0;
             uiPoITextBtnAdd.Text = (IsEditPoINew) ? "Add" : "Update";
@@ -472,23 +559,11 @@ namespace JAFDTC.UI.App
         {
             JAFDTC.App curApp = Application.Current as JAFDTC.App;
 
-            bool isUserInSel = false;
-            bool isCampaignInSel = false;
-            foreach (PoIListItem poi in uiPoIListView.SelectedItems.Cast<PoIListItem>())
-            {
-                if (poi.PoI.Type == PointOfInterestType.USER)
-                {
-                    isUserInSel = true;
-                    break;
-                }
-                else if (poi.PoI.Type == PointOfInterestType.CAMPAIGN)
-                {
-                    isCampaignInSel = true;
-                    break;
-                }
-            }
+            Dictionary<PointOfInterestType, List<PointOfInterest>> selectionByType = CrackSelectedPoIsByType();
+            bool isUserInSel = selectionByType.ContainsKey(PointOfInterestType.USER);
+            bool isCampaignInSel = selectionByType.ContainsKey(PointOfInterestType.CAMPAIGN);
 
-            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, null, uiPoIValueName.Text);
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, null, null, uiPoIValueName.Text);
             bool isPoIMatching = false;
             foreach (PointOfInterest poi in PointOfInterestDbase.Instance.Find(query))
             {
@@ -512,14 +587,20 @@ namespace JAFDTC.UI.App
             Utilities.SetEnableState(uiPoIBtnCapture, curApp.IsDCSAvailable);
 
             if (!isPoIValid)
-            {
                 uiPoITextBtnAdd.Text = "Add";
-            }
 
-            Utilities.SetEnableState(uiBarBtnEdit, uiPoIListView.SelectedItems.Count == 1);
+            bool isCampaigns = (PointOfInterestDbase.Instance.KnownCampaigns.Count > 0);
 
+            Utilities.SetEnableState(uiBarBtnEdit, (uiPoIListView.SelectedItems.Count == 1) && isUserInSel);
+            Utilities.SetEnableState(uiBarBtnDuplicate, uiPoIListView.SelectedItems.Count == 1);
+            Utilities.SetEnableState(uiBarBtnCopyCampaign, isCampaigns && (uiPoIListView.SelectedItems.Count > 0));
             Utilities.SetEnableState(uiBarBtnDelete, isUserInSel || isCampaignInSel);
-            Utilities.SetEnableState(uiBarBtnExport, isUserInSel || isCampaignInSel);
+            Utilities.SetEnableState(uiBarBtnExport, (uiPoIListView.SelectedItems.Count > 0));
+
+            Utilities.SetEnableState(uiBarBtnDeleteCamp, isCampaigns);
+
+            List<string> errors = EditPoI.GetErrorsWithEmpty(EditPoI.IsEmpty);
+            ValidateAllFields(_curPoIFieldValueMap, errors);
         }
 
         /// <summary>
@@ -567,16 +648,10 @@ namespace JAFDTC.UI.App
                 List<string> suitableItems = new();
                 List<PointOfInterest> pois = GetPoIsMatchingFilter(sender.Text);
                 if (pois.Count == 0)
-                {
                     suitableItems.Add("No Matching Points of Interest Found");
-                }
                 else
-                {
                     foreach (PointOfInterest poi in pois)
-                    {
                         suitableItems.Add(poi.Name);
-                    }
-                }
                 sender.ItemsSource = suitableItems;
             }
         }
@@ -593,81 +668,152 @@ namespace JAFDTC.UI.App
         // ---- command bar / commands --------------------------------------------------------------------------------
 
         /// <summary>
+        /// filter command click: setup the filter setup.
+        /// </summary>
+        private async void CmdFilter_Click(object sender, RoutedEventArgs args)
+        {
+            AppBarToggleButton button = (AppBarToggleButton)sender;
+            if (button.IsChecked != IsFiltered)
+                button.IsChecked = IsFiltered;
+
+            GetPoIFilterDialog filterDialog = new(FilterTheater, FilterCampaign, FilterTags, FilterIncludeTypes)
+            {
+                XamlRoot = Content.XamlRoot,
+                Title = $"Set a Filter for Points of Interest",
+                PrimaryButtonText = "Set",
+                SecondaryButtonText = "Clear Filters",
+                CloseButtonText = "Cancel",
+            };
+            ContentDialogResult result = await filterDialog.ShowAsync(ContentDialogPlacement.Popup);
+            if (result == ContentDialogResult.Primary)
+            {
+                FilterTheater = filterDialog.Theater;
+                FilterCampaign = filterDialog.Campaign;
+                FilterTags = PointOfInterest.SanitizedTags(filterDialog.Tags);
+                FilterIncludeTypes = filterDialog.IncludeTypes;
+            }
+            else if (result == ContentDialogResult.Secondary)
+            {
+                FilterTheater = "";
+                FilterCampaign = "";
+                FilterTags = "";
+                FilterIncludeTypes = PointOfInterestTypeMask.ANY;
+            }
+            else
+            {
+                return;                                         // EXIT: cancelled, no change...
+            }
+
+            button.IsChecked = IsFiltered;
+
+            Settings.LastPoIFilterTheater = FilterTheater;
+            Settings.LastPoIFilterCampaign = FilterCampaign;
+            Settings.LastPoIFilterTags = FilterTags;
+            Settings.LastPoIFilterIncludeTypes = FilterIncludeTypes;
+
+            uiPoIListView.SelectedItems.Clear();
+            RebuildPoIList();
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
         /// edit command click: copy the name, latitude, longitude, and elevation of the currnetly selected point of
-        /// interest into the poi editor fields and rebuild the interface state to reflect the change.
+        /// interest into the poi editor fields and rebuild the interface state to reflect the change. this should
+        /// only be called on editable user pois.
         /// </summary>
         private void CmdEdit_Click(object sender, RoutedEventArgs args)
         {
+            PoIListItem poiListItem = (PoIListItem)(uiPoIListView.SelectedItems[0]);
+            int index = _llFmtToIndexMap[LLDisplayFmt];
+            EditPoI.Name = poiListItem.PoI.Name;
+            EditPoI.Tags = PointOfInterest.SanitizedTags(poiListItem.PoI.Tags);
+            EditPoI.LL[index].LatUI = Coord.ConvertFromLatDD(poiListItem.PoI.Latitude, LLDisplayFmt);
+            EditPoI.LL[index].LonUI = Coord.ConvertFromLonDD(poiListItem.PoI.Longitude, LLDisplayFmt);
+            EditPoI.Alt = poiListItem.PoI.Elevation;
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// edit command click: copy the name, latitude, longitude, and elevation of the currnetly selected point of
+        /// interest into the poi editor fields and rebuild the interface state to reflect the change. this should
+        /// only be called on read-only campaign and system pois.
+        /// </summary>
+        private void CmdDuplicate_Click(object sender, RoutedEventArgs args)
+        {
+            PoIListItem poiListItem = (PoIListItem)(uiPoIListView.SelectedItems[0]);
+            int index = _llFmtToIndexMap[LLDisplayFmt];
+            EditPoI.Name = $"{poiListItem.PoI.Name} (User Copy)";
+            EditPoI.Tags = PointOfInterest.SanitizedTags(poiListItem.PoI.Tags);
+            EditPoI.LL[index].LatUI = Coord.ConvertFromLatDD(poiListItem.PoI.Latitude, LLDisplayFmt);
+            EditPoI.LL[index].LonUI = Coord.ConvertFromLonDD(poiListItem.PoI.Longitude, LLDisplayFmt);
+            EditPoI.Alt = poiListItem.PoI.Elevation;
+            RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// copy to campaign click: prompt the user for a campaign then copy the points of interest that are not
+        /// already part of that campaign to the campaign.
+        /// </summary>
+        private void CmdCopyCampaign_Click(object sender, RoutedEventArgs args)
+        {
             if (uiPoIListView.SelectedItems.Count > 0)
             {
-                PoIListItem poiListItem = (PoIListItem)(uiPoIListView.SelectedItems[0]);
-                string suffix = (poiListItem.PoI.Type == PointOfInterestType.USER) ? "" : " (User Copy)";
-                int index = _llFmtToIndexMap[LLDisplayFmt];
-                EditPoI.Name = $"{poiListItem.PoI.Name}{suffix}";
-                EditPoI.Tags = PointOfInterest.SanitizedTags(poiListItem.PoI.Tags);
-                EditPoI.LL[index].LatUI = Coord.ConvertFromLatDD(poiListItem.PoI.Latitude, LLDisplayFmt);
-                EditPoI.LL[index].LonUI = Coord.ConvertFromLonDD(poiListItem.PoI.Longitude, LLDisplayFmt);
-                EditPoI.Alt = poiListItem.PoI.Elevation;
-                RebuildInterfaceState();
+                CoreApplyFuncToExistingCampaign("Copy to", (campaignName) =>
+                {
+                    foreach (PoIListItem item in uiPoIListView.SelectedItems.Cast<PoIListItem>())
+                        if (string.IsNullOrEmpty(item.PoI.Campaign) || (item.PoI.Campaign != campaignName))
+                            PointOfInterestDbase.Instance.AddPointOfInterest(new PointOfInterest(item.PoI)
+                            {
+                                Type = PointOfInterestType.CAMPAIGN,
+                                Campaign = campaignName
+                            });
+                    RebuildPoIList();
+                    return true;
+                });
             }
         }
 
         /// <summary>
         /// delete command click: remove the selected points of interest from the points of interest database.
-        /// dcs core pois are skipped, user pois are deleted, and all campaign pois in the same campaign are
-        /// deleted.
+        /// dcs core pois are skipped.
         /// </summary>
         private async void CmdDelete_Click(object sender, RoutedEventArgs args)
         {
-            List<PointOfInterest> poisUser = GetPoIsOfTypeInSelection(PointOfInterestType.USER);
-            List<PointOfInterest> poisCampaign = GetPoIsOfTypeInSelection(PointOfInterestType.CAMPAIGN);
-            if ((poisUser.Count > 0) || (poisCampaign.Count > 0))
+            if (uiPoIListView.SelectedItems.Count > 0)
             {
-                string message = "delete this user point of interest?";
-                if (poisUser.Count > 1)
-                {
-                    message = "delete these user points of interest?";
-                }
-                else if ((poisUser.Count > 0) && (poisCampaign.Count > 0))
-                {
-                    message = "delete these user and campaign points of interest? Deleting a point of interest" +
-                              " from a particular campaign deletes all points of interest defined for that" +
-                              " campaign.";
-                }
-                else if (poisCampaign.Count > 0)
-                {
-                    string what = "this campaign point";
-                    if (poisCampaign.Count > 1)
-                    {
-                        what = "these campaign points";
-                    }
-                    message = $"delete {what} of interest? Deleting a point of interest from a particular campaign" +
-                              $" deletes all points of interest defined for that campaign.";
-                }
-                string dcs = "";
-                if (uiPoIListView.SelectedItems.Count > (poisUser.Count + poisCampaign.Count))
-                {
-                    dcs = "\n\nDCS points of interest will not be deleted.";
-                }
+                string message = "delete this point of interest?";
+                if (uiPoIListView.SelectedItems.Count > 1)
+                    message = "delete these points of interest?";
                 ContentDialogResult result = await Utilities.Message2BDialog(
                     Content.XamlRoot,
                     "Delete Points of Interest?",
-                    $"Are you sure you want to {message} This action cannot be undone.{dcs}",
+                    $"Are you sure you want to {message} This action cannot be undone.",
                     "Delete"
                 );
                 if (result == ContentDialogResult.Primary)
                 {
-                    foreach (PointOfInterest poi in poisUser)
-                    {
-                        PointOfInterestDbase.Instance.Remove(poi);
-                    }
-                    if (poisCampaign.Count > 0)
-                    {
-                        foreach (PointOfInterest poi in poisCampaign)
+                    bool isCampaignDeleted = false;
+                    foreach (PoIListItem item in uiPoIListView.SelectedItems.Cast<PoIListItem>())
+                        if (item.PoI.Type != PointOfInterestType.DCS_CORE)
                         {
-                            FileManager.DeleteUserDatabase(poi.SourceFile);
+                            if (PointOfInterestDbase.Instance.CountPoIInCampaign(item.PoI.Campaign) == 1)
+                            {
+                                PointOfInterestDbase.Instance.DeleteCampaign(item.PoI.Campaign);
+                                isCampaignDeleted = true;
+                            }
+                            else
+                            {
+                                // TODO: ideally, save at end after delete is done, rather than doing N saves
+                                PointOfInterestDbase.Instance.RemovePointOfInterest(item.PoI);
+                            }
                         }
-                        PointOfInterestDbase.Instance.Reset();
+                    if (isCampaignDeleted)
+                    {
+                        await Utilities.Message1BDialog(
+                            Content.XamlRoot,
+                            $"Deleted Empty Campaigns",
+                            $"The delete removed all points of interest from one or more campaigns." +
+                             " These campaigns have been deleted as well.");
                     }
                     RebuildPoIList();
                     RebuildInterfaceState();
@@ -682,192 +828,230 @@ namespace JAFDTC.UI.App
         /// </summary>
         private async void CmdImport_Click(object sender, RoutedEventArgs args)
         {
+            // pick a .json or .csv file to import from and attempt to deserialize a list of points of interest
+            // from the file.
+            //
+            FileOpenPicker picker = new()
+            {
+                SuggestedStartLocation = PickerLocationId.Desktop
+            };
+            picker.FileTypeFilter.Add(".json");
+            picker.FileTypeFilter.Add(".csv");
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            StorageFile file = await picker.PickSingleFileAsync();
+            if (file == null)
+                return;                                         // EXIT: cancelled picker...
+
+            List<PointOfInterest> pois;
             try
             {
-                // ---- pick file
-
-                FileOpenPicker picker = new()
-                {
-                    SuggestedStartLocation = PickerLocationId.Desktop
-                };
-                picker.FileTypeFilter.Add(".json");
-                picker.FileTypeFilter.Add(".tsv");
-                picker.FileTypeFilter.Add(".txt");
-                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-                WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-                StorageFile file = await picker.PickSingleFileAsync();
-                if (file == null)
-                {
-                    return;                                     // EXIT: cancelled picker...
-                }
-
-                // ---- select campaign / user and, if campaign, campaign name
-
-                ContentDialogResult resultWhat = await Utilities.Message3BDialog(
-                    Content.XamlRoot,
-                    $"What Would You Like to Import?",
-                    $"Would you like to import the information in this file as editable general user points of" +
-                    $" interest or fixed campaign points of interest?",
-                    $"User",
-                    $"Campaign",
-                    $"Cancel");
-                string campaign = null;
-                if (resultWhat == ContentDialogResult.Secondary)
-                {
-                    GetNameDialog nameDialog = new()
-                    {
-                        XamlRoot = Content.XamlRoot,
-                        Title = "Select a Campaign Name"
-                    };
-                    ContentDialog errDialog = new()
-                    {
-                        XamlRoot = Content.XamlRoot,
-                        Title = "Campaign Already Defined",
-                        DefaultButton = ContentDialogButton.Close,
-                        PrimaryButtonText = "Replace",
-                        CloseButtonText = "Select Different Name"
-                    };
-                    while (true)
-                    {
-                        if (await nameDialog.ShowAsync() == ContentDialogResult.None)
-                        {
-                            return;                             // EXIT: cancelled campaign name...
-                        }
-                        else if (!FileManager.IsCampaignDatabase(nameDialog.Value))
-                        {
-                            campaign = nameDialog.Value.Trim().Replace(';', ':');
-                            break;
-                        }
-                        errDialog.Content = $"The campaign name \"{nameDialog.Value}\" is already in use. Would you" +
-                                            $" like to replace it with the information from this import?";
-                        if (await errDialog.ShowAsync() == ContentDialogResult.Primary)
-                        {
-                            campaign = nameDialog.Value.Trim().Replace(';', ':');
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    return;                                     // EXIT: cancelled import type...
-                }
-
-                // ---- read and deserialize/parse file
-
-                string finalTitle = "Success!";
-                string finalMessage = "";
-                List<PointOfInterest> pois;
+                string data = await FileIO.ReadTextAsync(file);
                 if (file.FileType.ToLower() == ".json")
-                {
-                    string json = await FileIO.ReadTextAsync(file);
-                    pois = JsonSerializer.Deserialize<List<PointOfInterest>>(json);
-
-                    string what = (pois.Count > 1) ? "points" : "point";
-                    finalMessage = $"Imported {pois.Count} user {what} of interest.";
-                }
+                    pois = JsonSerializer.Deserialize<List<PointOfInterest>>(data);
                 else
-                {
-                    string text = await FileIO.ReadTextAsync(file);
-                    pois = PointOfInterestDbase.ParseTSV(text);
-
-                    string what = (pois.Count > 1) ? "points" : "point";
-                    finalMessage = $"Imported {pois.Count} {what} of interest into a campaign named \"{campaign}\".";
-                }
-
-                // ---- process pois
-
-                if (pois.Count > 0)
-                {
-                    foreach (PointOfInterest poi in pois)
-                    {
-                        if (string.IsNullOrEmpty(campaign))
-                        {
-                            poi.Type = PointOfInterestType.USER;
-                            PointOfInterestDbase.Instance.Add(poi, false);
-                        }
-                        else
-                        {
-                            poi.Type = PointOfInterestType.CAMPAIGN;
-                            bool isFound = false;
-                            if (!string.IsNullOrEmpty(poi.Tags))
-                            {
-                                foreach (string tag in poi.Tags.ToLower().Split(';').ToList<string>())
-                                {
-                                    if (tag.Trim() == campaign)
-                                    {
-                                        isFound = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!isFound)
-                            {
-                                poi.Tags = (string.IsNullOrEmpty(poi.Tags)) ? $"{campaign}" : $"{campaign}; " + poi.Tags;
-                            }
-                        }
-                    }
-                    if (string.IsNullOrEmpty(campaign))
-                    {
-                        PointOfInterestDbase.Instance.Save();
-                    }
-                    else
-                    {
-                        FileManager.SaveCampaignPointsOfInterest(campaign, pois);
-                        PointOfInterestDbase.Instance.Reset();
-                    }
-                }
-                else
-                {
-                    finalTitle = "Missing Points of Interest";
-                    finalMessage = "This import file does not appear to contain any valid points of interest?";
-                }
-
-                // ---- wrap up
-
-                await Utilities.Message1BDialog(Content.XamlRoot, finalTitle, finalMessage);
-
-                if (pois.Count > 0)
-                { 
-                    RebuildPoIList();
-                    RebuildInterfaceState();
-                }
+                    pois = PointOfInterestDbase.ParseCSV(data);
             }
             catch (Exception ex)
             {
                 FileManager.Log($"EditPointsOfInterestPage:CmdImport_Click exception {ex}");
-                await Utilities.Message1BDialog(Content.XamlRoot, "Import Failed", "Unable to import points of interest.");
+                await Utilities.Message1BDialog(Content.XamlRoot,
+                                                $"Import Failed",
+                                                $"Unable to import points of interest from {file.Name}.");
+                return;                                         // EXIT: file read failed
             }
+
+            // catalog the pois just read from the file to determine how many campaign and user pois were
+            // in the import along with which pois map to which campaign. this information is used to drive
+            // user prompts on how to handle the import. we'll handle duplicates here as well (import will
+            // over-write them).
+            //
+            Dictionary<PointOfInterestType, int> poiTypes = new();
+            Dictionary<string, List<PointOfInterest>> poisCampaign = new();
+            List<PointOfInterest> poisUser = new();
+            List<PointOfInterest> poisDup = new();
+            foreach (PointOfInterest poi in pois)
+            {
+                if (poiTypes.ContainsKey(poi.Type))
+                    poiTypes[poi.Type]++;
+                else
+                    poiTypes[poi.Type] = 1;
+                if (poi.Type == PointOfInterestType.USER)
+                {
+                    poisUser.Add(poi);
+                    PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, poi.Theater, null, poi.Name);
+                    foreach (PointOfInterest poiDup in PointOfInterestDbase.Instance.Find(query))
+                        poisDup.Add(poiDup);
+                }
+                else if ((poi.Type == PointOfInterestType.CAMPAIGN) && !string.IsNullOrEmpty(poi.Campaign))
+                {
+                    if (!poisCampaign.ContainsKey(poi.Campaign))
+                        poisCampaign[poi.Campaign] = new List<PointOfInterest>();
+                    poisCampaign[poi.Campaign].Add(poi);
+                    PointOfInterestDbQuery query = new(PointOfInterestTypeMask.CAMPAIGN, poi.Theater, poi.Campaign,
+                                                       poi.Name);
+                    foreach (PointOfInterest poiDup in PointOfInterestDbase.Instance.Find(query))
+                        poisDup.Add(poi);
+                }
+            }
+            if (poisDup.Count > 0)
+            {
+                ContentDialogResult result = await Utilities.Message2BDialog(
+                    Content.XamlRoot,
+                    "Duplicate Points of Interest?",
+                    $"The import contains points of interest that are already in the database. Do you want to update" +
+                    $" these points of interest from the import or cancel?",
+                    "Update"
+                );
+                if (result != ContentDialogResult.Primary)
+                    return;                                     // EXIT: cancelled
+                foreach (PointOfInterest poi in poisDup)
+                    PointOfInterestDbase.Instance.RemovePointOfInterest(poi, false);
+            }
+
+            // add the pois to the database. user pois are added as is. campaign pois that match an existing campaign
+            // prompt the user to "add" or "replace".
+            //
+            foreach (PointOfInterest poi in poisUser)
+                PointOfInterestDbase.Instance.AddPointOfInterest(poi, false);
+            PointOfInterestDbase.Instance.Save();
+
+            foreach (string campaign in poisCampaign.Keys)
+            {
+                if (PointOfInterestDbase.Instance.CountPoIInCampaign(campaign) > 0)
+                {
+                    ContentDialogResult result = await Utilities.Message3BDialog(
+                        Content.XamlRoot,
+                        $"Campaign Exists",
+                        $"Import file contains points of interest for a campaign '{campaign}' that is already in" +
+                        $" the database. Would you like to merge the points of interest to this existing campaign or" +
+                        $" replace the points of interest in this existing campaign with the imported points?",
+                        "Add",
+                        "Replace",
+                        "Cancel");
+                    if (result == ContentDialogResult.Secondary)
+                        PointOfInterestDbase.Instance.DeleteCampaign(campaign, false);
+                }
+                if (PointOfInterestDbase.Instance.CountPoIInCampaign(campaign) == 0)
+                    PointOfInterestDbase.Instance.AddCampaign(campaign, false);
+                foreach (PointOfInterest poi in poisCampaign[campaign])
+                    PointOfInterestDbase.Instance.AddPointOfInterest(poi, false);
+                PointOfInterestDbase.Instance.Save(campaign);
+            }
+
+            string what = (pois.Count > 1) ? "points" : "point";
+            await Utilities.Message1BDialog(Content.XamlRoot,
+                                            "Success!", $"Imported {pois.Count} {what} of interest.");
+
+            RebuildPoIList();
+            RebuildInterfaceState();
         }
 
         /// <summary>
         /// export command click: prompt the user for a file to export the selected points of interest to and
-        /// serialized the selected pois to the file.
+        /// serialize the selected pois to the file. we will make some modifications to what is exported based
+        /// on user responses: dcs pois are converted to user pois, and campaign pois may be added to export
+        /// entire campaigns if not all campaign pois are selected.
         /// </summary>
         private async void CmdExport_Click(object sender, RoutedEventArgs args)
         {
+            Dictionary<PointOfInterestType, List<PointOfInterest>> selectionByType = CrackSelectedPoIsByType();
+            List<PointOfInterest> pois = new();
+            ContentDialogResult result;
+
+            // user pois are copied into the export set as is with no changes.
+            //
+            if (selectionByType.ContainsKey(PointOfInterestType.USER))
+                foreach (PointOfInterest poi in selectionByType[PointOfInterestType.USER])
+                    pois.Add(poi);
+
+            // dcs pois are copied into the export set as user pois with an updated type and name. we'll ask the
+            // user if this is ok before doing the deed.
+            //
+            if (selectionByType.ContainsKey(PointOfInterestType.DCS_CORE))
+            {
+                result = await Utilities.Message2BDialog(
+                    Content.XamlRoot,
+                    $"Exporting DCS Points of Interest",
+                    $"The selection includes one or more DCS points of interest." +
+                    $" These points will be exported as user points of interest.");
+                if (result != ContentDialogResult.Primary)
+                    return;                                     // EXIT: user cancels
+
+                foreach (PointOfInterest poi in selectionByType[PointOfInterestType.DCS_CORE])
+                    pois.Add(new PointOfInterest(poi)
+                    {
+                        Type = PointOfInterestType.USER,
+                        Name = $"{poi.Name} (User Copy)"
+                    });
+            }
+
+            // campaign pois are copied into the export set either as complete campaigns or selected pois. if the
+            // user did not select all pois in a campaign, ask if they want to include all pois.
+            //
+            if (selectionByType.ContainsKey(PointOfInterestType.CAMPAIGN))
+            {
+                Dictionary<string, int> campaigns = new();
+                foreach (PointOfInterest poi in selectionByType[PointOfInterestType.CAMPAIGN])
+                    if (campaigns.ContainsKey(poi.Campaign))
+                        campaigns[poi.Campaign]++;
+                    else
+                        campaigns[poi.Campaign] = 1;
+
+                result = ContentDialogResult.Secondary;
+                foreach (string name in campaigns.Keys)
+                    if (PointOfInterestDbase.Instance.CountPoIInCampaign(name) != campaigns[name])
+                    {
+                        string plural1 = (campaigns.Count > 1) ? "one or more campaigns" : "a campaign";
+                        string plural2 = (campaigns.Count > 1) ? "s" : "";
+                        result = await Utilities.Message3BDialog(
+                            Content.XamlRoot,
+                            $"Exporting Partial Campaign{plural2}",
+                            $"The selection does not include all points of interest from {plural1}." +
+                            $" Would you like to include all points of interest from the selected" +
+                            $" campaign{plural2} in the export?",
+                            "All",
+                            "Only Selected");
+                        break;
+                    }
+                if (result == ContentDialogResult.None)
+                    return;                                     // EXIT: user cancels
+                else if (result == ContentDialogResult.Secondary)
+                    foreach (PointOfInterest poi in selectionByType[PointOfInterestType.CAMPAIGN])
+                        pois.Add(poi);
+                else
+                {
+                    foreach (string name in campaigns.Keys)
+                    {
+                        PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, null, null, name);
+                        foreach (PointOfInterest poi in PointOfInterestDbase.Instance.Find(query))
+                            pois.Add(poi);
+                    }
+                }
+            }
+
+            // now that we have the export poi list, prompt the user for a save file, serialize the export poi list as
+            // json, and save it to disk.
+            //
             try
             {
-                List<PointOfInterest> pois = GetPoIsOfTypeInSelection(PointOfInterestType.USER);
-                if (pois.Count > 0)
+                FileSavePicker picker = new()
                 {
-                    FileSavePicker picker = new()
-                    {
-                        SuggestedStartLocation = PickerLocationId.Desktop,
-                        SuggestedFileName = "pois"
-                    };
-                    picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
-                    var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-                    InitializeWithWindow.Initialize(picker, hwnd);
+                    SuggestedStartLocation = PickerLocationId.Desktop,
+                    SuggestedFileName = "JAFDTC PoIs"
+                };
+                picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
+                var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
+                InitializeWithWindow.Initialize(picker, hwnd);
 
-                    StorageFile file = await picker.PickSaveFileAsync();
-                    if (file != null)
-                    {
-                        await FileIO.WriteTextAsync(file, JsonSerializer.Serialize(pois, Configuration.JsonOptions));
-                        string what = (pois.Count > 1) ? "points" : "point";
-                        await Utilities.Message1BDialog(Content.XamlRoot,
-                                                        "Success!",  $"Exported {pois.Count} {what} of interest.");
-                    }
+                StorageFile file = await picker.PickSaveFileAsync();
+                if (file != null)
+                {
+                    await FileIO.WriteTextAsync(file, JsonSerializer.Serialize(pois, Configuration.JsonOptions));
+                    string what = (pois.Count > 1) ? "points" : "point";
+                    await Utilities.Message1BDialog(Content.XamlRoot,
+                                                    "Success!",  $"Exported {pois.Count} {what} of interest.");
                 }
             }
             catch (Exception ex)
@@ -877,53 +1061,36 @@ namespace JAFDTC.UI.App
             }
         }
 
+        // ---- campaign commands -------------------------------------------------------------------------------------
+
         /// <summary>
-        /// filter command click: setup the filter setup.
+        /// add campaign command click: prompt the user for the name of a new campaign and add it to the point of
+        /// interest database.
         /// </summary>
-        private async void CmdFilter_Click(object sender, RoutedEventArgs args)
+        private void CmdAddCampaign_Click(object sender, RoutedEventArgs args)
         {
-            AppBarToggleButton button = (AppBarToggleButton)sender;
-            if (button.IsChecked != IsFiltered)
+            CoreApplyFuncToNewCampaign("Add", (campaignName) =>
             {
-                button.IsChecked = IsFiltered;
-            }
-
-            GetPoIFilterDialog filterDialog = new(FilterTheater, true, FilterTags, FilterIncludeTypes)
-            {
-                XamlRoot = Content.XamlRoot,
-                Title = $"Set a Filter for Points of Interest",
-                PrimaryButtonText = "Set",
-                SecondaryButtonText = "Clear Filters",
-                CloseButtonText = "Cancel",
-            };
-            ContentDialogResult result = await filterDialog.ShowAsync(ContentDialogPlacement.Popup);
-            if (result == ContentDialogResult.Primary)
-            {
-                FilterTheater = filterDialog.Theater;
-                FilterTags = PointOfInterest.SanitizedTags(filterDialog.Tags);
-                FilterIncludeTypes = filterDialog.IncludeTypes;
-            }
-            else if (result == ContentDialogResult.Secondary)
-            {
-                FilterTheater = "";
-                FilterTags = "";
-                FilterIncludeTypes = PointOfInterestTypeMask.ANY;
-            }
-            else
-            {
-                return;                                         // EXIT: cancelled, no change...
-            }
-
-            button.IsChecked = IsFiltered;
-
-            Settings.LastPoIFilterTheater = FilterTheater;
-            Settings.LastPoIFilterTags = FilterTags;
-            Settings.LastPoIFilterIncludeTypes = FilterIncludeTypes;
-
-            uiPoIListView.SelectedItems.Clear();
-            RebuildPoIList();
-            RebuildInterfaceState();
+                PointOfInterestDbase.Instance.AddCampaign(campaignName);
+                return true;
+            });
         }
+
+        /// <summary>
+        /// delete campaign command click: prompt the user to select an existing campaign and delete it from the point
+        /// of interest database.
+        /// </summary>
+        private void CmdDeleteCampaign_Click(object sender, RoutedEventArgs args)
+        {
+            CoreApplyFuncToExistingCampaign("Delete", (campaignName) =>
+            {
+                PointOfInterestDbase.Instance.DeleteCampaign(campaignName);
+                RebuildPoIList();
+                return true;
+            });
+        }
+
+        // ---- coordinate setup --------------------------------------------------------------------------------------
 
         /// <summary>
         /// select coordinate format click: present the user with a list dialog to select the display format for poi
@@ -956,10 +1123,38 @@ namespace JAFDTC.UI.App
         /// </summary>
         private void PoIListView_RightTapped(object sender, RightTappedRoutedEventArgs args)
         {
-            uiPoiListCtxMenuFlyout.Items[0].IsEnabled = (uiPoIListView.SelectedItems.Count > 0);    // edit
-            uiPoiListCtxMenuFlyout.Items[1].IsEnabled = (uiPoIListView.SelectedItems.Count > 0);    // export
-            uiPoiListCtxMenuFlyout.Items[3].IsEnabled = (uiPoIListView.SelectedItems.Count > 0);    // delete
-            uiPoiListCtxMenuFlyout.ShowAt((ListView)sender, args.GetPosition((ListView)sender));
+            ListView listView = (ListView)sender;
+            PoIListItem poi = (PoIListItem)((FrameworkElement)args.OriginalSource).DataContext;
+            int index = CurPoIItems.IndexOf(poi);
+            bool isTappedItemSelected = false;
+            foreach (ItemIndexRange range in listView.SelectedRanges)
+                if ((index >= range.FirstIndex) && (index <= range.LastIndex))
+                {
+                    isTappedItemSelected = true;
+                    break;
+                }
+            if (!isTappedItemSelected)
+            {
+                listView.SelectedIndex = CurPoIItems.IndexOf(poi);
+                RebuildInterfaceState();
+            }
+
+            bool isSelect = (uiPoIListView.SelectedItems.Count > 0);
+            bool isOneUsrSel = false;
+            bool isOneNonUsrSel = false;
+            if (uiPoIListView.SelectedItems.Count == 1)
+            {
+                isOneUsrSel = (poi.PoI.Type == PointOfInterestType.USER);
+                isOneNonUsrSel = !isOneUsrSel;
+            }
+
+            uiPoiListCtxMenuFlyout.Items[0].IsEnabled = isOneUsrSel;                                // edit
+            uiPoiListCtxMenuFlyout.Items[1].IsEnabled = isOneNonUsrSel;                             // duplicate
+            uiPoiListCtxMenuFlyout.Items[2].IsEnabled = isSelect;                                   // export
+            uiPoiListCtxMenuFlyout.Items[4].IsEnabled = isSelect;                                   // copy to campaign
+            uiPoiListCtxMenuFlyout.Items[6].IsEnabled = isSelect;                                   // delete
+
+            uiPoiListCtxMenuFlyout.ShowAt((ListView)sender, args.GetPosition(listView));
         }
 
         /// <summary>
@@ -985,7 +1180,7 @@ namespace JAFDTC.UI.App
         {
             string theater = GetTheaterFromEditor();
             int index = _llFmtToIndexMap[LLDisplayFmt];
-            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, EditPoI.Name);
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, null, EditPoI.Name);
             List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
             if (IsEditPoINew || (pois.Count == 0))
             {
@@ -999,7 +1194,7 @@ namespace JAFDTC.UI.App
                     Longitude = EditPoI.LL[index].Lon,
                     Elevation = EditPoI.Alt,
                 };
-                PointOfInterestDbase.Instance.Add(poi);
+                PointOfInterestDbase.Instance.AddPointOfInterest(poi);
                 EditPoI.Tags = poi.Tags;
             }
             else
@@ -1085,6 +1280,7 @@ namespace JAFDTC.UI.App
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             FilterTheater = Settings.LastPoIFilterTheater;
+            FilterCampaign = Settings.LastPoIFilterCampaign;
             FilterTags = Settings.LastPoIFilterTags;
             FilterIncludeTypes = Settings.LastPoIFilterIncludeTypes;
 

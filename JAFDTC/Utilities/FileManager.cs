@@ -18,6 +18,8 @@
 //
 // ********************************************************************************************************************
 
+// define JAFDTC_LOG to enable logging to the jafdtc-log.txt file in the jafdtc documents area.
+//
 #define JAFDTC_LOG
 
 using JAFDTC.Models;
@@ -35,7 +37,8 @@ using System.Text.Json;
 namespace JAFDTC.Utilities
 {
     /// <summary>
-    /// TODO: document
+    /// FileManager provides a set of static functions used for interacting with various internal files for jafdtc.
+    /// these functions support settings, internal databases, and so on.
     /// </summary>
     public class FileManager
     {
@@ -47,7 +50,8 @@ namespace JAFDTC.Utilities
 
         private readonly static string _appDirPath = AppContext.BaseDirectory;
 
-        private static string _settingsDirPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "JAFDTC");
+        private static string _settingsDirPath
+            = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "JAFDTC");
 
         private static string _settingsPath = null;
 
@@ -77,9 +81,7 @@ namespace JAFDTC.Utilities
                 _logPath = Path.Combine(_settingsDirPath, "jafdtc-log.txt");
                 FileStream stream = new(_logPath, FileMode.OpenOrCreate);
                 if (stream.Seek(0, SeekOrigin.End) > 32768)
-                {
                     stream.SetLength(0);
-                }
                 _logStream = new StreamWriter(stream);
                 FileManager.Log($"==== JAFDTC {Globals.BuildJAFDTC} launched");
 #endif
@@ -87,7 +89,8 @@ namespace JAFDTC.Utilities
             catch (Exception ex)
             {
                 _settingsDirPath = null;
-                string msg = $"Unable to create settings folder: {_settingsDirPath}. Make sure the path is correct and that you have appropriate permissions.";
+                string msg = $"Unable to create settings folder: {_settingsDirPath}. Make sure the path is correct" +
+                             $" and that you have appropriate permissions.";
                 throw new Exception(msg, ex);
             }
         }
@@ -181,9 +184,7 @@ namespace JAFDTC.Utilities
                     FileManager.Log($"Created new settings");
                 }
                 if (json != null)
-                {
                     settings = JsonSerializer.Deserialize<SettingsData>(json);
-                }
                 FileManager.Log($"Loaded settings");
             }
             catch (Exception ex)
@@ -245,7 +246,7 @@ namespace JAFDTC.Utilities
             name = name.ToLower();
 
             string path = AirframeConfigDirPath(airframe);
-            char[] invalidChars = System.IO.Path.GetInvalidFileNameChars();
+            char[] invalidChars = Path.GetInvalidFileNameChars();
             string cleanFilenameBase = new(name.Where(m => !invalidChars.Contains(m)).ToArray<char>());
             string cleanFilename = cleanFilenameBase + ".json";
 
@@ -297,9 +298,7 @@ namespace JAFDTC.Utilities
         {
             string path = Path.Combine(AirframeConfigDirPath(config.Airframe), config.Filename);
             if (File.Exists(path))
-            {
                 File.Delete(path);
-            }
         }
 
         /// <summary>
@@ -396,9 +395,7 @@ namespace JAFDTC.Utilities
         {
             string path = Path.Combine(Path.Combine(_settingsDirPath, "Dbase"), name);
             if (File.Exists(path))
-            {
                 File.Delete(path);
-            }
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -413,23 +410,20 @@ namespace JAFDTC.Utilities
         private static string CampaignPoIFilename(string campaign)
         {
             campaign = campaign.ToLower().Replace(' ', '-');
-            char[] invalidChars = System.IO.Path.GetInvalidFileNameChars();
+            char[] invalidChars = Path.GetInvalidFileNameChars();
             string cleanFilenameBase = new(campaign.Where(m => !invalidChars.Contains(m)).ToArray<char>());
+            Debug.Assert(cleanFilenameBase.Length > 0);
             return $"jafdtc-pois-campaign-{cleanFilenameBase}.json";
         }
 
         /// <summary>
-        /// return the point of interest database that provides coordinates on known points in the world. this database
-        /// is the combination of a read-only system dbase that carries fixed dcs points, a user dbase that holds
-        /// editable user-specified points, and any number of read-only campaign databases.
+        /// return a list of points of interest in the database that provides coordinates on known points in the
+        /// world. this list is the union of a read-only system dbase that carries fixed dcs points (such as airbases),
+        /// a user dbase that holds editable user-specified points, and any number of per-campaign databases.
         /// </summary>
         public static List<PointOfInterest> LoadPointsOfInterest()
         {
             List<PointOfInterest> dbase = LoadSystemDbase<PointOfInterest>("db-pois-airbases.json");
-            foreach (PointOfInterest point in dbase)
-            {
-                point.SourceFile = "db-pois-airbases.json";
-            }
 
             string path = Path.Combine(_settingsDirPath, "Dbase");
             Directory.CreateDirectory(path);
@@ -437,20 +431,14 @@ namespace JAFDTC.Utilities
             {
                 string fileName = Path.GetFileName(srcFile);
                 if (fileName.ToLower().StartsWith("jafdtc-pois-") && fileName.ToLower().EndsWith(".json"))
-                {
-                    List<PointOfInterest> points = LoadUserDbase<PointOfInterest>(fileName);
-                    foreach (PointOfInterest point in points)
-                    {
-                        point.SourceFile = fileName;
-                    }
-                    dbase.AddRange(points);
-                }
+                    dbase.AddRange(LoadUserDbase<PointOfInterest>(fileName));
             }
             return dbase;
         }
 
         /// <summary>
-        /// saves points of interest to the user point of interest database. returns true on success, false otherwise.
+        /// saves points of interest to the user point of interest database. database is persisted as a list of
+        /// PointOfInterest instances. returns true on success, false otherwise.
         /// </summary>
         public static bool SaveUserPointsOfInterest(List<PointOfInterest> userPoIs)
         {
@@ -458,20 +446,20 @@ namespace JAFDTC.Utilities
         }
 
         /// <summary>
-        /// saves points of interest to the campaign point of interest database. returns true on success, false
-        /// otherwise. this function is used to create a campaign database.
+        /// saves points of interest to a per-campaign point of interest database. database is persisted as a list
+        /// of PointOfInterest instances. returns true on success, false otherwise.
         /// </summary>
-        public static bool SaveCampaignPointsOfInterest(string campaign, List<PointOfInterest> userPoIs)
+        public static bool SaveCampaignPointsOfInterest(string campaign, List<PointOfInterest> campaignPoIs)
         {
-            return SaveUserDbase<PointOfInterest>(CampaignPoIFilename(campaign), userPoIs);
+            return SaveUserDbase<PointOfInterest>(CampaignPoIFilename(campaign), campaignPoIs);
         }
 
         /// <summary>
-        /// returns true if there is a point of interest database for the specified campaign, false otherwise.
+        /// deletes the per-campaign points of interest.
         /// </summary>
-        public static bool IsCampaignDatabase(string campaign)
+        public static void DeleteCampaignPointsOfInterest(string campaign)
         {
-            return File.Exists(Path.Combine(Path.Combine(_settingsDirPath, "Dbase"), CampaignPoIFilename(campaign)));
+            DeleteUserDatabase(CampaignPoIFilename(campaign));
         }
 
         // ------------------------------------------------------------------------------------------------------------

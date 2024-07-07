@@ -45,10 +45,18 @@ namespace JAFDTC.UI.Base
 
         public string Name => PoI.Name;
 
-        public string Info => (string.IsNullOrEmpty(PoI.Tags)) ? PoI.Theater : $"{PoI.Theater} — {PoI.Tags}";
+        public string Info
+        {
+            get
+            {
+                string tags = (string.IsNullOrEmpty(PoI.Tags)) ? "—" : PoI.Tags.Replace(";", ", ");
+                return (string.IsNullOrEmpty(PoI.Campaign)) ? $"{PoI.Theater} : {tags}"
+                                                            : $"{PoI.Theater} [{PoI.Campaign}] : {tags}";
+            }
+        }
 
         public string Glyph => (PoI.Type == PointOfInterestType.USER)
-                       ? "\xE718" : ((PoI.Type == PointOfInterestType.CAMPAIGN) ? "\xE7C1" : "");
+                           ? "\xE718" : ((PoI.Type == PointOfInterestType.CAMPAIGN) ? "\xE7C1" : "");
 
         public PoIListItem(PointOfInterest poi) => (PoI) = (poi);
     }
@@ -62,19 +70,22 @@ namespace JAFDTC.UI.Base
     {
         public string Theater { get; set; }
 
+        public string Campaign { get; set; }
+
         public string Tags { get; set; }
 
         public PointOfInterestTypeMask IncludeTypes { get; set; }
 
         public bool IsFiltered => !(string.IsNullOrEmpty(Theater) &&
+                                    string.IsNullOrEmpty(Campaign) &&
                                     string.IsNullOrEmpty(Tags) &&
                                     IncludeTypes.HasFlag(PointOfInterestTypeMask.DCS_CORE) &&
                                     IncludeTypes.HasFlag(PointOfInterestTypeMask.USER) &&
                                     IncludeTypes.HasFlag(PointOfInterestTypeMask.CAMPAIGN));
 
-        public PoIFilterSpec(string theater = null, string tags = null,
+        public PoIFilterSpec(string theater = null, string campaign = null, string tags = null,
                              PointOfInterestTypeMask types = PointOfInterestTypeMask.ANY)
-            => (Theater, Tags, IncludeTypes) = (theater, tags, types);
+            => (Theater, Campaign, Tags, IncludeTypes) = (theater, campaign, tags, types);
     }
 
     // ================================================================================================================
@@ -101,7 +112,7 @@ namespace JAFDTC.UI.Base
                 button.IsChecked = spec.IsFiltered;
             }
 
-            GetPoIFilterDialog filterDialog = new(spec.Theater, true, spec.Tags, spec.IncludeTypes)
+            GetPoIFilterDialog filterDialog = new(spec.Theater, spec.Campaign, spec.Tags, spec.IncludeTypes)
             {
                 XamlRoot = root,
                 Title = $"Set a Filter for Points of Interest",
@@ -138,7 +149,7 @@ namespace JAFDTC.UI.Base
         public static List<PoIListItem> RebuildPointsOfInterest(PoIFilterSpec spec, string name = null)
         {
             List<PoIListItem> suitableItems = new();
-            PointOfInterestDbQuery query = new(spec.IncludeTypes, spec.Theater, name, spec.Tags,
+            PointOfInterestDbQuery query = new(spec.IncludeTypes, spec.Theater, null, name, spec.Tags,
                                                PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH);
             foreach (PointOfInterest poi in PointOfInterestDbase.Instance.Find(query, true))
             {
@@ -165,12 +176,12 @@ namespace JAFDTC.UI.Base
             }
             else
             {
-                PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, null, name);
+                PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, null, null, name);
                 List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
                 if (pois.Count == 0)
                 {
-                    PointOfInterest poi = new(PointOfInterestType.USER, theater, name, "", lat, lon, elev);
-                    PointOfInterestDbase.Instance.Add(poi);
+                    PointOfInterest poi = new(PointOfInterestType.USER, theater, "", name, "", lat, lon, elev);
+                    PointOfInterestDbase.Instance.AddPointOfInterest(poi);
                     return true;
                 }
                 else if ((pois.Count == 1) && (pois[0].IsMatchTypeMask(PointOfInterestTypeMask.USER)))

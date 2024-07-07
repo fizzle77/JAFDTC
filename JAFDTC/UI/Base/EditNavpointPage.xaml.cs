@@ -273,7 +273,7 @@ namespace JAFDTC.UI.Base
                 return false;
             }
             string theater = PointOfInterest.TheaterForCoords(lat, lon);
-            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, EditNavpt.Name);
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, null, EditNavpt.Name);
             List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
             foreach (PointOfInterest poi in pois)
             {
@@ -672,8 +672,8 @@ namespace JAFDTC.UI.Base
             EditNavptIndex = NavArgs.IndexNavpt;
             CopyConfigToEdit(EditNavptIndex);
 
-            FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterTags,
-                             Settings.LastStptFilterIncludeTypes);
+            FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterCampaign,
+                             Settings.LastStptFilterTags, Settings.LastStptFilterIncludeTypes);
 
             ValidateAllFields(_curNavptFieldValueMap, PageHelper.GetErrors(EditNavpt, null));
             RebuildPointsOfInterest();

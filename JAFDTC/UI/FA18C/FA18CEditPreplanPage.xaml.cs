@@ -1137,8 +1137,8 @@ namespace JAFDTC.UI.FA18C
             Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, PPSystem.SystemTag,
                                            _configNameList, _configNameToUID);
 
-            FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterTags,
-                             Settings.LastStptFilterIncludeTypes);
+            FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterCampaign,
+                             Settings.LastStptFilterTags, Settings.LastStptFilterIncludeTypes);
 
             BuildCoordSourceSelectMenu();
 

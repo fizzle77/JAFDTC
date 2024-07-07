@@ -52,8 +52,8 @@ namespace JAFDTC.Models.DCS
 
     /// <summary>
     /// defines the properties of a point of interest (poi) known to jafdtc. these instances are managed by the poi
-    /// database (PointOfInterestDbase). pois include a theater (set based on lat/lon), name, comma-separated list
-    /// of tags, and a lat/lon/elev.
+    /// database (PointOfInterestDbase). pois include a theater (set based on lat/lon), optional campaign name,
+    /// semicolon-separated list of tags, and a lat/lon/elev.
     /// </summary>
     public sealed class PointOfInterest
     {
@@ -65,7 +65,11 @@ namespace JAFDTC.Models.DCS
 
         public PointOfInterestType Type { get; set; }           // poi type (airfield, etc)
 
+        // NOTE: Theater may not be null or empty and should be consistent with Latitude and Longitude.
+
         public string Theater { get; set; }                     // theater (general geographic area)
+
+        public string Campaign { get; set; }                    // campaign name (null unless Type is CAMPAIGN)
         
         public string Name { get; set; }                        // name
 
@@ -76,9 +80,6 @@ namespace JAFDTC.Models.DCS
         public string Longitude { get; set; }                   // longitude (decimal degrees)
         
         public string Elevation { get; set; }                   // elevation (feet)
-
-        [JsonIgnore]
-        public string SourceFile { get; set; }                  // source file name
 
         public override string ToString()
         {
@@ -92,10 +93,56 @@ namespace JAFDTC.Models.DCS
         // ------------------------------------------------------------------------------------------------------------
 
         public PointOfInterest()
-            => (Type, Theater, Name, Tags, Latitude, Longitude, Elevation) = (PointOfInterestType.UNKNOWN, "", "", "", "", "", "");
+            => (Type, Theater, Campaign, Name, Tags, Latitude, Longitude, Elevation)
+             = (PointOfInterestType.UNKNOWN, "", "", "", "", "", "", "");
 
-        public PointOfInterest(PointOfInterestType type, string theater, string name, string tags, string lat, string lon, string elev)
-            => (Type, Theater, Name, Tags, Latitude, Longitude, Elevation) = (type, theater, name, tags, lat, lon, elev);
+        public PointOfInterest(PointOfInterestType type, string theater, string campaign, string name, string tags,
+                               string lat, string lon, string elev)
+            => (Type, Theater, Campaign, Name, Tags, Latitude, Longitude, Elevation)
+             = (type, theater, campaign, name, tags, lat, lon, elev);
+
+        public PointOfInterest(PointOfInterest poi)
+            => (Type, Theater, Campaign, Name, Tags, Latitude, Longitude, Elevation)
+             = (poi.Type, poi.Theater, poi.Campaign, poi.Name, poi.Tags, poi.Latitude, poi.Longitude, poi.Elevation);
+
+        /// <summary>
+        /// constructs a point of interest from a line of csv text. format of the line is,
+        ///
+        ///     [type],[campaign],[name],[tags],[latitude],[longitude],[elevation]
+        ///     
+        /// where the Theater is inferred from the decimal [latitude] and [longitude]. if the string is unable ot be
+        /// parsed, the PointOfInterest is set to PointOfInterestType.UNKNOWN.
+        /// </summary>
+        public PointOfInterest(string csv)
+        {
+            Type = PointOfInterestType.UNKNOWN;
+            Theater = "";
+            Campaign = "";
+            Name = "";
+            Tags = "";
+            Latitude = "";
+            Longitude = "";
+            Elevation = "";
+
+            string[] cols = csv.Split(",");
+            if (cols.Length >= 7)
+            {
+                string lat = cols[4].Trim();
+                string lon = cols[5].Trim();
+                string theater = TheaterForCoords(lat, lon);
+                if (int.TryParse(cols[0].Trim(), out int type) && (theater != null))
+                {
+                    Type = (PointOfInterestType)type;
+                    Theater = theater;
+                    Campaign = cols[1].Trim();
+                    Name = cols[2].Trim();
+                    Tags = cols[3].Trim();
+                    Latitude = lat;
+                    Longitude = lon;
+                    Elevation = cols[6].Trim();
+                }
+            }
+        }
 
         // ------------------------------------------------------------------------------------------------------------
         //

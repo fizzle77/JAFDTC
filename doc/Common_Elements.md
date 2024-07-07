@@ -1,6 +1,6 @@
 # JAFDTC: Common Elements Guide
 
-*Version 1.0.0-B.34 of 8-June-24*
+*Version 1.0.0-B.37 of 6-July-24*
 
 Though systems differ from airframe to airframe, based on the preculariites of the airframe,
 there are many concepts, layouts, and tasks in the JAFDTC user interface that share general
@@ -83,10 +83,17 @@ the dialog. The **Set** button sets the filter to match the fields in the dialog
 unchanged. The other fields in the dialog specify the filter,
 
 - **Theater** &ndash; Limits the points of interest to a particular DCS map or theater.
+- **Campaign** &ndash; Limits the points of interest to a particular campaign defined in the
+  PoI database.
 - **Tags** &ndash; Limits the points of interest to those that contain the specified tags. For
   eaxmple, setting this field to `foo; bar` matches any point of interest with `foo` and `bar`
   in its tags (comparisons are case-insensitive).
-- **Include...** &ndash; Inclues only DCS, User, or Campaign points of interest as selected.
+- **Shows...** &ndash; Shows only DCS, User, or Campaign points of interest as selected.
+
+For example, setting **Theater** to "Nevada", **Campaign** to "Dark Materials", **Tags** to
+"Base; Target", and selecting only **Shows Campaign...** would limit the PoIs listed to
+campaign PoIs that are in Nevada, part of the "Dark Materials" campaign, with either "Base"
+or "Target" in their tags.
 
 Once you have set the filter, typing in the search box will show a list of points of interest
 with names that match the typed text and properties (for example, theater) that match the

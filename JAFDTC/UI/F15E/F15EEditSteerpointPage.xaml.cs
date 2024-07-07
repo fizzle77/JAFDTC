@@ -408,7 +408,7 @@ namespace JAFDTC.UI.F15E
                 return false;
             }
             string theater = PointOfInterest.TheaterForCoords(lat, lon);
-            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, EditStpt.Name);
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, null, EditStpt.Name);
             List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
             foreach (PointOfInterest poi in pois)
             {
@@ -885,8 +885,8 @@ namespace JAFDTC.UI.F15E
             uiRfptComboSelect.SelectedIndex = EditRfptNum - 1;
             LoadEditRfptFromPointNumber(EditRfptNum);
 
-            FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterTags,
-                             Settings.LastStptFilterIncludeTypes);
+            FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterCampaign,
+                             Settings.LastStptFilterTags, Settings.LastStptFilterIncludeTypes);
 
             ValidateAllFields(_curStptFieldValueMap, EditStpt.GetErrors(null));
             RebuildPointsOfInterest();
