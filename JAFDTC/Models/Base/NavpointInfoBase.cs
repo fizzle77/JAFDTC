@@ -131,6 +131,12 @@ namespace JAFDTC.Models.Base
                                         IsDecimalFieldValid(_lon, -180.0, 180.0, false));
 
         [JsonIgnore]
+        public virtual bool IsEmpty => (string.IsNullOrEmpty(_name) && 
+                                        string.IsNullOrEmpty(_alt) &&
+                                        string.IsNullOrEmpty(_lat) &&
+                                        string.IsNullOrEmpty(_lon));
+
+        [JsonIgnore]
         public virtual string Location => ((string.IsNullOrEmpty(Lat)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LatUI)) + ", " +
                                           ((string.IsNullOrEmpty(Lon)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LonUI)) + " / " +
                                           ((string.IsNullOrEmpty(Alt)) ? "Unknown" : Alt + "’");
