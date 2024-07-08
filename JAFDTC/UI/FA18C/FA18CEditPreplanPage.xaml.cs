@@ -41,13 +41,14 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
+using static System.Collections.Specialized.BitVector32;
 
 namespace JAFDTC.UI.FA18C
 {
     /// <summary>
     /// TODO: document
     /// </summary>
-    public sealed partial class FA18CEditPreplanPage : Page
+    public sealed partial class FA18CEditPreplanPage : SystemEditorPageBase
     {
         public static ConfigEditorPageInfo PageInfo
             => new(PPSystem.SystemTag, "Pre-Planned", "PP", Glyphs.PP, typeof(FA18CEditPreplanPage));
@@ -58,13 +59,21 @@ namespace JAFDTC.UI.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private ConfigEditorPageNavArgs NavArgs { get; set; }
+        // ---- overrides of base SystemEditorPage properties
 
-        // NOTE: changes to the Config object may only occur through the marshall methods. bindings to and edits by
-        // NOTE: the ui are always directed at the EditStation properties.
+        protected override SystemBase SystemConfig => ((FA18CConfiguration)Config).PP;
+
+        protected override String SystemTag => PPSystem.SystemTag;
+
+        protected override string SystemName => "pre-planned";
+
+        protected override bool IsPageStateDefault => SystemConfig.IsDefault;
+
+        // ---- internal properties
+
+        // NOTE: the ui always interacts with Edit* when editing pre-planned system values, EditProgNum defines which program
+        // NOTE: the ui is currently editing.
         //
-        private FA18CConfiguration Config { get; set; }
-
         private PPCoordinateInfo EditCoordInfo { get; set; }
 
         private Weapons EditWeapon { get; set; }
@@ -79,27 +88,18 @@ namespace JAFDTC.UI.FA18C
 
         private int EditCoordSrcIdx { get; set; }
 
-        private bool IsRebuildPending { get; set; }
-
-        private bool IsRebuildingUI => (_isRebuildUICounter > 0);
-
         private PointOfInterest CurSelectedPoI { get; set; }
 
         private PoIFilterSpec FilterSpec { get; set; }
 
-        private int _isRebuildUICounter;
-
         // ---- read-only properties
-
-        private readonly Dictionary<string, string> _configNameToUID;
-        private readonly List<string> _configNameList;
 
         private readonly Dictionary<string, TextBox> _curPosnFieldValueMap;
         private readonly List<FontIcon> _staSelComboIcons;
         private readonly List<FontIcon> _pgmSelComboIcons;
         private readonly List<TextBlock> _pgmSelComboTextBlocks;
-        private readonly Brush _defaultBorderBrush;
-        private readonly Brush _defaultBkgndBrush;
+        private readonly Brush _brushEnabledText;
+        private readonly Brush _brushDisabledText;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -110,9 +110,7 @@ namespace JAFDTC.UI.FA18C
         public FA18CEditPreplanPage()
         {
             InitializeComponent();
-
-            IsRebuildPending = false;
-            _isRebuildUICounter = 0;
+            InitializeBase(null, uiPosnValueName, uiCtlLinkResetBtns);
 
             EditCoordInfo = new();
             EditCoordInfo.ErrorsChanged += EditField_DataValidationError;
@@ -127,9 +125,6 @@ namespace JAFDTC.UI.FA18C
             EditCoordIdx = 0;
 
             CurSelectedPoI = null;
-
-            _configNameToUID = new Dictionary<string, string>();
-            _configNameList = new List<string>();
 
             _curPosnFieldValueMap = new Dictionary<string, TextBox>
             {
@@ -151,9 +146,14 @@ namespace JAFDTC.UI.FA18C
                 uiProgSelectItem0Text, uiProgSelectItem1Text, uiProgSelectItem2Text, uiProgSelectItem3Text,
                 uiProgSelectItem4Text, uiProgSelectItem5Text
             };
-            _defaultBorderBrush = uiPosnValueName.BorderBrush;
-            _defaultBkgndBrush = uiPosnValueName.Background;
 
+            // HACK: this is a stupid hack because i'm too lazy to figure out how to get this from a resource. fix
+            // HACK: this at some point...
+            //
+            TextBlock tmpTxtBlk = new();
+            _brushEnabledText = tmpTxtBlk.Foreground;
+            tmpTxtBlk.Style = Application.Current.Resources["TableHeaderTextStyle"] as Style;
+            _brushDisabledText = tmpTxtBlk.Foreground;
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -163,130 +163,142 @@ namespace JAFDTC.UI.FA18C
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// marshall data between our local pre-planned state and the pre-planned configuration. largely, our state
-        /// consists of a coordinate EditCoordInfo, weapon EditWeapon, and loaded program EditPPLoadedNum along with
-        /// current indices for the station, PP, and coordinate. we will fill out the rest of the state as we marshall.
-        /// 
-        /// station is station index in Stations[], pgm is program index in PP[], coord is coordinate number where 0
-        /// is target coordinate and >0 is STP number (not index) on [1,5].
+        /// Copy data from the system configuration object to the edit objects the page interacts with. this copies
+        /// from the station, program, and coordinate given by EditStationNum, EditProgIdx, and EditCoordIdx.
         /// </summary>
-        private void CopyConfigToEdit(int station, int pgm, int coord)
+        protected override void CopyConfigToEditState()
         {
-            EditWeapon = Config.PP.Stations[station].Weapon;
-            EditBoxedPPNum = Config.PP.Stations[station].BoxedPP;
+            FA18CConfiguration config = (FA18CConfiguration)Config;
+            int station = EditStationNum;
+            int pgm = EditProgIdx;
+            int coord = EditCoordIdx;
+
+            EditWeapon = config.PP.Stations[station].Weapon;
+            EditBoxedPPNum = config.PP.Stations[station].BoxedPP;
 
             // if there is no coord yet at the given index (because it hasn't been yet defined), we'll set up empty
-            // and CopyConfigToEdit will handle adding the STP[] in the configuration.
+            // and CopyConfigToEditState will handle adding the STP[] in the configuration.
             //
             // if in waypoint mode with an invalid waypoint number, revert to position mode. for position mode, copy
             // out the name/lat/lon/elev from the config. for waypoint mode, set these fields to match the waypoint.
             //
             PPCoordinateInfo srcCoordInfo = null;
             if (coord == 0)
-            {
-                srcCoordInfo = Config.PP.Stations[station].PP[pgm];
-            }
-            else if (Config.PP.Stations[station].STP.Count >= coord)
-            {
-                srcCoordInfo = Config.PP.Stations[station].STP[coord - 1];
-            }
-            if ((srcCoordInfo == null) || (srcCoordInfo.WaypointNumber > Config.WYPT.Points.Count))
+                srcCoordInfo = config.PP.Stations[station].PP[pgm];
+            else if (config.PP.Stations[station].STP.Count >= coord)
+                srcCoordInfo = config.PP.Stations[station].STP[coord - 1];
+
+            EditCoordInfo.Reset();
+            if ((srcCoordInfo == null) || (srcCoordInfo.WaypointNumber > config.WYPT.Points.Count))
             {
                 EditCoordInfo.WaypointNumber = 0;
-                EditCoordInfo.Name = "";
-                EditCoordInfo.LatUI = "";
-                EditCoordInfo.LonUI = "";
-                EditCoordInfo.Alt = "";
             }
             else if (srcCoordInfo.WaypointNumber == 0)
             {
                 EditCoordInfo.WaypointNumber = srcCoordInfo.WaypointNumber;
-                EditCoordInfo.Name = srcCoordInfo.Name;
-                EditCoordInfo.LatUI = srcCoordInfo.LatUI;
-                EditCoordInfo.LonUI = srcCoordInfo.LonUI;
-                EditCoordInfo.Alt = srcCoordInfo.Alt;
+                if (srcCoordInfo.IsValid)
+                {
+                    EditCoordInfo.Name = srcCoordInfo.Name;
+                    //
+                    // NOTE: conversion necessary as srcCoordInfo and EditCoordInfo may have different ui formats.
+                    //
+                    EditCoordInfo.LatUI = Coord.ConvertFromLatDD(srcCoordInfo.Lat, LLFormat.DMDS_P2ZF);
+                    EditCoordInfo.LonUI = Coord.ConvertFromLonDD(srcCoordInfo.Lon, LLFormat.DMDS_P2ZF);
+                    EditCoordInfo.Alt = srcCoordInfo.Alt;
+                }
             }
             else
             {
-                WaypointInfo wypt = Config.WYPT.Points[srcCoordInfo.WaypointNumber - 1];
+                WaypointInfo wypt = config.WYPT.Points[srcCoordInfo.WaypointNumber - 1];
                 EditCoordInfo.WaypointNumber = srcCoordInfo.WaypointNumber;
-                EditCoordInfo.Name = wypt.Name;
-                EditCoordInfo.LatUI = wypt.LatUI;
-                EditCoordInfo.LonUI = wypt.LonUI;
-                EditCoordInfo.Alt = wypt.Alt;
+                if (wypt.IsValid)
+                {
+                    EditCoordInfo.Name = wypt.Name;
+                    //
+                    // NOTE: conversion necessary as wypt and EditCoordInfo have different ui formats.
+                    //
+                    EditCoordInfo.LatUI = Coord.ConvertFromLatDD(wypt.Lat, LLFormat.DMDS_P2ZF);
+                    EditCoordInfo.LonUI = Coord.ConvertFromLonDD(wypt.Lon, LLFormat.DMDS_P2ZF);
+                    EditCoordInfo.Alt = wypt.Alt;
+                }
             }
+
+            UpdateUIFromEditState();
         }
 
-        private void CopyEditToConfig(int station, int pgm, int coord, bool isPersist = false)
+        /// <summary>
+        /// Copy data from the edit objects the page interacts with to the system configuration object and persist the
+        /// updated configuration to disk. this updates the station, program, and coordinate given by EditStationNum,
+        /// EditProgIdx, and EditCoordIdx.
+        /// </summary>
+        protected override void SaveEditStateToConfig()
         {
-            if (!CurStateHasErrors())
+            if (!CurStateHasErrors() && !IsUIRebuilding)
             {
-                Config.PP.Stations[station].Weapon = EditWeapon;
-                Config.PP.Stations[station].BoxedPP = EditBoxedPPNum;
+                FA18CConfiguration config = (FA18CConfiguration)Config;
+                int station = EditStationNum;
+                int pgm = EditProgIdx;
+                int coord = EditCoordIdx;
+
+                config.PP.Stations[station].Weapon = EditWeapon;
+                config.PP.Stations[station].BoxedPP = EditBoxedPPNum;
 
                 if (EditWeapon == Weapons.NONE)
                 {
-                    Config.PP.Stations[station].Reset();
+                    config.PP.Stations[station].Reset();
                 }
                 else
                 {
                     bool isDelete = (EditCoordInfo.WaypointNumber == -1);
-                    if ((Config.PP.Stations[station].STP.Count > 0) &&
+                    if ((config.PP.Stations[station].STP.Count > 0) &&
                         ((isDelete && (coord == 0)) || (EditWeapon != Weapons.SLAM_ER)))
                     {
                         // reset stp coord list. this can occur if the stp coord list has more than one element and
                         // (a) user clears target coord, or (b) weapon does not support stp coords.
                         //
-                        Config.PP.Stations[station].STP.Clear();
+                        config.PP.Stations[station].STP.Clear();
                         coord = (coord != 0) ? -1 : coord;
                     }
                     else if (isDelete && (coord != 0))
                     {
                         // remove stp coordinate from steerpoint list.
                         //
-                        Config.PP.Stations[station].STP.RemoveRange(coord - 1, 1);
+                        config.PP.Stations[station].STP.RemoveRange(coord - 1, 1);
                         coord = -1;
                     }
                     if (isDelete)
-                    {
                         EditCoordInfo.Reset();
-                    }
 
                     if (coord != -1)
                     {
-                        while ((coord != 0) && (Config.PP.Stations[station].STP.Count < coord))
-                        {
-                            Config.PP.Stations[station].STP.Add(new());
-                        }
-                        PPCoordinateInfo dstCoordInfo = (coord == 0) ? Config.PP.Stations[station].PP[pgm]
-                                                                     : Config.PP.Stations[station].STP[coord - 1];
+                        while ((coord != 0) && (config.PP.Stations[station].STP.Count < coord))
+                            config.PP.Stations[station].STP.Add(new());
+                        PPCoordinateInfo dstCoordInfo = (coord == 0) ? config.PP.Stations[station].PP[pgm]
+                                                                     : config.PP.Stations[station].STP[coord - 1];
+                        dstCoordInfo.Reset();
                         dstCoordInfo.WaypointNumber = EditCoordInfo.WaypointNumber;
 
-                        // for position mode, copy out the name/lat/lon/elev from the editor. for waypoint mode, set these
-                        // to fields to empty strings.
+                        // for position mode, copy out the name/lat/lon/elev from the editor. for waypoint mode, these
+                        // fields are empty strings due to the reset above.
                         //
                         if (EditCoordInfo.WaypointNumber == 0)
                         {
                             dstCoordInfo.Name = EditCoordInfo.Name;
-                            dstCoordInfo.LatUI = EditCoordInfo.LatUI;
-                            dstCoordInfo.LonUI = EditCoordInfo.LonUI;
+                            //
+                            // NOTE: use Lat/Lon instead of LatUI/LonUI as dstCoordInfo and EditCoordInfo may have different
+                            // NOTE: ui formats.
+                            //
+                            dstCoordInfo.Lat = EditCoordInfo.Lat;
+                            dstCoordInfo.Lon = EditCoordInfo.Lon;
                             dstCoordInfo.Alt = EditCoordInfo.Alt;
-                        }
-                        else
-                        {
-                            dstCoordInfo.Name = "";
-                            dstCoordInfo.LatUI = "";
-                            dstCoordInfo.LonUI = "";
-                            dstCoordInfo.Alt = "";
                         }
                     }
                 }
 
-                if (isPersist)
-                {
-                    Config.Save(this, PPSystem.SystemTag);
-                }
+                Config.Save(this, SystemTag);
             }
+
+            UpdateUIFromEditState();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -295,29 +307,13 @@ namespace JAFDTC.UI.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        /// <summary>
-        /// set the border brush and background for a TextBox based on validity. valid fields use the defaults, invalid
-        /// fields use ErrorFieldBorderBrush from the resources.
-        /// </summary>
-        private void SetFieldValidState(TextBox field, bool isValid)
-        {
-            field.BorderBrush = (isValid || !field.IsEnabled) ? _defaultBorderBrush
-                                                              : (SolidColorBrush)Resources["ErrorFieldBorderBrush"];
-            field.Background = (isValid || !field.IsEnabled) ? _defaultBkgndBrush
-                                                             : (SolidColorBrush)Resources["ErrorFieldBackgroundBrush"];
-        }
-
         private void ValidateAllFields(Dictionary<string, TextBox> fields, IEnumerable errors)
         {
             Dictionary<string, bool> map = new();
             foreach (string error in errors)
-            {
                 map[error] = true;
-            }
             foreach (KeyValuePair<string, TextBox> kvp in fields)
-            {
-                SetFieldValidState(kvp.Value, !map.ContainsKey(kvp.Key));
-            }
+                SetFieldValidVisualState(kvp.Value, !map.ContainsKey(kvp.Key));
         }
 
         /// <summary>
@@ -333,19 +329,17 @@ namespace JAFDTC.UI.FA18C
             {
                 List<string> errors = (List<string>)EditCoordInfo.GetErrors(args.PropertyName);
                 if (_curPosnFieldValueMap.ContainsKey(args.PropertyName))
-                {
-                    SetFieldValidState(_curPosnFieldValueMap[args.PropertyName], (errors.Count == 0));
-                }
+                    SetFieldValidVisualState(_curPosnFieldValueMap[args.PropertyName], (errors.Count == 0));
             }
-            RebuildInterfaceState();
+            UpdateUIFromEditState();
         }
 
         /// <summary>
         /// property changed: rebuild interface state to account for configuration changes.
         /// </summary>
-        private void EditField_PropertyChanged(object sender, EventArgs args)
+        private void EditField_PropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            RebuildInterfaceState();
+            UpdateUIFromEditState();
         }
 
         /// <summary>
@@ -353,7 +347,7 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private bool CurStateHasErrors()
         {
-            return ((EditCoordInfo.WaypointNumber == 0) && EditCoordInfo.HasErrors);
+            return ((EditCoordInfo.WaypointNumber == 0) && EditCoordInfo.HasErrors && !EditCoordInfo.IsEmpty);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -373,7 +367,7 @@ namespace JAFDTC.UI.FA18C
                 new TextBlock { Text = "Position", Tag = "0", HorizontalAlignment = HorizontalAlignment.Left },
             };
             int num = 1;
-            foreach (WaypointInfo wypt in Config.WYPT.Points)
+            foreach (WaypointInfo wypt in ((FA18CConfiguration)Config).WYPT.Points)
             {
                 int max = Math.Min(40, wypt.Name.Length);
                 items.Add(new TextBlock
@@ -385,10 +379,10 @@ namespace JAFDTC.UI.FA18C
                 num++;
             }
 
-            Interlocked.Increment(ref _isRebuildUICounter);
+            StartUIRebuild();
             uiCoordSrcSelectCombo.ItemsSource = items;
             uiCoordSrcSelectCombo.SelectedIndex = 0;
-            Interlocked.Decrement(ref _isRebuildUICounter);
+            FinishUIRebuild();
         }
 
         /// <summary>
@@ -414,8 +408,9 @@ namespace JAFDTC.UI.FA18C
                 //
                 // NOTE: CopyEditToConfig takes care of resetting the station in response to removing weapon.
                 //
-                CopyEditToConfig(EditStationNum, EditProgIdx, EditCoordIdx, true);
-                CopyConfigToEdit(EditStationNum, EditProgIdx, EditCoordIdx);
+                // TODO: this feels wrong?
+                SaveEditStateToConfig();
+                CopyConfigToEditState();
                 ResetComboSelectionState();
             }
             return result;
@@ -429,11 +424,11 @@ namespace JAFDTC.UI.FA18C
         {
             if (EditStationNum != station)
             {
-                CopyEditToConfig(EditStationNum, EditProgIdx, EditCoordIdx, true);
+                SaveEditStateToConfig();
                 EditStationNum = station;
                 EditProgIdx = 0;
                 EditCoordIdx = 0;
-                CopyConfigToEdit(EditStationNum, EditProgIdx, EditCoordIdx);
+                CopyConfigToEditState();
                 EditCoordSrcIdx = EditCoordInfo.WaypointNumber;
                 ResetComboSelectionState();
             }
@@ -447,10 +442,10 @@ namespace JAFDTC.UI.FA18C
         {
             if (EditProgIdx != program)
             {
-                CopyEditToConfig(EditStationNum, EditProgIdx, EditCoordIdx, true);
+                SaveEditStateToConfig();
                 EditProgIdx = program;
                 EditCoordIdx = 0;
-                CopyConfigToEdit(EditStationNum, EditProgIdx, EditCoordIdx);
+                CopyConfigToEditState();
                 EditCoordSrcIdx = EditCoordInfo.WaypointNumber;
                 ResetComboSelectionState();
             }
@@ -464,9 +459,9 @@ namespace JAFDTC.UI.FA18C
         {
             if (EditCoordIdx != coord)
             {
-                CopyEditToConfig(EditStationNum, EditProgIdx, EditCoordIdx, true);
+                SaveEditStateToConfig();
                 EditCoordIdx = coord;
-                CopyConfigToEdit(EditStationNum, EditProgIdx, EditCoordIdx);
+                CopyConfigToEditState();
                 EditCoordSrcIdx = EditCoordInfo.WaypointNumber;
                 ResetComboSelectionState();
             }
@@ -483,15 +478,18 @@ namespace JAFDTC.UI.FA18C
                 EditCoordInfo.WaypointNumber = src;
                 if (src > 0)
                 {
-                    WaypointInfo wypt = Config.WYPT.Points[src - 1];
+                    WaypointInfo wypt = ((FA18CConfiguration)Config).WYPT.Points[src - 1];
                     EditCoordInfo.Name = wypt.Name;
-                    EditCoordInfo.LatUI = wypt.LatUI;
-                    EditCoordInfo.LonUI = wypt.LonUI;
+                    //
+                    // NOTE: use Lat/Lon instead of LatUI/LonUI as wypt and EditCoordInfo have different ui formats.
+                    //
+                    EditCoordInfo.LatUI = Coord.ConvertFromLatDD(wypt.Lat, LLFormat.DMDS_P2ZF);
+                    EditCoordInfo.LonUI = Coord.ConvertFromLonDD(wypt.Lon, LLFormat.DMDS_P2ZF);
                     EditCoordInfo.Alt = wypt.Alt;
                 }
-                CopyEditToConfig(EditStationNum, EditProgIdx, EditCoordIdx, true);
+                SaveEditStateToConfig();
                 EditCoordSrcIdx = src;
-                CopyConfigToEdit(EditStationNum, EditProgIdx, EditCoordIdx);
+                CopyConfigToEditState();
                 EditCoordSrcIdx = EditCoordInfo.WaypointNumber;
                 ResetComboSelectionState();
             }
@@ -503,18 +501,18 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private void ResetComboSelectionState()
         {
-            Interlocked.Increment(ref _isRebuildUICounter);
+            StartUIRebuild();
 
             RebuildCoordSelectMenu();
 
-            uiWeaponSelectCombo.SelectedIndex = (int)Config.PP.Stations[EditStationNum].Weapon;
+            uiWeaponSelectCombo.SelectedIndex = (int)(((FA18CConfiguration)Config).PP.Stations[EditStationNum].Weapon);
             uiProgSelectCombo.SelectedIndex = EditProgIdx;
             uiCoordSelectCombo.SelectedIndex = EditCoordIdx;
             uiCoordSrcSelectCombo.SelectedIndex = EditCoordSrcIdx;
 
-            Interlocked.Decrement(ref _isRebuildUICounter);
+            FinishUIRebuild();
 
-            RebuildInterfaceState();
+            UpdateUIFromEditState();
         }
 
         /// <summary>
@@ -525,7 +523,7 @@ namespace JAFDTC.UI.FA18C
             for (int i = 0; i < uiStationSelectCombo.Items.Count; i++)
             {
                 Grid item = uiStationSelectCombo.Items[i] as Grid;
-                PPStation station = Config.PP.Stations[int.Parse((string)item.Tag)];
+                PPStation station = ((FA18CConfiguration)Config).PP.Stations[int.Parse((string)item.Tag)];
                 _staSelComboIcons[i].Visibility = (station.IsDefault) ? Visibility.Collapsed : Visibility.Visible;
             }
         }
@@ -535,10 +533,11 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private void RebuildProgramSelectMenu()
         {
+            FA18CConfiguration config = (FA18CConfiguration)Config;
             for (int i = 0; i < uiProgSelectCombo.Items.Count; i++)
             {
                 Grid item = uiProgSelectCombo.Items[i] as Grid;
-                bool iIsHidden = Config.PP.Stations[EditStationNum].IsPPDefault(int.Parse((string)item.Tag));
+                bool iIsHidden = config.PP.Stations[EditStationNum].IsPPDefault(int.Parse((string)item.Tag));
                 _pgmSelComboIcons[i].Visibility = (iIsHidden) ? Visibility.Collapsed : Visibility.Visible;
                 _pgmSelComboTextBlocks[i].FontWeight = ((EditBoxedPPNum - 1) == i) ? FontWeights.Bold : FontWeights.Normal;
             }
@@ -550,7 +549,7 @@ namespace JAFDTC.UI.FA18C
         /// </summary>
         private void RebuildCoordSelectMenu()
         {
-            PPStation station = Config.PP.Stations[EditStationNum];
+            PPStation station = ((FA18CConfiguration)Config).PP.Stations[EditStationNum];
             bool isTargetOnly = ((EditWeapon != Weapons.SLAM_ER) || !station.PP[EditProgIdx].IsValid);
             int selIndex = uiCoordSelectCombo.SelectedIndex;
 
@@ -568,17 +567,15 @@ namespace JAFDTC.UI.FA18C
                     HorizontalAlignment = HorizontalAlignment.Left
                 });
                 if ((i > station.STP.Count) || !station.STP[i - 1].IsValid)
-                {
                     break;
-                }
             }
 
             if (uiCoordSelectCombo.Items.Count != items.Count)
             {
-                Interlocked.Increment(ref _isRebuildUICounter);
+                StartUIRebuild();
                 uiCoordSelectCombo.ItemsSource = items;
                 uiCoordSelectCombo.SelectedIndex = (selIndex < items.Count) ? selIndex : 0;
-                Interlocked.Decrement(ref _isRebuildUICounter);
+                FinishUIRebuild();
             }
         }
 
@@ -591,15 +588,6 @@ namespace JAFDTC.UI.FA18C
         }
 
         /// <summary>
-        /// rebuild the link controls on the page based on where the configuration is linked to.
-        /// </summary>
-        private void RebuildLinkControls()
-        {
-            Utilities.RebuildLinkControls(Config, PPSystem.SystemTag, NavArgs.UIDtoConfigMap,
-                                          uiPageBtnTxtLink, uiPageTxtLink);
-        }
-
-        /// <summary>
         /// update the enable state on the ui elements based on the current settings. link controls must be set up
         /// vi RebuildLinkControls() prior to calling this function.
         /// </summary>
@@ -607,36 +595,38 @@ namespace JAFDTC.UI.FA18C
         {
             JAFDTC.App curApp = Application.Current as JAFDTC.App;
 
+            FA18CConfiguration config = (FA18CConfiguration)Config;
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(PPSystem.SystemTag));
             bool isDCSListening = curApp.IsDCSAvailable && (curApp.DCSActiveAirframe == Config.Airframe);
             bool isWyptAvailable = (uiCoordSrcSelectCombo.Items.Count > 1);
             bool isWeaponLoaded = (EditWeapon != Weapons.NONE);
             bool isSLAMER = (EditWeapon == Weapons.SLAM_ER);
-            bool isProgDefault = Config.PP.Stations[EditStationNum].IsPPDefault(EditProgIdx);
+            bool isProgDefault = config.PP.Stations[EditStationNum].IsPPDefault(EditProgIdx);
             bool isCoordPosn = (EditCoordSrcIdx == 0);
             bool isCoordValid = false;
             if (EditCoordIdx == 0)
-            {
-                isCoordValid = Config.PP.Stations[EditStationNum].PP[EditProgIdx].IsValid;
-            }
-            else if (Config.PP.Stations[EditStationNum].STP.Count >= EditCoordIdx)
-            {
-                isCoordValid = Config.PP.Stations[EditStationNum].STP[EditCoordIdx - 1].IsValid;
-            }
+                isCoordValid = config.PP.Stations[EditStationNum].PP[EditProgIdx].IsValid;
+            else if (config.PP.Stations[EditStationNum].STP.Count >= EditCoordIdx)
+                isCoordValid = config.PP.Stations[EditStationNum].STP[EditCoordIdx - 1].IsValid;
+            bool isPosnEnabled = isEditable && isWeaponLoaded && isCoordPosn;
+            Brush posnBrush = (isPosnEnabled) ? _brushEnabledText : _brushDisabledText;
 
-            Utilities.SetEnableState(uiPoINameFilterBox, isEditable && isWeaponLoaded);
-            Utilities.SetEnableState(uiPoIBtnFilter, isEditable && isWeaponLoaded);
-            Utilities.SetEnableState(uiPoIBtnApply, isEditable && isWeaponLoaded && (CurSelectedPoI != null));
-            Utilities.SetEnableState(uiPosnBtnCapture, isEditable && isWeaponLoaded && isDCSListening);
+            Utilities.SetEnableState(uiPoINameFilterBox, isPosnEnabled);
+            Utilities.SetEnableState(uiPoIBtnFilter, isPosnEnabled);
+            Utilities.SetEnableState(uiPoIBtnApply, isPosnEnabled && (CurSelectedPoI != null));
+            Utilities.SetEnableState(uiPosnBtnCapture, isPosnEnabled && isDCSListening);
+            uiPosnTextPoI.Foreground = posnBrush;
 
             uiPoIBtnFilter.IsChecked = (FilterSpec.IsFiltered && isEditable);
+
+            uiCoordTextSrc.Foreground = (isWeaponLoaded) ? _brushEnabledText : _brushDisabledText;
 
             Utilities.SetEnableState(uiStationBtnPrev, (EditStationNum != 2));
             Utilities.SetEnableState(uiStationBtnNext, (EditStationNum != 8));
             Utilities.SetEnableState(uiStationBtnUnload, isEditable && isWeaponLoaded);
 
-            Utilities.SetEnableState(uiProgBtnPrev, (EditProgIdx > 0));
-            Utilities.SetEnableState(uiProgBtnNext, (EditProgIdx < (uiProgSelectCombo.Items.Count - 1)));
+            Utilities.SetEnableState(uiProgBtnPrev, isWeaponLoaded && (EditProgIdx > 0));
+            Utilities.SetEnableState(uiProgBtnNext, isWeaponLoaded && (EditProgIdx < (uiProgSelectCombo.Items.Count - 1)));
             Utilities.SetEnableState(uiProgSelectCombo, isEditable && isWeaponLoaded);
             Utilities.SetEnableState(uiProgCkbxBoxed, isEditable && isWeaponLoaded && !isProgDefault);
             Utilities.SetEnableState(uiProgBtnReset, isEditable && isWeaponLoaded && !isProgDefault);
@@ -657,37 +647,42 @@ namespace JAFDTC.UI.FA18C
             Utilities.SetEnableState(uiCoordSrcSelectCombo, isEditable && isWeaponLoaded && isWyptAvailable);
             Utilities.SetEnableState(uiCoordBtnDelete, isEditable && isWeaponLoaded && isCoordValid);
 
-            Utilities.SetEnableState(uiPosnValueName, isEditable && isWeaponLoaded && isCoordPosn);
-            Utilities.SetEnableState(uiPosnValueLat, isEditable && isWeaponLoaded && isCoordPosn);
-            Utilities.SetEnableState(uiPosnValueLon, isEditable && isWeaponLoaded && isCoordPosn);
-            Utilities.SetEnableState(uiPosnValueAlt, isEditable && isWeaponLoaded && isCoordPosn);
-
-            Utilities.SetEnableState(uiPageBtnResetAll, !Config.PP.IsDefault);
-            Utilities.SetEnableState(uiPageBtnLink, _configNameList.Count > 0);
+            Utilities.SetEnableState(uiPosnValueName, isPosnEnabled);
+            Utilities.SetEnableState(uiPosnValueLat, isPosnEnabled);
+            Utilities.SetEnableState(uiPosnValueLon, isPosnEnabled);
+            Utilities.SetEnableState(uiPosnValueAlt, isPosnEnabled);
+            uiPosnTextLocn.Foreground = posnBrush;
+            uiPosnTextName.Foreground = posnBrush;
+            uiPosnTextAltUnits.Foreground = posnBrush;
         }
 
         /// <summary>
-        /// rebuild the state of controls on the page in response to a change in the configuration.
+        /// update the enable state on the ui elements based on the current settings.
         /// </summary>
-        private void RebuildInterfaceState()
+        protected override void UpdateUICustom(bool isEditable)
         {
-            if (!IsRebuildPending)
-            {
-                IsRebuildPending = true;
-                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-                {
-                    Interlocked.Increment(ref _isRebuildUICounter);
-                    uiCoordBtnDeleteTitle.Text = (uiCoordSelectCombo.SelectedIndex == 0) ? "Clear" : "Delete";
-                    uiProgCkbxBoxed.IsChecked = (EditProgIdx == (EditBoxedPPNum - 1));
-                    RebuildStationSelectMenu();
-                    RebuildProgramSelectMenu();
-                    RebuildCoordSelectMenu();
-                    RebuildLinkControls();
-                    RebuildEnableState();
-                    Interlocked.Decrement(ref _isRebuildUICounter);
-                    IsRebuildPending = false;
-                });
-            }
+            uiCoordBtnDeleteTitle.Text = (uiCoordSelectCombo.SelectedIndex == 0) ? "Clear" : "Delete";
+            uiProgCkbxBoxed.IsChecked = (EditProgIdx == (EditBoxedPPNum - 1));
+            RebuildStationSelectMenu();
+            RebuildProgramSelectMenu();
+            RebuildCoordSelectMenu();
+            RebuildEnableState();
+        }
+
+        protected override void ResetConfigToDefault()
+        {
+            ((FA18CConfiguration)Config).PP.Reset();
+
+            StartUIRebuild();
+            uiStationSelectCombo.SelectedIndex = 0;
+            FinishUIRebuild();
+
+            EditStationNum = 2;
+            EditProgIdx = 0;
+            EditCoordIdx = 0;
+            EditCoordSrcIdx = 0;
+            CopyConfigToEditState();
+            ResetComboSelectionState();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -695,54 +690,6 @@ namespace JAFDTC.UI.FA18C
         // ui interactions
         //
         // ------------------------------------------------------------------------------------------------------------
-
-        // ---- page buttons ------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// reset all button click: reset all cmds settings back to their defaults.
-        /// </summary>
-        private async void PageBtnResetAll_Click(object sender, RoutedEventArgs args)
-        {
-            ContentDialogResult result = await Utilities.Message2BDialog(
-                Content.XamlRoot,
-                "Reset Configuration?",
-                "Are you sure you want to reset the pre-planned configurations to avionics defaults? This action cannot be undone.",
-                "Reset"
-            );
-            if (result == ContentDialogResult.Primary)
-            {
-                Config.UnlinkSystem(PPSystem.SystemTag);
-                Config.PP.Reset();
-                Config.Save(this, PPSystem.SystemTag);
-                EditStationNum = 2;
-                EditProgIdx = 0;
-                EditCoordIdx = 0;
-                EditCoordSrcIdx = 0;
-                CopyConfigToEdit(EditStationNum, EditProgIdx, EditCoordIdx);
-                ResetComboSelectionState();
-            }
-        }
-
-        /// <summary>
-        /// system link click: manage the ui to link this configuration to another pre-planned configuration.
-        /// </summary>
-        private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
-        {
-            string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, PPSystem.SystemTag,
-                                                                    _configNameList);
-            if (selectedItem == null)
-            {
-                Config.UnlinkSystem(PPSystem.SystemTag);
-                Config.Save(this);
-            }
-            else if (selectedItem.Length > 0)
-            {
-                Config.LinkSystemTo(PPSystem.SystemTag, NavArgs.UIDtoConfigMap[_configNameToUID[selectedItem]]);
-                Config.Save(this);
-                // TODO: reset to pp 1 / c 0?
-                CopyConfigToEdit(EditStationNum, EditProgIdx, EditCoordIdx);
-            }
-        }
 
         // ---- component delete buttons ------------------------------------------------------------------------------
 
@@ -768,15 +715,14 @@ namespace JAFDTC.UI.FA18C
             );
             if (result == ContentDialogResult.Primary)
             {
-                Config.PP.Stations[EditStationNum].PP[EditProgIdx].Reset();
-                CopyConfigToEdit(EditStationNum, EditProgIdx, EditCoordIdx);
+                ((FA18CConfiguration)Config).PP.Stations[EditStationNum].PP[EditProgIdx].Reset();
+                CopyConfigToEditState();
                 if ((EditBoxedPPNum - 1) == EditProgIdx)
                 {
                     EditBoxedPPNum = 0;
                     uiProgCkbxBoxed.IsChecked = false;
-                    CopyEditToConfig(EditStationNum, EditProgIdx, EditCoordIdx, true);
+                    SaveEditStateToConfig();
                 }
-                RebuildInterfaceState();
             }
         }
 
@@ -803,12 +749,12 @@ namespace JAFDTC.UI.FA18C
                 EditCoordInfo.Reset();
                 EditCoordInfo.WaypointNumber = -1;
                 //
-                // NOTE: CopyEditToConfig takes care of deleting/clearing coordinate at EditCoordIdx when
+                // NOTE: SaveEditStateToConfig takes care of deleting/clearing coordinate at EditCoordIdx when
                 // NOTE: WaypointNumber is -1
                 // 
-                CopyEditToConfig(EditStationNum, EditProgIdx, EditCoordIdx, true);
+                SaveEditStateToConfig();
                 EditCoordIdx = EditCoordIdx - ((EditCoordIdx == 0) ? 0 : 1);
-                CopyConfigToEdit(EditStationNum, EditProgIdx, EditCoordIdx);
+                CopyConfigToEditState();
                 EditCoordSrcIdx = EditCoordInfo.WaypointNumber;
                 ResetComboSelectionState();
             }
@@ -859,7 +805,7 @@ namespace JAFDTC.UI.FA18C
                     }
                 }
             }
-            RebuildInterfaceState();
+            UpdateUIFromEditState();
         }
 
         /// <summary>
@@ -879,7 +825,7 @@ namespace JAFDTC.UI.FA18C
                 Settings.LastStptFilterIncludeTypes = FilterSpec.IncludeTypes;
 
                 RebuildPointsOfInterest();
-                RebuildInterfaceState();
+                UpdateUIFromEditState();
             }
         }
 
@@ -897,8 +843,7 @@ namespace JAFDTC.UI.FA18C
 
             uiCoordSrcSelectCombo.SelectedIndex = 0;
 
-            CopyEditToConfig(EditStationNum, EditProgIdx, EditCoordIdx, true);
-            RebuildInterfaceState();
+            SaveEditStateToConfig();
         }
 
         /// <summary>
@@ -911,7 +856,7 @@ namespace JAFDTC.UI.FA18C
             await Utilities.CaptureSingleDialog(Content.XamlRoot, "Position");
             WyptCaptureDataRx.Instance.WyptCaptureDataReceived -= PosnBtnCapture_PosnCaptureDataReceived;
 
-            RebuildInterfaceState();
+            UpdateUIFromEditState();
         }
 
         /// <summary>
@@ -959,7 +904,7 @@ namespace JAFDTC.UI.FA18C
         private void StationSelectCombo_SelectionChanged(object sender, RoutedEventArgs args)
         {
             Grid item = (Grid)((ComboBox)sender).SelectedItem;
-            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            if (!IsUIRebuilding && (item != null) && (item.Tag != null))
             {
                 // NOTE: assume tag == station here...
                 SelectStation(int.Parse((string)item.Tag));
@@ -978,27 +923,26 @@ namespace JAFDTC.UI.FA18C
         private async void WeaponSelectCombo_SelectionChanged(object sender, RoutedEventArgs args)
         {
             TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
-            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            if (!IsUIRebuilding && (item != null) && (item.Tag != null))
             {
                 Weapons weapon = (Weapons)int.Parse((string)item.Tag);
                 if ((weapon != EditWeapon) && (weapon == Weapons.NONE))
                 {
                     if (await CoreUnloadWeaponUI() != ContentDialogResult.Primary)
                     {
-                        Interlocked.Increment(ref _isRebuildUICounter);
+                        StartUIRebuild();
                         uiWeaponSelectCombo.SelectedIndex = (int)EditWeapon;
-                        Interlocked.Decrement(ref _isRebuildUICounter);
+                        FinishUIRebuild();
                     }
                 }
                 else if (weapon != EditWeapon)
                 {
                     EditWeapon = weapon;
                     //
-                    // NOTE: CopyEditToConfig takes care of removing Coords[] elements not supported by the weapon.
+                    // NOTE: SaveEditStateToConfig removes Coords[] elements not supported by the weapon.
                     //
-                    CopyEditToConfig(EditStationNum, EditProgIdx, EditCoordIdx, true);
+                    SaveEditStateToConfig();
                     RebuildCoordSelectMenu();
-                    RebuildInterfaceState();
                 }
             }
         }
@@ -1028,7 +972,7 @@ namespace JAFDTC.UI.FA18C
         private void ProgSelectCombo_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
             Grid item = (Grid)((ComboBox)sender).SelectedItem;
-            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            if (!IsUIRebuilding && (item != null) && (item.Tag != null))
             {
                 // NOTE: assume tag == station here...
                 SelectProgram(int.Parse((string)item.Tag));
@@ -1042,8 +986,7 @@ namespace JAFDTC.UI.FA18C
         {
             CheckBox ckbx = (CheckBox)sender;
             EditBoxedPPNum = (ckbx.IsChecked == true) ? (EditProgIdx + 1) : 0;
-            CopyEditToConfig(EditStationNum, EditProgIdx, EditCoordIdx, true);
-            RebuildInterfaceState();
+            SaveEditStateToConfig();
         }
 
         // ---- coordinate selection ----------------------------------------------------------------------------------
@@ -1072,7 +1015,7 @@ namespace JAFDTC.UI.FA18C
         private void CoordSelectCombo_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
             TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
-            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            if (!IsUIRebuilding && (item != null) && (item.Tag != null))
             {
                 // NOTE: assume tag == index here...
                 SelectCoord(int.Parse((string)item.Tag));
@@ -1087,7 +1030,7 @@ namespace JAFDTC.UI.FA18C
         private void CoordSrcSelectCombo_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
             TextBlock item = (TextBlock)((ComboBox)sender).SelectedItem;
-            if (!IsRebuildingUI && (item != null) && (item.Tag != null))
+            if (!IsUIRebuilding && (item != null) && (item.Tag != null))
             {
                 // NOTE: assume tag == index here...
                 SelectCoordSource(int.Parse((string)item.Tag));
@@ -1104,7 +1047,7 @@ namespace JAFDTC.UI.FA18C
             // CONSIDER: may be better here to handle this in a property changed handler rather than here?
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
-                CopyEditToConfig(EditStationNum, EditProgIdx, EditCoordIdx, true);
+                SaveEditStateToConfig();
             });
         }
 
@@ -1115,55 +1058,30 @@ namespace JAFDTC.UI.FA18C
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// on configuration saved, rebuild the interface state to align with the latest save (assuming we go here
-        /// through a CopyEditToConfig).
-        /// </summary>
-        private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
-        {
-            RebuildInterfaceState();
-        }
-
-        /// <summary>
         /// on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
         /// we are editing.
         /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
-            NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
-            Config = (FA18CConfiguration)NavArgs.Config;
-
-            Config.ConfigurationSaved += ConfigurationSavedHandler;
-
-            Utilities.BuildSystemLinkLists(NavArgs.UIDtoConfigMap, Config.UID, PPSystem.SystemTag,
-                                           _configNameList, _configNameToUID);
-
             FilterSpec = new(Settings.LastStptFilterTheater, Settings.LastStptFilterCampaign,
                              Settings.LastStptFilterTags, Settings.LastStptFilterIncludeTypes);
+
+            base.OnNavigatedTo(args);
 
             BuildCoordSourceSelectMenu();
 
             EditStationNum = 2;
             EditProgIdx = 0;
             EditCoordIdx = 0;
-            CopyConfigToEdit(EditStationNum, EditProgIdx, EditCoordIdx);
+            CopyConfigToEditState();
 
             EditCoordSrcIdx = EditCoordInfo.WaypointNumber;
             uiStationSelectCombo.SelectedIndex = 0;
             ResetComboSelectionState();
 
-            ValidateAllFields(_curPosnFieldValueMap, EditCoordInfo.GetErrors(null));
-
             RebuildPointsOfInterest();
-            RebuildInterfaceState();
 
             base.OnNavigatedTo(args);
-        }
-
-        protected override void OnNavigatedFrom(NavigationEventArgs args)
-        {
-            Config.ConfigurationSaved -= ConfigurationSavedHandler;
-
-            base.OnNavigatedFrom(args);
         }
     }
 }

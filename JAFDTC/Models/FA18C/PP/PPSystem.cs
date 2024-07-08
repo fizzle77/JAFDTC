@@ -45,7 +45,7 @@ namespace JAFDTC.Models.FA18C.PP
     /// pre-planned system for the hornet. this system carries the weapon programs for smart weapons that can be
     /// carried on stations 2, 3, 7, and 8.
     /// </summary>
-    public class PPSystem : BindableObject, ISystem
+    public class PPSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:FA18C:PP";
 
@@ -65,7 +65,7 @@ namespace JAFDTC.Models.FA18C.PP
         /// returns true if the instance indicates a default setup, false otherwise.
         /// </summary>
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get
             {
@@ -115,7 +115,7 @@ namespace JAFDTC.Models.FA18C.PP
         /// <summary>
         /// reset the instance to defaults.
         /// </summary>
-        public void Reset()
+        public override void Reset()
         {
             foreach (PPStation station in Stations.Values)
                 station.Reset();
