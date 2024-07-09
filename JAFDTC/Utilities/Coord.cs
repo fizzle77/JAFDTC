@@ -201,7 +201,7 @@ namespace JAFDTC.Utilities
 
         private static string CoreDDMtoDD(string ddmValue, Regex regex, string posDir)
         {
-            if (regex.IsMatch(ddmValue))
+            if (!string.IsNullOrEmpty(ddmValue) && regex.IsMatch(ddmValue))
             {
                 string[] parts = ddmValue.Replace("°", "").Replace("’", "").Split(' ');
                 if ((parts.Length == 3) && double.TryParse(parts[1], out double d) &&
@@ -251,7 +251,7 @@ namespace JAFDTC.Utilities
 
         private static string CoreDMStoDD(string ddmValue, Regex regex, string posDir)
         {
-            if (regex.IsMatch(ddmValue))
+            if (!string.IsNullOrEmpty(ddmValue) && regex.IsMatch(ddmValue))
             {
                 string[] parts = ddmValue.Replace("°", "").Replace("’", "").Split(' ');
                 if ((parts.Length == 4) && int.TryParse(parts[1], out int d) &&
