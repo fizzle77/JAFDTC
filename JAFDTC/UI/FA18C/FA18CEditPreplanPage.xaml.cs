@@ -721,7 +721,8 @@ namespace JAFDTC.UI.FA18C
                 Content.XamlRoot,
                 "Reset Program?",
                 $"Are you sure you want to reset PP{EditProgIdx + 1} for the weapon on station {EditStationNum}?" +
-                $" This will clear this program for the weapon. This action cannot be undone.",
+                $" This will clear this program for the weapon leaving any station steerpoints untouched. This" +
+                $" action cannot be undone.",
                 "Reset"
             );
             if (result == ContentDialogResult.Primary)
@@ -732,21 +733,22 @@ namespace JAFDTC.UI.FA18C
                 {
                     EditBoxedPPNum = 0;
                     uiProgCkbxBoxed.IsChecked = false;
-                    SaveEditStateToConfig();
                 }
+                EditCoordIdx = 0;
+                EditCoordSrcIdx = 0;
+                SaveEditStateToConfig();
+                ResetComboSelectionState();
             }
         }
 
         /// <summary>
-        /// coordinate clear button click: clear out the currently selected coordinate.
+        /// coordinate clear/delete button click: clear out the currently selected coordinate.
         /// </summary>
         private async void CoordBtnDelete_Click(object sender, RoutedEventArgs args)
         {
             string auxMsg = "";
             if ((EditCoordIdx == 0) && ((EditWeapon == Weapons.SLAM) || (EditWeapon == Weapons.SLAM_ER)))
-            {
                 auxMsg = " This will also remove all defined STP coordinates.";
-            }
 
             string action = uiCoordBtnDeleteTitle.Text;
             ContentDialogResult result = await Utilities.Message2BDialog(
