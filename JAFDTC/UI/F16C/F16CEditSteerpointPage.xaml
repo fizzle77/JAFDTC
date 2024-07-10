@@ -29,6 +29,7 @@ https://www.gnu.org/licenses/.
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    Loaded="Page_Loaded"
     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
 
     <Page.Resources>
@@ -94,8 +95,7 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Points of Interest
             </TextBlock>
-            <AutoSuggestBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,12"
-                            x:Name="uiPoINameFilterBox"
+            <AutoSuggestBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,12" x:Name="uiPoINameFilterBox"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Stretch"
                             PlaceholderText="Select Point of Interest by Name"
@@ -134,8 +134,7 @@ https://www.gnu.org/licenses/.
                     </DataTemplate>
                 </AutoSuggestBox.ItemTemplate>
             </AutoSuggestBox>
-            <ToggleButton Grid.Row="1" Grid.Column="2" Margin="12,0,0,0"
-                          x:Name="uiPoIBtnFilter"
+            <ToggleButton Grid.Row="1" Grid.Column="2" Margin="12,0,0,0" x:Name="uiPoIBtnFilter"
                           Click="PoIBtnFilter_Click"
                           ToolTipService.ToolTip="Set filter to apply to points of interest">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE71C;"/>
@@ -170,30 +169,26 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0"
-                           x:Name="uiStptTextNum"
+                <TextBlock Grid.Column="0" x:Name="uiStptTextNum"
                            Style="{StaticResource EditorTitleTextBlockStyle}">
                     Steerpoint FIXUP Information
                 </TextBlock>
-                <Button Grid.Column="1" Margin="12,0,0,0"
-                        x:Name="uiStptBtnAddPoI"
+                <Button Grid.Column="1" Margin="12,0,0,0" x:Name="uiStptBtnAddPoI"
                         VerticalAlignment="Center"
                         Click="StptBtnAddPoI_Click"
                         ToolTipService.ToolTip="Create point of interest from steerpoint">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xECAF;"/>
                 </Button>
-                <Button Grid.Column="2" Margin="24,0,6,0"
-                        x:Name="uiPoIBtnApply"
+                <Button Grid.Column="2" Margin="24,0,6,0" x:Name="uiPoIBtnApply"
                         VerticalAlignment="Center"
                         Click="PoIBtnApply_Click"
                         ToolTipService.ToolTip="Paste selected point of interest to steerpoint">
                         <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE77F;"/>
                 </Button>
-                <Button Grid.Column="3" Height="34" Margin="0,0,24,0"
-                    x:Name="uiPoIBtnCapture"
-                    VerticalAlignment="Center"
-                    Click="PoIBtnCapture_Click"
-                    ToolTipService.ToolTip="Capture steerpoint LAT, LON, ALT from DCS">
+                <Button Grid.Column="3" Height="34" Margin="0,0,24,0" x:Name="uiPoIBtnCapture"
+                        VerticalAlignment="Center"
+                        Click="PoIBtnCapture_Click"
+                        ToolTipService.ToolTip="Capture steerpoint LAT, LON, ALT from DCS">
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Margin="0,0,6,0"
                                   FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE7B7;"/>
@@ -202,22 +197,19 @@ https://www.gnu.org/licenses/.
                         </TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="4" Margin="0,0,6,0"
-                        x:Name="uiStptBtnPrev"
+                <Button Grid.Column="4" Margin="0,0,6,0" x:Name="uiStptBtnPrev"
                         VerticalAlignment="Center"
                         Click="StptBtnPrev_Click"
                         ToolTipService.ToolTip="Move to previous steerpoint for editing">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
                 </Button>
-                <Button Grid.Column="5" Margin="0,0,6,0"
-                        x:Name="uiStptBtnAdd"
+                <Button Grid.Column="5" Margin="0,0,6,0" x:Name="uiStptBtnAdd"
                         VerticalAlignment="Center"
                         Click="StptBtnAdd_Click"
                         ToolTipService.ToolTip="Add new steerpoint to end of list">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
                 </Button>
-                <Button Grid.Column="6"
-                        x:Name="uiStptBtnNext"
+                <Button Grid.Column="6" x:Name="uiStptBtnNext"
                         VerticalAlignment="Center"
                         Click="StptBtnNext_Click"
                         ToolTipService.ToolTip="Move to next steerpoint for editing">
@@ -232,12 +224,18 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Name
             </TextBlock>
-            <TextBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
-                     x:Name="uiStptValueName"
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" x:Name="uiStptValueName"
+                     Tag="Name"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      Text="{x:Bind EditStpt.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      MaxLength="48"
+                     GotFocus="StptValueName_GotFocus"
+                     PreviewKeyDown="TextBox_PreviewKeyDown"
                      ToolTipService.ToolTip="Name of steerpoint"/>
+
+            <!-- TODO: all TextBoxen should grab PreviewTextDown. however, code does not work with TextBoxExtensions
+                 TODO: right now. for now, we'll just do it for name.
+              -->
 
             <!-- lat/lon/alt name field
               -->
@@ -255,8 +253,7 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="125"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0"
-                         x:Name="uiStptValueLat"
+                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0" x:Name="uiStptValueLat"
                          Tag="LatUI"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.LatUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -266,8 +263,7 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.Mask="N 99° 99.999’"
                          TextChanged="StptTextBox_TextChanged"
                          ToolTipService.ToolTip="Latitude of steerpoint in DDM format: [N|S] 00° 00.000’"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
-                         x:Name="uiStptValueLon"
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" x:Name="uiStptValueLon"
                          Tag="LonUI"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -277,18 +273,16 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.Mask="E 999° 99.999’"
                          TextChanged="StptTextBox_TextChanged"
                          ToolTipService.ToolTip="Longitude of steerpoint in DDM format: [E|W] 000° 00.000’"/>
-                <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"
-                         x:Name="uiStptValueAlt"
+                <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0" x:Name="uiStptValueAlt"
+                         Tag="Alt"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.Alt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          ToolTipService.ToolTip="Elevation of steerpoint in feet"/>
-                <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
-                           x:Name="uiStptAltitudeUnitsText"
+                <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0" x:Name="uiStptAltitudeUnitsText"
                            Style="{StaticResource EditorParamStaticTextBlockStyle}">
                     ft
                 </TextBlock>
-                <TextBox Grid.Row="0" Grid.Column="4" Margin="24,0,0,0"
-                         x:Name="uiStptValueTOS"
+                <TextBox Grid.Row="0" Grid.Column="4" Margin="24,0,0,0" x:Name="uiStptValueTOS"
                          Tag="TOS"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.TOS, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -357,10 +351,13 @@ https://www.gnu.org/licenses/.
                         Elevation (ft)
                     </TextBlock>
 
+                    <!-- TODO: all TextBoxen should grab PreviewTextDown. however, code does not work with TextBoxExtensions
+                         TODO: right now. for now, we'll just do it for name.
+                      -->
+
                     <!-- oap 1 parameters
                       -->
-                    <ComboBox Grid.Row="1" Grid.Column="0" Margin="0,6,0,0"
-                              x:Name="uiStptOAP0Combo"
+                    <ComboBox Grid.Row="1" Grid.Column="0" Margin="0,6,0,0" x:Name="uiStptOAP0Combo"
                               VerticalAlignment="Center"
                               HorizontalAlignment="Stretch"
                               SelectionChanged="OAPCombo_SelectionChanged"
@@ -375,29 +372,25 @@ https://www.gnu.org/licenses/.
                             <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">OAP 1</TextBlock>
                         </StackPanel>
                     </ComboBox>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Margin="12,6,0,0"
-                               x:Name="uiStptOAP0TextTitle"
+                    <TextBlock Grid.Row="1" Grid.Column="1" Margin="12,6,0,0" x:Name="uiStptOAP0TextTitle"
                                VerticalAlignment="Center"
                                HorizontalTextAlignment="Right"
                                Style="{StaticResource EditorParamStaticTextBlockStyle}">
                         OAP 1
                     </TextBlock>
-                    <TextBox Grid.Row="1" Grid.Column="2" Margin="12,6,0,0"
-                             x:Name="uiStptOAPValueRange0"
+                    <TextBox Grid.Row="1" Grid.Column="2" Margin="12,6,0,0" x:Name="uiStptOAPValueRange0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
                              Text="{x:Bind EditStpt.OAP[0].Range, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText = "0"
                              MaxLength="8"
                              ToolTipService.ToolTip="Range from steerpoint to OAP"/>
-                    <TextBox Grid.Row="1" Grid.Column="3" Margin="12,6,0,0"
-                             x:Name="uiStptOAPValueBrng0"
+                    <TextBox Grid.Row="1" Grid.Column="3" Margin="12,6,0,0" x:Name="uiStptOAPValueBrng0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
                              Text="{x:Bind EditStpt.OAP[0].Brng, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText = "0.0"
                              MaxLength="5"
                              ToolTipService.ToolTip="Bearing from steerpoint to OAP"/>
-                    <TextBox Grid.Row="1" Grid.Column="4" Margin="12,6,0,0"
-                             x:Name="uiStptOAPValueElev0"
+                    <TextBox Grid.Row="1" Grid.Column="4" Margin="12,6,0,0" x:Name="uiStptOAPValueElev0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
                              Text="{x:Bind EditStpt.OAP[0].Elev, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText = "0"
@@ -406,8 +399,7 @@ https://www.gnu.org/licenses/.
 
                     <!-- oap 2 parameters
                       -->
-                    <ComboBox Grid.Row="2" Grid.Column="0" Margin="0,12,0,0"
-                              x:Name="uiStptOAP1Combo"
+                    <ComboBox Grid.Row="2" Grid.Column="0" Margin="0,12,0,0" x:Name="uiStptOAP1Combo"
                               VerticalAlignment="Center"
                               HorizontalAlignment="Stretch"
                               SelectionChanged="OAPCombo_SelectionChanged"
@@ -422,28 +414,24 @@ https://www.gnu.org/licenses/.
                             <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">OAP 2</TextBlock>
                         </StackPanel>
                     </ComboBox>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Margin="12,12,0,0"
-                               x:Name="uiStptOAP1TextTitle"
+                    <TextBlock Grid.Row="2" Grid.Column="1" Margin="12,12,0,0" x:Name="uiStptOAP1TextTitle"
                                HorizontalTextAlignment="Right"
                                Style="{StaticResource EditorParamStaticTextBlockStyle}">
                         OAP 2
                     </TextBlock>
-                    <TextBox Grid.Row="2" Grid.Column="2" Margin="12,12,0,0"
-                             x:Name="uiStptOAPValueRange1"
+                    <TextBox Grid.Row="2" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStptOAPValueRange1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
                              Text="{x:Bind EditStpt.OAP[1].Range, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText = "0"
                              MaxLength="8"
                              ToolTipService.ToolTip="Range from steerpoint to OAP"/>
-                    <TextBox Grid.Row="2" Grid.Column="3" Margin="12,12,0,0"
-                             x:Name="uiStptOAPValueBrng1"
+                    <TextBox Grid.Row="2" Grid.Column="3" Margin="12,12,0,0" x:Name="uiStptOAPValueBrng1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
                              Text="{x:Bind EditStpt.OAP[1].Brng, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText = "0.0"
                              MaxLength="5"
                              ToolTipService.ToolTip="Bearing from steerpoint to OAP"/>
-                    <TextBox Grid.Row="2" Grid.Column="4" Margin="12,12,0,0"
-                             x:Name="uiStptOAPValueElev1"
+                    <TextBox Grid.Row="2" Grid.Column="4" Margin="12,12,0,0" x:Name="uiStptOAPValueElev1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
                              Text="{x:Bind EditStpt.OAP[1].Elev, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText = "0"
@@ -452,8 +440,7 @@ https://www.gnu.org/licenses/.
 
                     <!-- vip/vrp header row
                       -->
-                    <TextBlock Grid.Row="3" Grid.Column="2" Margin="0,18,0,0"
-                               x:Name="uiStptVxPRngTextHeader"
+                    <TextBlock Grid.Row="3" Grid.Column="2" Margin="0,18,0,0" x:Name="uiStptVxPRngTextHeader"
                                Style="{StaticResource TableHeaderTextStyle}">
                         Range (ft)
                     </TextBlock>
@@ -468,8 +455,7 @@ https://www.gnu.org/licenses/.
 
                     <!-- vip/vrp 1 parameters
                       -->
-                    <ComboBox Grid.Row="4" Grid.Column="0" Margin="0,6,0,0"
-                              x:Name="uiStptVxPCombo"
+                    <ComboBox Grid.Row="4" Grid.Column="0" Margin="0,6,0,0" x:Name="uiStptVxPCombo"
                               VerticalAlignment="Center"
                               HorizontalAlignment="Stretch"
                               SelectionChanged="VizCombo_SelectionChanged"
@@ -487,28 +473,24 @@ https://www.gnu.org/licenses/.
                             <TextBlock VerticalAlignment="Center" Margin="12,0,0,0">VRP</TextBlock>
                         </StackPanel>
                     </ComboBox>
-                    <TextBlock Grid.Row="4" Grid.Column="1" Margin="12,6,0,0"
-                               x:Name="uiStptVxP0TextTitle"
+                    <TextBlock Grid.Row="4" Grid.Column="1" Margin="12,6,0,0" x:Name="uiStptVxP0TextTitle"
                                HorizontalTextAlignment="Right"
                                Style="{StaticResource EditorParamStaticTextBlockStyle}">
                         Target to VRP
                     </TextBlock>
-                    <TextBox Grid.Row="4" Grid.Column="2" Margin="12,6,0,0"
-                             x:Name="uiStptVxPValueRange0"
+                    <TextBox Grid.Row="4" Grid.Column="2" Margin="12,6,0,0" x:Name="uiStptVxPValueRange0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
                              Text="{x:Bind EditStpt.VxP[0].Range, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText="0"
                              MaxLength="8"
                              ToolTipService.ToolTip="Range from steerpoint to VIP/VRP"/>
-                    <TextBox Grid.Row="4" Grid.Column="3" Margin="12,6,0,0"
-                             x:Name="uiStptVxPValueBrng0"
+                    <TextBox Grid.Row="4" Grid.Column="3" Margin="12,6,0,0" x:Name="uiStptVxPValueBrng0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
                              Text="{x:Bind EditStpt.VxP[0].Brng, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText="0.0"
                              MaxLength="5"
                              ToolTipService.ToolTip="Bearing from steerpoint to VIP/VRP"/>
-                    <TextBox Grid.Row="4" Grid.Column="4" Margin="12,6,0,0"
-                             x:Name="uiStptVxPValueElev0"
+                    <TextBox Grid.Row="4" Grid.Column="4" Margin="12,6,0,0" x:Name="uiStptVxPValueElev0"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
                              Text="{x:Bind EditStpt.VxP[0].Elev, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText="0"
@@ -517,28 +499,24 @@ https://www.gnu.org/licenses/.
 
                     <!-- vip/vrp 2 parameters
                       -->
-                    <TextBlock Grid.Row="5" Grid.Column="1" Margin="12,12,0,0"
-                               x:Name="uiStptVxP1TextTitle"
+                    <TextBlock Grid.Row="5" Grid.Column="1" Margin="12,12,0,0" x:Name="uiStptVxP1TextTitle"
                                HorizontalTextAlignment="Right"
                                Style="{StaticResource EditorParamStaticTextBlockStyle}">
                         Target to PUP
                     </TextBlock>
-                    <TextBox Grid.Row="5" Grid.Column="2" Margin="12,12,0,0"
-                             x:Name="uiStptVxPValueRange1"
+                    <TextBox Grid.Row="5" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStptVxPValueRange1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
                              Text="{x:Bind EditStpt.VxP[1].Range, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText="0"
                              MaxLength="8"
                              ToolTipService.ToolTip="Range from steerpoint to VIP/VRP"/>
-                    <TextBox Grid.Row="5" Grid.Column="3" Margin="12,12,0,0"
-                             x:Name="uiStptVxPValueBrng1"
+                    <TextBox Grid.Row="5" Grid.Column="3" Margin="12,12,0,0" x:Name="uiStptVxPValueBrng1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
                              Text="{x:Bind EditStpt.VxP[1].Brng, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText="0.0"
                              MaxLength="5"
                              ToolTipService.ToolTip="Bearing from steerpoint to VIP/VRP"/>
-                    <TextBox Grid.Row="5" Grid.Column="4" Margin="12,12,0,0"
-                             x:Name="uiStptVxPValueElev1"
+                    <TextBox Grid.Row="5" Grid.Column="4" Margin="12,12,0,0" x:Name="uiStptVxPValueElev1"
                              Style="{StaticResource EditorParamEditTextBoxStyle}"
                              Text="{x:Bind EditStpt.VxP[1].Elev, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              PlaceholderText="0"
@@ -563,8 +541,7 @@ https://www.gnu.org/licenses/.
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="3" Margin="20,0,0,0"
-                    x:Name="uiAcceptBtnCancel"
+            <Button Grid.Column="3" Margin="20,0,0,0" x:Name="uiAcceptBtnCancel"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     GettingFocus="AcceptBtnCancel_GettingFocus"
@@ -572,8 +549,7 @@ https://www.gnu.org/licenses/.
                     ToolTipService.ToolTip="Discard any changes to steerpoint">
                 Cancel
             </Button>
-            <Button Grid.Column="4" Margin="20,0,0,0"
-                    x:Name="uiAcceptBtnOK"
+            <Button Grid.Column="4" Margin="20,0,0,0" x:Name="uiAcceptBtnOK"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     Click="AcceptBtnOk_Click"

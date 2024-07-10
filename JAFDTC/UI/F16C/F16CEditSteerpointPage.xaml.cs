@@ -35,7 +35,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-
+using System.Reflection;
+using Windows.System;
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.F16C
@@ -520,7 +521,7 @@ namespace JAFDTC.UI.F16C
             if (!IsRebuildPending)
             {
                 IsRebuildPending = true;
-                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+                DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
                 {
                     uiStptTextNum.Text = $"Steerpoint {EditStpt.Number} Information";
                     RebuildRefPointState(EditStpt.OAP[0].Type, uiStptOAP0Combo, _oap0FieldTitles);
@@ -673,7 +674,7 @@ namespace JAFDTC.UI.F16C
         {
             if ((wypts.Length > 0) && !wypts[0].IsTarget)
             {
-                DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () =>
                 {
                     EditStpt.Name = "DCS Capture";
                     EditStpt.LatUI = Coord.ConvertFromLatDD(wypts[0].Latitude, LLFormat.DDM_P3ZF);
@@ -711,6 +712,7 @@ namespace JAFDTC.UI.F16C
             EditStptIndex -= 1;
             CopyConfigToEdit(EditStptIndex);
             RebuildInterfaceState();
+            uiStptValueName.Focus(FocusState.Programmatic);
         }
 
         /// <summary>
@@ -724,6 +726,7 @@ namespace JAFDTC.UI.F16C
             EditStptIndex += 1;
             CopyConfigToEdit(EditStptIndex);
             RebuildInterfaceState();
+            uiStptValueName.Focus(FocusState.Programmatic);
         }
 
         /// <summary>
@@ -838,6 +841,50 @@ namespace JAFDTC.UI.F16C
             RebuildInterfaceState();
         }
 
+        /// <summary>
+        /// steerpoint name got focus: select the text.
+        /// </summary>
+        private void StptValueName_GotFocus(object sender, RoutedEventArgs e)
+        {
+            uiStptValueName.SelectAll();
+        }
+
+        /// <summary>
+        /// Handle keyboard shortcuts for navigating to next/prev navpoint when a textbox is focused.
+        /// </summary>
+        private void TextBox_PreviewKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.Enter)
+            {
+                Utilities.GetModifierKeyStates(out bool isShiftDown, out bool isCtrlDown);
+                if (isCtrlDown)
+                {
+                    // Explicit property set is necessary because the binding update is on lost focus, which doesn't
+                    // occur here. Tag must contain the property name.
+                    //
+                    // TODO: this is broken for the community text extension fields, for now only the name field will
+                    // TODO: handle this event.
+                    //
+                    TextBox tbox = (TextBox)sender;
+                    PropertyInfo propInfo = EditStpt.GetType().GetProperty((string)tbox.Tag);
+                    propInfo?.SetValue(EditStpt, tbox.Text, null);
+
+                    if (!isShiftDown && uiStptBtnNext.IsEnabled)
+                    {
+                        StptBtnNext_Click(sender, e);
+                        uiStptValueName.SelectAll();
+                        e.Handled = true;
+                    }
+                    if (isShiftDown && uiStptBtnPrev.IsEnabled)
+                    {
+                        StptBtnPrev_Click(sender, e);
+                        uiStptValueName.SelectAll();
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // events
@@ -870,6 +917,14 @@ namespace JAFDTC.UI.F16C
             RebuildInterfaceState();
 
             base.OnNavigatedTo(args);
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            // We do this here (and not in OnNavigatedTo) for two reasons:
+            // 1. The visual tree is done loading here.
+            // 2. We want this to happen every time you click a WP from the list.
+            uiStptValueName.Focus(FocusState.Programmatic);
         }
     }
 }
