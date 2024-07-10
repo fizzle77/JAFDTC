@@ -114,6 +114,16 @@ namespace JAFDTC.Models.F14AB.WYPT
         public override void Reset()
         {
             base.Reset();
+
+            // set accessors treat "" as illegal. to work around the way SetProperty() handles updating backing store
+            // and error state, first set the fields to "" with no error to set backing store. then, use the set
+            // accessor with a known bad to set error state (which will not update backing store).
+            //
+            SetProperty(ref _latUI, "", null, nameof(LatUI));
+            SetProperty(ref _lonUI, "", null, nameof(LonUI));
+
+            LatUI = null;
+            LonUI = null;
         }
     }
 }
