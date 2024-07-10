@@ -17,6 +17,7 @@
 //
 // ********************************************************************************************************************
 
+using CommunityToolkit.WinUI.UI;
 using JAFDTC.Models;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.FA18C;
@@ -40,6 +41,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Security.EnterpriseData;
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 using static System.Collections.Specialized.BitVector32;
 
@@ -92,6 +94,8 @@ namespace JAFDTC.UI.FA18C
 
         private PoIFilterSpec FilterSpec { get; set; }
 
+        private bool IsCoordSupressError { get; set; }
+
         // ---- read-only properties
 
         private readonly Dictionary<string, TextBox> _curPosnFieldValueMap;
@@ -109,22 +113,19 @@ namespace JAFDTC.UI.FA18C
 
         public FA18CEditPreplanPage()
         {
-            InitializeComponent();
-            InitializeBase(null, uiPosnValueName, uiCtlLinkResetBtns);
-
-            EditCoordInfo = new();
-            EditCoordInfo.ErrorsChanged += EditField_DataValidationError;
-            EditCoordInfo.PropertyChanged += EditField_PropertyChanged;
-
             EditWeapon = Weapons.NONE;
             EditBoxedPPNum = 0;
-
             EditStationNum = 2;
             EditProgIdx = 0;
             EditCoordSrcIdx = 0;
             EditCoordIdx = 0;
+            EditCoordInfo = new();
+
+            InitializeComponent();
+            InitializeBase(EditCoordInfo, uiPosnValueName, uiCtlLinkResetBtns);
 
             CurSelectedPoI = null;
+            IsCoordSupressError = true;
 
             _curPosnFieldValueMap = new Dictionary<string, TextBox>
             {
@@ -172,6 +173,8 @@ namespace JAFDTC.UI.FA18C
             int station = EditStationNum;
             int pgm = EditProgIdx;
             int coord = EditCoordIdx;
+
+            StartUIRebuild();
 
             EditWeapon = config.PP.Stations[station].Weapon;
             EditBoxedPPNum = config.PP.Stations[station].BoxedPP;
@@ -222,6 +225,11 @@ namespace JAFDTC.UI.FA18C
                     EditCoordInfo.Alt = wypt.Alt;
                 }
             }
+
+            IsCoordSupressError = true;
+            SetPosnFieldValidVisualState(null);
+
+            FinishUIRebuild();
 
             UpdateUIFromEditState();
         }
@@ -307,39 +315,42 @@ namespace JAFDTC.UI.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private void ValidateAllFields(Dictionary<string, TextBox> fields, IEnumerable errors)
+        private void SetPosnFieldValidVisualState(string propertyName)
         {
-            Dictionary<string, bool> map = new();
-            foreach (string error in errors)
-                map[error] = true;
-            foreach (KeyValuePair<string, TextBox> kvp in fields)
-                SetFieldValidVisualState(kvp.Value, !map.ContainsKey(kvp.Key));
+            string name = (propertyName == "LatUI") ? "Lat" : ((propertyName == "LonUI") ? "Lon" : propertyName);
+
+            List<string> errors = (List<string>)EditCoordInfo.GetErrors();
+            if ((propertyName != null) && _curPosnFieldValueMap.ContainsKey(name))
+                SetFieldValidVisualState(_curPosnFieldValueMap[name], IsCoordSupressError || !errors.Contains(propertyName));
+            else if (propertyName == null)
+                foreach (KeyValuePair<string, TextBox> kvp in _curPosnFieldValueMap)
+                    SetFieldValidVisualState(_curPosnFieldValueMap[kvp.Key], IsCoordSupressError || !errors.Contains(kvp.Key));
         }
 
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void EditField_DataValidationError(object sender, DataErrorsChangedEventArgs args)
+        protected override void EditState_ErrorsChanged(object sender, DataErrorsChangedEventArgs args)
         {
-            if (args.PropertyName == null)
+            if (!IsUIRebuilding)
             {
-                ValidateAllFields(_curPosnFieldValueMap, EditCoordInfo.GetErrors(args.PropertyName));
+                SetPosnFieldValidVisualState(args.PropertyName);
+                UpdateUIFromEditState();
             }
-            else
-            {
-                List<string> errors = (List<string>)EditCoordInfo.GetErrors(args.PropertyName);
-                if (_curPosnFieldValueMap.ContainsKey(args.PropertyName))
-                    SetFieldValidVisualState(_curPosnFieldValueMap[args.PropertyName], (errors.Count == 0));
-            }
-            UpdateUIFromEditState();
         }
 
         /// <summary>
         /// property changed: rebuild interface state to account for configuration changes.
         /// </summary>
-        private void EditField_PropertyChanged(object sender, PropertyChangedEventArgs args)
+        protected override void EditState_PropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            UpdateUIFromEditState();
+            if (!IsUIRebuilding)
+            {
+                string name = (IsCoordSupressError) ? null : args.PropertyName;
+                IsCoordSupressError = false;
+                SetPosnFieldValidVisualState(name);
+                UpdateUIFromEditState();
+            }
         }
 
         /// <summary>
