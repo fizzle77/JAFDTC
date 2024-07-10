@@ -29,6 +29,7 @@ https://www.gnu.org/licenses/.
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    Loaded="Page_Loaded"
     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
 
     <Page.Resources>
@@ -94,8 +95,7 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Points of Interest
             </TextBlock>
-            <AutoSuggestBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,12"
-                            x:Name="uiPoINameFilterBox"
+            <AutoSuggestBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,12" x:Name="uiPoINameFilterBox"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Stretch"
                             PlaceholderText="Select Point of Interest by Name"
@@ -134,8 +134,7 @@ https://www.gnu.org/licenses/.
                     </DataTemplate>
                 </AutoSuggestBox.ItemTemplate>
             </AutoSuggestBox>
-            <ToggleButton Grid.Row="1" Grid.Column="2" Margin="12,0,0,0"
-                          x:Name="uiPoIBtnFilter"
+            <ToggleButton Grid.Row="1" Grid.Column="2" Margin="12,0,0,0" x:Name="uiPoIBtnFilter"
                           Click="PoIBtnFilter_Click"
                           ToolTipService.ToolTip="Set filter to apply to points of interest">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE71C;"/>
@@ -173,27 +172,23 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0"
-                           x:Name="uiStptTextNum"
+                <TextBlock Grid.Column="0" x:Name="uiStptTextNum"
                            Style="{StaticResource EditorTitleTextBlockStyle}">
                     Steerpoint FIXUP Information
                 </TextBlock>
-                <Button Grid.Column="1" Margin="12,0,0,0"
-                        x:Name="uiStptBtnAddPoI"
+                <Button Grid.Column="1" Margin="12,0,0,0" x:Name="uiStptBtnAddPoI"
                         VerticalAlignment="Center"
                         Click="StptBtnAddPoI_Click"
                         ToolTipService.ToolTip="Create point of interest from steerpoint">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xECAF;"/>
                 </Button>
-                <Button Grid.Column="2" Margin="24,0,6,0"
-                        x:Name="uiPoIBtnApply"
+                <Button Grid.Column="2" Margin="24,0,6,0" x:Name="uiPoIBtnApply"
                         VerticalAlignment="Center"
                         Click="PoIBtnApply_Click"
                         ToolTipService.ToolTip="Paste selected point of interest to steerpoint">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE77F;"/>
                 </Button>
-                <Button Grid.Column="3" Height="34" Margin="0,0,24,0"
-                    x:Name="uiPoIBtnCapture"
+                <Button Grid.Column="3" Height="34" Margin="0,0,24,0" x:Name="uiPoIBtnCapture"
                     VerticalAlignment="Center"
                     Click="PoIBtnCapture_Click"
                     ToolTipService.ToolTip="Capture steerpoint LAT, LON, ALT from DCS">
@@ -205,22 +200,19 @@ https://www.gnu.org/licenses/.
                         </TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="4" Margin="0,0,6,0"
-                        x:Name="uiStptBtnPrev"
+                <Button Grid.Column="4" Margin="0,0,6,0" x:Name="uiStptBtnPrev"
                         VerticalAlignment="Center"
                         Click="StptBtnPrev_Click"
                         ToolTipService.ToolTip="Move to previous steerpoint for editing">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
                 </Button>
-                <Button Grid.Column="5" Margin="0,0,6,0"
-                        x:Name="uiStptBtnAdd"
+                <Button Grid.Column="5" Margin="0,0,6,0" x:Name="uiStptBtnAdd"
                         VerticalAlignment="Center"
                         Click="StptBtnAdd_Click"
                         ToolTipService.ToolTip="Add new steerpoint to end of steerpoint list">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
                 </Button>
-                <Button Grid.Column="6"
-                        x:Name="uiStptBtnNext"
+                <Button Grid.Column="6" x:Name="uiStptBtnNext"
                         VerticalAlignment="Center"
                         Click="StptBtnNext_Click"
                         ToolTipService.ToolTip="Move to next steerpoint for editing">
@@ -235,12 +227,18 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Name
             </TextBlock>
-            <TextBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
-                     x:Name="uiStptValueName"
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" x:Name="uiStptValueName"
+                     Tag="Name"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      Text="{x:Bind EditStpt.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      MaxLength="48"
+                     GotFocus="StptValueName_GotFocus"
+                     PreviewKeyDown="TextBox_PreviewKeyDown"
                      ToolTipService.ToolTip="Name of steerpoint"/>
+
+            <!-- TODO: all TextBoxen should grab PreviewTextDown. however, code does not work with TextBoxExtensions
+                 TODO: right now. for now, we'll just do it for name.
+              -->
 
             <!-- lat/lon/elev/tos field
               -->
@@ -258,8 +256,7 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="125"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0"
-                         x:Name="uiStptValueLat"
+                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0" x:Name="uiStptValueLat"
                          Tag="LatUI"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.LatUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -269,8 +266,7 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.Mask="N 99° 99.999’"
                          TextChanged="StptTextBoxExt_TextChanged"
                          ToolTipService.ToolTip="Latitude of steerpoint in DDM format: [N|S] 00° 00.000’"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
-                         x:Name="uiStptValueLon"
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" x:Name="uiStptValueLon"
                          Tag="LonUI"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -280,18 +276,15 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.Mask="E 999° 99.999’"
                          TextChanged="StptTextBoxExt_TextChanged"
                          ToolTipService.ToolTip="Longitude of steerpoint in DDM format: [E|W] 000° 00.000’"/>
-                <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"
-                         x:Name="uiStptValueAlt"
+                <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0" x:Name="uiStptValueAlt"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.Alt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          ToolTipService.ToolTip="Elevation of steerpoint in feet"/>
-                <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
-                           x:Name="uiStptAltitudeUnitsText"
+                <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0" x:Name="uiStptAltitudeUnitsText"
                            Style="{StaticResource EditorParamStaticTextBlockStyle}">
                     ft
                 </TextBlock>
-                <TextBox Grid.Row="0" Grid.Column="4" Margin="24,0,0,0"
-                         x:Name="uiStptValueTOT"
+                <TextBox Grid.Row="0" Grid.Column="4" Margin="24,0,0,0" x:Name="uiStptValueTOT"
                          Tag="TOT"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditStpt.TOT, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -309,15 +302,13 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Target Point
             </TextBlock>
-            <CheckBox Grid.Row="3" Grid.Column="1"  Margin="12,12,0,0"
-                      x:Name="uiStptCkbxTarget"
+            <CheckBox Grid.Row="3" Grid.Column="1"  Margin="12,12,0,0" x:Name="uiStptCkbxTarget"
                       IsChecked="{x:Bind EditStpt.IsTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       Click="StptCkbxTarget_Click"/>
 
             <!-- reference point selection
               -->
-            <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,24,0,0"
-                       x:Name="uiRfptTextTitle"
+            <TextBlock Grid.Row="4" Grid.Column="0" Margin="12,24,0,0" x:Name="uiRfptTextTitle"
                        VerticalAlignment="Center"
                        HorizontalTextAlignment="Right"
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
@@ -335,8 +326,7 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <ComboBox Grid.Column="0"
-                          x:Name="uiRfptComboSelect"
+                <ComboBox Grid.Column="0" x:Name="uiRfptComboSelect"
                           VerticalAlignment="Center"
                           HorizontalAlignment="Stretch"
                           SelectionChanged="RfptComboSelect_SelectionChanged">
@@ -346,8 +336,7 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <FontIcon Grid.Column="0"
-                                      x:Name="uiRfptSelectItem1Icon"
+                            <FontIcon Grid.Column="0" x:Name="uiRfptSelectItem1Icon"
                                       VerticalAlignment="Center"
                                       Foreground="{ThemeResource SystemAccentColor}"
                                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
@@ -360,8 +349,7 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <FontIcon Grid.Column="0"
-                                      x:Name="uiRfptSelectItem2Icon"
+                            <FontIcon Grid.Column="0" x:Name="uiRfptSelectItem2Icon"
                                       VerticalAlignment="Center"
                                       Foreground="{ThemeResource SystemAccentColor}"
                                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
@@ -374,8 +362,7 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <FontIcon Grid.Column="0"
-                                      x:Name="uiRfptSelectItem3Icon"
+                            <FontIcon Grid.Column="0" x:Name="uiRfptSelectItem3Icon"
                                       VerticalAlignment="Center"
                                       Foreground="{ThemeResource SystemAccentColor}"
                                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
@@ -388,8 +375,7 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <FontIcon Grid.Column="0"
-                                      x:Name="uiRfptSelectItem4Icon"
+                            <FontIcon Grid.Column="0" x:Name="uiRfptSelectItem4Icon"
                                       VerticalAlignment="Center"
                                       Foreground="{ThemeResource SystemAccentColor}"
                                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
@@ -402,8 +388,7 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <FontIcon Grid.Column="0"
-                                      x:Name="uiRfptSelectItem5Icon"
+                            <FontIcon Grid.Column="0" x:Name="uiRfptSelectItem5Icon"
                                       VerticalAlignment="Center"
                                       Foreground="{ThemeResource SystemAccentColor}"
                                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
@@ -416,8 +401,7 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <FontIcon Grid.Column="0"
-                                      x:Name="uiRfptSelectItem6Icon"
+                            <FontIcon Grid.Column="0" x:Name="uiRfptSelectItem6Icon"
                                       VerticalAlignment="Center"
                                       Foreground="{ThemeResource SystemAccentColor}"
                                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
@@ -430,8 +414,7 @@ https://www.gnu.org/licenses/.
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <FontIcon Grid.Column="0"
-                                      x:Name="uiRfptSelectItem7Icon"
+                            <FontIcon Grid.Column="0" x:Name="uiRfptSelectItem7Icon"
                                       VerticalAlignment="Center"
                                       Foreground="{ThemeResource SystemAccentColor}"
                                       FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
@@ -441,15 +424,13 @@ https://www.gnu.org/licenses/.
                         </Grid>
                     </ComboBox.Items>
                 </ComboBox>
-                <Button Grid.Column="2" Margin="12,0,6,0"
-                        x:Name="uiRfptBtnApply"
+                <Button Grid.Column="2" Margin="12,0,6,0" x:Name="uiRfptBtnApply"
                         VerticalAlignment="Center"
                         Click="RfptBtnApply_Click"
                         ToolTipService.ToolTip="Paste selected point of interest to reference point">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE77F;"/>
                 </Button>
-                <Button Grid.Column="3" Height="34" Margin="0,0,24,0"
-                    x:Name="uiRfptBtnCapture"
+                <Button Grid.Column="3" Height="34" Margin="0,0,24,0" x:Name="uiRfptBtnCapture"
                     VerticalAlignment="Center"
                     Click="RfptBtnCapture_Click"
                     ToolTipService.ToolTip="Capture reference point LAT, LON, ELEV from DCS">
@@ -461,8 +442,7 @@ https://www.gnu.org/licenses/.
                         </TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="4" Margin="0,0,0,0"
-                        x:Name="uiRfptBtnClear"
+                <Button Grid.Column="4" Margin="0,0,0,0" x:Name="uiRfptBtnClear"
                         Click="RfptBtnClear_Click"
                         ToolTipService.ToolTip="Clear reference point">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE711;"/>
@@ -476,8 +456,7 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Name
             </TextBlock>
-            <TextBox Grid.Row="5" Grid.Column="1" Margin="12,12,0,0"
-                     x:Name="uiRfptValueName"
+            <TextBox Grid.Row="5" Grid.Column="1" Margin="12,12,0,0" x:Name="uiRfptValueName"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      Text="{x:Bind EditRfpt.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      MaxLength="48"
@@ -502,8 +481,7 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="125"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Row="0" Grid.Column="0" Margin="12,0,0,0"
-                         x:Name="uiRfptValueLat"
+                <TextBox Grid.Row="0" Grid.Column="0" Margin="12,0,0,0" x:Name="uiRfptValueLat"
                          Tag="LatUI"
                          HorizontalAlignment="Stretch"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
@@ -514,8 +492,7 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.Mask="N 99° 99.999’"
                          TextChanged="RfptTextBox_TextChanged"
                          ToolTipService.ToolTip="Latitude of reference point in DDM format: [N|S] 00° 00.000’"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
-                         x:Name="uiRfptValueLon"
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" x:Name="uiRfptValueLon"
                          Tag="LonUI"
                          HorizontalAlignment="Stretch"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
@@ -526,13 +503,11 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.Mask="E 999° 99.999’"
                          TextChanged="RfptTextBox_TextChanged"
                          ToolTipService.ToolTip="Longitude of reference point in DDM format: [E|W] 000° 00.000’"/>
-                <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"
-                         x:Name="uiRfptValueAlt"
+                <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0" x:Name="uiRfptValueAlt"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditRfpt.Alt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          ToolTipService.ToolTip="Elevation of reference point in feet"/>
-                <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
-                           x:Name="uiRfptAltitudeUnitsText"
+                <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0" x:Name="uiRfptAltitudeUnitsText"
                            Style="{StaticResource EditorParamStaticTextBlockStyle}">
                     ft
                 </TextBlock>
@@ -552,8 +527,7 @@ https://www.gnu.org/licenses/.
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="3" Margin="20,0,0,0"
-                    x:Name="uiAcceptBtnCancel"
+            <Button Grid.Column="3" Margin="20,0,0,0" x:Name="uiAcceptBtnCancel"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     GettingFocus="AcceptBtnCancel_GettingFocus"
@@ -561,8 +535,7 @@ https://www.gnu.org/licenses/.
                     ToolTipService.ToolTip="Discard any changes to steerpoint">
                 Cancel
             </Button>
-            <Button Grid.Column="4" Margin="20,0,0,0"
-                    x:Name="uiAcceptBtnOK"
+            <Button Grid.Column="4" Margin="20,0,0,0" x:Name="uiAcceptBtnOK"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     Click="AcceptBtnOk_Click"
