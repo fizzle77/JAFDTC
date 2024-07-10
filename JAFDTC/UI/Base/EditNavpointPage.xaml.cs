@@ -583,6 +583,13 @@ namespace JAFDTC.UI.Base
                 {
                     // Explicit property set is necessary because the binding update
                     // is on lost focus, which doesn't occur here.
+
+                    // TODO: this is broken on TextBoxExtensions text boxes (like the lat/lon fields). for now,
+                    // TODO: only do support the hotkeys on the name field.
+
+                    // TODO: this code likely needs to use reflection once more than name is supported (see the
+                    // TODO: viper code)...
+
                     EditNavpt.Name = uiNavptValueName.Text;
 
                     if (!isShiftDown && uiNavptBtnNext.IsEnabled)

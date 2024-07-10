@@ -82,8 +82,7 @@ https://www.gnu.org/licenses/.
 
             <!-- select poi
               -->
-            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
-                       x:Name="uiPoITextTitle"
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" x:Name="uiPoITextTitle"
                        HorizontalAlignment="Left"
                        Style="{StaticResource EditorTitleTextBlockStyle}">
                 FIXUP:Navpoint Initial Setup
@@ -94,8 +93,7 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Points of Interest
             </TextBlock>
-            <AutoSuggestBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,12"
-                            x:Name="uiPoINameFilterBox"
+            <AutoSuggestBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,12" x:Name="uiPoINameFilterBox"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Stretch"
                             PlaceholderText="Select Point of Interest by Name"
@@ -134,8 +132,7 @@ https://www.gnu.org/licenses/.
                     </DataTemplate>
                 </AutoSuggestBox.ItemTemplate>
             </AutoSuggestBox>
-            <ToggleButton Grid.Row="1" Grid.Column="2" Margin="12,0,0,0"
-                          x:Name="uiPoIBtnFilter"
+            <ToggleButton Grid.Row="1" Grid.Column="2" Margin="12,0,0,0" x:Name="uiPoIBtnFilter"
                           Click="PoIBtnFilter_Click"
                           ToolTipService.ToolTip="Set filter to apply to points of interest">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE71C;"/>
@@ -174,30 +171,26 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0"
-                           x:Name="uiNavptTextNum"
+                <TextBlock Grid.Column="0" x:Name="uiNavptTextNum"
                            Style="{StaticResource EditorTitleTextBlockStyle}">
                     FIXUP:Type FIXUP:Count Information
                 </TextBlock>
-                <Button Grid.Column="1" Margin="12,0,0,0"
-                        x:Name="uiNavptBtnAddPoI"
+                <Button Grid.Column="1" Margin="12,0,0,0" x:Name="uiNavptBtnAddPoI"
                         VerticalAlignment="Center"
                         Click="StptBtnAddPoI_Click"
                         ToolTipService.ToolTip="Create point of interest from navpoint">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xECAF;"/>
                 </Button>
-                <Button Grid.Column="2" Margin="24,0,6,0"
-                        x:Name="uiPoIBtnApply"
+                <Button Grid.Column="2" Margin="24,0,6,0" x:Name="uiPoIBtnApply"
                         VerticalAlignment="Center"
                         Click="PoIBtnApply_Click"
                         ToolTipService.ToolTip="Paste selected point of interest to navpoint">
                         <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE77F;"/>
                 </Button>
-                <Button Grid.Column="3" Height="34" Margin="0,0,24,0"
-                    x:Name="uiPoIBtnCapture"
-                    VerticalAlignment="Center"
-                    Click="PoIBtnCapture_Click"
-                    ToolTipService.ToolTip="Capture LAT, LON, ELEV for navpoint from DCS">
+                <Button Grid.Column="3" Height="34" Margin="0,0,24,0" x:Name="uiPoIBtnCapture"
+                        VerticalAlignment="Center"
+                        Click="PoIBtnCapture_Click"
+                        ToolTipService.ToolTip="Capture LAT, LON, ELEV for navpoint from DCS">
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Margin="0,0,6,0"
                                   FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE7B7;"/>
@@ -206,8 +199,7 @@ https://www.gnu.org/licenses/.
                         </TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="4" Margin="0,0,6,0"
-                        x:Name="uiNavptBtnPrev"
+                <Button Grid.Column="4" Margin="0,0,6,0" x:Name="uiNavptBtnPrev"
                         VerticalAlignment="Center"
                         Click="NavptBtnPrev_Click"
                         ToolTipService.ToolTip="Move to previous navpoint for editing (Control+Shift+Enter)">
@@ -216,15 +208,13 @@ https://www.gnu.org/licenses/.
                         <KeyboardAccelerator Key="Enter" Modifiers="Control,Shift"/>
                     </Button.KeyboardAccelerators>
                 </Button>
-                <Button Grid.Column="5" Margin="0,0,6,0"
-                        x:Name="uiNavptBtnAdd"
+                <Button Grid.Column="5" Margin="0,0,6,0" x:Name="uiNavptBtnAdd"
                         VerticalAlignment="Center"
                         Click="NavptBtnAdd_Click"
                         ToolTipService.ToolTip="Add new navpoint to end of navpoint list">
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;"/>
                 </Button>
-                <Button Grid.Column="6"
-                        x:Name="uiNavptBtnNext"
+                <Button Grid.Column="6" x:Name="uiNavptBtnNext"
                         VerticalAlignment="Center"
                         Click="NavptBtnNext_Click"
                         ToolTipService.ToolTip="Move to next navpoint for editing (Control+Enter)">
@@ -242,8 +232,7 @@ https://www.gnu.org/licenses/.
                        Style="{StaticResource EditorParamStaticTextBlockStyle}">
                 Name
             </TextBlock>
-            <TextBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0"
-                     x:Name="uiNavptValueName"
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="12,12,0,0" x:Name="uiNavptValueName"
                      Style="{StaticResource EditorParamEditTextBoxStyle}"
                      Text="{x:Bind EditNavpt.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      GotFocus="NavptValueName_GotFocus"
@@ -251,6 +240,10 @@ https://www.gnu.org/licenses/.
                      PreviewKeyDown="TextBox_PreviewKeyDown"
                      MaxLength="48"
                      ToolTipService.ToolTip="Name of navpoint"/>
+
+            <!-- TODO: all TextBoxen should grab PreviewTextDown. however, code does not work with TextBoxExtensions
+                 TODO: right now. for now, we'll just do it for name.
+              -->
 
             <!-- lat/lon/alt name field
               -->
@@ -268,8 +261,7 @@ https://www.gnu.org/licenses/.
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="125"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0"
-                         x:Name="uiNavptValueLat"
+                <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,0,0" x:Name="uiNavptValueLat"
                          Tag="LatUI"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditNavpt.LatUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -278,10 +270,8 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.CustomMask="N:[nNsS]"
                          ui_ctk:TextBoxExtensions.Mask="N 99° 99’ 99’’"
                          TextChanged="NavptTextBoxExt_TextChanged"
-                         PreviewKeyDown="TextBox_PreviewKeyDown"
                          ToolTipService.ToolTip="Latitude of navpoint"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0"
-                         x:Name="uiNavptValueLon"
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" x:Name="uiNavptValueLon"
                          Tag="LonUI"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditNavpt.LonUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -290,15 +280,12 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.CustomMask="E:[eEwW]"
                          ui_ctk:TextBoxExtensions.Mask="E 999° 99’ 99’’"
                          TextChanged="NavptTextBoxExt_TextChanged"
-                         PreviewKeyDown="TextBox_PreviewKeyDown"
                          ToolTipService.ToolTip="Longitude of navpoint"/>
-                <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"
-                         x:Name="uiNavptValueAlt"
+                <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0" x:Name="uiNavptValueAlt"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
                          Text="{x:Bind EditNavpt.Alt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          PlaceholderText="0"
                          MaxLength="8"
-                         PreviewKeyDown="TextBox_PreviewKeyDown"
                          ToolTipService.ToolTip="Elevation of navpoint in feet"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" Margin="6,0,4,0"
                            x:Name="uiNavptAltitudeUnitsText"
@@ -321,8 +308,7 @@ https://www.gnu.org/licenses/.
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="3" Margin="20,0,0,0"
-                    x:Name="uiAcceptBtnCancel"
+            <Button Grid.Column="3" Margin="20,0,0,0" x:Name="uiAcceptBtnCancel"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     GettingFocus="AcceptBtnCancel_GettingFocus"
@@ -330,8 +316,7 @@ https://www.gnu.org/licenses/.
                     ToolTipService.ToolTip="Discard any changes to navpoint">
                 Cancel
             </Button>
-            <Button Grid.Column="4" Margin="20,0,0,0"
-                    x:Name="uiAcceptBtnOK"
+            <Button Grid.Column="4" Margin="20,0,0,0" x:Name="uiAcceptBtnOK"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     Click="AcceptBtnOk_Click"
