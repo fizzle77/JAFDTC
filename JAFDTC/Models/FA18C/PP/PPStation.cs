@@ -27,7 +27,7 @@ namespace JAFDTC.Models.FA18C.PP
 {
     /// <summary>
     /// pre-planned programs are associated with a station on the hornet. each station can have up to 6 programs
-    /// that define target and steerpoint coordinates for the weapon on the station.
+    /// that define a target coordinate along with a list of steerpoint coordinates for use by some munitions.
     /// </summary>
     public class PPStation : BindableObject
     {
@@ -57,7 +57,7 @@ namespace JAFDTC.Models.FA18C.PP
         // ---- following properties are synthesized.
 
         /// <summary>
-        /// returns true if the instance indicates a default setup (all fields are ""), false otherwise.
+        /// returns true if the instance indicates a default setup, false otherwise.
         /// </summary>
         [JsonIgnore]
         public bool IsDefault
@@ -115,12 +115,9 @@ namespace JAFDTC.Models.FA18C.PP
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// returns true if the program in the station is default, false otherwise.
+        /// returns true if the requested program in the station is default, false otherwise.
         /// </summary>
-        public bool IsPPDefault(int pp)
-        {
-            return !PP[pp].IsValid;
-        }
+        public bool IsPPDefault(int pp) => !PP[pp].IsValid;
 
         /// <summary>
         /// reset the instance to defaults.

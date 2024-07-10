@@ -162,12 +162,17 @@ namespace JAFDTC.Models.Base
         {
             Name = "";
 
-            // force the underlying backing store for lat/lon/alt to null to avoid the error checking through the
-            // standard set accessors (which treat an empty value as legal) to restore to an "empty" state.
+            // set accessors treat "" as illegal. to work around the way SetProperty() handles updating backing store
+            // and error state, first set the fields to "" with no error to set backing store. then, use the set
+            // accessor with a known bad to set error state (which will not update backing store).
             //
             SetProperty(ref _lat, "", null, nameof(Lat));
             SetProperty(ref _lon, "", null, nameof(Lon));
             SetProperty(ref _alt, "", null, nameof(Alt));
+
+            Lat = null;
+            Lon = null;
+            Alt = null;
         }
     }
 }

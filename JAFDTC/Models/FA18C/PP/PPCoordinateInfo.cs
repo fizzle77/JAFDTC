@@ -138,11 +138,15 @@ namespace JAFDTC.Models.FA18C.PP
             base.Reset();
             WaypointNumber = 0;
 
-            // force the underlying backing store for lat/lon to null to avoid the error checking through the standard
-            // set accessors (which treat an empty value as legal) to restore to an "empty" state.
+            // set accessors treat "" as illegal. to work around the way SetProperty() handles updating backing store
+            // and error state, first set the fields to "" with no error to set backing store. then, use the set
+            // accessor with a known bad to set error state (which will not update backing store).
             //
             SetProperty(ref _latUI, "", null, nameof(LatUI));
             SetProperty(ref _lonUI, "", null, nameof(LonUI));
+
+            LatUI = null;
+            LonUI = null;
         }
     }
 }
