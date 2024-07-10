@@ -737,8 +737,10 @@ namespace JAFDTC.UI.F16C
             CopyEditToConfig(EditStptIndex, true);
             SteerpointInfo stpt = Config.STPT.Add();
             EditStptIndex = Config.STPT.Points.IndexOf(stpt);
+            EditStpt.Reset();
             CopyConfigToEdit(EditStptIndex);
             RebuildInterfaceState();
+            uiStptValueName.Focus(FocusState.Programmatic);
         }
 
         // ---- reference point type selection ------------------------------------------------------------------------

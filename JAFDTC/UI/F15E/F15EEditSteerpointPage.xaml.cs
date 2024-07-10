@@ -774,6 +774,7 @@ namespace JAFDTC.UI.F15E
             ResetRefPointForSteerpointChange();
             SteerpointInfo stpt = Config.STPT.Add();
             EditStptIndex = Config.STPT.Points.IndexOf(stpt);
+            EditStpt.Reset();
             CopyConfigToEdit(EditStptIndex);
             RebuildInterfaceState();
             uiStptValueName.Focus(FocusState.Programmatic);

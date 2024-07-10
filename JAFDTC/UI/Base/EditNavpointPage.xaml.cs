@@ -546,8 +546,10 @@ namespace JAFDTC.UI.Base
         {
             CopyEditToConfig(EditNavptIndex, true);
             EditNavptIndex = PageHelper.AddNavpoint(Config);
+            EditNavpt.Reset();
             CopyConfigToEdit(EditNavptIndex);
             RebuildInterfaceState();
+            uiNavptValueName.Focus(FocusState.Programmatic);
         }
 
         // ---- text field changes ------------------------------------------------------------------------------------
