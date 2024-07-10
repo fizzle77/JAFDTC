@@ -19,6 +19,7 @@
 
 using JAFDTC.Models;
 using JAFDTC.UI.App;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
@@ -30,6 +31,8 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.System;
+using Windows.UI.Core;
 
 namespace JAFDTC.UI
 {
@@ -221,6 +224,44 @@ namespace JAFDTC.UI
                 FontIcon icon = FindControl<FontIcon>((Grid)combo.Items[i], typeof(FontIcon), "BadgeIcon");
                 icon.Visibility = (fnIsBulletAtIndexVisible(i) ? Visibility.Visible : Visibility.Collapsed);
             }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // keyboard helpers
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// returns true if the requested modifier key is down, false otherwise.
+        /// </summary>
+        public static bool IsModifierKeyDown(CoreVirtualKeyStates leftKeyState, CoreVirtualKeyStates rightKeyState)
+        {
+            // Odd that this is so convoluted, but checking for (Down | Locked) does appear necessary to reliably
+            // detect key state.
+            // Doc source: https://learn.microsoft.com/en-us/windows/apps/design/input/keyboard-accelerators#override-default-keyboard-behavior
+
+            if (leftKeyState == CoreVirtualKeyStates.Down || leftKeyState == (CoreVirtualKeyStates.Down |
+                                                                              CoreVirtualKeyStates.Locked))
+                return true;
+            if (rightKeyState == CoreVirtualKeyStates.Down || rightKeyState == (CoreVirtualKeyStates.Down |
+                                                                                CoreVirtualKeyStates.Locked))
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// return the current shift and control modifier state.
+        /// </summary>
+        public static void GetModifierKeyStates(out bool isShiftDown, out bool isCtrlDown)
+        {
+            CoreVirtualKeyStates leftKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.LeftShift);
+            CoreVirtualKeyStates rightKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.RightShift);
+            isShiftDown = IsModifierKeyDown(leftKeyState, rightKeyState);
+
+            leftKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.LeftControl);
+            rightKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.RightControl);
+            isCtrlDown = IsModifierKeyDown(leftKeyState, rightKeyState);
         }
 
         // ------------------------------------------------------------------------------------------------------------
