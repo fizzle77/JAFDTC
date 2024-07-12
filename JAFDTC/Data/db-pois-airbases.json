@@ -1,6 +1,141 @@
 [
   {
     "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Bost",
+    "Tags": "Airbase",
+    "Latitude": "31.56003333",
+    "Longitude": "64.36480000",
+    "Elevation": "2549"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Chaghcharan",
+    "Tags": "Airbase",
+    "Latitude": "34.52661667",
+    "Longitude": "65.27141667",
+    "Elevation": "7435"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Camp Bastion",
+    "Tags": "Airbase",
+    "Latitude": "31.85011667",
+    "Longitude": "64.22363333",
+    "Elevation": "2894"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Camp Bastion Heliport",
+    "Tags": "Airbase",
+    "Latitude": "31.85558333",
+    "Longitude": "64.21323333",
+    "Elevation": "2907"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Dwyer",
+    "Tags": "Airbase",
+    "Latitude": "31.09201667",
+    "Longitude": "64.06698333",
+    "Elevation": "2406"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Farah",
+    "Tags": "Airbase",
+    "Latitude": "32.36335000",
+    "Longitude": "62.16768333",
+    "Elevation": "2226"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Herat",
+    "Tags": "Airbase",
+    "Latitude": "34.20801667",
+    "Longitude": "62.22798333",
+    "Elevation": "3237"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Kandahar",
+    "Tags": "Airbase",
+    "Latitude": "31.50576667",
+    "Longitude": "65.84770000",
+    "Elevation": "3323"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Kandahar Heliport",
+    "Tags": "Airbase",
+    "Latitude": "31.52075000",
+    "Longitude": "65.84588333",
+    "Elevation": "3337"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Maymana Zahiraddin Faryabi",
+    "Tags": "Airbase",
+    "Latitude": "35.93065000",
+    "Longitude": "64.76088333",
+    "Elevation": "2730"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Nimroz",
+    "Tags": "Airbase",
+    "Latitude": "30.96353333",
+    "Longitude": "62.06071667",
+    "Elevation": "1585"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Qala i Naw",
+    "Tags": "Airbase",
+    "Latitude": "34.98581667",
+    "Longitude": "63.11776667",
+    "Elevation": "2953"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Shindand",
+    "Tags": "Airbase",
+    "Latitude": "33.39276667",
+    "Longitude": "62.26106667",
+    "Elevation": "3751"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Shindand Heliport",
+    "Tags": "Airbase",
+    "Latitude": "33.40785000",
+    "Longitude": "62.26831667",
+    "Elevation": "3804"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Tarinkot",
+    "Tags": "Airbase",
+    "Latitude": "32.60521667",
+    "Longitude": "65.86415000",
+    "Elevation": "4414"
+  },
+  {
+    "Type": 0,
     "Theater": "Caucasus",
     "Name": "Anapa-Vityazevo",
     "Tags": "Airbase",
