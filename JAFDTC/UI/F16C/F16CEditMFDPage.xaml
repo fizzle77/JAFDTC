@@ -96,7 +96,7 @@ https://www.gnu.org/licenses/.
                                   Foreground="{ThemeResource SystemAccentColor}"
                                   FontFamily="Segoe Fluent Icons" Glyph="&#xE915;"/>
                         <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
-                            Air-to-Air Master Mode – ICP AA
+                            Air-to-Air – ICP AA
                         </TextBlock>
                     </Grid>
                     <Grid Tag="3">
