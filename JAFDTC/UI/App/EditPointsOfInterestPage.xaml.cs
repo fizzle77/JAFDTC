@@ -892,7 +892,7 @@ namespace JAFDTC.UI.App
                     PointOfInterestDbQuery query = new(PointOfInterestTypeMask.CAMPAIGN, poi.Theater, poi.Campaign,
                                                        poi.Name);
                     foreach (PointOfInterest poiDup in PointOfInterestDbase.Instance.Find(query))
-                        poisDup.Add(poi);
+                        poisDup.Add(poiDup);
                 }
             }
             if (poisDup.Count > 0)
