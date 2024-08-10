@@ -335,20 +335,20 @@
   {
     "Type": 0,
     "Theater": "Kola",
-    "Name": "Bas 100",
-    "Tags": "Airbase",
-    "Latitude": "67.06923333",
-    "Longitude": "26.54001667",
-    "Elevation": "736"
-  },
-  {
-    "Type": 0,
-    "Theater": "Kola",
     "Name": "Bodo",
     "Tags": "Airbase",
     "Latitude": "67.26920000",
     "Longitude": "14.36535000",
     "Elevation": "33"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Kallax",
+    "Tags": "Airbase",
+    "Latitude": "65.54386667",
+    "Longitude": "22.12166667",
+    "Elevation": "44"
   },
   {
     "Type": 0,
@@ -367,6 +367,15 @@
     "Latitude": "65.78150000",
     "Longitude": "24.58230000",
     "Elevation": "41"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Kirkenes",
+    "Tags": "Airbase",
+    "Latitude": "69.72536667",
+    "Longitude": "29.89010000",
+    "Elevation": "281"
   },
   {
     "Type": 0,
@@ -430,6 +439,24 @@
     "Latitude": "68.86698333",
     "Longitude": "33.71811667",
     "Elevation": "545"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Vidsel",
+    "Tags": "Airbase",
+    "Latitude": "65.87520000",
+    "Longitude": "20.15016667",
+    "Elevation": "594"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Vuojarvi",
+    "Tags": "Airbase",
+    "Latitude": "67.06923333",
+    "Longitude": "26.54001667",
+    "Elevation": "736"
   },
   {
     "Type": 0,
@@ -1100,6 +1127,15 @@
   {
     "Type": 0,
     "Theater": "Sinai",
+    "Name": "Al Bahr al Ahmar",
+    "Tags": "Airbase",
+    "Latitude": "26.557292872218643",
+    "Longitude": "33.122867931966454",
+    "Elevation": "1165"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
     "Name": "Al Ismailiyah",
     "Tags": "Airbase",
     "Latitude": "30.59880000",
@@ -1109,11 +1145,29 @@
   {
     "Type": 0,
     "Theater": "Sinai",
+    "Name": "Al Khatatbah",
+    "Tags": "Airbase",
+    "Latitude": "30.31234217921595",
+    "Longitude": "30.874557635120464",
+    "Elevation": "46"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
     "Name": "Al Mansurah",
     "Tags": "Airbase",
     "Latitude": "30.96520000",
     "Longitude": "31.43150000",
     "Elevation": "7"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Al Rahmaniyah Air Base",
+    "Tags": "Airbase",
+    "Latitude": "31.04336427544021",
+    "Longitude": "30.66439566368739",
+    "Elevation": "10"
   },
   {
     "Type": 0,
@@ -1154,6 +1208,15 @@
   {
     "Type": 0,
     "Theater": "Sinai",
+    "Name": "Beni Suef",
+    "Tags": "Airbase",
+    "Latitude": "29.197932451977444",
+    "Longitude": "31.01902213384504",
+    "Elevation": "98"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
     "Name": "Bilbeis Air Base",
     "Tags": "Airbase",
     "Latitude": "30.39866667",
@@ -1168,6 +1231,24 @@
     "Latitude": "30.19463333",
     "Longitude": "33.41281667",
     "Elevation": "1225"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Birma Air Base",
+    "Tags": "Airbase",
+    "Latitude": "30.837094996356335",
+    "Longitude": "30.936000626015545",
+    "Elevation": "20"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Borj El Arab International Airport",
+    "Tags": "Airbase",
+    "Latitude": "30.91685014213226",
+    "Longitude": "29.69395618266441",
+    "Elevation": "85"
   },
   {
     "Type": 0,
@@ -1217,11 +1298,29 @@
   {
     "Type": 0,
     "Theater": "Sinai",
+    "Name": "El Minya",
+    "Tags": "Airbase",
+    "Latitude": "28.10078441422702",
+    "Longitude": "30.729777176290142",
+    "Elevation": "125"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
     "Name": "Fayed",
     "Tags": "Airbase",
     "Latitude": "30.32906667",
     "Longitude": "32.26748333",
     "Elevation": "21"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Gebel El Basur Air Base",
+    "Tags": "Airbase",
+    "Latitude": "30.538512659066733",
+    "Longitude": "30.55249782415621",
+    "Elevation": "79"
   },
   {
     "Type": 0,
@@ -1244,11 +1343,29 @@
   {
     "Type": 0,
     "Theater": "Sinai",
+    "Name": "Hurghada International Airport",
+    "Tags": "Airbase",
+    "Latitude": "27.17654089819384",
+    "Longitude": "33.79166035070953",
+    "Elevation": "43"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
     "Name": "Inshas Airbase",
     "Tags": "Airbase",
     "Latitude": "30.32985000",
     "Longitude": "31.44778333",
     "Elevation": "155"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Jiyanklis Air Base",
+    "Tags": "Airbase",
+    "Latitude": "30.822283142214175",
+    "Longitude": "30.19246706299681",
+    "Elevation": "26"
   },
   {
     "Type": 0,
@@ -1266,6 +1383,15 @@
     "Tags": "Airbase",
     "Latitude": "30.24353333",
     "Longitude": "32.49116667",
+    "Elevation": "7"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Kom Awshim",
+    "Tags": "Airbase",
+    "Latitude": "29.553639767014133",
+    "Longitude": "30.893497528300774",
     "Elevation": "7"
   },
   {
@@ -1307,6 +1433,15 @@
   {
     "Type": 0,
     "Theater": "Sinai",
+    "Name": "Quwaysina",
+    "Tags": "Airbase",
+    "Latitude": "30.579254532364782",
+    "Longitude": "31.12895655903353",
+    "Elevation": "33"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
     "Name": "Ramon Airbase",
     "Tags": "Airbase",
     "Latitude": "30.77756667",
@@ -1316,11 +1451,29 @@
   {
     "Type": 0,
     "Theater": "Sinai",
+    "Name": "Ramon International Airport",
+    "Tags": "Airbase",
+    "Latitude": "29.727479782120387",
+    "Longitude": "35.014135274894834",
+    "Elevation": "226"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
     "Name": "Sde Dov",
     "Tags": "Airbase",
     "Latitude": "32.11466667",
     "Longitude": "34.78226667",
     "Elevation": "20"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Sharm El Sheikh International Airport",
+    "Tags": "Airbase",
+    "Latitude": "27.979420333911342",
+    "Longitude": "34.393996640262486",
+    "Elevation": "98"
   },
   {
     "Type": 0,
@@ -1339,6 +1492,15 @@
     "Latitude": "31.83601667",
     "Longitude": "34.81781667",
     "Elevation": "142"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Wadi Abu Rish",
+    "Tags": "Airbase",
+    "Latitude": "28.970861133317808",
+    "Longitude": "31.698623040620596",
+    "Elevation": "945"
   },
   {
     "Type": 0,
