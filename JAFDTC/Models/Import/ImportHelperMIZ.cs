@@ -122,6 +122,8 @@ namespace JAFDTC.Models.Import
                     double x = (double)navpointInfo["x"].GetDecimal();
                     double z = (double)navpointInfo["y"].GetDecimal();
                     CoordLL ll = CoordInterpolator.Instance.XZtoLL(Theater, x, z);
+                    if (ll == null)
+                        return null;
 
                     double alt = (double)navpointInfo["alt"].GetDecimal() * M_TO_FT;
                     double ton = (double)StartTime + (double)navpointInfo["ETA"].GetDecimal();
