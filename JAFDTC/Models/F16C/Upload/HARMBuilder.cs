@@ -78,7 +78,7 @@ namespace JAFDTC.Models.F16C.Upload
             AddActions(ufc, new() { "RTN", "RTN", "LIST", "0", "AG" });
             AddIfBlock("IsHARMOnDED", true, null, delegate ()
             {
-                AddAction(ufc, "0");
+                AddAction(ufc, "0", WAIT_BASE);
                 foreach (ALICTable table in _cfg.HARM.Tables)
                 {
                     if (!table.IsDefault)
@@ -88,7 +88,7 @@ namespace JAFDTC.Models.F16C.Upload
                             AddActions(ufc, PredActionsForNumAndEnter(table.Table[i].Code), new() { "DOWN" });
                         }
                     }
-                    AddAction(ufc, "INC");
+                    AddAction(ufc, "INC", WAIT_BASE);
                 }
             });
             AddActions(ufc, new() { "AG", "RTN" });
