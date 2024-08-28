@@ -37,56 +37,57 @@ namespace JAFDTC.Models.F16C
         
         public F16CDeviceManager()
         {
+            // TODO: this is ok for default, but needs to be hardened once changes are allowed
             int delay = Settings.CommandDelaysMs[AirframeTypes.F16C];
+            int delayDobber = delay;
+            int delayIncDec = delay;
+            int delayEntr = delay / 2;
             int delayMFDs = delay / 4;
             int delayList = delay / 4;
-            int delayEntr = delay / 2;
-            int delayDown = delay;
-            int delayUp = delay;
-            int delaySeq = delay;
-            int delayRtn = delay;
+            int delayHOTAS = delay / 4;
+            int delayKey = delay / 10;
 
             // ---- sms
 
             AirframeDevice sms = new(22, "SMS");
-            sms.AddAction(3002, "LEFT_HDPT", 0, 1);
-            sms.AddAction(3003, "RIGHT_HDPT", 0, 1);
+            sms.AddAction(3002, "LEFT_HDPT", delay, 1);
+            sms.AddAction(3003, "RIGHT_HDPT", delay, 1);
             AddDevice(sms);
 
             // ---- ufc
 
             AirframeDevice ufc = new(17, "UFC");
-            ufc.AddAction(3002, "0", 0, 1);
-            ufc.AddAction(3003, "1", 0, 1);
-            ufc.AddAction(3004, "2", 0, 1);
-            ufc.AddAction(3005, "3", 0, 1);
-            ufc.AddAction(3006, "4", 0, 1);
-            ufc.AddAction(3007, "5", 0, 1);
-            ufc.AddAction(3008, "6", 0, 1);
-            ufc.AddAction(3009, "7", 0, 1);
-            ufc.AddAction(3010, "8", 0, 1);
-            ufc.AddAction(3011, "9", 0, 1);
-            ufc.AddAction(3012, "COM1", 0, 1);
-            ufc.AddAction(3013, "COM2", 0, 1);
+            ufc.AddAction(3002, "0", delayKey, 1);
+            ufc.AddAction(3003, "1", delayKey, 1);
+            ufc.AddAction(3004, "2", delayKey, 1);
+            ufc.AddAction(3005, "3", delayKey, 1);
+            ufc.AddAction(3006, "4", delayKey, 1);
+            ufc.AddAction(3007, "5", delayKey, 1);
+            ufc.AddAction(3008, "6", delayKey, 1);
+            ufc.AddAction(3009, "7", delayKey, 1);
+            ufc.AddAction(3010, "8", delayKey, 1);
+            ufc.AddAction(3011, "9", delayKey, 1);
+            ufc.AddAction(3012, "COM1", delayKey, 1);
+            ufc.AddAction(3013, "COM2", delayKey, 1);
             ufc.AddAction(3015, "LIST", delayList, 1);
             ufc.AddAction(3016, "ENTR", delayEntr, 1);
-            ufc.AddAction(3017, "RCL", 0, 1);
+            ufc.AddAction(3017, "RCL", delayKey, 1);
             ufc.AddAction(3018, "AA", delay, 1);
             ufc.AddAction(3019, "AG", delay, 1);
-            ufc.AddAction(3030, "INC", delay, 1);
-            ufc.AddAction(3031, "DEC", delay, 1);
-            ufc.AddAction(3032, "RTN", delayRtn, -1);
-            ufc.AddAction(3033, "SEQ", delaySeq, 1);
-            ufc.AddAction(3034, "UP", delayUp, 1);
-            ufc.AddAction(3035, "DOWN", delayDown, -1);
+            ufc.AddAction(3030, "INC", delayIncDec, 1);
+            ufc.AddAction(3031, "DEC", delayIncDec, 1);
+            ufc.AddAction(3032, "RTN", delayDobber, -1);
+            ufc.AddAction(3033, "SEQ", delayDobber, 1);
+            ufc.AddAction(3034, "UP", delayDobber, 1);
+            ufc.AddAction(3035, "DOWN", delayDobber, -1);
             AddDevice(ufc);
 
             // ---- hotas buttons
 
             AirframeDevice hotas = new(16, "HOTAS");
-            hotas.AddAction(3030, "DGFT", 0, 1, 1);
-            hotas.AddAction(3030, "MSL", 0, -1, -1);
-            hotas.AddAction(3030, "CENTER", 0, 0, 0);
+            hotas.AddAction(3030, "DGFT", delayHOTAS, 1, 1);
+            hotas.AddAction(3030, "MSL", delayHOTAS, -1, -1);
+            hotas.AddAction(3030, "CENTER", delayHOTAS, 0, 0);
             AddDevice(hotas);
 
             // ---- left mfd
