@@ -243,18 +243,12 @@ namespace JAFDTC.Models
 
         public void CleanupSystemLinks(List<string> validUIDs)
         {
-            List<string> invalidUIDs = new();
+            List<string> invalidSystems = new();
             foreach (KeyValuePair<string, string> kvp in LinkedSysMap)
-            {
                 if (!validUIDs.Contains(kvp.Value))
-                {
-                    invalidUIDs.Add(kvp.Value);
-                }
-            }
-            foreach (string uid in invalidUIDs)
-            {
-                LinkedSysMap.Remove(uid);
-            }
+                    invalidSystems.Add(kvp.Key);
+            foreach (string system in invalidSystems)
+                LinkedSysMap.Remove(system);
         }
 
         public abstract void ConfigurationUpdated();
