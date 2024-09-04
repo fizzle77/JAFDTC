@@ -223,6 +223,7 @@ namespace JAFDTC.Models
             clone.ConfigurationSaved += ConfigurationSavedHandler;
             clone.Save(this);
             Configs.Add(clone);
+            UIDtoConfigMap[clone.UID] = clone;
             FilterConfigs(null);
         }
 
