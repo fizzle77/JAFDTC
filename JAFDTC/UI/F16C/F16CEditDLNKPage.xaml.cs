@@ -107,8 +107,8 @@ namespace JAFDTC.UI.F16C
             _baseFieldValueMap = new Dictionary<string, TextBox>()
             {
                 ["OwnshipCallsign"] = uiOwnTextCallsign,
-                ["OwnshipFENumber"] = uiOwnTextFENum
-                
+                ["OwnshipFENumber"] = uiOwnTextFENum,
+                ["FillEmptyTNDL"] = uiOwnTextFillTNDL
             };
             _tableTDOACkbxList = new List<CheckBox>()
             {
@@ -118,7 +118,7 @@ namespace JAFDTC.UI.F16C
             _tableTNDLTextList = new List<TextBox>()
             {
                 uiTNDLTextTNDL1, uiTNDLTextTNDL2, uiTNDLTextTNDL3, uiTNDLTextTNDL4,
-                uiTNDLTextTNDL5, uiTNDLTextTNDL6, uiTNDLTextTNDL7, uiTNDLTextTNDL8
+                uiTNDLTextTNDL5, uiTNDLTextTNDL6, uiTNDLTextTNDL7, uiTNDLTextTNDL8,
             };
             _tableCallsignComboList = new List<ComboBox>()
             {
@@ -144,6 +144,10 @@ namespace JAFDTC.UI.F16C
             EditDLNK.OwnshipCallsign = Config.DLNK.OwnshipCallsign;
             EditDLNK.OwnshipFENumber = Config.DLNK.OwnshipFENumber;
             EditDLNK.IsOwnshipLead = Config.DLNK.IsOwnshipLead;
+            EditDLNK.IsFillEmptyTNDL = Config.DLNK.IsFillEmptyTNDL;
+            EditDLNK.FillEmptyTNDL = (Config.DLNK.IsFillEmptyTNDL) ? Config.DLNK.FillEmptyTNDL : "";
+            if (string.IsNullOrEmpty(Config.DLNK.FillEmptyTNDL))
+                EditDLNK.IsFillEmptyTNDL = false;
             for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
             {
                 EditDLNK.TeamMembers[i].TDOA = Config.DLNK.TeamMembers[i].TDOA;
@@ -168,6 +172,8 @@ namespace JAFDTC.UI.F16C
                 Config.DLNK.OwnshipCallsign = (EditDLNK.OwnshipCallsign == "––") ? "" : EditDLNK.OwnshipCallsign;
                 Config.DLNK.OwnshipFENumber = (EditDLNK.OwnshipFENumber == "––") ? "" : EditDLNK.OwnshipFENumber;
                 Config.DLNK.IsOwnshipLead = EditDLNK.IsOwnshipLead;
+                Config.DLNK.IsFillEmptyTNDL = EditDLNK.IsFillEmptyTNDL;
+                Config.DLNK.FillEmptyTNDL = (EditDLNK.IsFillEmptyTNDL) ? EditDLNK.FillEmptyTNDL : "";
                 for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
                 {
                     Config.DLNK.TeamMembers[i].TDOA = EditDLNK.TeamMembers[i].TDOA;
@@ -176,9 +182,7 @@ namespace JAFDTC.UI.F16C
                 }
 
                 if (isPersist)
-                {
                     Config.Save(this, DLNKSystem.SystemTag);
-                }
             }
         }
 
@@ -209,9 +213,7 @@ namespace JAFDTC.UI.F16C
             if (args.PropertyName == null)
             {
                 for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
-                {
                     SetFieldValidState(_tableTNDLTextList[i], EditDLNK.TeamMembers[i].HasErrors);
-                }
             }
             else
             {
@@ -239,13 +241,9 @@ namespace JAFDTC.UI.F16C
             {
                 Dictionary<string, bool> map = new();
                 foreach (string error in EditDLNK.GetErrors(null))
-                {
                     map[error] = true;
-                }
                 foreach (KeyValuePair<string, TextBox> kvp in _baseFieldValueMap)
-                {
                     SetFieldValidState(kvp.Value, !map.ContainsKey(kvp.Key));
-                }
             }
             else if ((args.PropertyName == "OwnshipCallsign") && (EditDLNK.OwnshipCallsign == "––"))
             {
@@ -277,12 +275,8 @@ namespace JAFDTC.UI.F16C
         private bool CurStateHasErrors()
         {
             for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
-            {
                 if (EditDLNK.TeamMembers[i].HasErrors)
-                {
                     return true;
-                }
-            }
             return EditDLNK.HasErrors;
         }
 
@@ -299,12 +293,8 @@ namespace JAFDTC.UI.F16C
         {
             // TODO: maybe optimize; but honestly, pilot list is likely short so prolly not worth the effort...
             foreach (ViperDriver pilot in PilotDbase)
-            {
                 if (pilot.UID.Equals(UID))
-                {
                     return pilot;
-                }
-            }
             return null;
         }
 
@@ -356,9 +346,7 @@ namespace JAFDTC.UI.F16C
                 BuildPilotItemStackPanel(null)
             };
             for (int i = 0; i < PilotDbase.Count; i++)
-            {
                 pilotItems.Add(BuildPilotItemStackPanel(PilotDbase[i]));
-            };
             return pilotItems;
         }
 
@@ -374,9 +362,7 @@ namespace JAFDTC.UI.F16C
             {
                 uidToIndexMap[PilotDbase[i].UID] = i + 1;
                 if (PilotDbase[i].Name == Settings.Callsign)
-                {
                     OwnshipDriverUID = PilotDbase[i].UID;
-                }
             }
 
             for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
@@ -417,24 +403,16 @@ namespace JAFDTC.UI.F16C
                 {
                     list.Add((i + 1).ToString());
                     if (!string.IsNullOrEmpty(EditDLNK.Ownship) && (int.Parse(EditDLNK.Ownship) == (i + 1)))
-                    {
                         indexCurOwnship = list.Count - 1;
-                    }
                 }
                 if (EditDLNK.TeamMembers[i].DriverUID == OwnshipDriverUID)
-                {
                     indexPDbOwnship = list.Count - 1;
-                }
             }
             uiOwnComboEntry.ItemsSource = list;
             if (indexPDbOwnship != -1)
-            {
                 uiOwnComboEntry.SelectedIndex = indexPDbOwnship;
-            }
             else if (indexCurOwnship != -1)
-            {
                 uiOwnComboEntry.SelectedIndex = indexCurOwnship;
-            }
         }
 
         /// <summary>
@@ -465,15 +443,15 @@ namespace JAFDTC.UI.F16C
                 Utilities.SetEnableState(_tableCallsignComboList[i], isEditable);
 
                 if (EditDLNK.TeamMembers[i].DriverUID == OwnshipDriverUID)
-                {
                     isOwnInTable = true;
-                }
                 isAnyInTable |= !EditDLNK.TeamMembers[i].IsDefault;
             }
 
             Utilities.SetEnableState(uiOwnComboEntry, isEditable && !isOwnInTable && isAnyInTable);
             Utilities.SetEnableState(uiOwnCkbxLead, isEditable);
             Utilities.SetEnableState(uiPageBtnResetAll, !EditDLNK.IsDefault);
+
+            Utilities.SetEnableState(uiOwnTextFillTNDL, (bool)uiOwnCkbxFill.IsChecked);
         }
 
         /// <summary>
@@ -561,20 +539,48 @@ namespace JAFDTC.UI.F16C
         /// <summary>
         /// TODO: document
         /// </summary>
+        private void OwnCkbxFill_Click(object sender, RoutedEventArgs args)
+        {
+            // HACK: x:Bind doesn't work with bools? seems that way? this is a hack.
+            //
+            CheckBox cbox = (CheckBox)sender;
+            EditDLNK.IsFillEmptyTNDL = (bool)cbox.IsChecked;
+            EditDLNK.FillEmptyTNDL = (EditDLNK.IsFillEmptyTNDL) ? "66716" : "";
+            CopyEditToConfig(true);
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void OwnTextFillTNDL_LostFocus(object sender, RoutedEventArgs args)
+        {
+            TextBox tbox = (TextBox)sender;
+            tbox.IsEnabled = false;
+#if NOPE
+            if (string.IsNullOrEmpty(tbox.Text))
+            {
+                int index = int.Parse((string)tbox.Tag);
+                EditDLNK.TeamMembers[index].Reset();
+                if (!string.IsNullOrEmpty(EditDLNK.Ownship) && (EditDLNK.Ownship == (index + 1).ToString()))
+                    uiOwnComboEntry.SelectedIndex = -1;
+            }
+#endif
+            CopyEditToConfig(true);
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void OwnComboEntry_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
             ComboBox comboBox = (ComboBox)sender;
             if (!IsRebuildingUI)
             {
                 if (!string.IsNullOrEmpty(EditDLNK.Ownship))
-                {
                     EditDLNK.TeamMembers[int.Parse(EditDLNK.Ownship) - 1].TDOA = false;
-                }
                 EditDLNK.Ownship = (string)comboBox.SelectedItem;
                 if (!string.IsNullOrEmpty(EditDLNK.Ownship))
-                {
                     EditDLNK.TeamMembers[int.Parse(EditDLNK.Ownship) - 1].TDOA = true;
-                }
                 CopyEditToConfig(true);
             }
         }
@@ -627,9 +633,7 @@ namespace JAFDTC.UI.F16C
                 int index = int.Parse((string)tbox.Tag);
                 EditDLNK.TeamMembers[index].Reset();
                 if (!string.IsNullOrEmpty(EditDLNK.Ownship) && (EditDLNK.Ownship == (index + 1).ToString()))
-                {
                     uiOwnComboEntry.SelectedIndex = -1;
-                }
             }
             CopyEditToConfig(true);
         }
@@ -640,9 +644,7 @@ namespace JAFDTC.UI.F16C
         private void TNDLComboCallsign_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
             if (IsRebuildingUI)
-            {
                 return;
-            }
 
             ComboBox comboBox = (ComboBox)sender;
             int index = int.Parse((string)comboBox.Tag);

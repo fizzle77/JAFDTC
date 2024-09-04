@@ -42,6 +42,7 @@ namespace JAFDTC.Models.F16C.DLNK
 
         private static readonly Regex _callRegex = new(@"^[a-zA-Z][a-zA-Z]$");
         private static readonly Regex _numRegex = new(@"^[1-9][1-9]$");
+        private static readonly Regex _tndlRegex = new(@"^[0-7]{5}$");
 
         // ---- public properties
 
@@ -83,10 +84,26 @@ namespace JAFDTC.Models.F16C.DLNK
             {
                 string error = "Invalid callsign flight number format";
                 if (IsRegexFieldValid(value, _numRegex))
-                {
                     error = null;
-                }
                 SetProperty(ref _ownshipFENumber, value, error);
+            }
+        }
+
+        private bool _isFillEmptyTNDL;
+        public bool IsFillEmptyTNDL
+        {
+            get => _isFillEmptyTNDL;
+            set => SetProperty(ref _isFillEmptyTNDL, value);
+        }
+
+        private string _fillEmptyTNDL;
+        public string FillEmptyTNDL
+        {
+            get => _fillEmptyTNDL;
+            set
+            {
+                string error = ((IsRegexFieldValid(value, _tndlRegex))) ? null : "Invalid TNDL value";
+                SetProperty(ref _fillEmptyTNDL, value, error);
             }
         }
 
@@ -98,17 +115,13 @@ namespace JAFDTC.Models.F16C.DLNK
             get
             {
                 for (int i = 0; i < TeamMembers.Length; i++)
-                {
                     if (!TeamMembers[i].IsDefault)
-                    {
                         return false;
-                    }
-                }
-                //
+
                 // NOTE: we don't include IsOwnshipLead here as default will depend on which slot the pilot is
                 // NOTE: sitting in.
                 //
-                return string.IsNullOrEmpty(OwnshipCallsign) && string.IsNullOrEmpty(OwnshipFENumber);
+                return !IsFillEmptyTNDL && string.IsNullOrEmpty(OwnshipCallsign) && string.IsNullOrEmpty(OwnshipFENumber);
             }
         }
 
@@ -126,9 +139,7 @@ namespace JAFDTC.Models.F16C.DLNK
             OwnshipFENumber = "";
             TeamMembers = new TeamMember[8];
             for (int i = 0; i < TeamMembers.Length; i++)
-            {
                 TeamMembers[i] = new TeamMember();
-            }
         }
 
         public DLNKSystem(DLNKSystem other)
@@ -139,9 +150,7 @@ namespace JAFDTC.Models.F16C.DLNK
             OwnshipFENumber = "";
             TeamMembers = new TeamMember[8];
             for (int i = 0; i < TeamMembers.Length; i++)
-            {
                 TeamMembers[i] = new TeamMember(other.TeamMembers[i]);
-            }
         }
 
         public virtual object Clone() => new DLNKSystem(this);
@@ -160,10 +169,10 @@ namespace JAFDTC.Models.F16C.DLNK
             IsOwnshipLead = false;
             OwnshipCallsign = "";
             OwnshipFENumber = "";
+            IsFillEmptyTNDL = false;
+            FillEmptyTNDL = "";
             for (int i = 0; i < TeamMembers.Length; i++)
-            {
                 TeamMembers[i].Reset();
-            }
         }
     }
 }

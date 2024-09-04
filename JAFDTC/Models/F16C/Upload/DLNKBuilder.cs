@@ -95,14 +95,19 @@ namespace JAFDTC.Models.F16C.Upload
                 // set up TDOA, TNDL in two passes as hitting "ENTR" to commit TNDL clears TDOA. first pass will fill
                 // in all TNDL values, second pass will fill in all TDOA values. setup ownship between passes.
 
+                string defaultTNDL = (_cfg.DLNK.IsFillEmptyTNDL) ? _cfg.DLNK.FillEmptyTNDL : null;
                 for (int i = 0; i < _cfg.DLNK.TeamMembers.Length; i++)
                 {
                     TeamMember tm = _cfg.DLNK.TeamMembers[i];
-                    string tndl = (!string.IsNullOrEmpty(tm.TNDL)) ? tm.TNDL : "00000";
+                    string tndl = (!string.IsNullOrEmpty(tm.TNDL)) ? tm.TNDL : defaultTNDL;
                     AddActions(ufc, new() { "DOWN" }, PredActionsForNumAndEnter(tndl));
+                    if (tndl == null)
+                        AddAction(ufc, "DOWN");
                 }
 
+                AddWait(WAIT_BASE);
                 AddActions(ufc, PredActionsForNumAndEnter(_cfg.DLNK.Ownship), new() { "DOWN" });
+                AddWait(WAIT_BASE);
 
                 for (int i = 0; i < _cfg.DLNK.TeamMembers.Length; i++)
                 {

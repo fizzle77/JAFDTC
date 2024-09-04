@@ -43,6 +43,7 @@ https://www.gnu.org/licenses/.
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -441,7 +442,28 @@ https://www.gnu.org/licenses/.
 
         <!--
         ===============================================================================================================
-        row 5 : link / reset
+        row 4 : link / reset
+        ===============================================================================================================
+        -->
+        <StackPanel Grid.Row="4" Margin="0,24,0,24" Orientation="Horizontal">
+            <CheckBox Margin="24,2,0,0"
+                      x:Name="uiOwnCkbxFill"
+                      IsChecked="{x:Bind EditDLNK.IsFillEmptyTNDL, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                      Click="OwnCkbxFill_Click">
+                Set Empty Table Entries To TNDL
+            </CheckBox>
+            <TextBox Margin="12,0,0,0"
+                     Width="102"
+                     x:Name="uiOwnTextFillTNDL"
+                     VerticalAlignment="Center"
+                     MaxLength="5"
+                     Text="{x:Bind EditDLNK.FillEmptyTNDL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     LostFocus="OwnTextFillTNDL_LostFocus"/>
+        </StackPanel>
+
+        <!--
+        ===============================================================================================================
+        row 6 : link / reset
         ===============================================================================================================
         -->
         <Grid Grid.Row="6" Margin="0,0,16,4">
