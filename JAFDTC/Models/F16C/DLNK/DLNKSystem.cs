@@ -146,8 +146,8 @@ namespace JAFDTC.Models.F16C.DLNK
         {
             Ownship = new(other.Ownship);
             IsOwnshipLead = other.IsOwnshipLead;
-            OwnshipCallsign = "";
-            OwnshipFENumber = "";
+            OwnshipCallsign = other.OwnshipCallsign;
+            OwnshipFENumber = other.OwnshipFENumber;
             TeamMembers = new TeamMember[8];
             for (int i = 0; i < TeamMembers.Length; i++)
                 TeamMembers[i] = new TeamMember(other.TeamMembers[i]);
