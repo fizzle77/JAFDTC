@@ -100,6 +100,13 @@ namespace JAFDTC.UI.F16C
             IsRebuildingUI = false;
 
             PilotDbase = F16CPilotsDbase.LoadDbase();
+            OwnshipDriverUID = "<unknown>";
+            foreach (ViperDriver driver in PilotDbase)
+                if (driver.Name == Settings.Callsign)
+                {
+                    OwnshipDriverUID = driver.UID;
+                    break;
+                }
 
             _configNameToUID = new Dictionary<string, string>();
             _configNameList = new List<string>();
@@ -359,11 +366,7 @@ namespace JAFDTC.UI.F16C
             IsRebuildingUI = true;
             Dictionary<string, int> uidToIndexMap = new();
             for (int i = 0; i < PilotDbase.Count; i++)
-            {
                 uidToIndexMap[PilotDbase[i].UID] = i + 1;
-                if (PilotDbase[i].Name == Settings.Callsign)
-                    OwnshipDriverUID = PilotDbase[i].UID;
-            }
 
             for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
             {
@@ -718,7 +721,7 @@ namespace JAFDTC.UI.F16C
                 }
                 if (!isOldOwnByCallsign && !string.IsNullOrEmpty(EditDLNK.Ownship))
                 {
-                    EditDLNK.TeamMembers[int.Parse(EditDLNK.Ownship)-1].TDOA = false;
+                    EditDLNK.TeamMembers[int.Parse(EditDLNK.Ownship) - 1].TDOA = false;
                 }
                 //
                 // rebuild here to avoid some visual glitches from enabled -> disabled transition with the field
