@@ -99,7 +99,7 @@ namespace JAFDTC.UI.F16C
             IsRebuildPending = false;
             IsRebuildingUI = false;
 
-            PilotDbase = FileManager.LoadUserDbase<ViperDriver>(F16CConfigAuxCmdPilotDbase.PilotDbFilename);
+            PilotDbase = F16CPilotsDbase.LoadDbase();
 
             _configNameToUID = new Dictionary<string, string>();
             _configNameList = new List<string>();
@@ -767,7 +767,7 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void AuxCommandInvokedHandler(object sender, ConfigAuxCommandInfo args)
         {
-            PilotDbase = FileManager.LoadUserDbase<ViperDriver>(F16CConfigAuxCmdPilotDbase.PilotDbFilename);
+            PilotDbase = F16CPilotsDbase.LoadDbase();
             RebuildCallsignCombos();
         }
 

@@ -17,7 +17,9 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.DLNK;
+using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -28,7 +30,6 @@ using System.Threading.Tasks;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
-using JAFDTC.UI.App;
 
 namespace JAFDTC.UI.F16C
 {
@@ -37,8 +38,6 @@ namespace JAFDTC.UI.F16C
     /// </summary>
     internal class F16CConfigAuxCmdPilotDbase
     {
-        public readonly static string PilotDbFilename = "jafdtc-pilots-f16c.json";
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -70,7 +69,7 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         public async void RunPilotDbEditorUI(ConfigurationPage configPage, ConfigAuxCommandInfo cmd)
         {
-            List<ViperDriver> pilotDbase = FileManager.LoadUserDbase<ViperDriver>(PilotDbFilename);
+            List<ViperDriver> pilotDbase = F16CPilotsDbase.LoadDbase();
             while (true)
             {
                 F16CPilotDbaseDialog dialog = new(_xamlRoot, pilotDbase);
@@ -78,18 +77,18 @@ namespace JAFDTC.UI.F16C
                 if (dialog.IsExportRequested)
                 {
                     pilotDbase = new List<ViperDriver>(dialog.Pilots);
-                    FileManager.SaveUserDbase<ViperDriver>(PilotDbFilename, pilotDbase);
+                    F16CPilotsDbase.UpdateDbase(pilotDbase);
                     PilotDbExport(dialog.SelectedDrivers);
                 }
                 else if (dialog.IsImportRequested)
                 {
                     pilotDbase = await PilotDbImport(new List<ViperDriver>(dialog.Pilots));
-                    FileManager.SaveUserDbase<ViperDriver>(PilotDbFilename, pilotDbase);
+                    F16CPilotsDbase.UpdateDbase(pilotDbase);
                 }
                 else if (result == ContentDialogResult.Primary)
                 {
                     pilotDbase = new List<ViperDriver>(dialog.Pilots);
-                    FileManager.SaveUserDbase<ViperDriver>(PilotDbFilename, pilotDbase);
+                    F16CPilotsDbase.UpdateDbase(pilotDbase);
                     configPage.RaiseAuxCommandInvoked(cmd);
                     break;
                 }
@@ -138,13 +137,9 @@ namespace JAFDTC.UI.F16C
                         if (fileDrivers != null)
                         {
                             if (action == ContentDialogResult.Primary)
-                            {
                                 newDbase.Clear();
-                            }
                             foreach (ViperDriver driver in fileDrivers)
-                            {
                                 newDbase.Add(driver);
-                            }
                         }
                         else
                         {
@@ -180,9 +175,7 @@ namespace JAFDTC.UI.F16C
 
                 StorageFile file = await picker.PickSaveFileAsync();
                 if (file != null)
-                {
                     FileManager.SaveUserDbase<ViperDriver>(file.Path, exportDrivers);
-                }
             }
             catch (Exception ex)
             {
