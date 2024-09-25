@@ -160,6 +160,16 @@ namespace JAFDTC.UI.F16C
                 EditDLNK.TeamMembers[i].TDOA = Config.DLNK.TeamMembers[i].TDOA;
                 EditDLNK.TeamMembers[i].TNDL = new(Config.DLNK.TeamMembers[i].TNDL);
                 EditDLNK.TeamMembers[i].DriverUID = new(Config.DLNK.TeamMembers[i].DriverUID);
+
+                // it's possible that Ownship can get out of sync with the team members (for example, if you directly
+                // import a DLNK configuration from another pilot). check that here and update if necessary.
+                //
+                string ownship = (i + 1).ToString();
+                if ((Config.DLNK.TeamMembers[i].DriverUID == OwnshipDriverUID) && (ownship != Config.DLNK.Ownship))
+                {
+                    EditDLNK.Ownship = ownship;
+                    CopyEditToConfig(true);
+                }
             }
         }
 

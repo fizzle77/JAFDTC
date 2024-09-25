@@ -19,6 +19,7 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C.DLNK;
+using JAFDTC.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -56,7 +57,7 @@ namespace JAFDTC.Models.F16C.Upload
 
             if (!_cfg.DLNK.IsDefault)
             {
-                AddActions(ufc, new() { "RTN", "RTN", "LIST", "ENTR", "SEQ" });    // dlnk, tndl page
+                AddActions(ufc, new() { "RTN", "RTN", "LIST", "ENTR", "SEQ" });     // dlnk, tndl page
 
                 AddActions(ufc, new() { "DOWN", "DOWN", "DOWN" });                  // flight/element number
                 if (!string.IsNullOrEmpty(_cfg.DLNK.OwnshipFENumber))
@@ -106,7 +107,7 @@ namespace JAFDTC.Models.F16C.Upload
                 }
 
                 AddWait(WAIT_BASE);
-                AddActions(ufc, PredActionsForNumAndEnter(_cfg.DLNK.Ownship), new() { "DOWN" });
+                AddActions(ufc, PredActionsForNumAndEnter(InferOwnship()), new() { "DOWN" });
                 AddWait(WAIT_BASE);
 
                 for (int i = 0; i < _cfg.DLNK.TeamMembers.Length; i++)
@@ -118,6 +119,21 @@ namespace JAFDTC.Models.F16C.Upload
 
                 AddAction(ufc, "RTN");
             }
+        }
+
+        /// <summary>
+        /// look through the pilot database to infer the correct ownship value based on the callsign from the settings.
+        /// returns the inferred ownship or the ownship from the configuration if unable to infer.
+        /// <summary>
+        private string InferOwnship()
+        {
+            if (!string.IsNullOrEmpty(Settings.Callsign))
+                foreach (ViperDriver driver in F16CPilotsDbase.LoadDbase())
+                    if (driver.Name == Settings.Callsign)
+                        for (int j = 0; j < _cfg.DLNK.TeamMembers.Length; j++)
+                            if (driver.UID == _cfg.DLNK.TeamMembers[j].DriverUID)
+                                return (j + 1).ToString();
+            return _cfg.DLNK.Ownship;
         }
     }
 }
