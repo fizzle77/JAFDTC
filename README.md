@@ -67,20 +67,30 @@ on the release build that packages the application into a `.msi` file.
 
 ## Updating
 
-Generally, the safest way to update JAFDTC is to uninstall and reinstall. To do so,
+The safest and most stable way to update JAFDTC is to first uninstall the JAFDTC application
+and then install the new version. To do so,
 
-1. Uninstall JAFDTC via Windows `Add/Remove Programs`
-2. Check that there is no `51stVFW` directory in your `Program Files` directory or, if that
-   directory exists, it is empty. If not, delete the `51stVFW` directory
-3. Install the new version of JAFDTC by double-clicking on the `.msi` as described earlier.
+1. Uninstall the JAFDTC application using Windows **Add/Remove Programs**.
+2. Check that there is no `51stVFW` directory in your `Program Files` directory after Windows
+   uinstalls the application. If the `51stVFW` directory exists, delete it.
+3. Install the latest version of JAFDTC by double-clicking on the `.msi` as
+   [described earlier](#installing).
 
-Technically, JAFDTC should support in-place updates; however, there have been reports of
-people having issues updating.
+Updating the JAFDTC application without first unistalling it is not recommended as we have seen
+stability issues arise when doing so.
 
 ## Uninstalling
 
-The settings dialog in the JAFDTC program allows you to remove the DCS Lua support. The support
-can also be removed by hand by,
+JAFDTC has three components that must be removed to completely uninstall the software: the
+JAFDTC application, the DCS Lua support, and your JAFDTC settings and configurations.
+
+To uninstall the application, you can use the **Add/Remove Programs** function in Windows to
+remove the application itself. After doing so, you may safely remove any `51stVFW` directory
+in your `Program Files` directory.
+
+The settings dialog in the JAFDTC applicaiton allows you to remove the DCS Lua support. If you
+have already removed the JAFDTC application, the Lua support can also be removed manually with
+the following steps,
 
 1. Delete the `Scripts\JAFDTC` directory from your DCS installation in `Saved Games`
 2. Delete the `Scripts\Hooks\JAFDTCStatusMsgHook.lua` file from your DCS installation in
@@ -90,14 +100,22 @@ can also be removed by hand by,
 4. Edit the `Scripts\Export.lua` file with a text editor like `Notepad` and remove the line
    that starts with "`local JAFDTClfs=require('lfs');`"
 
-You can remove JAFDTC itself using the Add/Remove Programs function in Windows.
+Finally, JAFDTC keeps its configurations and settings in the `JAFDTC` directory in your 
+`Documents` directory. You can safely delete the `JAFDTC` directory if you wish to remove
+all of your configurations and settings.
 
 ## Troubleshooting
 
-Sometimes stuff goes wrong. One thing to try is uninstalling JAFDTC and then re-installing from
-a fresh `.msi`. After uninstalling from **Add/Remove Programs** in Windows, make sure the
-`51stVFW` directory in `Program Files` is empty before you re-install. If it is not empty, you
-can safely delete the `51stVFW` directory before re-installing.
+Sometimes stuff goes wrong. If JAFDTC is crashing, one thing to try is uninstalling just
+the JAFDTC application and then re-installing from a fresh `.msi`. You can do this by
+uninstalling from **Add/Remove Programs** in Windows and then making sure the `51stVFW`
+directory in `Program Files` is empty. You can safely delete the `51stVFW` directory before
+re-installing if it is not empty.
+
+> If you encounter crashes following an update, you should uninstall the JAFDTC application
+> (not the DCS Lua support and JAFDTC settings and configurations) before re-installing the
+> latest version as
+> [described earlier](#updating).
 
 JAFDTC uses the *Segoe Fluent Icons* font from Microsoft. If this font is not installed on your
 system, icons in the JAFDTC UI may appear as boxes. To restore the icons,
