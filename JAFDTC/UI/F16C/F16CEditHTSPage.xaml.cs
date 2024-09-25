@@ -201,6 +201,12 @@ namespace JAFDTC.UI.F16C
             for (int i = 0; i < EditHTS.MANTable.Count; i++)
                 if (!EditHTS.MANTable[i].IsDefault)
                     return false;
+
+            if (EditHTS.EnabledThreats[0])
+                return false;
+            for (int i = 1; i < EditHTS.EnabledThreats.Length; i++)
+                if (!EditHTS.EnabledThreats[i])
+                    return false;
             return true;
         }
 
@@ -209,6 +215,16 @@ namespace JAFDTC.UI.F16C
         // ui support
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// marshall the enabled threat tables from the configuration. we do this explicitly as they are not edited
+        /// directly on this page by the editor.
+        /// </summary>
+        private void UpdateThreatTable()
+        {
+            for (int i = 0; i < EditHTS.EnabledThreats.Length; i++)
+                EditHTS.EnabledThreats[i] = ((HTSSystem)SystemConfig).EnabledThreats[i];
+        }
 
         /// <summary>
         /// rebuild the content in the man threat table definition using the emitter database to lookup the details
@@ -248,6 +264,8 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void RebuildThreatListContent()
         {
+            UpdateThreatTable();
+
             List<string> threats = new();
             for (int threat = 1; threat < EditHTS.EnabledThreats.Length; threat++)
                 if (EditHTS.EnabledThreats[threat])
@@ -290,6 +308,7 @@ namespace JAFDTC.UI.F16C
         protected override void ResetConfigToDefault()
         {
             ((F16CConfiguration)Config).HTS.Reset();
+            UpdateThreatTable();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -374,6 +393,11 @@ namespace JAFDTC.UI.F16C
                 EditHTS.MANTable[i].ErrorsChanged += EditState_ErrorsChanged;
                 EditHTS.MANTable[i].PropertyChanged += EditState_PropertyChanged;
             }
+
+            // marshall the threat table information out of configuration in case we are coming from a page that did
+            // not set up our state (or the state has been edited since we last grabbed it).
+            //
+            UpdateThreatTable();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs args)
