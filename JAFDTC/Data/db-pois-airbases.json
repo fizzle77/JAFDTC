@@ -389,6 +389,24 @@
   {
     "Type": 0,
     "Theater": "Kola",
+    "Name": "Kuusamo",
+    "Tags": "Airbase",
+    "Latitude": "65.98753333",
+    "Longitude": "29.23948333",
+    "Elevation": "865"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Ivalo",
+    "Tags": "Airbase",
+    "Latitude": "68.60716667",
+    "Longitude": "27.4049667",
+    "Elevation": "473"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
     "Name": "Monchegorsk",
     "Tags": "Airbase",
     "Latitude": "67.98906667",
