@@ -30,13 +30,16 @@ function JAFDTC_Log(str)
 end
 
 function JAFDTC_ParseDisplay(indicator_id)  -- Thanks to [FSF]Ian code
-    local t = {}
+    local t = { }
     local li = list_indication(indicator_id)
-    local m = li:gmatch("-----------------------------------------\n([^\n]+)\n([^\n]*)\n")
+    local m = li:gmatch("-----------------------------------------\n([^\n]*)\n([^\n]*)\n")
     while true do
         local name, value = m()
-        if not name then break end
-            t[name]=value
+        if not name then
+            break
+        elseif string.len(name) > 0 then
+            t[name] = value
+        end
     end
     return t
 end
