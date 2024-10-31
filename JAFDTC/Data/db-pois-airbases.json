@@ -326,6 +326,24 @@
   {
     "Type": 0,
     "Theater": "Kola",
+    "Name": "Andoya",
+    "Tags": "Airbase",
+    "Latitude": "69.29763333",
+    "Longitude": "16.13536667",
+    "Elevation": "22"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Alakourtti",
+    "Tags": "Airbase",
+    "Latitude": "66.97275000",
+    "Longitude": "30.34841667",
+    "Elevation": "548"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
     "Name": "Banak",
     "Tags": "Airbase",
     "Latitude": "70.06886667",
@@ -1613,6 +1631,15 @@
   {
     "Type": 0,
     "Theater": "Syria",
+    "Name": "Ben Gurion",
+    "Tags": "Airbase",
+    "Latitude": "32.00608333",
+    "Longitude": "34.88241667",
+    "Elevation": "134"
+  },
+  {
+    "Type": 0,
+    "Theater": "Syria",
     "Name": "Damascus",
     "Tags": "Airbase",
     "Latitude": "33.42550000",
@@ -1739,6 +1766,15 @@
   {
     "Type": 0,
     "Theater": "Syria",
+    "Name": "Hatzor",
+    "Tags": "Airbase",
+    "Latitude": "31.76048333",
+    "Longitude": "34.72541667",
+    "Elevation": "110"
+  },
+  {
+    "Type": 0,
+    "Theater": "Syria",
     "Name": "Incirlik",
     "Tags": "Airbase",
     "Latitude": "37.00203333",
@@ -1762,6 +1798,15 @@
     "Latitude": "33.06618333",
     "Longitude": "36.57233333",
     "Elevation": "2376"
+  },
+  {
+    "Type": 0,
+    "Theater": "Syria",
+    "Name": "King Abdullah II",
+    "Tags": "Airbase",
+    "Latitude": "32.00535000",
+    "Longitude": "36.22388333",
+    "Elevation": "2297"
   },
   {
     "Type": 0,
@@ -1820,6 +1865,15 @@
   {
     "Type": 0,
     "Theater": "Syria",
+    "Name": "Marka",
+    "Tags": "Airbase",
+    "Latitude": "31.97280000",
+    "Longitude": "35.99185000",
+    "Elevation": "2493"
+  },
+  {
+    "Type": 0,
+    "Theater": "Syria",
     "Name": "Megiddo",
     "Tags": "Airbase",
     "Latitude": "32.59710000",
@@ -1847,6 +1901,24 @@
   {
     "Type": 0,
     "Theater": "Syria",
+    "Name": "Muwaffaq Salti",
+    "Tags": "Airbase",
+    "Latitude": "31.81775000",
+    "Longitude": "36.77968333",
+    "Elevation": "1636"
+  },
+  {
+    "Type": 0,
+    "Theater": "Syria",
+    "Name": "Palmachim",
+    "Tags": "Airbase",
+    "Latitude": "31.90053333",
+    "Longitude": "34.69218333",
+    "Elevation": "45"
+  },
+  {
+    "Type": 0,
+    "Theater": "Syria",
     "Name": "Palmyra",
     "Tags": "Airbase",
     "Latitude": "34.55728333",
@@ -1870,6 +1942,15 @@
     "Latitude": "35.27381667",
     "Longitude": "33.26823333",
     "Elevation": "770"
+  },
+  {
+    "Type": 0,
+    "Theater": "Syria",
+    "Name": "Prince Hassan",
+    "Tags": "Airbase",
+    "Latitude": "32.16076667",
+    "Longitude": "37.14930000",
+    "Elevation": "2148"
   },
   {
     "Type": 0,
@@ -1951,6 +2032,15 @@
     "Latitude": "35.75471667",
     "Longitude": "38.56643333",
     "Elevation": "1099"
+  },
+  {
+    "Type": 0,
+    "Theater": "Syria",
+    "Name": "Tel Nof",
+    "Tags": "Airbase",
+    "Latitude": "31.83833333",
+    "Longitude": "34.83263333",
+    "Elevation": "194"
   },
   {
     "Type": 0,
