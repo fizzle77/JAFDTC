@@ -108,7 +108,9 @@ namespace JAFDTC.UI.Base
     // ================================================================================================================
 
     /// <summary>
-    /// TODO: document
+    /// object representing the user interface view of the miscellaneous controls in the radio preset editor. this
+    /// object presents a ui-centric generic version of the miscellaneous settings for a particular airframe suitable
+    /// to binding to ui widgets.
     /// </summary>
     public sealed class RadioMiscItem : BindableObject
     {
@@ -162,7 +164,10 @@ namespace JAFDTC.UI.Base
     // ================================================================================================================
 
     /// <summary>
-    /// TODO: document
+    /// page to edit radio presets. this is a general-purpose class that is instatiated in combination with an
+    /// IEditRadioPageHelper class to provide airframe-specific specialization.
+    /// 
+    /// using IEditRadioPageHelper, this class can support other radio systems that go beyond the basic functionality
     /// </summary>
     public sealed partial class EditRadioPage : SystemEditorPageBase
     {
@@ -513,10 +518,17 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
-        /// update the modulation comboboxen.
+        /// update the per-preset modulation comboboxen. this method does nothing if the current radio does not
+        /// support per-preset modulation programming. depending on the state of the visual hierarchy, this
+        /// may schedule work for down the road.
         /// </summary>
-        private void RebuildModulationSelections()
+        private void RebuildPerPresetModulationSelections()
         {
+            if (!PageHelper.RadioCanProgramModulation(EditRadio))
+                return;
+
+            // TODO: revisit this code, it's proving to be fragile and the hack is maybe no longer a great idea.
+
             // HACK: this shite seems to be necessary due to a gnarly interaction between Move and bindings.
             // HACK: were life fair, we'd manage the modulation combo items and selections through bindings.
             // HACK: tried that, it crashed.
@@ -551,7 +563,7 @@ namespace JAFDTC.UI.Base
                     DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, async () =>
                     {
                         await Task.Delay(250);
-                        RebuildModulationSelections();
+                        RebuildPerPresetModulationSelections();
                     });
                     break;
                 }
@@ -568,7 +580,7 @@ namespace JAFDTC.UI.Base
 
             RebuildRadioSelectMenu();
             RebuildPerRadioMiscControls();
-            RebuildModulationSelections();
+            RebuildPerPresetModulationSelections();
 
             if ((EditPresets.Count > 0) && (EditPresets[0].IsEnabled != isEditable))
                 foreach (RadioPresetItem item in EditPresets)
