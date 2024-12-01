@@ -49,31 +49,29 @@ namespace JAFDTC.Models.F16C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure steerpoint system via the icp/ded according to the non-default programming settings (this
+        /// configure steerpoint system via the ded/ufc according to the non-default programming settings (this
         /// function is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
             ObservableCollection<SteerpointInfo> stpts = _cfg.STPT.Points;
+
+            if (stpts.Count == 0)
+                return;
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            if (stpts.Count > 0)
-            {
-                AddActions(ufc, new() { "RTN", "RTN" });
+            AddActions(ufc, new() { "RTN", "RTN" });
 
-                int dZ = -GetZuluDelta(stpts[0]);       // negate to get offset from local to zulu
+            int dZ = -GetZuluDelta(stpts[0]);       // negate to get offset from local to zulu
 
-                Dictionary<string, SteerpointInfo> jetStpts = new();
-                for (var i = 0; i < stpts.Count; i++)
-                {
-                    SteerpointInfo stpt = stpts[i];
-                    jetStpts.Add(stpt.Number.ToString(), stpt);
-                }
+            Dictionary<string, SteerpointInfo> jetStpts = new();
+            for (var i = 0; i < stpts.Count; i++)
+                jetStpts.Add(stpts[i].Number.ToString(), stpts[i]);
 
-                BuildWaypoints(ufc, jetStpts, dZ);
-                BuildVIP(ufc, jetStpts);
-                BuildVRP(ufc, jetStpts);
-            }
+            BuildWaypoints(ufc, jetStpts, dZ);
+            BuildVIP(ufc, jetStpts);
+            BuildVRP(ufc, jetStpts);
         }
 
         /// <summary>

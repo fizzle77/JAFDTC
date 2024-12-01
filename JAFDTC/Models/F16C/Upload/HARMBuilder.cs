@@ -48,28 +48,28 @@ namespace JAFDTC.Models.F16C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure harm alic system via the icp/ded according to the non-default programming settings (this function
+        /// configure harm alic system via the ded/ufc according to the non-default programming settings (this function
         /// is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            if (_cfg.HARM.IsDefault)
+                return;
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            if (!_cfg.HARM.IsDefault)
+            AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" }, null, WAIT_BASE);
+            AddIfBlock("IsInAAMode", true, null, delegate ()
             {
-                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" }, null, WAIT_BASE);
-                AddIfBlock("IsInAAMode", true, null, delegate ()
-                {
-                    AddAction(ufc, "SEQ");
-                    AddIfBlock("IsInAGMode", true, null, delegate () { BuildHARM(ufc); });
-                    AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
-                });
-                AddAction(ufc, "RTN");
-            }
+                AddAction(ufc, "SEQ");
+                AddIfBlock("IsInAGMode", true, null, delegate () { BuildHARM(ufc); });
+                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
+            });
+            AddAction(ufc, "RTN");
         }
 
         /// <summary>
-        /// configure harm alic tables via the icp/ded according to the non-default programming settings. tables are
+        /// configure harm alic tables via the ded/ufc according to the non-default programming settings. tables are
         /// only updated if they are non-default.
         /// <summary>
         private void BuildHARM(AirframeDevice ufc)
@@ -82,12 +82,8 @@ namespace JAFDTC.Models.F16C.Upload
                 foreach (ALICTable table in _cfg.HARM.Tables)
                 {
                     if (!table.IsDefault)
-                    {
                         for (int i = 0; i < table.Table.Count; i++)
-                        {
                             AddActions(ufc, PredActionsForNumAndEnter(table.Table[i].Code), new() { "DOWN" });
-                        }
-                    }
                     AddAction(ufc, "INC", WAIT_BASE);
                 }
             });

@@ -48,44 +48,39 @@ namespace JAFDTC.Models.F16C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure cmds system via the icp/ded according to the non-default programming settings (this function
+        /// configure cmds system via the ded/ufc according to the non-default programming settings (this function
         /// is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            if (_cfg.CMDS.IsDefault)
+                return;
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            if (!_cfg.CMDS.IsDefault)
+            AddActions(ufc, new() { "RTN", "RTN", "LIST", "7" }, null, WAIT_SHORT);
+
+            // ---- chaff, flare bingo
+
+            if (!string.IsNullOrEmpty(_cfg.CMDS.BingoChaff) || !string.IsNullOrEmpty(_cfg.CMDS.BingoFlare))
             {
-                AddActions(ufc, new() { "RTN", "RTN", "LIST", "7" }, null, WAIT_SHORT);
-
-                // ---- chaff, flare bingo
-
-                if (!string.IsNullOrEmpty(_cfg.CMDS.BingoChaff) || !string.IsNullOrEmpty(_cfg.CMDS.BingoFlare))
-                {
-                    AddActions(ufc, PredActionsForNumAndEnter(_cfg.CMDS.BingoChaff), new() { "DOWN" }, WAIT_BASE);
-                    AddActions(ufc, PredActionsForNumAndEnter(_cfg.CMDS.BingoFlare), new() { "UP" }, WAIT_BASE);
-                }
-
-                // ---- move to chaff program 1 and enter chaff programs 1-6
-
-                AddAction(ufc, "SEQ", WAIT_BASE);
-
-                for (int i = 0; i < _cfg.CMDS.Programs.Length; i++)
-                {
-                    BuildProgramCommands(ufc, _cfg.CMDS.Programs[i].Chaff);
-                }
-
-                // ---- move to flare program 1 and enter flare programs 1-6
-
-                AddAction(ufc, "SEQ", WAIT_BASE);
-                for (int i = 0; i < _cfg.CMDS.Programs.Length; i++)
-                {
-                    BuildProgramCommands(ufc, _cfg.CMDS.Programs[i].Flare);
-                }
-
-                AddAction(ufc, "RTN");
+                AddActions(ufc, PredActionsForNumAndEnter(_cfg.CMDS.BingoChaff), new() { "DOWN" }, WAIT_BASE);
+                AddActions(ufc, PredActionsForNumAndEnter(_cfg.CMDS.BingoFlare), new() { "UP" }, WAIT_BASE);
             }
+
+            // ---- move to chaff program 1 and enter chaff programs 1-6
+
+            AddAction(ufc, "SEQ", WAIT_BASE);
+            for (int i = 0; i < _cfg.CMDS.Programs.Length; i++)
+                BuildProgramCommands(ufc, _cfg.CMDS.Programs[i].Chaff);
+
+            // ---- move to flare program 1 and enter flare programs 1-6
+
+            AddAction(ufc, "SEQ", WAIT_BASE);
+            for (int i = 0; i < _cfg.CMDS.Programs.Length; i++)
+                BuildProgramCommands(ufc, _cfg.CMDS.Programs[i].Flare);
+
+            AddAction(ufc, "RTN");
         }
 
         /// <summary>

@@ -50,21 +50,21 @@ namespace JAFDTC.Models.F16C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure radio system (com1/com2 uhf/vhf radios) via the icp/ded according to the non-default programming
+        /// configure radio system (com1/com2 uhf/vhf radios) via the ded/ufc according to the non-default programming
         /// settings (this function is safe to call with a configuration with default settings: defaults are skipped as
         /// necessary).
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            if (_cfg.Radio.IsDefault)
+                return;
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            if (!_cfg.Radio.IsDefault)
-            {
-                AddActions(ufc, new() { "RTN", "RTN" });
-                BuildRadio(ufc, "COM1", _cfg.Radio.Presets[(int)Radios.COMM1], _cfg.Radio.COMM1DefaultTuning,
-                           _cfg.Radio.IsCOMM1MonitorGuard);
-                BuildRadio(ufc, "COM2", _cfg.Radio.Presets[(int)Radios.COMM2], _cfg.Radio.COMM2DefaultTuning, false);
-            }
+            AddActions(ufc, new() { "RTN", "RTN" });
+            BuildRadio(ufc, "COM1", _cfg.Radio.Presets[(int)Radios.COMM1], _cfg.Radio.COMM1DefaultTuning,
+                       _cfg.Radio.IsCOMM1MonitorGuard);
+            BuildRadio(ufc, "COM2", _cfg.Radio.Presets[(int)Radios.COMM2], _cfg.Radio.COMM2DefaultTuning, false);
         }
 
         /// <summary>

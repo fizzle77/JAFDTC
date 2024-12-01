@@ -48,31 +48,31 @@ namespace JAFDTC.Models.F16C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure misc systems (TACAN/ILS, ALOW, BINDO, LASR, BULLS, and HMCS) via the icp/ded according to the
+        /// configure misc systems (TACAN/ILS, ALOW, BINDO, LASR, BULLS, and HMCS) via the ded/ufc according to the
         /// non-default programming settings (this function is safe to call with a configuration with default settings:
         /// defaults are skipped as necessary).
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            if (_cfg.Misc.IsDefault)
+                return;
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice ehsi = _aircraft.GetDevice("EHSI");
             AirframeDevice hmcsInt = _aircraft.GetDevice("HMCS_INT");
 
-            if (!_cfg.Misc.IsDefault)
-            {
-                AddActions(ufc, new() { "RTN", "RTN" });
+            AddActions(ufc, new() { "RTN", "RTN" });
 
-                BuildTILS(ufc, ehsi);
-                BuildALOW(ufc);
-                BuildBingo(ufc);
-                BuildLaserSettings(ufc);
-                BuildBullseye(ufc);
-                BuildHMCS(ufc, hmcsInt);
-            }
+            BuildTILS(ufc, ehsi);
+            BuildALOW(ufc);
+            BuildBingo(ufc);
+            BuildLaserSettings(ufc);
+            BuildBullseye(ufc);
+            BuildHMCS(ufc, hmcsInt);
         }
 
         /// <summary>
-        /// configure icp t-ils (1) programming includes tacan (and ehsi mode) and ils via the icp/ded according to the
+        /// configure icp t-ils (1) programming includes tacan (and ehsi mode) and ils via the ded/ufc according to the
         /// non-default programming settings (this function is safe to call with a configuration with default settings:
         /// defaults are skipped as necessary).
         /// <summary>
@@ -127,7 +127,7 @@ namespace JAFDTC.Models.F16C.Upload
         }
 
         /// <summary>
-        /// configure icp alow (icp 2) programming via the icp/ded according to the non-default programming settings
+        /// configure icp alow (icp 2) programming via the ded/ufc according to the non-default programming settings
         /// (this function is safe to call with a configuration with default settings: defaults are skipped as
         /// necessary).
         /// <summary>
@@ -143,7 +143,7 @@ namespace JAFDTC.Models.F16C.Upload
         }
 
         /// <summary>
-        /// configure ded bngo (list 2) programming via the icp/ded according to the non-default programming settings
+        /// configure ded bngo (list 2) programming via the ded/ufc according to the non-default programming settings
         /// (this function is safe to call with a configuration with default settings: defaults are skipped as
         /// necessary).
         /// <summary>
@@ -158,7 +158,7 @@ namespace JAFDTC.Models.F16C.Upload
         }
 
         /// <summary>
-        /// configure ded lasr (list misc, 5) programming via the icp/ded according to the non-default programming
+        /// configure ded lasr (list misc, 5) programming via the ded/ufc according to the non-default programming
         /// settings (this function is safe to call with a configuration with default settings: defaults are skipped
         /// as necessary).
         /// <summary>
@@ -185,7 +185,7 @@ namespace JAFDTC.Models.F16C.Upload
         }
 
         /// <summary>
-        /// configure ded bull (list misc, 8) via the icp/ded according to the non-default programming settings (this
+        /// configure ded bull (list misc, 8) via the ded/ufc according to the non-default programming settings (this
         /// function is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
         private void BuildBullseye(AirframeDevice ufc)
@@ -205,7 +205,7 @@ namespace JAFDTC.Models.F16C.Upload
         }
 
         /// <summary>
-        /// configure jhms (list misc, rcl) programming via the icp/ded according to the non-default programming
+        /// configure jhms (list misc, rcl) programming via the ded/ufc according to the non-default programming
         /// settings (this function is safe to call with a configuration with default settings: defaults are skipped
         /// as necessary).
         /// <summary>

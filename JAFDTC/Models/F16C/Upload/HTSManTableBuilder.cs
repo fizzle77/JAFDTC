@@ -47,31 +47,31 @@ namespace JAFDTC.Models.F16C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure hts system via the icp/ded according to the non-default programming settings (this function
+        /// configure hts system via the ded/ufc according to the non-default programming settings (this function
         /// is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            if (_cfg.HTS.IsDefault)
+                return;
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            if (!_cfg.HTS.IsDefault)
+            AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" }, null, WAIT_BASE);
+            AddIfBlock("IsInAAMode", true, null, delegate ()
             {
-                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" }, null, WAIT_BASE);
-                AddIfBlock("IsInAAMode", true, null, delegate ()
+                AddAction(ufc, "SEQ");
+                AddIfBlock("IsInAGMode", true, null, delegate ()
                 {
-                    AddAction(ufc, "SEQ");
-                    AddIfBlock("IsInAGMode", true, null, delegate ()
-                    {
-                        BuildHTSManualTable(ufc);
-                    });
-                    AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
+                    BuildHTSManualTable(ufc);
                 });
-                AddAction(ufc, "RTN");
-            }
+                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
+            });
+            AddAction(ufc, "RTN");
         }
 
         /// <summary>
-        /// configure hts manual table via the icp/ded according to the non-default programming settings. the manual
+        /// configure hts manual table via the ded/ufc according to the non-default programming settings. the manual
         /// table is only populated if it is non-default.
         /// <summary>
         private void BuildHTSManualTable(AirframeDevice ufc)

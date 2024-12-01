@@ -84,7 +84,7 @@ namespace JAFDTC.Models.F16C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure mfd formats via the icp/ded according to the non-default programming settings (this function
+        /// configure mfd formats via the ded/ufc according to the non-default programming settings (this function
         /// is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// 
         ///     MFDModeConfig.{mode}, MFDModeConfiguration
