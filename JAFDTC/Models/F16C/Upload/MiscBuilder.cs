@@ -57,6 +57,8 @@ namespace JAFDTC.Models.F16C.Upload
             if (_cfg.Misc.IsDefault)
                 return;
 
+            AddExecFunction("NOP", new() { "==== MiscBuilder:Build()" });
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice ehsi = _aircraft.GetDevice("EHSI");
             AirframeDevice hmcsInt = _aircraft.GetDevice("HMCS_INT");

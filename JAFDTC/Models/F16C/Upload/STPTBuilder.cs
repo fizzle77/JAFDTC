@@ -59,6 +59,8 @@ namespace JAFDTC.Models.F16C.Upload
             if (stpts.Count == 0)
                 return;
 
+            AddExecFunction("NOP", new() { "==== STPTBuilder:Build()" });
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
             Dictionary<string, SteerpointInfo> jetStpts = new();

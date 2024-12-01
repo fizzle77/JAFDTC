@@ -150,6 +150,8 @@ namespace JAFDTC.Models.F16C.Upload
             if (_cfg.SMS.IsDefault)
                 return;
 
+            AddExecFunction("NOP", new() { "==== SMSBuilder:Build()" });
+
             // TODO: handle a2a or a2g here by allowing muniQtys state for a2a, a2g weapons? assume only a2g for now.
             MFDSystem.MasterModes mode = MFDSystem.MasterModes.ICP_AG;
 
@@ -197,8 +199,6 @@ namespace JAFDTC.Models.F16C.Upload
                         SetProfile(mfd, mfdSide, muniInfo.ID, selProfile);
                     });
                 }
-
-                AddExecFunction("NOP", new() { "==== SMSBuilder:Build() ends" });
             }
         }
 

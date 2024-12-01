@@ -57,6 +57,8 @@ namespace JAFDTC.Models.F16C.Upload
             if (_cfg.CMDS.IsDefault)
                 return;
 
+            AddExecFunction("NOP", new() { "==== CMDSBuilder:Build()" });
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
             SelectDEDPage(ufc, "7");

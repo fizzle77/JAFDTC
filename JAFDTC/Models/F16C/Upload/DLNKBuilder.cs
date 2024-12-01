@@ -56,6 +56,8 @@ namespace JAFDTC.Models.F16C.Upload
             if (_cfg.DLNK.IsDefault)
                 return;
 
+            AddExecFunction("NOP", new() { "==== DLNKBuilder:Build()" });
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
             SelectDEDPage(ufc, "ENTR");
