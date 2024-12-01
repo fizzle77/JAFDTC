@@ -131,6 +131,10 @@ namespace JAFDTC.Models.F16C
             // build the command stream to set up the jet. we will use the query state collected above to drive
             // decisions around how to twiddle the buttons in the jet.
             //
+            // NOTE: general expectation by builders is that master mode is NAV and DED page is default on entry.
+            // NOTE: builders must preserve master mode, DED state, and MFD state (one exception is MFDBuilder does
+            // NOTE: not maintain MFD state to set avions up as requested).
+            //
             new RadioBuilder(_cfg, _dm, sb).Build(state);
             new MiscBuilder(_cfg, _dm, sb).Build(state);
             new CMDSBuilder(_cfg, _dm, sb).Build(state);

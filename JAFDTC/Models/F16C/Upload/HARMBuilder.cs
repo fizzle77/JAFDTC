@@ -58,14 +58,15 @@ namespace JAFDTC.Models.F16C.Upload
 
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" }, null, WAIT_BASE);
+            // TODO: check/force NAV assumption here
+            SelectDEDPage(ufc, "8");
             AddIfBlock("IsInAAMode", true, null, delegate ()
             {
                 AddAction(ufc, "SEQ");
                 AddIfBlock("IsInAGMode", true, null, delegate () { BuildHARM(ufc); });
                 AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
             });
-            AddAction(ufc, "RTN");
+            SelectDEDPageDefault(ufc);
         }
 
         /// <summary>
@@ -74,7 +75,6 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         private void BuildHARM(AirframeDevice ufc)
         {
-            // TODO: check/force NAV assumption here
             AddActions(ufc, new() { "RTN", "RTN", "LIST", "0", "AG" });
             AddIfBlock("IsHARMOnDED", true, null, delegate ()
             {

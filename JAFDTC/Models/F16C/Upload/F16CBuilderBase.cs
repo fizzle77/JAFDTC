@@ -55,6 +55,22 @@ namespace JAFDTC.Models.F16C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// select the specified page for the ded.
+        /// </summary>
+        public void SelectDEDPage(AirframeDevice ufc, string page)
+        {
+            AddActions(ufc, new() { "LIST", page }, null, WAIT_BASE);
+        }
+
+        /// <summary>
+        /// select the default page for the ded.
+        /// </summary>
+        public void SelectDEDPageDefault(AirframeDevice ufc)
+        {
+            AddActions(ufc, new() { "RTN", "RTN" }, null, WAIT_BASE);
+        }
+
+        /// <summary>
         /// returns a list of actions to enter the numeric value followed by the ENTR key. the list is predicated on
         /// the value being non-null/non-empty (the list is only non-empty if the predicate is true). if negative
         /// values are allowed, prepends "00" to the digits to enter the "-" sign. returns the list of actions (empty

@@ -58,9 +58,9 @@ namespace JAFDTC.Models.F16C.Upload
 
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            AddActions(ufc, new() { "RTN", "RTN", "LIST", "ENTR", "SEQ" });     // dlnk, tndl page
+            SelectDEDPage(ufc, "ENTR");
 
-            AddActions(ufc, new() { "DOWN", "DOWN", "DOWN" });                  // flight/element number
+            AddActions(ufc, new() { "SEQ", "DOWN", "DOWN", "DOWN" });           // tndl page, flight/element number
             if (!string.IsNullOrEmpty(_cfg.DLNK.OwnshipFENumber))
                 AddActions(ufc, ActionsForString(_cfg.DLNK.OwnshipFENumber), new() { "ENTR" });
             else
@@ -114,7 +114,7 @@ namespace JAFDTC.Models.F16C.Upload
                 AddActions(ufc, new() { "DOWN", "DOWN" });
             }
 
-            AddAction(ufc, "RTN");
+            SelectDEDPageDefault(ufc);
         }
 
         /// <summary>

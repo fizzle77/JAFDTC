@@ -108,7 +108,8 @@ namespace JAFDTC.Models.F16C.Upload
             MFDSystem tgtMFD = (MFDSystem)_cfg.MFD.Clone();
             MFDSystem dflMFD = MFDSystem.ExplicitDefaults;
 
-            AddActions(ufc, new() { "RTN", "RTN", "LIST", "8" }, null, WAIT_BASE);
+            SelectDEDPage(ufc, "8");
+            // TODO: check/force NAV assumption here
             AddIfBlock("IsInAAMode", true, null, delegate ()
             {
                 AddAction(ufc, "SEQ");
@@ -130,7 +131,7 @@ namespace JAFDTC.Models.F16C.Upload
                 });
                 AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
             });
-            AddAction(ufc, "RTN");
+            SelectDEDPageDefault(ufc);
         }
 
         /// <summary>

@@ -20,6 +20,7 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C.CMDS;
+using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -58,7 +59,7 @@ namespace JAFDTC.Models.F16C.Upload
 
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            AddActions(ufc, new() { "RTN", "RTN", "LIST", "7" }, null, WAIT_SHORT);
+            SelectDEDPage(ufc, "7");
 
             // ---- chaff, flare bingo
 
@@ -80,7 +81,7 @@ namespace JAFDTC.Models.F16C.Upload
             for (int i = 0; i < _cfg.CMDS.Programs.Length; i++)
                 BuildProgramCommands(ufc, _cfg.CMDS.Programs[i].Flare);
 
-            AddAction(ufc, "RTN");
+            SelectDEDPageDefault(ufc);
         }
 
         /// <summary>

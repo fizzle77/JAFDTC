@@ -61,17 +61,15 @@ namespace JAFDTC.Models.F16C.Upload
 
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            AddActions(ufc, new() { "RTN", "RTN" });
-
-            int dZ = -GetZuluDelta(stpts[0]);       // negate to get offset from local to zulu
-
             Dictionary<string, SteerpointInfo> jetStpts = new();
             for (var i = 0; i < stpts.Count; i++)
                 jetStpts.Add(stpts[i].Number.ToString(), stpts[i]);
 
-            BuildWaypoints(ufc, jetStpts, dZ);
+            BuildWaypoints(ufc, jetStpts, -GetZuluDelta(stpts[0]));     // negate to get offset from local to zulu
             BuildVIP(ufc, jetStpts);
             BuildVRP(ufc, jetStpts);
+
+            SelectDEDPageDefault(ufc);
         }
 
         /// <summary>

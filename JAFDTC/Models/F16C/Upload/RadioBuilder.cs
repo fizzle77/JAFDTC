@@ -61,7 +61,6 @@ namespace JAFDTC.Models.F16C.Upload
 
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            AddActions(ufc, new() { "RTN", "RTN" });
             BuildRadio(ufc, "COM1", _cfg.Radio.Presets[(int)Radios.COMM1], _cfg.Radio.COMM1DefaultTuning,
                        _cfg.Radio.IsCOMM1MonitorGuard);
             BuildRadio(ufc, "COM2", _cfg.Radio.Presets[(int)Radios.COMM2], _cfg.Radio.COMM2DefaultTuning, false);
@@ -75,11 +74,9 @@ namespace JAFDTC.Models.F16C.Upload
         {
             AddAction(ufc, radioCmd);
 
+            // TODO: this should be conditional on guard not already set (ie MAIN, not BOTH).
             if (isGuardMonitor)
-            {
-                // TODO: this should be conditional on guard not already set (ie MAIN, not BOTH).
                 AddAction(ufc, "SEQ");
-            }
 
             AddActions(ufc, new() { "DOWN", "DOWN" });
 
@@ -97,7 +94,7 @@ namespace JAFDTC.Models.F16C.Upload
                 AddActions(ufc, PredActionsForCleanNumAndEnter(initialTuning));
             }
 
-            AddAction(ufc, "RTN");
+            SelectDEDPageDefault(ufc);
         }
     }
 }

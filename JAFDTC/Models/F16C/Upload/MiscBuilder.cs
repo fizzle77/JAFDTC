@@ -61,14 +61,14 @@ namespace JAFDTC.Models.F16C.Upload
             AirframeDevice ehsi = _aircraft.GetDevice("EHSI");
             AirframeDevice hmcsInt = _aircraft.GetDevice("HMCS_INT");
 
-            AddActions(ufc, new() { "RTN", "RTN" });
-
             BuildTILS(ufc, ehsi);
             BuildALOW(ufc);
             BuildBingo(ufc);
             BuildLaserSettings(ufc);
             BuildBullseye(ufc);
             BuildHMCS(ufc, hmcsInt);
+
+            SelectDEDPageDefault(ufc);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace JAFDTC.Models.F16C.Upload
             }
             AddActions(ufc, PredActionsForNumAndEnter(_cfg.Misc.ILSCourse));
 
-            AddAction(ufc, "RTN");
+            SelectDEDPageDefault(ufc);
         }
 
         /// <summary>
@@ -223,21 +223,15 @@ namespace JAFDTC.Models.F16C.Upload
 
                 // TODO: check current state, assume lvl1 by default for now
                 if (_cfg.Misc.HMCSDeclutterLvlValue != HMCSDeclutterLevels.LVL1)
-                {
                     AddAction(ufc, "1");
-                }
                 if (_cfg.Misc.HMCSDeclutterLvlValue == HMCSDeclutterLevels.LVL3)
-                {
                     AddAction(ufc, "1");
-                }
                 AddWait(WAIT_BASE);
                 AddAction(ufc, "DOWN");
 
                 // TODO: check current state, assume enabled by default for now
                 if (!_cfg.Misc.HMCSDisplayRWRValue)
-                {
                     AddAction(ufc, "0");
-                }
                 AddWait(WAIT_BASE);
 
                 if (!string.IsNullOrEmpty(_cfg.Misc.HMCSIntensity))
