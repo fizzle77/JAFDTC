@@ -107,7 +107,6 @@ namespace JAFDTC.Models.DCS
             ["Caucasus"] = new TheaterInfo(4998114.6775109, 99517.01067793, 36, false),
             ["Falklands"] = new TheaterInfo(4184583.3670, -147639.8755, 21, true),
             // TODO: ["Iraq"] = new TheaterInfo(TBD, TBD, TBD, false)
-            // TODO: fit converges, but coefficients are broken
             ["Kola"] = new TheaterInfo(7543624.54780873, 62701.93823161, 34, false),
             ["MarianaIslands"] = new TheaterInfo(1491839.88704271, -238417.99059562, 55, false),
             ["Nevada"] = new TheaterInfo(4410027.78012357, 193996.80821451, 11, false),
