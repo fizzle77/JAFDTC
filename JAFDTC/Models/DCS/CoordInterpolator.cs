@@ -103,8 +103,12 @@ namespace JAFDTC.Models.DCS
         //
         private readonly Dictionary<string, TheaterInfo> _theaterInfo = new()
         {
+            ["Afghanistan"] = new TheaterInfo(3759656.73273285, 300149.98159237, 41, false),
             ["Caucasus"] = new TheaterInfo(4998114.6775109, 99517.01067793, 36, false),
             ["Falklands"] = new TheaterInfo(4184583.3670, -147639.8755, 21, true),
+            // TODO: ["Iraq"] = new TheaterInfo(TBD, TBD, TBD, false)
+            // TODO: fit converges, but coefficients are broken
+            ["Kola"] = new TheaterInfo(7543624.54780873, 62701.93823161, 34, false),
             ["MarianaIslands"] = new TheaterInfo(1491839.88704271, -238417.99059562, 55, false),
             ["Nevada"] = new TheaterInfo(4410027.78012357, 193996.80821451, 11, false),
             ["PersianGulf"] = new TheaterInfo(2894932.78443276, -75755.99875273, 40, false),
