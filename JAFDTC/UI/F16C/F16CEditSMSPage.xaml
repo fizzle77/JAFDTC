@@ -168,7 +168,7 @@ https://www.gnu.org/licenses/.
                       SelectionChanged="ComboBox_SelectionChanged">
                 <!-- NOTE: ComboBoxItems are generated and installed at runtime -->
             </ComboBox>
-            <StackPanel Grid.Row="4" Grid.Column="2" Margin="12,12,0,0" x:Name="uiStackRelMode"
+            <StackPanel Grid.Row="4" Grid.Column="2" Margin="16,12,0,0" x:Name="uiStackRelMode"
                         Orientation="Horizontal">
                 <TextBlock Style="{ThemeResource EditorParamStaticTextBlockStyle}" x:Name="uiLabelRippleQty"
                            VerticalAlignment="Center">
@@ -180,7 +180,18 @@ https://www.gnu.org/licenses/.
                          MaxLength="2" PlaceholderText="1"
                          LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"
                          ToolTipService.ToolTip="Number of munitions to release per weapons release depression"/>
-                <TextBlock Margin="6,0,0,0" x:Name="uiLabelRippleFtAt"
+                <ComboBox Width="80" Margin="12,0,0,0" Tag ="RipplePulse" x:Name="uiComboRippleQty"
+                          VerticalAlignment="Center"
+                          SelectionChanged="ComboBox_SelectionChanged"
+                          ToolTipService.ToolTip="TODO">
+                    <ComboBox.Items>
+                        <TextBlock HorizontalAlignment="Left" Tag="1">RP1</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="2">RP2</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="3">RP3</TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Tag="4">RP4</TextBlock>
+                    </ComboBox.Items>
+                </ComboBox>
+                <TextBlock Margin="6,0,0,0" x:Name="uiLabelRippleAt"
                            VerticalAlignment="Center"
                            Style="{ThemeResource EditorParamStaticTextBlockStyle}">
                     at

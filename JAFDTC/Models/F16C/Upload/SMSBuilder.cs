@@ -93,11 +93,6 @@ namespace JAFDTC.Models.F16C.Upload
             [((int)MunitionSettings.ReleaseModes.TRI_PAIR_L2R).ToString()] = "PAIR_L2R",
             [((int)MunitionSettings.ReleaseModes.MAV_SGL).ToString()] = "SGL",
             [((int)MunitionSettings.ReleaseModes.MAV_PAIR).ToString()] = "PAIR",
-            [((int)MunitionSettings.ReleaseModes.GBU24_SGL).ToString()] = "SGL",
-            [((int)MunitionSettings.ReleaseModes.GBU24_RP1).ToString()] = "PAIR",
-            [((int)MunitionSettings.ReleaseModes.GBU24_RP2).ToString()] = "PAIR",
-            [((int)MunitionSettings.ReleaseModes.GBU24_RP3).ToString()] = "PAIR",
-            [((int)MunitionSettings.ReleaseModes.GBU24_RP4).ToString()] = "PAIR"
         };
         private readonly static Dictionary<string, string> _mapAutoPwrToLabel = new()
         {
@@ -135,7 +130,7 @@ namespace JAFDTC.Models.F16C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure sms system via the icp/ded according to the non-default programming settings (this function is
+        /// configure sms system via the mfd osbs according to the non-default programming settings (this function is
         /// safe to call with a configuration with default settings: defaults are skipped as necessary). the builder
         /// assumes the sms page is currently selected and requires the following state:
         /// 
@@ -280,7 +275,8 @@ namespace JAFDTC.Models.F16C.Upload
                     AdvanceToLabel(mfd, mfdSide, "IsSMSEmploymentGBU24", "OSB-02", settings.EmplMode, _mapEmplToLabel);
                     SetReleaseGBU24(mfd, mfdSide, settings);
                     AdvanceToLabel(mfd, mfdSide, "IsSMSFuzeGBU24", "OSB-18", settings.FuzeMode, _mapFuzeToLabel);
-                    AdvanceToLabel(mfd, mfdSide, "IsSMSArmDelayGBU24", "OSB-17", $"AD {settings.ArmDelayMode}SEC");
+                    if (!string.IsNullOrEmpty(settings.ArmDelayMode))
+                        AdvanceToLabel(mfd, mfdSide, "IsSMSArmDelayGBU24", "OSB-17", $"AD {settings.ArmDelayMode}SEC");
                     break;
                 case Munitions.GBU_31:
                 case Munitions.GBU_31P:
@@ -349,7 +345,8 @@ namespace JAFDTC.Models.F16C.Upload
                     EnterNumericParams(mfd, mfdSide, "OSB-06", new() { settings.ImpactAng });
                     EnterNumericParams(mfd, mfdSide, "OSB-07", new() { settings.ImpactAzi });
                     EnterNumericParams(mfd, mfdSide, "OSB-08", new() { settings.ImpactVel });
-                    AdvanceToLabel(mfd, mfdSide, "IsSMSArmDelayJDAM", "OSB-19", $"AD {settings.ArmDelayMode}SEC");
+                    if (!string.IsNullOrEmpty(settings.ArmDelayMode))
+                        AdvanceToLabel(mfd, mfdSide, "IsSMSArmDelayJDAM", "OSB-19", $"AD {settings.ArmDelayMode}SEC");
                     break;
                 case Munitions.AGM_65D:
                 case Munitions.AGM_65G:
@@ -490,29 +487,11 @@ namespace JAFDTC.Models.F16C.Upload
         /// </summary>
         private void SetReleaseGBU24(AirframeDevice mfd, string mfdSide, MunitionSettings settings)
         {
-            // only care about correctly identifying GBU24_RPx modes. none of these are default, so they should be
-            // explicitly set in settings.ReleaseMode (i.e., settings.Release mode can't be nil for these modes).
-            //
-            MunitionSettings.ReleaseModes relMode = MunitionSettings.ReleaseModes.Unknown;
-            if (!string.IsNullOrEmpty(settings.ReleaseMode))
-                relMode = (MunitionSettings.ReleaseModes)int.Parse(settings.ReleaseMode);
-
             if (!string.IsNullOrEmpty(settings.ReleaseMode))
                 AdvanceToLabel(mfd, mfdSide, "IsSMSReleaseTypeGBU24", "OSB-08", _mapRelToLabel[settings.ReleaseMode]);
-            if (!string.IsNullOrEmpty(settings.RippleDelayMode))
-            {
-                string target = relMode switch
-                {
-                    MunitionSettings.ReleaseModes.GBU24_RP1 => "1",
-                    MunitionSettings.ReleaseModes.GBU24_RP2 => "2",
-                    MunitionSettings.ReleaseModes.GBU24_RP3 => "3",
-                    MunitionSettings.ReleaseModes.GBU24_RP4 => "4",
-                    _ => null
-                };
-                if (target != null)
-                    AdvanceToLabel(mfd, mfdSide, "IsSMSRipplePulseGBU24", "OSB-10", target);
-            }
-            if (!string.IsNullOrEmpty(settings.RippleDelayMode) && (relMode != MunitionSettings.ReleaseModes.GBU24_RP1))
+            if (!string.IsNullOrEmpty(settings.RipplePulse))
+                AdvanceToLabel(mfd, mfdSide, "IsSMSRipplePulseGBU24", "OSB-10", settings.RipplePulse);
+            if (!string.IsNullOrEmpty(settings.RippleDelayMode) && (settings.RipplePulse != "1"))
                 AdvanceToLabel(mfd, mfdSide, "IsSMSRippleDelayGBU24", "OSB-09", $"{settings.RippleDelayMode}MSEC");
         }
 

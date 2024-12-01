@@ -126,7 +126,8 @@
       "ID": 6,
       "Profile": "0;0,1,2,3",
       "EmplMode": "5;5,6",
-      "ReleaseMode": "7;7,8,9,10,11",
+      "ReleaseMode": "0;0,1",
+      "RipplePulse": "1",
       "RippleDelayMode": "50;50,100,150,200,250,300,350,400,450,500",
       "FuzeMode": "0;0,1,2",
       "ArmDelayMode": "4;4,5,6,7,8,10,14,21",
@@ -270,7 +271,7 @@
   {
     "ID": 14,
     "LabelUI": "Mk-84 HD",
-    "DescrUI": "Mk-84 with BSU-50 High Drag General Purpose Bomb, 2000lb",
+    "DescrUI": "Mk-84 with BSU-50 High Drag General Purpose Bomb (GP or TP), 2000lb",
     "LabelSMS": [ "B50", "BD50" ],
     "Image": "mk-84hd.png",
     "MunitionInfo": {

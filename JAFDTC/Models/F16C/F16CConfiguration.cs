@@ -44,7 +44,12 @@ namespace JAFDTC.Models.F16C
     /// </summary>
     public class F16CConfiguration : Configuration
     {
-        private const string _versionCfg = "F16C-1.0";          // current version
+        private const string _versionCfg = "F16C-1.1";          // current version
+
+        // v1.0 --> v1.1:
+        // - interpretation of ReleaseMode, RipplePulse fields in the sms system changed.
+        //
+        private const string _versionCfg_10 = "F16C-1.0";
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -187,7 +192,12 @@ namespace JAFDTC.Models.F16C
             SMS   ??= new SMSSystem();
             STPT  ??= new STPTSystem();
 
-            // TODO: if the version number is older than current, may need to update object
+            // TODO: should parse out version number from version string and compare that as an integer
+            // TODO: to allow for "update if version older than x".
+            if (Version == _versionCfg_10)
+            {
+                SMS.UpdateFrom10to11();
+            }
             Version = _versionCfg;
 
             Save(this);

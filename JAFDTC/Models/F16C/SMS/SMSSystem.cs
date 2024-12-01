@@ -17,7 +17,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
@@ -80,15 +79,9 @@ namespace JAFDTC.Models.F16C.SMS
             get
             {
                 foreach (Dictionary<string, MunitionSettings> profiles in Settings.Values)
-                {
                     foreach (MunitionSettings munition in profiles.Values)
-                    {
                         if (!munition.IsDefault)
-                        {
                             return false;
-                        }
-                    }         
-                }
                 return true;
             }
         }
@@ -112,9 +105,7 @@ namespace JAFDTC.Models.F16C.SMS
                 Dictionary<string, MunitionSettings> profiles = new();
                 Settings.Add(kvpMuni.Key, profiles);
                 foreach (KeyValuePair<string, MunitionSettings> kvpProf in kvpMuni.Value)
-                {
                     profiles.Add(kvpProf.Key, (MunitionSettings)kvpProf.Value.Clone());
-                }
             }
         }
 
@@ -122,7 +113,41 @@ namespace JAFDTC.Models.F16C.SMS
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // Methods
+        // version update
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// update the sms system for the transition from v1.0 to v1.1. this involves changing the way ripple pulses
+        /// are encoded in the munition settings for a gbu-24: in v1.1 they are encoded in RipplePulse rather than as
+        /// different release modes.
+        /// </summary>
+        public void UpdateFrom10to11()
+        {
+            if (Settings.ContainsKey(Munitions.GBU_24))
+            {
+                foreach (KeyValuePair<string, MunitionSettings> kvpProfile in Settings[Munitions.GBU_24])
+                {
+                    MunitionSettings settings = kvpProfile.Value;
+                    if (int.TryParse(settings.ReleaseMode, out int releaseMode))
+                    {
+                        settings.RipplePulse = (MunitionSettings.ReleaseModes)releaseMode switch
+                        {
+                            MunitionSettings.ReleaseModes.DEPRECATE_v11_GBU24_RP1 => "1",
+                            MunitionSettings.ReleaseModes.DEPRECATE_v11_GBU24_RP2 => "2",
+                            MunitionSettings.ReleaseModes.DEPRECATE_v11_GBU24_RP3 => "3",
+                            MunitionSettings.ReleaseModes.DEPRECATE_v11_GBU24_RP4 => "4",
+                            _ => ""
+                        };
+                    }
+                    settings.ReleaseMode = "";
+                }
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // methods
         //
         // ------------------------------------------------------------------------------------------------------------
 
@@ -148,9 +173,7 @@ namespace JAFDTC.Models.F16C.SMS
                     if (!kvpProfile.Value.IsDefault)
                     {
                         if (!newSettings.ContainsKey(kvpProfiles.Key))
-                        {
                             newSettings.Add(kvpProfiles.Key, new());
-                        }
                         Dictionary<string, MunitionSettings> profiles = newSettings[kvpProfiles.Key];
                         profiles.Add(kvpProfile.Key, new(kvpProfile.Value));
                     }

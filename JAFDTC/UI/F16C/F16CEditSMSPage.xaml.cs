@@ -114,7 +114,7 @@ namespace JAFDTC.UI.F16C
             InitializeBase(EditSetup, uiValueRippleQty, uiCtlLinkResetBtns);
 
             _elemsProfile = new() { uiLabelProfile, uiComboProfile, uiCkboxProfileEnb };
-            _elemsRelease = new() { uiLabelRelMode, uiComboRelMode, null, uiStackRelMode };
+            _elemsRelease = new() { uiLabelRelMode, uiComboRelMode, uiStackRelMode };
             _elemsSpin = new() { uiLabelSpin, uiComboSpin, uiLabelSpinUnits };
             _elemsFuze = new() { uiLabelFuzeMode, uiComboFuzeMode };
             _elemsArmDelay = new() { uiLabelArmDelay, uiValueArmDelay, uiLabelArmDelayUnits };
@@ -226,6 +226,11 @@ namespace JAFDTC.UI.F16C
                 //
                 if (settings.EmplMode == ((int)MunitionSettings.EmploymentModes.MAN).ToString())
                     settings.RippleSpacing = "";
+
+                // cannot have a ripple delay without more than one ripple pulse.
+                //
+                if (string.IsNullOrEmpty(settings.RipplePulse) || (settings.RipplePulse == "1"))
+                    settings.RippleDelayMode = "";
 
                 config.SMS.CleanUp();
                 config.Save(this, SystemTag);
@@ -408,7 +413,9 @@ namespace JAFDTC.UI.F16C
 
             // set baseline visibility based on the newly selected munition (eg, hide controls that are not
             // relevant and show those that are). this only handles visibility that is a function of the munition,
-            // not visibility that is a function of the settings (UpdateUiCusomt() takes care of that).
+            // not visibility that is a function of the settings (UpdateUiCustom() takes care of that).
+            //
+            // NOTE: employment mode row is always visible as all munitions have an employment mode setting.
             //
             SetVisibilityFromSpec(_elemsProfile, info.Profile);
             SetVisibilityFromSpec(_elemsRelease, info.ReleaseMode);
@@ -417,7 +424,7 @@ namespace JAFDTC.UI.F16C
             SetVisibilityFromSpec(_elemsArmDelay, info.ArmDelay);
             SetVisibilityFromSpec(_elemsArmDelay2, info.ArmDelay2);
             SetVisibilityFromSpec(_elemsArmDelayMode, info.ArmDelayMode);
-            SetVisibilityFromSpec(_elemsBurstAlt, info  .BurstAlt);
+            SetVisibilityFromSpec(_elemsBurstAlt, info.BurstAlt);
             SetVisibilityFromSpec(_elemsReleaseAng, info.ReleaseAng);
             SetVisibilityFromSpec(_elemsImpactAng, info.ImpactAng);
             SetVisibilityFromSpec(_elemsImpactAzi, info.ImpactAzi);
@@ -461,6 +468,8 @@ namespace JAFDTC.UI.F16C
         protected override void UpdateUICustom(bool isEditable)
         {
             F16CConfiguration config = (F16CConfiguration)Config;
+            Boolean isRippleFeetViz;
+            Boolean isRippleDtViz;
 
             UpdateNonDefaultMunitionItems();
             UpdateNonDefaultProfileItems();
@@ -481,29 +490,10 @@ namespace JAFDTC.UI.F16C
             Utilities.SetEnableState(uiMuniBtnReset, !EditSetup.IsDefault);
 
             // set up visibility of the ripple-related fields (quantity, spacing, and delay) based on the current
-            // release mode selected in the settings.
+            // release mode selected in the settings along with the munition type.
             //
             switch (EditSetup.ReleaseModeEnum)
             {
-                case MunitionSettings.ReleaseModes.PAIR:
-                    uiStackRelMode.Visibility = Visibility.Visible;
-                    uiLabelRippleQty.Visibility = Visibility.Visible;
-                    uiValueRippleQty.Visibility = Visibility.Visible;
-                    if (EditSetup.EmplMode == ((int)MunitionSettings.EmploymentModes.MAN).ToString())
-                    {
-                        uiLabelRippleFtAt.Visibility = Visibility.Collapsed;
-                        uiValueRippleFt.Visibility = Visibility.Collapsed;
-                        uiLabelRippleFtUnits.Visibility = Visibility.Collapsed;
-                    }
-                    else if (!string.IsNullOrEmpty(muni.MunitionInfo.ReleaseMode))
-                    {
-                        uiLabelRippleFtAt.Visibility = Visibility.Visible;
-                        uiValueRippleFt.Visibility = Visibility.Visible;
-                        uiLabelRippleFtUnits.Visibility = Visibility.Visible;
-                    }
-                    uiComboRippleDt.Visibility = Visibility.Collapsed;
-                    uiLabelRippleDtUnits.Visibility = Visibility.Collapsed;
-                    break;
                 case MunitionSettings.ReleaseModes.TRI_PAIR_F2B:
                 case MunitionSettings.ReleaseModes.TRI_PAIR_L2R:
                     uiStackRelMode.Visibility = Visibility.Visible;
@@ -511,33 +501,45 @@ namespace JAFDTC.UI.F16C
                     uiValueRippleQty.Visibility = Visibility.Collapsed;
                     uiValueRippleFt.Visibility = Visibility.Visible;
                     uiLabelRippleFtUnits.Visibility = Visibility.Visible;
+                    uiComboRippleQty.Visibility = Visibility.Collapsed;
                     uiComboRippleDt.Visibility = Visibility.Collapsed;
                     uiLabelRippleDtUnits.Visibility = Visibility.Collapsed;
-                    break;
-                case MunitionSettings.ReleaseModes.GBU24_RP1:
-                    uiStackRelMode.Visibility = Visibility.Visible;
-                    uiLabelRippleQty.Visibility = Visibility.Collapsed;
-                    uiValueRippleQty.Visibility = Visibility.Collapsed;
-                    uiValueRippleFt.Visibility = Visibility.Collapsed;
-                    uiLabelRippleFtUnits.Visibility = Visibility.Collapsed;
-                    uiLabelRippleFtAt.Visibility = Visibility.Collapsed;
-                    uiComboRippleDt.Visibility = Visibility.Collapsed;
-                    uiLabelRippleDtUnits.Visibility = Visibility.Collapsed;
-                    break;
-                case MunitionSettings.ReleaseModes.GBU24_RP2:
-                case MunitionSettings.ReleaseModes.GBU24_RP3:
-                case MunitionSettings.ReleaseModes.GBU24_RP4:
-                    uiStackRelMode.Visibility = Visibility.Visible;
-                    uiLabelRippleQty.Visibility = Visibility.Collapsed;
-                    uiValueRippleQty.Visibility = Visibility.Collapsed;
-                    uiValueRippleFt.Visibility = Visibility.Collapsed;
-                    uiLabelRippleFtUnits.Visibility = Visibility.Collapsed;
-                    uiLabelRippleFtAt.Visibility = Visibility.Visible;
-                    uiComboRippleDt.Visibility = Visibility.Visible;
-                    uiLabelRippleDtUnits.Visibility = Visibility.Visible;
                     break;
                 default:
-                    uiStackRelMode.Visibility = Visibility.Collapsed;
+                    if (string.IsNullOrEmpty(muni.MunitionInfo.RipplePulse))
+                    {
+                        uiStackRelMode.Visibility = Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        isRippleFeetViz = false;
+                        isRippleDtViz = false;
+
+                        uiStackRelMode.Visibility = Visibility.Visible;
+                        uiLabelRippleQty.Visibility = Visibility.Visible;
+                        if (muni.MunitionInfo.ID == Munitions.GBU_24)
+                        {
+                            uiValueRippleQty.Visibility = Visibility.Collapsed;
+                            uiComboRippleQty.Visibility = Visibility.Visible;
+                            if (!string.IsNullOrEmpty(EditSetup.RipplePulse) && (EditSetup.RipplePulse != "1"))
+                                isRippleDtViz = true;
+                        }
+                        else
+                        {
+                            uiValueRippleQty.Visibility = Visibility.Visible;
+                            uiComboRippleQty.Visibility = Visibility.Collapsed;
+                            if (EditSetup.EmplMode != ((int)MunitionSettings.EmploymentModes.MAN).ToString())
+                                isRippleFeetViz = true;
+                        }
+
+                        uiLabelRippleAt.Visibility = (isRippleFeetViz || isRippleDtViz) ? Visibility.Visible
+                                                                                        : Visibility.Collapsed;
+                        uiValueRippleFt.Visibility = (isRippleFeetViz) ? Visibility.Visible : Visibility.Collapsed;
+                        uiLabelRippleFtUnits.Visibility = (isRippleFeetViz) ? Visibility.Visible : Visibility.Collapsed;
+
+                        uiComboRippleDt.Visibility = (isRippleDtViz) ? Visibility.Visible : Visibility.Collapsed;
+                        uiLabelRippleDtUnits.Visibility = (isRippleDtViz) ? Visibility.Visible : Visibility.Collapsed;
+                    }
                     break;
             }
 

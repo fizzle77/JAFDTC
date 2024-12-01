@@ -72,11 +72,14 @@ namespace JAFDTC.Models.F16C.SMS
             TRI_PAIR_L2R = 4,
             MAV_SGL = 5,
             MAV_PAIR = 6,
-            GBU24_SGL = 7,
-            GBU24_RP1 = 8,
-            GBU24_RP2 = 9,
-            GBU24_RP3 = 10,
-            GBU24_RP4 = 11,
+
+            // encodings deprecated for v1.1 and later configuration file versions.
+
+            DEPRECATE_v11_GBU24_SGL = 7,                        // DEPRECATED, v1.1
+            DEPRECATE_v11_GBU24_RP1 = 8,                        // DEPRECATED, v1.1
+            DEPRECATE_v11_GBU24_RP2 = 9,                        // DEPRECATED, v1.1
+            DEPRECATE_v11_GBU24_RP3 = 10,                       // DEPRECATED, v1.1
+            DEPRECATE_v11_GBU24_RP4 = 11,                       // DEPRECATED, v1.1
         }
 
         /// <summary>
