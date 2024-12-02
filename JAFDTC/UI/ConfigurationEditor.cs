@@ -97,7 +97,7 @@ namespace JAFDTC.UI
             string infoText = "Default setup, no changes to avionics";
             if (sysList.Count > 0)
             {
-                infoText = $"Includes changes to {General.JoinList(sysList)} system" + ((sysList.Count > 1) ? "s" : "");
+                infoText = $"Sets up {General.JoinList(sysList)} system" + ((sysList.Count > 1) ? "s" : "");
             }
 
             return new Dictionary<string, string>()
