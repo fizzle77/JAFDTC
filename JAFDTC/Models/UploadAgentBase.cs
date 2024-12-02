@@ -61,7 +61,6 @@ namespace JAFDTC.Models
 
             public override void Build(Dictionary<string, object> state = null)
             {
-                AddExecFunction("NOP", new() { "==== CoreSetupBuilder:Build()" });
                 AddMarker("<upload_prog>");
             }
         }
