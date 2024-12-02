@@ -233,6 +233,7 @@ namespace JAFDTC.Models.F16C.Upload
                 return PointOfInterest.TheaterForCoords(lat, lon) switch
                 {
                     "Marianas"          => 10,  // UTC +10
+                    "Afghanistan"       => 5,   // UTC +5
                     "Caucasus"          => 4,   // UTC +4
                     "Persian Gulf"      => 4,   // UTC +4
                     "Kola"              => 3,   // UTC +3
