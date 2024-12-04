@@ -55,46 +55,26 @@ namespace JAFDTC.Models.F16C.Upload
             if (_cfg.HTS.IsDefault)
                 return;
 
+            AddExecFunction("NOP", new() { "==== HTSManTableBuilder:Build()" });
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            // TODO: check/force NAV assumption here
-            SelectDEDPage(ufc, "8");
-            AddIfBlock("IsInAAMode", true, null, delegate ()
+            // NOTE: hts is only shown on ded list in a-g master mode
+
+            SwitchMasterModeAG(ufc, true);                      // nav to a-g
+            SelectDEDPage(ufc, "0");
+            AddIfBlock("IsHTSOnDED", true, null, delegate ()
             {
-                AddAction(ufc, "SEQ");
-                AddIfBlock("IsInAGMode", true, null, delegate ()
+                AddAction(ufc, "ENTR");
+                for (int row = 0; row < _cfg.HTS.MANTable.Count; row++)
                 {
-                    BuildHTSManualTable(ufc);
-                });
-                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
+                    List<string> actions = PredActionsForNumAndEnter(_cfg.HTS.MANTable[row].Code);
+                    AddActions(ufc, actions);
+                    if (actions.Count == 0)
+                        AddAction(ufc, "DOWN");
+                }
             });
-            SelectDEDPageDefault(ufc);
-        }
-
-        /// <summary>
-        /// configure hts manual table via the ded/ufc according to the non-default programming settings. the manual
-        /// table is only populated if it is non-default.
-        /// <summary>
-        private void BuildHTSManualTable(AirframeDevice ufc)
-        {
-            if (_cfg.HTS.IsMANTablePopulated)
-            {
-                AddActions(ufc, new() { "RTN", "RTN", "LIST", "0" }, null, WAIT_BASE);
-
-                AddIfBlock("IsHTSOnDED", true, null, delegate ()
-                {
-                    AddAction(ufc, "ENTR");
-                    for (int row = 0; row < _cfg.HTS.MANTable.Count; row++)
-                    {
-                        List<string> actions = PredActionsForNumAndEnter(_cfg.HTS.MANTable[row].Code);
-                        AddActions(ufc, actions);
-                        if (actions.Count == 0)
-                            AddAction(ufc, "DOWN");
-                    }
-                });
-
-                AddAction(ufc, "RTN");
-            }
+            SwitchMasterModeAG(ufc, false);                     // a-g to nav, ded to default
         }
     }
 }

@@ -56,26 +56,14 @@ namespace JAFDTC.Models.F16C.Upload
             if (_cfg.HARM.IsDefault)
                 return;
 
+            AddExecFunction("NOP", new() { "==== HARMBuilder:Build()" });
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            // TODO: check/force NAV assumption here
-            SelectDEDPage(ufc, "8");
-            AddIfBlock("IsInAAMode", true, null, delegate ()
-            {
-                AddAction(ufc, "SEQ");
-                AddIfBlock("IsInAGMode", true, null, delegate () { BuildHARM(ufc); });
-                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
-            });
-            SelectDEDPageDefault(ufc);
-        }
+            // NOTE: alic is only shown on ded list in a-g master mode
 
-        /// <summary>
-        /// configure harm alic tables via the ded/ufc according to the non-default programming settings. tables are
-        /// only updated if they are non-default.
-        /// <summary>
-        private void BuildHARM(AirframeDevice ufc)
-        {
-            AddActions(ufc, new() { "RTN", "RTN", "LIST", "0", "AG" });
+            SwitchMasterModeAG(ufc, true);                      // nav to a-g
+            SelectDEDPage(ufc, "0");
             AddIfBlock("IsHARMOnDED", true, null, delegate ()
             {
                 AddAction(ufc, "0", WAIT_BASE);
@@ -87,7 +75,7 @@ namespace JAFDTC.Models.F16C.Upload
                     AddAction(ufc, "INC", WAIT_BASE);
                 }
             });
-            AddActions(ufc, new() { "AG", "RTN" });
+            SwitchMasterModeAG(ufc, false);                     // a-g to nav, ded to default
         }
     }
 }

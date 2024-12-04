@@ -71,6 +71,45 @@ namespace JAFDTC.Models.F16C.Upload
         }
 
         /// <summary>
+        /// switch a-g master mode via ded master mode page (list / 8) between a-g and nav. returns ded to
+        /// default page.
+        /// </summary>
+        public void SwitchMasterModeAG(AirframeDevice ufc, bool is_ag_selected)
+        {
+            SelectDEDPage(ufc, "8");
+            AddWhileBlock("IsShowingAGMode", false, null, delegate () { AddAction(ufc, "SEQ"); });
+            AddIfBlock("IsSelectingAGMode", !is_ag_selected, null, delegate () { AddAction(ufc, "0"); });
+            AddWait(WAIT_BASE);
+            SelectDEDPageDefault(ufc);
+        }
+
+        /// <summary>
+        /// switch a-a master mode via ded master mode page (list / 8) between a-a and nav. returns ded to
+        /// default page.
+        /// </summary>
+        public void SwitchMasterModeAA(AirframeDevice ufc, bool is_aa_selected)
+        {
+            SelectDEDPage(ufc, "8");
+            AddWhileBlock("IsShowingAAMode", false, null, delegate () { AddAction(ufc, "SEQ"); });
+            AddIfBlock("IsSelectingAAMode", !is_aa_selected, null, delegate () { AddAction(ufc, "0"); });
+            AddWait(WAIT_BASE);
+            SelectDEDPageDefault(ufc);
+        }
+
+        /// <summary>
+        /// select nav master mode via ded master mode page (list / 8). returns ded to default page.
+        /// </summary>
+        public void SelectMasterModeNAV(AirframeDevice ufc)
+        {
+            SelectDEDPage(ufc, "8");
+            AddWhileBlock("IsShowingAAMode", false, null, delegate () { AddAction(ufc, "SEQ"); });
+            AddIfBlock("IsSelectingAAMode", true, null, delegate () { AddAction(ufc, "0"); });
+            AddWhileBlock("IsShowingAGMode", false, null, delegate () { AddAction(ufc, "SEQ"); });
+            AddIfBlock("IsSelectingAGMode", true, null, delegate () { AddAction(ufc, "0"); });
+            SelectDEDPageDefault(ufc);
+        }
+
+        /// <summary>
         /// returns a list of actions to enter the numeric value followed by the ENTR key. the list is predicated on
         /// the value being non-null/non-empty (the list is only non-empty if the predicate is true). if negative
         /// values are allowed, prepends "00" to the digits to enter the "-" sign. returns the list of actions (empty

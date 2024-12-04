@@ -50,14 +50,29 @@ namespace JAFDTC.Models.F16C
 
             public override void Build(Dictionary<string, object> state = null)
             {
+                AddExecFunction("NOP", new() { "==== F16CSetupBuilder:Build()" });
+
                 base.Build();
 
                 AirframeDevice sms = _aircraft.GetDevice("SMS");
+                AirframeDevice ufc = _aircraft.GetDevice("UFC");
+                AirframeDevice hotas = _aircraft.GetDevice("HOTAS");
 
                 AddIfBlock("IsLeftHdptOn", false, null, delegate () { AddAction(sms, "LEFT_HDPT"); });
                 AddIfBlock("IsRightHdptOn", false, null, delegate () { AddAction(sms, "RIGHT_HDPT"); });
 
                 // TODO: ensure cmds is on?
+
+                AddIfBlock("IsInNAVMode", false, null, delegate ()
+                {
+                    AddAction(hotas, "CENTER");
+                    AddActions(ufc, new() { "LIST", "8" }, null, WAIT_BASE);
+                    AddWhileBlock("IsShowingAAMode", false, null, delegate () { AddAction(ufc, "SEQ"); });
+                    AddIfBlock("IsSelectingAAMode", true, null, delegate () { AddAction(ufc, "0"); });
+                    AddWhileBlock("IsShowingAGMode", false, null, delegate () { AddAction(ufc, "SEQ"); });
+                    AddIfBlock("IsSelectingAGMode", true, null, delegate () { AddAction(ufc, "0"); });
+                    AddActions(ufc, new() { "RTN", "RTN" }, null, WAIT_BASE);
+                });
             }
         }
 
@@ -79,7 +94,23 @@ namespace JAFDTC.Models.F16C
 
             public override void Build(Dictionary<string, object> state = null)
             {
+                AddExecFunction("NOP", new() { "==== F16CTeardownBuilder:Build()" });
+
                 base.Build();
+
+                AirframeDevice ufc = _aircraft.GetDevice("UFC");
+                AirframeDevice hotas = _aircraft.GetDevice("HOTAS");
+
+                AddIfBlock("IsInNAVMode", false, null, delegate ()
+                {
+                    AddAction(hotas, "CENTER");
+                    AddActions(ufc, new() { "LIST", "8" }, null, WAIT_BASE);
+                    AddWhileBlock("IsShowingAAMode", false, null, delegate () { AddAction(ufc, "SEQ"); });
+                    AddIfBlock("IsSelectingAAMode", true, null, delegate () { AddAction(ufc, "0"); });
+                    AddWhileBlock("IsShowingAGMode", false, null, delegate () { AddAction(ufc, "SEQ"); });
+                    AddIfBlock("IsSelectingAGMode", true, null, delegate () { AddAction(ufc, "0"); });
+                    AddActions(ufc, new() { "RTN", "RTN" }, null, WAIT_BASE);
+                });
 
                 if ((Settings.UploadFeedback == SettingsData.UploadFeedbackTypes.AUDIO_LIGHTS) ||
                     (Settings.UploadFeedback == SettingsData.UploadFeedbackTypes.LIGHTS))
@@ -139,14 +170,15 @@ namespace JAFDTC.Models.F16C
             new MiscBuilder(_cfg, _dm, sb).Build(state);
             new CMDSBuilder(_cfg, _dm, sb).Build(state);
             //
-            // NOTE: hts must be done before mfd as mfd can set the man hts threat class which is only available if
-            // NOTE: the hts manual table has been set up.
+            // NOTE: hts man threat table must be built before the mfd as mfd builds can select threat classes in the
+            // NOTE: had format and man is only available if the hts manual table is set up (i.e., non-default).
+            //
+            new HTSManTableBuilder(_cfg, _dm, sb).Build(state);
+            new HARMBuilder(_cfg, _dm, sb).Build(state);
             //
             // NOTE: mfd will invoke the sms builder if there are sms changes and the sms page is selected
             //
-            new HTSManTableBuilder(_cfg, _dm, sb).Build(state);
             new MFDBuilder(_cfg, _dm, sb).Build(state);
-            new HARMBuilder(_cfg, _dm, sb).Build(state);
             new DLNKBuilder(_cfg, _dm, sb).Build(state);
             new STPTBuilder(_cfg, _dm, sb).Build(state);
         }

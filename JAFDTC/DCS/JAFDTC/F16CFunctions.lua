@@ -112,16 +112,34 @@ function JAFDTC_F16CM_Fn_IsRightHdptOn()
     return (switch == 1)
 end
 
-function JAFDTC_F16CM_Fn_IsInAAMode()
+-- NOTE: assumes ded is on master mode select page (list / 8)
+--
+function JAFDTC_F16CM_Fn_IsShowingAAMode()
     local table = JAFDTC_F16CM_GetParsedDED()
-    local str = table["Master_mode"]
+    local str = table["Master_mode"] or table["Master_mode_inv"]
     return (str == "A-A")
 end
 
-function JAFDTC_F16CM_Fn_IsInAGMode()
+-- NOTE: assumes ded is on master mode select page (list / 8)
+--
+function JAFDTC_F16CM_Fn_IsShowingAGMode()
     local table = JAFDTC_F16CM_GetParsedDED()
-    local str = table["Master_mode"]
+    local str = table["Master_mode"] or table["Master_mode_inv"]
     return (str == "A-G")
+end
+
+-- NOTE: assumes ded is on master mode select page (list / 8)
+--
+function JAFDTC_F16CM_Fn_IsSelectingAAMode()
+    local table = JAFDTC_F16CM_GetParsedDED()
+    return (table["Master_mode_inv"] == "A-A")
+end
+
+-- NOTE: assumes ded is on master mode select page (list / 8)
+--
+function JAFDTC_F16CM_Fn_IsSelectingAGMode()
+    local table = JAFDTC_F16CM_GetParsedDED()
+    return (table["Master_mode_inv"] == "A-G")
 end
 
 function JAFDTC_F16CM_Fn_IsInNAVMode()
@@ -394,7 +412,7 @@ function JAFDTC_F16CM_Fn_IsSMSRippleDelayGBU24(mfd, rd)
     return (str == rd)
 end
 
----- munition ripple delay selection
+---- munition ripple pulse selection
 
 function JAFDTC_F16CM_Fn_IsSMSRipplePulseGBU24(mfd, rp)
     local table = JAFDTC_F16CM_GetMFD(mfd)

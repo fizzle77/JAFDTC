@@ -96,7 +96,7 @@ namespace JAFDTC.Models.F16C.Upload
             if (_cfg.MFD.IsDefault)
                 return;
 
-            AddExecFunction("NOP", new() { "MFDBuilder:Build()" });
+            AddExecFunction("NOP", new() { "==== MFDBuilder:Build()" });
 
             _state = state;
 
@@ -108,30 +108,22 @@ namespace JAFDTC.Models.F16C.Upload
             MFDSystem tgtMFD = (MFDSystem)_cfg.MFD.Clone();
             MFDSystem dflMFD = MFDSystem.ExplicitDefaults;
 
-            SelectDEDPage(ufc, "8");
-            // TODO: check/force NAV assumption here
-            AddIfBlock("IsInAAMode", true, null, delegate ()
-            {
-                AddAction(ufc, "SEQ");
-                AddIfBlock("IsInAGMode", true, null, delegate ()
+            SelectMasterModeNAV(ufc);
+            for (int mode = 0; mode < (int)MFDSystem.MasterModes.NUM_MODES; mode++)
+                if (state.TryGetValueAs($"MFDModeConfig.{(MFDSystem.MasterModes)mode}",
+                                        out MFDModeConfiguration curMFD))
                 {
-                    for (int mode = 0; mode < (int)MFDSystem.MasterModes.NUM_MODES; mode++)
-                        if (state.TryGetValueAs($"MFDModeConfig.{(MFDSystem.MasterModes)mode}",
-                                                out MFDModeConfiguration curMFD))
-                        {
-                            MergeConfigs((MFDSystem.MasterModes) mode, tgtMFD.ModeConfigs[mode].LeftMFD,
-                                         curMFD.LeftMFD, dflMFD.ModeConfigs[mode].LeftMFD);
-                            MergeConfigs((MFDSystem.MasterModes) mode, tgtMFD.ModeConfigs[mode].RightMFD,
-                                         curMFD.RightMFD, dflMFD.ModeConfigs[mode].RightMFD);
+                    MergeConfigs((MFDSystem.MasterModes)mode, tgtMFD.ModeConfigs[mode].LeftMFD,
+                                 curMFD.LeftMFD, dflMFD.ModeConfigs[mode].LeftMFD);
+                    MergeConfigs((MFDSystem.MasterModes)mode, tgtMFD.ModeConfigs[mode].RightMFD,
+                                 curMFD.RightMFD, dflMFD.ModeConfigs[mode].RightMFD);
 
-                            BuildMFDsForMode((MFDSystem.MasterModes)mode, ufc, hotas, mfdL, mfdR,
-                                             tgtMFD.ModeConfigs[mode], curMFD.LeftMFD.SelectedOSB,
-                                             curMFD.RightMFD.SelectedOSB);
-                        }
-                });
-                AddActions(ufc, new() { "RTN", "RTN", "LIST", "8", "SEQ" });
-            });
-            SelectDEDPageDefault(ufc);
+                    BuildMFDsForMode((MFDSystem.MasterModes)mode, ufc, hotas, mfdL, mfdR,
+                                     tgtMFD.ModeConfigs[mode], curMFD.LeftMFD.SelectedOSB,
+                                     curMFD.RightMFD.SelectedOSB);
+                }
+            AddAction(hotas, "CENTER");
+            SelectMasterModeNAV(ufc);
         }
 
         /// <summary>
