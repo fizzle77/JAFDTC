@@ -52,6 +52,8 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            AddExecFunction("NOP", new() { "==== MiscBuilder:Build()" });
+
             AirframeDevice fltInst = _aircraft.GetDevice("FLTINST");
 
             if (_cfg.CrewMember == F15EConfiguration.CrewPositions.PILOT)
@@ -68,19 +70,15 @@ namespace JAFDTC.Models.F15E.Upload
         /// </summary>
         private void BuildBingo(AirframeDevice fltInst)
         {
-            if (!_cfg.Misc.IsBINGODefault)
-            {
-                int bingo = int.Parse(_cfg.Misc.Bingo);
-                // TODO: handle this through a dcs-side loop?
-                for (int i = 0; i < 140; i++)
-                {
-                    AddAction(fltInst, "BingoDecrease");
-                }
-                for (int i = 0; i < bingo / 100; i++)
-                {
-                    AddAction(fltInst, "BingoIncrease");
-                }
-            }
+            if (_cfg.Misc.IsBINGODefault)
+                return;
+
+            int bingo = int.Parse(_cfg.Misc.Bingo);
+            // TODO: handle this through a dcs-side loop?
+            for (int i = 0; i < 140; i++)
+                AddAction(fltInst, "BingoDecrease");
+            for (int i = 0; i < bingo / 100; i++)
+                AddAction(fltInst, "BingoIncrease");
         }
     }
 }

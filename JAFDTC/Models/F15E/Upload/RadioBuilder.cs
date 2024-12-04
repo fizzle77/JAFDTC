@@ -55,6 +55,8 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            AddExecFunction("NOP", new() { "==== RadioBuilder:Build()" });
+
             AirframeDevice ufcPilot = _aircraft.GetDevice("UFC_PILOT");
             AirframeDevice ufcWizzo = _aircraft.GetDevice("UFC_WSO");
 
@@ -119,9 +121,7 @@ namespace JAFDTC.Models.F15E.Upload
                 AddActions(ufc, new() { "1", (isRadio1 ? "PRESL" : "PRESR"), "CLR" });
                 AddAction(ufc, isRadio1 ? "PRESLCCW" : "PRESRCCW");
                 if (!isRadio1)
-                {
                     AddAction(ufc, "PRESRCCW");
-                }
             }
             else if (dfltTuning.ToUpper() == "GV")
             {
@@ -144,9 +144,7 @@ namespace JAFDTC.Models.F15E.Upload
             });
 
             if ((presets.Count > 0) && (pb == "PB6"))
-            {
                 AddAction(ufc, "PB9");
-            }
         }
 
         private void BuildRadioPresets(AirframeDevice ufc, ObservableCollection<RadioPreset> presets)
@@ -171,9 +169,7 @@ namespace JAFDTC.Models.F15E.Upload
             if (freq.Length == 6)
             {
                 if (freq.EndsWith("000"))
-                {
                     freq = freq.Replace("000", "001");
-                }
                 var parts = freq.Split('.');
                 AddActions(ufc, ActionsForString(parts[0]));
                 AddAction(ufc, ".");

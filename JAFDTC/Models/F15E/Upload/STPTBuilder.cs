@@ -52,6 +52,8 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            AddExecFunction("NOP", new() { "==== STPTBuilder:Build()" });
+
             AirframeDevice ufcPilot = _aircraft.GetDevice("UFC_PILOT");
             AirframeDevice ufcWizzo = _aircraft.GetDevice("UFC_WSO");
 
@@ -108,16 +110,13 @@ namespace JAFDTC.Models.F15E.Upload
                     });
 
                     if (stpt.IsTarget)
-                    {
                         AddActions(ufc, ActionsForString(stptNum), new() { ".", "SHF", routePB, "PB1" });
-                    }
 
                     AddActions(ufc, ActionsForMudhen2864CoordinateString(stpt.LatUI), new() { "PB2" });
                     AddActions(ufc, ActionsForMudhen2864CoordinateString(stpt.LonUI), new() { "PB3" });
                     AddActions(ufc, ActionsForString(stpt.Alt), new() { "PB7" });
 
                     foreach (RefPointInfo rfpt in stpt.RefPoints)
-                    {
                         if (rfpt.IsValid)
                         {
                             AddActions(ufc, ActionsForString(stptNum), new() { "." });
@@ -131,7 +130,6 @@ namespace JAFDTC.Models.F15E.Upload
                             AddActions(ufc, ActionsForMudhen2864CoordinateString(rfpt.LonUI), new() { "PB3" });
                             AddActions(ufc, ActionsForString(rfpt.Alt), new() { "PB7" });
                         }
-                    }
                 }
             }
         }

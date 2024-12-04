@@ -53,6 +53,8 @@ namespace JAFDTC.Models.F15E.Upload
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            AddExecFunction("NOP", new() { "==== MPDBuilder:Build()" });
+
             Dictionary<MPDSystem.CockpitDisplays, AirframeDevice> devMap = new()
             {
                 [MPDSystem.CockpitDisplays.PILOT_L_MPD] = _aircraft.GetDevice("FLMPD"),
@@ -90,9 +92,7 @@ namespace JAFDTC.Models.F15E.Upload
                            MPDSystem.CockpitDisplays min, MPDSystem.CockpitDisplays max)
         {
             for (MPDSystem.CockpitDisplays disp = min; disp <= max; disp++)
-            {
                 BuildDisplay(devMap[disp], _cfg.MPD.Displays[(int)disp]);
-            }
         }
 
         /// <summary>
@@ -120,9 +120,7 @@ namespace JAFDTC.Models.F15E.Upload
             {
                 AddAction(dispDev, "PB06");
                 for (int i = 0; i < MPDConfiguration.NUM_SEQUENCES; i++)
-                {
                     AddActions(dispDev, ButtonsToSelectFormat(dispConfig.Formats[i]));
-                }
                 for (int i = 0; i < MPDConfiguration.NUM_SEQUENCES; i++)
                 {
                     List<string> modeButtons = ButtonsToEnterMode(dispConfig.Modes[i]);
@@ -137,9 +135,7 @@ namespace JAFDTC.Models.F15E.Upload
 
                 List<string> fmtButtons = ButtonsToSelectFormat(dispConfig.Formats[0]);
                 if (fmtButtons.Count > 0)
-                {
                     AddActions(dispDev, fmtButtons);
-                }
             });
         }
 
