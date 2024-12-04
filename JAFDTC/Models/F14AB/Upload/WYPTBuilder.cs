@@ -54,33 +54,36 @@ namespace JAFDTC.Models.F14AB.Upload
         public override void Build(Dictionary<string, object> state = null)
         {
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
+
+            if (wypts.Count == 0)
+                return;
+
+            AddExecFunction("NOP", new() { "==== WYPTBuilder:Build()" });
+
             AirframeDevice cap = _aircraft.GetDevice("PCN");
 
             // TODO: support for other navigation point types?
 
-            if (wypts.Count > 0)
+            // NOTE: should be at most 3 steerpoints, 1-3.
+            //
+            AddAction(cap, "RIO_CAP_CATEGORY_TAC");
+            for (int i = 0; i < wypts.Count; i++)
             {
-                // NOTE: should be at most 3 steerpoints, 1-3.
-
-                AddAction(cap, "RIO_CAP_CATEGORY_TAC");
-                for (int i = 0; i < wypts.Count; i++)
+                if (wypts[i].IsValid)
                 {
-                    if (wypts[i].IsValid)
-                    {
-                        // NOTE: coords are zero-filled in the ui, back that out here.
+                    // NOTE: coords are zero-filled in the ui, back that out here.
 
-                        AddActions(cap, new() { $"RIO_CAP_BTN_{i + 1}", "RIO_CAP_CLEAR" });
+                    AddActions(cap, new() { $"RIO_CAP_BTN_{i + 1}", "RIO_CAP_CLEAR" });
 
-                        AddAction(cap, "RIO_CAP_LAT_1");
-                        AddActions(cap, ActionsForCoordinateString(Coord.RemoveLLDegZeroFill(wypts[i].LatUI)));
-                        AddAction(cap, "RIO_CAP_ENTER");
+                    AddAction(cap, "RIO_CAP_LAT_1");
+                    AddActions(cap, ActionsForCoordinateString(Coord.RemoveLLDegZeroFill(wypts[i].LatUI)));
+                    AddAction(cap, "RIO_CAP_ENTER");
 
-                        AddAction(cap, "RIO_CAP_LONG_6");
-                        AddActions(cap, ActionsForCoordinateString(Coord.RemoveLLDegZeroFill(wypts[i].LonUI)));
-                        AddAction(cap, "RIO_CAP_ENTER");
+                    AddAction(cap, "RIO_CAP_LONG_6");
+                    AddActions(cap, ActionsForCoordinateString(Coord.RemoveLLDegZeroFill(wypts[i].LonUI)));
+                    AddAction(cap, "RIO_CAP_ENTER");
 
-                        AddAction(cap, "RIO_CAP_CLEAR");
-                    }
+                    AddAction(cap, "RIO_CAP_CLEAR");
                 }
             }
         }

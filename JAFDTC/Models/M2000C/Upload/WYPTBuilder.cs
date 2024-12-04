@@ -53,32 +53,35 @@ namespace JAFDTC.Models.M2000C.Upload
         public override void Build(Dictionary<string, object> state = null)
         {
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
+
+            if (wypts.Count == 0)
+                return;
+
+            AddExecFunction("NOP", new() { "==== WYPTBuilder:Build()" });
+
             AirframeDevice pcn = _aircraft.GetDevice("PCN");
 
-            if (wypts.Count > 0)
+            // NOTE: should be at most 10 steerpoints, 1-10.
+            //
+            for (var i = 0; i < wypts.Count; i++)
             {
-                // NOTE: should be at most 10 steerpoints, 1-10.
-
-                for (var i = 0; i < wypts.Count; i++)
+                if (wypts[i].IsValid)
                 {
-                    if (wypts[i].IsValid)
-                    {
-                        // TODO: Set UNI Parameter Selector Switch to L/G
+                    // TODO: Set UNI Parameter Selector Switch to L/G
 
-                        AddActions(pcn, new() { "INS_PREP_SW", "0", $"{wypts[i].Number - 1}" });
+                    AddActions(pcn, new() { "INS_PREP_SW", "0", $"{wypts[i].Number - 1}" });
 
-                        AddAction(pcn, "1");
-                        AddActions(pcn, ActionsFor2864CoordinateString(wypts[i].LatUI), new() { "INS_ENTER_BTN" });
+                    AddAction(pcn, "1");
+                    AddActions(pcn, ActionsFor2864CoordinateString(wypts[i].LatUI), new() { "INS_ENTER_BTN" });
 
-                        AddAction(pcn, "3");
-                        AddActions(pcn, ActionsFor2864CoordinateString(wypts[i].LonUI), new() { "INS_ENTER_BTN" });
+                    AddAction(pcn, "3");
+                    AddActions(pcn, ActionsFor2864CoordinateString(wypts[i].LonUI), new() { "INS_ENTER_BTN" });
 
-                        // TODO: Set UNI Parameter Selector Switch to ALT
-                        // TODO: 1 to set feet, 3 to set m
-                        // TODO: 1 to set +ive, 7 to set -ive
-                        // TODO: enter elevation
-                        // TODO: INS_ENTER_BTN
-                    }
+                    // TODO: Set UNI Parameter Selector Switch to ALT
+                    // TODO: 1 to set feet, 3 to set m
+                    // TODO: 1 to set +ive, 7 to set -ive
+                    // TODO: enter elevation
+                    // TODO: INS_ENTER_BTN
                 }
             }
         }

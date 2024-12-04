@@ -53,36 +53,39 @@ namespace JAFDTC.Models.AV8B.Upload
         public override void Build(Dictionary<string, object> state = null)
         {
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
+
+            if (wypts.Count == 0)
+                return;
+
+            AddExecFunction("NOP", new() { "==== WYPTBuilder:Build()" });
+
             AirframeDevice lmpcd = _aircraft.GetDevice("LMPCD");
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice odu = _aircraft.GetDevice("ODU");
 
-            if (wypts.Count > 0)
+            AddAction(lmpcd, "MPCD_L_2");
+            for (int i = 0; i < wypts.Count; i++)
             {
-                AddAction(lmpcd, "MPCD_L_2");
-                for (int i = 0; i < wypts.Count; i++)
+                if (wypts[i].IsValid)
                 {
-                    if (wypts[i].IsValid)
+                    if (_cfg.WYPT.IsAppendMode)
                     {
-                        if (_cfg.WYPT.IsAppendMode)
-                        {
-                            AddActions(ufc, new() { $"{wypts[i].Number - 1}", $"{wypts[i].Number}" });
-                        }
-                        else
-                        {
-                            AddActions(ufc, new() { "7", "7" });
-                        }
-                        AddAction(ufc, "UFC_ENTER");
-                        AddAction(odu, "ODU_OPT2");
-
-                        AddActions(ufc, ActionsFor2864CoordinateString(wypts[i].LatUI), new() { "UFC_ENTER" });
-                        AddActions(ufc, ActionsFor2864CoordinateString(wypts[i].LonUI), new() { "UFC_ENTER" });
-
-                        AddAction(odu, "ODU_OPT1");
+                        AddActions(ufc, new() { $"{wypts[i].Number - 1}", $"{wypts[i].Number}" });
                     }
+                    else
+                    {
+                        AddActions(ufc, new() { "7", "7" });
+                    }
+                    AddAction(ufc, "UFC_ENTER");
+                    AddAction(odu, "ODU_OPT2");
+
+                    AddActions(ufc, ActionsFor2864CoordinateString(wypts[i].LatUI), new() { "UFC_ENTER" });
+                    AddActions(ufc, ActionsFor2864CoordinateString(wypts[i].LonUI), new() { "UFC_ENTER" });
+
+                    AddAction(odu, "ODU_OPT1");
                 }
-                AddAction(lmpcd, "MPCD_L_2");
             }
+            AddAction(lmpcd, "MPCD_L_2");
         }
     }
 }
