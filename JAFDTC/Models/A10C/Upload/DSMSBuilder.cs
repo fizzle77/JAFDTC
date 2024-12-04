@@ -59,6 +59,8 @@ namespace JAFDTC.Models.A10C.Upload
             if (_cfg.DSMS.IsDefault)
                 return;
 
+            AddExecFunction("NOP", new() { "==== DSMSBuilder:Build()" });
+
             AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
 

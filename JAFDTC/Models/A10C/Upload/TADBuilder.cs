@@ -46,6 +46,8 @@ namespace JAFDTC.Models.A10C.Upload
             if (_cfg.TAD.IsDefault)
                 return;
 
+            AddExecFunction("NOP", new() { "==== TADBuilder:Build()" });
+
             AirframeDevice hotas = _aircraft.GetDevice("HOTAS");
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
             AirframeDevice lmfd = _aircraft.GetDevice("LMFD");

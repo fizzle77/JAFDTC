@@ -45,6 +45,8 @@ namespace JAFDTC.Models.A10C.Upload
             if (_cfg.IFFCC.IsDefault)
                 return;
 
+            AddExecFunction("NOP", new() { "==== IFFCCBuilder:Build()" });
+
             AirframeDevice ahcp = _aircraft.GetDevice("AHCP");
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 

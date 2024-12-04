@@ -54,51 +54,54 @@ namespace JAFDTC.Models.A10C.Upload
         public override void Build(Dictionary<string, object> state = null)
         {
             ObservableCollection<WaypointInfo> wypts = _cfg.WYPT.Points;
+
+            if (wypts.Count == 0)
+                return;
+
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
             AirframeDevice aap = _aircraft.GetDevice("AAP");
             AirframeDevice rmfd = _aircraft.GetDevice("RMFD");
 
-            if (wypts.Count > 0)
+            AddExecFunction("NOP", new() { "==== WYPTBuilder:Build()" });
+
+            // STEER PT Knob to MISSION
+            AddActions(aap, new() { "STEER_MISSION" });
+            AddWait(WAIT_BASE);
+
+            // CDU Page Knob to OTHER
+            AddActions(aap, new() { "PAGE_OTHER" });
+            AddWait(WAIT_BASE);
+
+            AddActions(cdu, new() { "WP", "LSK_3L" });
+            AddWait(WAIT_BASE);
+
+            AddIfBlock("IsCoordFmtLL", true, null, delegate ()
             {
-                // STEER PT Knob to MISSION
-                AddActions(aap, new() { "STEER_MISSION" });
-                AddWait(WAIT_BASE);
-
-                // CDU Page Knob to OTHER
-                AddActions(aap, new() { "PAGE_OTHER" });
-                AddWait(WAIT_BASE);
-
-                AddActions(cdu, new() { "WP", "LSK_3L" });
-                AddWait(WAIT_BASE);
-
-                AddIfBlock("IsCoordFmtLL", true, null, delegate ()
+                AddIfBlock("IsCDUInDefaultMFDPosition", true, null, delegate ()
                 {
-                    AddIfBlock("IsCDUInDefaultMFDPosition", true, null, delegate ()
-                    {
-                        AddAction(rmfd, "RMFD_13");
-                        BuildWaypoints(cdu, wypts);
-                    });
-                    AddIfBlock("IsCDUInDefaultMFDPosition", false, null, delegate ()
-                    {
-                        BuildWaypoints(cdu, wypts);
-                    });
+                    AddAction(rmfd, "RMFD_13");
+                    BuildWaypoints(cdu, wypts);
                 });
-                AddIfBlock("IsCoordFmtLL", false, null, delegate ()
+                AddIfBlock("IsCDUInDefaultMFDPosition", false, null, delegate ()
                 {
-                    AddActions(cdu, new() { "LSK_9R" }); // Change to LL
-                    AddIfBlock("IsCDUInDefaultMFDPosition", true, null, delegate ()
-                    {
-                        AddAction(rmfd, "RMFD_13");
-                        BuildWaypoints(cdu, wypts);
-                        AddActions(cdu, new() { "LSK_9R" }); // Go back to UTM
-                    });
-                    AddIfBlock("IsCDUInDefaultMFDPosition", false, null, delegate ()
-                    {
-                        BuildWaypoints(cdu, wypts);
-                        AddActions(cdu, new() { "LSK_9R" }); // Go back to UTM
-                    });
+                    BuildWaypoints(cdu, wypts);
                 });
-            }
+            });
+            AddIfBlock("IsCoordFmtLL", false, null, delegate ()
+            {
+                AddActions(cdu, new() { "LSK_9R" }); // Change to LL
+                AddIfBlock("IsCDUInDefaultMFDPosition", true, null, delegate ()
+                {
+                    AddAction(rmfd, "RMFD_13");
+                    BuildWaypoints(cdu, wypts);
+                    AddActions(cdu, new() { "LSK_9R" }); // Go back to UTM
+                });
+                AddIfBlock("IsCDUInDefaultMFDPosition", false, null, delegate ()
+                {
+                    BuildWaypoints(cdu, wypts);
+                    AddActions(cdu, new() { "LSK_9R" }); // Go back to UTM
+                });
+            });
         }
 
         /// <summary>

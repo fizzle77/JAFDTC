@@ -51,6 +51,11 @@ namespace JAFDTC.Models.A10C.Upload
         /// </summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            if (_cfg.Misc.IsDefault)
+                return;
+                
+            AddExecFunction("NOP", new() { "==== MiscBuilder:Build()" });
+
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice aap = _aircraft.GetDevice("AAP"); // "auxiliary avionics panel"
@@ -58,19 +63,16 @@ namespace JAFDTC.Models.A10C.Upload
             AirframeDevice tacan  = _aircraft.GetDevice("TACAN_CTRL_PANEL");
             AirframeDevice iff  = _aircraft.GetDevice("IFF");
 
-            if (!_cfg.Misc.IsDefault)
-            {
-                BuildCoordSystem(cdu, _cfg.Misc);
-                BuildBullseyeOnHUD(cdu, ufc, _cfg.Misc);
-                BuildFlightPlan1Manual(cdu, _cfg.Misc);
-                BuildSpeedDisplay(cdu, ufc, _cfg.Misc);
-                BuildAapSteerPt(aap, _cfg.Misc);
-                BuildAapPage(aap, _cfg.Misc);
-                BuildAutopilot(ap, _cfg.Misc);
-                BuildAltitudeWarnings(ufc, _cfg.Misc);
-                BuildTACAN(tacan, _cfg.Misc);
-                BuildIFF(iff, _cfg.Misc);
-            }
+            BuildCoordSystem(cdu, _cfg.Misc);
+            BuildBullseyeOnHUD(cdu, ufc, _cfg.Misc);
+            BuildFlightPlan1Manual(cdu, _cfg.Misc);
+            BuildSpeedDisplay(cdu, ufc, _cfg.Misc);
+            BuildAapSteerPt(aap, _cfg.Misc);
+            BuildAapPage(aap, _cfg.Misc);
+            BuildAutopilot(ap, _cfg.Misc);
+            BuildAltitudeWarnings(ufc, _cfg.Misc);
+            BuildTACAN(tacan, _cfg.Misc);
+            BuildIFF(iff, _cfg.Misc);
         }
 
         /// <summary>

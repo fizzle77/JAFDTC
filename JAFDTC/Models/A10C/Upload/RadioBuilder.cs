@@ -52,6 +52,11 @@ namespace JAFDTC.Models.A10C.Upload
         /// </summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            if (_cfg.Radio.IsDefault)
+                return;
+
+            AddExecFunction("NOP", new() { "==== RadioBuilder:Build()" });
+
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
             AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
             AirframeDevice rmfd = _aircraft.GetDevice("RMFD");
@@ -60,12 +65,9 @@ namespace JAFDTC.Models.A10C.Upload
             AirframeDevice arc164 = _aircraft.GetDevice("UHF_ARC164");
             AirframeDevice arc186 = _aircraft.GetDevice("VHF_ARC186");
 
-            if (!_cfg.Radio.IsDefault)
-            {
-                BuildARC210(cdu, ufc, lmfd, rmfd, arc210, _cfg.Radio);
-                BuildARC164(arc164, _cfg.Radio);
-                BuildARC186(arc186, _cfg.Radio);
-            }
+            BuildARC210(cdu, ufc, lmfd, rmfd, arc210, _cfg.Radio);
+            BuildARC164(arc164, _cfg.Radio);
+            BuildARC186(arc186, _cfg.Radio);
         }
 
         /// <summary>

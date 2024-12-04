@@ -46,6 +46,8 @@ namespace JAFDTC.Models.A10C.Upload
             if (_cfg.TGP.IsDefault)
                 return;
 
+            AddExecFunction("NOP", new() { "==== TGPBuilder:Build()" });
+
             AirframeDevice hotas = _aircraft.GetDevice("HOTAS");
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
             AirframeDevice rmfd = _aircraft.GetDevice("RMFD");

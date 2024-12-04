@@ -47,6 +47,8 @@ namespace JAFDTC.Models.A10C.Upload
             if (_cfg.HMCS.IsDefault)
                 return;
 
+            AddExecFunction("NOP", new() { "==== HMCSBuilder:Build()" });
+
             AirframeDevice cdu = _aircraft.GetDevice("CDU");
             AirframeDevice rmfd = _aircraft.GetDevice("RMFD");
 
