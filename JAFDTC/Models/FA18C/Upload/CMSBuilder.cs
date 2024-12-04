@@ -52,65 +52,67 @@ namespace JAFDTC.Models.FA18C.Upload
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            if (_cfg.CMS.IsDefault)
+                return;
+
+            AddExecFunction("NOP", new() { "==== CMSBuilder:Build()" });
+
             AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
             AirframeDevice cmds = _aircraft.GetDevice("CMDS");
             CMSSystem defaultSys = CMSSystem.ExplicitDefaults;
 
-            if (!_cfg.CMS.IsDefault)
+            AddWhileBlock("IsLMFDTAC", false, null, delegate ()
             {
-                AddWhileBlock("IsLMFDTAC", false, null, delegate ()
-                {
-                    AddAction(lmfd, "OSB-18");                                                  // MENU
-                });
-                AddActions(lmfd, new() { "OSB-17" });                                           // EW
-                AddIfBlock("IsDispenserOff", true, null, delegate ()
-                {
-                    AddAction(cmds, "ON");
-                    AddWait(WAIT_VERY_LONG);
-                });
+                AddAction(lmfd, "OSB-18");                                                  // MENU
+            });
+            AddActions(lmfd, new() { "OSB-17" });                                           // EW
+            AddIfBlock("IsDispenserOff", true, null, delegate ()
+            {
+                AddAction(cmds, "ON");
+                AddWait(WAIT_VERY_LONG);
+            });
 
-                AddActions(lmfd, new() { "OSB-08", "OSB-09" }); // ALE-47, ARM
+            AddActions(lmfd, new() { "OSB-08", "OSB-09" }); // ALE-47, ARM
 
-                for (var i = 0; i < _cfg.CMS.Programs.Length; i++)
+            for (var i = 0; i < _cfg.CMS.Programs.Length; i++)
+            {
+                CMProgram pgm = _cfg.CMS.Programs[i];
+                CMProgram pgmDefault = defaultSys.Programs[i];
+                if (!pgm.IsDefault)
                 {
-                    CMProgram pgm = _cfg.CMS.Programs[i];
-                    CMProgram pgmDefault = defaultSys.Programs[i];
-                    if (!pgm.IsDefault)
+                    if (!string.IsNullOrEmpty(pgm.ChaffQ))
                     {
-                        if (!string.IsNullOrEmpty(pgm.ChaffQ))
-                        {
-                            AddAction(lmfd, "OSB-05", WAIT_BASE);                               // Chaff
-                            AdjustQty(lmfd, int.Parse(pgm.ChaffQ), int.Parse(pgmDefault.ChaffQ));
-                            AddAction(lmfd, "OSB-05");
-                        }
-                        if (!string.IsNullOrEmpty(pgm.FlareQ))
-                        {
-                            AddAction(lmfd, "OSB-04", WAIT_BASE);                               // Flare
-                            AdjustQty(lmfd, int.Parse(pgm.FlareQ), int.Parse(pgmDefault.FlareQ));
-                            AddAction(lmfd, "OSB-04");
-                        }
-                        if (!string.IsNullOrEmpty(pgm.SQ))
-                        {
-                            AddAction(lmfd, "OSB-14", WAIT_BASE);                               // Rpt
-                            AdjustQty(lmfd, int.Parse(pgm.SQ), int.Parse(pgmDefault.SQ));
-                            AddAction(lmfd, "OSB-14");
-                        }
-                        if (!string.IsNullOrEmpty(pgm.SI))
-                        {
-                            AddAction(lmfd, "OSB-15", WAIT_BASE);                               // Interval
-                            AdjustInterval(lmfd, double.Parse(pgm.SI), double.Parse(pgmDefault.SI));
-                            AddAction(lmfd, "OSB-15");
-                        }
+                        AddAction(lmfd, "OSB-05", WAIT_BASE);                               // Chaff
+                        AdjustQty(lmfd, int.Parse(pgm.ChaffQ), int.Parse(pgmDefault.ChaffQ));
+                        AddAction(lmfd, "OSB-05");
                     }
-                    AddActions(lmfd, new() { "OSB-19", "OSB-20" }, null, WAIT_BASE);            // SAVE, STEP
+                    if (!string.IsNullOrEmpty(pgm.FlareQ))
+                    {
+                        AddAction(lmfd, "OSB-04", WAIT_BASE);                               // Flare
+                        AdjustQty(lmfd, int.Parse(pgm.FlareQ), int.Parse(pgmDefault.FlareQ));
+                        AddAction(lmfd, "OSB-04");
+                    }
+                    if (!string.IsNullOrEmpty(pgm.SQ))
+                    {
+                        AddAction(lmfd, "OSB-14", WAIT_BASE);                               // Rpt
+                        AdjustQty(lmfd, int.Parse(pgm.SQ), int.Parse(pgmDefault.SQ));
+                        AddAction(lmfd, "OSB-14");
+                    }
+                    if (!string.IsNullOrEmpty(pgm.SI))
+                    {
+                        AddAction(lmfd, "OSB-15", WAIT_BASE);                               // Interval
+                        AdjustInterval(lmfd, double.Parse(pgm.SI), double.Parse(pgmDefault.SI));
+                        AddAction(lmfd, "OSB-15");
+                    }
                 }
-                AddActions(lmfd, new() { "OSB-09" });                                           // RETURN
-                AddWhileBlock("IsLMFDTAC", false, null, delegate ()
-                {
-                    AddAction(lmfd, "OSB-18");                                                  // MENU
-                });
-                AddActions(lmfd, new() { "OSB-03" });                                           // HUD
+                AddActions(lmfd, new() { "OSB-19", "OSB-20" }, null, WAIT_BASE);            // SAVE, STEP
             }
+            AddActions(lmfd, new() { "OSB-09" });                                           // RETURN
+            AddWhileBlock("IsLMFDTAC", false, null, delegate ()
+            {
+                AddAction(lmfd, "OSB-18");                                                  // MENU
+            });
+            AddActions(lmfd, new() { "OSB-03" });                                           // HUD
         }
 
         /// <summary>
@@ -121,16 +123,12 @@ namespace JAFDTC.Models.FA18C.Upload
             if (target > defaultValue)
             {
                 for (var s = 0; s < target - defaultValue; s++)
-                {
                     AddAction(lmfd, "OSB-12"); // Up
-                }
             }
             else if (target < defaultValue)
             {
                 for (var s = 0; s < defaultValue - target; s++)
-                {
                     AddAction(lmfd, "OSB-13"); // Down
-                }
             }
         }
 
@@ -142,16 +140,12 @@ namespace JAFDTC.Models.FA18C.Upload
             if (target > defaultValue)
             {
                 for (var s = 0; s < (target - defaultValue) / (double)0.25; s++)
-                {
                     AddAction(lmfd, "OSB-12"); // Up
-                }
             }
             else if(target < defaultValue)
             {
                 for (var s = 0; s < (defaultValue - target) / (double)0.25; s++)
-                {
                     AddAction(lmfd, "OSB-13"); // Down
-                }
             }
         }
     }

@@ -81,116 +81,116 @@ namespace JAFDTC.Models.FA18C.Upload
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            if (_cfg.PP.IsDefault)
+                return;
+
+            AddExecFunction("NOP", new() { "==== PPBuilder:Build()" });
+
             AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            if (!_cfg.PP.IsDefault)
-            {
-                Dictionary<Weapons, List<PPStation>> stationGroups = GroupStationsByPayloadType();
+            Dictionary<Weapons, List<PPStation>> stationGroups = GroupStationsByPayloadType();
 
-                // check if stores in configuration match stores in jet, we'll abort from dcs side if not rather
-                // than continue to send button mashes.
-                //
-                AddWhileBlock("IsLMFDTAC", false, null, delegate () { AddAction(lmfd, "OSB-18"); });  // MENU (TAC)
+            // check if stores in configuration match stores in jet, we'll abort from dcs side if not rather
+            // than continue to send button mashes.
+            //
+            AddWhileBlock("IsLMFDTAC", false, null, delegate () { AddAction(lmfd, "OSB-18"); });  // MENU (TAC)
+            AddAction(lmfd, "OSB-05");                                                              // STORES
+            foreach (KeyValuePair<Weapons, List<PPStation>> group in stationGroups)
+            {
+                string wpnCode = GetDCSWeaponCode(group.Key);
+                foreach (var station in group.Value)
+                    AddIfBlock("IsStationCarriesStore", false, new() { $"{station.Number}", wpnCode }, delegate ()
+                    {
+                        AddAbort($"ERROR: Station {station.Number} doesn't match configuration");
+                    });
+            }
+            AddAction(lmfd, "OSB-18");                                                              // MENU
+
+            foreach (KeyValuePair<Weapons, List<PPStation>> group in stationGroups)
+            {
+                AddWhileBlock("IsLMFDTAC", false, null, delegate () { AddAction(lmfd, "OSB-18"); });    // MENU (TAC)
                 AddAction(lmfd, "OSB-05");                                                              // STORES
-                foreach (KeyValuePair<Weapons, List<PPStation>> group in stationGroups)
+                AddExecFunction("SelectStore", new() { GetDCSWeaponCode(group.Key) }, WAIT_LONG);
+
+                // add steerpoints to stations that carry weapons that support steerpoints.
+                //
+                if (group.Key == Weapons.SLAM_ER)
                 {
-                    string wpnCode = GetDCSWeaponCode(group.Key);
                     foreach (var station in group.Value)
                     {
-                        AddIfBlock("IsStationCarriesStore", false, new() { $"{station.Number}", wpnCode }, delegate ()
+                        if (!station.IsDefault && (station.STP.Count > 0))
                         {
-                            AddAbort($"ERROR: Station {station.Number} doesn't match configuration");
-                        });
+                            AddWhileBlock("IsStationSelected", false, new() { $"{station.Number}" }, delegate ()
+                            {
+                                AddAction(lmfd, "OSB-13", WAIT_LONG);                               // STEP
+                            });
+                            BuildSteerpoints(ufc, lmfd, station);
+                        }
                     }
                 }
-                AddAction(lmfd, "OSB-18");                                                              // MENU
 
-                foreach (KeyValuePair<Weapons, List<PPStation>> group in stationGroups)
+                // select display osb needed to bring up pre-planned mission page for weapon and ensure that
+                // we're in pp mode, not too.
+                //
+                string dispKey = ((group.Key == Weapons.GBU_38) ||
+                                    (group.Key == Weapons.GBU_32) ||
+                                    (group.Key == Weapons.GBU_31_V12) ||
+                                    (group.Key == Weapons.GBU_31_V34)) ? "OSB-11" : "OSB-12";
+                AddActions(lmfd, new() { dispKey, "OSB-04" }, null, WAIT_BASE);                     // DSPLY, MSN
+
+                // walk stations adding the target point for each valid pre-planned mission to the station.
+                //
+                foreach (PPStation station in group.Value)
                 {
-                    AddWhileBlock("IsLMFDTAC", false, null, delegate () { AddAction(lmfd, "OSB-18"); });    // MENU (TAC)
-                    AddAction(lmfd, "OSB-05");                                                              // STORES
-                    AddExecFunction("SelectStore", new() { GetDCSWeaponCode(group.Key) }, WAIT_LONG);
-
-                    // add steerpoints to stations that carry weapons that support steerpoints.
-                    //
-                    if (group.Key == Weapons.SLAM_ER)
+                    AddWhileBlock("IsInPPStation", false, new() { $"{station.Number}" }, delegate ()
                     {
-                        foreach (var station in group.Value)
+                        AddAction(lmfd, "OSB-13", WAIT_LONG);                                       // STEP
+                    });
+                    int lastValidPP = 0;
+                    for (int i = 0; i < station.PP.Length; i++)
+                    {
+                        PPCoordinateInfo pp = station.PP[i];
+                        if (pp.IsValid)
                         {
-                            if (!station.IsDefault && (station.STP.Count > 0))
+                            AddIfBlock("IsPPSelected", false, new() { $"{i + 1}" }, delegate ()
                             {
-                                AddWhileBlock("IsStationSelected", false, new() { $"{station.Number}" }, delegate ()
-                                {
-                                    AddAction(lmfd, "OSB-13", WAIT_LONG);                               // STEP
-                                });
-                                BuildSteerpoints(ufc, lmfd, station);
-                            }
+                                AddAction(lmfd, _mapPPNumToOSB[i + 1], WAIT_LONG);
+                            });
+                            AddIfBlock("IsTargetOfOpportunity", true, null, delegate ()
+                            {
+                                AddAction(lmfd, "OSB-05", WAIT_BASE);                               // MODE
+                            });
+                            AddActions(lmfd, new() { "OSB-14" });                                   // UFC
+
+                            AddAction(ufc, "Opt3", WAIT_BASE);                                      // POSN
+                            AddAction(ufc, "Opt1", WAIT_BASE);                                      // LAT
+                            BuildCoordinate(ufc, Coord.RemoveLLDegZeroFill(pp.LatUI));
+
+                            AddAction(ufc, "Opt3", WAIT_BASE);                                      // LON
+                            BuildCoordinate(ufc, Coord.RemoveLLDegZeroFill(pp.LonUI));
+
+                            AddActions(lmfd, new() { "OSB-14", "OSB-14" }, null, WAIT_BASE);        // UFC, UFC
+
+                            AddAction(ufc, "Opt4", WAIT_BASE);                                      // ELEV
+                            AddAction(ufc, "Opt3", WAIT_BASE);                                      // FEET
+                            AddActions(ufc, ActionsForString(pp.Alt), new() { "ENT" }, WAIT_BASE);
+
+                            AddActions(lmfd, new() { "OSB-14" });                                   // UFC
+
+                            lastValidPP = i + 1;
                         }
                     }
-
-                    // select display osb needed to bring up pre-planned mission page for weapon and ensure that
-                    // we're in pp mode, not too.
-                    //
-                    string dispKey = ((group.Key == Weapons.GBU_38) ||
-                                      (group.Key == Weapons.GBU_32) ||
-                                      (group.Key == Weapons.GBU_31_V12) ||
-                                      (group.Key == Weapons.GBU_31_V34)) ? "OSB-11" : "OSB-12";
-                    AddActions(lmfd, new() { dispKey, "OSB-04" }, null, WAIT_BASE);                     // DSPLY, MSN
-
-                    // walk stations adding the target point for each valid pre-planned mission to the station.
-                    //
-                    foreach (PPStation station in group.Value)
+                    if ((station.BoxedPP != 0) && (station.BoxedPP != lastValidPP))
                     {
-                        AddWhileBlock("IsInPPStation", false, new() { $"{station.Number}" }, delegate ()
-                        {
-                            AddAction(lmfd, "OSB-13", WAIT_LONG);                                       // STEP
-                        });
-                        int lastValidPP = 0;
-                        for (int i = 0; i < station.PP.Length; i++)
-                        {
-                            PPCoordinateInfo pp = station.PP[i];
-                            if (pp.IsValid)
-                            {
-                                AddIfBlock("IsPPSelected", false, new() { $"{i + 1}" }, delegate ()
-                                {
-                                    AddAction(lmfd, _mapPPNumToOSB[i + 1], WAIT_LONG);
-                                });
-                                AddIfBlock("IsTargetOfOpportunity", true, null, delegate ()
-                                {
-                                    AddAction(lmfd, "OSB-05", WAIT_BASE);                               // MODE
-                                });
-                                AddActions(lmfd, new() { "OSB-14" });                                   // UFC
-
-                                AddAction(ufc, "Opt3", WAIT_BASE);                                      // POSN
-                                AddAction(ufc, "Opt1", WAIT_BASE);                                      // LAT
-                                BuildCoordinate(ufc, Coord.RemoveLLDegZeroFill(pp.LatUI));
-
-                                AddAction(ufc, "Opt3", WAIT_BASE);                                      // LON
-                                BuildCoordinate(ufc, Coord.RemoveLLDegZeroFill(pp.LonUI));
-
-                                AddActions(lmfd, new() { "OSB-14", "OSB-14" }, null, WAIT_BASE);        // UFC, UFC
-
-                                AddAction(ufc, "Opt4", WAIT_BASE);                                      // ELEV
-                                AddAction(ufc, "Opt3", WAIT_BASE);                                      // FEET
-                                AddActions(ufc, ActionsForString(pp.Alt), new() { "ENT" }, WAIT_BASE);
-
-                                AddActions(lmfd, new() { "OSB-14" });                                   // UFC
-
-                                lastValidPP = i + 1;
-                            }
-                        }
-                        if ((station.BoxedPP != 0) && (station.BoxedPP != lastValidPP))
-                        {
-                            AddAction(lmfd, _mapPPNumToOSB[station.BoxedPP], WAIT_LONG);
-                        }
+                        AddAction(lmfd, _mapPPNumToOSB[station.BoxedPP], WAIT_LONG);
                     }
-                    AddActions(lmfd, new() { "OSB-19" });                                               // RETURN
                 }
-
-                AddWhileBlock("IsLMFDTAC", false, null, delegate () { AddAction(lmfd, "OSB-18"); });    // MENU (TAC)
-                AddAction(lmfd, "OSB-03");                                                              // HUD
+                AddActions(lmfd, new() { "OSB-19" });                                               // RETURN
             }
+
+            AddWhileBlock("IsLMFDTAC", false, null, delegate () { AddAction(lmfd, "OSB-18"); });    // MENU (TAC)
+            AddAction(lmfd, "OSB-03");                                                              // HUD
         }
 
         /// <summary>
@@ -247,9 +247,7 @@ namespace JAFDTC.Models.FA18C.Upload
         private void BuildCoordinate(AirframeDevice ufc, string coord)
         {
             foreach (string key in ActionsFor2864PrecisionCoordString(coord))
-            {
                 AddAction(ufc, key, (key == "ENT") ? WAIT_BASE : WAIT_NONE);
-            }
         }
 
         /// <summary>

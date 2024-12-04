@@ -66,14 +66,16 @@ namespace JAFDTC.Models.FA18C.Upload
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            if (_cfg.Radio.IsDefault)
+                return;
+
+            AddExecFunction("NOP", new() { "==== RadioBuilder:Build()" });
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
-            if (!_cfg.Radio.IsDefault)
-            {
-                BuildRadio(ufc, 1, _cfg.Radio.Presets[(int)Radios.COMM1], _cfg.Radio.COMM1DefaultTuning);
-                BuildRadio(ufc, 2, _cfg.Radio.Presets[(int)Radios.COMM2], _cfg.Radio.COMM2DefaultTuning);
-                AddAction(ufc, "COM", WAIT_LONG);
-            }
+            BuildRadio(ufc, 1, _cfg.Radio.Presets[(int)Radios.COMM1], _cfg.Radio.COMM1DefaultTuning);
+            BuildRadio(ufc, 2, _cfg.Radio.Presets[(int)Radios.COMM2], _cfg.Radio.COMM2DefaultTuning);
+            AddAction(ufc, "COM", WAIT_LONG);
         }
 
         /// <summary>

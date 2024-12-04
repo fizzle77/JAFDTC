@@ -50,53 +50,55 @@ namespace JAFDTC.Models.FA18C.Upload
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
+            if (_cfg.WYPT.IsDefault)
+                return;
+
+            AddExecFunction("NOP", new() { "==== RadioBuilder:Build()" });
+
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice rmfd = _aircraft.GetDevice("RMFD");
 
-            if (!_cfg.WYPT.IsDefault)
+            AddWhileBlock("IsRMFDSUPT", false, null, delegate()
             {
-                AddWhileBlock("IsRMFDSUPT", false, null, delegate()
+                AddAction(rmfd, "OSB-18");                                                  // MENU (SUPT)
+            });   
+            AddActions(rmfd, new() { "OSB-02", "OSB-10", "OSB-07", "OSB-05" });             // HSI, DATA, WYPT, UFC
+
+            AddWhileBlock("IsAtWYPTn", false, new() { $"{_cfg.WYPT.Points[0].Number - 1}" }, delegate()
+            {
+                AddAction(rmfd, "OSB-12", WAIT_BASE);                                       // WYPT ++
+            }, 150);
+            for (int i = 0; i < _cfg.WYPT.Points.Count; i++)
+            {
+                AddAction(rmfd, "OSB-12", WAIT_BASE);                                       // WYPT ++
+
+                WaypointInfo wypt = _cfg.WYPT.Points[i];
+                if (wypt.IsValid)
                 {
-                    AddAction(rmfd, "OSB-18");                                                  // MENU (SUPT)
-                });   
-                AddActions(rmfd, new() { "OSB-02", "OSB-10", "OSB-07", "OSB-05" });             // HSI, DATA, WYPT, UFC
+                    // NOTE: coords are zero-filled in the ui, back that out here.
 
-                AddWhileBlock("IsAtWYPTn", false, new() { $"{_cfg.WYPT.Points[0].Number - 1}" }, delegate()
-                {
-                    AddAction(rmfd, "OSB-12", WAIT_BASE);                                       // WYPT ++
-                }, 150);
-                for (int i = 0; i < _cfg.WYPT.Points.Count; i++)
-                {
-                    AddAction(rmfd, "OSB-12", WAIT_BASE);                                       // WYPT ++
+                    AddAction(ufc, "Opt1", WAIT_BASE);                                      // POSN
 
-                    WaypointInfo wypt = _cfg.WYPT.Points[i];
-                    if (wypt.IsValid)
-                    {
-                        // NOTE: coords are zero-filled in the ui, back that out here.
+                    AddActions(ufc, ActionsFor2864CoordinateString(Coord.RemoveLLDegZeroFill(wypt.LatUI)),  // DDM
+                                new() { "ENT" }, WAIT_LONG);
+                    AddActions(ufc, ActionsFor2864CoordinateString(Coord.RemoveLLDegZeroFill(wypt.LonUI)),  // DDM
+                                new() { "ENT" }, WAIT_LONG);
 
-                        AddAction(ufc, "Opt1", WAIT_BASE);                                      // POSN
-
-                        AddActions(ufc, ActionsFor2864CoordinateString(Coord.RemoveLLDegZeroFill(wypt.LatUI)),  // DDM
-                                   new() { "ENT" }, WAIT_LONG);
-                        AddActions(ufc, ActionsFor2864CoordinateString(Coord.RemoveLLDegZeroFill(wypt.LonUI)),  // DDM
-                                   new() { "ENT" }, WAIT_LONG);
-
-                        AddAction(ufc, "Opt3", WAIT_BASE);                                      // ALT
-                        AddAction(ufc, "Opt1", WAIT_BASE);                                      // FEET
-                        AddActions(ufc, ActionsForString(wypt.Alt), new() { "ENT" }, WAIT_BASE);
-                    }
+                    AddAction(ufc, "Opt3", WAIT_BASE);                                      // ALT
+                    AddAction(ufc, "Opt1", WAIT_BASE);                                      // FEET
+                    AddActions(ufc, ActionsForString(wypt.Alt), new() { "ENT" }, WAIT_BASE);
                 }
-                AddWhileBlock("IsAtWYPTn", false, new() { $"{_cfg.WYPT.Points[0].Number}" }, delegate ()
-                {
-                    AddAction(rmfd, "OSB-13", WAIT_BASE);                                       // WYPT --
-                }, 150);
-
-                AddWhileBlock("IsRMFDSUPT", false, null, delegate()
-                {
-                    AddAction(rmfd, "OSB-18");                                                  // MENU (SUPT)
-                });
-                AddAction(rmfd, "OSB-15");                                                      // FCS
             }
+            AddWhileBlock("IsAtWYPTn", false, new() { $"{_cfg.WYPT.Points[0].Number}" }, delegate ()
+            {
+                AddAction(rmfd, "OSB-13", WAIT_BASE);                                       // WYPT --
+            }, 150);
+
+            AddWhileBlock("IsRMFDSUPT", false, null, delegate()
+            {
+                AddAction(rmfd, "OSB-18");                                                  // MENU (SUPT)
+            });
+            AddAction(rmfd, "OSB-15");                                                      // FCS
         }
     }
 }
