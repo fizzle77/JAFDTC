@@ -512,6 +512,7 @@ namespace JAFDTC.UI.F16C
                 Config.DLNK.Reset();
                 Config.Save(this, DLNKSystem.SystemTag);
                 CopyConfigToEdit();
+                RebuildCallsignCombos();
             }
         }
 
