@@ -361,6 +361,123 @@
   },
   {
     "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Al-Asad Airbase",
+    "Tags": "Airbase",
+    "Latitude": "33.78123333",
+    "Longitude": "42.42746667",
+    "Elevation": "592"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Al-Sahra Airport",
+    "Tags": "Airbase",
+    "Latitude": "36.66790000",
+    "Longitude": "43.53643333",
+    "Elevation": "419"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Al-Salam Airport",
+    "Tags": "Airbase",
+    "Latitude": "33.27890000",
+    "Longitude": "44.49428333",
+    "Elevation": "67"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Al-Taji Airport",
+    "Tags": "Airbase",
+    "Latitude": "33.52378333",
+    "Longitude": "44.25675000",
+    "Elevation": "102"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Al-Taquddum Airport",
+    "Tags": "Airbase",
+    "Latitude": "33.33913333",
+    "Longitude": "43.59848333",
+    "Elevation": "255"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Baghdad International Airport",
+    "Tags": "Airbase",
+    "Latitude": "33.25588333",
+    "Longitude": "44.22558333",
+    "Elevation": "96"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Balad Airbase",
+    "Tags": "Airbase",
+    "Latitude": "33.94273333",
+    "Longitude": "44.36713333",
+    "Elevation": "144"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Bashur Airport",
+    "Tags": "Airbase",
+    "Latitude": "36.53450000",
+    "Longitude": "44.33920000",
+    "Elevation": "2035"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Erbil International Airport",
+    "Tags": "Airbase",
+    "Latitude": "36.23820000",
+    "Longitude": "43.94665000",
+    "Elevation": "1223"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "K1 Base",
+    "Tags": "Airbase",
+    "Latitude": "35.51268333",
+    "Longitude": "44.28431667",
+    "Elevation": "973"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Kirkuk International Airport",
+    "Tags": "Airbase",
+    "Latitude": "35.47115000",
+    "Longitude": "44.34455000",
+    "Elevation": "1027"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Qayyarah Airfield West",
+    "Tags": "Airbase",
+    "Latitude": "35.76581667",
+    "Longitude": "43.12230000",
+    "Elevation": "708"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Sulaimaniyah International Airport",
+    "Tags": "Airbase",
+    "Latitude": "33.56083333",
+    "Longitude": "45.31471667",
+    "Elevation": "2408"
+  },
+  {
+    "Type": 0,
     "Theater": "Kola",
     "Name": "Kallax",
     "Tags": "Airbase",

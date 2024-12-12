@@ -177,6 +177,10 @@ namespace JAFDTC.Models.DCS
             {
                 return "Caucasus";
             }
+            else if (InRange(24.0, lat, 38.0) && InRange(39.0, lon, 53.0))
+            {
+                return "Iraq";
+            }
             else if (InRange(62.0, lat, 75.0) && InRange(15.0, lon, 48.0))
             {
                 return "Kola";

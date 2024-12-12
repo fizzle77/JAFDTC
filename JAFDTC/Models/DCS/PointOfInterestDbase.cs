@@ -127,6 +127,7 @@ namespace JAFDTC.Models.DCS
         {
             "Afghanistan",
             "Caucasus",
+            "Iraq",
             "Kola",
             "Marianas",
             "Nevada",
