@@ -24,6 +24,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -322,8 +323,15 @@ namespace JAFDTC.UI.App
         {
             if (result.ErrorTitle != null)
             {
+                FileManager.Log($"Lua check fails, {result.ErrorTitle}: {result.ErrorMessage}");
                 await Utilities.Message1BDialog(Content.XamlRoot, result.ErrorTitle, result.ErrorMessage);
                 Settings.IsSkipDCSLuaInstall = true;
+            }
+            else if ((result.InstallPaths.Count == 0) && (result.UpdatePaths.Count == 0))
+            {
+                foreach (KeyValuePair<string, bool> kvp in DCSLuaManager.LuaInstallStatus())
+                    if (kvp.Value)
+                        FileManager.Log($"Lua install found at {kvp.Key}");
             }
             else if (!Settings.IsSkipDCSLuaInstall)
             {
@@ -345,11 +353,13 @@ namespace JAFDTC.UI.App
                     {
                         sucPlural = (successes.Length > 0) ? "s" : "";
                         successes += $"      {path} (Installed)\n";
+                        FileManager.Log($"Successfully installed Lua at {path}");
                     }
                     else if (choice == ContentDialogResult.Primary)
                     {
                         errPlural = (successes.Length > 0) ? "s" : "";
                         errors += $"      {path}\n";
+                        FileManager.Log($"Failed to install Lua at {path}");
                     }
                     else
                     {
@@ -364,11 +374,17 @@ namespace JAFDTC.UI.App
                     {
                         sucPlural = (successes.Length > 0) ? "s" : "";
                         successes += $"      {path} was Updated\n";
+                        FileManager.Log($"Successfully updated Lua at {path}");
+                    }
+                    else if (isSuccess && !didUpdate)
+                    {
+                        FileManager.Log($"Using Lua install found at {path}");
                     }
                     else if (!isSuccess)
                     {
                         errPlural = (successes.Length > 0) ? "s" : "";
                         errors += $"      {path}\n";
+                        FileManager.Log($"Failed to update Lua at {path}");
                     }
                 }
 

@@ -101,14 +101,22 @@ namespace JAFDTC.Utilities
         /// </summary>
         public static bool IsLuaInstalled()
         {
-                foreach (KeyValuePair<string, DCSLuaVersion> kvp in Settings.VersionDCSLua)
-				{
-					if ((kvp.Value != DCSLuaVersion.NONE) && IsJAFDTCInstalled(kvp.Key))
-					{
-						return true;
-					}
-                }
-				return false;
+            foreach (KeyValuePair<string, DCSLuaVersion> kvp in Settings.VersionDCSLua)
+				if ((kvp.Value != DCSLuaVersion.NONE) && IsJAFDTCInstalled(kvp.Key))
+					return true;
+			return false;
+        }
+
+        /// <summary>
+        /// returns dictionary keyed by install path with boolean indicating if lua is installed according to
+        /// IsJAFDTCInstalled
+        /// </summary>
+        public static Dictionary<string, bool> LuaInstallStatus()
+        {
+            Dictionary<string, bool> result = new Dictionary<string, bool>();
+            foreach (KeyValuePair<string, DCSLuaVersion> kvp in Settings.VersionDCSLua)
+                result[kvp.Key] = ((kvp.Value != DCSLuaVersion.NONE) && IsJAFDTCInstalled(kvp.Key));
+            return result;
         }
 
         /// <summary>
