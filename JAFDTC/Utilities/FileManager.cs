@@ -83,7 +83,8 @@ namespace JAFDTC.Utilities
                 if (stream.Seek(0, SeekOrigin.End) > 32768)
                     stream.SetLength(0);
                 _logStream = new StreamWriter(stream);
-                FileManager.Log($"==== JAFDTC {Globals.BuildJAFDTC} launched");
+                string now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                FileManager.Log($"==== JAFDTC {Globals.BuildJAFDTC} launched on {now}");
 #endif
             }
             catch (Exception ex)
