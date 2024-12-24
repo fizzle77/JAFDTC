@@ -134,6 +134,8 @@
     "Longitude": "65.86415000",
     "Elevation": "4414"
   },
+
+
   {
     "Type": 0,
     "Theater": "Caucasus",
@@ -323,42 +325,8 @@
     "Longitude": "45.02721667",
     "Elevation": "1524"
   },
-  {
-    "Type": 0,
-    "Theater": "Kola",
-    "Name": "Andoya",
-    "Tags": "Airbase",
-    "Latitude": "69.29763333",
-    "Longitude": "16.13536667",
-    "Elevation": "22"
-  },
-  {
-    "Type": 0,
-    "Theater": "Kola",
-    "Name": "Alakourtti",
-    "Tags": "Airbase",
-    "Latitude": "66.97275000",
-    "Longitude": "30.34841667",
-    "Elevation": "548"
-  },
-  {
-    "Type": 0,
-    "Theater": "Kola",
-    "Name": "Banak",
-    "Tags": "Airbase",
-    "Latitude": "70.06886667",
-    "Longitude": "24.97365000",
-    "Elevation": "17"
-  },
-  {
-    "Type": 0,
-    "Theater": "Kola",
-    "Name": "Bodo",
-    "Tags": "Airbase",
-    "Latitude": "67.26920000",
-    "Longitude": "14.36535000",
-    "Elevation": "33"
-  },
+
+
   {
     "Type": 0,
     "Theater": "Iraq",
@@ -476,6 +444,53 @@
     "Longitude": "45.31471667",
     "Elevation": "2408"
   },
+
+
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Andoya",
+    "Tags": "Airbase",
+    "Latitude": "69.29763333",
+    "Longitude": "16.13536667",
+    "Elevation": "22"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Alakourtti",
+    "Tags": "Airbase",
+    "Latitude": "66.97275000",
+    "Longitude": "30.34841667",
+    "Elevation": "548"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Banak",
+    "Tags": "Airbase",
+    "Latitude": "70.06886667",
+    "Longitude": "24.97365000",
+    "Elevation": "17"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Bardufoss",
+    "Tags": "Airbase",
+    "Latitude": "69.05535000",
+    "Longitude": "18.54336667",
+    "Elevation": "234"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Bodo",
+    "Tags": "Airbase",
+    "Latitude": "67.26920000",
+    "Longitude": "14.36535000",
+    "Elevation": "33"
+  },
   {
     "Type": 0,
     "Theater": "Kola",
@@ -493,6 +508,15 @@
     "Latitude": "67.76500000",
     "Longitude": "20.25100000",
     "Elevation": "1537"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Kattila",
+    "Tags": "Airbase",
+    "Latitude": "67.70103333",
+    "Longitude": "24.84686667",
+    "Elevation": "641"
   },
   {
     "Type": 0,
@@ -611,6 +635,8 @@
     "Longitude": "26.54001667",
     "Elevation": "736"
   },
+
+
   {
     "Type": 0,
     "Theater": "Marianas",
@@ -656,6 +682,8 @@
     "Longitude": "144.93105000",
     "Elevation": "545"
   },
+
+
   {
     "Type": 0,
     "Theater": "Nevada",
@@ -809,6 +837,8 @@
     "Longitude": "-116.78078333",
     "Elevation": "5534"
   },
+
+
   {
     "Type": 0,
     "Theater": "Persian Gulf",
@@ -1070,6 +1100,8 @@
     "Longitude": "55.14556667",
     "Elevation": "16"
   },
+
+
   {
     "Type": 0,
     "Theater": "South Atlantic",
@@ -1259,6 +1291,8 @@
     "Longitude": "-68.29583333",
     "Elevation": "61"
   },
+
+
   {
     "Type": 0,
     "Theater": "Sinai",
@@ -1664,6 +1698,8 @@
     "Longitude": "31.83328333",
     "Elevation": "740"
   },
+
+
   {
     "Type": 0,
     "Theater": "Syria",
