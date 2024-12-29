@@ -170,10 +170,10 @@ namespace JAFDTC.Utilities
             {
                 json = ReadFile(_settingsPath);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 json = null;
-                FileManager.Log($"Settings:ReadSettings settings not found, attempting to create new file");
+                FileManager.Log($"Settings:ReadSettings settings not found, attempting to create new file, exception {ex}");
             }
             try
             {
@@ -340,7 +340,7 @@ namespace JAFDTC.Utilities
             }
             catch (Exception ex)
             {
-                FileManager.Log($"FileManager:LoadDbaseCore exception {ex}");
+                FileManager.Log($"FileManager:LoadDbaseCore exception reading {path}, {ex}");
             }
             return dbase;
         }
@@ -383,7 +383,7 @@ namespace JAFDTC.Utilities
             }
             catch (Exception ex)
             {
-                FileManager.Log($"FileManager:SaveUserDbase exception {ex}");
+                FileManager.Log($"FileManager:SaveUserDbase exception saving {path}, {ex}");
             }
             return false;
         }
