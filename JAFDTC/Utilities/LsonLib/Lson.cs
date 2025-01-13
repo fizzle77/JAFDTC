@@ -321,6 +321,7 @@ namespace JAFDTC.Utilities.LsonLib
                                 case 't': sb.Append('\t'); break;
                                 case 'v': sb.Append('\v'); break;
                                 case '\r': sb.Append('\r'); break;
+                                case '\n': sb.Append('\n'); break;
                                 default:
                                     if (Cur >= '0' && Cur <= '9')
                                         throw new LsonParseException(this, "String escapes like \\d - \\ddd are not yet implemented.");
