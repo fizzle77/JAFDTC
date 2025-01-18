@@ -2,7 +2,7 @@
 //
 // App.xaml.cs -- ui c# for main application
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -334,10 +334,10 @@ namespace JAFDTC
                         General.PlayAudio("ux_action.wav");
                     });
                 }
-                FileManager.Log($"Upload triggered");
+                FileManager.Log($"Upload triggered, {cfg.Name}");
                 if (!await cfg.UploadAgent.Load())
                 {
-                    error = "Configuration Upload Failed";
+                    error = $"Upload Failed for {cfg.Name}";
                 }
             }
             if (error != null)
