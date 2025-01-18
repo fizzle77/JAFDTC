@@ -4,7 +4,7 @@
 F16CFunctions.lua -- viper airframe-specific lua functions
 
 Copyright(C) 2021-2023 the-paid-actor & dcs-dtc contributors
-Copyright(C) 2023-2024 ilominar/raven
+Copyright(C) 2023-2025 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -102,6 +102,14 @@ end
 --
 -- --------------------------------------------------------------------------------------------------------------------
 
+function JAFDTC_F16CM_Fn_QueryNOP()
+    return "NOP"
+end
+
+function JAFDTC_F16CM_Fn_NOP(msg)
+    -- do nothing...
+end
+
 function JAFDTC_F16CM_Fn_IsLeftHdptOn()
     local switch = GetDevice(0):get_argument_value(670)
     return (switch == 1)
@@ -146,14 +154,6 @@ function JAFDTC_F16CM_Fn_IsInNAVMode()
     local table = JAFDTC_F16CM_GetParsedHUD()
     local str = table["HUD_Window8_MasterMode"]
     return (str == "NAV")
-end
-
-function JAFDTC_F16CM_Fn_QueryNOP()
-    return "NOP"
-end
-
-function JAFDTC_F16CM_Fn_NOP(msg)
-    -- do nothing...
 end
 
 -- --------------------------------------------------------------------------------------------------------------------
