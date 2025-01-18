@@ -3,7 +3,7 @@
 
 JAFDTC.lua -- dcs export handlers for jafdtc
 
-Copyright(C) 2023-2024 ilominar/raven
+Copyright(C) 2023-2025 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -455,10 +455,11 @@ function LuaExportBeforeNextFrame()
             local status, di, dt = coroutine.resume(cmdCurCort, cmdList, cmdListIndex)
             if not status then
                 local cmdName = "JAFDTC_Cmd_" .. cmdList[cmdListIndex]["f"]
-                JAFDTC_Log(string.format("[%.3f] ERROR: Resume [%d] %s failed", curTime, cmdListIndex, cmdName, curTime))
+                local cmdMsgInfo = string.format("[%d] %s", cmdListIndex, cmdName)
+                JAFDTC_Log(string.format("[%.3f] ERROR: Resume %s failed", curTime, cmdMsgInfo))
                 cmdList = nil
                 cmdCurCort = nil
-                markerVal = "ERROR: Command Failed"
+                markerVal = string.format("ERROR: Command Failed, %s", cmdMsgInfo)
             else
                 cmdListIndex = cmdListIndex + di
                 cmdResumeTime = curTime + (dt / 1000.0)
