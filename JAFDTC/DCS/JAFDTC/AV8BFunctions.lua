@@ -3,7 +3,7 @@
 
 AV8BFunctions.lua -- harrier airframe-specific lua functions
 
-Copyright(C) 2023-2024 ilominar/raven
+Copyright(C) 2023-2025 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -22,6 +22,16 @@ You should have received a copy of the GNU General Public License along with thi
 -- NOTE: requires that CommonFunctions.lua has been loaded...
 
 -- TODO: implement clickable cockpit and setup/configuration checks for harrier
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- general functions
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
+function JAFDTC_AV8B_Fn_NOP(msg)
+    -- do nothing...
+end
 
 -- --------------------------------------------------------------------------------------------------------------------
 --
