@@ -2,7 +2,7 @@
 //
 // AppTypes.cs : helpful jafdtc types
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-25 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -65,8 +65,8 @@ namespace JAFDTC
 
         public static readonly JsonSerializerOptions JSONOptions = new() { WriteIndented = true };
 
-        public const string VersionJAFDTC = "v1.0.0-B.43";              // current version
+        public const string VersionJAFDTC = "v1.0.0-B.44";              // current version
 
-        public const string BuildJAFDTC = "version 1.0.0-B.43 of 24-Dec-24 (build ef2d131)";
+        public const string BuildJAFDTC = "version 1.0.0-B.44 of 17-Jan-25 (build 40345aa)";
     }
 }
