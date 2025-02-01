@@ -36,7 +36,8 @@ using System.Diagnostics;
 namespace JAFDTC.UI.F16C
 {
     /// <summary>
-    /// TODO: document
+    /// Page obejct for the system editor page that handles the ui for the viper datalink table editor. this handles
+    /// setup for the tndl, callsign, flight lead and other data link state.
     /// </summary>
     public sealed partial class F16CEditDLNKPage : Page
     {
@@ -91,9 +92,7 @@ namespace JAFDTC.UI.F16C
 
             EditDLNK = new DLNKSystem();
             for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
-            {
                 EditDLNK.TeamMembers[i].ErrorsChanged += TeamField_DataValidationError;
-            }
             EditDLNK.ErrorsChanged += BaseField_DataValidationError;
 
             IsRebuildPending = false;
@@ -761,6 +760,36 @@ namespace JAFDTC.UI.F16C
                 EditDLNK.TeamMembers[index].DriverUID = (pilot != null) ? pilot.UID : "";
                 CopyEditToConfig(true);
             }
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void TNDLBtnSwap_Click(object sender, RoutedEventArgs args)
+        {
+            TeamMember tmL;
+            TeamMember tmR;
+
+            for (int i = 0; i < 4; i++)
+            {
+                tmL = (EditDLNK.TeamMembers[i].HasErrors) ? new TeamMember() : new TeamMember(EditDLNK.TeamMembers[i]);
+                tmR = (EditDLNK.TeamMembers[i+4].HasErrors) ? new TeamMember() : new TeamMember(EditDLNK.TeamMembers[i+4]);
+
+                // copy individual fields to make sure property changed events get posted...
+                //
+                EditDLNK.TeamMembers[i].TDOA = tmR.TDOA;
+                EditDLNK.TeamMembers[i].TNDL = tmR.TNDL;
+                EditDLNK.TeamMembers[i].DriverUID = tmR.DriverUID;
+
+                EditDLNK.TeamMembers[i + 4].TDOA = tmL.TDOA;
+                EditDLNK.TeamMembers[i + 4].TNDL = tmL.TNDL;
+                EditDLNK.TeamMembers[i + 4].DriverUID = tmL.DriverUID;
+            }
+            CopyEditToConfig(true);
+
+            RebuildCallsignCombos();
+            RebuildEnableState();
+            RebuildInterfaceState();
         }
 
         // ------------------------------------------------------------------------------------------------------------

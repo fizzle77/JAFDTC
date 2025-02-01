@@ -4,7 +4,7 @@
     
 F16CEditDLNKPage.xaml : ui xaml for viper data link editor page
 
-Copyright(C) 2023-2024 ilominar/raven
+Copyright(C) 2023-2025 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -39,6 +39,7 @@ https://www.gnu.org/licenses/.
 
     <Grid Margin="16,8,0,8">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -442,10 +443,24 @@ https://www.gnu.org/licenses/.
 
         <!--
         ===============================================================================================================
-        row 4 : link / reset
+        row 4-5 : swap
         ===============================================================================================================
         -->
-        <StackPanel Grid.Row="4" Margin="0,24,0,24" Orientation="Horizontal">
+        <StackPanel Grid.Row="4" Margin="0,16,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="uiTNDLBtnSwap"
+                    Click="TNDLBtnSwap_Click"
+                    ToolTipService.ToolTip="Swap TNDL Entries 1-4 and 5-6">
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE76B;"/>
+                    <TextBlock Margin="12,0,12,0">
+                        Swap Entries for 4-Ships
+                    </TextBlock>
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE76C;"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <StackPanel Grid.Row="5" Margin="0,24,0,24" Orientation="Horizontal" HorizontalAlignment="Center">
             <CheckBox Margin="24,2,0,0"
                       x:Name="uiOwnCkbxFill"
                       IsChecked="{x:Bind EditDLNK.IsFillEmptyTNDL, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -463,7 +478,7 @@ https://www.gnu.org/licenses/.
 
         <!--
         ===============================================================================================================
-        row 6 : link / reset
+        row 7 : link / reset
         ===============================================================================================================
         -->
         <Grid Grid.Row="6" Margin="0,0,16,4">
