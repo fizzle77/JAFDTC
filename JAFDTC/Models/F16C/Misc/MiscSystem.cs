@@ -3,7 +3,7 @@
 // MiscSystem.cs -- f-16c miscellaneous system
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -346,7 +346,8 @@ namespace JAFDTC.Models.F16C.Misc
             HMCSBlankHUD = true.ToString(),
             HMCSBlankCockpit = true.ToString(),
             HMCSDisplayRWR = true.ToString(),
-            HMCSDeclutterLvl = ((int)HMCSDeclutterLevels.LVL1).ToString()
+            HMCSDeclutterLvl = ((int)HMCSDeclutterLevels.LVL1).ToString(),
+            HMCSIntensity = "0.0"
         };
 
         // returns true if the instance indicates a default setup (all fields are "") or the object is in explicit
@@ -475,10 +476,11 @@ namespace JAFDTC.Models.F16C.Misc
             TACANMode = new(other.TACANMode);
             ILSFrequency = new(other.ILSFrequency);
             ILSCourse = new(other.ILSCourse);
-            HMCSBlankHUD = new(other.HMCSBlankHUD);
-            HMCSBlankCockpit = new(other.HMCSBlankCockpit);
-            HMCSDisplayRWR = new(other.HMCSDisplayRWR);
+            HMCSBlankHUD = new(other.HMCSBlankHUDValue.ToString());
+            HMCSBlankCockpit = new(other.HMCSBlankCockpitValue.ToString());
+            HMCSDisplayRWR = new(other.HMCSDisplayRWR.ToString());
             HMCSDeclutterLvl = new(other.HMCSDeclutterLvl);
+            HMCSIntensity = new(other.HMCSIntensity);
         }
 
         public virtual object Clone() => new MiscSystem(this);
@@ -506,10 +508,11 @@ namespace JAFDTC.Models.F16C.Misc
             TACANMode = "";
             ILSFrequency = "";
             ILSCourse = "";
-            HMCSBlankHUD = "";
-            HMCSBlankCockpit = "";
-            HMCSDisplayRWR = "";
+            HMCSBlankHUD = true.ToString();
+            HMCSBlankCockpit = true.ToString();
+            HMCSDisplayRWR = true.ToString();
             HMCSDeclutterLvl = "";
+            HMCSIntensity = "";
         }
     }
 }

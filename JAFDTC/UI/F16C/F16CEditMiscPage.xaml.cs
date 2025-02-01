@@ -2,7 +2,7 @@
 //
 // F16CEditMFDPage.xaml.cs : ui c# for viper misc setup editor page
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -83,6 +83,60 @@ namespace JAFDTC.UI.F16C
 
         // ------------------------------------------------------------------------------------------------------------
         //
+        // data marshalling
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Copy data from the system configuration object to the edit object the page interacts with.
+        /// </summary>
+        protected override void CopyConfigToEditState()
+        {
+            if (EditState != null)
+            {
+                EditState.ClearErrors();
+                ((MiscSystem)EditState).HMCSIntensity = ((MiscSystem)SystemConfig).HMCSIntensity;
+                CopyAllSettings(SettingLocation.Config, SettingLocation.Edit);
+            }
+            UpdateUIFromEditState();
+        }
+
+        /// <summary>
+        /// Copy data from the edit object the page interacts with to the system configuration object and persist the
+        /// updated configuration to disk.
+        /// </summary>
+        protected override void SaveEditStateToConfig()
+        {
+            if ((EditState != null) && !EditStateHasErrors() && !IsUIRebuilding)
+            {
+                ((MiscSystem)SystemConfig).HMCSIntensity = ((MiscSystem)EditState).HMCSIntensity;
+                CopyAllSettings(SettingLocation.Edit, SettingLocation.Config, true);
+                Config.Save(this, SystemTag);
+            }
+            UpdateUIFromEditState();
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // ui configuration/state updates
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// update the hmcs intensity slider as part of the ui update.
+        /// </summary>
+        protected override void UpdateUICustom(bool isEditable)
+        {
+            if (EditState != null)
+            {
+                if (!double.TryParse(((MiscSystem)EditState).HMCSIntensity, out double val))
+                    val = 0.0;
+                uiHMCSSliderIntensity.Value = val * 100.0;
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
         // ui events
         //
         // ------------------------------------------------------------------------------------------------------------
@@ -94,9 +148,12 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void HMCSSliderIntensity_ValueChanged(object sender, RoutedEventArgs args)
         {
-            Slider slider = (Slider)sender;
-            EditMisc.HMCSIntensity = (slider.Value == 0.0) ? "" : $"{slider.Value / 100.0:F2}";
-            SaveEditStateToConfig();
+            if (!IsUIRebuilding)
+            {
+                Slider slider = (Slider)sender;
+                EditMisc.HMCSIntensity = (slider.Value == 0.0) ? "" : $"{slider.Value / 100.0:F2}";
+                SaveEditStateToConfig();
+            }
         }
     }
 }

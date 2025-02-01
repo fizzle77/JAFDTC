@@ -4,7 +4,7 @@
     
 F16CEditMiscPage.xaml.cs : ui xaml for viper misc setup editor page
 
-Copyright(C) 2023-2024 ilominar/raven
+Copyright(C) 2023-2025 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -387,6 +387,7 @@ https://www.gnu.org/licenses/.
             </TextBlock>
             <Slider Grid.Row="11" Grid.Column="1" x:Name="uiHMCSSliderIntensity"
                     Margin="12,16,0,0" VerticalAlignment="Bottom"
+                    Minimum="0" Maximum="100"
                     ValueChanged="HMCSSliderIntensity_ValueChanged"/>
         </Grid>
 
