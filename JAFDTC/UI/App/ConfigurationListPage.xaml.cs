@@ -2,7 +2,7 @@
 //
 // ConfigurationListPage.xaml.cs -- ui c# for configuration list page that provides the top-level ui
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -475,6 +475,7 @@ namespace JAFDTC.UI.App
 
         /// <summary>
         /// paste command: check if we have a valid clipbaoard and, if so, paste it into the selected configuration.
+        /// the only ui updates are at list level; these are handled by a ConfigurationSavedHandler.
         /// </summary>
         private async void CmdPaste_Click(object sender, RoutedEventArgs args)
         {
