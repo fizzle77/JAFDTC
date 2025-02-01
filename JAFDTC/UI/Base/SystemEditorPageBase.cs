@@ -2,7 +2,7 @@
 //
 // SystemEditorPageBase.cs : Base Page class for system editors
 //
-// Copyright(C) 2024 fizzle, ilominar/raven
+// Copyright(C) 2024-2025 fizzle, ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -432,7 +432,7 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
-        /// Find propertyName on source and if found, copy its value to destination.Silently does nothing if prop,
+        /// Find propertyName on source and if found, copy its value to destination. Silently does nothing if prop,
         /// src, or dest objects are null or if source error checking is enabled and there is an error.
         /// </summary>
         protected static void CopyProperty(PropertyInfo prop, BindableObject src, BindableObject dest,
@@ -695,10 +695,22 @@ namespace JAFDTC.UI.Base
 
         // ---- page-level event handlers -----------------------------------------------------------------------------
 
+        /// <summary>
+        /// on configuration saved, if save is result of a paste, copy the config to the edit state to make sure edit
+        /// state is up to date.
+        /// </summary>
+        private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
+        {
+            if (string.IsNullOrEmpty(args.SyncSysTag))
+                CopyConfigToEditState();
+        }
+
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;
             Config = NavArgs.Config;
+
+            Config.ConfigurationSaved += ConfigurationSavedHandler;
 
             if (EditState != null)
             {
@@ -720,6 +732,8 @@ namespace JAFDTC.UI.Base
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
+            Config.ConfigurationSaved -= ConfigurationSavedHandler;
+
             if (EditState != null)
             {
                 EditState.ErrorsChanged -= EditState_ErrorsChanged;
