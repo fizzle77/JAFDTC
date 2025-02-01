@@ -774,6 +774,11 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
         {
+            if (string.IsNullOrEmpty(args.SyncSysTag))
+            {
+                CopyConfigToEdit();
+                RebuildCallsignCombos();
+            }
             RebuildInterfaceState();
         }
 

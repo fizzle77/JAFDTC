@@ -2,7 +2,7 @@
 //
 // F16CEditSteerpointListPage.xaml.cs : ui c# for viper steerpoint list editor page
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -504,6 +504,8 @@ namespace JAFDTC.UI.F16C
         //
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
         {
+            if (string.IsNullOrEmpty(args.SyncSysTag))
+                CopyConfigToEdit();
             RebuildInterfaceState();
         }
 

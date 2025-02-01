@@ -2,7 +2,7 @@
 //
 // A10CEditDSMSPage.cs : ui c# for warthog dsms page
 //
-// Copyright(C) 2024 fizzle
+// Copyright(C) 2024-2025 fizzle
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -99,6 +99,8 @@ namespace JAFDTC.UI.A10C
 
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
         {
+            if (string.IsNullOrEmpty(args.SyncSysTag))
+                CopyConfigToEditState();
             UpdateDefaultStateIndicators();
         }
 
