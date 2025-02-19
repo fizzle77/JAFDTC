@@ -369,7 +369,7 @@ namespace JAFDTC.Utilities
         }
 
         /// <summary>
-        /// load a system database (a .json serialized List<T>) from the "Data" directory in the app bundle.  system
+        /// load a system database (a .json serialized List<T>) from the "Data" directory in the app bundle. system
         /// databases are immutable and cannot be updated. returns an empty list on error.
         /// </summary>
         public static List<T> LoadSystemDbase<T>(string name)
@@ -391,16 +391,21 @@ namespace JAFDTC.Utilities
 
         /// <summary>
         /// save the user database (a .json serialized List<T>) with the given name to the database area in the jafdtc
-        /// settings directory (creating the file if necessary). returns true on success, false on failure
+        /// settings directory (creating the file if necessary). entries in the database are only persisted if the
+        /// given filter function returns true when passed the entry (default function always returns true). returns
+        /// true on success, false on failure.
         /// </summary>
-        public static bool SaveUserDbase<T>(string name, List<T> dbase)
+        public static bool SaveUserDbase<T>(string name, List<T> dbase, Func<T,Boolean> fnFilter = null)
         {
+            fnFilter ??= entry => true;
+            List<T> dbFilter = dbase.Where(fnFilter).ToList();
+
             string path = Path.Combine(_settingsDirPath, "Dbase");
             Directory.CreateDirectory(path);
             path = Path.Combine(path, name);
             try
             {
-                string json = JsonSerializer.Serialize<List<T>>(dbase, Configuration.JsonOptions);
+                string json = JsonSerializer.Serialize<List<T>>(dbFilter, Configuration.JsonOptions);
                 WriteFile(path, json);
                 return true;
             }
