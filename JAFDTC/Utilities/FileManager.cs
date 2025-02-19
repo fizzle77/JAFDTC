@@ -297,8 +297,16 @@ namespace JAFDTC.Utilities
                 {
                     var json = File.ReadAllText(file);
                     IConfiguration config = Configuration.FactoryJSON(airframe, json);
-                    dict.Add(file, config);
-                    FileManager.Log($"Loaded {Globals.AirframeShortNames[config.Airframe]} {config.UID} '{config.Name}' from '{config.Filename}'");
+                    if (config != null)
+                    {
+                        dict.Add(file, config);
+                        FileManager.Log($"Loaded {Globals.AirframeShortNames[config.Airframe]} {config.UID} '{config.Name}' from '{config.Filename}'");
+                    }
+                    else
+                    {
+                        // TODO: handle failure to load a configuration
+                        FileManager.Log($"Skipped loading configuration from '{file}' due to ERROR");
+                    }
                 }
             }
             return dict;
