@@ -3,7 +3,7 @@
 // FileManager.cs : file management abstraction layer
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -53,6 +53,9 @@ namespace JAFDTC.Utilities
         private static string _settingsDirPath
             = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "JAFDTC");
 
+        private static string _commonDirPath
+            = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Saved Games\\JAFDTC");
+
         private static string _settingsPath = null;
 
         private static string _logPath = null;
@@ -77,7 +80,18 @@ namespace JAFDTC.Utilities
             {
                 Directory.CreateDirectory(_settingsDirPath);
                 _settingsPath = Path.Combine(_settingsDirPath, "jafdtc-settings.json");
+            }
+            catch (Exception ex)
+            {
+                _settingsDirPath = null;
+                string msg = $"Unable to create settings folder: {_settingsDirPath}. Make sure the path is correct" +
+                             $" and that you have appropriate permissions ({ex}).";
+                throw new Exception(msg, ex);
+            }
+
 #if JAFDTC_LOG
+            try
+            {
                 _logPath = Path.Combine(_settingsDirPath, "jafdtc-log.txt");
                 FileStream stream = new(_logPath, FileMode.OpenOrCreate);
                 if (stream.Seek(0, SeekOrigin.End) > 32768)
@@ -85,14 +99,23 @@ namespace JAFDTC.Utilities
                 _logStream = new StreamWriter(stream);
                 string now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 FileManager.Log($"==== JAFDTC {Globals.BuildJAFDTC} launched on {now}");
-#endif
             }
             catch (Exception ex)
             {
                 _settingsDirPath = null;
-                string msg = $"Unable to create settings folder: {_settingsDirPath}. Make sure the path is correct" +
-                             $" and that you have appropriate permissions.";
+                string msg = $"Unable to create log file: {_logPath} ({ex}).";
                 throw new Exception(msg, ex);
+            }
+#endif
+
+            if (Directory.Exists(_commonDirPath))
+            {
+                FileManager.Log($"Common directory {_commonDirPath} is available.");
+            }
+            else
+            {
+                FileManager.Log($"Common directory {_commonDirPath} is not available.");
+                _commonDirPath = null;
             }
         }
 
