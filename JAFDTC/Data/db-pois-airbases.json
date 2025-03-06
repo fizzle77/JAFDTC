@@ -2,6 +2,15 @@
   {
     "Type": 0,
     "Theater": "Afghanistan",
+    "Name": "Bagram",
+    "Tags": "Airbase",
+    "Latitude": "34.94616000",
+    "Longitude": "69.26498444",
+    "Elevation": "4895"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
     "Name": "Bost",
     "Tags": "Airbase",
     "Latitude": "31.56003333",
@@ -56,11 +65,47 @@
   {
     "Type": 0,
     "Theater": "Afghanistan",
+    "Name": "Gardez",
+    "Tags": "Airbase",
+    "Latitude": "33.62803333",
+    "Longitude": "69.23748333",
+    "Elevation": "7785"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Ghazni Heliport",
+    "Tags": "Airbase",
+    "Latitude": "33.50490000",
+    "Longitude": "68.41421667",
+    "Elevation": "7127"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
     "Name": "Herat",
     "Tags": "Airbase",
     "Latitude": "34.20801667",
     "Longitude": "62.22798333",
     "Elevation": "3237"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Jalalabad",
+    "Tags": "Airbase",
+    "Latitude": "34.40026667",
+    "Longitude": "70.49806667",
+    "Elevation": "1841"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Kabul",
+    "Tags": "Airbase",
+    "Latitude": "34.56575000",
+    "Longitude": "69.21268333",
+    "Elevation": "5869"
   },
   {
     "Type": 0,
@@ -79,6 +124,24 @@
     "Latitude": "31.52075000",
     "Longitude": "65.84588333",
     "Elevation": "3337"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Khost",
+    "Tags": "Airbase",
+    "Latitude": "34.33315000",
+    "Longitude": "69.95110000",
+    "Elevation": "3768"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Khost Heliport",
+    "Tags": "Airbase",
+    "Latitude": "33.36340000",
+    "Longitude": "69.95538333",
+    "Elevation": "3788"
   },
   {
     "Type": 0,
@@ -110,6 +173,15 @@
   {
     "Type": 0,
     "Theater": "Afghanistan",
+    "Name": "Sharana",
+    "Tags": "Airbase",
+    "Latitude": "33.12571667",
+    "Longitude": "68.83855000",
+    "Elevation": "7345"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
     "Name": "Shindand",
     "Tags": "Airbase",
     "Latitude": "33.39276667",
@@ -133,6 +205,15 @@
     "Latitude": "32.60521667",
     "Longitude": "65.86415000",
     "Elevation": "4414"
+  },
+  {
+    "Type": 0,
+    "Theater": "Afghanistan",
+    "Name": "Urgoon Heliport",
+    "Tags": "Airbase",
+    "Latitude": "32.93765000",
+    "Longitude": "69.15185000",
+    "Elevation": "7483"
   },
 
 
