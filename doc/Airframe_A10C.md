@@ -22,7 +22,7 @@ for more on the aspects of JAFDTC that are common to multiple airframes.
 
 # DCS Cockpit Integration
 
-> This functiuonality requires installation of the DCS Lua support. 
+> This functiuonality requires installation of the DCS Lua support.
 
 The Warthog allows the user to operate JAFDTC from buttons in the cockpit without needing to go
 through the Windows UI. This is helpful for VR and other situations where you may not be able
@@ -73,34 +73,43 @@ Each of the the HMCS profiles' settings can be modified in the middle section of
 
 Common settings that apply to all profiles are at the bottom of this editor.
 
-- **TGP Track** selectss the type of track the TGP will use when initiated from the HMCS with DMS-right-long.
+- **TGP Track** selects the type of track the TGP will use when initiated from the HMCS with DMS-right-long.
 - **Active Profile** will set one of the three HMCS profiles active when done configuring.
 - **Brightness** selects either DAY or NIGHT brightness levels.
 
 ## IFFCC
 
-TODO
+The IFFCC system allows changing its myriad of HUD display options.
 
 ![](images/Hawg_Sys_IFFCC.png)
 
-TODO
+In the left column:
+
+- **AUTO DATA DISP** briefly displays release data on the HUD.
+- **CCIP GUN CROSS OCCLUDE** occludes the TVV behind the CCIP gun cross.
+- **TAPES** displays speed and altitude tapes instead of digital values.
+- **METRIC** displays HUD data values in metric rather than imperial units.
+- **RDRALT TAPE** displays a vertical tape indicating radar altitude.
+- **AIRSPEED** changes the airspeed displayed. Options include IAS, MACH/IAS, GS, and TRUE.
+- **VERT VEL** displays vertical velocity on the left side of the HUD.
+- **CCIP CONSENT OPT** changes the CCIP release symbology. Options include OFF, 5 MIL, and 3/9.
+
+In the right column, the **AAS** section configures Air-to-Air master mode HUD options. You can select which airframe presets will appear in the list when using DMS left and right. You can also enter a wingspan, length, and speed for two additional manual presets, one rotary and one fixed wing.
 
 ## Radios
 
 The system editor for the communications system in the Warthog follows the general outline of
 the common
 [Communications System Editor](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md#communications-system-editors)
-with some small changes for capabilities of the Warthog radios. The configuration supports the
-AN/ARC-210 and AN/ARC-164 radios.
+with some small changes for capabilities of the Warthog radios. The configuration supports all 3 radios:
+AN/ARC-210, AN/ARC-164 and AN/ARC-186.
 
-> Support for the AN/ARC-186 radio is planned for a future release.
-
-The AN/ARC-164 radio most closely follows the common communiation systems editor and allows you
-to specify preset frequencies and other configuration,
+The AN/ARC-164 VHF AM radio closely follows the common communication systems editor and allows you
+to specify preset frequencies and other configuration.
 
 ![](images/Hawg_Sys_COM_ARC164.png)
 
-The airframe specific controls for the AN/ARC-164 include,
+The airframe specific controls for the AN/ARC-164 include
 
 - **Initial Freq./Preset** &ndash; Specifies the initial frequency or preset to tune the
   radio to. For example, "15" sets the radio to preset 15 while "251.00" sets the radio to
@@ -114,7 +123,7 @@ Other controls work as described in
 [Communications System Editor](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md#communications-system-editors)
 documentation.
 
-The AN/ARC-210 radio support selectable modulation (FM or AM) on some frequency bands. In
+The AN/ARC-210 all-frequency radio supports selectable modulation (FM or AM) on some frequency bands. In
 addition to the Preset, Frequency, and Description information, this radio includes a drop
 down menu to select modulation.
 
@@ -124,7 +133,7 @@ After changing the preset frequency, the modulation is initially set to the defa
 for the frequency. The first item in the modulation drop down menu is always the default
 modulation for the preset.
 
-The airframe specific controls for the AN/ARC-210 include,
+The airframe specific controls for the AN/ARC-210 include
 
 - **Initial Freq./Preset** &ndash; Specifies the initial frequency or preset to tune the
   radio to. For example, "15" sets the radio to preset 15 while "251.00" sets the radio to
@@ -140,6 +149,8 @@ Other controls work as described in
 [Communications System Editor](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md#communications-system-editors)
 documentation.
 
+The AN/ARC-186 VHF FM radio's functionality is identical to the AN/ARC-164 except that there is no monitor guard option.
+
 ## TAD
 
 **TAD NET Settings** allow for changing the Group ID, Own, ID, and Callsign used for SADL and datalink. Leaving them blank makes no changes, leaving the mission editor's configuration. Note that given the buggy state of datalink in May 2024, leaving them blank is often the better choice.
@@ -152,7 +163,7 @@ JAFDTC does not support creation of additional TAD display profiles, but allows 
 
 ## TGP
 
-In addition to being on the default right MFD button, the TGP must be fully timed out when its settings are loaded from JAFDTC, or it will be skipped.
+In addition to being on the default button on the right-side MFD, the TGP must be fully timed out when its settings are loaded from JAFDTC or it will be skipped.
 
 ![](images/Hawg_Sys_TGP.png)
 
@@ -199,7 +210,7 @@ Most of these settings should be self-apparent. For the CDU,
 
 - **Coordinate System** allows changing from the default L/L to MGRS. This only affects the CDU at present, not the TAD or TGP.
 - **Bullseye on HUD** will make visible your aircraft's BULLS position in the upper right corner of the HUD.
-- **FPM Flight Plan 01** allows changing the default flight plan, on the CDU FPM page, between manual and automatinc waypoint advancement.
+- **FPM Flight Plan 01** allows changing the default flight plan, on the CDU FPM page, between manual and automatic waypoint advancement.
 - **STEER Page Speed Display** changes the speed displayed on the CDU's STEER page between IAS, TAS, and GS.
 
 For the AAP,
