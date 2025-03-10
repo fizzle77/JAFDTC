@@ -65,7 +65,6 @@ namespace JAFDTC.UI.F16C
 
         private bool IsRebuildingUI { get; set; }
 
-
         private List<ViperDriver> PilotDbase { get; set; }
 
         // ---- read-only properties
@@ -462,9 +461,16 @@ namespace JAFDTC.UI.F16C
 
             Utilities.SetEnableState(uiOwnComboEntry, isEditable && !isOwnInTable && isAnyInTable);
             Utilities.SetEnableState(uiOwnCkbxLead, isEditable);
-            Utilities.SetEnableState(uiPageBtnResetAll, !EditDLNK.IsDefault);
 
-            Utilities.SetEnableState(uiOwnTextFillTNDL, (bool)uiOwnCkbxFill.IsChecked);
+            Utilities.SetEnableState(uiOwnTextCallsign, isEditable);
+            Utilities.SetEnableState(uiOwnTextFENum, isEditable);
+
+            Utilities.SetEnableState(uiTNDLBtnSwap, isEditable);
+
+            Utilities.SetEnableState(uiOwnCkbxFill, isEditable);
+            Utilities.SetEnableState(uiOwnTextFillTNDL, isEditable && (bool)uiOwnCkbxFill.IsChecked);
+
+            Utilities.SetEnableState(uiPageBtnResetAll, !EditDLNK.IsDefault);
         }
 
         /// <summary>
