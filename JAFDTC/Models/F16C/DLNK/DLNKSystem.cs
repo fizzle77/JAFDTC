@@ -2,7 +2,7 @@
 //
 // DLNKSystem.cs -- f-16c datalink system configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -137,6 +137,8 @@ namespace JAFDTC.Models.F16C.DLNK
             IsOwnshipLead = false;
             OwnshipCallsign = "";
             OwnshipFENumber = "";
+            IsFillEmptyTNDL = false;
+            FillEmptyTNDL = "";
             TeamMembers = new TeamMember[8];
             for (int i = 0; i < TeamMembers.Length; i++)
                 TeamMembers[i] = new TeamMember();
@@ -148,6 +150,8 @@ namespace JAFDTC.Models.F16C.DLNK
             IsOwnshipLead = other.IsOwnshipLead;
             OwnshipCallsign = other.OwnshipCallsign;
             OwnshipFENumber = other.OwnshipFENumber;
+            IsFillEmptyTNDL = other.IsFillEmptyTNDL;
+            FillEmptyTNDL = other.FillEmptyTNDL;
             TeamMembers = new TeamMember[8];
             for (int i = 0; i < TeamMembers.Length; i++)
                 TeamMembers[i] = new TeamMember(other.TeamMembers[i]);
