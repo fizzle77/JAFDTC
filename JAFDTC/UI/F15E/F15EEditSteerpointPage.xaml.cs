@@ -36,9 +36,10 @@ using System.Diagnostics;
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 using JAFDTC.UI.Base;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.Common;
 using System.Reflection;
 using Windows.System;
+using CommunityToolkit.WinUI;
 
 namespace JAFDTC.UI.F15E
 {

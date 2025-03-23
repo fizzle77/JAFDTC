@@ -560,12 +560,12 @@ namespace JAFDTC.UI.Base
                     // hierarchy is built (which it will be, eventually). we'll wait a jiffy before trying again to
                     // avoid pestering the framework too much: "ARE WE THERE YET?!?".
                     //
-                    DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, async () =>
-                    {
-                        await Task.Delay(250);
-                        RebuildPerPresetModulationSelections();
-                    });
-                    break;
+                    //DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, async () =>
+                    //{
+                    //    await Task.Delay(250);
+                    //    RebuildPerPresetModulationSelections();
+                    //});
+                    //break;
                 }
             }
         }

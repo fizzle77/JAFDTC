@@ -24,7 +24,7 @@ https://www.gnu.org/licenses/.
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:JAFDTC.UI.Base"
     xmlns:ui_app="using:JAFDTC.UI.App"
-    xmlns:ui_ctk="using:CommunityToolkit.WinUI.UI"
+    xmlns:ui_ctk="using:CommunityToolkit.WinUI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"

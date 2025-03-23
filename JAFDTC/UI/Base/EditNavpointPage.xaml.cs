@@ -17,14 +17,13 @@
 //
 // ********************************************************************************************************************
 
-using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI;
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
-using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -35,7 +34,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Windows.System;
-using Windows.UI.Core;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
