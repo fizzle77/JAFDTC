@@ -143,6 +143,7 @@ https://www.gnu.org/licenses/.
                                      HorizontalTextAlignment="Center"
                                      MaxLength="2"
                                      Tag="Preset"
+                                     GotFocus="TextBox_GotFocus"
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      Text="{x:Bind Preset, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                             <TextBox Grid.Column="1" Margin="6,0,0,0"
@@ -150,17 +151,21 @@ https://www.gnu.org/licenses/.
                                      HorizontalTextAlignment="Left"
                                      MaxLength="7"
                                      Tag="Frequency"
+                                     GotFocus="TextBox_GotFocus"
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      Text="{x:Bind Frequency, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                             <ComboBox Grid.Column="2" Width="72" Margin="6,1,0,0"
                                       Tag="Modulation"
                                       Visibility="{x:Bind ModulationVisibility, Mode=OneWay}"
+                                      ItemsSource="{Binding ModulationItems, Mode=OneWay}"
+                                      SelectedIndex="{x:Bind ModulationIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                       SelectionChanged="PreListModCombo_SelectionChanged"/>
                             <TextBox Grid.Column="3" Margin="6,0,0,0"
                                      VerticalAlignment="Center"
                                      HorizontalTextAlignment="Center"
                                      Tag="Description"
                                      FontWeight="Medium"
+                                     GotFocus="TextBox_GotFocus"
                                      FontSize="16"
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      Text="{x:Bind Description, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
@@ -203,6 +208,9 @@ https://www.gnu.org/licenses/.
                          VerticalAlignment="Center"
                          PlaceholderText="None Set"
                          MaxLength="7"
+                         GotFocus="TextBox_GotFocus"
+                         LostFocus="InitialFreq_LostFocus"
+                         Tag=""
                          Text="{x:Bind EditMisc.DefaultTuning, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                 <TextBlock Grid.Column="2" Margin="8,0,0,0"
                            x:Name="uiMiscTextDefaultLabel"
