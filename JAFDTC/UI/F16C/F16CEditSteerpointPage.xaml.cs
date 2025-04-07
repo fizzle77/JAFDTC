@@ -2,7 +2,7 @@
 //
 // F16CEditSteerpointPage.xaml.cs : ui c# for viper steerpoint editor page
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -279,13 +279,9 @@ namespace JAFDTC.UI.F16C
         {
             Dictionary<string, bool> map = new();
             foreach (string error in errors)
-            {
                 map[error] = true;
-            }
             foreach (KeyValuePair<string, TextBox> kvp in fields)
-            {
                 SetFieldValidState(kvp.Value, !map.ContainsKey(kvp.Key));
-            }
         }
 
         private void CoreDataValidationError(INotifyDataErrorInfo obj, string propertyName, Dictionary<string, TextBox> fields)
@@ -298,9 +294,7 @@ namespace JAFDTC.UI.F16C
             {
                 List<string> errors = (List<string>)obj.GetErrors(propertyName);
                 if (fields.ContainsKey(propertyName))
-                {
                     SetFieldValidState(fields[propertyName], (errors.Count == 0));
-                }
             }
             RebuildInterfaceState();
         }
@@ -368,16 +362,12 @@ namespace JAFDTC.UI.F16C
             {
                 TextBox tbox = kvp.Value;
                 if (!TextBoxExtensions.GetIsValid(tbox) && (((string)tbox.Tag != "TOS") || (tbox.Text != "––:––:––")))
-                {
                     return true;
-                }
             }
 
             bool hasErrors = EditStpt.HasErrors;
             for (int i = 0; i < EditStpt.OAP.Length; i++)
-            {
                 hasErrors = (EditStpt.OAP[i].HasErrors || EditStpt.VxP[i].HasErrors) || hasErrors;
-            }
             return hasErrors;
         }
 
@@ -402,12 +392,8 @@ namespace JAFDTC.UI.F16C
             PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, null, EditStpt.Name);
             List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
             foreach (PointOfInterest poi in pois)
-            {
                 if (poi.Type != PointOfInterestType.USER)
-                {
                     return false;
-                }
-            }
             return true;
         }
 
@@ -441,17 +427,17 @@ namespace JAFDTC.UI.F16C
             }
             if (rpType == RefPointTypes.VRP)
             {
-                uiStptVxPRngTextHeader.Text = "Range (nm)";
-                uiStptVxPValueRange0.PlaceholderText = "0.0";
-                uiStptVxPValueRange1.PlaceholderText = "0.0";
+                uiStptVxPRngTextHeader.Text = "Range (ft)";
+                uiStptVxPValueRange0.PlaceholderText = "0";
+                uiStptVxPValueRange1.PlaceholderText = "0";
                 uiStptVxP0TextTitle.Text = "Target to VRP";
                 uiStptVxP1TextTitle.Text = "Target to PUP";
             }
             else if (rpType == RefPointTypes.VIP)
             {
-                uiStptVxPRngTextHeader.Text = "Range (ft)";
-                uiStptVxPValueRange0.PlaceholderText = "0";
-                uiStptVxPValueRange1.PlaceholderText = "0";
+                uiStptVxPRngTextHeader.Text = "Range (nm)";
+                uiStptVxPValueRange0.PlaceholderText = "0.0";
+                uiStptVxPValueRange1.PlaceholderText = "0.0";
                 uiStptVxP0TextTitle.Text = "VIP to Target";
                 uiStptVxP1TextTitle.Text = "VIP to PUP";
             }
@@ -477,30 +463,20 @@ namespace JAFDTC.UI.F16C
 
             Utilities.SetEnableState(uiStptValueName, isEditable);
             foreach (KeyValuePair<string, TextBox> kvp in _curStptFieldValueMap)
-            {
                 Utilities.SetEnableState(kvp.Value, isEditable);
-            }
 
             Utilities.SetEnableState(uiStptOAP0Combo, isEditable);
             Utilities.SetEnableState(uiStptOAP1Combo, isEditable);
             foreach (KeyValuePair<string, TextBox> kvp in _oap0FieldValueMap)
-            {
                 Utilities.SetEnableState(kvp.Value, isEditable && (EditStpt.OAP[0].Type == RefPointTypes.OAP));
-            }
             foreach (KeyValuePair<string, TextBox> kvp in _oap1FieldValueMap)
-            {
                 Utilities.SetEnableState(kvp.Value, isEditable && (EditStpt.OAP[1].Type == RefPointTypes.OAP));
-            }
 
             Utilities.SetEnableState(uiStptVxPCombo, isEditable);
             foreach (KeyValuePair<string, TextBox> kvp in _vxp0FieldValueMap)
-            {
                 Utilities.SetEnableState(kvp.Value, isEditable && (EditStpt.VxP[0].Type != RefPointTypes.NONE));
-            }
             foreach (KeyValuePair<string, TextBox> kvp in _vxp1FieldValueMap)
-            {
                 Utilities.SetEnableState(kvp.Value, isEditable && (EditStpt.VxP[0].Type != RefPointTypes.NONE));
-            }
 
             Utilities.SetEnableState(uiStptBtnAddPoI, isEditable && IsEditCoordValidPoI());
             Utilities.SetEnableState(uiStptBtnPrev, !isErrorsInUI && (EditStptIndex > 0));
@@ -547,9 +523,7 @@ namespace JAFDTC.UI.F16C
         private void AcceptBtnOk_Click(object sender, RoutedEventArgs args)
         {
             if (!CurStateHasErrors() && string.IsNullOrEmpty(Config.SystemLinkedTo(STPTSystem.SystemTag)))
-            {
                 CopyEditToConfig(EditStptIndex, true);
-            }
             Frame.GoBack();
         }
 

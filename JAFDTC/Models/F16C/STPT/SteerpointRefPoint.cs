@@ -3,7 +3,7 @@
 // SteerpointRefPoint.cs -- f-16c steerpoint r/b/e offset for oap, vip, vrp
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -51,8 +51,8 @@ namespace JAFDTC.Models.F16C.STPT
         // ---- following properties post change and validation events.
 
         // oap: integer, 00000 on [0,99999) ft
-        // vip: integer, 000000 on [0,486090] ft
-        // vrp: decimal, 00.0 on [0.0, 80.0] nm
+        // vip: decimal, 00.0 on [0.0, 80.0] nm
+        // vrp: integer, 000000 on [0,486090] ft
 
         private string _range;
         public string Range
@@ -62,12 +62,12 @@ namespace JAFDTC.Models.F16C.STPT
             {
                 string error = (string.IsNullOrEmpty(value)) ? null : "Invalid format";
                 if (((Type == RefPointTypes.OAP) && IsIntegerFieldValid(value, 0, 99999)) ||
-                    ((Type == RefPointTypes.VIP) && IsIntegerFieldValid(value, 0, 486090)))
+                    ((Type == RefPointTypes.VRP) && IsIntegerFieldValid(value, 0, 486090)))
                 {
                     value = FixupIntegerField(value);
                     error = null;
                 }
-                else if ((Type == RefPointTypes.VRP) && IsDecimalFieldValid(value, 0.0, 80.0))
+                else if ((Type == RefPointTypes.VIP) && IsDecimalFieldValid(value, 0.0, 80.0))
                 {
                     value = FixupDecimalField(value, "F1");
                     error = null;
