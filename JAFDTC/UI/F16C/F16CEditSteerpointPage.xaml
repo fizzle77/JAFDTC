@@ -344,11 +344,11 @@ https://www.gnu.org/licenses/.
                     </TextBlock>
                     <TextBlock Grid.Row="0" Grid.Column="3"
                                Style="{StaticResource TableHeaderTextStyle}">
-                        Bearing (° Magnetic)
+                        Bearing (° True)
                     </TextBlock>
                     <TextBlock Grid.Row="0" Grid.Column="4"
                                Style="{StaticResource TableHeaderTextStyle}">
-                        Elevation (ft)
+                        Elevation (MSL, ft)
                     </TextBlock>
 
                     <!-- TODO: all TextBoxen should grab PreviewTextDown. however, code does not work with TextBoxExtensions
@@ -450,7 +450,7 @@ https://www.gnu.org/licenses/.
                     </TextBlock>
                     <TextBlock Grid.Row="3" Grid.Column="4" Margin="0,18,0,0"
                                Style="{StaticResource TableHeaderTextStyle}">
-                        Elevation (ft)
+                        Elevation (Delta, ft)
                     </TextBlock>
 
                     <!-- vip/vrp 1 parameters

@@ -430,16 +430,16 @@ namespace JAFDTC.UI.F16C
                 uiStptVxPRngTextHeader.Text = "Range (ft)";
                 uiStptVxPValueRange0.PlaceholderText = "0";
                 uiStptVxPValueRange1.PlaceholderText = "0";
-                uiStptVxP0TextTitle.Text = "Target to VRP";
-                uiStptVxP1TextTitle.Text = "Target to PUP";
+                uiStptVxP0TextTitle.Text = "SP (TGT) to VRP";
+                uiStptVxP1TextTitle.Text = "SP (TGT) to PUP";
             }
             else if (rpType == RefPointTypes.VIP)
             {
                 uiStptVxPRngTextHeader.Text = "Range (nm)";
                 uiStptVxPValueRange0.PlaceholderText = "0.0";
                 uiStptVxPValueRange1.PlaceholderText = "0.0";
-                uiStptVxP0TextTitle.Text = "VIP to Target";
-                uiStptVxP1TextTitle.Text = "VIP to PUP";
+                uiStptVxP0TextTitle.Text = "SP (IP) to TGT";
+                uiStptVxP1TextTitle.Text = "SP (IP) to PUP";
             }
         }
 
