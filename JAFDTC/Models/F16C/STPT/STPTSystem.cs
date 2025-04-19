@@ -3,7 +3,7 @@
 // STPTSystem.cs -- f-16c steerpoint system configuration
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -23,8 +23,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.F16C.STPT
@@ -167,7 +165,7 @@ namespace JAFDTC.Models.F16C.STPT
 
                     stptCur.OAP[index].Type = RefPointTypes.OAP;
                     stptCur.OAP[index].Range = StptRange(stptCur, stpt, true);
-                    stptCur.OAP[index].Brng = StptBearing(stptCur, stpt, magVar);
+                    stptCur.OAP[index].Brng = StptBearing(stptCur, stpt, 0.0);
                     stptCur.OAP[index].Elev = stpt.Alt;
                 }
                 else if ((stptCur != null) && (name.Contains("#VIP.V2T") || name.Contains("#VIP.V2P")))
