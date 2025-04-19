@@ -2,7 +2,7 @@
 //
 // AppTypes.cs : helpful jafdtc types
 //
-// Copyright(C) 2023-25 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -61,6 +61,19 @@ namespace JAFDTC
             [AirframeTypes.FA18C] = "F/A-18C",
             [AirframeTypes.M2000C] = "M2000C",
             [AirframeTypes.F14AB] = "F-14A/B"
+        };
+
+        public static readonly Dictionary<AirframeTypes, string> AirframeDTCTypes = new()
+        {
+            [AirframeTypes.None] = "",
+            [AirframeTypes.A10C] = "",
+            [AirframeTypes.AH64D] = "",
+            [AirframeTypes.AV8B] = "",
+            [AirframeTypes.F15E] = "",
+            [AirframeTypes.F16C] = "F-16C_50",
+            [AirframeTypes.FA18C] = "FA-18C_hornet",
+            [AirframeTypes.M2000C] = "",
+            [AirframeTypes.F14AB] = ""
         };
 
         public static readonly JsonSerializerOptions JSONOptions = new() { WriteIndented = true };
