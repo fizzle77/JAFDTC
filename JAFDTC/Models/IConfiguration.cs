@@ -109,6 +109,12 @@ namespace JAFDTC.Models
         public int LastSystemEdited { get; set; }
 
         /// <summary>
+        /// return a list of system tags for systems that can be merged wth a dcs dtc.
+        /// </summary>
+        [JsonIgnore]
+        public List<string> MergeableSysTagsForDTC { get; }
+
+        /// <summary>
         /// provides an instance of an upload agent object that implements IUploadAgent. this object handles creating
         /// a command set that will set up the jet (according to the configuration) and uploading it to the jet.
         /// </summary>
@@ -167,6 +173,11 @@ namespace JAFDTC.Models
         public ISystem SystemForTag(string tag);
 
         /// <summary>
+        /// returns true if the system with specified tag is into dcs dtc configuration, false otherwise.
+        /// </summary>
+        public bool IsMerged(string systemTag);
+
+        /// <summary>
         /// update a system in this configuration to match the system in a target configuration. this method creates
         /// a deep copy of the system.
         /// </summary>
@@ -205,6 +216,13 @@ namespace JAFDTC.Models
         /// configuration (null indicates no systems should be sync'd).
         /// </summary>
         public void Save(object invokedBy = null, string syncSysTag = null);
+
+        /// <summary>
+        /// persist the merged configuration into the dcs dtc file at the output path. the dcs dtc file is built by
+        /// merging the configuration of mergable systems into the base template. returns true on success, false on
+        /// failure.
+        /// </summary>
+        public bool SaveMergedSimDTC(string template, string outputPath);
 
         /// <summary>
         /// TODO: document

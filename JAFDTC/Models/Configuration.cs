@@ -162,6 +162,9 @@ namespace JAFDTC.Models
         // ---- properties, computed
 
         [JsonIgnore]
+        public virtual List<string> MergeableSysTagsForDTC => new();
+
+        [JsonIgnore]
         public virtual IUploadAgent UploadAgent { get; }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -212,6 +215,8 @@ namespace JAFDTC.Models
 
         public virtual ISystem SystemForTag(string tag) => null;
 
+        public virtual bool IsMerged(string systemTag) => false;
+
         public void LinkSystemTo(string systemTag, IConfiguration linkedConfig)
         {
             LinkedSysMap ??= new Dictionary<string, string>();
@@ -234,6 +239,11 @@ namespace JAFDTC.Models
             FileManager.SaveConfigurationFile(this);
             ConfigurationUpdated();
             OnConfigurationSaved(invokedBy, syncSysTag);
+        }
+
+        public bool SaveMergedSimDTC(string template, string outputPath)
+        {
+            return true;
         }
 
         public string SystemLinkedTo(string systemTag)
