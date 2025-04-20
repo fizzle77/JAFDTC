@@ -2,7 +2,7 @@
 //
 // FA18CConfigurationEditor.cs : supports editors for the fa18c configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -17,11 +17,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.FA18C;
-using JAFDTC.Models.FA18C.CMS;
-using JAFDTC.Models.FA18C.PP;
-using JAFDTC.Models.FA18C.Radio;
-using JAFDTC.Models.FA18C.WYPT;
 using JAFDTC.Models;
 using JAFDTC.UI.App;
 using System.Collections.ObjectModel;
@@ -58,18 +53,5 @@ namespace JAFDTC.UI.FA18C
         public FA18CConfigurationEditor(IConfiguration config) => (Config) = (config);
 
         public override ObservableCollection<ConfigEditorPageInfo> ConfigEditorPageInfo() => _configEditorPageInfo;
-
-        public override ISystem SystemForConfig(IConfiguration config, string tag)
-        {
-            ISystem system = tag switch
-            {
-                CMSSystem.SystemTag => ((FA18CConfiguration)config).CMS,
-                PPSystem.SystemTag => ((FA18CConfiguration)config).PP,
-                RadioSystem.SystemTag => ((FA18CConfiguration)config).Radio,
-                WYPTSystem.SystemTag => ((FA18CConfiguration) config).WYPT,
-                _ => null,
-            };
-            return system;
-        }
     }
 }

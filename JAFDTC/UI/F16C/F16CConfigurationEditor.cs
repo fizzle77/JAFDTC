@@ -2,7 +2,7 @@
 //
 // F16CConfigurationEditor.cs : supports editors for the f16c configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,16 +18,6 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
-using JAFDTC.Models.F16C;
-using JAFDTC.Models.F16C.CMDS;
-using JAFDTC.Models.F16C.DLNK;
-using JAFDTC.Models.F16C.HARM;
-using JAFDTC.Models.F16C.HTS;
-using JAFDTC.Models.F16C.MFD;
-using JAFDTC.Models.F16C.Misc;
-using JAFDTC.Models.F16C.Radio;
-using JAFDTC.Models.F16C.SMS;
-using JAFDTC.Models.F16C.STPT;
 using JAFDTC.UI.App;
 using Microsoft.UI.Xaml;
 using System.Collections.ObjectModel;
@@ -68,7 +58,8 @@ namespace JAFDTC.UI.F16C
                 F16CEditHARMPage.PageInfo,
                 F16CEditHTSPage.PageInfo,
                 F16CEditDLNKPage.PageInfo,
-                F16CEditMiscPage.PageInfo
+                F16CEditMiscPage.PageInfo,
+                F16CEditSimulatorDTCPageHelper.PageInfo
         };
 
         private static readonly ObservableCollection<ConfigAuxCommandInfo> _configAuxCmdInfo = new()
@@ -81,24 +72,6 @@ namespace JAFDTC.UI.F16C
         public override ObservableCollection<ConfigAuxCommandInfo> ConfigAuxCommandInfo() => _configAuxCmdInfo;
 
         public F16CConfigurationEditor(IConfiguration config) => (Config) = (config);
-
-        public override ISystem SystemForConfig(IConfiguration config, string tag)
-        {
-            ISystem system = tag switch
-            {
-                CMDSSystem.SystemTag => ((F16CConfiguration)config).CMDS,
-                DLNKSystem.SystemTag => ((F16CConfiguration)config).DLNK,
-                HARMSystem.SystemTag => ((F16CConfiguration)config).HARM,
-                HTSSystem.SystemTag => ((F16CConfiguration)config).HTS,
-                MFDSystem.SystemTag => ((F16CConfiguration)config).MFD,
-                MiscSystem.SystemTag => ((F16CConfiguration)config).Misc,
-                RadioSystem.SystemTag => ((F16CConfiguration)config).Radio,
-                SMSSystem.SystemTag => ((F16CConfiguration)config).SMS,
-                STPTSystem.SystemTag => ((F16CConfiguration)config).STPT,
-                _ => null,
-            };
-            return system;
-        }
 
         public override bool HandleAuxCommand(ConfigurationPage configPage, ConfigAuxCommandInfo cmd)
         {

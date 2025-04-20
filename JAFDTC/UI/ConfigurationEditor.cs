@@ -2,7 +2,7 @@
 //
 // ConfigurationEditor.cs : abstract base class for a configuration editor
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -59,11 +59,9 @@ namespace JAFDTC.UI
 
         public virtual ObservableCollection<ConfigAuxCommandInfo> ConfigAuxCommandInfo() => new();
 
-        public virtual ISystem SystemForConfig(IConfiguration config, string tag) => null;
-
         public virtual bool IsSystemDefault(IConfiguration config, string tag)
         {
-            ISystem system = SystemForConfig(config, tag);
+            ISystem system = config.SystemForTag(tag);
             return system == null || system.IsDefault;
         }
 

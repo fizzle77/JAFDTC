@@ -2,7 +2,7 @@
 //
 // F15EConfigurationEditor.cs : supports editors for the f16c configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -19,11 +19,6 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.F15E;
-using JAFDTC.Models.F15E.Misc;
-using JAFDTC.Models.F15E.MPD;
-using JAFDTC.Models.F15E.Radio;
-using JAFDTC.Models.F15E.STPT;
-using JAFDTC.Models.F15E.UFC;
 using JAFDTC.UI.App;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -76,20 +71,6 @@ namespace JAFDTC.UI.F15E
                                                                                                  : _configAuxCmdWSO;
 
         public F15EConfigurationEditor(IConfiguration config) => (Config) = (config);
-
-        public override ISystem SystemForConfig(IConfiguration config, string tag)
-        {
-            ISystem system = tag switch
-            {
-                MiscSystem.SystemTag => ((F15EConfiguration)config).Misc,
-                MPDSystem.SystemTag => ((F15EConfiguration)config).MPD,
-                RadioSystem.SystemTag => ((F15EConfiguration)config).Radio,
-                STPTSystem.SystemTag => ((F15EConfiguration)config).STPT,
-                UFCSystem.SystemTag => ((F15EConfiguration)config).UFC,
-                _ => null,
-            };
-            return system;
-        }
 
         public override bool HandleAuxCommand(ConfigurationPage configPage, ConfigAuxCommandInfo cmd)
         {

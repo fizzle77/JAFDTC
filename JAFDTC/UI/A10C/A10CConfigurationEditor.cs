@@ -2,7 +2,7 @@
 //
 // A10CConfigurationEditor.cs : supports editors for the a-10c configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,15 +18,6 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
-using JAFDTC.Models.A10C;
-using JAFDTC.Models.A10C.DSMS;
-using JAFDTC.Models.A10C.HMCS;
-using JAFDTC.Models.A10C.IFFCC;
-using JAFDTC.Models.A10C.Misc;
-using JAFDTC.Models.A10C.Radio;
-using JAFDTC.Models.A10C.TAD;
-using JAFDTC.Models.A10C.TGP;
-using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.UI.App;
 using System.Collections.ObjectModel;
 
@@ -66,22 +57,5 @@ namespace JAFDTC.UI.A10C
                 A10CEditIFFCCPage.PageInfo,
                 A10CEditMiscPage.PageInfo
             };
-
-        public override ISystem SystemForConfig(IConfiguration config, string tag)
-        {
-            ISystem system = tag switch
-            {
-                DSMSSystem.SystemTag => ((A10CConfiguration)config).DSMS,
-                HMCSSystem.SystemTag => ((A10CConfiguration)config).HMCS,
-                IFFCCSystem.SystemTag => ((A10CConfiguration)config).IFFCC,
-                MiscSystem.SystemTag => ((A10CConfiguration)config).Misc,
-                RadioSystem.SystemTag => ((A10CConfiguration)config).Radio,
-                TADSystem.SystemTag => ((A10CConfiguration)config).TAD,
-                TGPSystem.SystemTag => ((A10CConfiguration)config).TGP,
-                WYPTSystem.SystemTag => ((A10CConfiguration)config).WYPT,
-                _ => null,
-            };
-            return system;
-        }
     }
 }

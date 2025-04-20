@@ -2,7 +2,7 @@
 //
 // F14ABConfigurationEditor.cs : supports editors for the f-14a/b configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,8 +18,6 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
-using JAFDTC.Models.F14AB;
-using JAFDTC.Models.F14AB.WYPT;
 using JAFDTC.UI.App;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -46,15 +44,5 @@ namespace JAFDTC.UI.F14AB
             {
                 F14ABEditWaypointListHelper.PageInfo,
             };
-
-        public override ISystem SystemForConfig(IConfiguration config, string tag)
-        {
-            ISystem system = tag switch
-            {
-                WYPTSystem.SystemTag => ((F14ABConfiguration)config).WYPT,
-                _ => null,
-            };
-            return system;
-        }
     }
 }

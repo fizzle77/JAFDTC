@@ -2,7 +2,7 @@
 //
 // AV8BConfigurationEditor.cs : supports editors for the av8b configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -17,8 +17,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Models.AV8B;
-using JAFDTC.Models.AV8B.WYPT;
 using JAFDTC.Models;
 using JAFDTC.UI.App;
 using System.Collections.ObjectModel;
@@ -48,16 +46,6 @@ namespace JAFDTC.UI.AV8B
             {
                 AV8BEditWaypointListHelper.PageInfo,
             };
-        }
-
-        public override ISystem SystemForConfig(IConfiguration config, string tag)
-        {
-            ISystem system = tag switch
-            {
-                WYPTSystem.SystemTag => ((AV8BConfiguration)config).WYPT,
-                _ => null,
-            };
-            return system;
         }
     }
 }

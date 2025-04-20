@@ -2,7 +2,7 @@
 //
 // IConfigurationEditor.cs : general interface to a configuration editor
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -47,11 +47,6 @@ namespace JAFDTC.UI
         /// configuration.
         /// </summary>
         public ObservableCollection<ConfigAuxCommandInfo> ConfigAuxCommandInfo();
-
-        /// <summary>
-        /// returns the system associated with the given tag in the given configuration. 
-        /// </summary>
-        public ISystem SystemForConfig(IConfiguration config, string tag);
 
         /// <summary>
         /// returns true if the system with the given tag is in a default state in the given configuration,
