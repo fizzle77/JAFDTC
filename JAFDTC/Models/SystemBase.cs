@@ -2,7 +2,7 @@
 //
 // SystemBase.cs : abstract base class for system configurations
 //
-// Copyright(C) 2024 fizzle, ilominar/raven
+// Copyright(C) 2024-2025 fizzle, ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -19,6 +19,7 @@
 
 using JAFDTC.Utilities;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Nodes;
 
 namespace JAFDTC.Models
 {
@@ -37,6 +38,14 @@ namespace JAFDTC.Models
         public abstract bool IsDefault { get; }
 
         public abstract void Reset();
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // virtual definitions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        public virtual void MergeIntoSimDTC(JsonNode dataRoot) { }
 
         // ------------------------------------------------------------------------------------------------------------
         //
