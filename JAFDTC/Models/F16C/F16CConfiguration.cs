@@ -18,6 +18,7 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.Base;
 using JAFDTC.Models.F16C.CMDS;
 using JAFDTC.Models.F16C.DLNK;
 using JAFDTC.Models.F16C.HARM;
@@ -75,6 +76,8 @@ namespace JAFDTC.Models.F16C
 
         public STPTSystem STPT { get; set; }
 
+        public SimDTCSystem DTE { get; set; }
+
         [JsonIgnore]
         public override IUploadAgent UploadAgent => new F16CUploadAgent(this);
 
@@ -96,6 +99,7 @@ namespace JAFDTC.Models.F16C
             Radio = new RadioSystem();
             SMS = new SMSSystem();
             STPT = new STPTSystem();
+            DTE = new SimDTCSystem();
             ConfigurationUpdated();
         }
 
@@ -115,6 +119,7 @@ namespace JAFDTC.Models.F16C
                 Radio = (RadioSystem)Radio.Clone(),
                 SMS = (SMSSystem)SMS.Clone(),
                 STPT = (STPTSystem)STPT.Clone(),
+                DTE = (SimDTCSystem)DTE.Clone(),
             };
             clone.ResetUID();
             clone.ConfigurationUpdated();
@@ -135,6 +140,7 @@ namespace JAFDTC.Models.F16C
                 case RadioSystem.SystemTag: Radio = otherViper.Radio.Clone() as RadioSystem; break;
                 case SMSSystem.SystemTag: SMS = otherViper.SMS.Clone() as SMSSystem; break;
                 case STPTSystem.SystemTag: STPT = otherViper.STPT.Clone() as STPTSystem; break;
+                case SimDTCSystem.SystemTag: DTE = otherViper.DTE.Clone() as SimDTCSystem; break;
                 default: break;
             }
         }
@@ -190,6 +196,7 @@ namespace JAFDTC.Models.F16C
                 RadioSystem.SystemTag => JsonSerializer.Serialize(Radio, Configuration.JsonOptions),
                 SMSSystem.SystemTag => JsonSerializer.Serialize(SMS, Configuration.JsonOptions),
                 STPTSystem.SystemTag => JsonSerializer.Serialize(STPT, Configuration.JsonOptions),
+                SimDTCSystem.SystemTag => JsonSerializer.Serialize(DTE, Configuration.JsonOptions),
                 _                    => null
             };
         }
@@ -205,6 +212,7 @@ namespace JAFDTC.Models.F16C
             Radio ??= new RadioSystem();
             SMS   ??= new SMSSystem();
             STPT  ??= new STPTSystem();
+            DTE   ??= new SimDTCSystem();
 
             // TODO: should parse out version number from version string and compare that as an integer
             // TODO: to allow for "update if version older than x".
@@ -250,6 +258,7 @@ namespace JAFDTC.Models.F16C
                     case SMSSystem.SystemTag: SMS = JsonSerializer.Deserialize<SMSSystem>(json); break;
                     case STPTSystem.SystemTag: STPT = JsonSerializer.Deserialize<STPTSystem>(json); break;
                     case STPTSystem.STPTListTag: STPT.ImportSerializedNavpoints(json, false); break;
+                    case SimDTCSystem.SystemTag: DTE = JsonSerializer.Deserialize<SimDTCSystem>(json); break;
                     default: isHandled = false;  break;
                 }
                 if (isHandled)
