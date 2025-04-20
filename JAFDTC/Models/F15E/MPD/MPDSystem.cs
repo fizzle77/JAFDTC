@@ -2,7 +2,7 @@
 //
 // MPDSystem.cs -- f-15e mpd/mpcd system
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -23,7 +23,7 @@ using System.Text.Json.Serialization;
 
 namespace JAFDTC.Models.F15E.MPD
 {
-    public class MPDSystem : BindableObject, ISystem
+    public class MPDSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:F15E:MPD";
 
@@ -59,17 +59,13 @@ namespace JAFDTC.Models.F15E.MPD
         /// returns true if the instance indicates a default setup (all fields are ""), false otherwise.
         /// </summary>
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get
             {
                 for (int i = 0; i < (int)CockpitDisplays.NUM_DISPLAYS; i++)
-                {
                     if (!Displays[i].IsDefault)
-                    {
                         return false;
-                    }
-                }
                 return true;
             }
         }
@@ -84,12 +80,8 @@ namespace JAFDTC.Models.F15E.MPD
             int max = (member == F15EConfiguration.CrewPositions.PILOT) ? (int)CockpitDisplays.PILOT_R_MPD
                                                                         : (int)CockpitDisplays.WSO_R_MPCD;
             for (int i = min; i <= max; i++)
-            {
                 if (!Displays[i].IsDefault)
-                {
                     return false;
-                }
-            }
             return true;
         }
 
@@ -103,18 +95,14 @@ namespace JAFDTC.Models.F15E.MPD
         {
             Displays = new MPDConfiguration[(int)CockpitDisplays.NUM_DISPLAYS];
             for (int i = 0; i < (int)CockpitDisplays.NUM_DISPLAYS; i++)
-            {
                 Displays[i] = new MPDConfiguration();
-            }
         }
 
         public MPDSystem(MPDSystem other)
         {
             Displays = new MPDConfiguration[(int)CockpitDisplays.NUM_DISPLAYS];
             for (int i = 0; i < (int)CockpitDisplays.NUM_DISPLAYS; i++)
-            {
                 Displays[i] = new MPDConfiguration(other.Displays[i]);
-            }
         }
 
         public virtual object Clone() => new MPDSystem(this);
@@ -128,12 +116,10 @@ namespace JAFDTC.Models.F15E.MPD
         /// <summary>
         /// reset the instance to defaults (by definition, field value of "" implies default).
         /// </summary>
-        public void Reset()
+        public override void Reset()
         {
             for (int i = 0; i < (int)CockpitDisplays.NUM_DISPLAYS; i++)
-            {
                 Displays[i].Reset();
-            }
         }
     }
 }

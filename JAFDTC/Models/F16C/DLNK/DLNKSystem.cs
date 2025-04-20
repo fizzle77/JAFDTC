@@ -28,7 +28,7 @@ namespace JAFDTC.Models.F16C.DLNK
     /// class to capture the settings of the DLNK system. most DLNK fields are encoded as strings. a field value of
     /// "" implies that the field is set to the default value in the avionics.
     /// </summary>
-    public class DLNKSystem : BindableObject, ISystem
+    public class DLNKSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:F16C:DLNK";
 
@@ -110,7 +110,7 @@ namespace JAFDTC.Models.F16C.DLNK
         // ---- public properties, computed
 
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get
             {
@@ -167,7 +167,7 @@ namespace JAFDTC.Models.F16C.DLNK
 
         // reset the instance to defaults (by definition, field value of "" implies default).
         //
-        public void Reset()
+        public override void Reset()
         {
             Ownship = "";
             IsOwnshipLead = false;

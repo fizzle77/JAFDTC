@@ -2,7 +2,7 @@
 //
 // RadioSystemBase.cs : radio system abstract base class
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -17,7 +17,6 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
@@ -29,7 +28,7 @@ namespace JAFDTC.Models.Base
     /// M can vary from radio to radio) of type T (where T should be conform to IRadioPresetInfo and is typically
     /// derived from the RadioPresetInfoBase abstract base class).
     /// </summary>
-    public abstract class RadioSystemBase<T> : BindableObject, ISystem
+    public abstract class RadioSystemBase<T> : SystemBase
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -44,17 +43,13 @@ namespace JAFDTC.Models.Base
         // ---- synthesized properties
 
         [JsonIgnore]
-        public virtual bool IsDefault
+        public override bool IsDefault
         {
             get
             {
                 foreach (ObservableCollection<T> collection in Presets)
-                {
                     if (collection.Count > 0)
-                    {
                         return false;
-                    }
-                }
                 return true;
             }
         }
@@ -68,12 +63,10 @@ namespace JAFDTC.Models.Base
         /// <summary>
         /// reset the instance to defaults by removing all presets.
         /// </summary>
-        public virtual void Reset()
+        public override void Reset()
         {
             foreach (ObservableCollection<T> list in Presets)
-            {
                 list.Clear();
-            }
         }
     }
 }

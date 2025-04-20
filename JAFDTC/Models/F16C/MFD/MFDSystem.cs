@@ -3,7 +3,7 @@
 // MFDSystem.cs -- f-16c mfd system
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -28,7 +28,7 @@ namespace JAFDTC.Models.F16C.MFD
     /// class to capture the settings of the MFD setup. most MFD fields are encoded as strings. when persisted, a
     /// field value of "" implies that the field is set to the default value in the avionics.
     /// </summary>
-    public class MFDSystem : BindableObject, ISystem
+    public class MFDSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:F16C:MFD";
 
@@ -110,17 +110,13 @@ namespace JAFDTC.Models.F16C.MFD
         // form, false otherwise.
         //
         [JsonIgnore]
-        public bool IsDefault
+        public override bool IsDefault
         {
             get
             {
                 for (var i = MasterModes.NAV; i <= MasterModes.DGFT_DGFT; i++)
-                {
                     if (!ModeConfigs[(int)i].IsDefault)
-                    {
                         return false;
-                    }
-                }
                 return true;
             }
         }
@@ -168,12 +164,10 @@ namespace JAFDTC.Models.F16C.MFD
 
         // reset the instance to defaults (by definition, field value of "" implies default).
         //
-        public void Reset()
+        public override void Reset()
         {
             foreach (MFDModeConfiguration config in ModeConfigs)
-            {
                 config.Reset();
-            }
         }
     }
 }
