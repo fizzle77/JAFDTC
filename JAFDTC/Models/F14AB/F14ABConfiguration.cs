@@ -2,7 +2,7 @@
 //
 // F14ABConfiguration.cs -- f-14a/b airframe configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -88,9 +88,18 @@ namespace JAFDTC.Models.F14AB
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // methods
+        // overriden class methods
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        public override ISystem SystemForTag(string tag)
+        {
+            return tag switch
+            {
+                WYPTSystem.SystemTag => WYPT,
+                _ => null,
+            };
+        }
 
         public override void ConfigurationUpdated()
         {

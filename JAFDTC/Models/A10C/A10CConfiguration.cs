@@ -2,7 +2,7 @@
 //
 // A10CConfiguration.cs -- a-10c airframe configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven, JAFDTC contributors
+// Copyright(C) 2023-2025 ilominar/raven, JAFDTC contributors
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -132,6 +132,22 @@ namespace JAFDTC.Models.A10C
         // overriden class methods
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        public override ISystem SystemForTag(string tag)
+        {
+            return tag switch
+            {
+                DSMSSystem.SystemTag => DSMS,
+                HMCSSystem.SystemTag => HMCS,
+                IFFCCSystem.SystemTag => IFFCC,
+                MiscSystem.SystemTag => Misc,
+                RadioSystem.SystemTag => Radio,
+                TADSystem.SystemTag => TAD,
+                TGPSystem.SystemTag => TGP,
+                WYPTSystem.SystemTag => WYPT,
+                _ => null,
+            };
+        }
 
         public override void ConfigurationUpdated()
         {

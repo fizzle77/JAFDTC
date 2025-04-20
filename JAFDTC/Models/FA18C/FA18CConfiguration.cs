@@ -3,7 +3,7 @@
 // FA18CConfiguration.cs -- fa-18c airframe configuration
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -108,9 +108,21 @@ namespace JAFDTC.Models.FA18C
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // methods
+        // overriden class methods
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        public override ISystem SystemForTag(string tag)
+        {
+            return tag switch
+            {
+                CMSSystem.SystemTag => CMS,
+                PPSystem.SystemTag => PP,
+                RadioSystem.SystemTag => Radio,
+                WYPTSystem.SystemTag => WYPT,
+                _ => null,
+            };
+        }
 
         public override void ConfigurationUpdated()
         {

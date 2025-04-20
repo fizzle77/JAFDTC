@@ -3,7 +3,7 @@
 // IConfiguration.cs -- interface for airframe configuration class
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -162,33 +162,39 @@ namespace JAFDTC.Models
         public void ResetUID();
 
         /// <summary>
+        /// returns the system associated with the given tag in the configuration, null if there is no such system.
+        /// </summary>
+        public ISystem SystemForTag(string tag);
+
+        /// <summary>
         /// update a system in this configuration to match the system in a target configuration. this method creates
         /// a deep copy of the system.
         /// </summary>
         public void CloneSystemFrom(string systemTag, IConfiguration other);
 
         /// <summary>
-        /// TODO: document
+        /// link the configuration of a system with the specified tag to the system in another configuration.
         /// </summary>
         public void LinkSystemTo(string systemTag, IConfiguration linkedConfig);
 
         /// <summary>
-        /// TODO: document
+        /// unlink the configuration of a system with the specified tag.
         /// </summary>
         public void UnlinkSystem(string systemTag);
 
         /// <summary>
-        /// TODO: document
+        /// return the uid for the configuration that the system with the specified tag is linked to, null if the
+        /// system is not linked.
         /// </summary>
         public string SystemLinkedTo(string systemTag);
 
         /// <summary>
-        /// TODO: document
+        /// returns true if the system with specified tag is linked to a different configuration, false otherwise.
         /// </summary>
         public bool IsLinked(string systemTag);
 
         /// <summary>
-        /// TODO: document
+        /// clean up the system links in the configuration removing any stale links for the systems.
         /// </summary>
         public void CleanupSystemLinks(List<string> validUIDs);
 
@@ -212,12 +218,14 @@ namespace JAFDTC.Models
         public string Serialize(string systemTag = null);
 
         /// <summary>
-        /// TODO: document
+        /// returns true if able to deserialize the json string into the configuration for a system with the specified
+        /// system tag, false on error.
         /// </summary>
         public bool Deserialize(string systemTag, string json);
 
-        // called after deserializing a configuration from json to allow opportunities to update versions, etc.
-        //
+        /// <summary>
+        /// called after deserializing a configuration from json to allow opportunities to update versions, etc.
+        /// </summary>
         public void AfterLoadFromJSON();
 
         /// <summary>

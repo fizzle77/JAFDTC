@@ -3,7 +3,7 @@
 // F16CConfiguration.cs -- f-16c airframe configuration
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -103,9 +103,7 @@ namespace JAFDTC.Models.F16C
         {
             Dictionary<string, string> linkedSysMap = new();
             foreach (KeyValuePair<string, string> kvp in LinkedSysMap)
-            {
                 linkedSysMap[new(kvp.Key)] = new(kvp.Value);
-            }
             F16CConfiguration clone = new("", Name, linkedSysMap)
             {
                 CMDS = (CMDSSystem)CMDS.Clone(),
@@ -143,9 +141,27 @@ namespace JAFDTC.Models.F16C
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // methods
+        // overriden class methods
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        public override ISystem SystemForTag(string tag)
+        {
+            return tag switch
+            {
+                CMDSSystem.SystemTag => CMDS,
+                DLNKSystem.SystemTag => DLNK,
+                HARMSystem.SystemTag => HARM,
+                HTSSystem.SystemTag => HTS,
+                MFDSystem.SystemTag => MFD,
+                MiscSystem.SystemTag => Misc,
+                RadioSystem.SystemTag => Radio,
+                SMSSystem.SystemTag => SMS,
+                STPTSystem.SystemTag => STPT,
+                SimDTCSystem.SystemTag => DTE,
+                _ => null,
+            };
+        }
 
         public override void ConfigurationUpdated()
         {
@@ -154,9 +170,7 @@ namespace JAFDTC.Models.F16C
 
             string stpts = "";
             if (!STPT.IsDefault)
-            {
                 stpts = $" along with { STPT.Count } steerpoint" + ((STPT.Count > 1) ? "s" : "");
-            }
             UpdatesInfoTextUI = updatesStrings["UpdatesInfoTextUI"] + stpts;
             UpdatesIconsUI = updatesStrings["UpdatesIconsUI"];
             UpdatesIconBadgesUI = updatesStrings["UpdatesIconBadgesUI"];
@@ -195,9 +209,7 @@ namespace JAFDTC.Models.F16C
             // TODO: should parse out version number from version string and compare that as an integer
             // TODO: to allow for "update if version older than x".
             if (Version == _versionCfg_10)
-            {
                 SMS.UpdateFrom10to11();
-            }
             Version = _versionCfg;
 
             Save(this);
