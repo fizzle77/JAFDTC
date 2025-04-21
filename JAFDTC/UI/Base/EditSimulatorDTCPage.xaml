@@ -40,6 +40,7 @@ https://www.gnu.org/licenses/.
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -116,12 +117,21 @@ https://www.gnu.org/licenses/.
             </GridView.ItemTemplate>
         </GridView>
 
+        <StackPanel Grid.Row="4" Margin="24,0,24,24">
+            <TextBlock Style="{StaticResource TableHeaderTextStyle}">
+                JAFDTC expects all merged systems to be configured via DCS DTC through the .dtc file saved below. When a system
+            </TextBlock>
+            <TextBlock Style="{StaticResource TableHeaderTextStyle}">
+                 is marked as merged, JAFDTC will only configure those system parameters that cannot be set through a .dtc file.
+            </TextBlock>
+        </StackPanel>
+
         <!-- output -->
-        <TextBlock Grid.Row="4" Margin="12,0,12,0"
+        <TextBlock Grid.Row="5" Margin="12,0,12,0"
                    Style="{StaticResource EditorTitleTextBlockStyle}">
             Location to Save Merged DTC Tape:
         </TextBlock>
-        <Grid Grid.Row="5" Margin="24,0,12,0">
+        <Grid Grid.Row="6" Margin="24,0,12,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -150,7 +160,7 @@ https://www.gnu.org/licenses/.
             </Button>
         </Grid>
 
-        <StackPanel Grid.Row="6" Margin="24,24,24,24">
+        <StackPanel Grid.Row="7" Margin="24,12,24,24">
             <TextBlock Style="{StaticResource TableHeaderTextStyle}">
                 To use the merged DCS DTC file, you must first save it (using the save icon to the right of output
                 location above),
@@ -163,7 +173,7 @@ https://www.gnu.org/licenses/.
             </TextBlock>
         </StackPanel>
 
-        <CheckBox Grid.Row="7" Grid.Column="0" Tag="EnableLoad" x:Name="uiCkbxEnableLoad"
+        <CheckBox Grid.Row="8" Grid.Column="0" Tag="EnableLoad" x:Name="uiCkbxEnableLoad"
                   Margin="24,36,12,0" HorizontalAlignment="Center"
                   Click="CheckBox_Clicked">
             JAFDTC triggers DCS tape load via the aircraft avionics at the start of JAFDTC upload
@@ -174,7 +184,7 @@ https://www.gnu.org/licenses/.
         common editor controls 
         ===============================================================================================================
         -->
-        <ui_ctrl:LinkResetBtnsControl Grid.Row="9" Grid.Column="0" Margin="0,0,0,0" x:Name="uiCtlLinkResetBtns"/>
+        <ui_ctrl:LinkResetBtnsControl Grid.Row="10" Grid.Column="0" Margin="0,0,0,0" x:Name="uiCtlLinkResetBtns"/>
 
     </Grid>
 </ui_base:SystemEditorPageBase>
