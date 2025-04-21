@@ -33,6 +33,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace JAFDTC.Utilities
 {
@@ -125,6 +127,26 @@ namespace JAFDTC.Utilities
         public static string AppDCSDataDirPath()
         {
             return Path.Combine(_appDirPath, "DCS");
+        }
+
+        /// <summary>
+        /// returns the path to the airframe-specific directory for a given type of data for a given
+        /// airframe in the settings directory
+        /// </summary>
+        private static string AirframeDataDirPath(AirframeTypes airframe, string dataType)
+        {
+            return airframe switch
+            {
+                AirframeTypes.A10C => Path.Combine(_settingsDirPath, dataType, "A10C"),
+                AirframeTypes.AH64D => Path.Combine(_settingsDirPath, dataType, "AH64D"),
+                AirframeTypes.AV8B => Path.Combine(_settingsDirPath, dataType, "AV8B"),
+                AirframeTypes.F14AB => Path.Combine(_settingsDirPath, dataType, "F14AB"),
+                AirframeTypes.F15E => Path.Combine(_settingsDirPath, dataType, "F15E"),
+                AirframeTypes.F16C => Path.Combine(_settingsDirPath, dataType, "F16C"),
+                AirframeTypes.FA18C => Path.Combine(_settingsDirPath, dataType, "FA18C"),
+                AirframeTypes.M2000C => Path.Combine(_settingsDirPath, dataType, "M2000C"),
+                _ => Path.Combine(_settingsDirPath, dataType, "Other"),
+            };
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -244,21 +266,7 @@ namespace JAFDTC.Utilities
         /// <summary>
         /// returns the path to the configurations directory for a given airframe in the settings directory
         /// </summary>
-        private static string AirframeConfigDirPath(AirframeTypes airframe)
-        {
-            return airframe switch
-            {
-                AirframeTypes.A10C => Path.Combine(_settingsDirPath, "Configs", "A10C"),
-                AirframeTypes.AH64D => Path.Combine(_settingsDirPath, "Configs", "AH64D"),
-                AirframeTypes.AV8B => Path.Combine(_settingsDirPath, "Configs", "AV8B"),
-                AirframeTypes.F14AB => Path.Combine(_settingsDirPath, "Configs", "F14AB"),
-                AirframeTypes.F15E => Path.Combine(_settingsDirPath, "Configs", "F15E"),
-                AirframeTypes.F16C => Path.Combine(_settingsDirPath, "Configs", "F16C"),
-                AirframeTypes.FA18C => Path.Combine(_settingsDirPath, "Configs", "FA18C"),
-                AirframeTypes.M2000C => Path.Combine(_settingsDirPath, "Configs", "M2000C"),
-                _ => Path.Combine(_settingsDirPath, "Configs"),
-            };
-        }
+        private static string AirframeConfigDirPath(AirframeTypes airframe) => AirframeDataDirPath(airframe, "Configs");
 
         /// <summary>
         /// returns the configuration file name for the given airframe. configuration file name is built by removing
@@ -348,6 +356,97 @@ namespace JAFDTC.Utilities
             else
             {
                 config.Filename = null;
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // aircraft dtc templates
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// returns the path to the dtc template directory for a given airframe in the settings directory
+        /// </summary>
+        private static string AirframeDTCTemplateDirPath(AirframeTypes airframe) => AirframeDataDirPath(airframe, "DTC");
+
+        /// <summary>
+        /// returns true if the airframe has a template file with the specified name, false otherwise. a name of ""
+        /// indicates the default airframe template file and is always valid.
+        /// </summary>
+        public static bool IsValidDTCTemplate(AirframeTypes airframe, string name)
+            => (string.IsNullOrEmpty(name) ||
+                File.Exists(Path.Combine(AirframeDTCTemplateDirPath(airframe), $"{name}.dtc")));
+
+        /// <summary>
+        /// returns a list of the dtc template names for an airframe (excluding the default template).
+        /// </summary>
+        public static List<string> ListDTCTemplates(AirframeTypes airframe)
+        {
+            List<string> list = new();
+            string path = AirframeDTCTemplateDirPath(airframe);
+            if (Directory.Exists(path))
+                foreach (string srcFile in Directory.GetFiles(path))
+                    list.Add(Path.GetFileNameWithoutExtension(srcFile));
+            return list;
+        }
+
+        /// <summary>
+        /// import a dcs dtc file into jafdtc as a template file by copying the source template file to the airframe's
+        /// dtc template area. returns the template name, "" on error. this operation will over-write an existing
+        /// template with the same name and create the template directory if it does not yet exist.
+        /// </summary>
+        public static string ImportDTCTemplate(AirframeTypes airframe, string srcPath)
+        {
+            string destPath = AirframeDTCTemplateDirPath(airframe);
+            string destName = Path.GetFileNameWithoutExtension(srcPath);
+            try
+            {
+                Directory.CreateDirectory(destPath);
+                string template = ReadFile(srcPath);
+                WriteFile(Path.Combine(destPath, $"{destName}.dtc"), template);
+            }
+            catch (Exception ex)
+            {
+                FileManager.Log($"FileManager:SaveDTCTemplateFile exception copying {srcPath} to {destPath}, {ex}");
+                destName = "";
+            }
+            return destName;
+        }
+
+        /// <summary>
+        /// returns the contents of a dtc template file with the given name for the specified airframe, null on
+        /// error. the name "" indicates the default airframe template, by convention.
+        /// </summary>
+        public static string LoadDTCTemplate(AirframeTypes airframe, string name)
+        {
+            string srcPath = null;
+            if (string.IsNullOrEmpty(name))
+                srcPath = Path.Combine(_appDirPath, "DCS", "DTC", $"{Globals.AirframeDTCTypes[airframe]}.dtc");
+            else
+                srcPath = Path.Combine(AirframeDTCTemplateDirPath(airframe), $"{name}.dtc");
+            try
+            {
+                return ReadFile(srcPath);
+            }
+            catch (Exception ex)
+            {
+                FileManager.Log($"FileManager:LoadDTCTemplateFile exception loading from {srcPath}, {ex}");
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// remove the dtc template file with a given name for the specified airframe. operations on the default
+        /// template (name "", by convention) are ignored.
+        /// </summary>
+        public static void DeleteDTCTemplate(AirframeTypes airframe, string name)
+        {
+            if (!string.IsNullOrEmpty(name))
+            {
+                string path = Path.Combine(AirframeDTCTemplateDirPath(airframe), $"{name}.dtc");
+                if (File.Exists(path))
+                    File.Delete(path);
             }
         }
 
