@@ -203,6 +203,9 @@
     <None Update="Images\mk-84hd.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="UI\Base\EditSimulatorDTCPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="UI\F16C\F16CEditSMSPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+EditSimulatorDTC.xaml : ui xaml for general radio setup editor page
+
+Copyright(C) 2023-2024 ilominar/raven
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+**********************************************************************************************************************
+-->
+<ui_base:SystemEditorPageBase
+    x:Class="JAFDTC.UI.Base.EditSimulatorDTCPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.Base"
+    xmlns:ui_base="using:JAFDTC.UI.Base"
+    xmlns:ui_ctrl="using:JAFDTC.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        merge setup 
+        ===============================================================================================================
+        -->
+
+        <!-- base tape template -->
+        <TextBlock Grid.Row="0" Margin="12,12,12,0"
+                   Style="{StaticResource EditorTitleTextBlockStyle}">
+            Base DTC Tape:
+        </TextBlock>
+        <Grid Grid.Row="1" Margin="24,0,12,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <ComboBox Grid.Row="0" Grid.Column="0" x:Name="uiComboTemplate"
+                      Margin="0,12,0,0" HorizontalAlignment="Stretch"
+                      SelectionChanged="ComboTemplate_SelectionChanged"
+                      ToolTipService.ToolTip="Selects DTC Base Tape to Use for Merged Tape"/>
+            <Button Grid.Row="0" Grid.Column="1" x:Name="uiBtnAddTmplt"
+                    Margin="12,12,0,0" VerticalAlignment="Center"
+                    Click="BtnAddTmplt_Click"
+                    ToolTipService.ToolTip="Imports a DCS DTC File for use as a Base Tape for the Current Airframe">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE896;"/>
+            </Button>
+            <Button Grid.Row="0" Grid.Column="2" x:Name="uiBtnDelTmplt"
+                    Margin="6,12,0,0" VerticalAlignment="Center"
+                    Click="BtnDelTmplt_Click"
+                    ToolTipService.ToolTip="Deletes the Selected DTC Base Tape">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74D;"/>
+            </Button>
+        </Grid>
+
+        <!-- merged systems -->
+        <TextBlock Grid.Row="2" Margin="12,12,12,0"
+                   Style="{StaticResource EditorTitleTextBlockStyle}">
+            Systems to Merge:
+        </TextBlock>
+        <GridView Grid.Row="3" x:Name="uiGridSystemItems"
+                  Margin="12,12,12,0" HorizontalAlignment="Center"
+                  SelectionMode="None">
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="local:DTCSystemItem">
+                    <StackPanel Margin="0,0,2,0">
+                        <ToggleButton Width="240" Tag="{x:Bind Tag}" IsChecked="{x:Bind IsChecked, Mode=TwoWay}"
+                                      Click="BtnSystemItem_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <FontIcon Grid.Column="0" Margin="0,4,12,0"
+                                          FontFamily="Segoe Fluent Icons"
+                                          FontSize="20"
+                                          Glyph="{x:Bind Glyph}"/>
+                                <TextBlock Grid.Column="1" VerticalAlignment="center" Text="{x:Bind Name}"/>
+                            </Grid>
+                        </ToggleButton>
+                    </StackPanel>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
+
+        <!-- output -->
+        <TextBlock Grid.Row="4" Margin="12,0,12,0"
+                   Style="{StaticResource EditorTitleTextBlockStyle}">
+            Location to Save Merged DTC Tape:
+        </TextBlock>
+        <Grid Grid.Row="5" Margin="24,0,12,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Grid.Row="0" Grid.Column="0" x:Name="uiValueOutput"
+                     Margin="0,12,0,0" HorizontalAlignment="Stretch"
+                     Text="{x:Bind EditDTC.OutputPath, Mode=TwoWay}"
+                     IsEnabled="False"
+                     PlaceholderText="No Save Location Set for Merged Tape"/>
+            <Button Grid.Row="0" Grid.Column="1" x:Name="uiBtnSetOutput"
+                    Margin="12,12,0,0" VerticalAlignment="Center"
+                    Click="BtnSetOutput_Click"
+                    ToolTipService.ToolTip="Selects the Save Path for the Merged DTC Tape">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74E;"/>
+            </Button>
+            <Button Grid.Row="0" Grid.Column="2" x:Name="uiBtnClearOutput"
+                    Margin="6,12,0,0" VerticalAlignment="Center"
+                    Click="BtnClearOutput_Click"
+                    ToolTipService.ToolTip="Clears the Save Path for the Merged DTC Tape">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE894;"/>
+            </Button>
+        </Grid>
+
+        <StackPanel Grid.Row="6" Margin="24,24,24,24">
+            <TextBlock Style="{StaticResource TableHeaderTextStyle}">
+                To use the merged DCS DTC file, you must first save it (using the save icon to the right of output
+                location above),
+            </TextBlock>
+            <TextBlock Style="{StaticResource TableHeaderTextStyle}">
+                then import the saved DCS DTC file through the DCS DTC user interface, and then finally use JAFDTC to
+            </TextBlock>
+            <TextBlock Style="{StaticResource TableHeaderTextStyle}">
+                load the configuration.
+            </TextBlock>
+        </StackPanel>
+
+        <CheckBox Grid.Row="7" Grid.Column="0" Tag="EnableLoad" x:Name="uiCkbxEnableLoad"
+                  Margin="24,36,12,0" HorizontalAlignment="Center"
+                  Click="CheckBox_Clicked">
+            JAFDTC triggers DCS tape load via the aircraft avionics at the start of JAFDTC upload
+        </CheckBox>
+
+        <!--
+        ===============================================================================================================
+        common editor controls 
+        ===============================================================================================================
+        -->
+        <ui_ctrl:LinkResetBtnsControl Grid.Row="9" Grid.Column="0" Margin="0,0,0,0" x:Name="uiCtlLinkResetBtns"/>
+
+    </Grid>
+</ui_base:SystemEditorPageBase>
