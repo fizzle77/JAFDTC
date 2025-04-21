@@ -3,7 +3,7 @@
 // CMDSBuilder.cs -- f-16c cmds command builder
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -20,7 +20,6 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C.CMDS;
-using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -58,6 +57,9 @@ namespace JAFDTC.Models.F16C.Upload
                 return;
 
             AddExecFunction("NOP", new() { "==== CMDSBuilder:Build()" });
+
+            if (_cfg.IsMerged(CMDSSystem.SystemTag))
+                return;
 
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 

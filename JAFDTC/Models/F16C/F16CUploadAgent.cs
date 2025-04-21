@@ -3,7 +3,7 @@
 // F16CUploadAgent.cs -- f-16c upload agent
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -164,8 +164,9 @@ namespace JAFDTC.Models.F16C
             //
             // NOTE: general expectation by builders is that master mode is NAV and DED page is default on entry.
             // NOTE: builders must preserve master mode, DED state, and MFD state (one exception is MFDBuilder does
-            // NOTE: not maintain MFD state to set avions up as requested).
+            // NOTE: not maintain MFD state to set avionics up as requested).
             //
+            new DTEBuilder(_cfg, _dm, sb).Build(state);
             new RadioBuilder(_cfg, _dm, sb).Build(state);
             new MiscBuilder(_cfg, _dm, sb).Build(state);
             new CMDSBuilder(_cfg, _dm, sb).Build(state);

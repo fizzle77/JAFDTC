@@ -85,8 +85,10 @@ function JAFDTC_F16CM_Fn_DebugDumpDED(msg)
 end
 
 function JAFDTC_F16CM_Fn_DebugDumpLeftMFD(msg)
-    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpLeftMFD - " .. msg)
+    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpLeftMFD (ParseDisplay) - " .. msg)
     JAFDTC_DebugDisplay(JAFDTC_F16CM_GetParsedLeftMFD())
+    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpLeftMFD (GetDisplay) - " .. msg)
+    JAFDTC_DebugDisplay(JAFDTC_GetDisplay(4))
 end
 
 function JAFDTC_F16CM_Fn_DebugDumpRightMFD(msg)
@@ -432,6 +434,35 @@ function JAFDTC_F16CM_Fn_IsSMSAutoPwrModeMAV(mfd, app)
     local table = JAFDTC_F16CM_GetMFD(mfd)
     local str = table["MAVERICK_ROOT.2.MAVERICK_CNTL_PAGE.2.Table. Root. Unic ID: _id:1106.2.Table. Root. Unic ID: _id:1106. Text.1"] or ""
     return (str == app)
+end
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- dte format support
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
+-- for DCS 2.9.15.9408, dte load is done once the INV button (OSB 18) on DTE page 1 switches to inverted text.
+--
+-- 1 MPD        MPD Selectable Root. Unic ID: _id:37. Black Text
+-- 1 COMM       COMM Selectable Root. Unic ID: _id:34. Black Text
+-- 1 INV        INV Selectable Root. Unic ID: _id:31. Black Text
+-- 1 PROF       PROF Selectable Root. Unic ID: _id:28. Black Text
+-- 1 MSMD       MSMD Selectable Root. Unic ID: _id:25. Black Text
+-- 1 CLSD       CLSD Selectable Root. Unic ID: _id:3. Black Text
+-- 1 FCR        FCR Selectable Root. Unic ID: _id:9. Black Text
+-- 1 ELINT      ELINT Selectable Root. Unic ID: _id:12. Black Text
+-- 1 SMDL       SMDL Selectable Root. Unic ID: _id:15. Black Text
+-- 1 TNDL A     ???
+-- 1 NCTR       NCTR Selectable Root. Unic ID: _id:21. Black Text
+--
+function JAFDTC_F16CM_Fn_IsDTELoadDone(mfd)
+    local table = JAFDTC_F16CM_GetParsedMFD(mfd)
+    --
+    -- inverted text is easier to locate in the parsed output...
+    --
+    local str = table["INV Selectable Root. Unic ID: _id:31. Black Text"]
+    return (str == "INV")
 end
 
 -- --------------------------------------------------------------------------------------------------------------------
