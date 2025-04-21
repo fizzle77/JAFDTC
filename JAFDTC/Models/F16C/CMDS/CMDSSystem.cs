@@ -3,7 +3,7 @@
 // CMDSSystem.cs -- f-16c cmds system configuration
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,8 +18,9 @@
 //
 // ********************************************************************************************************************
 
-using JAFDTC.Utilities;
+using System;
 using System.Diagnostics;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace JAFDTC.Models.F16C.CMDS
@@ -123,12 +124,8 @@ namespace JAFDTC.Models.F16C.CMDS
             {
                 var isDefault = ((BingoChaff.Length == 0) && (BingoFlare.Length == 0));
                 for (int i = 0; isDefault && (i < 6); i++)
-                {
                     if (!Programs[i].IsDefault)
-                    {
                         return false;
-                    }
-                }
                 return isDefault;
             }
         }
@@ -177,17 +174,53 @@ namespace JAFDTC.Models.F16C.CMDS
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // reset the instance to defaults (by definition, field value of "" implies default). table numbers are not
-        // changed by this operation.
-        //
+        /// <summary>
+        /// merge core program (bq/bi/sq/si) into dcs dtc dom.
+        /// </summary>
+        private void MergeProgramIntoSimDTC(JsonNode progRoot, CMDSProgramCore prog, CMDSProgramCore dflt)
+        {
+            if (int.TryParse((string.IsNullOrEmpty(prog.BQ)) ? dflt.BQ : prog.BQ, out int bq))
+                progRoot["BurstQuantity"] = bq;
+            if (int.TryParse((string.IsNullOrEmpty(prog.SQ)) ? dflt.BQ : prog.SQ, out int sq))
+                progRoot["SalvoQuantity"] = sq;
+            if (double.TryParse((string.IsNullOrEmpty(prog.BI)) ? dflt.SI : prog.SI, out double bi))
+                progRoot["BurstInterval"] = Math.Truncate(bi * 1000.0) / 1000.0;
+            if (double.TryParse((string.IsNullOrEmpty(prog.SI)) ? dflt.SI : prog.SI, out double si))
+                progRoot["SalvoInterval"] = Math.Truncate(si * 100.0) / 100.0;
+        }
+
+        /// <summary>
+        /// merge radio settings into dcs dtc configuration.
+        /// </summary>
+        public override void MergeIntoSimDTC(JsonNode dataRoot)
+        {
+            CMDSSystem dflt = ExplicitDefaults;
+            JsonNode cmdsRoot = dataRoot["MPD"]["CMDS"];
+
+            JsonNode bingoRoot = cmdsRoot["CMDSBingoSettings"];
+            if (int.TryParse((string.IsNullOrEmpty(BingoChaff)) ? dflt.BingoChaff : BingoChaff, out int bingoChaff))
+                bingoRoot["ChaffNum"] = bingoChaff;
+            if (int.TryParse((string.IsNullOrEmpty(BingoFlare)) ? dflt.BingoFlare : BingoFlare, out int bingoFlare))
+                bingoRoot["FlaresNum"] = bingoFlare;
+
+            JsonNode progRoot = cmdsRoot["CMDSProgramSettings"];
+            for (int i = (int)ProgramNumbers.MAN1; i < (int)ProgramNumbers.MAN2; i++)
+            {
+                MergeProgramIntoSimDTC(progRoot[$"MAN{i + 1}"]["Chaff"], Programs[i].Chaff, dflt.Programs[i].Chaff);
+                MergeProgramIntoSimDTC(progRoot[$"MAN{i + 1}"]["Flare"], Programs[i].Flare, dflt.Programs[i].Chaff);
+            }
+        }
+
+        /// <summary>
+        /// reset the instance to defaults (by definition, field value of "" implies default). table numbers are not
+        /// changed by this operation.
+        /// <summary>
         public override void Reset()
         {
             BingoChaff = "";
             BingoFlare = "";
             foreach (CMDSProgram program in Programs)
-            {
                 program.Reset();
-            }
         }
     }
 }

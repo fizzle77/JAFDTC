@@ -28,6 +28,7 @@ using JAFDTC.Models.F16C.Misc;
 using JAFDTC.Models.F16C.Radio;
 using JAFDTC.Models.F16C.SMS;
 using JAFDTC.Models.F16C.STPT;
+using JAFDTC.UI.App;
 using JAFDTC.UI.F16C;
 using JAFDTC.Utilities;
 using System;
@@ -77,6 +78,13 @@ namespace JAFDTC.Models.F16C
         public STPTSystem STPT { get; set; }
 
         public SimDTCSystem DTE { get; set; }
+
+        [JsonIgnore]
+        public override List<string> MergeableSysTagsForDTC => new()
+        {
+            RadioSystem.SystemTag,
+            CMDSSystem.SystemTag
+        };
 
         [JsonIgnore]
         public override IUploadAgent UploadAgent => new F16CUploadAgent(this);
@@ -168,6 +176,8 @@ namespace JAFDTC.Models.F16C
                 _ => null,
             };
         }
+
+        public override bool IsMerged(string systemTag) => DTE.MergedSystemTags.Contains(systemTag);
 
         public override void ConfigurationUpdated()
         {
