@@ -30,8 +30,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 using static JAFDTC.Models.IConfiguration;
@@ -243,6 +245,31 @@ namespace JAFDTC.Models
 
         public bool SaveMergedSimDTC(string template, string outputPath)
         {
+            string name = Path.GetFileNameWithoutExtension(outputPath);
+            try
+            {
+                string json = FileManager.LoadDTCTemplate(Airframe, template)
+                    ?? throw new Exception("TODO: FAILED TO LOAD");
+                JsonNode dom = JsonNode.Parse(json)
+                    ?? throw new Exception("TODO: FAILED TO PARSE");
+
+                dom["name"] = name;
+                foreach (string tag in MergeableSysTagsForDTC)
+                {
+                    ISystem system = SystemForTag(tag);
+                    if (!system.IsDefault && IsMerged(tag))
+                        system.MergeIntoSimDTC(dom["data"]);
+                }
+
+                json = dom.ToJsonString(Globals.JSONOptions)
+                    ?? throw new Exception("TODO: FAILED TO SERIALIZE");
+                FileManager.WriteFile(outputPath, json);
+            }
+            catch (Exception ex)
+            {
+                FileManager.Log($"Configuration:SaveMergedSimDTC exception {ex}");
+                return false;
+            }
             return true;
         }
 
