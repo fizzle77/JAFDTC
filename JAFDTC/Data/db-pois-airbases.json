@@ -530,6 +530,15 @@
   {
     "Type": 0,
     "Theater": "Kola",
+    "Name": "Alta",
+    "Tags": "Airbase",
+    "Latitude": "69.97728333",
+    "Longitude": "23.36601667",
+    "Elevation": "9"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
     "Name": "Andoya",
     "Tags": "Airbase",
     "Latitude": "69.29763333",
@@ -571,6 +580,33 @@
     "Latitude": "67.26920000",
     "Longitude": "14.36535000",
     "Elevation": "33"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Enontekio",
+    "Tags": "Airbase",
+    "Latitude": "68.36255000",
+    "Longitude": "23.42425000",
+    "Elevation": "1001"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Evenes",
+    "Tags": "Airbase",
+    "Latitude": "68.49120000",
+    "Longitude": "16.67818333",
+    "Elevation": "85"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Hosio (Airstrip Road 924)",
+    "Tags": "Airbase",
+    "Latitude": "65.89610000",
+    "Longitude": "25.70403333",
+    "Elevation": "379"
   },
   {
     "Type": 0,
@@ -697,6 +733,15 @@
     "Latitude": "68.86698333",
     "Longitude": "33.71811667",
     "Elevation": "545"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Sodankyla",
+    "Tags": "Airbase",
+    "Latitude": "67.39501667",
+    "Longitude": "26.61910000",
+    "Elevation": "597"
   },
   {
     "Type": 0,
