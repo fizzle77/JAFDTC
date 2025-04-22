@@ -1,6 +1,6 @@
 # JAFDTC: User’s Guide
 
-*Version 1.0.0-B.37 of 9-July-24*
+*Version 1.0.0-B.47 of 20-April-24*
 
 _Just Another #%*@^!% DTC_ (JAFDTC) is a native Windows application that allows you to upload
 data typically saved on a data cartridge in real life, such as steerpoints/waypoints and other
@@ -199,6 +199,21 @@ JAFDTC will automatically update these files as needed, notifying you when an up
 
 While JAFDTC allows you to decline the installation, doing so will prevent JAFDTC from
 interacting with DCS in any capacity.
+
+### Working with DCS DTC
+
+ED delivered an initial DTC implementation in DCS 2.9.15.9408 released in April of 2025. While
+the DTC implementation in DCS is not yet complete, it does provide some advantages over tools
+like JAFDTC (primarily, by being able to inject configurations directly into the jet without
+needing to rely on clicking cockpit controls). JAFDTC provides the ability to push
+configurations into the jet through the ED DCS DTC, with some restrictions. The
+[_Common Elements Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/Common_Elements.md#selecting--filtering-points-of-interest)
+and
+[airframe guides](#what-now)
+provide further discussion on how JAFDTC interoperates with the DCS DTC.
+
+Whether or not there is a place for tools like JAFDTC in the DCS ecosystem over the long
+term reamins to be seen.
 
 ### Uploading Configurations to DCS
 

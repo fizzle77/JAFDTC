@@ -1,6 +1,6 @@
 # JAFDTC: Just Another #%*@^!& DTC
 
-*Version 1.0.0-B.37 of 9-July-24*
+*Version 1.0.0-B.47 of 20-April-24*
 
 Just Another #%*@^!% DTC (JAFDTC) is a native C# WinUI Windows application for Windows 10 and
 Windows 11 that allows you to upload data typically saved on a data cartridge, such as
@@ -26,7 +26,8 @@ JAFDTC manages a set of airframe-specific "Configurations" that each contain inf
 avionics systems (e.g., navigation, countermeasures, radios) within a supported airframe should
 be set up. It integrates with DCS to drive these configurations into the jet in DCS through
 clickable cockpit controls. Basically, JAFDTC cannot set up anything you couldn't set up on your
-own through DCS but it can set up far faster than a human.
+own through DCS but it can set up far faster than a human. JAFDTC is also able to integrate with
+the native DTC ED implemented in DCS.
 
 Configurations can share system setups allowing you to compose a setup from existing
 configurations. For example, you could build a configuration with a common radio setup and then

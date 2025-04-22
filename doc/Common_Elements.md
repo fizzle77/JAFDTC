@@ -1,6 +1,6 @@
 # JAFDTC: Common Elements Guide
 
-*Version 1.0.0-B.37 of 9-July-24*
+*Version 1.0.0-B.47 of 20-April-24*
 
 Though systems differ from airframe to airframe, based on the preculariites of the airframe,
 there are many concepts, layouts, and tasks in the JAFDTC user interface that share general
@@ -18,6 +18,10 @@ well as tasks that may share some common features between different airframes. T
 discusses some of these common tasks.
 
 ## Applying a Configuration to the Jet
+
+> This section focuses on JAFDTC configuration capabilities and sets aside the DCS DTC. The
+> [next section](#working-with-the-dcs-dtc)
+> discusses how JAFDTC can work with DCS DTC to configure the jet.
 
 The primary interaction between JAFDTC and DCS involves uploading configurations to the jet. To
 do so, four conditions must hold,
@@ -62,6 +66,59 @@ relevant systems powered up. Typically, shortly before taxi.
 Because JAFDTC works through the clickable cockpit, you should limit your interactions with
 cockpit switches while JAFDTC is loading a configuration. Interacting with controls that
 JAFDTC will use can cause incorrect command sequences that will mess up the configuration.
+
+## Working with the DCS DTC
+
+JAFDTC can interoperate with the DTC system ED introduced in DCS.
+
+> At present, DCS only supports a subset of DTC functionality on F-16C and F/A-18C airframes.
+> JAFDTC is in the process of rolling out support with B.47 supporting only the F-16C.
+
+Basically, what JAFDTC allows you to do is "merge" the JAFDTC configuration into a DCS .dtc
+file that can be loaded into the jet through the DCS UI. Then, JAFDTC relies on the DCS DTC
+to program those parts of the configuration and fills in the other settings the DCS DTC is
+unable to set. To use this capability,
+
+1. Select a `.dtc` template to use. This can be a `.dtc` file exported from DCS or the
+   built-in default template that JAFDTC includes with default settings.
+2. Select the systems in the configuration that are to be merged into this template. Note
+   that only those systems the `.dtc` file supports can be merged.
+3. Load the `.dtc` file into through the DCS user interface; typically with File > Import.
+4. If are not allowing JAFDTC to drive the DTC in the jet, you will need to upload the DTC
+   through the avionics.
+5. Load the JAFDTC configuration into the jet as usual.
+
+The DTC interaction is configured through a system common to all airframes,
+
+![](images/Core_Base_DCS_DTC.png)
+
+The combo box at the top of the page allows you to select a template. JAFDTC includes a default
+template for each airframe that provides a basic setup. You can also set up your own templates
+by setting up a DTC tape in DCS, exporting it to a file, then using the import button to copy
+the file into your DCS settings. The delete button can be used to delete a previously imported
+template.
+
+The middle section includes a set of buttons, one for each system that corresponds to settings
+in a `.dtc` file. When merging, the JAFDTC parameters are copied into the template to replace
+the template settings. Note that settings that are unique to JAFDTC or DCS DTC are not changed
+by this process. Once merged, JAFDTC will only configure those parameters that do not have a
+counterpart in the `.dtc` file and rely on the DCS DTC to configure those parameters that do
+have a counterpart and were merged.
+
+The next section specifies where to build the merged `.dtc` file. Tapping the save button
+will let you select a location (if you have not already done so) and merge the configurations
+selected above into the template. You can clear the location to save the merged file
+(preventing it from being generated) by clicking on the clear button.
+
+> If you change the configuration of a merged system, you **must** regenerate the merged `.dtc`
+> file yourself by tapping on the save button. This must be done **before** loading the
+> merged `.dtc` into the jet via the DCS DTC user interface.
+
+If you want to manage the DTC yourself, you can unselect the checkbox at the bottom of the
+page. Otherwise, JAFDTC will start the DTC load prior to starting its own configuration.
+
+> JAFDTC expects that the DTC is loaded **before** JAFDTC uploads its configuration. Loading
+> the DTC after a JAFDTC upload may lead to unexpected results.
 
 ## Selecting & Filtering Points of Interest
 
