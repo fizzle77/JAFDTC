@@ -3,7 +3,7 @@
 // BuilderBase.cs -- base class for command builder
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -52,6 +52,50 @@ namespace JAFDTC.Models.DCS
 
             valueAs = default;
             return false;
+        }
+    }
+
+    // ================================================================================================================
+
+    /// <summary>
+    /// debug command builder class to inject a single exec function into the command stream.
+    /// </summary>
+    public class DebugBuilder : BuilderBase
+    {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // properties
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        private string _debugFn;
+        private List<string> _debugArgs;
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // construction
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        public DebugBuilder(IAirframeDeviceManager dm, StringBuilder sb, string fn, List<string> args)
+            : base(dm, sb)
+        {
+            _debugFn = fn;
+            _debugArgs = args;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // build methods
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// build the command stream with the specified debug function exec and add it to internal object state.
+        /// <summary>
+        public override void Build(Dictionary<string, object> state = null)
+        {
+            AddExecFunction(_debugFn, _debugArgs);
         }
     }
 
