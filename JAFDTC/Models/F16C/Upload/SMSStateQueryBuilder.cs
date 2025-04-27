@@ -2,7 +2,7 @@
 //
 // SMSStateQueryBuilder.cs -- f-16c sms state query builder
 //
-// Copyright(C) 2024 ilominar/raven
+// Copyright(C) 2024-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -42,6 +42,9 @@ namespace JAFDTC.Models.F16C.Upload
     ///         sms quantity + name strings for the munitions on the jet in "mode"
     ///
     /// where "mode" is a MFDSystem.MasterModes.
+    /// 
+    /// NOTE: the dictionary values represent the state at the time the query is run. depending on mfd configuration,
+    /// NOTE: these values may no longer be valid once changes are made to mfd configuration.
     /// </summary>
     internal class SMSStateQueryBuilder : QueryBuilderBase, IBuilder
     {
@@ -63,8 +66,8 @@ namespace JAFDTC.Models.F16C.Upload
         /// search the mfd format configuration for left/right displays looking for the side (left or right), sms
         /// osb (osb12-14), and currently-selected osb (osb12-14). return these three parameters.
         /// </summary>
-        private void FindSMSFormat(MFDModeConfiguration mfdFmts,
-                                   out string mfdSideOut, out string osbSMSOut, out string osbSelOut)
+        private static void FindSMSFormat(MFDModeConfiguration mfdFmts,
+                                          out string mfdSideOut, out string osbSMSOut, out string osbSelOut)
         {
             string fmtSMS = ((int)MFDConfiguration.DisplayFormats.SMS).ToString();
             string osbSMS;
@@ -101,7 +104,7 @@ namespace JAFDTC.Models.F16C.Upload
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice mfd = (mfdSide == "left") ? _aircraft.GetDevice("LMFD") : _aircraft.GetDevice("RMFD");
 
-            AddAction(ufc, modeBtn, WAIT_BASE);                                 // push A-G
+            AddAction(ufc, modeBtn, WAIT_BASE);                                 // push master mode
             if (osbSMS != osbSelect)
                 AddAction(mfd, osbSMS);                                         // push osb to select SMS format
             AddWhileBlock("IsSMSOnINV", true, new() { mfdSide }, delegate ()
@@ -131,7 +134,7 @@ namespace JAFDTC.Models.F16C.Upload
             ClearCommands();
             if (osbSMS != osbSelect)
                 AddAction(mfd, osbSelect);                                      // push osb to return to original
-            AddAction(ufc, modeBtn, WAIT_BASE);                                 // push nav
+            AddAction(ufc, modeBtn, WAIT_BASE);                                 // push master mode (return nav)
             AddQuery("QueryNOP", null);
             Query();
 
@@ -162,8 +165,8 @@ namespace JAFDTC.Models.F16C.Upload
 
             string modeBtn = mode switch
             {
-                // TODO: support ICP_AA here as well eventually?
                 MFDSystem.MasterModes.ICP_AG => "AG",
+                MFDSystem.MasterModes.ICP_AA => "AA",
                 _ => null
             };
             state ??= new();
