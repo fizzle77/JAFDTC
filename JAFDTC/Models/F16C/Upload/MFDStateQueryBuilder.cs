@@ -2,7 +2,7 @@
 //
 // MFDQueryStateBuilder.cs -- f-16c mfd command builder
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -35,6 +35,9 @@ namespace JAFDTC.Models.F16C.Upload
     /// 
     /// entries for each master mode. if unable to establish the setup on the jet for a given mode, the default setup
     /// for the master mode is returned.
+    /// 
+    /// NOTE: the dictionary values represent the state at the time the query is run. depending on mfd configuration,
+    /// NOTE: these values may no longer be valid once changes are made to mfd configuration.
     /// </summary>
     internal class MFDStateQueryBuilder : QueryBuilderBase, IBuilder
     {
