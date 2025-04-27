@@ -106,7 +106,7 @@ namespace JAFDTC.Models.F16C.Upload
                 AddAction(mfd, osbSMS);                                         // push osb to select SMS format
             AddWhileBlock("IsSMSOnINV", true, new() { mfdSide }, delegate ()
             {
-                AddAction(mfd, "OSB-04");                                       // INV osb
+                AddAction(mfd, "OSB-04");                                       // INV osb until not on INV page
             });
 
             List<string> munitions = new();

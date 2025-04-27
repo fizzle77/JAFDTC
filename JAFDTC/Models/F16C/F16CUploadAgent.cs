@@ -177,7 +177,10 @@ namespace JAFDTC.Models.F16C
             new HTSManTableBuilder(_cfg, _dm, sb).Build(state);
             new HARMBuilder(_cfg, _dm, sb).Build(state);
             //
-            // NOTE: mfd will invoke the sms builder if there are sms changes and the sms page is selected
+            // NOTE: mfd will invoke the sms builder if there are sms changes and the sms page is added to an mfd in
+            // NOTE: the appropriate master mode.
+            //
+            // TODO: this won't setup sms if mfds are default, fix that...
             //
             new MFDBuilder(_cfg, _dm, sb).Build(state);
             new DLNKBuilder(_cfg, _dm, sb).Build(state);
