@@ -3,7 +3,7 @@
 // UploadAgentBase.cs -- abstract base class for an upload agent
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -21,6 +21,10 @@
 // define this to enable dcs command stream logging to the log file.
 //
 #define noDEBUG_CMD_LOGGING
+
+// define this to use a single DebugBuilder as the builder
+//
+#define noDEBUG_USES_DEBUG_BUILDER
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Utilities.Networking;
@@ -102,19 +106,30 @@ namespace JAFDTC.Models
         public async Task<bool> Load()
         {
             StringBuilder sb = new();
+
+#if DEBUG_USES_DEBUG_BUILDER
+
+            IBuilder teardownBuilder = new DebugBuilder(null, sb, "DebugDumpRightMFD", new() { "******** DEBUG DUMP" });
+            await Task.Run(() => teardownBuilder.Build());
+
+#else
+
             IBuilder setupBuilder = SetupBuilder(sb);
             IBuilder teardownBuilder = TeardownBuilder(sb);
 
             setupBuilder.Build();
             await Task.Run(() => BuildSystems(sb));
             teardownBuilder.Build();
+#endif
 
             string str = teardownBuilder.ToString();
             if (!string.IsNullOrEmpty(str))
             {
 #if DEBUG_CMD_LOGGING
+
                 FileManager.Log($"UploadAgentBase stream data size is {str.Length}");
                 FileManager.Log($"UploadAgentBase stream:\n****************\n{str}\n****************");
+
 #endif
                 return CockpitCmdTx.Send(str);
             }
@@ -132,7 +147,7 @@ namespace JAFDTC.Models
         public virtual IBuilder SetupBuilder(StringBuilder sb) => new CoreSetupBuilder(null, sb);
 
         /// <summary>
-        /// TODOderived classes may override this method to return a different builder, see IUploadAgent.
+        /// derived classes may override this method to return a different builder, see IUploadAgent.
         /// </summary>
         public virtual IBuilder TeardownBuilder(StringBuilder sb) => new CoreTeardownBuilder(null, sb);
     }
