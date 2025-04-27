@@ -2,7 +2,7 @@
 //
 // F16CEditSMSPage.xaml.cs : ui c# for viper sms editor page
 //
-// Copyright(C) 2024 ilominar/raven
+// Copyright(C) 2024-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -36,7 +36,8 @@ using static JAFDTC.Models.F16C.SMS.SMSSystem;
 namespace JAFDTC.UI.F16C
 {
     /// <summary>
-    /// TODO: document
+    /// Page obejct for the system editor page that handles the ui for the viper sms munition setup editor. this
+    /// handles setups for munition parameters like ripple modes, employment modes, etc.
     /// </summary>
     public sealed partial class F16CEditSMSPage : SystemEditorPageBase
     {
@@ -193,44 +194,57 @@ namespace JAFDTC.UI.F16C
                             muni.IsProfileSelected = "";
                 }
 
+                // all mav variants share the same munition settings. we'll replicate the EditSetup properties
+                // across all mav variants.
+                //
+                List<Munitions> muniIDs = new() { EditMuniID };
+                if ((EditMuniID == Munitions.AGM_65D) || (EditMuniID == Munitions.AGM_65G) ||
+                    (EditMuniID == Munitions.AGM_65H) || (EditMuniID == Munitions.AGM_65K))
+                {
+                    muniIDs = new() { Munitions.AGM_65D, Munitions.AGM_65G, Munitions.AGM_65H, Munitions.AGM_65K };
+                }
+
                 // remap the EditSetup properties based on defaults from _munitions. if the edit settings match the
                 // default value, we will update to "". we do this here because it is easier at this point to enforce
                 // setting a default field to "" than to determine later when a non-"" field is default.
                 //
-                MunitionSettings settings = config.SMS.GetSettingsForMunitionProfile(EditMuniID, EditProfileID);
-                MunitionSettings defaults = _munitions[(int)EditMuniID].MunitionInfo;
+                foreach (Munitions muniID in muniIDs)
+                {
+                    MunitionSettings settings = config.SMS.GetSettingsForMunitionProfile(muniID, EditProfileID);
+                    MunitionSettings defaults = _munitions[(int)EditMuniID].MunitionInfo;
 
-                CopyPropertyHonorDefault(settings, EditState, defaults, "IsProfileSelected");
-                CopyPropertyHonorDefault(settings, EditState, defaults, "RipplePulse");
-                CopyPropertyHonorDefault(settings, EditState, defaults, "RippleSpacing");
-                CopyPropertyHonorDefault(settings, EditState, defaults, "ArmDelay");
-                CopyPropertyHonorDefault(settings, EditState, defaults, "ArmDelay2");
-                CopyPropertyHonorDefault(settings, EditState, defaults, "BurstAlt");
-                CopyPropertyHonorDefault(settings, EditState, defaults, "ReleaseAng");
-                CopyPropertyHonorDefault(settings, EditState, defaults, "ImpactAng");
-                CopyPropertyHonorDefault(settings, EditState, defaults, "ImpactAzi");
-                CopyPropertyHonorDefault(settings, EditState, defaults, "ImpactVel");
-                CopyPropertyHonorDefault(settings, EditState, defaults, "CueRange");
-                CopyPropertyHonorDefault(settings, EditState, defaults, "AutoPwrSP");
+                    CopyPropertyHonorDefault(settings, EditState, defaults, "IsProfileSelected");
+                    CopyPropertyHonorDefault(settings, EditState, defaults, "RipplePulse");
+                    CopyPropertyHonorDefault(settings, EditState, defaults, "RippleSpacing");
+                    CopyPropertyHonorDefault(settings, EditState, defaults, "ArmDelay");
+                    CopyPropertyHonorDefault(settings, EditState, defaults, "ArmDelay2");
+                    CopyPropertyHonorDefault(settings, EditState, defaults, "BurstAlt");
+                    CopyPropertyHonorDefault(settings, EditState, defaults, "ReleaseAng");
+                    CopyPropertyHonorDefault(settings, EditState, defaults, "ImpactAng");
+                    CopyPropertyHonorDefault(settings, EditState, defaults, "ImpactAzi");
+                    CopyPropertyHonorDefault(settings, EditState, defaults, "ImpactVel");
+                    CopyPropertyHonorDefault(settings, EditState, defaults, "CueRange");
+                    CopyPropertyHonorDefault(settings, EditState, defaults, "AutoPwrSP");
 
-                CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "EmplMode");
-                CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "ReleaseMode");
-                CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "RippleDelayMode");
-                CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "FuzeMode");
-                CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "ArmDelayMode");
-                CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "Spin");
-                CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "AutoPwrMode");
+                    CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "EmplMode");
+                    CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "ReleaseMode");
+                    CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "RippleDelayMode");
+                    CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "FuzeMode");
+                    CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "ArmDelayMode");
+                    CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "Spin");
+                    CopyPropertyHonorDefaultComboVal(settings, EditState, defaults, "AutoPwrMode");
 
-                // MAN employment mode has different RippleSpacing defaults than other modes. we'll just unilaterally
-                // slam RippleSpaing to "" here for MAN employment just to be safe.
-                //
-                if (settings.EmplMode == ((int)MunitionSettings.EmploymentModes.MAN).ToString())
-                    settings.RippleSpacing = "";
+                    // MAN employment mode has different RippleSpacing defaults than other modes. we'll just
+                    // unilaterally slam RippleSpaing to "" here for MAN employment just to be safe.
+                    //
+                    if (settings.EmplMode == ((int)MunitionSettings.EmploymentModes.MAN).ToString())
+                        settings.RippleSpacing = "";
 
-                // cannot have a ripple delay without more than one ripple pulse.
-                //
-                if (string.IsNullOrEmpty(settings.RipplePulse) || (settings.RipplePulse == "1"))
-                    settings.RippleDelayMode = "";
+                    // cannot have a ripple delay without more than one ripple pulse.
+                    //
+                    if (string.IsNullOrEmpty(settings.RipplePulse) || (settings.RipplePulse == "1"))
+                        settings.RippleDelayMode = "";
+                }
 
                 config.SMS.CleanUp();
                 config.Save(this, SystemTag);
@@ -336,12 +350,10 @@ namespace JAFDTC.UI.F16C
         {
             Visibility visible = (!string.IsNullOrEmpty(spec)) ? Visibility.Visible : Visibility.Collapsed;
             foreach (FrameworkElement elem in elems)
-            {
                 if (elem != null)
                     elem.Visibility = visible;
                 else
                     visible = Visibility.Collapsed;
-            }
             return visible;
         }
 
@@ -352,7 +364,7 @@ namespace JAFDTC.UI.F16C
         private void UpdateNonDefaultMunitionItems()
         {
             F16CConfiguration config = (F16CConfiguration)Config;
-            foreach (F16CMunition munition in uiListMunition.Items)
+            foreach (F16CMunition munition in uiListMunition.Items.Cast<F16CMunition>())
             {
                 UIElement container = (UIElement)uiListMunition.ContainerFromItem(munition);
                 FontIcon icon = Utilities.FindControl<FontIcon>(container, typeof(FontIcon), "DefaultBadgeIcon");
@@ -383,6 +395,67 @@ namespace JAFDTC.UI.F16C
                 FontIcon icon = Utilities.FindControl<FontIcon>(grid, typeof(FontIcon), "BadgeIcon");
                 if (icon != null)
                     icon.Visibility = Utilities.HiddenIfDefault(settings);
+            }
+        }
+
+        /// <summary>
+        /// set up visibility of the ripple-related fields (quantity, spacing, and delay) based on the current
+        /// release mode selected in the settings along with the munition type.
+        /// </summary>
+        private void SetVisibilityRippleUI(MunitionSettings.ReleaseModes relMode, string ripplePulse, Munitions muniID)
+        {
+            Boolean isRippleFeetViz;
+            Boolean isRippleDtViz;
+
+            switch (relMode)
+            {
+                case MunitionSettings.ReleaseModes.TRI_PAIR_F2B:
+                case MunitionSettings.ReleaseModes.TRI_PAIR_L2R:
+                    uiStackRelMode.Visibility = Visibility.Visible;
+                    uiLabelRippleQty.Visibility = Visibility.Collapsed;
+                    uiValueRippleQty.Visibility = Visibility.Collapsed;
+                    uiValueRippleFt.Visibility = Visibility.Visible;
+                    uiLabelRippleFtUnits.Visibility = Visibility.Visible;
+                    uiComboRippleQty.Visibility = Visibility.Collapsed;
+                    uiComboRippleDt.Visibility = Visibility.Collapsed;
+                    uiLabelRippleDtUnits.Visibility = Visibility.Collapsed;
+                    break;
+                default:
+                    if (string.IsNullOrEmpty(ripplePulse))
+                    {
+                        uiStackRelMode.Visibility = Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        isRippleFeetViz = false;
+                        isRippleDtViz = false;
+
+                        uiStackRelMode.Visibility = Visibility.Visible;
+                        uiLabelRippleQty.Visibility = Visibility.Visible;
+                        if (muniID == Munitions.GBU_24)
+                        {
+                            uiValueRippleQty.Visibility = Visibility.Collapsed;
+                            uiComboRippleQty.Visibility = Visibility.Visible;
+                            if (!string.IsNullOrEmpty(EditSetup.RipplePulse) && (EditSetup.RipplePulse != "1"))
+                                isRippleDtViz = true;
+                        }
+                        else
+                        {
+                            uiValueRippleQty.Visibility = Visibility.Visible;
+                            uiComboRippleQty.Visibility = Visibility.Collapsed;
+                            if (EditSetup.EmplMode != ((int)MunitionSettings.EmploymentModes.MAN).ToString())
+                                isRippleFeetViz = true;
+                        }
+
+                        uiLabelRippleAt.Visibility = (isRippleFeetViz || isRippleDtViz) ? Visibility.Visible
+                                                                                        : Visibility.Collapsed;
+                        uiValueRippleFt.Visibility = (isRippleFeetViz) ? Visibility.Visible : Visibility.Collapsed;
+                        uiLabelRippleFtUnits.Visibility = (isRippleFeetViz) ? Visibility.Visible : Visibility.Collapsed;
+
+                        uiComboRippleDt.Visibility = (isRippleDtViz) ? Visibility.Visible : Visibility.Collapsed;
+                        uiLabelRippleDtUnits.Visibility = (isRippleDtViz) ? Visibility.Visible : Visibility.Collapsed;
+                    }
+                    break;
             }
         }
 
@@ -432,6 +505,12 @@ namespace JAFDTC.UI.F16C
             SetVisibilityFromSpec(_elemsCueRange, info.CueRange);
             SetVisibilityFromSpec(_elemsAutoPwr, info.AutoPwrMode);
 
+            SetVisibilityRippleUI(EditSetup.ReleaseModeEnum, info.RipplePulse, muniID);
+
+            // only show mav note when mavs are being edited.
+            //
+            uiLabelMavNote.Visibility = (isMav) ? Visibility.Visible : Visibility.Collapsed;
+
             // change release mode label to line up with the way mavs handle ripples versus other munitions.
             //
             uiLabelRelMode.Text = (isMav) ? "Ripple Quantity" : "Release Mode";
@@ -467,10 +546,6 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         protected override void UpdateUICustom(bool isEditable)
         {
-            F16CConfiguration config = (F16CConfiguration)Config;
-            Boolean isRippleFeetViz;
-            Boolean isRippleDtViz;
-
             UpdateNonDefaultMunitionItems();
             UpdateNonDefaultProfileItems();
 
@@ -492,56 +567,7 @@ namespace JAFDTC.UI.F16C
             // set up visibility of the ripple-related fields (quantity, spacing, and delay) based on the current
             // release mode selected in the settings along with the munition type.
             //
-            switch (EditSetup.ReleaseModeEnum)
-            {
-                case MunitionSettings.ReleaseModes.TRI_PAIR_F2B:
-                case MunitionSettings.ReleaseModes.TRI_PAIR_L2R:
-                    uiStackRelMode.Visibility = Visibility.Visible;
-                    uiLabelRippleQty.Visibility = Visibility.Collapsed;
-                    uiValueRippleQty.Visibility = Visibility.Collapsed;
-                    uiValueRippleFt.Visibility = Visibility.Visible;
-                    uiLabelRippleFtUnits.Visibility = Visibility.Visible;
-                    uiComboRippleQty.Visibility = Visibility.Collapsed;
-                    uiComboRippleDt.Visibility = Visibility.Collapsed;
-                    uiLabelRippleDtUnits.Visibility = Visibility.Collapsed;
-                    break;
-                default:
-                    if (string.IsNullOrEmpty(muni.MunitionInfo.RipplePulse))
-                    {
-                        uiStackRelMode.Visibility = Visibility.Collapsed;
-                    }
-                    else
-                    {
-                        isRippleFeetViz = false;
-                        isRippleDtViz = false;
-
-                        uiStackRelMode.Visibility = Visibility.Visible;
-                        uiLabelRippleQty.Visibility = Visibility.Visible;
-                        if (muni.MunitionInfo.ID == Munitions.GBU_24)
-                        {
-                            uiValueRippleQty.Visibility = Visibility.Collapsed;
-                            uiComboRippleQty.Visibility = Visibility.Visible;
-                            if (!string.IsNullOrEmpty(EditSetup.RipplePulse) && (EditSetup.RipplePulse != "1"))
-                                isRippleDtViz = true;
-                        }
-                        else
-                        {
-                            uiValueRippleQty.Visibility = Visibility.Visible;
-                            uiComboRippleQty.Visibility = Visibility.Collapsed;
-                            if (EditSetup.EmplMode != ((int)MunitionSettings.EmploymentModes.MAN).ToString())
-                                isRippleFeetViz = true;
-                        }
-
-                        uiLabelRippleAt.Visibility = (isRippleFeetViz || isRippleDtViz) ? Visibility.Visible
-                                                                                        : Visibility.Collapsed;
-                        uiValueRippleFt.Visibility = (isRippleFeetViz) ? Visibility.Visible : Visibility.Collapsed;
-                        uiLabelRippleFtUnits.Visibility = (isRippleFeetViz) ? Visibility.Visible : Visibility.Collapsed;
-
-                        uiComboRippleDt.Visibility = (isRippleDtViz) ? Visibility.Visible : Visibility.Collapsed;
-                        uiLabelRippleDtUnits.Visibility = (isRippleDtViz) ? Visibility.Visible : Visibility.Collapsed;
-                    }
-                    break;
-            }
+            SetVisibilityRippleUI(EditSetup.ReleaseModeEnum, muni.MunitionInfo.RipplePulse, muni.MunitionInfo.ID);
 
             // auto power steerpoint fields are only visible if auto power mode is not off.
             //

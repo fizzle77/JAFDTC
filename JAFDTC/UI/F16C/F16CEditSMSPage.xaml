@@ -4,7 +4,7 @@
     
 F16CEditSMSPage.xaml.cs : ui xaml for viper sms editor page
 
-Copyright(C) 2024 ilominar/raven
+Copyright(C) 2024-2025 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -97,6 +97,7 @@ https://www.gnu.org/licenses/.
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -440,8 +441,15 @@ https://www.gnu.org/licenses/.
                          ToolTipService.ToolTip="TODO"/>
             </StackPanel>
 
+            <!-- Maverick Note -->
+            <TextBlock Grid.Row="17" Grid.Column="0" Grid.ColumnSpan="3" Margin="12,12,0,0" x:Name="uiLabelMavNote"
+                       HorizontalAlignment="Left" VerticalAlignment="Center"
+                       Style="{ThemeResource TableHeaderTextStyle}" >
+                When mixing AGM-65 variants in a loadout, all variants share same munition settings.
+            </TextBlock>
+
             <!-- Reset Munition -->
-            <Button Grid.Row="17" Grid.Column="0" Grid.ColumnSpan="2" Margin="12,24,0,0" x:Name="uiMuniBtnReset"
+            <Button Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="2" Margin="12,24,0,0" x:Name="uiMuniBtnReset"
                     HorizontalAlignment="Stretch"
                     Click="MuniBtnReset_Click"
                     ToolTipService.ToolTip="Reset the configuration of this munition to its defaults">
