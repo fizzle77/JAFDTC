@@ -3,7 +3,7 @@
 // MFDBuilder.cs -- f-16c mfd command builder
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -34,7 +34,16 @@ namespace JAFDTC.Models.F16C.Upload
     ///     MFDModeConfig.{mode}: MFDModeConfiguration
     ///         default format and current mfd formats for master mode "mode" (MFDSystem.MasterModes)
     ///
-    /// see MFDStateQueryBuilder for further details.
+    ///     SMSMuni.{mode}.mfdSide: string
+    ///         identifies mfd that displays the hts page in "mode", legal values are "left" or "right"
+    ///     SMSMuni.{mode}.osbSel: string
+    ///         mfd button name ("OSB-nn") of the currently selected format on the mfd identified by mfdSide in "mode"
+    ///     SMSMuni.{mode}.osbSMS: string
+    ///         mfd button name ("OSB-nn") that selects the sms format on the mfd identified by mfdSide in "mode"
+    ///     SMSMuni.{mode}: List of string
+    ///         sms quantity + name strings for the munitions on the jet in "mode"
+    ///
+    /// see MFDStateQueryBuilder, SMSStateQueryBuilder for further details.
     /// </summary>
     internal class MFDBuilder : F16CBuilderBase, IBuilder
     {
@@ -85,17 +94,25 @@ namespace JAFDTC.Models.F16C.Upload
 
         /// <summary>
         /// configure mfd formats via the ded/ufc according to the non-default programming settings (this function
-        /// is safe to call with a configuration with default settings: defaults are skipped as necessary).
+        /// is safe to call with a configuration with default settings). while programming, the sms and hts threat
+        /// pages are setup as necessary.
         /// 
         ///     MFDModeConfig.{mode}, MFDModeConfiguration
         ///         default format and current mfd formats for master mode "mode" (MFDSystem.MasterModes)
-        /// 
+        ///
+        ///     SMSMuni.{mode}.mfdSide: string
+        ///         identifies mfd that displays the hts page in "mode", legal values are "left" or "right"
+        ///     SMSMuni.{mode}.osbSel: string
+        ///         mfd button name ("OSB-nn") of the currently selected format on the mfd identified by mfdSide in "mode"
+        ///     SMSMuni.{mode}.osbSMS: string
+        ///         mfd button name ("OSB-nn") that selects the sms format on the mfd identified by mfdSide in "mode"
+        ///     SMSMuni.{mode}: List of string
+        ///         sms quantity + name strings for the munitions on the jet in "mode"
+        ///
+        /// see MFDStateQueryBuilder, SMSStateQueryBuilder for further details.
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
-            if (_cfg.MFD.IsDefault)
-                return;
-
             AddExecFunction("NOP", new() { "==== MFDBuilder:Build()" });
 
             _state = state;
@@ -113,14 +130,14 @@ namespace JAFDTC.Models.F16C.Upload
                 if (state.TryGetValueAs($"MFDModeConfig.{(MFDSystem.MasterModes)mode}",
                                         out MFDModeConfiguration curMFD))
                 {
-                    MergeConfigs((MFDSystem.MasterModes)mode, tgtMFD.ModeConfigs[mode].LeftMFD,
-                                 curMFD.LeftMFD, dflMFD.ModeConfigs[mode].LeftMFD);
-                    MergeConfigs((MFDSystem.MasterModes)mode, tgtMFD.ModeConfigs[mode].RightMFD,
-                                 curMFD.RightMFD, dflMFD.ModeConfigs[mode].RightMFD);
-
-                    BuildMFDsForMode((MFDSystem.MasterModes)mode, ufc, hotas, mfdL, mfdR,
-                                     tgtMFD.ModeConfigs[mode], curMFD.LeftMFD.SelectedOSB,
-                                     curMFD.RightMFD.SelectedOSB);
+                    bool isWork = MergeConfigs((MFDSystem.MasterModes)mode, tgtMFD.ModeConfigs[mode].LeftMFD,
+                                               curMFD.LeftMFD, dflMFD.ModeConfigs[mode].LeftMFD) ||
+                                  MergeConfigs((MFDSystem.MasterModes)mode, tgtMFD.ModeConfigs[mode].RightMFD,
+                                               curMFD.RightMFD, dflMFD.ModeConfigs[mode].RightMFD);
+                    if (isWork)
+                        BuildMFDsForMode((MFDSystem.MasterModes)mode, ufc, hotas, mfdL, mfdR,
+                                         tgtMFD.ModeConfigs[mode], curMFD.LeftMFD.SelectedOSB,
+                                         curMFD.RightMFD.SelectedOSB);
                 }
             AddAction(hotas, "CENTER");
             SelectMasterModeNAV(ufc);
@@ -128,7 +145,8 @@ namespace JAFDTC.Models.F16C.Upload
 
         /// <summary>
         /// returns true if the format should always be configured (even if it is already set up on a particular osb),
-        /// false otherwise. currently, had and sms formats are always set as they may link to other configuration.
+        /// false otherwise. currently, had and sms formats are always set as they may link to other configuration
+        /// (hts threats and sms munitions, respectively).
         /// </summary>
         private static bool IsFormatAlwaysConfigured(MFDSystem.MasterModes mode, string format)
             => ((format == ((int)MFDConfiguration.DisplayFormats.HAD).ToString()) ||
@@ -141,9 +159,10 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         /// merge the target, current, and default configurations to determine the target configuration we are trying
         /// to load. target configuration is updated with defaults expanded and defaults set where setup agrees with
-        /// the current settings (except for IsFormatAlwaysConfigured formats).
+        /// the current settings (except for IsFormatAlwaysConfigured formats). returns true if the merged configs
+        /// require work to be done, false if the merged configurations will not change current state.
         /// </summary>
-        private static void MergeConfigs(MFDSystem.MasterModes mode, MFDConfiguration cfgTgt, MFDConfiguration cfgCur,
+        private static bool MergeConfigs(MFDSystem.MasterModes mode, MFDConfiguration cfgTgt, MFDConfiguration cfgCur,
                                          MFDConfiguration cfgDft)
         {
             string osb12 = (!string.IsNullOrEmpty(cfgTgt.OSB12)) ? cfgTgt.OSB12 : cfgDft.OSB12;
@@ -154,6 +173,8 @@ namespace JAFDTC.Models.F16C.Upload
             cfgTgt.OSB12 = ((cfgCur.OSB12 != osb12) || IsFormatAlwaysConfigured(mode, osb12)) ? osb12 : null;
             cfgTgt.OSB13 = ((cfgCur.OSB13 != osb13) || IsFormatAlwaysConfigured(mode, osb13)) ? osb13 : null;
             cfgTgt.OSB14 = ((cfgCur.OSB14 != osb14) || IsFormatAlwaysConfigured(mode, osb14)) ? osb14 : null;
+
+            return ((cfgTgt.OSB12 != null) || (cfgTgt.OSB13 != null) || (cfgTgt.OSB14 != null));
         }
 
         /// <summary>
@@ -167,29 +188,19 @@ namespace JAFDTC.Models.F16C.Upload
         {
             string masterMode = (mode == MFDSystem.MasterModes.ICP_AA) ? "AA" : "AG";
             if (mode == MFDSystem.MasterModes.DGFT_DGFT)
-            {
                 AddAction(hotas, "DGFT");
-            }
             else if (mode == MFDSystem.MasterModes.DGFT_MSL)
-            {
                 AddAction(hotas, "MSL");
-            }
             else if(mode != MFDSystem.MasterModes.NAV)
-            {
                 AddAction(ufc, masterMode);
-            }
-
+ 
             BuildMFD(mode, mfdL, "left", $"OSB-{curLeftOSB}", tgtMFD.LeftMFD);
             BuildMFD(mode, mfdR, "right", $"OSB-{curRightOSB}", tgtMFD.RightMFD);
 
             if ((mode == MFDSystem.MasterModes.DGFT_DGFT) || (mode == MFDSystem.MasterModes.DGFT_MSL))
-            {
                 AddAction(hotas, "CENTER");
-            }
             else if (mode != MFDSystem.MasterModes.NAV)
-            {
                 AddAction(ufc, masterMode);
-            }
         }
 
         /// <summary>
@@ -207,9 +218,7 @@ namespace JAFDTC.Models.F16C.Upload
             curSelOSB = BuildPage(mode, mfd, mfdSide, curSelOSB, "OSB-14", tgtMFD.OSB14);
 
             if ($"OSB-{tgtMFD.SelectedOSB}" != curSelOSB)
-            {
                 AddAction(mfd, $"OSB-{tgtMFD.SelectedOSB}");
-            }
         }
 
         /// <summary>
@@ -222,21 +231,19 @@ namespace JAFDTC.Models.F16C.Upload
                                  string osbTgt, string page)
         {
             if (!string.IsNullOrEmpty(page) && (osbSel != osbTgt))
-            {
                 AddAction(mfd, osbTgt);
-            }
+
             if (!string.IsNullOrEmpty(page))
             {
                 MFDConfiguration.DisplayFormats format = (MFDConfiguration.DisplayFormats)int.Parse(page);
                 AddActions(mfd, new() { osbTgt, _mapFormatToOSB[format] });
                 if (format == MFDConfiguration.DisplayFormats.HAD)
-                {
                     ConfigureHADFormatThreats(mfdSide);
-                }
                 else if ((format == MFDConfiguration.DisplayFormats.SMS) &&
-                         ((mode == MFDSystem.MasterModes.ICP_AG) /* TODO: ||(mode == MFDSystem.MasterModes.ICP_AG) */))
+                         ((mode == MFDSystem.MasterModes.ICP_AG) || (mode == MFDSystem.MasterModes.ICP_AA)))
                 {
-                    ConfigureSMSFormat(mfd, mfdSide);
+                    if (_state.TryGetValueAs($"SMSMuni.{mode}", out List<string> muniQtys))
+                        ConfigureSMSFormat(mfdSide, mode, muniQtys);
                 }
                 return osbTgt;
             }
@@ -244,7 +251,8 @@ namespace JAFDTC.Models.F16C.Upload
         }
 
         /// <summary>
-        /// configure the enabled threats in the had format. assumes the had format is selected on the indicated mfd.
+        /// configure the enabled threats in the had format. assumes the had format is currently active on the
+        /// indicated mfd.
         /// </summary>
         private void ConfigureHADFormatThreats(string mfdSide)
         {
@@ -253,18 +261,13 @@ namespace JAFDTC.Models.F16C.Upload
         }
 
         /// <summary>
-        /// clear inv mode and configure the munitions in the sms format. assumes the sms format is selected on the
-        /// indicated mfd.
+        /// use a SMSBuilder to configure the sms page for the specified master mode and munition quantities. assumes
+        /// the sms format is currently active on the indicated mfd.
         /// </summary>
-        private void ConfigureSMSFormat(AirframeDevice mfd, string mfdSide)
+        private void ConfigureSMSFormat(string mfdSide, MFDSystem.MasterModes mode, List<string> muniQtys)
         {
-            AddIfBlock("IsSMSOnINV", true, new() { mfdSide }, delegate ()
-            {
-                AddAction(mfd, "OSB-04", WAIT_BASE);
-            });
             SMSBuilder builder = new(_cfg, (F16CDeviceManager)_aircraft, null);
-            AddBuild(builder, _state);
-            // TODO: allow configuration of "to inv, or not to inv? that is the question..."
+            AddBuild(builder, new() { ["mfdSide"] = mfdSide, ["mode"] = $"{mode}", ["muniQtys"] = muniQtys });
         }
     }
 }

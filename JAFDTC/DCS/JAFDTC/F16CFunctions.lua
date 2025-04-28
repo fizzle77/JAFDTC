@@ -98,6 +98,14 @@ function JAFDTC_F16CM_Fn_DebugDumpRightMFD(msg)
     JAFDTC_DebugDisplay(JAFDTC_GetDisplay(5))
 end
 
+function JAFDTC_F16CM_Fn_DebugDumpMFD(mfd, msg)
+    if mfd == "left" then
+        JAFDTC_F16CM_Fn_DebugDumpLeftMFD(msg)
+    else
+        JAFDTC_F16CM_Fn_DebugDumpRightMFD(msg)
+    end
+end
+
 -- --------------------------------------------------------------------------------------------------------------------
 --
 -- core support
@@ -270,11 +278,17 @@ end
 --
 -- --------------------------------------------------------------------------------------------------------------------
 
--- return munition quantity and type from osb 6 on the mfd.
+-- QuerySMSMuniState            get munition quantity/type from sms osb 6 label
 --
+-- IsSMSMuniSelected            t => sms osb 6 label (selected munition) matches specified munition
+-- IsSMSCntlNumericPadNeg       t => sms data entry field currently holds a negative number
+-- IsSMSOnMode                  t => sms master mode matches specified mode
+-- IsSMSOnINV                   t => sms currently on inv subpage
+-- IsSMSOnCNTL                  t => sms currently on cntl subpage
+
 function JAFDTC_F16CM_Fn_QuerySMSMuniState(mfd)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    return table["Table. Root. Unic ID: _id:1321.2.Table. Root. Unic ID: _id:1321. Text.1"] or ""
+    return table["Table. Root. Unic ID: _id:119.2.Table. Root. Unic ID: _id:119. Text.1"] or ""
 end
 
 function JAFDTC_F16CM_Fn_IsSMSMuniSelected(mfd, muniQT)
@@ -288,6 +302,12 @@ function JAFDTC_F16CM_Fn_IsSMSCntlNumericPadNeg(mfd)
     return (string.find(str, "-%d*") ~= nil)
 end
 
+function JAFDTC_F16CM_Fn_IsSMSOnMode(mfd, mode)
+    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local str = table["A-G Table. Root. Unic ID: _id:116.2.A-G Table. Root. Unic ID: _id:116. Text.1"] or ""
+    return (str == mode)
+end
+
 function JAFDTC_F16CM_Fn_IsSMSOnINV(mfd)
     local table = JAFDTC_F16CM_GetParsedMFD(mfd)
     --
@@ -297,81 +317,107 @@ function JAFDTC_F16CM_Fn_IsSMSOnINV(mfd)
     return (str == "INV")
 end
 
+function JAFDTC_F16CM_Fn_IsSMSOnCNTL(mfd)
+    local table = JAFDTC_F16CM_GetParsedMFD(mfd)
+    --
+    -- CNTL is easier to locate in the parsed output...
+    --
+    local str = table["CNTL Selectable Root. Unic ID: _id:53. Black Text"]
+    return (str == "INV")
+end
+
 ---- munition profile selection
+
+-- IsSMSProfile                 t => sms osb 7 label (profile: 1-4, "PROFn") matches specified state, other than gbu-24
+-- IsSMSProfileGBU24            t => sms osb 7 label (profile: 1-4, "PROFn") matches specified state, gbu-24
 
 function JAFDTC_F16CM_Fn_IsSMSProfile(mfd, prof)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["BOMB_ROOT.2.BOMB_PAGE.2.Table. Root. Unic ID: _id:253.2.Table. Root. Unic ID: _id:253. Text.1"] or ""
+    local str = table["BOMB_ROOT.2.BOMB_PAGE.2.Table. Root. Unic ID: _id:19.2.Table. Root. Unic ID: _id:19. Text.1"] or ""
     return (str == prof)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSProfileGBU24(mfd, prof)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:1307.2.Table. Root. Unic ID: _id:1307. Text.2"] or ""
+    local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:105.2.Table. Root. Unic ID: _id:105. Text.2"] or ""
     return (str == prof)
 end
 
 ---- munition employment selection
 
+-- IsSMSEmploymentWCMD      t => sms osb 2 label (mode: pre/vis) matches specified state, wcmd
+-- IsSMSEmploymentJDAM      t => sms osb 2 label (mode: pre/vis) matches specified state, jdam
+-- IsSMSEmploymentGBU24     t => sms osb 2 label (mode: pre/vis) matches specified state, gbu-24
+-- IsSMSEmploymentMAV       t => sms osb 2 label (mode: pre/vis/bore) matches specified state, mav
+
 function JAFDTC_F16CM_Fn_IsSMSEmploymentWCMD(mfd, empl)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["WCMD_ROOT.2.WCMD_PAGE.2.PRE Table. Root. Unic ID: _id:1254.2.PRE Table. Root. Unic ID: _id:1254. Text.1"] or ""
+    local str = table["WCMD_ROOT.2.WCMD_PAGE.2.PRE Table. Root. Unic ID: _id:91.2.PRE Table. Root. Unic ID: _id:91. Text.1"] or ""
     return (str == empl)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSEmploymentJDAM(mfd, empl)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["JDAM_ROOT.2.JDAM_PAGE.2.PRE Table. Root. Unic ID: _id:1151.2.PRE Table. Root. Unic ID: _id:1151. Text.1"] or ""
+    local str = table["JDAM_ROOT.2.JDAM_PAGE.2.PRE Table. Root. Unic ID: _id:66.2.PRE Table. Root. Unic ID: _id:66. Text.1"] or ""
     return (str == empl)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSEmploymentGBU24(mfd, empl)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["GBU24_ROOT.2.GBU24_PAGE.2.PRE Table. Root. Unic ID: _id:1306.2.PRE Table. Root. Unic ID: _id:1306. Text.1"] or ""
+    local str = table["GBU24_ROOT.2.GBU24_PAGE.2.PRE Table. Root. Unic ID: _id:104.2.PRE Table. Root. Unic ID: _id:104. Text.1"] or ""
     return (str == empl)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSEmploymentMAV(mfd, empl)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["Table. Root. Unic ID: _id:1319.2.Table. Root. Unic ID: _id:1319. Text.1"] or ""
+    local str = table["Table. Root. Unic ID: _id:117.2.Table. Root. Unic ID: _id:117. Text.1"] or ""
     return (str == empl)
 end
 
 ---- munition fuze selection
 
+-- IsSMSFuze                t => sms osb 18 label (fusing: nose/tail/nstl) matches specified state, non gbu-24 and hd
+-- IsSMSFuzeHD              t => sms osb 18 label (fusing: nose/tail/nstl) matches specified state, hd
+-- IsSMSFuzeGBU24           t => sms osb 18 label (fusing: nose/tail/nstl) matches specified state, gbu-24
+
 function JAFDTC_F16CM_Fn_IsSMSFuze(mfd, fuze)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["BOMB_ROOT.2.BOMB_PAGE.2.Table. Root. Unic ID: _id:257.2.Table. Root. Unic ID: _id:257. Text.1"] or ""
+    local str = table["BOMB_ROOT.2.BOMB_PAGE.2.Table. Root. Unic ID: _id:23.2.Table. Root. Unic ID: _id:23. Text.1"] or ""
     return (str == fuze)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSFuzeHD(mfd, fuze)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["BOMB_ROOT.2.BOMB_PAGE.2.Table. Root. Unic ID: _id:257.2.Table. Root. Unic ID: _id:257. Text.2"] or ""
+    local str = table["BOMB_ROOT.2.BOMB_PAGE.2.Table. Root. Unic ID: _id:23.2.Table. Root. Unic ID: _id:23. Text.2"] or ""
     return (str == fuze)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSFuzeGBU24(mfd, fuze)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:1312.2.Table. Root. Unic ID: _id:1312. Text.1"] or ""
+    local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:110.2.Table. Root. Unic ID: _id:110. Text.1"] or ""
     return (str == fuze)
 end
 
 ---- munition sgl/pair selection
 
+-- IsSMSReleaseType         t => sms osb 8 label (release: sgl/pair) matches specified state, non gbu-24 and wcmd
+-- IsSMSReleaseTypeGBU24    t => sms osb 8 label (release: sgl/pair) matches specified state, gbu-24
+-- IsSMSReleaseTypeWCMD     t => sms osb 19 icon (release: sgl/l-r/f-b) matches specified state, wcmd
+
 function JAFDTC_F16CM_Fn_IsSMSReleaseType(mfd, rel)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["BOMB_ROOT.2.BOMB_PAGE.2.Table. Root. Unic ID: _id:254.2.Table. Root. Unic ID: _id:254. Text.1"] or ""
+    local str = table["BOMB_ROOT.2.BOMB_PAGE.2.Table. Root. Unic ID: _id:20.2.Table. Root. Unic ID: _id:20. Text.1"] or ""
     return (string.gsub(str, "%s*%d*%s*", "") == rel)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSReleaseTypeGBU24(mfd, rel)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:1308.2.Table. Root. Unic ID: _id:1308. Text.1"] or ""
+    local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:106.2.Table. Root. Unic ID: _id:106. Text.1"] or ""
     return (str == rel)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSReleaseTypeWCMD(mfd, rel)
+-- TODO check?
     local table = JAFDTC_F16CM_GetMFD(mfd)
     local str = nil
     if rel == "SGL" then
@@ -386,13 +432,18 @@ end
 
 ---- munition spin selection
 
+-- IsSMSSpinWCMD            t => sms/cntl osb 17 label (spin: various in RPM, "?RPM") matches specified state, cbu-103
+
 function JAFDTC_F16CM_Fn_IsSMSSpinWCMD(mfd, spin)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["WCMD_ROOT.2.WCMD_CNTL_PAGE.2.Table. Root. Unic ID: _id:1260.2.Table. Root. Unic ID: _id:1260. Text.2"] or ""
+    local str = table["WCMD_ROOT.2.WCMD_CNTL_PAGE.2.Table. Root. Unic ID: _id:97.2.Table. Root. Unic ID: _id:97. Text.2"] or ""
     return (str == spin)
 end
 
 ---- munition arm delay selection
+
+-- IsSMSArmDelayGBU24       t => sms page text (ad: various in s, "AD ?SEC") matches specified state, gbu-24
+-- IsSMSArmDelayJDAM        t => sms/cntl osb 19 label (ad: various in s, "AD ?SEC") matches specified state, jdam
 
 function JAFDTC_F16CM_Fn_IsSMSArmDelayGBU24(mfd, ad)
     local table = JAFDTC_F16CM_GetMFD(mfd)
@@ -402,37 +453,44 @@ end
 
 function JAFDTC_F16CM_Fn_IsSMSArmDelayJDAM(mfd, ad)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["JDAM_ROOT.2.JDAM_CNTL_PAGE.2.Table. Root. Unic ID: _id:1156.2.Table. Root. Unic ID: _id:1156. Text.1"] or ""
+    local str = table["JDAM_ROOT.2.JDAM_CNTL_PAGE.2.Table. Root. Unic ID: _id:71.2.Table. Root. Unic ID: _id:71. Text.1"] or ""
     return (str == ad)
 end
 
 ---- munition ripple delay selection
 
+-- IsSMSRippleDelayGBU24    t => sms osb 9 label (delay: 50-500ms by 50ms, "?MSEC") matches specified state, gbu-24
+
 function JAFDTC_F16CM_Fn_IsSMSRippleDelayGBU24(mfd, rd)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:1309.2.Table. Root. Unic ID: _id:1309. Text.1"] or ""
+    local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:107.2.Table. Root. Unic ID: _id:107. Text.1"] or ""
     return (str == rd)
 end
 
 ---- munition ripple pulse selection
 
+-- IsSMSRipplePulseGBU24    t => sms osb 10 label (rp: 1/2/3/4, "?") matches specified state, gbu-24
+
 function JAFDTC_F16CM_Fn_IsSMSRipplePulseGBU24(mfd, rp)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:1310.2.Table. Root. Unic ID: _id:1310. Text.2"] or ""
+    local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:108.2.Table. Root. Unic ID: _id:108. Text.2"] or ""
     return (str == rp)
 end
 
 ---- munition auto power selection
 
+-- IsSMSAutoPwrMAV          t => sms/cntl osb 7 label (auto pwr: on/off) matches specified state, mav
+-- IsSMSAutoPwrModeMAV      t => sms/cntl osb 20 label (mode: n/s/e/w of) matches specified state, mav
+
 function JAFDTC_F16CM_Fn_IsSMSAutoPwrMAV(mfd, pwr)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["MAVERICK_ROOT.2.MAVERICK_CNTL_PAGE.2.Table. Root. Unic ID: _id:1104.2.Table. Root. Unic ID: _id:1104. Text.2"] or ""
+    local str = table["MAVERICK_ROOT.2.MAVERICK_CNTL_PAGE.2.Table. Root. Unic ID: _id:58.2.Table. Root. Unic ID: _id:58. Text.2"] or ""
     return (str == pwr)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSAutoPwrModeMAV(mfd, app)
     local table = JAFDTC_F16CM_GetMFD(mfd)
-    local str = table["MAVERICK_ROOT.2.MAVERICK_CNTL_PAGE.2.Table. Root. Unic ID: _id:1106.2.Table. Root. Unic ID: _id:1106. Text.1"] or ""
+    local str = table["MAVERICK_ROOT.2.MAVERICK_CNTL_PAGE.2.Table. Root. Unic ID: _id:60.2.Table. Root. Unic ID: _id:60. Text.1"] or ""
     return (str == app)
 end
 

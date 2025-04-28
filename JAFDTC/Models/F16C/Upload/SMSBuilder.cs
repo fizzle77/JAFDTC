@@ -2,7 +2,7 @@
 //
 // SMSBuilder.cs -- f-16c sms command builder
 //
-// Copyright(C) 2024 ilominar/raven
+// Copyright(C) 2024-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -24,6 +24,7 @@ using JAFDTC.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+
 using static JAFDTC.Models.F16C.SMS.SMSSystem;
 
 namespace JAFDTC.Models.F16C.Upload
@@ -33,13 +34,11 @@ namespace JAFDTC.Models.F16C.Upload
     /// command stream is built assuming the sms format is selected on one of the viper's mfds. the builder
     /// requires the following state:
     ///
-    ///     SMSMuni.{mode}.mfdSide: string
-    ///         identifies mfd that displays the hts page in "mode", legal values are "left" or "right"
-    ///     SMSMuni.{mode}.osbSel: string
-    ///         mfd button name ("OSB-nn") of the currently selected format on the mfd identified by mfdSide in "mode"
-    ///     SMSMuni.{mode}.osbSMS: string
-    ///         mfd button name ("OSB-nn") that selects the sms format on the mfd identified by mfdSide in "mode"
-    ///     SMSMuni.{mode}: List of string
+    ///     mode: string (MFDSystem.MasterModes)
+    ///         name of master mode (MFDSystem.MasterModes) to be built, either ICP_AG or ICP_AA.
+    ///     mfdSide: string
+    ///         identifies mfd that displays the sms page in "mode", legal values are "left" or "right"
+    ///     muniQtys: List of string
     ///         sms quantity + name strings for the munitions on the jet in "mode"
     ///         
     /// where "mode" is a MFDSystem.MasterModes.
@@ -132,18 +131,16 @@ namespace JAFDTC.Models.F16C.Upload
         /// <summary>
         /// configure sms system via the mfd osbs according to the non-default programming settings (this function is
         /// safe to call with a configuration with default settings: defaults are skipped as necessary). the builder
-        /// assumes the sms page is currently selected and requires the following state:
+        /// assumes the sms page is currently selected in the mfdSide mfd and requires the following state:
         /// 
-        ///     SMSMuni.{mode}.mfdSide: string
-        ///         identifies mfd that displays the hts page in "mode", legal values are "left" or "right"
-        ///     SMSMuni.{mode}.osbSel: string
-        ///         mfd button name ("OSB-nn") of the currently selected format on the mfd identified by mfdSide in "mode"
-        ///     SMSMuni.{mode}.osbSMS: string
-        ///         mfd button name ("OSB-nn") that selects the sms format on the mfd identified by mfdSide in "mode"
-        ///     SMSMuni.{mode}: List of string
+        ///     mode: string (MFDSystem.MasterModes)
+        ///         name of master mode (MFDSystem.MasterModes) to be built, either ICP_AG or ICP_AA.
+        ///     mfdSide: string
+        ///         identifies mfd that displays the sms page in "mode", legal values are "left" or "right"
+        ///     muniQtys: List of string
         ///         sms quantity + name strings for the munitions on the jet in "mode"
         ///
-        /// where "mode" is a MFDSystem.MasterModes.
+        /// where "mode" is a MFDSystem.MasterModes. the following state is optional,
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
         {
@@ -152,36 +149,52 @@ namespace JAFDTC.Models.F16C.Upload
 
             AddExecFunction("NOP", new() { "==== SMSBuilder:Build()" });
 
-            // TODO: handle a2a or a2g here by allowing muniQtys state for a2a, a2g weapons? assume only a2g for now.
-            MFDSystem.MasterModes mode = MFDSystem.MasterModes.ICP_AG;
+            state.TryGetValueAs($"mode", out string modeStr);
+            state.TryGetValueAs($"mfdSide", out string mfdSide);
+            state.TryGetValueAs($"muniQtys", out List<string> muniQtys);
 
-            state.TryGetValueAs($"SMSMuni.{mode}.mfdSide", out string mfdSide);
-            state.TryGetValueAs($"SMSMuni.{mode}.osbSel", out string osbSel);
-            state.TryGetValueAs($"SMSMuni.{mode}.osbSMS", out string osbSMS);
-            state.TryGetValueAs($"SMSMuni.{mode}", out List<string> muniQtys);
+            string modeSMS = "A-G";
+            if (modeStr == "ICP_AA")
+                modeSMS = "AAM";
+            else if (modeStr != "ICP_AG")
+                return;
 
-            AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice mfd = (mfdSide == "left") ? _aircraft.GetDevice("LMFD") : _aircraft.GetDevice("RMFD");
 
-            AddExecFunction("NOP", new() { "==== SMSBuilder:Build() begins" });
+            PrepareSMSPage(mfd, mfdSide, modeSMS);
+            BuildCore(mfd, mfdSide, muniQtys);
+        }
 
+        /// <summary>
+        /// configure sms system via the mfd osbs according to the non-default programming settings (this function is
+        /// safe to call with a configuration with default settings: defaults are skipped as necessary). this function
+        /// assumes the sms page is currently selected on mfdSide and is ready to handle setup.
+        /// </summary>
+        private void BuildCore(AirframeDevice mfd, string mfdSide, List<string> muniQtys)
+        {
+            bool isMavSetup = false;
             foreach (string muniQty in muniQtys)
             {
                 F16CMunition muniInfo = FindMunitionInfoForSMS(muniQty[1..]);
                 if (muniInfo != null)
                 {
                     List<MunitionSettings> profiles = FindProfilesForMunition(muniInfo.ID);
+
+                    // NOTE: because mav configurations are shared across all variants, we will only program
+                    // NOTE: mavs once and skip any further mav configuration.
+
+                    bool isMav = ((muniInfo.ID == Munitions.AGM_65D) || (muniInfo.ID == Munitions.AGM_65G) ||
+                                  (muniInfo.ID == Munitions.AGM_65H) || (muniInfo.ID == Munitions.AGM_65K));
                     bool isDefault = true;
                     foreach (MunitionSettings profile in profiles)
-                    {
                         if (!profile.IsDefault)
                         {
                             isDefault = false;
                             break;
                         }
-                    }
-                    if (isDefault)
+                    if (isDefault || (isMav && isMavSetup))
                         continue;
+                    isMavSetup = (isMavSetup || isMav);
 
                     AddWhileBlock("IsSMSMuniSelected", false, new() { mfdSide, muniQty }, delegate ()
                     {
@@ -203,11 +216,41 @@ namespace JAFDTC.Models.F16C.Upload
         }
 
         /// <summary>
+        /// ensure the sms page on the given mfd is ready to accept munition configuration: not on the inv or cntl
+        /// subpages with the proper master mode selected on the page.
+        /// </summary>
+        private void PrepareSMSPage(AirframeDevice mfd, string mfdSide, string modeSMS)
+        {
+            AddIfBlock("IsSMSOnINV", true, new() { mfdSide }, delegate ()
+            {
+                AddAction(mfd, "OSB-04", WAIT_BASE);
+            });
+            AddIfBlock("IsSMSOnCNTL", true, new() { mfdSide }, delegate ()
+            {
+                AddAction(mfd, "OSB-05", WAIT_BASE);
+            });
+            AddWhileBlock("IsSMSOnMode", false, new() { mfdSide, modeSMS }, delegate ()
+            {
+                AddAction(mfd, "OSB-01", WAIT_BASE);
+            }, 4);
+        }
+
+        /// <summary>
         /// build the command stream for the munition setup. for munitions that have profiles, the method will
         /// select the correct profile. BuildMunitionConfigCore() build the munition-specific command stream.
         /// </summary>
         private void BuildMunition(AirframeDevice mfd, string mfdSide, F16CMunition muniInfo, MunitionSettings settings)
         {
+            // TODO: currently, code assumes sms munition setups are in their default state. the setup code
+            // TODO: will only drive changes if the settings are *non-default*. this means that if the jet
+            // TODO: is in a non-default state, but the configuration is in a default state, the update will
+            // TODO: *not* reset the jet back to default.
+            //
+            // TODO: intent was to limit the lua on the dcs side in the case of default values.
+            //
+            // TODO: consider changing this behavior: could either always input defaults or guard updates
+            // TODO: with if/then in lua.
+
             if (!string.IsNullOrEmpty(settings.Profile))
             {
                 string profNum = $"{int.Parse(settings.Profile) + 1}";
@@ -418,9 +461,10 @@ namespace JAFDTC.Models.F16C.Upload
                     if (isNegOK)
                         AddWhileBlock("IsSMSCntlNumericPadNeg", isPositive, new() { mfdSide }, delegate ()
                         {
-                            AddAction(mfd, "OSB-05");
+                            AddAction(mfd, "OSB-05", WAIT_BASE);
                         });
-                    AddActions(mfd, buttons);
+                    foreach (string button in buttons)
+                        AddAction(mfd, button, WAIT_BASE);
                 }
                 AddAction(mfd, "OSB-02", WAIT_BASE);
             }
@@ -504,7 +548,7 @@ namespace JAFDTC.Models.F16C.Upload
             if (!string.IsNullOrEmpty(release))
             {
                 string relQty = (release == ((int)MunitionSettings.ReleaseModes.MAV_PAIR).ToString()) ? "2" : "1";
-                EnterNumericParams(mfd, mfdSide, "OSB-08", new() { relQty });
+                EnterNumericParams(mfd, mfdSide, osb, new() { relQty });
             }
         }
 

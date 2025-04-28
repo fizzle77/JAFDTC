@@ -156,7 +156,7 @@ namespace JAFDTC.Models.F16C
 
             SMSStateQueryBuilder querySMS = new(_dm, null);
             state = querySMS.QuerySMSMunitionsForMode(MFDSystem.MasterModes.ICP_AG, state);
-            // TODO: maybe add this when munitions handle a2a weapons too?
+            // TODO: add this when munitions handle a2a weapons too?
             // state = querySMS.QuerySMSMunitionsForMode(MFDSystem.MasterModes.ICP_AA, state);
 
             // build the command stream to set up the jet. we will use the query state collected above to drive
@@ -179,8 +179,6 @@ namespace JAFDTC.Models.F16C
             //
             // NOTE: mfd will invoke the sms builder if there are sms changes and the sms page is added to an mfd in
             // NOTE: the appropriate master mode.
-            //
-            // TODO: this won't setup sms if mfds are default, fix that...
             //
             new MFDBuilder(_cfg, _dm, sb).Build(state);
             new DLNKBuilder(_cfg, _dm, sb).Build(state);
