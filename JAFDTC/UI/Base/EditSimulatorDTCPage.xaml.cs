@@ -18,6 +18,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
+using JAFDTC.Models.Base;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml;
@@ -25,28 +26,22 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
-using JAFDTC.Models.Base;
-using System.Xml.Linq;
-using JAFDTC.Models.F16C;
-using System.ComponentModel.Design;
-using JAFDTC.Utilities.LsonLib;
-using System.Text.Json.Nodes;
-using System.Linq;
 
 namespace JAFDTC.UI.Base
 {
     /// <summary>
     /// object representing the user interface view of a system that can be included in the dtc tape.
     /// </summary>
-    public sealed class DTCSystemItem : BindableObject
+    public sealed partial class DTCSystemItem : BindableObject
     {
         public string Tag { get; set; }
 
@@ -87,9 +82,7 @@ namespace JAFDTC.UI.Base
 
         private IEditSimulatorDTCPageHelper PageHelper { get; set;  }
 
-        private SimDTCSystem EditDTC;
-
-        private Dictionary<int, string> MapTmpltPaths { get; set; }
+        private readonly SimDTCSystem EditDTC;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -326,6 +319,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void BtnSetOutput_Click(object sender, RoutedEventArgs args)
         {
+            bool shouldMerge = true;
             if (string.IsNullOrEmpty(EditDTC.OutputPath))
             {
                 try
@@ -342,6 +336,8 @@ namespace JAFDTC.UI.Base
                     StorageFile file = await picker.PickSaveFileAsync();
                     if (file != null)
                         UpdateDTCOutputPath(file.Path);
+                    else
+                        shouldMerge = false;
                 }
                 catch (Exception ex)
                 {
@@ -350,16 +346,19 @@ namespace JAFDTC.UI.Base
                 }
             }
 
-            try
+            if (shouldMerge)
             {
-                Config.SaveMergedSimDTC(EditDTC.Template, EditDTC.OutputPath);
-                await Utilities.Message1BDialog(Content.XamlRoot, "Tape Merged",
-                                                $"Successfully generated the merged tape at “{EditDTC.OutputPath}”");
-            }
-            catch (Exception ex)
-            {
-                FileManager.Log($"EditSimulatorDTCPage:BtnSetOutput_Click exception {ex}");
-                await Utilities.Message1BDialog(Content.XamlRoot, "Tape Merge Failed", "TODO");
+                try
+                {
+                    Config.SaveMergedSimDTC(EditDTC.Template, EditDTC.OutputPath);
+                    await Utilities.Message1BDialog(Content.XamlRoot, "Tape Merged",
+                                                    $"Successfully generated the merged tape at “{EditDTC.OutputPath}”");
+                }
+                catch (Exception ex)
+                {
+                    FileManager.Log($"EditSimulatorDTCPage:BtnSetOutput_Click exception {ex}");
+                    await Utilities.Message1BDialog(Content.XamlRoot, "Tape Merge Failed", "TODO");
+                }
             }
         }
 
