@@ -57,6 +57,9 @@ namespace JAFDTC.Models.FA18C.Upload
 
             AddExecFunction("NOP", new() { "==== CMSBuilder:Build()" });
 
+            if (_cfg.IsMerged(CMSSystem.SystemTag))
+                return;
+
             AirframeDevice lddi = _aircraft.GetDevice("LDDI");
             AirframeDevice cmds = _aircraft.GetDevice("CMDS");
             CMSSystem defaultSys = CMSSystem.ExplicitDefaults;

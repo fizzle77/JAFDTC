@@ -2,7 +2,7 @@
 //
 // FA18CBuilderBase.cs -- fa-18c abstract base command builder
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -45,5 +45,24 @@ namespace JAFDTC.Models.FA18C.Upload
 
         public FA18CBuilderBase(FA18CConfiguration cfg, FA18CDeviceManager dcsCmds, StringBuilder sb) : base(dcsCmds, sb)
             => (_cfg) = (cfg);
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // methods
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// advance a ddi to the specified page by pressing "MENU" on the indicated ddi until it matches the state
+        /// tested for by fnCheckMode then pressing the osb given by pageOSB to advance to the target page.
+        /// </summary>
+        public void SwitchDDIToPage(AirframeDevice ddi, string fnCheckMode, string pageOSB)
+        {
+            AddWhileBlock(fnCheckMode, false, null, delegate ()
+            {
+                AddAction(ddi, "OSB-18", WAIT_BASE);                                        // MENU
+            }, 6);
+            AddAction(ddi, pageOSB, WAIT_BASE);                                             // page selection osb
+        }
     }
 }

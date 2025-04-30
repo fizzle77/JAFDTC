@@ -3,7 +3,7 @@
 // CMSSystem.cs -- fa-18c cmds system configuration
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,7 +18,9 @@
 //
 // ********************************************************************************************************************
 
+using System;
 using System.Diagnostics;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace JAFDTC.Models.FA18C.CMS
@@ -127,6 +129,34 @@ namespace JAFDTC.Models.FA18C.CMS
         // methods
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// merge cms settings into dcs dtc configuration.
+        /// </summary>
+        public override void MergeIntoSimDTC(JsonNode dataRoot)
+        {
+            CMSSystem dflt = ExplicitDefaults;
+            JsonNode cmdsRoot = dataRoot["ALR67"]["CMDS"];
+
+            JsonNode progRoot = cmdsRoot["CMDSProgramSettings"];
+            for (int i = (int)ProgramNumbers.PROG1; i < (int)ProgramNumbers.PROG5; i++)
+            {
+                CMProgram prog = Programs[i];
+                CMProgram progDflt = dflt.Programs[i];
+
+                JsonNode chaffRoot = progRoot[$"MAN_{i + 1}"]["Chaff"];
+                if (int.TryParse((string.IsNullOrEmpty(prog.ChaffQ)) ? progDflt.ChaffQ : prog.ChaffQ, out int cq))
+                    chaffRoot["Quantity"] = cq;
+                if (int.TryParse((string.IsNullOrEmpty(prog.SQ)) ? progDflt.SQ : prog.SQ, out int sq))
+                    progRoot["Repeat"] = sq;
+                if (double.TryParse((string.IsNullOrEmpty(prog.SI)) ? progDflt.SI : prog.SI, out double si))
+                    progRoot["Interval"] = Math.Truncate(si * 100.0) / 100.0;
+
+                JsonNode flareRoot = progRoot[$"MAN_{i + 1}"]["Flare"];
+                if (int.TryParse((string.IsNullOrEmpty(prog.FlareQ)) ? progDflt.FlareQ : prog.FlareQ, out int fq))
+                    flareRoot["Quantity"] = fq;
+            }
+        }
 
         /// <summary>
         /// reset the instance to defaults (by definition, field value of "" implies default). table numbers are not

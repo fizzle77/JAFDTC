@@ -93,21 +93,47 @@ end
 -- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_FA18C_Fn_IsDispenserOff()
-    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI);
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI)
     local str = table["ALE-47_1__id:3.3.EW_ALE47_MODE_label_cross_Root.2.EW_ALE47_MODE_label_cross_TopLine.1"]
     return (str == "")
 end
 
 function JAFDTC_FA18C_Fn_IsLDDITAC()
-    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI);
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI)
     local str = table["TAC_id:23.1"]
     return (str == "TAC")
 end
 
 function JAFDTC_FA18C_Fn_IsALE47Mode(mode)
-    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI);
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI)
     local str = table["ALE-47_1__id:3.2"] or ""
     return (str == mode)
+end
+
+-- --------------------------------------------------------------------------------------------------------------------
+--
+-- conditions: mumi system
+--
+-- --------------------------------------------------------------------------------------------------------------------
+
+function JAFDTC_FA18C_Fn_IsRDDISUPT()
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_R_DDI)
+    local str = table["Menu_SUPT.2.SUPT_id:13.1"]
+    return (str == "SUPT")
+end
+
+function JAFDTC_FA18C_Fn_IsRDDMUMILoadedCOMM()
+    JAFDTC_FA18C_Fn_DebugDumpRightDDI("JAFDTC_FA18C_Fn_IsRDDMUMILoadedCOMM")
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_R_DDI)
+    local str = table["MUMI_root.2.MUMI_Main_Menu_Root_PB.2.COMM_1_box__id:26.1"]
+    return (str == "")
+end
+
+function JAFDTC_FA18C_Fn_IsRDDMUMILoadedALR()
+    JAFDTC_FA18C_Fn_DebugDumpRightDDI("JAFDTC_FA18C_Fn_IsRDDMUMILoadedALR")
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_R_DDI)
+    local str = table["MUMI_root.2.MUMI_Main_Menu_Root_PB.2.ALR67_1_box__id:32.1"]
+    return (str == "")
 end
 
 -- --------------------------------------------------------------------------------------------------------------------
@@ -117,31 +143,31 @@ end
 -- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_FA18C_Fn_IsStationCarriesStore(stn, store)
-    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI);
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI)
     local label = table["STA" .. stn .. "_Label_TYPE.1"] or ""
     return (label == store)
 end
 
 function JAFDTC_FA18C_Fn_IsStationSelected(station)
-    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI);
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI)
     local str = table["STA" .. station .. "_Label_TYPE.2.STA" .. station .. "_Selective_Box_Line_02.1"] or "x"
     return (str == "")
 end
 
 function JAFDTC_FA18C_Fn_IsInPPStation(station)
-    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI);
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI)
     local str = table["Station_JDAM.2.CurrStation_JDAM.1"] or ""
     return (str == station)
 end
 
 function JAFDTC_FA18C_Fn_IsPPSelected(number)
-    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI);
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI)
     local str = table["MISSION_Type.1"] or ""
     return (str == "PP" .. number)
 end
 
 function JAFDTC_FA18C_Fn_IsTargetOfOpportunity()
-    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI);
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI)
     local str = table["Miss_Type.1"] or ""
     return (str == "TOO1")
 end
@@ -180,7 +206,7 @@ end
 -- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_FA18C_Fn_IsRadioOnChannel(radio, channel)
-    local table = JAFDTC_ParseDisplaySimple(DID_FA18C_UFC);
+    local table = JAFDTC_ParseDisplaySimple(DID_FA18C_UFC)
     local varName = "UFC_Comm"..radio.."Display"
     local str = table[varName] or ""
     local currChannel = str:gsub("%s+", ""):gsub("`", "1"):gsub("~", "2")
@@ -188,7 +214,7 @@ function JAFDTC_FA18C_Fn_IsRadioOnChannel(radio, channel)
 end
 
 function JAFDTC_FA18C_Fn_IsRadioGuardDisabled()
-    local table = JAFDTC_ParseDisplaySimple(DID_FA18C_UFC);
+    local table = JAFDTC_ParseDisplaySimple(DID_FA18C_UFC)
     local str = table["UFC_OptionCueing1"] or ""
     return (str ~= ":")
 end
@@ -200,13 +226,13 @@ end
 -- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_FA18C_Fn_IsRDDISUPT()
-    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_R_DDI);
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_R_DDI)
     local str = table["Menu_SUPT.2.SUPT_id:13.1"] or ""
     return (str == "SUPT")
 end
 
 function JAFDTC_FA18C_Fn_IsAtWYPTn(num)
-    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_R_DDI);
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_R_DDI)
     local str = table["WYPT_Page_Number.1"] or ""
     return (str == num)
 end
@@ -249,7 +275,7 @@ local BTN_FA18C_LDDI_OSB_09 = 3019
 local BTN_FA18C_LDDI_OSB_10 = 3020
 
 function JAFDTC_FA18C_Fn_UnSelectStore()
-    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI);
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI)
     local selOBS06 = table["_1__id:136.2.BP_6_Break_X_Root.2.BP_6_Break_X_TopLine.1"]
     local selOBS07 = table["_1__id:139.2.BP_7_Break_X_Root.2.BP_7_Break_X_TopLine.1"]
     local selOBS08 = table["_1__id:142.2.BP_8_Break_X_Root.2.BP_8_Break_X_TopLine.1"]
@@ -275,7 +301,7 @@ function JAFDTC_FA18C_Fn_SelectStore(store)
     JAFDTC_FA18C_Fn_UnSelectStore()
     JAFDTC_Core_Wait(200)
 
-    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI);
+    local table = JAFDTC_ParseDisplayFlat(DID_FA18C_L_DDI)
     local storeOBS06 = table["_1__id:136.1"] or ""
     local storeOBS07 = table["_1__id:139.1"] or ""
     local storeOBS08 = table["_1__id:142.1"] or ""
@@ -304,9 +330,9 @@ end
 -- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_FA18C_AfterNextFrame(params)
-    local mainPanel = GetDevice(0);
-    local ipButton = mainPanel:get_argument_value(99);
-    local hudVideoSwitch = mainPanel:get_argument_value(144);
+    local mainPanel = GetDevice(0)
+    local ipButton = mainPanel:get_argument_value(99)
+    local hudVideoSwitch = mainPanel:get_argument_value(144)
 
     if ipButton == 1 then params["uploadCommand"] = "1" end
     if hudVideoSwitch >= 0.2 then params["showJAFDTCCommand"] = "1" end

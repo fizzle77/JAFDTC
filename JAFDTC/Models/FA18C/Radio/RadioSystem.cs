@@ -3,7 +3,7 @@
 // RadioSystem.cs -- fa-18c radio system
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -21,6 +21,8 @@
 using JAFDTC.Models.Base;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
+using System.Text.Json.Nodes;
+using System;
 
 namespace JAFDTC.Models.FA18C.Radio
 {
@@ -57,12 +59,8 @@ namespace JAFDTC.Models.FA18C.Radio
             get
             {
                 foreach (ObservableCollection<RadioPreset> presets in Presets)
-                {
                     if (presets.Count > 0)
-                    {
                         return false;
-                    }
-                }
                 return string.IsNullOrEmpty(COMM1DefaultTuning) && string.IsNullOrEmpty(COMM2DefaultTuning);
             }
         }
@@ -115,14 +113,36 @@ namespace JAFDTC.Models.FA18C.Radio
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// merge the presets for the given radio in the dcs dtc dom. we will only change the frequence in the dcs dtc
+        /// as the modulation for the hornet is fixed and can't change from what is already in the dtc.
+        /// </summary>
+        private static void MergeRadioIntoSimDTC(JsonNode radioRoot, ObservableCollection<RadioPreset> presets)
+        {
+            foreach (RadioPreset preset in presets)
+            {
+                JsonNode dtcPreset = radioRoot[$"Channel_{preset.Preset}"];
+                if (double.TryParse(preset.Frequency, out double freq))
+                    dtcPreset["frequency"] = Math.Truncate(freq * 1000.0) / 1000.0;
+            }
+        }
+
+        /// <summary>
+        /// merge radio settings into dcs dtc configuration.
+        /// </summary>
+        public override void MergeIntoSimDTC(JsonNode dataRoot)
+        {
+            JsonNode commRoot = dataRoot["COMM"];
+            MergeRadioIntoSimDTC(commRoot["COMM1"], Presets[(int)Radios.COMM1]);
+            MergeRadioIntoSimDTC(commRoot["COMM2"], Presets[(int)Radios.COMM2]);
+        }
+
+        /// <summary>
         /// reset the instance to defaults by clearing all presets from all radios.
         /// </summary>
         public override void Reset()
         {
             foreach (ObservableCollection<RadioPreset> radio in Presets)
-            {
                 radio.Clear();
-            }
             COMM1DefaultTuning = "";
             COMM2DefaultTuning = "";
         }

@@ -3,7 +3,7 @@
 // FA18CUploadAgent.cs -- fa-18c upload agent
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -93,6 +93,7 @@ namespace JAFDTC.Models.FA18C
 
         public override void BuildSystems(StringBuilder sb)
         {
+            new MUMIBuilder(_cfg, _dcsCmds, sb).Build();
             new RadioBuilder(_cfg, _dcsCmds, sb).Build();
             new CMSBuilder(_cfg, _dcsCmds, sb).Build();
             new WYPTBuilder(_cfg, _dcsCmds, sb).Build();

@@ -18,6 +18,7 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models.Base;
 using JAFDTC.Models.FA18C.CMS;
 using JAFDTC.Models.FA18C.PP;
 using JAFDTC.Models.FA18C.Radio;
@@ -37,7 +38,7 @@ namespace JAFDTC.Models.FA18C
     /// up. this object is serialized to/from json when persisting configurations. configuration supports navigation,
     /// countermeasure, and radio systems.
     /// </summary>
-    public class FA18CConfiguration : Configuration
+    public partial class FA18CConfiguration : Configuration
     {
         private const string _versionCfg = "FA18C-1.0";         // current version
 
@@ -55,6 +56,15 @@ namespace JAFDTC.Models.FA18C
 
         public WYPTSystem WYPT { get; set; }
 
+        public SimDTCSystem MUMI { get; set; }
+
+        [JsonIgnore]
+        public override List<string> MergeableSysTagsForDTC => new()
+        {
+            RadioSystem.SystemTag,
+            CMSSystem.SystemTag
+        };
+
         [JsonIgnore]
         public override IUploadAgent UploadAgent => new FA18CUploadAgent(this);
 
@@ -71,6 +81,7 @@ namespace JAFDTC.Models.FA18C
             PP = new PPSystem();
             Radio = new RadioSystem();
             WYPT = new WYPTSystem();
+            MUMI = new SimDTCSystem();
             ConfigurationUpdated();
         }
 
@@ -78,15 +89,14 @@ namespace JAFDTC.Models.FA18C
         {
             Dictionary<string, string> linkedSysMap = new();
             foreach (KeyValuePair<string, string> kvp in LinkedSysMap)
-            {
                 linkedSysMap[new(kvp.Key)] = new(kvp.Value);
-            }
             FA18CConfiguration clone = new("", Name, linkedSysMap)
             {
                 CMS = (CMSSystem)CMS.Clone(),
                 PP = (PPSystem)PP.Clone(),
                 Radio = (RadioSystem)Radio.Clone(),
-                WYPT = (WYPTSystem)WYPT.Clone()
+                WYPT = (WYPTSystem)WYPT.Clone(),
+                MUMI = (SimDTCSystem)MUMI.Clone()
             };
             clone.ResetUID();
             clone.ConfigurationUpdated();
@@ -102,6 +112,7 @@ namespace JAFDTC.Models.FA18C
                 case PPSystem.SystemTag: PP = otherHornet.PP.Clone() as PPSystem; break;
                 case RadioSystem.SystemTag: Radio = otherHornet.Radio.Clone() as RadioSystem; break;
                 case WYPTSystem.SystemTag: WYPT = otherHornet.WYPT.Clone() as WYPTSystem; break;
+                case SimDTCSystem.SystemTag: MUMI = otherHornet.MUMI.Clone() as SimDTCSystem; break;
                 default: break;
             }
         }
@@ -120,9 +131,12 @@ namespace JAFDTC.Models.FA18C
                 PPSystem.SystemTag => PP,
                 RadioSystem.SystemTag => Radio,
                 WYPTSystem.SystemTag => WYPT,
+                SimDTCSystem.SystemTag => MUMI,
                 _ => null,
             };
         }
+
+        public override bool IsMerged(string systemTag) => MUMI.MergedSystemTags.Contains(systemTag);
 
         public override void ConfigurationUpdated()
         {
@@ -131,9 +145,7 @@ namespace JAFDTC.Models.FA18C
 
             string stpts = "";
             if (!WYPT.IsDefault)
-            {
                 stpts = $" along with {WYPT.Count} waypoint" + ((WYPT.Count > 1) ? "s" : "");
-            }
             UpdatesInfoTextUI = updatesStrings["UpdatesInfoTextUI"] + stpts;
             UpdatesIconsUI = updatesStrings["UpdatesIconsUI"];
             UpdatesIconBadgesUI = updatesStrings["UpdatesIconBadgesUI"];
@@ -148,6 +160,7 @@ namespace JAFDTC.Models.FA18C
                 PPSystem.SystemTag => JsonSerializer.Serialize(PP, Configuration.JsonOptions),
                 RadioSystem.SystemTag => JsonSerializer.Serialize(Radio, Configuration.JsonOptions),
                 WYPTSystem.SystemTag => JsonSerializer.Serialize(WYPT, Configuration.JsonOptions),
+                SimDTCSystem.SystemTag => JsonSerializer.Serialize(MUMI, Configuration.JsonOptions),
                 _ => null
             };
         }
@@ -158,6 +171,7 @@ namespace JAFDTC.Models.FA18C
             PP ??= new PPSystem();
             Radio ??= new RadioSystem();
             WYPT ??= new WYPTSystem();
+            MUMI ??= new SimDTCSystem();
 
             // TODO: if the version number is older than current, may need to update object
             Version = _versionCfg;
@@ -173,7 +187,8 @@ namespace JAFDTC.Models.FA18C
                      ((systemTag == null) && ((cboardTag == CMSSystem.SystemTag) ||
                                               (cboardTag == PPSystem.SystemTag) ||
                                               (cboardTag == RadioSystem.SystemTag) ||
-                                              (cboardTag == WYPTSystem.SystemTag)))));
+                                              (cboardTag == WYPTSystem.SystemTag) ||
+                                              (cboardTag == SimDTCSystem.SystemTag)))));
         }
 
         public override bool Deserialize(string systemTag, string json)
@@ -188,6 +203,7 @@ namespace JAFDTC.Models.FA18C
                     case PPSystem.SystemTag: PP = JsonSerializer.Deserialize<PPSystem>(json); break;
                     case RadioSystem.SystemTag: Radio = JsonSerializer.Deserialize<RadioSystem>(json); break;
                     case WYPTSystem.SystemTag: WYPT = JsonSerializer.Deserialize<WYPTSystem>(json); break;
+                    case SimDTCSystem.SystemTag: MUMI = JsonSerializer.Deserialize<SimDTCSystem>(json); break;
                     default: isHandled = false; break;
                 }
                 if (isHandled)
