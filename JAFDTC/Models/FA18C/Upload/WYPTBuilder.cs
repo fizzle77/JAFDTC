@@ -58,7 +58,7 @@ namespace JAFDTC.Models.FA18C.Upload
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
             AirframeDevice rmfd = _aircraft.GetDevice("RMFD");
 
-            AddWhileBlock("IsRMFDSUPT", false, null, delegate()
+            AddWhileBlock("IsRDDISUPT", false, null, delegate()
             {
                 AddAction(rmfd, "OSB-18");                                                  // MENU (SUPT)
             });   
@@ -94,7 +94,7 @@ namespace JAFDTC.Models.FA18C.Upload
                 AddAction(rmfd, "OSB-13", WAIT_BASE);                                       // WYPT --
             }, 150);
 
-            AddWhileBlock("IsRMFDSUPT", false, null, delegate()
+            AddWhileBlock("IsRDDISUPT", false, null, delegate()
             {
                 AddAction(rmfd, "OSB-18");                                                  // MENU (SUPT)
             });
