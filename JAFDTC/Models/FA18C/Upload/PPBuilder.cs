@@ -86,7 +86,7 @@ namespace JAFDTC.Models.FA18C.Upload
 
             AddExecFunction("NOP", new() { "==== PPBuilder:Build()" });
 
-            AirframeDevice lddi = _aircraft.GetDevice("LMFD");
+            AirframeDevice lddi = _aircraft.GetDevice("LDDI");
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
 
             Dictionary<Weapons, List<PPStation>> stationGroups = GroupStationsByPayloadType();

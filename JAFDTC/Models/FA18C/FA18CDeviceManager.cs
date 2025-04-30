@@ -90,55 +90,55 @@ namespace JAFDTC.Models.FA18C
             ifei.AddAction(3004, "DOWN", delayIFEI, 1);
             AddDevice(ifei);
 
-            // ---- left mfd
+            // ---- left ddi
 
-            AirframeDevice leftMFD = new(35, "LMFD");
-            leftMFD.AddAction(3011, "OSB-01", delayMFDs, 1);
-            leftMFD.AddAction(3012, "OSB-02", delayMFDs, 1);
-            leftMFD.AddAction(3013, "OSB-03", delayMFDs, 1);
-            leftMFD.AddAction(3014, "OSB-04", delayMFDs, 1);
-            leftMFD.AddAction(3015, "OSB-05", delayMFDs, 1);
-            leftMFD.AddAction(3016, "OSB-06", delayMFDs, 1);
-            leftMFD.AddAction(3017, "OSB-07", delayMFDs, 1);
-            leftMFD.AddAction(3018, "OSB-08", delayMFDs, 1);
-            leftMFD.AddAction(3019, "OSB-09", delayMFDs, 1);
-            leftMFD.AddAction(3020, "OSB-10", delayMFDs, 1);
-            leftMFD.AddAction(3021, "OSB-11", delayMFDs, 1);
-            leftMFD.AddAction(3022, "OSB-12", delayMFDs, 1);
-            leftMFD.AddAction(3023, "OSB-13", delayMFDs, 1);
-            leftMFD.AddAction(3024, "OSB-14", delayMFDs, 1);
-            leftMFD.AddAction(3025, "OSB-15", delayMFDs, 1);
-            leftMFD.AddAction(3026, "OSB-16", delayMFDs, 1);
-            leftMFD.AddAction(3027, "OSB-17", delayMFDs, 1);
-            leftMFD.AddAction(3028, "OSB-18", delayMFDs, 1);
-            leftMFD.AddAction(3029, "OSB-19", delayMFDs, 1);
-            leftMFD.AddAction(3030, "OSB-20", delayMFDs, 1);
-            AddDevice(leftMFD);
+            AirframeDevice leftDDI = new(35, "LDDI");
+            leftDDI.AddAction(3011, "OSB-01", delayMFDs, 1);
+            leftDDI.AddAction(3012, "OSB-02", delayMFDs, 1);
+            leftDDI.AddAction(3013, "OSB-03", delayMFDs, 1);
+            leftDDI.AddAction(3014, "OSB-04", delayMFDs, 1);
+            leftDDI.AddAction(3015, "OSB-05", delayMFDs, 1);
+            leftDDI.AddAction(3016, "OSB-06", delayMFDs, 1);
+            leftDDI.AddAction(3017, "OSB-07", delayMFDs, 1);
+            leftDDI.AddAction(3018, "OSB-08", delayMFDs, 1);
+            leftDDI.AddAction(3019, "OSB-09", delayMFDs, 1);
+            leftDDI.AddAction(3020, "OSB-10", delayMFDs, 1);
+            leftDDI.AddAction(3021, "OSB-11", delayMFDs, 1);
+            leftDDI.AddAction(3022, "OSB-12", delayMFDs, 1);
+            leftDDI.AddAction(3023, "OSB-13", delayMFDs, 1);
+            leftDDI.AddAction(3024, "OSB-14", delayMFDs, 1);
+            leftDDI.AddAction(3025, "OSB-15", delayMFDs, 1);
+            leftDDI.AddAction(3026, "OSB-16", delayMFDs, 1);
+            leftDDI.AddAction(3027, "OSB-17", delayMFDs, 1);
+            leftDDI.AddAction(3028, "OSB-18", delayMFDs, 1);
+            leftDDI.AddAction(3029, "OSB-19", delayMFDs, 1);
+            leftDDI.AddAction(3030, "OSB-20", delayMFDs, 1);
+            AddDevice(leftDDI);
 
             // ---- right mfd
 
-            AirframeDevice rightMFD = new(36, "RMFD");
-            rightMFD.AddAction(3011, "OSB-01", delayMFDs, 1);
-            rightMFD.AddAction(3012, "OSB-02", delayMFDs, 1);
-            rightMFD.AddAction(3013, "OSB-03", delayMFDs, 1);
-            rightMFD.AddAction(3014, "OSB-04", delayMFDs, 1);
-            rightMFD.AddAction(3015, "OSB-05", delayMFDs, 1);
-            rightMFD.AddAction(3016, "OSB-06", delayMFDs, 1);
-            rightMFD.AddAction(3017, "OSB-07", delayMFDs, 1);
-            rightMFD.AddAction(3018, "OSB-08", delayMFDs, 1);
-            rightMFD.AddAction(3019, "OSB-09", delayMFDs, 1);
-            rightMFD.AddAction(3020, "OSB-10", delayMFDs, 1);
-            rightMFD.AddAction(3021, "OSB-11", delayMFDs, 1);
-            rightMFD.AddAction(3022, "OSB-12", delayMFDs, 1);
-            rightMFD.AddAction(3023, "OSB-13", delayMFDs, 1);
-            rightMFD.AddAction(3024, "OSB-14", delayMFDs, 1);
-            rightMFD.AddAction(3025, "OSB-15", delayMFDs, 1);
-            rightMFD.AddAction(3026, "OSB-16", delayMFDs, 1);
-            rightMFD.AddAction(3027, "OSB-17", delayMFDs, 1);
-            rightMFD.AddAction(3028, "OSB-18", delayMFDs, 1);
-            rightMFD.AddAction(3029, "OSB-19", delayMFDs, 1);
-            rightMFD.AddAction(3030, "OSB-20", delayMFDs, 1);
-            AddDevice(rightMFD);
+            AirframeDevice rightDDI = new(36, "RDDI");
+            rightDDI.AddAction(3011, "OSB-01", delayMFDs, 1);
+            rightDDI.AddAction(3012, "OSB-02", delayMFDs, 1);
+            rightDDI.AddAction(3013, "OSB-03", delayMFDs, 1);
+            rightDDI.AddAction(3014, "OSB-04", delayMFDs, 1);
+            rightDDI.AddAction(3015, "OSB-05", delayMFDs, 1);
+            rightDDI.AddAction(3016, "OSB-06", delayMFDs, 1);
+            rightDDI.AddAction(3017, "OSB-07", delayMFDs, 1);
+            rightDDI.AddAction(3018, "OSB-08", delayMFDs, 1);
+            rightDDI.AddAction(3019, "OSB-09", delayMFDs, 1);
+            rightDDI.AddAction(3020, "OSB-10", delayMFDs, 1);
+            rightDDI.AddAction(3021, "OSB-11", delayMFDs, 1);
+            rightDDI.AddAction(3022, "OSB-12", delayMFDs, 1);
+            rightDDI.AddAction(3023, "OSB-13", delayMFDs, 1);
+            rightDDI.AddAction(3024, "OSB-14", delayMFDs, 1);
+            rightDDI.AddAction(3025, "OSB-15", delayMFDs, 1);
+            rightDDI.AddAction(3026, "OSB-16", delayMFDs, 1);
+            rightDDI.AddAction(3027, "OSB-17", delayMFDs, 1);
+            rightDDI.AddAction(3028, "OSB-18", delayMFDs, 1);
+            rightDDI.AddAction(3029, "OSB-19", delayMFDs, 1);
+            rightDDI.AddAction(3030, "OSB-20", delayMFDs, 1);
+            AddDevice(rightDDI);
 
             // ---- radar altimeter
 

@@ -47,7 +47,7 @@ namespace JAFDTC.Models.FA18C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure cms system via the lmfd/cmds according to the non-default programming settings (this function is
+        /// configure cms system via the lddi/cmds according to the non-default programming settings (this function is
         /// safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
@@ -57,16 +57,16 @@ namespace JAFDTC.Models.FA18C.Upload
 
             AddExecFunction("NOP", new() { "==== CMSBuilder:Build()" });
 
-            AirframeDevice lmfd = _aircraft.GetDevice("LMFD");
+            AirframeDevice lddi = _aircraft.GetDevice("LDDI");
             AirframeDevice cmds = _aircraft.GetDevice("CMDS");
             CMSSystem defaultSys = CMSSystem.ExplicitDefaults;
 
             AddWhileBlock("IsLDDITAC", false, null, delegate ()
             {
-                AddAction(lmfd, "OSB-18", WAIT_BASE);                                       // MENU
+                AddAction(lddi, "OSB-18", WAIT_BASE);                                       // MENU
             }, 4);
 
-            AddAction(lmfd, "OSB-17", WAIT_BASE);                                           // EW
+            AddAction(lddi, "OSB-17", WAIT_BASE);                                           // EW
             AddIfBlock("IsDispenserOff", true, null, delegate ()
             {
                 AddAction(cmds, "ON");
@@ -75,12 +75,12 @@ namespace JAFDTC.Models.FA18C.Upload
                     AddWait(1000);
                 });
             });
-            AddAction(lmfd, "OSB-08", WAIT_BASE);                                           // ALE-47
+            AddAction(lddi, "OSB-08", WAIT_BASE);                                           // ALE-47
             AddWhileBlock("IsALE47Mode", false, new() { "MAN 1" }, delegate ()
             {
-                AddAction(lmfd, "OSB-19", WAIT_BASE);                                       // MODE
+                AddAction(lddi, "OSB-19", WAIT_BASE);                                       // MODE
             });
-            AddAction(lmfd, "OSB-09", WAIT_BASE);                                           // ARM
+            AddAction(lddi, "OSB-09", WAIT_BASE);                                           // ARM
 
             for (var i = 0; i < _cfg.CMS.Programs.Length; i++)
             {
@@ -90,68 +90,68 @@ namespace JAFDTC.Models.FA18C.Upload
                 {
                     if (!string.IsNullOrEmpty(pgm.ChaffQ))
                     {
-                        AddAction(lmfd, "OSB-05", WAIT_BASE);                               // Chaff
-                        AdjustQty(lmfd, int.Parse(pgm.ChaffQ), int.Parse(pgmDefault.ChaffQ));
-                        AddAction(lmfd, "OSB-05", WAIT_BASE);
+                        AddAction(lddi, "OSB-05", WAIT_BASE);                               // Chaff
+                        AdjustQty(lddi, int.Parse(pgm.ChaffQ), int.Parse(pgmDefault.ChaffQ));
+                        AddAction(lddi, "OSB-05", WAIT_BASE);
                     }
                     if (!string.IsNullOrEmpty(pgm.FlareQ))
                     {
-                        AddAction(lmfd, "OSB-04", WAIT_BASE);                               // Flare
-                        AdjustQty(lmfd, int.Parse(pgm.FlareQ), int.Parse(pgmDefault.FlareQ));
-                        AddAction(lmfd, "OSB-04", WAIT_BASE);
+                        AddAction(lddi, "OSB-04", WAIT_BASE);                               // Flare
+                        AdjustQty(lddi, int.Parse(pgm.FlareQ), int.Parse(pgmDefault.FlareQ));
+                        AddAction(lddi, "OSB-04", WAIT_BASE);
                     }
                     if (!string.IsNullOrEmpty(pgm.SQ))
                     {
-                        AddAction(lmfd, "OSB-14", WAIT_BASE);                               // Rpt
-                        AdjustQty(lmfd, int.Parse(pgm.SQ), int.Parse(pgmDefault.SQ));
-                        AddAction(lmfd, "OSB-14", WAIT_BASE);
+                        AddAction(lddi, "OSB-14", WAIT_BASE);                               // Rpt
+                        AdjustQty(lddi, int.Parse(pgm.SQ), int.Parse(pgmDefault.SQ));
+                        AddAction(lddi, "OSB-14", WAIT_BASE);
                     }
                     if (!string.IsNullOrEmpty(pgm.SI))
                     {
-                        AddAction(lmfd, "OSB-15", WAIT_BASE);                               // Interval
-                        AdjustInterval(lmfd, double.Parse(pgm.SI), double.Parse(pgmDefault.SI));
-                        AddAction(lmfd, "OSB-15", WAIT_BASE);
+                        AddAction(lddi, "OSB-15", WAIT_BASE);                               // Interval
+                        AdjustInterval(lddi, double.Parse(pgm.SI), double.Parse(pgmDefault.SI));
+                        AddAction(lddi, "OSB-15", WAIT_BASE);
                     }
                 }
-                AddAction(lmfd, "OSB-19", WAIT_BASE);                                       // SAVE
-                AddAction(lmfd, "OSB-20", WAIT_BASE);                                       // STEP
+                AddAction(lddi, "OSB-19", WAIT_BASE);                                       // SAVE
+                AddAction(lddi, "OSB-20", WAIT_BASE);                                       // STEP
             }
-            AddActions(lmfd, new() { "OSB-09" });                                           // RTN
+            AddActions(lddi, new() { "OSB-09" });                                           // RTN
             AddWhileBlock("IsLDDITAC", false, null, delegate ()
             {
-                AddAction(lmfd, "OSB-18");                                                  // MENU
+                AddAction(lddi, "OSB-18");                                                  // MENU
             });
-            AddActions(lmfd, new() { "OSB-03" });                                           // HUD
+            AddActions(lddi, new() { "OSB-03" });                                           // HUD
         }
 
         /// <summary>
         /// adjust the quantity of a chaff or flare program.
         /// </summary>
-        private void AdjustQty(AirframeDevice lmfd, int target, int defaultValue)
+        private void AdjustQty(AirframeDevice lddi, int target, int defaultValue)
         {
             // TODO: worth looking at querying this state to minimize the number of button presses.
 
             if (target > defaultValue)
                 for (var s = 0; s < target - defaultValue; s++)
-                    AddAction(lmfd, "OSB-12", WAIT_BASE);                                   // Up
+                    AddAction(lddi, "OSB-12", WAIT_BASE);                                   // Up
             else if (target < defaultValue)
                 for (var s = 0; s < defaultValue - target; s++)
-                    AddAction(lmfd, "OSB-13", WAIT_BASE);                                   // Down
+                    AddAction(lddi, "OSB-13", WAIT_BASE);                                   // Down
         }
 
         /// <summary>
         /// adjust the interval of a chaff or flare program.
         /// </summary>
-        private void AdjustInterval(AirframeDevice lmfd, double target, double defaultValue)
+        private void AdjustInterval(AirframeDevice lddi, double target, double defaultValue)
         {
             // TODO: worth looking at querying this state to minimize the number of button presses.
 
             if (target > defaultValue)
                 for (var s = 0; s < (target - defaultValue) / (double)0.25; s++)
-                    AddAction(lmfd, "OSB-12", WAIT_BASE);                                   // Up
+                    AddAction(lddi, "OSB-12", WAIT_BASE);                                   // Up
             else if (target < defaultValue)
                 for (var s = 0; s < (defaultValue - target) / (double)0.25; s++)
-                    AddAction(lmfd, "OSB-13", WAIT_BASE);                                   // Down
+                    AddAction(lddi, "OSB-13", WAIT_BASE);                                   // Down
         }
     }
 }

@@ -45,7 +45,7 @@ namespace JAFDTC.Models.FA18C.Upload
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// configure steerpoint system via the ufc/rmfd according to the non-default programming settings (this
+        /// configure steerpoint system via the ufc/rddi according to the non-default programming settings (this
         /// function is safe to call with a configuration with default settings: defaults are skipped as necessary).
         /// <summary>
         public override void Build(Dictionary<string, object> state = null)
@@ -56,21 +56,21 @@ namespace JAFDTC.Models.FA18C.Upload
             AddExecFunction("NOP", new() { "==== RadioBuilder:Build()" });
 
             AirframeDevice ufc = _aircraft.GetDevice("UFC");
-            AirframeDevice rmfd = _aircraft.GetDevice("RMFD");
+            AirframeDevice rddi = _aircraft.GetDevice("RDDI");
 
             AddWhileBlock("IsRDDISUPT", false, null, delegate()
             {
-                AddAction(rmfd, "OSB-18");                                                  // MENU (SUPT)
+                AddAction(rddi, "OSB-18");                                                  // MENU (SUPT)
             });   
-            AddActions(rmfd, new() { "OSB-02", "OSB-10", "OSB-07", "OSB-05" });             // HSI, DATA, WYPT, UFC
+            AddActions(rddi, new() { "OSB-02", "OSB-10", "OSB-07", "OSB-05" });             // HSI, DATA, WYPT, UFC
 
             AddWhileBlock("IsAtWYPTn", false, new() { $"{_cfg.WYPT.Points[0].Number - 1}" }, delegate()
             {
-                AddAction(rmfd, "OSB-12", WAIT_BASE);                                       // WYPT ++
+                AddAction(rddi, "OSB-12", WAIT_BASE);                                       // WYPT ++
             }, 150);
             for (int i = 0; i < _cfg.WYPT.Points.Count; i++)
             {
-                AddAction(rmfd, "OSB-12", WAIT_BASE);                                       // WYPT ++
+                AddAction(rddi, "OSB-12", WAIT_BASE);                                       // WYPT ++
 
                 WaypointInfo wypt = _cfg.WYPT.Points[i];
                 if (wypt.IsValid)
@@ -91,14 +91,14 @@ namespace JAFDTC.Models.FA18C.Upload
             }
             AddWhileBlock("IsAtWYPTn", false, new() { $"{_cfg.WYPT.Points[0].Number}" }, delegate ()
             {
-                AddAction(rmfd, "OSB-13", WAIT_BASE);                                       // WYPT --
+                AddAction(rddi, "OSB-13", WAIT_BASE);                                       // WYPT --
             }, 150);
 
             AddWhileBlock("IsRDDISUPT", false, null, delegate()
             {
-                AddAction(rmfd, "OSB-18");                                                  // MENU (SUPT)
+                AddAction(rddi, "OSB-18");                                                  // MENU (SUPT)
             });
-            AddAction(rmfd, "OSB-15");                                                      // FCS
+            AddAction(rddi, "OSB-15");                                                      // FCS
         }
     }
 }
