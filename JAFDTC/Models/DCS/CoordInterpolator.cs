@@ -106,6 +106,7 @@ namespace JAFDTC.Models.DCS
             ["Afghanistan"] = new TheaterInfo(3759656.73273285, 300149.98159237, 41, false),
             ["Caucasus"] = new TheaterInfo(4998114.6775109, 99517.01067793, 36, false),
             ["Falklands"] = new TheaterInfo(4184583.3670, -147639.8755, 21, true),
+            ["Germany"] = new TheaterInfo(6061632.75443205, -35427.57613432, 34, false),
             ["Iraq"] = new TheaterInfo(3680056.7536012, -72289.97515422, 38, false),
             ["Kola"] = new TheaterInfo(7543624.54780873, 62701.93823161, 34, false),
             ["MarianaIslands"] = new TheaterInfo(1491839.88704271, -238417.99059562, 55, false),
