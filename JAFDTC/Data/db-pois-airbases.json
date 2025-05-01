@@ -410,6 +410,558 @@
 
   {
     "Type": 0,
+    "Theater": "Germany",
+    "Name": "Airracing Koblenz",
+    "Tags": "Airbase",
+    "Latitude": "50.292067",
+    "Longitude": "7.830283",
+    "Elevation": "1056"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Allstedt",
+    "Tags": "Airbase",
+    "Latitude": "51.380733",
+    "Longitude": "11.446983",
+    "Elevation": "932"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Altes Lager",
+    "Tags": "Airbase",
+    "Latitude": "51.995517",
+    "Longitude": "12.983350",
+    "Elevation": "312"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Barth",
+    "Tags": "Airbase",
+    "Latitude": "54.338250",
+    "Longitude": "12.709883",
+    "Elevation": "21"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Bindersleben",
+    "Tags": "Airbase",
+    "Latitude": "50.979517",
+    "Longitude": "10.962450",
+    "Elevation": "1014"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Bitburg",
+    "Tags": "Airbase",
+    "Latitude": "49.945167",
+    "Longitude": "6.565133",
+    "Elevation": "1211"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Braunschweig",
+    "Tags": "Airbase",
+    "Latitude": "52.319100",
+    "Longitude": "10.554383",
+    "Elevation": "273"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Bremen",
+    "Tags": "Airbase",
+    "Latitude": "52.046817",
+    "Longitude": "8.787067",
+    "Elevation": "41"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Briest",
+    "Tags": "Airbase",
+    "Latitude": "52.437650",
+    "Longitude": "12.454117",
+    "Elevation": "115"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Buchel",
+    "Tags": "Airbase",
+    "Latitude": "50.174417",
+    "Longitude": "7.064200",
+    "Elevation": "1509"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Buckeburg",
+    "Tags": "Airbase",
+    "Latitude": "51.278767",
+    "Longitude": "9.083400",
+    "Elevation": "193"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Celle",
+    "Tags": "Airbase",
+    "Latitude": "52.591550",
+    "Longitude": "10.025367",
+    "Elevation": "126"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Cochstedt",
+    "Tags": "Airbase",
+    "Latitude": "51.856083",
+    "Longitude": "11.419017",
+    "Elevation": "569"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Damgarten",
+    "Tags": "Airbase",
+    "Latitude": "54.264067",
+    "Longitude": "12.444483",
+    "Elevation": "26"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Dessau",
+    "Tags": "Airbase",
+    "Latitude": "51.831683",
+    "Longitude": "12.193600",
+    "Elevation": "195"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Fassberg",
+    "Tags": "Airbase",
+    "Latitude": "52.919417",
+    "Longitude": "10.184867",
+    "Elevation": "254"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Finow",
+    "Tags": "Airbase",
+    "Latitude": "52.827100",
+    "Longitude": "13.693883",
+    "Elevation": "111"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Frankfurt",
+    "Tags": "Airbase",
+    "Latitude": "50.040417",
+    "Longitude": "8.567350",
+    "Elevation": "328"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Garz",
+    "Tags": "Airbase",
+    "Latitude": "53.878450",
+    "Longitude": "14.153567",
+    "Elevation": "66"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Gatow",
+    "Tags": "Airbase",
+    "Latitude": "52.475400",
+    "Longitude": "13.138650",
+    "Elevation": "136"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Giebelstadt",
+    "Tags": "Airbase",
+    "Latitude": "49.648200",
+    "Longitude": "9.966300",
+    "Elevation": "953"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Gross Mohrdorf",
+    "Tags": "Airbase",
+    "Latitude": "54.383050",
+    "Longitude": "12.912367",
+    "Elevation": "10"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Gutersloh",
+    "Tags": "Airbase",
+    "Latitude": "51.922783",
+    "Longitude": "8.304550",
+    "Elevation": "213"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Hahn",
+    "Tags": "Airbase",
+    "Latitude": "49.948700",
+    "Longitude": "7.264067",
+    "Elevation": "1621"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Hamburg Finkenwerder",
+    "Tags": "Airbase",
+    "Latitude": "53.534517",
+    "Longitude": "9.833667",
+    "Elevation": "10"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Hamburg",
+    "Tags": "Airbase",
+    "Latitude": "53.627567",
+    "Longitude": "9.982650",
+    "Elevation": "73"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Hannover",
+    "Tags": "Airbase",
+    "Latitude": "52.454333",
+    "Longitude": "9.695933",
+    "Elevation": "168"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Holzdorf",
+    "Tags": "Airbase",
+    "Latitude": "51.767833",
+    "Longitude": "13.169550",
+    "Elevation": "245"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Kothen",
+    "Tags": "Airbase",
+    "Latitude": "51.721400",
+    "Longitude": "11.961567",
+    "Elevation": "284"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Laage",
+    "Tags": "Airbase",
+    "Latitude": "53.918033",
+    "Longitude": "12.279700",
+    "Elevation": "115"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Larz",
+    "Tags": "Airbase",
+    "Latitude": "53.306617",
+    "Longitude": "12.753833",
+    "Elevation": "209"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Leipzig Halle",
+    "Tags": "Airbase",
+    "Latitude": "51.415017",
+    "Longitude": "12.227317",
+    "Elevation": "421"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Leipzig Mockau",
+    "Tags": "Airbase",
+    "Latitude": "51.393750",
+    "Longitude": "12.407983",
+    "Elevation": "415"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Lubeck",
+    "Tags": "Airbase",
+    "Latitude": "53.805133",
+    "Longitude": "10.718067",
+    "Elevation": "70"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Mahlwinkel",
+    "Tags": "Airbase",
+    "Latitude": "52.388250",
+    "Longitude": "11.826317",
+    "Elevation": "157"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Mendig",
+    "Tags": "Airbase",
+    "Latitude": "50.366017",
+    "Longitude": "7.315500",
+    "Elevation": "601"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Merseburg",
+    "Tags": "Airbase",
+    "Latitude": "51.364400",
+    "Longitude": "11.952117",
+    "Elevation": "340"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Neubrandenburg",
+    "Tags": "Airbase",
+    "Latitude": "53.602267",
+    "Longitude": "13.306450",
+    "Elevation": "177"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Neuruppin",
+    "Tags": "Airbase",
+    "Latitude": "52.941067",
+    "Longitude": "12.787733",
+    "Elevation": "148"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Obermehler Schlotheim",
+    "Tags": "Airbase",
+    "Latitude": "51.267633",
+    "Longitude": "10.635033",
+    "Elevation": "889"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Parchim",
+    "Tags": "Airbase",
+    "Latitude": "53.427850",
+    "Longitude": "11.786617",
+    "Elevation": "171"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Peenemunde",
+    "Tags": "Airbase",
+    "Latitude": "54.158967",
+    "Longitude": "13.773483",
+    "Elevation": "23"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Pferdsfeld",
+    "Tags": "Airbase",
+    "Latitude": "49.855150",
+    "Longitude": "7.604917",
+    "Elevation": "1313"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Pottschutthohe",
+    "Tags": "Airbase",
+    "Latitude": "49.264650",
+    "Longitude": "7.489183",
+    "Elevation": "1099"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Ramstein",
+    "Tags": "Airbase",
+    "Latitude": "49.436933",
+    "Longitude": "7.599600",
+    "Elevation": "805"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Schonefeld",
+    "Tags": "Airbase",
+    "Latitude": "52.384767",
+    "Longitude": "13.535267",
+    "Elevation": "142"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Schweinfurt",
+    "Tags": "Airbase",
+    "Latitude": "50.048833",
+    "Longitude": "10.170083",
+    "Elevation": "753"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Sembach",
+    "Tags": "Airbase",
+    "Latitude": "49.506283",
+    "Longitude": "7.863800",
+    "Elevation": "1022"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Spangdahlem",
+    "Tags": "Airbase",
+    "Latitude": "49.976517",
+    "Longitude": "6.698800",
+    "Elevation": "984"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Sperenberg",
+    "Tags": "Airbase",
+    "Latitude": "52.136900",
+    "Longitude": "13.306300",
+    "Elevation": "184"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Stendal",
+    "Tags": "Airbase",
+    "Latitude": "52.629100",
+    "Longitude": "11.820017",
+    "Elevation": "122"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Tegel",
+    "Tags": "Airbase",
+    "Latitude": "52.558550",
+    "Longitude": "13.293767",
+    "Elevation": "116"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Tempelhof",
+    "Tags": "Airbase",
+    "Latitude": "52.471050",
+    "Longitude": "13.404483",
+    "Elevation": "154"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Templin",
+    "Tags": "Airbase",
+    "Latitude": "53.032033",
+    "Longitude": "13.544933",
+    "Elevation": "242"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Tutow",
+    "Tags": "Airbase",
+    "Latitude": "53.920867",
+    "Longitude": "13.219333",
+    "Elevation": "7"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Werneuchen",
+    "Tags": "Airbase",
+    "Latitude": "52.632083",
+    "Longitude": "13.770650",
+    "Elevation": "259"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Wiesbaden",
+    "Tags": "Airbase",
+    "Latitude": "50.049817",
+    "Longitude": "8.325867",
+    "Elevation": "453"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Wittstock",
+    "Tags": "Airbase",
+    "Latitude": "53.202483",
+    "Longitude": "12.523417",
+    "Elevation": "223"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Wunstorf",
+    "Tags": "Airbase",
+    "Latitude": "52.457733",
+    "Longitude": "9.428200",
+    "Elevation": "161"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Zerbst",
+    "Tags": "Airbase",
+    "Latitude": "51.999717",
+    "Longitude": "12.144400",
+    "Elevation": "250"
+  },
+  {
+    "Type": 0,
+    "Theater": "Germany",
+    "Name": "Zweibrucken",
+    "Tags": "Airbase",
+    "Latitude": "49.210100",
+    "Longitude": "7.401283",
+    "Elevation": "1110"
+  },
+
+
+
+  {
+    "Type": 0,
     "Theater": "Iraq",
     "Name": "Al-Asad Airbase",
     "Tags": "Airbase",
