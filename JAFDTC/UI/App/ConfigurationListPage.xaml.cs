@@ -552,6 +552,7 @@ namespace JAFDTC.UI.App
             {
                 FileOpenPicker picker = new()
                 {
+                    SettingsIdentifier = "JAFDTC_ImportCfg",
                     SuggestedStartLocation = PickerLocationId.Desktop
                 };
                 picker.FileTypeFilter.Add(".json");
@@ -583,6 +584,7 @@ namespace JAFDTC.UI.App
             {
                 FileSavePicker picker = new()
                 {
+                    SettingsIdentifier = "JAFDTC_ExportCfg",
                     SuggestedStartLocation = PickerLocationId.Desktop,
                     SuggestedFileName = "Configuration"
                 };

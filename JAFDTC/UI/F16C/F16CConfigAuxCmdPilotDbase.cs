@@ -113,6 +113,7 @@ namespace JAFDTC.UI.F16C
 
                 FileOpenPicker picker = new()
                 {
+                    SettingsIdentifier = "JAFDTC_ImportViperDrivers",
                     SuggestedStartLocation = PickerLocationId.Desktop
                 };
                 picker.FileTypeFilter.Add(".json");
@@ -166,6 +167,7 @@ namespace JAFDTC.UI.F16C
             {
                 FileSavePicker picker = new()
                 {
+                    SettingsIdentifier = "JAFDTC_ExportViperDrivers",
                     SuggestedStartLocation = PickerLocationId.Desktop,
                     SuggestedFileName = "Viper Drivers"
                 };

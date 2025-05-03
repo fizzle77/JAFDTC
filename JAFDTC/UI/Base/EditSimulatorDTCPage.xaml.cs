@@ -245,6 +245,7 @@ namespace JAFDTC.UI.Base
         {
             FileOpenPicker picker = new()
             {
+                SettingsIdentifier = "JAFDTC_ImportDTC",
                 SuggestedStartLocation = PickerLocationId.Desktop
             };
             picker.FileTypeFilter.Add(".dtc");
@@ -326,6 +327,7 @@ namespace JAFDTC.UI.Base
                 {
                     FileSavePicker picker = new()
                     {
+                        SettingsIdentifier = "JAFDTC_ExportDTC",
                         SuggestedStartLocation = PickerLocationId.Desktop,
                         SuggestedFileName = "JAFDTC DTC Tape.dtc",
                         DefaultFileExtension = ".dtc"
