@@ -319,7 +319,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void BtnSetOutput_Click(object sender, RoutedEventArgs args)
         {
-            bool shouldMerge = true;
+            bool shouldMerge = false;
             if (string.IsNullOrEmpty(EditDTC.OutputPath))
             {
                 try
@@ -327,7 +327,8 @@ namespace JAFDTC.UI.Base
                     FileSavePicker picker = new()
                     {
                         SuggestedStartLocation = PickerLocationId.Desktop,
-                        SuggestedFileName = "JAFDTC DTC Tape.dtc"
+                        SuggestedFileName = "JAFDTC DTC Tape.dtc",
+                        DefaultFileExtension = ".dtc"
                     };
                     picker.FileTypeChoices.Add("DTC", new List<string>() { ".dtc" });
                     var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
@@ -335,14 +336,16 @@ namespace JAFDTC.UI.Base
 
                     StorageFile file = await picker.PickSaveFileAsync();
                     if (file != null)
+                    {
                         UpdateDTCOutputPath(file.Path);
-                    else
-                        shouldMerge = false;
+                        shouldMerge = true;
+                    }
                 }
                 catch (Exception ex)
                 {
                     FileManager.Log($"EditSimulatorDTCPage:BtnSetOutput_Click exception {ex}");
                     await Utilities.Message1BDialog(Content.XamlRoot, "Selection Failed", "Unable to select that file for output.");
+                    shouldMerge = false;
                 }
             }
 
@@ -357,7 +360,7 @@ namespace JAFDTC.UI.Base
                 catch (Exception ex)
                 {
                     FileManager.Log($"EditSimulatorDTCPage:BtnSetOutput_Click exception {ex}");
-                    await Utilities.Message1BDialog(Content.XamlRoot, "Tape Merge Failed", "TODO");
+                    await Utilities.Message1BDialog(Content.XamlRoot, "Tape Merge Failed", $"Windows says you can thank {ex}");
                 }
             }
         }
