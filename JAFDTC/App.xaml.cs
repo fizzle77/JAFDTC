@@ -49,11 +49,11 @@ namespace JAFDTC
         // ------------------------------------------------------------------------------------------------------------
 
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
 
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ShowWindow(IntPtr hWnd, WindowShowStyle nCmdShow);
+        private static extern bool ShowWindow(IntPtr hWnd, WindowShowStyle nCmdShow);
 
         // Full enum def is at https://github.com/dotnet/pinvoke/blob/main/src/User32/User32+WindowShowStyle.cs
         public enum WindowShowStyle : uint
@@ -388,7 +388,7 @@ namespace JAFDTC
             else if (IsDCSUploadInFlight && data.Marker.StartsWith("ERROR: "))
             {
                 IsDCSUploadInFlight = false;
-                StatusMessageTx.Send(data.Marker.Remove(0, "ERROR: ".Length));
+                StatusMessageTx.Send(data.Marker["ERROR: ".Length..]);
                 Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
                     General.PlayAudio("ux_error.wav");
