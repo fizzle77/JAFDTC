@@ -28,49 +28,29 @@ You should have received a copy of the GNU General Public License along with thi
 --
 -- --------------------------------------------------------------------------------------------------------------------
 
--- 13 hsi
--- 16 cmds quantities
+local DID_F16C_HUD = 1
+local DID_F16C_L_MFD = 4
+local DID_F16C_R_MFD = 5
+local DID_F16C_DED = 6
+local DID_F16C_HSI = 13
+local DID_F16C_CMDS_QTY = 16
 
-function JAFDTC_F16CM_GetParsedHUD()
-    return JAFDTC_ParseDisplay(1)
-end
+-- TODO: long term, move away from simple parsing in favor of flat parsing.
 
-function JAFDTC_F16CM_GetParsedLeftMFD()
-    return JAFDTC_ParseDisplay(4)
-end
-
-function JAFDTC_F16CM_GetParsedRightMFD()
-    return JAFDTC_ParseDisplay(5)
-end
-
-function JAFDTC_F16CM_GetParsedMFD(mfd)
+function JAFDTC_F16CM_ParseMFDSimple(mfd)
     if mfd == "left" then
-        return JAFDTC_F16CM_GetParsedLeftMFD()
+        return JAFDTC_ParseDisplaySimple(DID_F16C_L_MFD)
+    else
+        return JAFDTC_ParseDisplaySimple(DID_F16C_R_MFD)
     end
-    return JAFDTC_F16CM_GetParsedRightMFD()
 end
 
-function JAFDTC_F16CM_GetParsedDED()
-    return JAFDTC_ParseDisplay(6)
-end
-
--- TODO: GetDisplay does a better job at representing the display at the expense of much longer keys than
--- TODO: ParseDisplay generates. for consistency, probably should move everything to that function. for now,
--- TODO: provide both options.
-
-function JAFDTC_F16CM_GetLeftMFD()
-    return JAFDTC_GetDisplay(4)
-end
-
-function JAFDTC_F16CM_GetRightMFD()
-    return JAFDTC_GetDisplay(5)
-end
-
-function JAFDTC_F16CM_GetMFD(mfd)
+function JAFDTC_F16CM_ParseMFDFlat(mfd)
     if mfd == "left" then
-        return JAFDTC_F16CM_GetLeftMFD()
+        return JAFDTC_ParseDisplayFlat(DID_F16C_L_MFD)
+    else
+        return JAFDTC_ParseDisplayFlat(DID_F16C_R_MFD)
     end
-    return JAFDTC_F16CM_GetRightMFD()
 end
 
 -- --------------------------------------------------------------------------------------------------------------------
@@ -81,21 +61,21 @@ end
 
 function JAFDTC_F16CM_Fn_DebugDumpDED(msg)
     JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDED - " .. msg)
-    JAFDTC_DebugDisplay(JAFDTC_F16CM_GetParsedDED())
+    JAFDTC_LogSerializedObj(JAFDTC_ParseDisplaySimple(DID_F16C_DED))
 end
 
 function JAFDTC_F16CM_Fn_DebugDumpLeftMFD(msg)
-    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpLeftMFD (ParseDisplay) - " .. msg)
-    JAFDTC_DebugDisplay(JAFDTC_F16CM_GetParsedLeftMFD())
-    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpLeftMFD (GetDisplay) - " .. msg)
-    JAFDTC_DebugDisplay(JAFDTC_GetDisplay(4))
+    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpLeftMFD (ParseDisplaySimple) - " .. msg)
+    JAFDTC_LogSerializedObj(JAFDTC_ParseDisplaySimple(DID_F16C_L_MFD))
+    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpLeftMFD (ParseDisplayFlat) - " .. msg)
+    JAFDTC_LogSerializedObj(JAFDTC_ParseDisplayFlat(DID_F16C_L_MFD))
 end
 
 function JAFDTC_F16CM_Fn_DebugDumpRightMFD(msg)
-    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpRightMFD (ParseDisplay) - " .. msg)
-    JAFDTC_DebugDisplay(JAFDTC_F16CM_GetParsedRightMFD())
-    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpRightMFD (GetDisplay) - " .. msg)
-    JAFDTC_DebugDisplay(JAFDTC_GetDisplay(5))
+    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpRightMFD (ParseDisplaySimple) - " .. msg)
+    JAFDTC_LogSerializedObj(JAFDTC_ParseDisplaySimple(DID_F16C_R_MFD))
+    JAFDTC_Log("JAFDTC_F16CM_Fn_DebugDumpRightMFD (ParseDisplayFlat) - " .. msg)
+    JAFDTC_LogSerializedObj(JAFDTC_ParseDisplayFlat(DID_F16C_R_MFD))
 end
 
 function JAFDTC_F16CM_Fn_DebugDumpMFD(mfd, msg)
@@ -133,7 +113,7 @@ end
 -- NOTE: assumes ded is on master mode select page (list / 8)
 --
 function JAFDTC_F16CM_Fn_IsShowingAAMode()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str = table["Master_mode"] or table["Master_mode_inv"]
     return (str == "A-A")
 end
@@ -141,7 +121,7 @@ end
 -- NOTE: assumes ded is on master mode select page (list / 8)
 --
 function JAFDTC_F16CM_Fn_IsShowingAGMode()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str = table["Master_mode"] or table["Master_mode_inv"]
     return (str == "A-G")
 end
@@ -149,19 +129,19 @@ end
 -- NOTE: assumes ded is on master mode select page (list / 8)
 --
 function JAFDTC_F16CM_Fn_IsSelectingAAMode()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     return (table["Master_mode_inv"] == "A-A")
 end
 
 -- NOTE: assumes ded is on master mode select page (list / 8)
 --
 function JAFDTC_F16CM_Fn_IsSelectingAGMode()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     return (table["Master_mode_inv"] == "A-G")
 end
 
 function JAFDTC_F16CM_Fn_IsInNAVMode()
-    local table = JAFDTC_F16CM_GetParsedHUD()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_HUD)
     local str = table["HUD_Window8_MasterMode"]
     return (str == "NAV")
 end
@@ -173,26 +153,26 @@ end
 -- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_F16CM_Fn_IsCallSignChar(position, letter)
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local value = table["CallSign Name char" .. position .. "_inv"]
     return (value == letter)
 end
 
 function JAFDTC_F16CM_Fn_IsFlightLead(status)
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local value = table["FL status"]
     return (value == status)
 end
 
 function JAFDTC_F16CM_Fn_IsTDOASet(slot)
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local value = table["STN TDOA value_" .. slot]
     return (value == "T")
 end
 
 --[[
 function JAFDTC_F16CM_Fn_RadioNotBoth()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str = table["Receiver Mode"]
     if str == "MAIN" then
         return true
@@ -208,7 +188,7 @@ end
 -- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_F16CM_Fn_IsHARMOnDED()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str = table["Misc Item 0 Name"]
     return (str == "HARM")
 end
@@ -220,7 +200,7 @@ end
 -- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_F16CM_Fn_IsHTSOnDED()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str = table["Misc Item E Name"]
     return (str == "HTS")
 end
@@ -254,20 +234,20 @@ function JAFDTC_F16CM_Fn_QueryMFDFormatState(mfd)
         return "0"
     end
 
-    local table = JAFDTC_F16CM_GetParsedMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDSimple(mfd)
     return string.format("%s,%s,%s,%s",
                          GetSetOSBSelected(table),
                          GetSetOSBFormat(table, "12"), GetSetOSBFormat(table, "13"), GetSetOSBFormat(table, "14"))
 end
 
 function JAFDTC_F16CM_Fn_IsHTSOnMFD(mfd)
-    local table = JAFDTC_F16CM_GetParsedMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDSimple(mfd)
     local str = table["HAD_OFF_Lable_name"]
     return (str ~= "HAD")
 end
 
 function JAFDTC_F16CM_Fn_HTSAllNotSelected(mfd)
-    local table = JAFDTC_F16CM_GetParsedMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDSimple(mfd)
     local str = table["ALL Table. Root. Unic ID: _id:178. Text"]
     return (str == "ALL")
 end
@@ -287,7 +267,7 @@ end
 -- IsSMSOnCNTL                  t => sms currently on cntl subpage
 
 function JAFDTC_F16CM_Fn_QuerySMSMuniState(mfd)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     return table["Table. Root. Unic ID: _id:119.2.Table. Root. Unic ID: _id:119. Text.1"] or ""
 end
 
@@ -297,19 +277,19 @@ function JAFDTC_F16CM_Fn_IsSMSMuniSelected(mfd, muniQT)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSCntlNumericPadNeg(mfd)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["DATA ENTRY Line PH 0.2.Scratchpad 0_txt_placeholder.2.Scratchpad 0_white_txt.1"] or ""
     return (string.find(str, "-%d*") ~= nil)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSOnMode(mfd, mode)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["A-G Table. Root. Unic ID: _id:116.2.A-G Table. Root. Unic ID: _id:116. Text.1"] or ""
     return (str == mode)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSOnINV(mfd)
-    local table = JAFDTC_F16CM_GetParsedMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDSimple(mfd)
     --
     -- INV is easier to locate in the parsed output...
     --
@@ -318,7 +298,7 @@ function JAFDTC_F16CM_Fn_IsSMSOnINV(mfd)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSOnCNTL(mfd)
-    local table = JAFDTC_F16CM_GetParsedMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDSimple(mfd)
     --
     -- CNTL is easier to locate in the parsed output...
     --
@@ -332,13 +312,13 @@ end
 -- IsSMSProfileGBU24            t => sms osb 7 label (profile: 1-4, "PROFn") matches specified state, gbu-24
 
 function JAFDTC_F16CM_Fn_IsSMSProfile(mfd, prof)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["BOMB_ROOT.2.BOMB_PAGE.2.Table. Root. Unic ID: _id:19.2.Table. Root. Unic ID: _id:19. Text.1"] or ""
     return (str == prof)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSProfileGBU24(mfd, prof)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:105.2.Table. Root. Unic ID: _id:105. Text.2"] or ""
     return (str == prof)
 end
@@ -351,25 +331,25 @@ end
 -- IsSMSEmploymentMAV       t => sms osb 2 label (mode: pre/vis/bore) matches specified state, mav
 
 function JAFDTC_F16CM_Fn_IsSMSEmploymentWCMD(mfd, empl)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["WCMD_ROOT.2.WCMD_PAGE.2.PRE Table. Root. Unic ID: _id:91.2.PRE Table. Root. Unic ID: _id:91. Text.1"] or ""
     return (str == empl)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSEmploymentJDAM(mfd, empl)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["JDAM_ROOT.2.JDAM_PAGE.2.PRE Table. Root. Unic ID: _id:66.2.PRE Table. Root. Unic ID: _id:66. Text.1"] or ""
     return (str == empl)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSEmploymentGBU24(mfd, empl)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["GBU24_ROOT.2.GBU24_PAGE.2.PRE Table. Root. Unic ID: _id:104.2.PRE Table. Root. Unic ID: _id:104. Text.1"] or ""
     return (str == empl)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSEmploymentMAV(mfd, empl)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["Table. Root. Unic ID: _id:117.2.Table. Root. Unic ID: _id:117. Text.1"] or ""
     return (str == empl)
 end
@@ -381,19 +361,19 @@ end
 -- IsSMSFuzeGBU24           t => sms osb 18 label (fusing: nose/tail/nstl) matches specified state, gbu-24
 
 function JAFDTC_F16CM_Fn_IsSMSFuze(mfd, fuze)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["BOMB_ROOT.2.BOMB_PAGE.2.Table. Root. Unic ID: _id:23.2.Table. Root. Unic ID: _id:23. Text.1"] or ""
     return (str == fuze)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSFuzeHD(mfd, fuze)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["BOMB_ROOT.2.BOMB_PAGE.2.Table. Root. Unic ID: _id:23.2.Table. Root. Unic ID: _id:23. Text.2"] or ""
     return (str == fuze)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSFuzeGBU24(mfd, fuze)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:110.2.Table. Root. Unic ID: _id:110. Text.1"] or ""
     return (str == fuze)
 end
@@ -405,20 +385,20 @@ end
 -- IsSMSReleaseTypeWCMD     t => sms osb 19 icon (release: sgl/l-r/f-b) matches specified state, wcmd
 
 function JAFDTC_F16CM_Fn_IsSMSReleaseType(mfd, rel)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["BOMB_ROOT.2.BOMB_PAGE.2.Table. Root. Unic ID: _id:20.2.Table. Root. Unic ID: _id:20. Text.1"] or ""
     return (string.gsub(str, "%s*%d*%s*", "") == rel)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSReleaseTypeGBU24(mfd, rel)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:106.2.Table. Root. Unic ID: _id:106. Text.1"] or ""
     return (str == rel)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSReleaseTypeWCMD(mfd, rel)
 -- TODO check?
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = nil
     if rel == "SGL" then
         str = table["WCMD_ROOT.2.WCMD_PAGE.2.Impact_option_WCMD_PH.2.Single_WCMD_PH.2.Single_WCMD_triangle.1"]
@@ -435,7 +415,7 @@ end
 -- IsSMSSpinWCMD            t => sms/cntl osb 17 label (spin: various in RPM, "?RPM") matches specified state, cbu-103
 
 function JAFDTC_F16CM_Fn_IsSMSSpinWCMD(mfd, spin)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["WCMD_ROOT.2.WCMD_CNTL_PAGE.2.Table. Root. Unic ID: _id:97.2.Table. Root. Unic ID: _id:97. Text.2"] or ""
     return (str == spin)
 end
@@ -446,13 +426,13 @@ end
 -- IsSMSArmDelayJDAM        t => sms/cntl osb 19 label (ad: various in s, "AD ?SEC") matches specified state, jdam
 
 function JAFDTC_F16CM_Fn_IsSMSArmDelayGBU24(mfd, ad)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["GBU24_ROOT.2.GBU24_PAGE.2.GBU24_Arming_Delay.1"] or ""
     return (str == ad)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSArmDelayJDAM(mfd, ad)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["JDAM_ROOT.2.JDAM_CNTL_PAGE.2.Table. Root. Unic ID: _id:71.2.Table. Root. Unic ID: _id:71. Text.1"] or ""
     return (str == ad)
 end
@@ -462,7 +442,7 @@ end
 -- IsSMSRippleDelayGBU24    t => sms osb 9 label (delay: 50-500ms by 50ms, "?MSEC") matches specified state, gbu-24
 
 function JAFDTC_F16CM_Fn_IsSMSRippleDelayGBU24(mfd, rd)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:107.2.Table. Root. Unic ID: _id:107. Text.1"] or ""
     return (str == rd)
 end
@@ -472,7 +452,7 @@ end
 -- IsSMSRipplePulseGBU24    t => sms osb 10 label (rp: 1/2/3/4, "?") matches specified state, gbu-24
 
 function JAFDTC_F16CM_Fn_IsSMSRipplePulseGBU24(mfd, rp)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["GBU24_ROOT.2.GBU24_PAGE.2.Table. Root. Unic ID: _id:108.2.Table. Root. Unic ID: _id:108. Text.2"] or ""
     return (str == rp)
 end
@@ -483,13 +463,13 @@ end
 -- IsSMSAutoPwrModeMAV      t => sms/cntl osb 20 label (mode: n/s/e/w of) matches specified state, mav
 
 function JAFDTC_F16CM_Fn_IsSMSAutoPwrMAV(mfd, pwr)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["MAVERICK_ROOT.2.MAVERICK_CNTL_PAGE.2.Table. Root. Unic ID: _id:58.2.Table. Root. Unic ID: _id:58. Text.2"] or ""
     return (str == pwr)
 end
 
 function JAFDTC_F16CM_Fn_IsSMSAutoPwrModeMAV(mfd, app)
-    local table = JAFDTC_F16CM_GetMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDFlat(mfd)
     local str = table["MAVERICK_ROOT.2.MAVERICK_CNTL_PAGE.2.Table. Root. Unic ID: _id:60.2.Table. Root. Unic ID: _id:60. Text.1"] or ""
     return (str == app)
 end
@@ -515,7 +495,7 @@ end
 -- 1 NCTR       NCTR Selectable Root. Unic ID: _id:21. Black Text
 --
 function JAFDTC_F16CM_Fn_IsDTELoadDone(mfd)
-    local table = JAFDTC_F16CM_GetParsedMFD(mfd)
+    local table = JAFDTC_F16CM_ParseMFDSimple(mfd)
     --
     -- inverted text is easier to locate in the parsed output...
     --
@@ -530,19 +510,19 @@ end
 -- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_F16CM_Fn_IsBullseyeSelected()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str = table["BULLSEYE LABEL"]
     return (str ~= "BULLSEYE")
 end
 
 function JAFDTC_F16CM_Fn_IsTACANBand(band)
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str = table["TCN BAND XY"]
     return (str == band)
 end
 
 function JAFDTC_F16CM_Fn_IsTACANMode(mode)
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str = table["TCN Mode"]
     return (str == mode)
 end
@@ -554,39 +534,39 @@ end
 -- --------------------------------------------------------------------------------------------------------------------
 
 function JAFDTC_F16CM_Fn_IsI2TNotSelected()
-    local table = JAFDTC_F16CM_GetParsedDED();
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED);
     local str1 = table["Visual initial point to TGT Label"]
     local str2 = table["Visual initial point to TGT Label_inv"]
     return not ((str1 == "VIP-TO-TGT") or (str2 == "VIP-TO-TGT"))
 end
 
 function JAFDTC_F16CM_Fn_IsI2TNotHighlighted()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str = table["Visual initial point to TGT Label"]
     return (str == "VIP-TO-TGT")
 end
 
 function JAFDTC_F16CM_Fn_IsI2PNotHighlighted()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str = table["Visual initial point to TGT Label"]
     return (str == "VIP-TO-PUP")
 end
 
 function JAFDTC_F16CM_Fn_IsT2RNotSelected()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str1 = table["Target to VRP Label"]
     local str2 = table["Target to VRP Label_inv"]
     return not ((str1 == "TGT-TO-VRP") or (str2 == "TGT-TO-VRP"))
 end
 
 function JAFDTC_F16CM_Fn_IsT2RNotHighlighted()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str = table["Target to VRP Label"]
     return (str == "TGT-TO-VRP")
 end
 
 function JAFDTC_F16CM_Fn_IsT2PNotHighlighted()
-    local table = JAFDTC_F16CM_GetParsedDED()
+    local table = JAFDTC_ParseDisplaySimple(DID_F16C_DED)
     local str = table["Target to VRP Label"]
     return (str == "TGT-TO-PUP")
 end
