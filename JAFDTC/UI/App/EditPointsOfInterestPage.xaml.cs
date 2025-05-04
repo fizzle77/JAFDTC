@@ -2,7 +2,7 @@
 //
 // EditPointsOfInterestPage.xaml.cs : ui c# point of interest editor
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -80,7 +80,7 @@ namespace JAFDTC.UI.App
     /// point of interest lat/lon helper. this provides for translation between the user-facing presentation of the
     /// lat/lon (where settings in the ui specify the lat/lon display format) and the internal decimal degress format.
     /// </summary>
-    internal class PoILL : BindableObject
+    internal partial class PoILL : BindableObject
     {
         public LLFormat Format { get; set; }
 
@@ -148,7 +148,7 @@ namespace JAFDTC.UI.App
     /// <summary>
     /// backing object for editing a point of interest.
     /// </summary>
-    internal class PoIDetails : BindableObject
+    internal partial class PoIDetails : BindableObject
     {
         public int CurIndexLL { get; set; }
 
@@ -545,7 +545,6 @@ namespace JAFDTC.UI.App
             string theater = GetTheaterFromEditor();
             uiPoITextTheater.Text = (string.IsNullOrEmpty(theater)) ? "Unknown Theater" : theater;
 
-            string test = uiPoIValueName.Text;
             PointOfInterestDbQuery query = new(PointOfInterestTypeMask.USER, theater, null, uiPoIValueName.Text);
             List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
             IsEditPoINew = pois.Count == 0;

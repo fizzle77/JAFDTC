@@ -420,7 +420,7 @@ namespace JAFDTC.Utilities
         /// </summary>
         public static string LoadDTCTemplate(AirframeTypes airframe, string name)
         {
-            string srcPath = null;
+            string srcPath;
             if (string.IsNullOrEmpty(name))
                 srcPath = Path.Combine(_appDirPath, "DCS", "DTC", $"{Globals.AirframeDTCTypes[airframe]}.dtc");
             else

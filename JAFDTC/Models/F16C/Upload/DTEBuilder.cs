@@ -19,11 +19,8 @@
 
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.F16C.MFD;
-using Microsoft.UI.Composition;
 using System.Collections.Generic;
 using System.Text;
-using Windows.AI.MachineLearning.Preview;
-using Windows.Media.Capture.Frames;
 
 namespace JAFDTC.Models.F16C.Upload
 {
@@ -50,7 +47,7 @@ namespace JAFDTC.Models.F16C.Upload
         /// return the osb number (12, 13, or 14 as a string) in the mfd configuration that has the given display
         /// format, null if no such format is found.
         /// </summary>
-        private string FindMSBWithFormat(MFDConfiguration mfd, MFDConfiguration.DisplayFormats format)
+        private static string FindMSBWithFormat(MFDConfiguration mfd, MFDConfiguration.DisplayFormats format)
         {
             string strFormat = ((int)format).ToString();
             if (mfd.OSB12 == strFormat)

@@ -3,7 +3,7 @@
 // DCSLuaManager.cs : manages install/remove/update of lua files in dcs install to support jafdtc
 //
 // Copyright(C) 2021-2023 the-paid-actor & dcs-dtc contributors
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -113,7 +113,7 @@ namespace JAFDTC.Utilities
         /// </summary>
         public static Dictionary<string, bool> LuaInstallStatus()
         {
-            Dictionary<string, bool> result = new Dictionary<string, bool>();
+            Dictionary<string, bool> result = new();
             foreach (KeyValuePair<string, DCSLuaVersion> kvp in Settings.VersionDCSLua)
                 result[kvp.Key] = ((kvp.Value != DCSLuaVersion.NONE) && IsJAFDTCInstalled(kvp.Key));
             return result;

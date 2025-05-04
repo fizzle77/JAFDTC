@@ -52,7 +52,7 @@ namespace JAFDTC.UI.App
         // ------------------------------------------------------------------------------------------------------------
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
 
         // ------------------------------------------------------------------------------------------------------------
         //
