@@ -20,11 +20,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using Windows.Devices.Bluetooth.Advertisement;
 
 namespace JAFDTC.Models
 {
@@ -173,7 +169,12 @@ namespace JAFDTC.Models
         public ISystem SystemForTag(string tag);
 
         /// <summary>
-        /// returns true if the system with specified tag is into dcs dtc configuration, false otherwise.
+        /// returns true if the system with specified tag is default, false otherwise.
+        /// </summary>
+        public bool IsDefault(string systemTag);
+
+        /// <summary>
+        /// returns true if the system with specified tag is merged into dcs dtc configuration, false otherwise.
         /// </summary>
         public bool IsMerged(string systemTag);
 

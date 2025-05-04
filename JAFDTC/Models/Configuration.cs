@@ -217,6 +217,12 @@ namespace JAFDTC.Models
 
         public virtual ISystem SystemForTag(string tag) => null;
 
+        public bool IsDefault(string systemTag)
+        {
+            ISystem system = SystemForTag(systemTag);
+            return system == null || system.IsDefault;
+        }
+
         public virtual bool IsMerged(string systemTag) => false;
 
         public void LinkSystemTo(string systemTag, IConfiguration linkedConfig)
