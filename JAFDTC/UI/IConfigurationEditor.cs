@@ -49,17 +49,6 @@ namespace JAFDTC.UI
         public ObservableCollection<ConfigAuxCommandInfo> ConfigAuxCommandInfo();
 
         /// <summary>
-        /// returns true if the system with the given tag is in a default state in the given configuration,
-        /// false otherwise.
-        /// </summary>
-        public bool IsSystemDefault(IConfiguration config, string tag);
-
-        /// <summary>
-        /// returns true if the system with the given tag is linked in the given configuration, false otherwise.
-        /// </summary>
-        public bool IsSystemLinked(IConfiguration config, string tag);
-
-        /// <summary>
         /// returns the string with a human-readable description of what avionics systems the configuration changes.
         /// </summary>
         public Dictionary<string, string> BuildUpdatesStrings(IConfiguration config);

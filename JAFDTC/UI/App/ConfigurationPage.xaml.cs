@@ -29,7 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using Windows.Devices.Bluetooth.Advertisement;
 using Windows.UI;
 
 namespace JAFDTC.UI.App
@@ -38,7 +37,7 @@ namespace JAFDTC.UI.App
     /// holds information on the editor page for a section of an airframe configuration. ConfigurationPage
     /// uses this data to dynamically build the content of the configuration editor page navigation list.
     /// </summary>
-    public sealed class ConfigEditorPageInfo : BindableObject
+    public sealed partial class ConfigEditorPageInfo : BindableObject
     {
         public string Tag { get; }
 
@@ -84,7 +83,7 @@ namespace JAFDTC.UI.App
     /// holds information on an auxiliary command from the aux list of an airframe configuration. ConfigurationPage
     /// uses this data to dynamically build the content of the configuration editor page.
     /// </summary>
-    public sealed class ConfigAuxCommandInfo : BindableObject
+    public sealed partial class ConfigAuxCommandInfo : BindableObject
     {
         public string Tag { get; }
 
@@ -101,7 +100,7 @@ namespace JAFDTC.UI.App
     /// <summary>
     /// class encapsulating arguments/parameters to pass in to a system editor page.
     /// </summary>
-    public sealed class ConfigEditorPageNavArgs
+    public sealed partial class ConfigEditorPageNavArgs
     {
         public ConfigurationPage ConfigPage {  get; }
 
@@ -179,10 +178,10 @@ namespace JAFDTC.UI.App
         /// </summary>
         private void RebuildIconForeground(ConfigEditorPageInfo info)
         {
-            info.EditorPageIconFg = (ConfigEditor.IsSystemDefault(Config, info.Tag))
+            info.EditorPageIconFg = (Config.IsDefault(info.Tag))
                                     ? (SolidColorBrush)Resources["EditorListIconNormalBrush"]
                                     : (SolidColorBrush)Resources["EditorListIconHighlightBrush"];
-            info.EditorPageBadgeFg = (ConfigEditor.IsSystemLinked(Config, info.Tag))
+            info.EditorPageBadgeFg = (Config.IsLinked(info.Tag))
                                     ? new SolidColorBrush(Color.FromArgb(0xFF, 0xB8, 0x86, 0x0B))       // DarkGoldenrod
                                     : new SolidColorBrush(Color.FromArgb(0x00, 0x00, 0x00, 0x00));      // Transparent
         }
@@ -332,7 +331,7 @@ namespace JAFDTC.UI.App
             {
                 ClipboardData cboard = await General.ClipboardDataAsync();
                 bool isPasteValid = (cboard != null) && Config.CanAcceptPasteForSystem(cboard.SystemTag, info.Tag);
-                bool isDefault = ConfigEditor.IsSystemDefault(Config, info.Tag);
+                bool isDefault = Config.IsDefault(info.Tag);
 
                 uiNavListEditorsCtxMenuFlyout.Items[0].IsEnabled = !isDefault;          // copy
                 uiNavListEditorsCtxMenuFlyout.Items[1].IsEnabled = isPasteValid;        // paste
