@@ -493,6 +493,7 @@ namespace JAFDTC.UI.Base
         private void DoUIUpdate()
         {
             bool isEditable = string.IsNullOrEmpty(Config.SystemLinkedTo(SystemTag));
+            bool isRepair = false;
 
             // We want UIUpdateCustom() to be called even if EditState is null, so we only
             // prevent the base UI updates that rely on it here, rather than just returning.
@@ -552,6 +553,7 @@ namespace JAFDTC.UI.Base
                         FileManager.Log(string.Format("Unparseable bool ({0}) in {1}. {2} replaced with false.",
                                                       property.GetValue(editState), editState.GetType(), property.Name));
                         isChecked = false;
+                        isRepair = true;
                     }
 
                     Utilities.SetCheckEnabledAndState(kv.Value, isEditable, isChecked);
@@ -561,6 +563,9 @@ namespace JAFDTC.UI.Base
             _linkResetBtnsControl?.SetResetButtonEnabled(!IsPageStateDefault);
 
             UpdateUICustom(isEditable);
+
+            if (isRepair)
+                SaveEditStateToConfig();
         }
 
         /// <summary>
