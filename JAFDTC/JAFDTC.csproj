@@ -14,6 +14,7 @@
 	<ApplicationIcon>Images\JAFDTC_Icon.ico</ApplicationIcon>
 	<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 	<WindowsPackageType>MSIX</WindowsPackageType>
+	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Models\F16C\COMM\**" />
