@@ -132,7 +132,7 @@ end
 -- this output is parsed into a lua table with the JAFDTC_ParseDisplay() or JAFDTC_ParseDisplayFlat() functions
 -- that differ in how they express the hierarchy.
 --
--- JAFDTC_ParseDisplay() ignores the hierarchy and returns the following table for the above example:
+-- JAFDTC_ParseDisplaySimple() ignores the hierarchy and returns the following table for the above example:
 --
 --     { "a" : "w", "b" : "y", c : "z" }
 --
@@ -220,7 +220,7 @@ end
 
 -- TODO: deprecate
 function JAFDTC_DebugDisplay(display)
-    JAFDTC_Log(JAFDTC_SerializeObject(display));
+    JAFDTC_Log(JAFDTC_SerializeObj(display));
 end
 
 -- TODO: depreate
