@@ -1082,6 +1082,15 @@
   {
     "Type": 0,
     "Theater": "Kola",
+    "Name": "Afrikanda",
+    "Tags": "Airbase",
+    "Latitude": "67.45728333",
+    "Longitude": "32.78416667",
+    "Elevation": "495"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
     "Name": "Alta",
     "Tags": "Airbase",
     "Latitude": "69.97728333",
@@ -1163,6 +1172,15 @@
   {
     "Type": 0,
     "Theater": "Kola",
+    "Name": "Kalevala",
+    "Tags": "Airbase",
+    "Latitude": "65.20981667",
+    "Longitude": "31.13411667",
+    "Elevation": "400"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
     "Name": "Kallax",
     "Tags": "Airbase",
     "Latitude": "65.54386667",
@@ -1199,6 +1217,15 @@
   {
     "Type": 0,
     "Theater": "Kola",
+    "Name": "Kilpyavr",
+    "Tags": "Airbase",
+    "Latitude": "69.09526667",
+    "Longitude": "23.40150000",
+    "Elevation": "305"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
     "Name": "Kirkenes",
     "Tags": "Airbase",
     "Latitude": "69.72536667",
@@ -1217,6 +1244,15 @@
   {
     "Type": 0,
     "Theater": "Kola",
+    "Name": "Koshka Yavr",
+    "Tags": "Airbase",
+    "Latitude": "69.25123333",
+    "Longitude": "31.19628333",
+    "Elevation": "471"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
     "Name": "Kuusamo",
     "Tags": "Airbase",
     "Latitude": "65.98753333",
@@ -1231,6 +1267,15 @@
     "Latitude": "68.60716667",
     "Longitude": "27.4049667",
     "Elevation": "473"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Luostari Pechenga",
+    "Tags": "Airbase",
+    "Latitude": "69.40103333",
+    "Longitude": "30.98870000",
+    "Elevation": "249"
   },
   {
     "Type": 0,
@@ -1258,6 +1303,15 @@
     "Latitude": "68.15180000",
     "Longitude": "33.46433333",
     "Elevation": "682"
+  },
+  {
+    "Type": 0,
+    "Theater": "Kola",
+    "Name": "Poduzhemye",
+    "Tags": "Airbase",
+    "Latitude": "64.91861667",
+    "Longitude": "34.26315000",
+    "Elevation": "157"
   },
   {
     "Type": 0,
