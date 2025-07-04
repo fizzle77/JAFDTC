@@ -2118,6 +2118,15 @@
   {
     "Type": 0,
     "Theater": "Sinai",
+    "Name": "Beirut-Rafic Hariri",
+    "Tags": "Airbase",
+    "Latitude": "33.82726667",
+    "Longitude": "35.48768333",
+    "Elevation": "39"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
     "Name": "Ben-Gurion",
     "Tags": "Airbase",
     "Latitude": "32.00701667",
@@ -2186,6 +2195,15 @@
     "Latitude": "30.10836667",
     "Longitude": "30.89565000",
     "Elevation": "440"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Damascus International",
+    "Tags": "Airbase",
+    "Latitude": "33.42550000",
+    "Longitude": "36.51850000",
+    "Elevation": "2007"
   },
   {
     "Type": 0,
@@ -2325,6 +2343,15 @@
   {
     "Type": 0,
     "Theater": "Sinai",
+    "Name": "Mezzeh",
+    "Tags": "Airbase",
+    "Latitude": "33.47778333",
+    "Longitude": "36.22420000",
+    "Elevation": "2363"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
     "Name": "Nevatim",
     "Tags": "Airbase",
     "Latitude": "31.20833333",
@@ -2357,6 +2384,15 @@
     "Latitude": "30.579254532364782",
     "Longitude": "31.12895655903353",
     "Elevation": "33"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Ramat David",
+    "Tags": "Airbase",
+    "Latitude": "32.66635000",
+    "Longitude": "35.17686667",
+    "Elevation": "119"
   },
   {
     "Type": 0,
@@ -2411,6 +2447,15 @@
     "Latitude": "31.83601667",
     "Longitude": "34.81781667",
     "Elevation": "142"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Tabuk",
+    "Tags": "Airbase",
+    "Latitude": "28.37129700",
+    "Longitude": "36.60612900",
+    "Elevation": "2551"
   },
   {
     "Type": 0,
@@ -2525,7 +2570,7 @@
   {
     "Type": 0,
     "Theater": "Syria",
-    "Name": "Damascus",
+    "Name": "Damascus International",
     "Tags": "Airbase",
     "Latitude": "33.42550000",
     "Longitude": "36.51850000",
