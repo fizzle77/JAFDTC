@@ -46,38 +46,38 @@ You should have received a copy of the GNU General Public License along with thi
 -- 18 - Rear UFC
 
 function JAFDTC_F15E_GetFrontLeftMPD()
-    return JAFDTC_ParseDisplay(3)
+    return JAFDTC_ParseDisplaySimple(3)
 end
 
 function JAFDTC_F15E_GetFrontRightMPD()
-    return JAFDTC_ParseDisplay(7)
+    return JAFDTC_ParseDisplaySimple(7)
 end
 
 function JAFDTC_F15E_GetFrontMPCD()
-    return JAFDTC_ParseDisplay(5)
+    return JAFDTC_ParseDisplaySimple(5)
 end
 
 function JAFDTC_F15E_GetRearLeftMPCD()
-    return JAFDTC_ParseDisplay(10)
+    return JAFDTC_ParseDisplaySimple(10)
 end
 
 function JAFDTC_F15E_GetRearLeftMPD()
-    return JAFDTC_ParseDisplay(12)
+    return JAFDTC_ParseDisplaySimple(12)
 end
 
 function JAFDTC_F15E_GetRearRightMPD()
-    return JAFDTC_ParseDisplay(14)
+    return JAFDTC_ParseDisplaySimple(14)
 end
 
 function JAFDTC_F15E_GetRearRightMPCD()
-    return JAFDTC_ParseDisplay(16)
+    return JAFDTC_ParseDisplaySimple(16)
 end
 
 function JAFDTC_F15E_GetUFC(disp)
     if disp == "UFC_PILOT" then
-        return JAFDTC_ParseDisplay(9)		-- front ufc
+        return JAFDTC_ParseDisplaySimple(9)		-- front ufc
     end
-        return JAFDTC_ParseDisplay(18)		-- rear ufc
+        return JAFDTC_ParseDisplaySimple(18)		-- rear ufc
 end
 
 function JAFDTC_F15E_GetDisplay(disp)

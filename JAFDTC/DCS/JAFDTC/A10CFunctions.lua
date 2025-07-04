@@ -45,14 +45,14 @@ end
 -- LFMD Routines
 
 function JAFDTC_A10C_GetLMFD()
-    local table = JAFDTC_ParseDisplay(1);
-    JAFDTC_DebugDisplay(table);
+    local table = JAFDTC_ParseDisplaySimple(1);
+    JAFDTC_LogSerializedObj(table);
     return table;
 end
 
 function JAFDTC_A10C_GetRMFD()
-    local table = JAFDTC_ParseDisplay(2);
-    JAFDTC_DebugDisplay(table);
+    local table = JAFDTC_ParseDisplaySimple(2);
+    JAFDTC_LogSerializedObj(table);
     return table;
 end
 
@@ -129,8 +129,8 @@ function JAFDTC_A10C_Fn_IsCDUInDefaultMFDPosition()
 end
 
 function JAFDTC_A10C_GetCDU()
-    local table = JAFDTC_ParseDisplay(3);
-    JAFDTC_DebugDisplay(table);
+    local table = JAFDTC_ParseDisplaySimple(3);
+    JAFDTC_LogSerializedObj(table);
     return table;
 end
 
@@ -189,8 +189,8 @@ end
 -- HUD Routines
 
 function JAFDTC_A10C_GetHUD()
-	local table = JAFDTC_ParseDisplay(5);
-    JAFDTC_DebugDisplay(table);
+	local table = JAFDTC_ParseDisplaySimple(5);
+    JAFDTC_LogSerializedObj(table);
     return table;
 end
 

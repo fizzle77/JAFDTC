@@ -217,18 +217,3 @@ function JAFDTC_ParseDisplayFlat(id)
     end
     return JAFDTC_FlattenTable(cur_table)
 end
-
--- TODO: deprecate
-function JAFDTC_DebugDisplay(display)
-    JAFDTC_Log(JAFDTC_SerializeObj(display));
-end
-
--- TODO: depreate
-function JAFDTC_ParseDisplay(id)
-    return JAFDTC_ParseDisplaySimple(id)
-end
-
--- TODO: depreate
-function JAFDTC_GetDisplay(id)
-    return JAFDTC_ParseDisplayFlat(id)
-end
