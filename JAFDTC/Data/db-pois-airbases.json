@@ -963,6 +963,15 @@
   {
     "Type": 0,
     "Theater": "Iraq",
+    "Name": "Al-Kut Airport",
+    "Tags": "Airbase",
+    "Latitude": "32.48371667",
+    "Longitude": "45.75613333",
+    "Elevation": "40"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
     "Name": "Al-Asad Airbase",
     "Tags": "Airbase",
     "Latitude": "33.78123333",
@@ -1044,6 +1053,42 @@
   {
     "Type": 0,
     "Theater": "Iraq",
+    "Name": "H-2 Airbase",
+    "Tags": "Airbase",
+    "Latitude": "33.35651667",
+    "Longitude": "40.58841667",
+    "Elevation": "2070"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "H3 Main Airbase",
+    "Tags": "Airbase",
+    "Latitude": "32.93613333",
+    "Longitude": "39.74588333",
+    "Elevation": "2542"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "H3 Northwest Airbase",
+    "Tags": "Airbase",
+    "Latitude": "33.07631667",
+    "Longitude": "39.59590000",
+    "Elevation": "2551"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "H-3 Southwest Airbase",
+    "Tags": "Airbase",
+    "Latitude": "32.74385000",
+    "Longitude": "39.60130000",
+    "Elevation": "2651"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
     "Name": "K1 Base",
     "Tags": "Airbase",
     "Latitude": "35.51268333",
@@ -1058,6 +1103,15 @@
     "Latitude": "35.47115000",
     "Longitude": "44.34455000",
     "Elevation": "1027"
+  },
+  {
+    "Type": 0,
+    "Theater": "Iraq",
+    "Name": "Mosul International Airport",
+    "Tags": "Airbase",
+    "Latitude": "36.30648333",
+    "Longitude": "43.14706667",
+    "Elevation": "742"
   },
   {
     "Type": 0,
