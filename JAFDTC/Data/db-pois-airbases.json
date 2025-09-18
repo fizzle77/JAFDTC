@@ -2271,6 +2271,15 @@
   {
     "Type": 0,
     "Theater": "Sinai",
+    "Name": "Ein Shamer (UAV)",
+    "Tags": "Airbase",
+    "Latitude": "32.44080000",
+    "Longitude": "35.00753333",
+    "Elevation": "48"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
     "Name": "El Arish",
     "Tags": "Airbase",
     "Latitude": "31.03786667",
@@ -2370,6 +2379,15 @@
   {
     "Type": 0,
     "Theater": "Sinai",
+    "Name": "Khalkhalah Air Base",
+    "Tags": "Airbase",
+    "Latitude": "33.07893333",
+    "Longitude": "36.54070000",
+    "Elevation": "2346"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
     "Name": "Kibrit Air Base",
     "Tags": "Airbase",
     "Latitude": "30.24353333",
@@ -2379,11 +2397,29 @@
   {
     "Type": 0,
     "Theater": "Sinai",
+    "Name": "King Faisa bin Abdul Aziz",
+    "Tags": "Airbase",
+    "Latitude": "30.34363333",
+    "Longitude": "36.14750000",
+    "Elevation": "2859"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
     "Name": "Kom Awshim",
     "Tags": "Airbase",
     "Latitude": "29.553639767014133",
     "Longitude": "30.893497528300774",
     "Elevation": "7"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Megiddo",
+    "Tags": "Airbase",
+    "Latitude": "32.59710000",
+    "Longitude": "35.23006667",
+    "Elevation": "180"
   },
   {
     "Type": 0,
@@ -2496,11 +2532,11 @@
   {
     "Type": 0,
     "Theater": "Sinai",
-    "Name": "Tel Nof",
+    "Name": "Taba International Airport",
     "Tags": "Airbase",
-    "Latitude": "31.83601667",
-    "Longitude": "34.81781667",
-    "Elevation": "142"
+    "Latitude": "29.58818333",
+    "Longitude": "34.77845000",
+    "Elevation": "2326"
   },
   {
     "Type": 0,
@@ -2510,6 +2546,15 @@
     "Latitude": "28.37129700",
     "Longitude": "36.60612900",
     "Elevation": "2551"
+  },
+  {
+    "Type": 0,
+    "Theater": "Sinai",
+    "Name": "Tel Nof",
+    "Tags": "Airbase",
+    "Latitude": "31.83601667",
+    "Longitude": "34.81781667",
+    "Elevation": "142"
   },
   {
     "Type": 0,
