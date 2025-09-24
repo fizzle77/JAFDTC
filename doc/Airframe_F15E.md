@@ -1,6 +1,6 @@
 # JAFDTC: Configuring F-15E Strike Eagle Airframes
 
-*Version 1.0.0-B.31 of 5-May-24*
+**_Version 1.0.0 of 17-September-24_**
 
 JAFDTC supports configuration of the following systems in the Strike Eagle,
 

@@ -1,6 +1,6 @@
 # JAFDTC: Common Elements Guide
 
-*Version 1.0.0-B.47 of 20-April-24*
+**_Version 1.0.0 of 17-September-24_**
 
 Though systems differ from airframe to airframe, based on the preculariites of the airframe,
 there are many concepts, layouts, and tasks in the JAFDTC user interface that share general
@@ -17,11 +17,12 @@ The JAFDTC user interface has tasks that can be used in multiple contexts within
 well as tasks that may share some common features between different airframes. This section
 discusses some of these common tasks.
 
-## Applying a Configuration to the Jet
+## Loading a Configuration Into the Jet
 
-> This section focuses on JAFDTC configuration capabilities and sets aside the DCS DTC. The
+> This section focuses on JAFDTC configuration capabilities and sets aside the native DCS DTC.
+> The
 > [next section](#working-with-the-dcs-dtc)
-> discusses how JAFDTC can work with DCS DTC to configure the jet.
+> discusses how JAFDTC can work with the native DCS DTC to configure the jet.
 
 The primary interaction between JAFDTC and DCS involves uploading configurations to the jet. To
 do so, four conditions must hold,
@@ -33,7 +34,7 @@ do so, four conditions must hold,
 3. A configuration must be selected from the
    [*Configuration List Page*](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#configuration-list-page).
 4. A mission must be running with a pilot in pit in an airframe that matches the airframe of
-   the selection in (3).
+   the selected configuration in (3).
 
 The
 [status area](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#status-area)
@@ -56,12 +57,12 @@ relevant systems powered up. Typically, shortly before taxi.
 > In some cases, it is difficult to impossible for JAFDTC to get the jet in a known
 > configuration from a non-default starting point. In these situations, JAFDTC must rely on the
 > avionics being in a known state coming out of a cold or hot start. For example, if there is a
-> 4-position switch whose setting JAFDTC is unable to read, JAFDTC will not be able to reliably
+> 4-position switch whose setting JAFDTC is unable to read, JAFDTC may not be able to reliably
 > set the switch to a particular setting except if assumes the switch hasn't changed positions
 > since mission start.
 >
 > For these reasons, it is generally advisable to perform uploads prior to manually changing
-> any avionics settings that overlap with those in the configuration.
+> any avionics settings that overlap with those in the JAFDTC configuration.
 
 Because JAFDTC works through the clickable cockpit, you should limit your interactions with
 cockpit switches while JAFDTC is loading a configuration. Interacting with controls that
@@ -69,7 +70,7 @@ JAFDTC will use can cause incorrect command sequences that will mess up the conf
 
 ## Working with the DCS DTC
 
-JAFDTC can interoperate with the DTC system ED introduced in DCS.
+JAFDTC can interoperate with the native DTC system ED has introduced in DCS.
 
 > At present, DCS only supports a subset of DTC functionality on F-16C and F/A-18C airframes.
 > JAFDTC is in the process of rolling out support with B.47 supporting only the F-16C.
@@ -222,7 +223,7 @@ dismiss the “Capturing” dialog in JAFDTC as discussed earlier.
 To better support VR and other use cases where it may be difficult to interact with the JAFDTC
 Windows UI, some airframes allow cockpit controls to trigger some JAFTDC operations. Generally,
 JAFDTC selects controls for unused systems for this purpose (for example, a set of switches for
-a system that is not modeled in the module).
+a system that is not modeled in the module, such as the FLIR UFC controls in the Viper).
 
 > See the
 > [airframe guides](https://github.com/51st-Vfw/JAFDTC/tree/master/doc/README.md#what-now)

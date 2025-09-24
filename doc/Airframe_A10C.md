@@ -1,6 +1,6 @@
 # JAFDTC: Configuring A-10C Warthog Airframes
 
-*Version 1.0.0-B.34 of 8-June-24*
+**_Version 1.0.0 of 17-September-24_**
 
 JAFDTC supports configuration of the following systems in the A-10C II Warthog,
 

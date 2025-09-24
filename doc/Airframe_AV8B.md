@@ -1,6 +1,8 @@
 # JAFDTC: Configuring AV-8B Harrier Airframes
 
-*Version 1.0.0-B.31 of 5-May-24*
+**_Version 1.0.0 of 17-September-24_**
+
+> Support for the *Harrier* is experimental and has had limited testing.
 
 JAFDTC supports configuration of the following systems in the AV-8B Harrier,
 

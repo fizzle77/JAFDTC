@@ -1,6 +1,6 @@
 # JAFDTC: Just Another #%*@^!& DTC
 
-*Version 1.0.0-B.47 of 20-April-24*
+**_Version 1.0.0 of 17-September-24_**
 
 Just Another #%*@^!% DTC (JAFDTC) is a native C# WinUI Windows application for Windows 10 and
 Windows 11 that allows you to upload data typically saved on a data cartridge, such as
@@ -16,6 +16,9 @@ application supports the following DCS airframes and systems,
 - *F/A-18C Hornet* &ndash; Countermeasures, Pre-Planned Weapons, Radios, Waypoints
 - *Mirage M-2000C* &ndash; Waypoints
 
+> Support for the *Harrier*, *Tomcat*, and *Mirage* airframes is experimental and has had
+> limited testing.
+
 This document describes how to get JAFDTC installed and running on your system. See the
 [_User's Guide_](https://github.com/51st-Vfw/JAFDTC/tree/master/doc)
 in the JAFDTC repository for detailed discussion of how to use JAFDTC and operate its features.
@@ -25,9 +28,9 @@ in the JAFDTC repository for detailed discussion of how to use JAFDTC and operat
 JAFDTC manages a set of airframe-specific "Configurations" that each contain information on how
 avionics systems (e.g., navigation, countermeasures, radios) within a supported airframe should
 be set up. It integrates with DCS to drive these configurations into the jet in DCS through
-clickable cockpit controls. Basically, JAFDTC cannot set up anything you couldn't set up on your
-own through DCS but it can set up far faster than a human. JAFDTC is also able to integrate with
-the native DTC ED implemented in DCS.
+clickable cockpit controls. Basically, JAFDTC cannot set up anything you couldn't set up on
+your own through DCS but it can set up far faster than a human. JAFDTC is also able to
+integrate with the native DTC ED has implemented in DCS for some airframes.
 
 Configurations can share system setups allowing you to compose a setup from existing
 configurations. For example, you could build a configuration with a common radio setup and then
