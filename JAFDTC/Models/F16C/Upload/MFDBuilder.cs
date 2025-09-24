@@ -130,11 +130,11 @@ namespace JAFDTC.Models.F16C.Upload
                 if (state.TryGetValueAs($"MFDModeConfig.{(MFDSystem.MasterModes)mode}",
                                         out MFDModeConfiguration curMFD))
                 {
-                    bool isWork = MergeConfigs((MFDSystem.MasterModes)mode, tgtMFD.ModeConfigs[mode].LeftMFD,
-                                               curMFD.LeftMFD, dflMFD.ModeConfigs[mode].LeftMFD) ||
-                                  MergeConfigs((MFDSystem.MasterModes)mode, tgtMFD.ModeConfigs[mode].RightMFD,
-                                               curMFD.RightMFD, dflMFD.ModeConfigs[mode].RightMFD);
-                    if (isWork)
+                    bool isWorkL = MergeConfigs((MFDSystem.MasterModes)mode, tgtMFD.ModeConfigs[mode].LeftMFD,
+                                                curMFD.LeftMFD, dflMFD.ModeConfigs[mode].LeftMFD);
+                    bool isWorkR = MergeConfigs((MFDSystem.MasterModes)mode, tgtMFD.ModeConfigs[mode].RightMFD,
+                                                curMFD.RightMFD, dflMFD.ModeConfigs[mode].RightMFD);
+                    if (isWorkL || isWorkR)
                         BuildMFDsForMode((MFDSystem.MasterModes)mode, ufc, hotas, mfdL, mfdR,
                                          tgtMFD.ModeConfigs[mode], curMFD.LeftMFD.SelectedOSB,
                                          curMFD.RightMFD.SelectedOSB);
