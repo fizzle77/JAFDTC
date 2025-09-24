@@ -4,7 +4,7 @@
     
 EditNavpointListPage.cs : ui xaml for general navigation point editor page
 
-Copyright(C) 2023-2024 ilominar/raven
+Copyright(C) 2023-2025 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -24,7 +24,7 @@ https://www.gnu.org/licenses/.
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:JAFDTC.UI.Base"
     xmlns:ui_app="using:JAFDTC.UI.App"
-    xmlns:ui_ctk="using:CommunityToolkit.WinUI.UI"
+    xmlns:ui_ctk="using:CommunityToolkit.WinUI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"

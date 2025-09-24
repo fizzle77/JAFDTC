@@ -2,7 +2,7 @@
 //
 // F15EEditSteerpointPage.xaml.cs : ui c# for mudhen steerpoint editor page
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -36,7 +36,7 @@ using System.Diagnostics;
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 using JAFDTC.UI.Base;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI;
 using System.Reflection;
 using Windows.System;
 
@@ -234,7 +234,7 @@ namespace JAFDTC.UI.F15E
                 //
                 // TODO: check TOT format in mudhen
                 //
-                stptDst.TOT = (EditStpt.TOT == "––:––:––") ? "" : EditStpt.TOT;
+                stptDst.TOT = (EditStpt.TOT == "ï¿½ï¿½:ï¿½ï¿½:ï¿½ï¿½") ? "" : EditStpt.TOT;
 
                 List<RefPointInfo> emptyRfpts = new();
                 bool isNew = true;
@@ -325,7 +325,7 @@ namespace JAFDTC.UI.F15E
         private void EditStpt_DataValidationError(object sender, DataErrorsChangedEventArgs args)
         {
             // TODO: check TOT format in mudhen
-            if ((args.PropertyName == "TOT") && (EditStpt.TOT == "––:––:––"))
+            if ((args.PropertyName == "TOT") && (EditStpt.TOT == "ï¿½ï¿½:ï¿½ï¿½:ï¿½ï¿½"))
             {
                 // TOT field uses text mask and can come back as "--:--:--" when empty. this is really "" and, since
                 // that value is OK, remove the error.
@@ -356,7 +356,7 @@ namespace JAFDTC.UI.F15E
             foreach (KeyValuePair<string, TextBox> kvp in _curStptTxtBoxExtMap)
             {
                 TextBox tbox = kvp.Value;
-                if (!TextBoxExtensions.GetIsValid(tbox) && (((string)tbox.Tag != "TOT") || (tbox.Text != "––:––:––")))
+                if (!TextBoxExtensions.GetIsValid(tbox) && (((string)tbox.Tag != "TOT") || (tbox.Text != "ï¿½ï¿½:ï¿½ï¿½:ï¿½ï¿½")))
                 {
                     return true;
                 }
@@ -373,8 +373,8 @@ namespace JAFDTC.UI.F15E
             {
                 TextBox tbox = kvp.Value;
                 if (!TextBoxExtensions.GetIsValid(tbox) &&
-                    ((((string)tbox.Tag == "LatUI") && (tbox.Text != "– ––° ––.–––’")) ||
-                     (((string)tbox.Tag == "LonUI") && (tbox.Text != "– –––° ––.–––’"))))
+                    ((((string)tbox.Tag == "LatUI") && (tbox.Text != "ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½.ï¿½ï¿½ï¿½ï¿½")) ||
+                     (((string)tbox.Tag == "LonUI") && (tbox.Text != "ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½.ï¿½ï¿½ï¿½ï¿½"))))
                 {
                     return true;
                 }

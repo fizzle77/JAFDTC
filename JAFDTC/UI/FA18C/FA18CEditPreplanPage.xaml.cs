@@ -2,7 +2,7 @@
 //
 // FA18CEditPreplanPage.xaml.cs : ui c# for hornet pre-planned editor page
 //
-// Copyright(C) 2024 ilominar/raven
+// Copyright(C) 2024-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -17,7 +17,7 @@
 //
 // ********************************************************************************************************************
 
-using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI;
 using JAFDTC.Models;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.FA18C;
