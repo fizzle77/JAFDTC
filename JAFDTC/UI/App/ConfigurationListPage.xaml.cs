@@ -28,6 +28,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.Windows.Storage.Pickers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,8 +36,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
-using Windows.Storage.Pickers;
-using WinRT.Interop;
 
 namespace JAFDTC.UI.App
 {
@@ -550,18 +549,19 @@ namespace JAFDTC.UI.App
         {
             try
             {
-                FileOpenPicker picker = new()
+                FileOpenPicker picker = new((Application.Current as JAFDTC.App).Window.AppWindow.Id)
                 {
-                    SettingsIdentifier = "JAFDTC_ImportCfg",
-                    SuggestedStartLocation = PickerLocationId.Desktop
+                    // SettingsIdentifier = "JAFDTC_ImportCfg"
+                    CommitButtonText = "Import Configuration",
+                    SuggestedStartLocation = PickerLocationId.Desktop,
+                    ViewMode = PickerViewMode.List
                 };
-                picker.FileTypeFilter.Add(".json");
-                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-                WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
-                StorageFile file = await picker.PickSingleFileAsync();
-                if (file != null)
+                picker.FileTypeFilter.Add(".json");
+                PickFileResult resultPick = await picker.PickSingleFileAsync();
+                if (resultPick != null)
                 {
+                    StorageFile file = await StorageFile.GetFileFromPathAsync(resultPick.Path);
                     IConfiguration config = (IConfiguration)uiCfgListView.SelectedItem;
                     string json = await FileIO.ReadTextAsync(file);
                     PromptForConfigName("Name Imported Configuration", null, null, AddJSONConfigNameOpHandler, json);
@@ -582,19 +582,19 @@ namespace JAFDTC.UI.App
         {
             try
             {
-                FileSavePicker picker = new()
+                FileSavePicker picker = new((Application.Current as JAFDTC.App).Window.AppWindow.Id)
                 {
-                    SettingsIdentifier = "JAFDTC_ExportCfg",
+                    // SettingsIdentifier = "JAFDTC_ExportCfg",
+                    CommitButtonText = "Export Configuration",
                     SuggestedStartLocation = PickerLocationId.Desktop,
                     SuggestedFileName = "Configuration"
                 };
-                picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
-                var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-                InitializeWithWindow.Initialize(picker, hwnd);
+                picker.FileTypeChoices.Add("JSON", [ ".json" ]);
 
-                StorageFile file = await picker.PickSaveFileAsync();
-                if (file != null)
+                PickFileResult resultPick = await picker.PickSaveFileAsync();
+                if (resultPick != null)
                 {
+                    StorageFile file = await StorageFile.GetFileFromPathAsync(resultPick.Path);
                     IConfiguration config = (IConfiguration)uiCfgListView.SelectedItem;
                     await FileIO.WriteTextAsync(file, config.Serialize());
                 }

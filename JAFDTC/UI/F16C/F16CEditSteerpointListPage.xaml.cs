@@ -20,7 +20,6 @@
 using JAFDTC.Models;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.STPT;
-using JAFDTC.Models.Import;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
@@ -38,9 +37,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage.Pickers;
-using Windows.Storage;
-using WinRT.Interop;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 using JAFDTC.UI.Base;

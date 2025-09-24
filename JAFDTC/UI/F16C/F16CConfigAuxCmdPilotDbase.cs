@@ -2,7 +2,7 @@
 //
 // F16CConfigAuxCmdPilotDbase.cs : configuration auxiliary command handler for viper pilot database
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -23,13 +23,14 @@ using JAFDTC.UI.App;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.Windows.Storage.Pickers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
-using Windows.Storage.Pickers;
+
 using Windows.Storage;
-using WinRT.Interop;
 
 namespace JAFDTC.UI.F16C
 {
@@ -111,20 +112,20 @@ namespace JAFDTC.UI.F16C
             {
                 // ---- pick file
 
-                FileOpenPicker picker = new()
+                FileOpenPicker picker = new((Application.Current as JAFDTC.App).Window.AppWindow.Id)
                 {
-                    SettingsIdentifier = "JAFDTC_ImportViperDrivers",
-                    SuggestedStartLocation = PickerLocationId.Desktop
+                    // SettingsIdentifier = "JAFDTC_ImportViperDrivers",
+                    CommitButtonText = "Import Pilots",
+                    SuggestedStartLocation = PickerLocationId.Desktop,
+                    ViewMode = PickerViewMode.List
                 };
                 picker.FileTypeFilter.Add(".json");
-                var hwnd = WindowNative.GetWindowHandle(_window);
-                InitializeWithWindow.Initialize(picker, hwnd);
 
-                StorageFile file = await picker.PickSingleFileAsync();
+                PickFileResult resultPick = await picker.PickSingleFileAsync();
 
                 // ---- do the import
 
-                if ((file != null) && (file.FileType.ToLower() == ".json"))
+                if ((resultPick != null) && (Path.GetExtension(resultPick.Path.ToLower()) == ".json"))
                 {
                     ContentDialogResult action = await Utilities.Message3BDialog(_xamlRoot,
                         "Import Pilots",
@@ -134,7 +135,7 @@ namespace JAFDTC.UI.F16C
                         "Cancel");
                     if (action != ContentDialogResult.None)
                     {
-                        List<ViperDriver> fileDrivers = FileManager.LoadUserDbase<ViperDriver>(file.Path);
+                        List<ViperDriver> fileDrivers = FileManager.LoadUserDbase<ViperDriver>(resultPick.Path);
                         if (fileDrivers != null)
                         {
                             if (action == ContentDialogResult.Primary)
@@ -165,19 +166,18 @@ namespace JAFDTC.UI.F16C
         {
             try
             {
-                FileSavePicker picker = new()
+                FileSavePicker picker = new((Application.Current as JAFDTC.App).Window.AppWindow.Id)
                 {
-                    SettingsIdentifier = "JAFDTC_ExportViperDrivers",
+                    // SettingsIdentifier = "JAFDTC_ExportViperDrivers",
+                    CommitButtonText = "Export Pilots",
                     SuggestedStartLocation = PickerLocationId.Desktop,
                     SuggestedFileName = "Viper Drivers"
                 };
-                picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
-                var hwnd = WindowNative.GetWindowHandle(_window);
-                InitializeWithWindow.Initialize(picker, hwnd);
+                picker.FileTypeChoices.Add("JSON", [ ".json" ]);
 
-                StorageFile file = await picker.PickSaveFileAsync();
-                if (file != null)
-                    FileManager.SaveUserDbase<ViperDriver>(file.Path, exportDrivers);
+                PickFileResult resultPick = await picker.PickSaveFileAsync();
+                if (resultPick != null)
+                    FileManager.SaveUserDbase<ViperDriver>(resultPick.Path, exportDrivers);
             }
             catch (Exception ex)
             {

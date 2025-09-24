@@ -25,6 +25,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.Windows.Storage.Pickers;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
@@ -32,9 +33,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using Windows.Storage.Pickers;
 using Windows.Storage;
-using WinRT.Interop;
 
 namespace JAFDTC.UI.Base
 {
@@ -243,22 +242,22 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void BtnAddTmplt_Click(object sender, RoutedEventArgs args)
         {
-            FileOpenPicker picker = new()
+            FileOpenPicker picker = new((Application.Current as JAFDTC.App).Window.AppWindow.Id)
             {
-                SettingsIdentifier = "JAFDTC_ImportDTC",
-                SuggestedStartLocation = PickerLocationId.Desktop
+                // SettingsIdentifier = "JAFDTC_ImportDTC",
+                CommitButtonText = "Add Template",
+                SuggestedStartLocation = PickerLocationId.Desktop,
+                ViewMode = PickerViewMode.List
             };
             picker.FileTypeFilter.Add(".dtc");
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
-            StorageFile file = await picker.PickSingleFileAsync();
-            if (file != null)
+            PickFileResult resultPick = await picker.PickSingleFileAsync();
+            if (resultPick != null)
             {
-                string name = Path.GetFileNameWithoutExtension(file.Path);
+                string name = Path.GetFileNameWithoutExtension(resultPick.Path);
                 try
                 {
-                    string json = FileManager.ReadFile(file.Path);
+                    string json = FileManager.ReadFile(resultPick.Path);
                     using (JsonDocument data = JsonDocument.Parse(json))
                         if (data.RootElement.GetProperty("type").ToString() != Globals.AirframeDTCTypes[Config.Airframe])
                             throw new Exception($"The template “{name}” is not suitable for use as a DTC" +
@@ -275,7 +274,7 @@ namespace JAFDTC.UI.Base
                     }
                     if (result == ContentDialogResult.Primary)
                     {
-                        FileManager.ImportDTCTemplate(Config.Airframe, file.Path);
+                        FileManager.ImportDTCTemplate(Config.Airframe, resultPick.Path);
                         RebuildTemplateList();
                     }
                 }
@@ -325,21 +324,20 @@ namespace JAFDTC.UI.Base
             {
                 try
                 {
-                    FileSavePicker picker = new()
+                    FileSavePicker picker = new((Application.Current as JAFDTC.App).Window.AppWindow.Id)
                     {
-                        SettingsIdentifier = "JAFDTC_ExportDTC",
+                        // SettingsIdentifier = "JAFDTC_ExportDTC",
+                        CommitButtonText = "Save Merged Tape",
                         SuggestedStartLocation = PickerLocationId.Desktop,
                         SuggestedFileName = "JAFDTC DTC Tape.dtc",
                         DefaultFileExtension = ".dtc"
                     };
-                    picker.FileTypeChoices.Add("DTC", new List<string>() { ".dtc" });
-                    var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-                    InitializeWithWindow.Initialize(picker, hwnd);
+                    picker.FileTypeChoices.Add("DTC", [ ".dtc" ]);
 
-                    StorageFile file = await picker.PickSaveFileAsync();
-                    if (file != null)
+                    PickFileResult resultPick = await picker.PickSaveFileAsync();
+                    if (resultPick != null)
                     {
-                        UpdateDTCOutputPath(file.Path);
+                        UpdateDTCOutputPath(resultPick.Path);
                         shouldMerge = true;
                     }
                 }

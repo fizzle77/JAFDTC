@@ -25,13 +25,13 @@ using JAFDTC.Utilities;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.Windows.Storage.Pickers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Windows.Storage.Pickers;
+using Windows.Security.Credentials.UI;
 using Windows.Storage;
-using WinRT.Interop;
 
 namespace JAFDTC.UI.Base
 {
@@ -275,18 +275,19 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private static async Task<StorageFile> ImportFileOpenPicker()
         {
-            FileOpenPicker picker = new()
+            FileOpenPicker picker = new((Application.Current as JAFDTC.App).Window.AppWindow.Id)
             {
-                SettingsIdentifier = "JAFDTC_ImportNavpt",
-                SuggestedStartLocation = PickerLocationId.Desktop
+                // SettingsIdentifier = "JAFDTC_ImportNavpt",
+                CommitButtonText = "Import Navpoints",
+                SuggestedStartLocation = PickerLocationId.Desktop,
+                ViewMode = PickerViewMode.List
             };
             picker.FileTypeFilter.Add(".json");
             picker.FileTypeFilter.Add(".cf");
             picker.FileTypeFilter.Add(".miz");
-            var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-            InitializeWithWindow.Initialize(picker, hwnd);
 
-            return await picker.PickSingleFileAsync();
+            PickFileResult resultPick = await picker.PickSingleFileAsync();
+            return (resultPick != null) ? await StorageFile.GetFileFromPathAsync(resultPick.Path) : null;
         }
 
         /// <summary>
@@ -386,21 +387,20 @@ namespace JAFDTC.UI.Base
         /// <summary>
         /// present and handle a file save picker to select a .json/.cf/.miz file to export to. returns the result of
         /// FileSavePicker.PickSaveFileAsync. what parameter should be capitalized and singular (e.g., "Steerpoints").
-
         /// </summary>
         private static async Task<StorageFile> ExportFileSavePicker(string name, string what)
         {
-            FileSavePicker picker = new()
+            FileSavePicker picker = new((Application.Current as JAFDTC.App).Window.AppWindow.Id)
             {
-                SettingsIdentifier = "JAFDTC_ExportNavpt",
+                // SettingsIdentifier = "JAFDTC_ExportNavpt",
+                CommitButtonText = "Export Navpoints",
                 SuggestedStartLocation = PickerLocationId.Desktop,
                 SuggestedFileName = ((name.Length > 0) ? name + " " : "") + $"{what}s"
             };
-            picker.FileTypeChoices.Add("JSON", new List<string>() { ".json" });
-            var hwnd = WindowNative.GetWindowHandle((Application.Current as JAFDTC.App)?.Window);
-            InitializeWithWindow.Initialize(picker, hwnd);
+            picker.FileTypeChoices.Add("JSON", [ ".json" ]);
 
-            return await picker.PickSaveFileAsync();
+            PickFileResult resultPick = await picker.PickSaveFileAsync();
+            return (resultPick != null) ? await StorageFile.GetFileFromPathAsync(resultPick.Path) : null;
         }
 
         /// <summary>
