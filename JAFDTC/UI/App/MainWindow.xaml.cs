@@ -2,7 +2,7 @@
 //
 // MainWindow.xaml.cs -- ui c# for main window
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,11 +18,9 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Utilities;
-using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,7 +28,6 @@ using System.IO;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Windows.Foundation;
 using Windows.Graphics;
 
 namespace JAFDTC.UI.App
@@ -100,9 +97,9 @@ namespace JAFDTC.UI.App
         private static WinProc _newWndProc = null;
         private static IntPtr _oldWndProc = IntPtr.Zero;
 
-        private static int _minWindowWidth = 1000;
+        private static int _minWindowWidth = 900;
         private static int _maxWindowWidth = 1800;
-        private static int _minWindowHeight = 700;
+        private static int _minWindowHeight = 590;
         private static int _maxWindowHeight = 1600;
 
         // ------------------------------------------------------------------------------------------------------------
@@ -117,12 +114,8 @@ namespace JAFDTC.UI.App
 
             Title = "JAFDTC";
 
-            SystemBackdrop = new DesktopAcrylicBackdrop();
-            // SystemBackdrop = new MicaBackdrop() { Kind = MicaKind.BaseAlt };
-            uiAppTitleBar.Loaded += AppTitleBar_Loaded;
-            uiAppTitleBar.SizeChanged += AppTitleBar_SizeChanged;
             ExtendsContentIntoTitleBar = true;
-            SetTitleBar(uiAppTitleBar);
+            AppWindow.TitleBar.PreferredHeightOption = Microsoft.UI.Windowing.TitleBarHeightOption.Tall;
 
             var hWnd = GetWindowHandleForCurrentWindow(this);
 
@@ -219,66 +212,12 @@ namespace JAFDTC.UI.App
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// change the visibility of the filter box. this is used to hide/show the filter box so it is only visible
+        /// when the configuration list page is visible.
         /// </summary>
         public void SetConfigFilterBoxVisibility(Visibility visibility)
         {
             uiAppConfigFilterBox.Visibility = visibility;
-            if (ExtendsContentIntoTitleBar == true)
-            {
-                SetRegionsForCustomTitleBar(visibility != Visibility.Visible);
-            }
-        }
-
-        // sets up and updates iteractive regions of the title bar, see
-        //
-        // https://learn.microsoft.com/en-us/windows/apps/develop/title-bar
-
-        private void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (ExtendsContentIntoTitleBar == true)
-            {
-                SetRegionsForCustomTitleBar();
-            }
-        }
-
-        private void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (ExtendsContentIntoTitleBar == true)
-            {
-                SetRegionsForCustomTitleBar(uiAppConfigFilterBox.Visibility != Visibility.Visible);
-            }
-        }
-
-        private void SetRegionsForCustomTitleBar(bool forceFull = false)
-        {
-            // Specify the interactive regions of the title bar.
-
-            double scaleAdjustment = uiAppTitleBar.XamlRoot.RasterizationScale;
-
-            uiAppTbarRightPadCol.Width = new GridLength(AppWindow.TitleBar.RightInset / scaleAdjustment);
-            uiAppTbarLeftPadCol.Width = new GridLength(AppWindow.TitleBar.LeftInset / scaleAdjustment);
-
-            GeneralTransform transform = uiAppConfigFilterBox.TransformToVisual(null);
-            Rect bounds = transform.TransformBounds(new Rect(0, 0,
-                                                             uiAppConfigFilterBox.ActualWidth,
-                                                             uiAppConfigFilterBox.ActualHeight));
-            RectInt32 SearchBoxRect = GetRect(bounds, scaleAdjustment);
-
-            var rectArray = (forceFull) ? Array.Empty<RectInt32>() : new RectInt32[] { SearchBoxRect };
-
-            InputNonClientPointerSource nonClientInputSrc = InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
-            nonClientInputSrc.SetRegionRects(NonClientRegionKind.Passthrough, rectArray);
-        }
-
-        private static RectInt32 GetRect(Rect bounds, double scale)
-        {
-            return new RectInt32(
-                _X: (int)Math.Round(bounds.X * scale),
-                _Y: (int)Math.Round(bounds.Y * scale),
-                _Width: (int)Math.Round(bounds.Width * scale),
-                _Height: (int)Math.Round(bounds.Height * scale)
-            );
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -297,13 +236,9 @@ namespace JAFDTC.UI.App
             {
                 ConfigListPage.ConfigFilterBox = uiAppConfigFilterBox;
                 if (!Settings.IsNewVersCheckDisabled)
-                {
                     await CheckForUpdates();
-                }
                 if (Settings.IsVersionUpdated)
-                {
                     await Utilities.Message1BDialog(Content.XamlRoot, "Welcome to JAFDTC!", $"Version {Settings.VersionJAFDTC}");
-                }
                 Sploosh(DCSLuaManager.LuaCheck());
             }
             else
