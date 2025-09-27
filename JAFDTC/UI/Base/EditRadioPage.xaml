@@ -4,7 +4,7 @@
     
 EditRadioPage.cs : ui xaml for general radio setup editor page
 
-Copyright(C) 2023-2024 ilominar/raven
+Copyright(C) 2023-2025 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -26,7 +26,7 @@ https://www.gnu.org/licenses/.
     xmlns:ui_base="using:JAFDTC.UI.Base"
     xmlns:ui_ctrl="using:JAFDTC.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DataContext="{d:DesignInstance Type=local:RadioPresetItem}"
     mc:Ignorable="d"
     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
 
@@ -61,32 +61,25 @@ https://www.gnu.org/licenses/.
                       x:Name="uiRadSelectCombo"
                       VerticalAlignment="Center"
                       SelectionChanged="RadSelectCombo_SelectionChanged"
-                      ToolTipService.ToolTip="Selects Radio to Edit">
+                      ToolTipService.ToolTip="Selects radio to edit">
                 <!-- ComboBox items are built when the page is displayed according to the radio -->
             </ComboBox>
             <Button Margin="24,0,6,0" VerticalAlignment="Center"
                     x:Name="uiRadPrevBtn"
-                    ToolTipService.ToolTip="Select previous radio"
+                    ToolTipService.ToolTip="Selects previous radio on airframe"
                     Click="RadBtnPrev_Click">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70E;"/>
             </Button>
             <Button VerticalAlignment="Center"
                     x:Name="uiRadNextBtn"
-                    ToolTipService.ToolTip="Select next radio"
+                    ToolTipService.ToolTip="Selects next radio on airframe"
                     Click="RadBtnNext_Click">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70D;"/>
             </Button>
             <CommandBar Margin="56,0,0,0" HorizontalAlignment="Center">
                 <AppBarButton x:Name="uiBarAdd" Icon="Add" Label="Add"
                               Click="CmdAdd_Click"
-                              ToolTipService.ToolTip="Add new preset to radio"/>
-                <AppBarSeparator/>
-                <AppBarButton x:Name="uiBarImport" Icon="Download" Label="Import"
-                              Click="CmdImport_Click"
-                              ToolTipService.ToolTip="Import radio presets from a file"/>
-                <AppBarButton x:Name="uiBarExport" Icon="Upload" Label="Export"
-                              Click="CmdExport_Click"
-                              ToolTipService.ToolTip="Export radio presets to a file"/>
+                              ToolTipService.ToolTip="Adds new preset to selected radio"/>
                 <AppBarSeparator/>
             </CommandBar>
         </StackPanel>
@@ -168,7 +161,7 @@ https://www.gnu.org/licenses/.
                                      VerticalAlignment="Center"
                                      IsEnabled="{x:Bind IsEnabled, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      Tag="{x:Bind Tag}"
-                                     ToolTipService.ToolTip="Delete this Preset"
+                                     ToolTipService.ToolTip="Deletes this preset"
                                      Click="PreListBtnDelete_Click">
                                 <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE894;"/>
                             </Button>

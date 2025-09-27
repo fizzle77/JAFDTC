@@ -2,7 +2,7 @@
 //
 // EditRadioPage.cs : ui c# for general radio setup editor page
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -38,7 +38,7 @@ namespace JAFDTC.UI.Base
     /// preset editor. this object presents a ui-centric generic version of the radio preset object for a particular
     /// airframe suitable to binding to ui widgets.
     /// </summary>
-    public sealed class RadioPresetItem : BindableObject
+    public sealed partial class RadioPresetItem : BindableObject
     {
         public IEditRadioPageHelper PageHelper { get; }
 
@@ -112,7 +112,7 @@ namespace JAFDTC.UI.Base
     /// object presents a ui-centric generic version of the miscellaneous settings for a particular airframe suitable
     /// to binding to ui widgets.
     /// </summary>
-    public sealed class RadioMiscItem : BindableObject
+    public sealed partial class RadioMiscItem : BindableObject
     {
         public IEditRadioPageHelper PageHelper { get; }
 
@@ -207,12 +207,12 @@ namespace JAFDTC.UI.Base
 
         public EditRadioPage()
         {
-            EditPresets = new ObservableCollection<RadioPresetItem>();
+            EditPresets = [ ];
             EditRadio = 0;
             EditItemTag = 1;
 
             InitializeComponent();
-            InitializeBase(null, uiMiscValueDefaultFreq, uiCtlLinkResetBtns, new List<string>() { });
+            InitializeBase(null, uiMiscValueDefaultFreq, uiCtlLinkResetBtns, [ ]);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -415,9 +415,9 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void SortEditPresets()
         {
-            List<RadioPresetItem> sortableList = new(EditPresets);
+            List<RadioPresetItem> sortableList = [.. EditPresets ];
             sortableList.Sort((a, b) => int.Parse(a.Preset).CompareTo(int.Parse(b.Preset)));
-            EditPresets = new ObservableCollection<RadioPresetItem>();
+            EditPresets = [ ];
             for (int i = 0; i < sortableList.Count; i++)
                 EditPresets.Add(sortableList[i]);
         }
@@ -481,7 +481,7 @@ namespace JAFDTC.UI.Base
         private void RebuildRadioSelectMenu()
         {
             Utilities.SetBulletsInBulletComboBox(uiRadSelectCombo,
-                                                 (int i) => !PageHelper.RadioModuleIsDefault(Config, i));
+                                                 i => !PageHelper.RadioModuleIsDefault(Config, i));
         }
 
         /// <summary>
@@ -587,8 +587,6 @@ namespace JAFDTC.UI.Base
                     item.IsEnabled = isEditable;
 
             Utilities.SetEnableState(uiBarAdd, isEditable && (EditPresets.Count < PageHelper.RadioMaxPresets(EditRadio)));
-            Utilities.SetEnableState(uiBarImport, isEditable);
-            Utilities.SetEnableState(uiBarExport, isEditable && (EditPresets.Count > 0));
 
             Utilities.SetEnableState(uiMiscValueDefaultFreq, isEditable);
             Utilities.SetEnableState(uiMiscCkbxAux1, isEditable);
@@ -622,24 +620,6 @@ namespace JAFDTC.UI.Base
             // TODO: scroll to visible after adding new preset?
             AddNewPreset(EditRadio);
             SaveEditStateToConfig();
-        }
-
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private async void CmdImport_Click(object sender, RoutedEventArgs args)
-        {
-            // TODO: implement
-            await Utilities.Message1BDialog(Content.XamlRoot, "Sad Trombone", "Not yet supported, you'll have to do it the old-fashioned way...");
-        }
-
-        /// <summary>
-        /// TODO: document
-        /// </summary>
-        private async void CmdExport_Click(object sender, RoutedEventArgs args)
-        {
-            // TODO: implement
-            await Utilities.Message1BDialog(Content.XamlRoot, "Sad Trombone", "Not yet supported, you'll have to do it the old-fashioned way...");
         }
 
         // ---- radio selection ---------------------------------------------------------------------------------------
@@ -778,7 +758,7 @@ namespace JAFDTC.UI.Base
 
             base.OnNavigatedTo(args);
 
-            List<FrameworkElement> items = new();
+            List<FrameworkElement> items = [ ];
             for (int i = 0; i < PageHelper.RadioNames.Count; i++)
                     items.Add(Utilities.BulletComboBoxItem(PageHelper.RadioNames[i], i.ToString()));
             uiRadSelectCombo.ItemsSource = items;
