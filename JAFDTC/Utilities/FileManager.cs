@@ -33,8 +33,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace JAFDTC.Utilities
 {
@@ -231,7 +229,7 @@ namespace JAFDTC.Utilities
                 }
                 if (json != null)
                     settings = JsonSerializer.Deserialize<SettingsData>(json);
-                FileManager.Log($"Loaded settings");
+                FileManager.Log($"Loaded settings from {_settingsPath}");
             }
             catch (Exception ex)
             {
@@ -279,7 +277,7 @@ namespace JAFDTC.Utilities
 
             string path = AirframeConfigDirPath(airframe);
             char[] invalidChars = Path.GetInvalidFileNameChars();
-            string cleanFilenameBase = new(name.Where(m => !invalidChars.Contains(m)).ToArray<char>());
+            string cleanFilenameBase = new([.. name.Where(m => !invalidChars.Contains(m)) ]);
             string cleanFilename = cleanFilenameBase + ".json";
 
             int index = 1;
@@ -297,7 +295,7 @@ namespace JAFDTC.Utilities
         public static Dictionary<string, IConfiguration> LoadConfigurationFiles(AirframeTypes airframe)
         {
             string path = AirframeConfigDirPath(airframe);
-            Dictionary<string, IConfiguration> dict = new();
+            Dictionary<string, IConfiguration> dict = [ ];
             if (Directory.Exists(path))
             {
                 var files = Directory.EnumerateFiles(path, "*.json");
@@ -383,7 +381,7 @@ namespace JAFDTC.Utilities
         /// </summary>
         public static List<string> ListDTCTemplates(AirframeTypes airframe)
         {
-            List<string> list = new();
+            List<string> list = [ ];
             string path = AirframeDTCTemplateDirPath(airframe);
             if (Directory.Exists(path))
                 foreach (string srcFile in Directory.GetFiles(path))
@@ -462,7 +460,7 @@ namespace JAFDTC.Utilities
         /// </summary>
         private static List<T> LoadDbaseCore<T>(string path)
         {
-            List<T> dbase = new();
+            List<T> dbase = [ ];
             try
             {
                 string json = ReadFile(path);
@@ -482,7 +480,7 @@ namespace JAFDTC.Utilities
         public static List<T> LoadSystemDbase<T>(string name)
         {
             string path = Path.Combine(_appDirPath, "Data", name);
-            return (File.Exists(path)) ? LoadDbaseCore<T>(path) : new List<T>();
+            return (File.Exists(path)) ? LoadDbaseCore<T>(path) : [ ];
         }
 
         /// <summary>
@@ -505,7 +503,7 @@ namespace JAFDTC.Utilities
         public static bool SaveUserDbase<T>(string name, List<T> dbase, Func<T,Boolean> fnFilter = null)
         {
             fnFilter ??= entry => true;
-            List<T> dbFilter = dbase.Where(fnFilter).ToList();
+            List<T> dbFilter = [.. dbase.Where(fnFilter) ];
 
             string path = Path.Combine(_settingsDirPath, "Dbase");
             Directory.CreateDirectory(path);
@@ -547,7 +545,7 @@ namespace JAFDTC.Utilities
         {
             campaign = campaign.ToLower().Replace(' ', '-');
             char[] invalidChars = Path.GetInvalidFileNameChars();
-            string cleanFilenameBase = new(campaign.Where(m => !invalidChars.Contains(m)).ToArray<char>());
+            string cleanFilenameBase = new([.. campaign.Where(m => !invalidChars.Contains(m)) ]);
             Debug.Assert(cleanFilenameBase.Length > 0);
             return $"jafdtc-pois-campaign-{cleanFilenameBase}.json";
         }
@@ -566,8 +564,11 @@ namespace JAFDTC.Utilities
             foreach (string srcFile in Directory.GetFiles(path))
             {
                 string fileName = Path.GetFileName(srcFile);
-                if (fileName.ToLower().StartsWith("jafdtc-pois-") && fileName.ToLower().EndsWith(".json"))
+                if (fileName.StartsWith("jafdtc-pois-", StringComparison.CurrentCultureIgnoreCase) &&
+                    fileName.ToLower().EndsWith(".json", StringComparison.CurrentCultureIgnoreCase))
+                {
                     dbase.AddRange(LoadUserDbase<PointOfInterest>(fileName));
+                }
             }
             return dbase;
         }
