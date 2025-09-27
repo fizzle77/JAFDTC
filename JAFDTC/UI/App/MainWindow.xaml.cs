@@ -97,7 +97,7 @@ namespace JAFDTC.UI.App
         private static WinProc _newWndProc = null;
         private static IntPtr _oldWndProc = IntPtr.Zero;
 
-        private static int _minWindowWidth = 900;
+        private static int _minWindowWidth = 1000;
         private static int _maxWindowWidth = 1800;
         private static int _minWindowHeight = 590;
         private static int _maxWindowHeight = 1600;
