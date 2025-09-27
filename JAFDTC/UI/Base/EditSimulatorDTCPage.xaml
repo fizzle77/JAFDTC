@@ -4,7 +4,7 @@
     
 EditSimulatorDTC.xaml : ui xaml for general radio setup editor page
 
-Copyright(C) 2023-2024 ilominar/raven
+Copyright(C) 2023-2025 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -26,12 +26,14 @@ https://www.gnu.org/licenses/.
     xmlns:ui_base="using:JAFDTC.UI.Base"
     xmlns:ui_ctrl="using:JAFDTC.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DataContext="{d:DesignInstance Type=local:DTCSystemItem}"
     mc:Ignorable="d"
     Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -72,22 +74,22 @@ https://www.gnu.org/licenses/.
             <ComboBox Grid.Row="0" Grid.Column="0" x:Name="uiComboTemplate"
                       Margin="0,12,0,0" HorizontalAlignment="Stretch"
                       SelectionChanged="ComboTemplate_SelectionChanged"
-                      ToolTipService.ToolTip="Selects DTC Base Tape to Use for Merged Tape"/>
+                      ToolTipService.ToolTip="Selects DTC base tape to use for the merged tape"/>
             <Button Grid.Row="0" Grid.Column="1" x:Name="uiBtnAddTmplt"
                     Margin="12,12,0,0" VerticalAlignment="Center"
                     Click="BtnAddTmplt_Click"
-                    ToolTipService.ToolTip="Imports a DCS DTC File for use as a Base Tape for the Current Airframe">
+                    ToolTipService.ToolTip="Imports a DCS .dtc file for use as a base tape for the current airframe">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE896;"/>
             </Button>
             <Button Grid.Row="0" Grid.Column="2" x:Name="uiBtnDelTmplt"
                     Margin="6,12,0,0" VerticalAlignment="Center"
                     Click="BtnDelTmplt_Click"
-                    ToolTipService.ToolTip="Deletes the Selected DTC Base Tape">
+                    ToolTipService.ToolTip="Deletes the selected DTC base tape">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74D;"/>
             </Button>
         </Grid>
 
-        <!-- merged systems -->
+        <!-- merged systems grid -->
         <TextBlock Grid.Row="2" Margin="12,12,12,0"
                    Style="{StaticResource EditorTitleTextBlockStyle}">
             Systems to Merge:
@@ -117,17 +119,17 @@ https://www.gnu.org/licenses/.
             </GridView.ItemTemplate>
         </GridView>
 
-        <StackPanel Grid.Row="4" Margin="24,0,24,24">
+        <StackPanel Grid.Row="4" Margin="24,0,24,0">
             <TextBlock Style="{StaticResource TableHeaderTextStyle}">
-                JAFDTC expects all merged systems to be configured via DCS DTC through the .dtc file saved below. When a system
+                JAFDTC expects all merged systems to be configured via DCS DTC through the merged .dtc file saved below. When a
             </TextBlock>
             <TextBlock Style="{StaticResource TableHeaderTextStyle}">
-                 is marked as merged, JAFDTC will only configure those system parameters that cannot be set through a .dtc file.
+                 system is marked as merged, JAFDTC will only configure those system parameters that a .dtc file cannot set.
             </TextBlock>
         </StackPanel>
 
         <!-- output -->
-        <TextBlock Grid.Row="5" Margin="12,0,12,0"
+        <TextBlock Grid.Row="5" Margin="12,12,12,0"
                    Style="{StaticResource EditorTitleTextBlockStyle}">
             Location to Save Merged DTC Tape:
         </TextBlock>
@@ -149,32 +151,40 @@ https://www.gnu.org/licenses/.
             <Button Grid.Row="0" Grid.Column="1" x:Name="uiBtnSetOutput"
                     Margin="12,12,0,0" VerticalAlignment="Center"
                     Click="BtnSetOutput_Click"
-                    ToolTipService.ToolTip="Selects the Save Path for the Merged DTC Tape">
+                    ToolTipService.ToolTip="Selects the save path for the merged DTC tape and generates the merged .dtc file">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74E;"/>
             </Button>
             <Button Grid.Row="0" Grid.Column="2" x:Name="uiBtnClearOutput"
                     Margin="6,12,0,0" VerticalAlignment="Center"
                     Click="BtnClearOutput_Click"
-                    ToolTipService.ToolTip="Clears the Save Path for the Merged DTC Tape">
+                    ToolTipService.ToolTip="Clears the save path for the merged DTC tape">
                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE894;"/>
             </Button>
         </Grid>
 
-        <StackPanel Grid.Row="7" Margin="24,12,24,24">
+        <StackPanel Grid.Row="7" Margin="24,12,24,0">
             <TextBlock Style="{StaticResource TableHeaderTextStyle}">
-                To use the merged DCS DTC file, you must first save it (using the save icon to the right of output
-                location above),
+                Specifies the path to save the merged .dtc file at. This file must be imported into DCS through the DCS DTC user
             </TextBlock>
             <TextBlock Style="{StaticResource TableHeaderTextStyle}">
-                then import the saved DCS DTC file through the DCS DTC user interface, and then finally use JAFDTC to
-            </TextBlock>
-            <TextBlock Style="{StaticResource TableHeaderTextStyle}">
-                load the configuration.
+                interface. The tape name shown in the avionics will match the filename (excluding the extension) of the save path.
             </TextBlock>
         </StackPanel>
 
-        <CheckBox Grid.Row="8" Grid.Column="0" Tag="EnableLoad" x:Name="uiCkbxEnableLoad"
-                  Margin="24,36,12,0" HorizontalAlignment="Center"
+        <!-- behavior -->
+        <TextBlock Grid.Row="8" Margin="12,12,12,0"
+                   Style="{StaticResource EditorTitleTextBlockStyle}">
+            Behaviors:
+        </TextBlock>
+
+        <CheckBox Grid.Row="9" Tag="EnableRebuild" x:Name="uiCkbxEnableRebuild"
+                  Margin="24,12,24,0" HorizontalAlignment="Left"
+                  Click="CheckBox_Clicked">
+            JAFDTC always rebuilds the merged .dtc file when a merged system changes
+        </CheckBox>
+
+        <CheckBox Grid.Row="10" Tag="EnableLoad" x:Name="uiCkbxEnableLoad"
+                  Margin="24,0,24,0" HorizontalAlignment="Left"
                   Click="CheckBox_Clicked">
             JAFDTC triggers DCS tape load via the aircraft avionics at the start of JAFDTC upload
         </CheckBox>
@@ -184,7 +194,7 @@ https://www.gnu.org/licenses/.
         common editor controls 
         ===============================================================================================================
         -->
-        <ui_ctrl:LinkResetBtnsControl Grid.Row="10" Grid.Column="0" Margin="0,0,0,0" x:Name="uiCtlLinkResetBtns"/>
+        <ui_ctrl:LinkResetBtnsControl Grid.Row="12" Grid.Column="0" Margin="0,0,0,0" x:Name="uiCtlLinkResetBtns"/>
 
     </Grid>
 </ui_base:SystemEditorPageBase>

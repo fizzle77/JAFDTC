@@ -164,7 +164,7 @@ namespace JAFDTC.Models
         // ---- properties, computed
 
         [JsonIgnore]
-        public virtual List<string> MergeableSysTagsForDTC => new();
+        public virtual List<string> MergeableSysTagsForDTC => [ ];
 
         [JsonIgnore]
         public virtual IUploadAgent UploadAgent { get; }
@@ -227,7 +227,7 @@ namespace JAFDTC.Models
 
         public void LinkSystemTo(string systemTag, IConfiguration linkedConfig)
         {
-            LinkedSysMap ??= new Dictionary<string, string>();
+            LinkedSysMap ??= [ ];
             LinkedSysMap[systemTag] = linkedConfig.UID;
             CloneSystemFrom(systemTag, linkedConfig);
             ConfigurationUpdated();
@@ -260,6 +260,7 @@ namespace JAFDTC.Models
                     ?? throw new Exception("TODO: FAILED TO PARSE");
 
                 dom["name"] = name;
+                dom["data"]["name"] = name;
                 foreach (string tag in MergeableSysTagsForDTC)
                 {
                     ISystem system = SystemForTag(tag);
@@ -281,14 +282,14 @@ namespace JAFDTC.Models
 
         public string SystemLinkedTo(string systemTag)
         {
-            return ((LinkedSysMap != null) && LinkedSysMap.ContainsKey(systemTag)) ? LinkedSysMap[systemTag] : null;
+            return ((LinkedSysMap != null) && LinkedSysMap.TryGetValue(systemTag, out string value)) ? value : null;
         }
 
         public bool IsLinked(string systemTag) => !string.IsNullOrEmpty(SystemLinkedTo(systemTag));
 
         public void CleanupSystemLinks(List<string> validUIDs)
         {
-            List<string> invalidSystems = new();
+            List<string> invalidSystems = [ ];
             foreach (KeyValuePair<string, string> kvp in LinkedSysMap)
                 if (!validUIDs.Contains(kvp.Value))
                     invalidSystems.Add(kvp.Key);
@@ -319,14 +320,14 @@ namespace JAFDTC.Models
         {
             return airframe switch
             {
-                AirframeTypes.A10C  => new A10CConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
+                AirframeTypes.A10C  => new A10CConfiguration(Guid.NewGuid().ToString(), name, [ ]),
                 AirframeTypes.AH64D => null,
-                AirframeTypes.AV8B  => new AV8BConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
-                AirframeTypes.F14AB => new F14ABConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
-                AirframeTypes.F15E  => new F15EConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
-                AirframeTypes.F16C  => new F16CConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
-                AirframeTypes.FA18C => new FA18CConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
-                AirframeTypes.M2000C => new M2000CConfiguration(Guid.NewGuid().ToString(), name, new Dictionary<string, string>()),
+                AirframeTypes.AV8B  => new AV8BConfiguration(Guid.NewGuid().ToString(), name, [ ]),
+                AirframeTypes.F14AB => new F14ABConfiguration(Guid.NewGuid().ToString(), name, [ ]),
+                AirframeTypes.F15E  => new F15EConfiguration(Guid.NewGuid().ToString(), name, [ ]),
+                AirframeTypes.F16C  => new F16CConfiguration(Guid.NewGuid().ToString(), name, [ ]),
+                AirframeTypes.FA18C => new FA18CConfiguration(Guid.NewGuid().ToString(), name, [ ]),
+                AirframeTypes.M2000C => new M2000CConfiguration(Guid.NewGuid().ToString(), name, [ ]),
                 AirframeTypes.None  => null,
                 _                   => null,
             };

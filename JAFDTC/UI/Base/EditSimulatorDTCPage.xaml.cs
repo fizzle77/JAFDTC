@@ -33,7 +33,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using Windows.Storage;
 
 namespace JAFDTC.UI.Base
 {
@@ -57,7 +56,8 @@ namespace JAFDTC.UI.Base
     // ================================================================================================================
 
     /// <summary>
-    /// TODO: document
+    /// page to edit dcs dtc integration fields. this is a general-purpose class that is instatiated in combination
+    /// a IEditSimulatorDTCPageHelper class to provide airframe-specific specialization.
     /// </summary>
     public sealed partial class EditSimulatorDTCPage : SystemEditorPageBase
     {
@@ -200,6 +200,9 @@ namespace JAFDTC.UI.Base
         {
             Utilities.SetEnableState(uiBtnDelTmplt, (uiComboTemplate.SelectedIndex > 0));
             Utilities.SetEnableState(uiBtnClearOutput, (uiValueOutput.Text.Length > 0));
+
+            // TODO: permanently disable this until rebuild is supported...
+            Utilities.SetEnableState(uiCkbxEnableRebuild, false);
         }
 
         /// <summary>
@@ -220,7 +223,7 @@ namespace JAFDTC.UI.Base
             //
             // HACK: can't get the bindings to work for some reason, have to do this the brute force way...
             //
-            List<ToggleButton> tbtns = new();
+            List<ToggleButton> tbtns = [ ];
             Utilities.FindDescendantControls<ToggleButton>(tbtns, uiGridSystemItems);
             foreach (ToggleButton tbtn in tbtns)
                 tbtn.IsChecked = false;
@@ -329,7 +332,7 @@ namespace JAFDTC.UI.Base
                         // SettingsIdentifier = "JAFDTC_ExportDTC",
                         CommitButtonText = "Save Merged Tape",
                         SuggestedStartLocation = PickerLocationId.Desktop,
-                        SuggestedFileName = "JAFDTC DTC Tape.dtc",
+                        SuggestedFileName = "JAFDTC_Tape.dtc",
                         DefaultFileExtension = ".dtc"
                     };
                     picker.FileTypeChoices.Add("DTC", [ ".dtc" ]);
@@ -347,6 +350,9 @@ namespace JAFDTC.UI.Base
                     await Utilities.Message1BDialog(Content.XamlRoot, "Selection Failed", "Unable to select that file for output.");
                     shouldMerge = false;
                 }
+            } else
+            {
+                shouldMerge = true;
             }
 
             if (shouldMerge)
@@ -429,7 +435,7 @@ namespace JAFDTC.UI.Base
 
             CopyConfigToEditState();
 
-            ObservableCollection<DTCSystemItem> items = new();
+            ObservableCollection<DTCSystemItem> items = [ ];
             foreach (ConfigEditorPageInfo info in PageHelper.MergableSystems)
                 items.Add(new DTCSystemItem(info.Tag, info.Glyph, info.Label, EditDTC.MergedSystemTags.Contains(info.Tag)));
             uiGridSystemItems.ItemsSource = items;

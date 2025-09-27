@@ -29,7 +29,7 @@ namespace JAFDTC.Models.Base
     /// class to capture the settings of the DTC "system". this serves as a helper to integrate JAFDTC system settings
     /// with settings from the built-in DTC in DCS. this system is airframe-agnostic
     /// </summary>
-    public class SimDTCSystem : SystemBase
+    public partial class SimDTCSystem : SystemBase
     {
         public const string SystemTag = "JAFDTC:Generic:DTC";
 
@@ -57,6 +57,13 @@ namespace JAFDTC.Models.Base
 
         public ObservableCollection<string> MergedSystemTags { get; set; }
 
+        private string _enableRebuild;
+        public string EnableRebuild
+        {
+            get => _enableRebuild;
+            set => ValidateAndSetBoolProp(value, ref _enableRebuild);
+        }
+
         private string _enableLoad;
         public string EnableLoad
         {
@@ -71,9 +78,13 @@ namespace JAFDTC.Models.Base
         public override bool IsDefault => ((Template.Length == 0) &&
                                            (OutputPath.Length == 0) &&
                                            (MergedSystemTags.Count == 0) &&
+                                           (EnableRebuildValue == false) &&
                                            (EnableLoadValue == false));
 
         // ---- following accessors get the current value (default or non-default) for various properties
+
+        [JsonIgnore]
+        public bool EnableRebuildValue => !string.IsNullOrEmpty(EnableRebuild) && bool.Parse(EnableRebuild);
 
         [JsonIgnore]
         public bool EnableLoadValue => !string.IsNullOrEmpty(EnableLoad) && bool.Parse(EnableLoad);
@@ -88,16 +99,18 @@ namespace JAFDTC.Models.Base
         {
             Template = "";
             OutputPath = "";
+            EnableRebuild = false.ToString();
             EnableLoad = false.ToString();
-            MergedSystemTags = new ObservableCollection<string>();
+            MergedSystemTags = [ ];
         }
 
         public SimDTCSystem(SimDTCSystem other)
         {
             Template = new(other.Template);
             OutputPath = new(other.OutputPath);
+            EnableRebuild = new(other.EnableRebuild);
             EnableLoad = new(other.EnableLoad);
-            MergedSystemTags = new ObservableCollection<string>();
+            MergedSystemTags = [ ];
         }
 
         public virtual object Clone() => new SimDTCSystem(this);
@@ -130,6 +143,7 @@ namespace JAFDTC.Models.Base
         {
             Template = "";
             OutputPath = "";
+            EnableRebuild = false.ToString();
             EnableLoad = false.ToString();
             MergedSystemTags.Clear();
         }
