@@ -3,7 +3,7 @@
 // IUploadAgent.cs -- interface for airframe upload agent class
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -30,6 +30,13 @@ namespace JAFDTC.Models
     /// </summary>
     public interface IUploadAgent
     {
+        /// <summary>
+        /// create the stream of commands and state necessary to open the dcs dtc editor interface on the jet, then
+        /// send the commands to the jet for processing via the network connection to the dcs scripting engine.
+        /// returns true on success, false on failure.
+        /// </summary>
+        public Task<bool> OpenDCSDTCEditor();
+
         /// <summary>
         /// create the stream of commands and state necessary to load a configuration on the jet, then send the
         /// commands to the jet for processing via the network connection to the dcs scripting engine. Load()
@@ -62,5 +69,11 @@ namespace JAFDTC.Models
         /// stream. by default, the returned IBuilder generates a stream with an "end of upload" marker command.
         /// </summary>
         public IBuilder TeardownBuilder(StringBuilder sb);
+
+        /// <summary>
+        /// returns an object that implements IBuilder to generate commands that open the dcs dtc editor. by
+        /// default, returns null.
+        /// </summary>
+        public IBuilder OpenDCSDTCBuilder(StringBuilder sb);
     }
 }

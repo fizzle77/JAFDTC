@@ -60,7 +60,8 @@ namespace JAFDTC.Models.DCS
     /// <summary>
     /// debug command builder class to inject a single exec function into the command stream.
     /// </summary>
-    public class DebugBuilder : BuilderBase
+    public class DebugBuilder(IAirframeDeviceManager dm, StringBuilder sb, string fn, List<string> args)
+                 : BuilderBase(dm, sb)
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -68,21 +69,8 @@ namespace JAFDTC.Models.DCS
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        private string _debugFn;
-        private List<string> _debugArgs;
-
-        // ------------------------------------------------------------------------------------------------------------
-        //
-        // construction
-        //
-        // ------------------------------------------------------------------------------------------------------------
-
-        public DebugBuilder(IAirframeDeviceManager dm, StringBuilder sb, string fn, List<string> args)
-            : base(dm, sb)
-        {
-            _debugFn = fn;
-            _debugArgs = args;
-        }
+        private readonly string _debugFn = fn;
+        private readonly List<string> _debugArgs = args;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -107,7 +95,7 @@ namespace JAFDTC.Models.DCS
     /// derived classes may extend the base to handle airframe- or system-specific needs (for example, to generate
     /// the correct set of actions to specify a negative number in an avionics system).
     /// </summary>
-    public abstract class BuilderBase : IBuilder
+    public abstract class BuilderBase(IAirframeDeviceManager aircraft, StringBuilder sb) : IBuilder
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -129,6 +117,25 @@ namespace JAFDTC.Models.DCS
         protected const int WAIT_LONG = 600;
         protected const int WAIT_VERY_LONG = 17000;
 
+        // dcs icommand values for use by LoSetCommand() api
+        //
+        protected enum DCSiCommand
+        {
+            CMENU_TOGGLE = 179,                 // toggle f10/comm menu
+            CMENU_ITEM_01 = 966,                // f1 menu item
+            CMENU_ITEM_02 = 967,                // f2 menu item
+            CMENU_ITEM_03 = 968,
+            CMENU_ITEM_04 = 969,
+            CMENU_ITEM_05 = 970,
+            CMENU_ITEM_06 = 971,
+            CMENU_ITEM_07 = 972,                // ... you get the picture...
+            CMENU_ITEM_08 = 973,
+            CMENU_ITEM_09 = 974,
+            CMENU_ITEM_10 = 975,
+            CMENU_ITEM_11 = 976,
+            CMENU_ITEM_12 = 977                 // f12 menu item
+        };
+
         // in debug command format, add a newline after every command to make it easier to read the command sequences
         // that the builder generates.
         //
@@ -144,21 +151,8 @@ namespace JAFDTC.Models.DCS
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        protected readonly IAirframeDeviceManager _aircraft;
-
-        private readonly StringBuilder _sb;
-
-        // ------------------------------------------------------------------------------------------------------------
-        //
-        // construction
-        //
-        // ------------------------------------------------------------------------------------------------------------
-
-        public BuilderBase(IAirframeDeviceManager aircraft, StringBuilder sb)
-        {
-            _aircraft = aircraft;
-            _sb = sb ?? new StringBuilder();
-        }
+        protected readonly IAirframeDeviceManager _aircraft = aircraft;
+        private readonly StringBuilder _sb = sb ?? new StringBuilder();
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -172,7 +166,7 @@ namespace JAFDTC.Models.DCS
             // NOTE: to returning the string.
             //
             string value = _sb.ToString();
-            return (value.Length > 0) ? value.Remove(value.Length - 1, 1) : value;
+            return (value.Length > 0) ? value[..^1] : value;
         }
 
         public abstract void Build(Dictionary<string, object> state = null);
@@ -259,7 +253,7 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add an action for the key to the command stream the builder is buidling.
+        /// add an action for the key to the command stream the builder is building.
         /// </summary>
         protected void AddAction(AirframeDevice device, string key, int dtWaitPost = WAIT_NONE)
         {
@@ -268,16 +262,14 @@ namespace JAFDTC.Models.DCS
 #endif
 #if DEBUG_LOG_BOGUS_ACTIONS
             if (string.IsNullOrEmpty(device[key]))
-            {
                 FileManager.Log($"Action {device.Name}.{key} is undefined");
-            }
 #endif
             AddCommand(device[key]);
             AddWait(dtWaitPost);
         }
 
         /// <summary>
-        /// add a action for the key to the command stream the builder is buidling. the action is updated to use the
+        /// add a action for the key to the command stream the builder is building. the action is updated to use the
         /// specified delay between up and down rather than the base delay.
         /// </summary>
         protected void AddActionWithDelay(AirframeDevice device, string key, int delay)
@@ -286,7 +278,7 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// add a dyamic action for the key to the command stream the builder is buidling. a dynamic action has
+        /// add a dyamic action for the key to the command stream the builder is building. a dynamic action has
         /// caller-specified values for the up/down values. this allows programatic switching of controls from
         /// windows.
         /// </summary>
@@ -305,10 +297,8 @@ namespace JAFDTC.Models.DCS
             foreach (string key in keys)
                 AddAction(device, key);
             if (keysPost != null)
-            {
                 foreach (string key in keysPost)
                     AddAction(device, key);
-            }
             AddWait(dtWaitPost);
         }
 
@@ -317,13 +307,31 @@ namespace JAFDTC.Models.DCS
         /// </summary>
         protected void AddActions(AirframeDevice device, string action, int count, int dtWaitPost = WAIT_NONE)
         {
-            if (count < 1)
-                return;
+            if (count >= 1)
+            {
+                for (int i = 0; i < count; i++)
+                    AddAction(device, action);
+                AddWait(dtWaitPost);
+            }
+        }
 
-            for (int i = 0; i < count; i++)
-                AddAction(device, action);
-
+        /// <summary>
+        /// add an dcs icommand to the command stream the builder is building.
+        /// </summary>
+        protected void AddLoCommand(DCSiCommand iCmd, int dtWaitPost = WAIT_NONE)
+        {
+            string cmd = $"{{\"f\":\"LoSetCmd\",\"a\":{{\"cmd\":{(int)iCmd}}}}},";
+            AddCommand(cmd);
             AddWait(dtWaitPost);
+        }
+
+        /// <summary>
+        /// add a list of dcs icommands to the command stream the builder is building.
+        /// </summary>
+        protected void AddLoCommands(List<DCSiCommand> iCmds, int dtWaitPost = WAIT_NONE)
+        {
+            foreach (DCSiCommand iCmd in iCmds)
+                AddLoCommand(iCmd, dtWaitPost);
         }
 
         /// <summary>
@@ -401,9 +409,7 @@ namespace JAFDTC.Models.DCS
         {
             string cmd = $"{{\"f\":\"While\",\"a\":{{\"cond\":\"{cond}\",\"expt\":\"{expect}\"";
             if (timeOut != 0)
-            {
                 cmd += $",\"tout\":\"{timeOut}\"";
-            }
             cmd += BuildArgList(argsCond) + $"}}}},";
             AddCommand(cmd);
 
@@ -423,13 +429,11 @@ namespace JAFDTC.Models.DCS
         /// returns a list of actions to enter the string value. all characters that appear in the string must have
         /// corresponding actions in the airframe device that the actions will target.
         /// </summary>
-        protected List<string> ActionsForString(string value)
+        protected static List<string> ActionsForString(string value)
         {
-            List<string> actions = new();
+            List<string> actions = [ ];
             foreach (var c in value.ToCharArray())
-            {
                 actions.Add(c.ToString());
-            }
             return actions;
         }
 
@@ -438,7 +442,7 @@ namespace JAFDTC.Models.DCS
         /// the list of actions. all characters that appear in the string must have corresponding actions in the
         /// airframe device that the actions will target.
         /// </summary>
-        public List<string> ActionsForCleanNum(string value)
+        public static List<string> ActionsForCleanNum(string value)
         {
             return ActionsForString(AdjustNoSeparators(AdjustNoLeadZeros(value)));
         }
@@ -450,13 +454,12 @@ namespace JAFDTC.Models.DCS
         /// and/or characters that should be typed in to the device. they device must have single-character actions
         /// that map to the non-separator characters that may appear in the coordinate string.
         /// <summary>
-        protected List<string> ActionsFor2864CoordinateString(string coord)
+        protected static List<string> ActionsFor2864CoordinateString(string coord)
         {
             coord = AdjustNoSeparators(coord.Replace(" ", ""));
 
-            List<string> actions = new();
+            List<string> actions = [ ];
             foreach (char c in coord.ToUpper().ToCharArray())
-            {
                 switch (c)
                 {
                     case 'N': actions.Add("2"); break;
@@ -465,7 +468,6 @@ namespace JAFDTC.Models.DCS
                     case 'W': actions.Add("4"); break;
                     default: actions.Add(c.ToString()); break;
                 }
-            }
             return actions;
         }
 
@@ -489,10 +491,8 @@ namespace JAFDTC.Models.DCS
         protected static string AdjustNoLeadZeros(string s)
         {
             bool isEmpty = string.IsNullOrEmpty(s);
-            while (s.StartsWith("0"))
-            {
-                s = s.Remove(0, 1);
-            }
+            while (s.StartsWith('0'))
+                s = s[1..];
             return (!isEmpty && (s == "")) ? "0" : s;
         }
 

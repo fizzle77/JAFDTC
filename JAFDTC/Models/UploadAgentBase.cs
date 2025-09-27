@@ -27,6 +27,7 @@
 #define noDEBUG_USES_DEBUG_BUILDER
 
 using JAFDTC.Models.DCS;
+using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -53,16 +54,24 @@ namespace JAFDTC.Models
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// core empty builder to do nothing.
+        /// 
+        /// instances of this class may be built with a null IAirframeDeviceManager.
+        /// </summary>
+        internal class CoreEmptyBuilder(IAirframeDeviceManager adm, StringBuilder sb) : BuilderBase(adm, sb), IBuilder
+        {
+            public override void Build(Dictionary<string, object> state = null) { }
+        }
+
+        /// <summary>
         /// core setup builder to perform common setup actions at the start of a command stream.  SetupBuilder()
         /// returns an instance of this class. the base implementation sends a "start of upload" marker. derived
         /// classes should invoke base.Build() from their Build() methods before returning.
         /// 
         /// instances of this class may be built with a null IAirframeDeviceManager.
         /// </summary>
-        internal class CoreSetupBuilder : BuilderBase, IBuilder
+        internal class CoreSetupBuilder(IAirframeDeviceManager adm, StringBuilder sb) : BuilderBase(adm, sb), IBuilder
         {
-            public CoreSetupBuilder(IAirframeDeviceManager adm, StringBuilder sb) : base(adm, sb) { }
-
             public override void Build(Dictionary<string, object> state = null)
             {
                 AddMarker("<upload_prog>");
@@ -76,10 +85,8 @@ namespace JAFDTC.Models
         /// 
         /// instances of this class may be built with a null IAirframeDeviceManager.
         /// </summary>
-        internal class CoreTeardownBuilder : BuilderBase, IBuilder
+        internal class CoreTeardownBuilder(IAirframeDeviceManager adm, StringBuilder sb) : BuilderBase(adm, sb), IBuilder
         {
-            public CoreTeardownBuilder(IAirframeDeviceManager adm, StringBuilder sb) : base(adm, sb) { }
-
             public override void Build(Dictionary<string, object> state = null)
             {
                 AddMarker("");
@@ -101,6 +108,30 @@ namespace JAFDTC.Models
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
+        /// open the dcs dtc editor interface, see IUploadAgent.
+        /// </summary>
+        public virtual async Task<bool> OpenDCSDTCEditor()
+        {
+            StringBuilder sb = new();
+
+            IBuilder openBuilder = OpenDCSDTCBuilder(sb);
+            await Task.Run(() => openBuilder.Build());
+
+            string str = openBuilder.ToString();
+            if (!string.IsNullOrEmpty(str))
+            {
+#if DEBUG_CMD_LOGGING
+
+                FileManager.Log($"OpenDCSDTCEditor stream data size is {str.Length}");
+                FileManager.Log($"OpenDCSDTCEditor stream:\n****************\n{str}\n****************");
+
+#endif
+                return CockpitCmdTx.Send(str);
+            }
+            return true;
+        }
+
+        /// <summary>
         /// load a configuration onto the jet, see IUploadAgent.
         /// </summary>
         public async Task<bool> Load()
@@ -120,6 +151,7 @@ namespace JAFDTC.Models
             setupBuilder.Build();
             await Task.Run(() => BuildSystems(sb));
             teardownBuilder.Build();
+
 #endif
 
             string str = teardownBuilder.ToString();
@@ -150,5 +182,10 @@ namespace JAFDTC.Models
         /// derived classes may override this method to return a different builder, see IUploadAgent.
         /// </summary>
         public virtual IBuilder TeardownBuilder(StringBuilder sb) => new CoreTeardownBuilder(null, sb);
+
+        /// <summary>
+        /// derived classes may override this method to return a different builder, see IUploadAgent.
+        /// </summary>
+        public virtual IBuilder OpenDCSDTCBuilder(StringBuilder sb) => new CoreEmptyBuilder(null, sb);
     }
 }

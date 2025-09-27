@@ -24,7 +24,9 @@ using JAFDTC.Models.F16C.Upload;
 using JAFDTC.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection.Emit;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace JAFDTC.Models.F16C
 {
@@ -44,13 +46,12 @@ namespace JAFDTC.Models.F16C
         /// generates the command sequence for setup in the viper. this includes making sure the left and right
         /// hardpoints have power applied.
         /// </summary>
-        private class F16CSetupBuilder : CoreSetupBuilder, IBuilder
+        private class F16CSetupBuilder(F16CDeviceManager dcsCmds, StringBuilder sb)
+                      : CoreSetupBuilder(dcsCmds, sb), IBuilder
         {
-            public F16CSetupBuilder(F16CDeviceManager dcsCmds, StringBuilder sb) : base(dcsCmds, sb) { }
-
             public override void Build(Dictionary<string, object> state = null)
             {
-                AddExecFunction("NOP", new() { "==== F16CSetupBuilder:Build()" });
+                AddExecFunction("NOP", [ "==== F16CSetupBuilder:Build()" ]);
 
                 base.Build();
 
@@ -66,12 +67,12 @@ namespace JAFDTC.Models.F16C
                 AddIfBlock("IsInNAVMode", false, null, delegate ()
                 {
                     AddAction(hotas, "CENTER");
-                    AddActions(ufc, new() { "LIST", "8" }, null, WAIT_BASE);
+                    AddActions(ufc, [ "LIST", "8" ], null, WAIT_BASE);
                     AddWhileBlock("IsShowingAAMode", false, null, delegate () { AddAction(ufc, "SEQ"); });
                     AddIfBlock("IsSelectingAAMode", true, null, delegate () { AddAction(ufc, "0"); });
                     AddWhileBlock("IsShowingAGMode", false, null, delegate () { AddAction(ufc, "SEQ"); });
                     AddIfBlock("IsSelectingAGMode", true, null, delegate () { AddAction(ufc, "0"); });
-                    AddActions(ufc, new() { "RTN", "RTN" }, null, WAIT_BASE);
+                    AddActions(ufc, [ "RTN", "RTN" ], null, WAIT_BASE);
                 });
             }
         }
@@ -79,22 +80,17 @@ namespace JAFDTC.Models.F16C
         // ================================================================================================================
 
         /// <summary>
-        /// generates the command sequence for teardown in the strike eagle. this includes triggering light test
-        /// feedback at the end of the sequence.
+        /// generates the command sequence for teardown in the viper. this includes triggering light test feedback
+        /// at the end of the sequence.
         /// </summary>
-        private sealed class F16CTeardownBuilder : CoreTeardownBuilder, IBuilder
+        private sealed class F16CTeardownBuilder(F16CConfiguration cfg, F16CDeviceManager dcsCmds, StringBuilder sb)
+                             : CoreTeardownBuilder(dcsCmds, sb), IBuilder
         {
-            private readonly F16CConfiguration _cfg;
-
-            public F16CTeardownBuilder(F16CConfiguration cfg, F16CDeviceManager dcsCmds, StringBuilder sb)
-                : base(dcsCmds, sb)
-            {
-                _cfg = cfg;
-            }
+            private readonly F16CConfiguration _cfg = cfg;
 
             public override void Build(Dictionary<string, object> state = null)
             {
-                AddExecFunction("NOP", new() { "==== F16CTeardownBuilder:Build()" });
+                AddExecFunction("NOP", [ "==== F16CTeardownBuilder:Build()" ]);
 
                 base.Build();
 
@@ -104,12 +100,12 @@ namespace JAFDTC.Models.F16C
                 AddIfBlock("IsInNAVMode", false, null, delegate ()
                 {
                     AddAction(hotas, "CENTER");
-                    AddActions(ufc, new() { "LIST", "8" }, null, WAIT_BASE);
+                    AddActions(ufc, [ "LIST", "8" ], null, WAIT_BASE);
                     AddWhileBlock("IsShowingAAMode", false, null, delegate () { AddAction(ufc, "SEQ"); });
                     AddIfBlock("IsSelectingAAMode", true, null, delegate () { AddAction(ufc, "0"); });
                     AddWhileBlock("IsShowingAGMode", false, null, delegate () { AddAction(ufc, "SEQ"); });
                     AddIfBlock("IsSelectingAGMode", true, null, delegate () { AddAction(ufc, "0"); });
-                    AddActions(ufc, new() { "RTN", "RTN" }, null, WAIT_BASE);
+                    AddActions(ufc, [ "RTN", "RTN" ], null, WAIT_BASE);
                 });
 
                 if ((Settings.UploadFeedback == SettingsData.UploadFeedbackTypes.AUDIO_LIGHTS) ||
@@ -120,6 +116,25 @@ namespace JAFDTC.Models.F16C
                     AddWait(2000);
                     AddDynamicAction(intl, "MAL_IND_LTS_TEST", 1, 0);
                 }
+            }
+        }
+
+        // ================================================================================================================
+
+        /// <summary>
+        /// generates the command sequence for opening the dtc in the viper.
+        /// </summary>
+        private class F16COpenDTCBuilder(F16CDeviceManager dcsCmds, StringBuilder sb)
+                      : BuilderBase(dcsCmds, sb), IBuilder
+        {
+            public override void Build(Dictionary<string, object> state = null)
+            {
+                AddExecFunction("NOP", ["==== F16COpenDTCBuilder:Build()"]);
+                AddLoCommands([ DCSiCommand.CMENU_TOGGLE,
+                                DCSiCommand.CMENU_ITEM_11, DCSiCommand.CMENU_ITEM_11, DCSiCommand.CMENU_ITEM_11,
+                                DCSiCommand.CMENU_ITEM_08,
+                                DCSiCommand.CMENU_ITEM_06,
+                                DCSiCommand.CMENU_ITEM_01 ], WAIT_SHORT);
             }
         }
 
@@ -188,5 +203,7 @@ namespace JAFDTC.Models.F16C
         public override IBuilder SetupBuilder(StringBuilder sb) => new F16CSetupBuilder(_dm, sb);
 
         public override IBuilder TeardownBuilder(StringBuilder sb) => new F16CTeardownBuilder(_cfg, _dm, sb);
+
+        public override IBuilder OpenDCSDTCBuilder(StringBuilder sb) => new F16COpenDTCBuilder(_dm, sb);
     }
 }

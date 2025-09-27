@@ -37,6 +37,8 @@ dofile(lfs.writedir() .. 'Scripts/JAFDTC/F16CFunctions.lua')
 dofile(lfs.writedir() .. 'Scripts/JAFDTC/FA18CFunctions.lua')
 dofile(lfs.writedir() .. 'Scripts/JAFDTC/M2000CFunctions.lua')
 
+JAFDTC_Log("JAFDTC.lua loads complete");
+
 -- --------------------------------------------------------------------------------------------------------------------
 --
 -- locals
@@ -250,6 +252,18 @@ function JAFDTC_Cmd_Actn(list, index)
     return 1, 0
 end
 
+-- LoSetCmd(number cmd)
+--
+-- perform a LoSetCommand() with the given cmd.
+--
+function JAFDTC_Cmd_LoSetCmd(list, index)
+    local args = list[index]["a"]
+    local cmd = args["cmd"] or 0
+
+    LoSetCommand(cmd)
+    return 1, 0
+end
+
 -- Query(string fn, list<string> prm = nil)
 --
 -- invokes the function JAFDTC_<airframe>_Fn_<fn> with the specified parameters (list of strings). the function must
@@ -435,6 +449,8 @@ function LuaExportBeforeNextFrame()
                 elseif cmdList and data then
                     JAFDTC_Log(string.format("[%.3f] Process rx cmdList[1:%d] %dB", curTime, #cmdList, string.len(data)))
                     whileTout = { }
+                else
+                    JAFDTC_Log(string.format("[%.3f] ERROR: Unable to process rx data", curTime))
                 end
             end
         end

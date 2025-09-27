@@ -92,8 +92,6 @@ namespace JAFDTC
 
         private bool IsJAFDTCPinnedToTop { get; set; }
 
-        private bool UploadPressed { get; set; }
-
         private long UploadPressedTimestamp { get; set; }
 
         private bool IncPressed { get; set; }
@@ -306,7 +304,7 @@ namespace JAFDTC
 
         // ------------------------------------------------------------------------------------------------------------
         //
-        // configuration upload
+        // upload button behaviors
         //
         // ------------------------------------------------------------------------------------------------------------
 
@@ -349,6 +347,15 @@ namespace JAFDTC
                     General.PlayAudio("ux_error.wav");
                 });
             }
+        }
+
+        /// <summary>
+        /// open dcs dtc editor.
+        /// </summary>
+        private async static void OpenDCSDTCEditor(IConfiguration cfg)
+        {
+            if (cfg != null)
+                await cfg.UploadAgent.OpenDCSDTCEditor();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -435,30 +442,25 @@ namespace JAFDTC
         {
             if (IsDCSUploadInFlight)
             {
-                UploadPressed = false;
                 UploadPressedTimestamp = 0;
             }
             else
             {
-                if (!UploadPressed && (data.CmdUpload == "1") && (UploadPressedTimestamp == 0))
+                if ((data.CmdUpload == "1") && (UploadPressedTimestamp == 0))
                 {
                     UploadPressedTimestamp = DateTime.Now.Ticks;
                 }
-                if (data.CmdUpload == "0")
+                else if ((data.CmdUpload == "0") && (UploadPressedTimestamp != 0))
                 {
-                    UploadPressedTimestamp = 0;
-                }
-
-                UploadPressed = data.CmdUpload == "1";
-
-                TimeSpan dt = new(DateTime.Now.Ticks - UploadPressedTimestamp);
-                if ((UploadPressedTimestamp != 0) && UploadPressed && (dt.TotalMilliseconds > 250))
-                { 
-                    UploadPressedTimestamp = 0;
+                    TimeSpan dt = new(DateTime.Now.Ticks - UploadPressedTimestamp);
                     Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                     {
-                        UploadConfigurationToJet(CurrentConfig);
+                        if (dt.TotalMilliseconds > 1000)
+                            OpenDCSDTCEditor(CurrentConfig);
+                        else if (dt.TotalMilliseconds > 200)
+                            UploadConfigurationToJet(CurrentConfig);
                     });
+                    UploadPressedTimestamp = 0;
                 }
             }
         }
@@ -563,8 +565,8 @@ namespace JAFDTC
         {
             if (Window != null)
             {
-                DCSActiveAirframe = (_dcsToJAFDTCTypeMap.ContainsKey(data.Model)) ? _dcsToJAFDTCTypeMap[data.Model]
-                                                                                  : AirframeTypes.None;
+                DCSActiveAirframe = (_dcsToJAFDTCTypeMap.TryGetValue(data.Model, out AirframeTypes value))
+                                        ? value : AirframeTypes.None;
 
 #if DCS_TELEM_INCLUDES_LAT_LON
                 DCSLastLat = (double.TryParse(data.Lat, out double lat)) ? lat : 0.0;
