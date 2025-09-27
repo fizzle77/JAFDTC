@@ -21,6 +21,8 @@ You should have received a copy of the GNU General Public License along with thi
 
 -- NOTE: requires that CommonFunctions.lua has been loaded...
 
+JAFDTC_Log("Loading A10CFunctions.lua");
+
 -- --------------------------------------------------------------------------------------------------------------------
 --
 -- general functions

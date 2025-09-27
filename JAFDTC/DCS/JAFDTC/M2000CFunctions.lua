@@ -23,6 +23,8 @@ You should have received a copy of the GNU General Public License along with thi
 
 -- TODO: implement clickable cockpit and setup/configuration checks for mirage
 
+JAFDTC_Log("Loading M2000CFunctions.lua");
+
 -- --------------------------------------------------------------------------------------------------------------------
 --
 -- frame handler
