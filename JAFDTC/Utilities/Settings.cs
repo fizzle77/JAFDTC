@@ -3,7 +3,7 @@
 // Settings.cs : jafdtc application settings
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -22,7 +22,6 @@ using JAFDTC.Models.DCS;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-using static JAFDTC.Models.Base.NavpointInfoBase;
 using static JAFDTC.Utilities.SettingsData;
 
 namespace JAFDTC.Utilities
@@ -61,7 +60,7 @@ namespace JAFDTC.Utilities
 
         public int LastAirframeSelection { get; set; }
 
-        public int LastConfigSelection { get; set; }
+        public string LastConfigFilenameSelection { get; set; }
 
         public string LastStptFilterTheater { get; set; }
 
@@ -115,10 +114,10 @@ namespace JAFDTC.Utilities
             SkipJAFDTCVersion = "";
 
             IsSkipDCSLuaInstall = false;
-            VersionDCSLua = new Dictionary<string, DCSLuaManager.DCSLuaVersion>();
+            VersionDCSLua = [ ];
 
             LastAirframeSelection = 0;
-            LastConfigSelection = -1;
+            LastConfigFilenameSelection = "";
             LastStptFilterTheater = "";
             LastStptFilterCampaign = "";
             LastStptFilterTags = "";
@@ -231,9 +230,11 @@ namespace JAFDTC.Utilities
 
         public static void SetVersionDCSLua(string key, DCSLuaManager.DCSLuaVersion version)
         {
-            if (!_currentSettings.VersionDCSLua.ContainsKey(key) || (_currentSettings.VersionDCSLua[key] != version))
+            if ((!_currentSettings.VersionDCSLua.TryGetValue(key, out DCSLuaManager.DCSLuaVersion value)) ||
+                (value != version))
             {
-                _currentSettings.VersionDCSLua[key] = version;
+                value = version;
+                _currentSettings.VersionDCSLua[key] = value;
                 FileManager.WriteSettings(_currentSettings);
             }
         }
@@ -329,14 +330,14 @@ namespace JAFDTC.Utilities
             }
         }
 
-        public static int LastConfigSelection
+        public static string LastConfigFilenameSelection
         {
-            get => _currentSettings.LastConfigSelection;
+            get => _currentSettings.LastConfigFilenameSelection;
             set
             {
-                if (_currentSettings.LastConfigSelection != value)
+                if (_currentSettings.LastConfigFilenameSelection != value)
                 {
-                    _currentSettings.LastConfigSelection = value;
+                    _currentSettings.LastConfigFilenameSelection = value;
                     FileManager.WriteSettings(_currentSettings);
                 }
             }

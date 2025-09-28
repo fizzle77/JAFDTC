@@ -121,14 +121,34 @@ namespace JAFDTC.UI.App
             IsNavPending = false;
 
             if (Settings.LastAirframeSelection >= uiBarComboAirframe.Items.Count)
-            {
                 Settings.LastAirframeSelection = 0;
-            }
 
             TextBlock item = (TextBlock)uiBarComboAirframe.Items[Settings.LastAirframeSelection];
             CurAirframe = (AirframeTypes)int.Parse((string)item.Tag);
 
             ConfigList = new ConfigurationList(CurAirframe);
+
+            if (!string.IsNullOrEmpty(Settings.LastConfigFilenameSelection))
+            {
+                int iMatch = -1;
+                for (int i = 0; i < ConfigList.ConfigsFiltered.Count; i++)
+                    if (ConfigList.ConfigsFiltered[i].Filename == Settings.LastConfigFilenameSelection)
+                        iMatch = i;
+                if (iMatch == -1)
+                {
+                    Settings.LastConfigFilenameSelection = "";
+                }
+                else
+                {
+                    uiCfgListView.SelectedIndex = iMatch;
+                    DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+                    {
+                        object selectedItem = uiCfgListView.SelectedItem;
+                        if (selectedItem != null)
+                            uiCfgListView.ScrollIntoView(selectedItem);
+                    });
+                }
+            }
 
             uiBarComboAirframe.SelectedIndex = Settings.LastAirframeSelection;
 
@@ -193,13 +213,9 @@ namespace JAFDTC.UI.App
         {
             string message = null;
             if ((name == null) || (name.Length == 0))
-            {
                 return "The name may not be empty";
-            }
             else if (ConfigList.IsNameUnique(name) == false)
-            {
                 message = "There is already a configuration with that name.";
-            }
             return message;
         }
 
@@ -239,9 +255,7 @@ namespace JAFDTC.UI.App
             if (result == ContentDialogResult.Primary)
             {
                 if (!handler(nameDialog.Value, cfgHandlerArg))
-                {
                     await Utilities.Message1BDialog(Content.XamlRoot, "Something Went Wrong?", "That operation failed, bruh. Bummer.");
-                }
                 RebuildInterfaceState();
             }
         }
@@ -258,9 +272,7 @@ namespace JAFDTC.UI.App
         public void NextConfiguration(bool isFirst)
         {
             if ((uiCfgListView.SelectedIndex == -1) && (ConfigList.ConfigsFiltered.Count > 0))
-            {
                 uiCfgListView.SelectedIndex = 0;
-            }
             if ((uiCfgListView.SelectedIndex == -1) ||
                 (!isFirst && (uiCfgListView.SelectedIndex == (ConfigList.ConfigsFiltered.Count - 1))))
             {
@@ -269,11 +281,11 @@ namespace JAFDTC.UI.App
             else
             {
                 if (!isFirst)
-                {
                     uiCfgListView.SelectedIndex += 1;
-                }
                 string name = ((IConfiguration)uiCfgListView.SelectedItem).Name;
                 StatusMessageTx.Send(name);
+
+                Settings.LastConfigFilenameSelection = name;
             }
         }
 
@@ -283,9 +295,7 @@ namespace JAFDTC.UI.App
         public void PreviousConfiguration(bool isFirst)
         {
             if ((uiCfgListView.SelectedIndex == -1) && (ConfigList.ConfigsFiltered.Count > 0))
-            {
                 uiCfgListView.SelectedIndex = 0;
-            }
             if ((uiCfgListView.SelectedIndex == -1) ||(!isFirst && (uiCfgListView.SelectedIndex == 0)))
             {
                 General.PlayAudio("ux_error.wav");
@@ -293,11 +303,11 @@ namespace JAFDTC.UI.App
             else
             {
                 if (!isFirst)
-                {
                     uiCfgListView.SelectedIndex -= 1;
-                }
                 string name = ((IConfiguration)uiCfgListView.SelectedItem).Name;
                 StatusMessageTx.Send(name);
+
+                Settings.LastConfigFilenameSelection = name;
             }
         }
 
@@ -308,7 +318,7 @@ namespace JAFDTC.UI.App
         {
             if (!IsNavPending && (uiCfgListView.SelectedItem is IConfiguration config))
             {
-                config.CleanupSystemLinks(new List<string>(ConfigList.UIDtoConfigMap.Keys));
+                config.CleanupSystemLinks([.. ConfigList.UIDtoConfigMap.Keys ]);
 
                 IsNavPending = true;
                 CurConfigEditing = config;
@@ -348,13 +358,9 @@ namespace JAFDTC.UI.App
                     string sep = (!string.IsNullOrEmpty(Settings.WingName) &&
                                   !string.IsNullOrEmpty(Settings.Callsign)) ? " | " : "";
                     if (!string.IsNullOrEmpty(Settings.WingName) || !string.IsNullOrEmpty(Settings.Callsign))
-                    {
                         uiStatsValuePilot.Text = $"{Settings.WingName}{sep}“{Settings.Callsign}”";
-                    }
                     else
-                    {
                         uiStatsValuePilot.Text = "Set Your Callsign Through Settings";
-                    }
 
                     IConfiguration config = (IConfiguration)uiCfgListView.SelectedItem;
                     bool isEnabled = (config != null);
@@ -393,9 +399,7 @@ namespace JAFDTC.UI.App
             {
                 List<string> suitableItems = ConfigList.FilterHits(sender.Text);
                 if (suitableItems.Count == 0)
-                {
                     suitableItems.Add("No Matching Configurations Found");
-                }
                 sender.ItemsSource = suitableItems;
             }
         }
@@ -415,9 +419,7 @@ namespace JAFDTC.UI.App
         private void ConfigFilterBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
             if (args.SelectedItem.Equals("No Matching Configurations Found"))
-            {
                 ConfigFilterBox.Text = "";
-            }
         }
 
         // ---- airframe selection ------------------------------------------------------------------------------------
@@ -466,10 +468,8 @@ namespace JAFDTC.UI.App
         private void CmdCopy_Click(object sender, RoutedEventArgs args)
         {
             if (uiCfgListView.SelectedItem is IConfiguration config)
-            {
                 PromptForConfigName("Duplicate Configuration", "Enter Name of Duplicate:",
                                     $"{config.Name} Copy", CopyConfigNameOpHandler);
-            }
         }
 
         /// <summary>
@@ -504,9 +504,7 @@ namespace JAFDTC.UI.App
         private void CmdRename_Click(object sender, RoutedEventArgs args)
         {
             if (uiCfgListView.SelectedItem is IConfiguration config)
-            {
                 PromptForConfigName("Rename Configuration", "Enter New Name:", config.Name, RenameConfigNameOpHandler);
-            }
         }
 
         /// <summary>
@@ -526,6 +524,8 @@ namespace JAFDTC.UI.App
                 {
                     ConfigList.Delete(config);
                     RebuildInterfaceState();
+
+                    Settings.LastConfigFilenameSelection = "";
                 }
             }
         }
@@ -668,9 +668,7 @@ namespace JAFDTC.UI.App
                 result = ContentDialogResult.Primary;
                 await Utilities.Message1BDialog(Content.XamlRoot, "Sad Trombone", "Not yet supported, you'll have to do it the old-fashioned way...");
                 foreach (string dcsPath in Settings.VersionDCSLua.Keys)
-                {
                     DCSLuaManager.UninstallLua(dcsPath);
-                }
                 Settings.IsSkipDCSLuaInstall = false;
             }
             if (result == ContentDialogResult.Primary)
@@ -750,6 +748,8 @@ namespace JAFDTC.UI.App
             ListView cfgList = (ListView)sender;
             CurApp.CurrentConfig = cfgList.SelectedItem as IConfiguration;
             RebuildInterfaceState();
+
+            Settings.LastConfigFilenameSelection = (CurApp.CurrentConfig != null) ? CurApp.CurrentConfig.Filename : "";
         }
 
         // ------------------------------------------------------------------------------------------------------------
