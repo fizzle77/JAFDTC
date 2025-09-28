@@ -24,8 +24,8 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.A10C;
-using JAFDTC.Models.F16C;
 using JAFDTC.Models.DCS;
+using JAFDTC.Models.F16C;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,6 +33,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace JAFDTC.Utilities
 {
@@ -290,7 +291,8 @@ namespace JAFDTC.Utilities
         }
 
         /// <summary>
-        /// TODO: document
+        /// load all .json configuration files found in the per-airframe configuration directory for the specified
+        /// airframe type.
         /// </summary>
         public static Dictionary<string, IConfiguration> LoadConfigurationFiles(AirframeTypes airframe)
         {
@@ -319,7 +321,31 @@ namespace JAFDTC.Utilities
         }
 
         /// <summary>
-        /// TODO: document
+        /// reads an "unmanaged" configuration file (one outside of the standard config directory) from the file
+        /// system. after read, the uid and filename for the configuration are reset. returns a configuration
+        /// object, null on error.
+        /// </summary>
+        public static IConfiguration ReadUnmanagedConfigurationFile(string path)
+        {
+            if (File.Exists(path))
+            {
+                var json = File.ReadAllText(path);
+                JsonNode dom = JsonNode.Parse(json);
+                int? airframe = (int?)dom["Airframe"];
+                if (airframe != null)
+                {
+                    IConfiguration config = Configuration.FactoryJSON((AirframeTypes)airframe, json);
+                    config.ResetUID();
+                    config.Filename = null;
+                    return config;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// save a configuration file to the per-airframe configuration directory. the destination path is based
+        /// on the current name of the configuration.
         /// </summary>
         public static void SaveConfigurationFile(IConfiguration config)
         {
@@ -330,7 +356,7 @@ namespace JAFDTC.Utilities
         }
 
         /// <summary>
-        /// TODO: document
+        /// delete a configuration file from the per-airframe configuration directory.
         /// </summary>
         public static void DeleteConfigurationFile(IConfiguration config)
         {
@@ -340,7 +366,8 @@ namespace JAFDTC.Utilities
         }
 
         /// <summary>
-        /// TODO: document
+        /// rename the configuration file in the per-airframe configuration directory to match the current
+        /// configuration name. the pre-rename filename is provided to locate the source.
         /// </summary>
         public static void RenameConfigurationFile(IConfiguration config, string oldFilename)
         {
