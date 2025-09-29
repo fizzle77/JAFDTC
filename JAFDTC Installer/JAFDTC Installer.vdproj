@@ -15,6 +15,12 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_468C27C41E6C4696ADEFD53E6D250EFD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E2453D771C3D4C6FA54C6C57A3E09FE8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -116,6 +122,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_468C27C41E6C4696ADEFD53E6D250EFD"
+            {
+            "SourcePath" = "8:..\\JAFDTC\\Images\\JAFDTC_File_Icon.ico"
+            "TargetName" = "8:JAFDTC_File_Icon.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_317C8FB995AB4638A7906463197DE148"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E2453D771C3D4C6FA54C6C57A3E09FE8"
             {
             "SourcePath" = "8:..\\JAFDTC\\Images\\JAFDTC_Icon.ico"
@@ -139,6 +165,29 @@
         }
         "FileType"
         {
+            "{5EB83D71-FA18-4901-BE56-DE22E13CC478}:_4DFA4CFB0D8E4CF2893CC0231E207C37"
+            {
+            "Name" = "8:JAFDTC File"
+            "Description" = "8:"
+            "Extensions" = "8:.jafdtc"
+            "MIME" = "8:"
+            "Icon" = "8:_468C27C41E6C4696ADEFD53E6D250EFD"
+            "IconIndex" = "3:0"
+                "Command"
+                {
+                "Command" = "8:_2C362B37881F40EFACBD557EF069DEA5"
+                }
+                "Verbs"
+                {
+                    "{95C0C507-CBF0-42B8-B119-07219E384A4A}:_7222D455784249FF9B9CFDA347C891AC"
+                    {
+                    "Command" = "8:&Open"
+                    "Verb" = "8:open"
+                    "Arguments" = "8:\"%1\""
+                    "Order" = "3:0"
+                    }
+                }
+            }
         }
         "Folder"
         {
@@ -193,7 +242,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:JAFDTC"
         "ProductCode" = "8:{E2BDECA9-A5B2-4598-8BD6-AEBC2BE2760F}"
-        "PackageCode" = "8:{347AF624-ECD7-401F-91BB-FEFD86BBCD29}"
+        "PackageCode" = "8:{1933A23C-D529-431B-B7B8-CA4D51282084}"
         "UpgradeCode" = "8:{D978BA41-44A4-483B-B26B-8F2AC4897C51}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -728,7 +777,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2C362B37881F40EFACBD557EF069DEA5"
             {
-            "SourcePath" = "8:..\\JAFDTC\\obj\\x64\\Release\\net9.0-windows10.0.19041.0\\win-x64\\apphost.exe"
+            "SourcePath" = "8:..\\JAFDTC\\obj\\x64\\Release\\net9.0-windows10.0.22621.0\\win-x64\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_317C8FB995AB4638A7906463197DE148"

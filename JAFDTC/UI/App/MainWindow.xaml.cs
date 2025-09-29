@@ -97,9 +97,9 @@ namespace JAFDTC.UI.App
         private static WinProc _newWndProc = null;
         private static IntPtr _oldWndProc = IntPtr.Zero;
 
-        private static int _minWindowWidth = 1000;
+        private static readonly int _minWindowWidth = 1000;
+        private static readonly int _minWindowHeight = 590;
         private static int _maxWindowWidth = 1800;
-        private static int _minWindowHeight = 590;
         private static int _maxWindowHeight = 1600;
 
         // ------------------------------------------------------------------------------------------------------------
@@ -218,6 +218,7 @@ namespace JAFDTC.UI.App
         public void SetConfigFilterBoxVisibility(Visibility visibility)
         {
             uiAppConfigFilterBox.Visibility = visibility;
+            uiAppConfigFilterBox.IsEnabled = (visibility == Visibility.Visible);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -235,6 +236,7 @@ namespace JAFDTC.UI.App
             if ((Application.Current as JAFDTC.App).IsAppStartupGood)
             {
                 ConfigListPage.ConfigFilterBox = uiAppConfigFilterBox;
+                await CheckForPulledPork((Application.Current as JAFDTC.App).CmdLnArgs.ArgValuePack);
                 if (!Settings.IsNewVersCheckDisabled)
                     await CheckForUpdates();
                 if (Settings.IsVersionUpdated)
@@ -275,7 +277,7 @@ namespace JAFDTC.UI.App
                 string successes = "";
                 string sucPlural = "";
                 string errors = "";
-                string errPlural ="";
+                string errPlural = "";
                 foreach (string path in result.InstallPaths)
                 {
                     string msg = $"Would you like to add the JAFDTC Lua support to the DCS installation at:\n\n" +
@@ -363,7 +365,7 @@ namespace JAFDTC.UI.App
             }
 
             string skipVers = (string.IsNullOrEmpty(Settings.SkipJAFDTCVersion)) ? "None" : Settings.SkipJAFDTCVersion;
-            FileManager.Log($"Update check found local {Globals.VersionJAFDTC}, remote {githubVersion}, skip {skipVers}");
+            FileManager.Log($"Update check found local {Globals.VersionJAFDTC}, latest remote {githubVersion}, skip {skipVers}");
 
             if ((githubVersion != Settings.SkipJAFDTCVersion) && (githubVersion != Globals.VersionJAFDTC))
             {
@@ -380,56 +382,8 @@ namespace JAFDTC.UI.App
                     $"Later");
                 if (actionUpdate == ContentDialogResult.Primary)
                 {
-                    try
-                    {
-                        string url = $"https://github.com/51st-Vfw/JAFDTC/releases/download/{githubVersion}/JAFDTC.Installer.msi";
-                        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                                                   "Downloads", "JAFDTC.Installer.msi");
-                        FileManager.Log($"Update check remote: {url}");
-                        FileManager.Log($"Update check local : {path}");
-
-                        ContentDialogResult actionReplace = ContentDialogResult.Primary;
-                        if (File.Exists(path))
-                        {
-                            FileManager.Log($"Update check {path} exists, asking permission...");
-
-                            actionReplace = await Utilities.Message2BDialog(
-                                Content.XamlRoot,
-                                $"JAFDTC Package Exists",
-                                $"There is already a “JAFDTC.Installer.msi” file in your Downloads folder. Would you like to replace it?",
-                                $"Replace",
-                                $"Cancel Download");
-                        }
-
-                        if (actionReplace == ContentDialogResult.Primary)
-                        {
-                            FileManager.Log($"Update check pulls update package from remote to local");
-
-                            using HttpClient client = new();
-                            Stream msiStream = await client.GetStreamAsync(url);
-
-                            using FileStream fileStream = new(path, FileMode.Create);
-                            await msiStream.CopyToAsync(fileStream);
-
-                            string msg = $"JAFDTC {githubVersion} package successfully copied to your Downloads folder,\n\n" +
-                                         $"    {path}\n\n" +
-                                         $"please install it at your convenience.";
-                            await Utilities.Message1BDialog(Content.XamlRoot, "Qapla'!", msg);
-                        }
-                        else
-                        {
-                            FileManager.Log($"Update check user cancels download");
-                        }
-                    }
-                    catch (System.Exception ex)
-                    {
-                        FileManager.Log($"Update check got .msi exception {ex}");
-
-                        await Utilities.Message1BDialog(
-                            Content.XamlRoot,
-                            "Sad Trombone",
-                            "Unable to download latest JAFDTC package for reasons mysterious. Maybe try again later?");
-                    }
+                    FileManager.Log($"Version check request to pull \"{githubVersion}\"");
+                    await PullPackage(githubVersion);
                 }
                 else if (actionUpdate == ContentDialogResult.Secondary)
                 {
@@ -438,6 +392,77 @@ namespace JAFDTC.UI.App
                 }
             }
             return githubVersion;
+        }
+
+        /// <summary>
+        /// pull a jafdtc package with the given version from github.
+        /// </summary>
+        private async Task<string> CheckForPulledPork(string version)
+        {
+            if (version != null)
+            {
+                FileManager.Log($"Command line request to pull \"{version}\"");
+                await PullPackage(version);
+            }
+            return version;
+        }
+
+        /// <summary>
+        /// pull a jafdtc package with the given version from github.
+        /// </summary>
+        private async Task<string> PullPackage(string version)
+        {
+            try
+            {
+                string url = $"https://github.com/51st-Vfw/JAFDTC/releases/download/{version}/JAFDTC.Installer.msi";
+                string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                                           "Downloads", $"JAFDTC.{version}.Installer.msi");
+                FileManager.Log($"Pull package remote: {url}");
+                FileManager.Log($"Pull package local : {path}");
+
+                ContentDialogResult actionReplace = ContentDialogResult.Primary;
+                if (File.Exists(path))
+                {
+                    FileManager.Log($"Pull package {path} exists, asking permission...");
+
+                    actionReplace = await Utilities.Message2BDialog(
+                        Content.XamlRoot,
+                        $"JAFDTC Package Exists",
+                        $"There is already a “JAFDTC.{version}.Installer.msi” file in your Downloads folder. Would you like to replace it?",
+                        $"Replace",
+                        $"Cancel Download");
+                }
+
+                if (actionReplace == ContentDialogResult.Primary)
+                {
+                    FileManager.Log($"Pull package moves update package from remote to local");
+
+                    using HttpClient client = new();
+                    Stream msiStream = await client.GetStreamAsync(url);
+
+                    using FileStream fileStream = new(path, FileMode.Create);
+                    await msiStream.CopyToAsync(fileStream);
+
+                    string msg = $"JAFDTC {version} package successfully copied to your Downloads folder,\n\n" +
+                                 $"    {path}\n\n" +
+                                 $"Share and enjoy!";
+                    await Utilities.Message1BDialog(Content.XamlRoot, "Qapla'!", msg);
+                }
+                else
+                {
+                    FileManager.Log($"Pull package user cancels download");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                FileManager.Log($"Pull package got .msi exception {ex}");
+
+                await Utilities.Message1BDialog(
+                    Content.XamlRoot,
+                    $"Sad Trombone",
+                    $"Unable to download JAFDTC package with version “{version}”. Maybe try again later?");
+            }
+            return version;
         }
     }
 }

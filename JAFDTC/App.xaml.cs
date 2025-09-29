@@ -17,6 +17,10 @@
 //
 // ********************************************************************************************************************
 
+// define this to enable the file activation handling in the application.
+//
+#define ENABLE_FILE_ACTIVATION
+
 using JAFDTC.Models;
 using JAFDTC.UI.App;
 using JAFDTC.Utilities;
@@ -28,6 +32,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Pipes;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -38,7 +44,28 @@ using static JAFDTC.Utilities.SettingsData;
 namespace JAFDTC
 {
     /// <summary>
+    /// encodes the jafdtc command line.
+    /// 
+    ///     jafdtc [--open {path}] [--pack {version}] [path] .. [path]
+    ///     
+    /// </summary>
+    public sealed class CmdLnArgInfo
+    {
+        public string Summary { get; }
+        public string ArgValueOpen { get; }
+        public string ArgValuePack { get; }
+        public List<string> ArgPath { get; }
+
+        public CmdLnArgInfo(string _sum = null, string _avOpen = null, string _avPack = null, List<string> _path = null)
+            => ( Summary, ArgValueOpen, ArgValuePack, ArgPath ) = ( _sum, _avOpen, _avPack, _path );
+    }
+
+    /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
+    /// 
+    /// HACK: this class uses a hack to handle file activations on Microsoft.UI.Xaml.Application as the base class
+    /// HACK: does not provide OnFileActivated unlike Windows.UI.Xaml.Application). file activations, as a result
+    /// HACK: are kinky wonky.
     /// </summary>
     public partial class App : Application
     {
@@ -64,6 +91,21 @@ namespace JAFDTC
 
         // ------------------------------------------------------------------------------------------------------------
         //
+        // statics
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+#if ENABLE_FILE_ACTIVATION
+
+        private const string JAFDTCFileActMutexName = "JAFDTC_FileActivationMutex";
+        private const string JAFDTCFileActPipeName = "JAFDTC_FileActivationPipe";
+
+        static private readonly Mutex MutexJAFDTC = new (false, JAFDTCFileActMutexName);
+
+#endif
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
         // properties
         //
         // ------------------------------------------------------------------------------------------------------------
@@ -72,7 +114,11 @@ namespace JAFDTC
 
         public MainWindow Window { get; private set; }
 
+        public CmdLnArgInfo CmdLnArgs { get; private set; }
+
         public bool IsAppStartupGood { get; private set; }
+
+        public bool IsAppShuttingDown { get; set; }
 
         public IConfiguration CurrentConfig { get; set; }
 
@@ -92,13 +138,13 @@ namespace JAFDTC
 
         private bool IsJAFDTCPinnedToTop { get; set; }
 
-        private long UploadPressedTimestamp { get; set; }
-
         private bool IncPressed { get; set; }
 
         private bool DecPressed { get; set; }
 
         private bool TogglePressed { get; set; }
+
+        private long UploadPressedTimestamp { get; set; }
 
         private long IncDecPressedTimestamp { get; set; }
 
@@ -238,68 +284,210 @@ namespace JAFDTC
 
         /// <summary>
         /// Initializes the singleton application object. this is the first line of authored code executed, and as
-        /// such is the logical equivalent of main() or WinMain(). preflight the file manager and settings before
-        /// initializing the "dcs available" timer.
+        /// such is the logical equivalent of main() or WinMain().
         /// </summary>
         public App()
         {
-            InitializeComponent();
+            IsAppShuttingDown = false;
+            IsAppStartupGood = false;
+
+            // TODO: this likely needs changes to work for packaged applications. see the discussion around
+            // TODO: IApplicationActivationManager.ActivateApplication
+            //
+            CmdLnArgs = ParseCommandLine([.. Environment.GetCommandLineArgs() ]);
+            if (FileActivationSetup(CmdLnArgs))
+            {
+                InitializeComponent();
 
 #if DCS_TELEM_INCLUDES_LAT_LON
-            DCSLastLat = 0.0;
-            DCSLastLon = 0.0;
+                DCSLastLat = 0.0;
+                DCSLastLon = 0.0;
 #endif
 
-            LastDCSExportCheck = System.DateTimeOffset.Now;
-            LastDCSExportPacketCount = 0;
-            TogglePressed = false;
-            UploadPressedTimestamp = 0;
-            IncDecPressedTimestamp = 0;
-            MarkerUpdateTimestamp = 0;
+                LastDCSExportCheck = System.DateTimeOffset.Now;
+                LastDCSExportPacketCount = 0;
+                IncPressed = false;
+                DecPressed = false;
+                TogglePressed = false;
+                UploadPressedTimestamp = 0;
+                IncDecPressedTimestamp = 0;
+                MarkerUpdateTimestamp = 0;
 
-            _dcsToJAFDTCTypeMap = new Dictionary<string, AirframeTypes>()
-            {
-                ["A10C"] = AirframeTypes.A10C,
-                ["AH64D"] = AirframeTypes.AH64D,
-                ["AV8B"] = AirframeTypes.AV8B,
-                ["F14AB"] = AirframeTypes.F14AB,
-                ["F15E"] = AirframeTypes.F15E,
-                ["F16CM"] = AirframeTypes.F16C,
-                ["FA18C"] = AirframeTypes.FA18C,
-                ["M2000C"] = AirframeTypes.M2000C,
-            };
+                _dcsToJAFDTCTypeMap = new Dictionary<string, AirframeTypes>()
+                {
+                    ["A10C"] = AirframeTypes.A10C,
+                    ["AH64D"] = AirframeTypes.AH64D,
+                    ["AV8B"] = AirframeTypes.AV8B,
+                    ["F14AB"] = AirframeTypes.F14AB,
+                    ["F15E"] = AirframeTypes.F15E,
+                    ["F16CM"] = AirframeTypes.F16C,
+                    ["FA18C"] = AirframeTypes.FA18C,
+                    ["M2000C"] = AirframeTypes.M2000C,
+                };
 
-            this.UnhandledException += (sender, args) =>
+                this.UnhandledException += (sender, args) =>
+                {
+// TODO: what if exception happens before FileManager is preflighted in OnLaunched?
+                    FileManager.Log($"App:App Unhandled exception: {args.Exception.Message}\n");
+                    FileManager.Log(args.Exception.StackTrace);
+                    IsAppShuttingDown = true;
+                };
+            }
+            else
             {
-                FileManager.Log($"App:App Unhandled exception: {args.Exception.Message}\n");
-                FileManager.Log(args.Exception.StackTrace);
-            };
+                // NOTE: this is super icky, but we don't really want the app to continue its startup sequence in
+                // NOTE: the event we have a file activation as there's a bunch of assumptions baked in that a ui
+                // NOTE: is coming up, which is not the case if we've got a file activiation.
+                //
+                throw new Exception("Aborting launch for JAFDTC file activation");
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // file activation hack
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        // HACK: this is a hack to handle file activations on Microsoft.UI.Xaml.Application as that class does not
+        // HACK: provide OnFileActivated unlike Windows.UI.Xaml.Application). we create and grab a named mutex so
+        // HACK: that launches while another jafdtc instance is running will send their path arg to the running
+        // HACK: instance via a named pipe.
+        //
+        // HACK: a launch without an instance running will create the named pipe and server to listen for incoming
+        // HACK: path args from subsequent launches.
+        //
+        // HACK: gotta be a better way here? have i mentioned lately how much this platform sucks?
+
+        /// <summary>
+        /// handle a file activation event for a set of files. this function should be called on the main thread and
+        /// will re-launch the file activation server thread if requested.
+        /// 
+        /// paths parameter has "|"-separated paths, a path may be prefixed by "--noui" to supress user interaction.
+        /// </summary>
+        public void FileActivationHandler(List<string> paths, bool isRestart)
+        {
+            foreach (string path in paths)
+            {
+                FileManager.Log($"FileActivationHandler: process {path}");
+// TODO: handle activation...
+// TODO: note this can be called in situations where ui is already up or where ui is coming up, may need assumption
+// TODO: basic behavior is to copy to config and refresh list, may also have user interaction...
+            }
+            if (isRestart)
+            {
+                FileManager.Log($"FileActivationHandler: restarts server thread");
+                Thread serverThread = new(this.FileActivationServerThread);
+                serverThread.Start();
+            }
+        }
+
+        /// <summary>
+        /// server thread to run under the initial instance of jafdtc. sets up a named pipe to accepts paths
+        /// from subsequent app launches that specify files. when data arrives, thread exits after invoking
+        /// the handler.
+        /// </summary>
+        private void FileActivationServerThread()
+        {
+#if ENABLE_FILE_ACTIVATION
 
             try
             {
-                IsAppStartupGood = false;
-
-                FileManager.Preflight();
-                Settings.Preflight();
-
-                IsJAFDTCPinnedToTop = Settings.IsAlwaysOnTop;
-                IsDCSUploadInFlight = false;
-
-                TelemDataRx.Instance.TelemDataReceived += TelemDataReceiver_DataReceived;
-                TelemDataRx.Instance.Start();
-
-                WyptCaptureDataRx.Instance.Start();
-
-                CheckDCSTimer = new DispatcherTimer();
-                CheckDCSTimer.Tick += CheckDCSTimer_Tick;
-                CheckDCSTimer.Interval = new System.TimeSpan(0, 0, 10);
-
-                IsAppStartupGood = true;
+                using NamedPipeServerStream server = new(JAFDTCFileActPipeName);
+                server.WaitForConnectionAsync();
+                while (!IsAppShuttingDown && !server.IsConnected)
+                    Thread.Sleep(750);
+                if (server.IsConnected)
+                {
+                    using StreamReader reader = new(server);
+                    string filePaths = reader.ReadLine();
+                    if (!string.IsNullOrEmpty(filePaths))
+                    {
+                        List<string> paths = [.. filePaths.Split('|') ];
+                        Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                        {
+                            FileActivationHandler(paths, true);
+                        });
+                    }
+                    server.Disconnect();
+                }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                FileManager.Log($"App:App exception: {ex.Message}\n{ex.StackTrace}");
+                FileManager.Log($"App:FileActivationServerThread exception: {ex.Message}\n{ex.StackTrace}");
             }
+
+#endif // #if ENABLE_FILE_ACTIVATION
+        }
+
+        /// <summary>
+        /// check to see if the application is running, if so, and we have a path or --open arg, send it to the
+        /// running instance to handle. returns true if the app is not currently running, false otherwise.
+        /// </summary>
+        public bool FileActivationSetup(CmdLnArgInfo args)
+        {
+
+#if ENABLE_FILE_ACTIVATION
+
+            if (MutexJAFDTC.WaitOne(10, false))
+            {
+                Thread serverThread = new(this.FileActivationServerThread);
+                serverThread.Start();
+            }
+            else
+            {
+                if ((args.ArgPath.Count > 0) || !string.IsNullOrEmpty(args.ArgValueOpen))
+                {
+                    using NamedPipeClientStream client = new(JAFDTCFileActPipeName);
+                    client.Connect(500);
+                    if (client.IsConnected)
+                    {
+                        string msg = string.Join("|", args.ArgPath);
+                        string sep = (msg.Length > 0) ? "|" : "";
+                        if (!string.IsNullOrEmpty(args.ArgValueOpen))
+                            msg = $"--noui {args.ArgValueOpen}{sep}{msg}";
+                        using StreamWriter writer = new(client);
+                        writer.WriteLine(msg);
+                        writer.Flush();
+                    }
+                }
+                return false;
+            }
+
+#endif // #if ENABLE_FILE_ACTIVATION
+
+            return true;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // command line support
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// returns string representation of command line, excluding the application path.
+        /// </summary>
+        private static CmdLnArgInfo ParseCommandLine(List<string> args)
+        {
+            string summary = "";
+            string argValueOpen = null;
+            string argValuePack = null;
+            List<string> argPath = [ ];
+
+            for (int i = 1; i < args.Count; i++)
+            {
+                if ((args[i].Equals("--open", StringComparison.CurrentCultureIgnoreCase)) && ((i + 1) < args.Count))
+                    argValueOpen = args[++i];
+                else if ((args[i].Equals("--pack", StringComparison.CurrentCultureIgnoreCase)) && ((i + 1) < args.Count))
+                    argValuePack = args[++i];
+                else if (!args[i].StartsWith('-'))
+                    argPath.Add(args[i]);
+                else
+                    return null;
+                summary = summary + " " + args[i];
+            }
+            return new CmdLnArgInfo(summary, argValueOpen, argValuePack, argPath);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -334,9 +522,7 @@ namespace JAFDTC
                 }
                 FileManager.Log($"Upload triggered, {cfg.Name}");
                 if (!await cfg.UploadAgent.Load())
-                {
                     error = $"Upload Failed for {cfg.Name}";
-                }
             }
             if (error != null)
             {
@@ -588,12 +774,62 @@ namespace JAFDTC
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// application launched: create the main window, set it up, and activate it to get this show on the road.
+        /// application launched: preflight the file manager and settings, initialize the "dcs available" timer,
+        /// create the main window, set it up, and activate it to get this show on the road.
         /// </summary>
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
+            // NOTE: we should not get here on file activations, they should exit out via exception during
+            // NOTE: application construction...
+
+            try
+            {
+                FileManager.Preflight();
+                Settings.Preflight();
+
+                FileManager.Log($"Command line: jafdtc.exe {CmdLnArgs.Summary}");
+                FileManager.Log($"  --open value: {CmdLnArgs.ArgValueOpen}");
+                FileManager.Log($"  --pack value: {CmdLnArgs.ArgValuePack}");
+                FileManager.Log($"  [path] value: {CmdLnArgs.ArgPath}");
+
+                if (CmdLnArgs.ArgPath.Count > 0)
+                {
+// TODO: do we need to adjust this to ensure ui is up before handler is called?
+                    FileActivationHandler(CmdLnArgs.ArgPath, false);
+                }
+
+                if (!string.IsNullOrEmpty(CmdLnArgs.ArgValueOpen))
+                {
+// TODO: this should probably share code with FileActivationHandler()
+                    FileManager.Log($"Opening unmanaged config file: {CmdLnArgs.ArgValueOpen}");
+                    IConfiguration config = FileManager.ReadUnmanagedConfigurationFile(CmdLnArgs.ArgValueOpen);
+                    FileManager.SaveConfigurationFile(config);
+                    Settings.LastConfigFilenameSelection = config.Filename;
+                }
+
+                IsJAFDTCPinnedToTop = Settings.IsAlwaysOnTop;
+                IsDCSUploadInFlight = false;
+
+                TelemDataRx.Instance.TelemDataReceived += TelemDataReceiver_DataReceived;
+                TelemDataRx.Instance.Start();
+
+                WyptCaptureDataRx.Instance.Start();
+
+                CheckDCSTimer = new DispatcherTimer();
+                CheckDCSTimer.Tick += CheckDCSTimer_Tick;
+                CheckDCSTimer.Interval = new System.TimeSpan(0, 0, 10);
+
+                IsAppStartupGood = true;
+            }
+            catch (System.Exception ex)
+            {
+// TODO: what if FileManager doesn't pass preflight?
+                FileManager.Log($"App:App exception: {ex.Message}\n{ex.StackTrace}");
+            }
+
             Window = new MainWindow();
             Window.Activated += MainWindow_Activated;
+            Window.Closed += MainWindow_Closed;
             Window.Activate();
         }
 
@@ -603,7 +839,7 @@ namespace JAFDTC
         /// </summary>
         private void CheckDCSTimer_Tick(object sender, object args)
         {
-            _ = IsDCSAvailable;
+            _ = IsDCSAvailable;                     // invoke accessor to rebuild state, return value ignored
         }
 
         /// <summary>
@@ -618,9 +854,17 @@ namespace JAFDTC
             }
             else
             {
-                _ = IsDCSAvailable;
+                _ = IsDCSAvailable;                 // invoke accessor to rebuild state, return value ignored
                 CheckDCSTimer?.Start();
             }
+        }
+
+        /// <summary>
+        /// window closed: flag the app as shutting down so interested parties can take appropriate action.
+        /// </summary>
+        private void MainWindow_Closed(object sender, WindowEventArgs args)
+        {
+            IsAppShuttingDown = true;
         }
     }
 }
