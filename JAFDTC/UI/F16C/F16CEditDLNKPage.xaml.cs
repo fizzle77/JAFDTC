@@ -17,6 +17,7 @@
 //
 // ********************************************************************************************************************
 
+using CommunityToolkit.WinUI;
 using JAFDTC.Models;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.DLNK;
@@ -46,6 +47,40 @@ namespace JAFDTC.UI.F16C
 
         // ------------------------------------------------------------------------------------------------------------
         //
+        // internal classes
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// specialization of the datalink system to include ui views of several parameters.
+        /// </summary>
+        internal partial class DLNKSystemUI : DLNKSystem
+        {
+            private string _ownshipCallsignUI;                      // string, two letter [A-Z][A-Z]
+            public string OwnshipCallsignUI
+            {
+                get => _ownshipCallsignUI;
+                set
+                {
+                    OwnshipCallsign = (value != "––") ? value : "";
+                    _ownshipCallsignUI = OwnshipCallsign;
+                }
+            }
+
+            private string _ownshipFENumberUI;                      // string, two digit [1-9][1-9]
+            public string OwnshipFENumberUI
+            {
+                get => _ownshipFENumberUI;
+                set
+                {
+                    OwnshipFENumber = (value != "––") ? value : "";
+                    _ownshipFENumberUI = OwnshipFENumber;
+                }
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
         // properties
         //
         // ------------------------------------------------------------------------------------------------------------
@@ -57,7 +92,7 @@ namespace JAFDTC.UI.F16C
         //
         private F16CConfiguration Config { get; set; }
 
-        private DLNKSystem EditDLNK { get; set; }
+        private DLNKSystemUI EditDLNK { get; set; }
 
         private string OwnshipDriverUID { get; set; }
 
@@ -89,7 +124,7 @@ namespace JAFDTC.UI.F16C
         {
             InitializeComponent();
 
-            EditDLNK = new DLNKSystem();
+            EditDLNK = new DLNKSystemUI();
             for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
                 EditDLNK.TeamMembers[i].ErrorsChanged += TeamField_DataValidationError;
             EditDLNK.ErrorsChanged += BaseField_DataValidationError;
@@ -107,8 +142,8 @@ namespace JAFDTC.UI.F16C
                     break;
                 }
 
-            _configNameToUID = new Dictionary<string, string>();
-            _configNameList = new List<string>();
+            _configNameToUID = [ ];
+            _configNameList = [ ];
 
             _baseFieldValueMap = new Dictionary<string, TextBox>()
             {
@@ -116,21 +151,21 @@ namespace JAFDTC.UI.F16C
                 ["OwnshipFENumber"] = uiOwnTextFENum,
                 ["FillEmptyTNDL"] = uiOwnTextFillTNDL
             };
-            _tableTDOACkbxList = new List<CheckBox>()
-            {
+            _tableTDOACkbxList =
+            [
                 uiTNDLCkbxTDOA1, uiTNDLCkbxTDOA2, uiTNDLCkbxTDOA3, uiTNDLCkbxTDOA4,
                 uiTNDLCkbxTDOA5, uiTNDLCkbxTDOA6, uiTNDLCkbxTDOA7, uiTNDLCkbxTDOA8
-            };
-            _tableTNDLTextList = new List<TextBox>()
-            {
+            ];
+            _tableTNDLTextList =
+            [
                 uiTNDLTextTNDL1, uiTNDLTextTNDL2, uiTNDLTextTNDL3, uiTNDLTextTNDL4,
                 uiTNDLTextTNDL5, uiTNDLTextTNDL6, uiTNDLTextTNDL7, uiTNDLTextTNDL8,
-            };
-            _tableCallsignComboList = new List<ComboBox>()
-            {
+            ];
+            _tableCallsignComboList =
+            [
                 uiTNDLComboCallsign1, uiTNDLComboCallsign2, uiTNDLComboCallsign3, uiTNDLComboCallsign4,
                 uiTNDLComboCallsign5, uiTNDLComboCallsign6, uiTNDLComboCallsign7, uiTNDLComboCallsign8
-            };
+            ];
             _defaultBorderBrush = uiTNDLTextTNDL1.BorderBrush;
             _defaultBkgndBrush = uiTNDLTextTNDL1.Background;
         }
@@ -147,8 +182,8 @@ namespace JAFDTC.UI.F16C
         private void CopyConfigToEdit()
         {
             EditDLNK.Ownship = Config.DLNK.Ownship;
-            EditDLNK.OwnshipCallsign = Config.DLNK.OwnshipCallsign;
-            EditDLNK.OwnshipFENumber = Config.DLNK.OwnshipFENumber;
+            EditDLNK.OwnshipCallsignUI = Config.DLNK.OwnshipCallsign;
+            EditDLNK.OwnshipFENumberUI = Config.DLNK.OwnshipFENumber;
             EditDLNK.IsOwnshipLead = Config.DLNK.IsOwnshipLead;
             EditDLNK.IsFillEmptyTNDL = Config.DLNK.IsFillEmptyTNDL;
             EditDLNK.FillEmptyTNDL = (Config.DLNK.IsFillEmptyTNDL) ? Config.DLNK.FillEmptyTNDL : "";
@@ -185,8 +220,8 @@ namespace JAFDTC.UI.F16C
                 // OwnshipCallsign, OwnshipFENumber fields use text masks and can come back as "--" when empty. this
                 // is really "" and, since that value is OK, remove the error.
                 //
-                Config.DLNK.OwnshipCallsign = (EditDLNK.OwnshipCallsign == "––") ? "" : EditDLNK.OwnshipCallsign;
-                Config.DLNK.OwnshipFENumber = (EditDLNK.OwnshipFENumber == "––") ? "" : EditDLNK.OwnshipFENumber;
+                Config.DLNK.OwnshipCallsign = EditDLNK.OwnshipCallsign;
+                Config.DLNK.OwnshipFENumber = EditDLNK.OwnshipFENumber;
                 Config.DLNK.IsOwnshipLead = EditDLNK.IsOwnshipLead;
                 Config.DLNK.IsFillEmptyTNDL = EditDLNK.IsFillEmptyTNDL;
                 Config.DLNK.FillEmptyTNDL = (EditDLNK.IsFillEmptyTNDL) ? EditDLNK.FillEmptyTNDL : "";
@@ -255,27 +290,11 @@ namespace JAFDTC.UI.F16C
         {
             if (args.PropertyName == null)
             {
-                Dictionary<string, bool> map = new();
+                Dictionary<string, bool> map = [ ];
                 foreach (string error in EditDLNK.GetErrors(null))
                     map[error] = true;
                 foreach (KeyValuePair<string, TextBox> kvp in _baseFieldValueMap)
                     SetFieldValidState(kvp.Value, !map.ContainsKey(kvp.Key));
-            }
-            else if ((args.PropertyName == "OwnshipCallsign") && (EditDLNK.OwnshipCallsign == "––"))
-            {
-                // OwnshipCallsign field uses text mask and can come back as "--" when empty. this is really "" and,
-                // since that value is OK, remove the error.
-                //
-                EditDLNK.ClearErrors("OwnshipCallsign");
-                SetFieldValidState(_baseFieldValueMap[args.PropertyName], true);
-            }
-            else if ((args.PropertyName == "OwnshipFENumber") && (EditDLNK.OwnshipFENumber == "––"))
-            {
-                // OwnshipFENumber field uses text mask and can come back as "--" when empty. this is really "" and,
-                // since that value is OK, remove the error.
-                //
-                EditDLNK.ClearErrors("OwnshipFENumber");
-                SetFieldValidState(_baseFieldValueMap[args.PropertyName], true);
             }
             else
             {
@@ -290,10 +309,17 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private bool CurStateHasErrors()
         {
+            TextBox tboxCS = _baseFieldValueMap["OwnshipCallsign"];
+            TextBox tboxFE = _baseFieldValueMap["OwnshipFENumber"];
+            if ((!TextBoxExtensions.GetIsValid(tboxCS) && (tboxCS.Text != "––")) ||
+                (!TextBoxExtensions.GetIsValid(tboxFE) && (tboxFE.Text != "––")))
+                return true;
+
             for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
                 if (EditDLNK.TeamMembers[i].HasErrors)
                     return true;
-            return EditDLNK.HasErrors;
+
+            return (((List<string>)EditDLNK.GetErrors("FillEmptyTNDL")).Count != 0);
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -355,12 +381,9 @@ namespace JAFDTC.UI.F16C
         /// returns a list of StackPanel instances to serve as the menu items for the callsign format combo controls.
         /// the tags are set to the uid of the pilot from the pilot database. first element is blank with a "0" tag.
         /// </summary>
-        private IList<StackPanel> BuildCallsignComboItems()
+        private List<StackPanel> BuildCallsignComboItems()
         {
-            List<StackPanel> pilotItems = new()
-            {
-                BuildPilotItemStackPanel(null)
-            };
+            List<StackPanel> pilotItems = [ BuildPilotItemStackPanel(null) ];
             for (int i = 0; i < PilotDbase.Count; i++)
                 pilotItems.Add(BuildPilotItemStackPanel(PilotDbase[i]));
             return pilotItems;
@@ -373,7 +396,7 @@ namespace JAFDTC.UI.F16C
         private void RebuildCallsignCombos()
         {
             IsRebuildingUI = true;
-            Dictionary<string, int> uidToIndexMap = new();
+            Dictionary<string, int> uidToIndexMap = [ ];
             for (int i = 0; i < PilotDbase.Count; i++)
                 uidToIndexMap[PilotDbase[i].UID] = i + 1;
 
@@ -382,9 +405,9 @@ namespace JAFDTC.UI.F16C
                 _tableCallsignComboList[i].ItemsSource = BuildCallsignComboItems();
 
                 string uid = EditDLNK.TeamMembers[i].DriverUID;
-                if (uidToIndexMap.ContainsKey(uid) && (_tableCallsignComboList[i].SelectedIndex != uidToIndexMap[uid]))
+                if (uidToIndexMap.TryGetValue(uid, out int value) && (_tableCallsignComboList[i].SelectedIndex != value))
                 {
-                    _tableCallsignComboList[i].SelectedIndex = uidToIndexMap[uid];
+                    _tableCallsignComboList[i].SelectedIndex = value;
                 }
                 else if (!uidToIndexMap.ContainsKey(uid) && !string.IsNullOrEmpty(uid))
                 {
@@ -408,7 +431,7 @@ namespace JAFDTC.UI.F16C
         {
             int indexPDbOwnship = -1;
             int indexCurOwnship = -1;
-            List<string> list = new();
+            List<string> list = [ ];
             for (int i = 0; i < EditDLNK.TeamMembers.Length; i++)
             {
                 if (!string.IsNullOrEmpty(EditDLNK.TeamMembers[i].TNDL))

@@ -92,7 +92,7 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.Regex="^[a-zA-Z]{0,2}$"
                          ui_ctk:TextBoxExtensions.CustomMask="D:[a-zA-Z]"
                          ui_ctk:TextBoxExtensions.Mask="DD"
-                         Text="{x:Bind EditDLNK.OwnshipCallsign, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         Text="{x:Bind EditDLNK.OwnshipCallsignUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          LostFocus="OwnText_LostFocus"/>
                 <TextBox MinWidth="44" Margin="6,0,0,0"
                          x:Name="uiOwnTextFENum"
@@ -101,7 +101,7 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.Regex="^[1-9]{0,2}$"
                          ui_ctk:TextBoxExtensions.CustomMask="D:[1-9]"
                          ui_ctk:TextBoxExtensions.Mask="DD"
-                         Text="{x:Bind EditDLNK.OwnshipFENumber, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         Text="{x:Bind EditDLNK.OwnshipFENumberUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          LostFocus="OwnText_LostFocus"/>
                 <CheckBox Width="48" Margin="24,2,0,0"
                           x:Name="uiOwnCkbxLead"
