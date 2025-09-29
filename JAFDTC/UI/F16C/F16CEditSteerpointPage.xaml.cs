@@ -70,6 +70,29 @@ namespace JAFDTC.UI.F16C
     {
         // ------------------------------------------------------------------------------------------------------------
         //
+        // internal classes
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// specialization of the SteerpointInfo class to include ui views of several parameters.
+        /// </summary>
+        internal partial class SteerpointInfoUI : SteerpointInfo
+        {
+            private string _tosUI;                      // "HH:MM:SS", HH = [00,24), MM on [00,59), SS on [00,59)
+            public string TOSUI
+            {
+                get => _tosUI;
+                set
+                {
+                    TOS = (value != "––:––:––") ? value : "";
+                    _tosUI = TOS;
+                }
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
         // properties
         //
         // ------------------------------------------------------------------------------------------------------------
@@ -82,7 +105,7 @@ namespace JAFDTC.UI.F16C
         //
         private F16CConfiguration Config { get; set; }
 
-        private SteerpointInfo EditStpt { get; set; }
+        private SteerpointInfoUI EditStpt { get; set; }
 
         private int EditStptIndex { get; set; }
 
@@ -148,14 +171,14 @@ namespace JAFDTC.UI.F16C
                 ["LonUI"] = uiStptValueLon,
                 ["TOS"] = uiStptValueTOS
             };
-            _oap0FieldTitles = new List<TextBlock>()
-            {
+            _oap0FieldTitles = 
+            [
                 uiStptOAP0TextTitle
-            };
-            _oap1FieldTitles = new List<TextBlock>()
-            {
+            ];
+            _oap1FieldTitles =
+            [
                 uiStptOAP1TextTitle
-            };
+            ];
             _oap0FieldValueMap = new Dictionary<string, TextBox>()
             {
                 ["Range"] = uiStptOAPValueRange0, ["Brng"] = uiStptOAPValueBrng0, ["Elev"] = uiStptOAPValueElev0,
@@ -164,10 +187,10 @@ namespace JAFDTC.UI.F16C
             {
                 ["Range"] = uiStptOAPValueRange1, ["Brng"] = uiStptOAPValueBrng1, ["Elev"] = uiStptOAPValueElev1
             };
-            _vxpFieldTitles = new List<TextBlock>()
-            {
+            _vxpFieldTitles =
+            [
                 uiStptVxP0TextTitle, uiStptVxP1TextTitle
-            };
+            ];
             _vxp0FieldValueMap = new Dictionary<string, TextBox>()
             {
                 ["Range"] = uiStptVxPValueRange0, ["Brng"] = uiStptVxPValueBrng0, ["Elev"] = uiStptVxPValueElev0,
@@ -199,7 +222,7 @@ namespace JAFDTC.UI.F16C
             EditStpt.LatUI = Coord.ConvertFromLatDD(stptSrc.Lat, LLFormat.DDM_P3ZF);
             EditStpt.LonUI = Coord.ConvertFromLonDD(stptSrc.Lon, LLFormat.DDM_P3ZF);
             EditStpt.Alt = new(stptSrc.Alt);
-            EditStpt.TOS = new(stptSrc.TOS);
+            EditStpt.TOSUI = new(stptSrc.TOS);
 
             for (int i = 0; i < EditStpt.OAP.Length; i++)
             {
@@ -230,11 +253,7 @@ namespace JAFDTC.UI.F16C
                 stptDst.Lat = EditStpt.Lat;
                 stptDst.Lon = EditStpt.Lon;
                 stptDst.Alt = EditStpt.Alt;
-                //
-                // TOS field uses text mask and can come back as "--:--:--" when empty. this is really "" and, since
-                // that value is OK, remove the error.
-                //
-                stptDst.TOS = (EditStpt.TOS == "––:––:––") ? "" : EditStpt.TOS;
+                stptDst.TOS = EditStpt.TOS;
 
                 for (int i = 0; i < EditStpt.OAP.Length; i++)
                 {
@@ -250,9 +269,7 @@ namespace JAFDTC.UI.F16C
                 }
 
                 if (isPersist)
-                {
                     Config.Save(NavArgs.ParentEditor, STPTSystem.SystemTag);
-                }
             }
         }
 
@@ -277,7 +294,7 @@ namespace JAFDTC.UI.F16C
 
         private void ValidateAllFields(Dictionary<string, TextBox> fields, IEnumerable errors)
         {
-            Dictionary<string, bool> map = new();
+            Dictionary<string, bool> map = [ ];
             foreach (string error in errors)
                 map[error] = true;
             foreach (KeyValuePair<string, TextBox> kvp in fields)
@@ -293,8 +310,8 @@ namespace JAFDTC.UI.F16C
             else
             {
                 List<string> errors = (List<string>)obj.GetErrors(propertyName);
-                if (fields.ContainsKey(propertyName))
-                    SetFieldValidState(fields[propertyName], (errors.Count == 0));
+                if (fields.TryGetValue(propertyName, out TextBox value))
+                    SetFieldValidState(value, (errors.Count == 0));
             }
             RebuildInterfaceState();
         }
@@ -330,19 +347,7 @@ namespace JAFDTC.UI.F16C
         /// </summary>
         private void EditStpt_DataValidationError(object sender, DataErrorsChangedEventArgs args)
         {
-            if ((args.PropertyName == "TOS") && (EditStpt.TOS == "––:––:––"))
-            {
-                // TOS field uses text mask and can come back as "--:--:--" when empty. this is really "" and, since
-                // that value is OK, remove the error.
-                //
-                EditStpt.ClearErrors("TOS");
-                TextBox field = (TextBox)_curStptFieldValueMap[args.PropertyName];
-                SetFieldValidState(field, true);
-            }
-            else
-            {
-                CoreDataValidationError(EditStpt, args.PropertyName, _curStptFieldValueMap);
-            }
+            CoreDataValidationError(EditStpt, args.PropertyName, _curStptFieldValueMap);
         }
 
         /// <summary>
@@ -421,10 +426,7 @@ namespace JAFDTC.UI.F16C
             };
             bool isNone = (combo.SelectedIndex == 0);
             foreach (TextBlock title in titles)
-            {
-                title.Style = (Style)((isNone) ? Resources["DisabledStaticTextStyle"]
-                                               : Resources["EnabledStaticTextStyle"]);
-            }
+                title.Style = (Style)((isNone) ? Resources["DisabledStaticTextStyle"] : Resources["EnabledStaticTextStyle"]);
             if (rpType == RefPointTypes.VRP)
             {
                 uiStptVxPRngTextHeader.Text = "Range (ft)";
@@ -544,7 +546,6 @@ namespace JAFDTC.UI.F16C
         {
             IsCancelInFlight = true;
         }
-
 
         // ---- poi management ----------------------------------------------------------------------------------------
 

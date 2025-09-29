@@ -285,7 +285,7 @@ https://www.gnu.org/licenses/.
                 <TextBox Grid.Row="0" Grid.Column="4" Margin="24,0,0,0" x:Name="uiStptValueTOS"
                          Tag="TOS"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"
-                         Text="{x:Bind EditStpt.TOS, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         Text="{x:Bind EditStpt.TOSUI, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ui_ctk:TextBoxExtensions.MaskPlaceholder="–"
                          ui_ctk:TextBoxExtensions.Regex="^([0-1][0-9]\:[0-5][0-9]\:[0-5][0-9])|(2[0-3]\:[0-5][0-9]\:[0-5][0-9])$"
                          ui_ctk:TextBoxExtensions.Mask="99:99:99"
