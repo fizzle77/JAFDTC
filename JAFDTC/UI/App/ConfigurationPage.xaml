@@ -108,6 +108,7 @@ https://www.gnu.org/licenses/.
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!-- Style="{StaticResource NavigationBackButtonSmallStyle}" -->
@@ -117,7 +118,7 @@ https://www.gnu.org/licenses/.
                           VerticalAlignment="Center"
                           IsEnabled="True"
                           Click="HdrBtnBack_Click"
-                          ToolTipService.ToolTip="Return to Configuration List">
+                          ToolTipService.ToolTip="Return to configuration list">
                 <SymbolIcon Symbol="Back"/>
             </AppBarButton>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0">
@@ -136,13 +137,21 @@ https://www.gnu.org/licenses/.
                     FIXUP: Config Name
                 </TextBlock>
             </StackPanel>
-            <TextBlock Grid.Column="2" Margin="0,0,16,0"
+            <TextBlock Grid.Column="2" Margin="0,0,4,0"
                        x:Name="uiNavTxtAirframeName"
                        Style="{StaticResource TableHeaderTextStyle}"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Right">
-                FIXUP - Airframe Name
+                FIXUP: Airframe Name
             </TextBlock>
+            <AppBarButton Grid.Column="3" Height="48" Margin="8,2,0,0"
+                          x:Name="uiHdrBtnExport"
+                          VerticalAlignment="Center"
+                          IsEnabled="True"
+                          Click="HdrBtnExport_Click"
+                          ToolTipService.ToolTip="Export configuration to file">
+                <SymbolIcon Symbol="Upload"/>
+            </AppBarButton>
         </Grid>
 
         <!--

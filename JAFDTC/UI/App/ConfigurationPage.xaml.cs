@@ -25,10 +25,12 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.Windows.Storage.Pickers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Windows.Storage;
 using Windows.UI;
 
 namespace JAFDTC.UI.App
@@ -226,6 +228,37 @@ namespace JAFDTC.UI.App
         private void HdrBtnBack_Click(object sender, RoutedEventArgs args)
         {
             Frame.GoBack();
+        }
+
+        /// <summary>
+        /// export button: prompt for a filename, serialize the selected configuration to json, and write it to the
+        /// specified file.
+        /// </summary>
+        private async void HdrBtnExport_Click(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                FileSavePicker picker = new((Application.Current as JAFDTC.App).Window.AppWindow.Id)
+                {
+                    // SettingsIdentifier = "JAFDTC_ExportCfg",
+                    CommitButtonText = "Export Configuration",
+                    SuggestedStartLocation = PickerLocationId.Desktop,
+                    SuggestedFileName = "Configuration"
+                };
+                picker.FileTypeChoices.Add("JSON", [".json"]);
+
+                PickFileResult resultPick = await picker.PickSaveFileAsync();
+                if (resultPick != null)
+                {
+                    StorageFile file = await StorageFile.GetFileFromPathAsync(resultPick.Path);
+                    await FileIO.WriteTextAsync(file, Config.Serialize());
+                }
+            }
+            catch (Exception ex)
+            {
+                FileManager.Log($"ConfigurationListPage:CmdExport_Click exception {ex}");
+                await Utilities.Message1BDialog(Content.XamlRoot, "Export Failed", "Unable to export the configuration.");
+            }
         }
 
         /// <summary>
