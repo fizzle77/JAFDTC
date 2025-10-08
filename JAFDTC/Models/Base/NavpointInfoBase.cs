@@ -137,9 +137,9 @@ namespace JAFDTC.Models.Base
                                         string.IsNullOrEmpty(_lon));
 
         [JsonIgnore]
-        public virtual string Location => ((string.IsNullOrEmpty(Lat)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LatUI)) + ", " +
-                                          ((string.IsNullOrEmpty(Lon)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LonUI)) + " / " +
-                                          ((string.IsNullOrEmpty(Alt)) ? "Unknown" : Alt + "’");
+        public virtual string LocationUI => ((string.IsNullOrEmpty(Lat)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LatUI)) + ", " +
+                                            ((string.IsNullOrEmpty(Lon)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LonUI)) + " / " +
+                                            ((string.IsNullOrEmpty(Alt)) ? "Unknown" : Alt + "’");
 
         // ------------------------------------------------------------------------------------------------------------
         //

@@ -4,7 +4,7 @@
     
 EditNavpointListPage.cs : ui xaml for general navigation point list editor page
 
-Copyright(C) 2023-24 ilominar/raven
+Copyright(C) 2023-25 ilominar/raven
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -163,7 +163,7 @@ https://www.gnu.org/licenses/.
                             <TextBlock Grid.Column="2" Margin="6,0,0,0"
                                        VerticalAlignment="Center"
                                        HorizontalTextAlignment="Center"
-                                       Text="{x:Bind Location}"/>
+                                       Text="{x:Bind LocationUI}"/>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
