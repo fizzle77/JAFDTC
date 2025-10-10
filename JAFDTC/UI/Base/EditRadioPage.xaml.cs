@@ -363,6 +363,11 @@ namespace JAFDTC.UI.Base
                 RadioPresetItem item = (RadioPresetItem)sender;
                 item.ModulationItems = PageHelper.RadioModulationItems(EditRadio, item.Frequency);
                 item.ModulationIndex = ModulationIndexForModulation(item);
+
+                // Binding doesn't correctly update the selection here, but doing it manually seems to work.
+                Grid gridRow = Utilities.FindControl<Grid>(uiPreListView, typeof(Grid), item.Tag);
+                ComboBox cb = Utilities.FindControl<ComboBox>(gridRow, typeof(ComboBox), "Modulation");
+                if (cb != null) cb.SelectedIndex = ModulationIndexForModulation(item);
             }
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
