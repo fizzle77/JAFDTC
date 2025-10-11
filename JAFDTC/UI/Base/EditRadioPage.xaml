@@ -149,10 +149,9 @@ https://www.gnu.org/licenses/.
                                      Text="{x:Bind Frequency, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                             <ComboBox Grid.Column="2" Width="72" Margin="6,1,0,0"
                                       Tag="Modulation"
-                                      Visibility="{x:Bind ModulationVisibility, Mode=OneWay}"
-                                      ItemsSource="{Binding ModulationItems, Mode=OneWay}"
-                                      SelectedIndex="{x:Bind ModulationIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      SelectionChanged="PreListModCombo_SelectionChanged"/>
+                                      Visibility="{x:Bind ModulationVisibility, Mode=OneTime}"
+                                      ItemsSource="{x:Bind ModulationItems, Mode=OneWay}"
+                                      SelectedIndex="{x:Bind ModulationIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="3" Margin="6,0,0,0"
                                      VerticalAlignment="Center"
                                      HorizontalTextAlignment="Center"

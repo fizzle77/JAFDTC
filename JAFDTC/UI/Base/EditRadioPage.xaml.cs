@@ -364,10 +364,12 @@ namespace JAFDTC.UI.Base
                 item.ModulationItems = PageHelper.RadioModulationItems(EditRadio, item.Frequency);
                 item.ModulationIndex = ModulationIndexForModulation(item);
 
-                // Binding doesn't correctly update the selection here, but doing it manually seems to work.
+                // For some reason the binding doesn't correctly update the selection
+                // when we change the property above, so we do it manually here.
                 Grid gridRow = Utilities.FindControl<Grid>(uiPreListView, typeof(Grid), item.Tag);
                 ComboBox cb = Utilities.FindControl<ComboBox>(gridRow, typeof(ComboBox), "Modulation");
-                if (cb != null) cb.SelectedIndex = ModulationIndexForModulation(item);
+                if (cb != null)
+                    cb.SelectedIndex = ModulationIndexForModulation(item);
             }
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
@@ -417,11 +419,16 @@ namespace JAFDTC.UI.Base
             }
 
             RadioPresetItem newItem = new(PageHelper, EditItemTag++, radio);
-            newItem.ErrorsChanged += PreField_DataValidationError;
-            newItem.PropertyChanged += PreField_PropertyChanged;
             newItem.Preset = newPreset.ToString();
             newItem.Frequency = PageHelper.RadioDefaultFrequency(radio);
             newItem.ModulationItems = PageHelper.RadioModulationItems(radio, newItem.Frequency);
+            if (newItem.ModulationItems != null && newItem.ModulationItems.Count > 0)
+            {
+                newItem.Modulation = newItem.ModulationItems[0].ToString();
+                newItem.ModulationIndex = ModulationIndexForModulation(newItem);
+            }
+            newItem.ErrorsChanged += PreField_DataValidationError;
+            newItem.PropertyChanged += PreField_PropertyChanged;
             EditPresets.Insert(newIndex, newItem);
         }
 
@@ -432,9 +439,7 @@ namespace JAFDTC.UI.Base
         {
             List<RadioPresetItem> sortableList = new(EditPresets);
             sortableList.Sort((a, b) => int.Parse(a.Preset).CompareTo(int.Parse(b.Preset)));
-            EditPresets = new ObservableCollection<RadioPresetItem>();
-            for (int i = 0; i < sortableList.Count; i++)
-                EditPresets.Add(sortableList[i]);
+            EditPresets = new ObservableCollection<RadioPresetItem>(sortableList);
         }
 
         /// <summary>
@@ -660,20 +665,6 @@ namespace JAFDTC.UI.Base
             if (item != null)
             {
                 EditPresets.Remove(item);
-                SaveEditStateToConfig();
-            }
-        }
-
-        /// <summary>
-        /// preset modulation combo selection changed: update the edit state and update the configuration.
-        /// </summary>
-        private void PreListModCombo_SelectionChanged(object sender, SelectionChangedEventArgs args)
-        {
-            ComboBox cbox = (ComboBox)sender;
-            RadioPresetItem item = FindPresetItemByTag(((Grid)cbox.Parent).Tag);
-            if ((item != null) && (cbox.SelectedIndex != -1))
-            {
-                item.ModulationIndex = cbox.SelectedIndex;
                 SaveEditStateToConfig();
             }
         }
