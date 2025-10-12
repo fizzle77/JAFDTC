@@ -18,6 +18,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
+using JAFDTC.Models.A10C;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.FA18C;
 using JAFDTC.Models.M2000C;
@@ -39,7 +40,7 @@ namespace JAFDTC.UI.M2000C
     /// helper class for EditNavpointListPage that implements IEditNavpointListPageHelper. this handles the
     /// specialization of the generate navpoint list page for the m-2000c airframe.
     /// </summary>
-    internal class M2000CEditWaypointListHelper : IEditNavpointListPageHelper
+    internal class M2000CEditWaypointListHelper : EditWaypointListHelperBase
     {
         public static ConfigEditorPageInfo PageInfo
             => new(WYPTSystem.SystemTag, "Waypoints", "WYPT", Glyphs.WYPT,
@@ -51,17 +52,13 @@ namespace JAFDTC.UI.M2000C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public string SystemTag => WYPTSystem.SystemTag;
+        public override string SystemTag => WYPTSystem.SystemTag;
 
-        public string NavptListTag => WYPTSystem.WYPTListTag;
+        public override string NavptListTag => WYPTSystem.WYPTListTag;
 
-        public AirframeTypes AirframeType => AirframeTypes.M2000C;
+        public override AirframeTypes AirframeType => AirframeTypes.M2000C;
 
-        public string NavptName => "Waypoint";
-
-        public Type NavptEditorType => typeof(EditNavpointPage);
-
-        public int NavptMaxCount => 10;
+        public override int NavptMaxCount => 10;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -69,9 +66,9 @@ namespace JAFDTC.UI.M2000C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public void SetupUserInterface(IConfiguration config, ListView listView) { }
+        public override int NavptCurrentCount(IConfiguration config) => ((M2000CConfiguration)config).WYPT.Count;
 
-        public void CopyConfigToEdit(IConfiguration config, ObservableCollection<INavpointInfo> edit)
+        public override void CopyConfigToEdit(IConfiguration config, ObservableCollection<INavpointInfo> edit)
         {
             M2000CConfiguration a10cConfig = (M2000CConfiguration)config;
             edit.Clear();
@@ -81,43 +78,62 @@ namespace JAFDTC.UI.M2000C
             }
         }
 
-        public bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config)
+        public override bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config)
         {
-            M2000CConfiguration a10cConfig = (M2000CConfiguration)config;
-            a10cConfig.WYPT.Points.Clear();
+            M2000CConfiguration m2kConfig = (M2000CConfiguration)config;
+            m2kConfig.WYPT.Points.Clear();
             foreach (WaypointInfo wypt in edit.Cast<WaypointInfo>())
             {
-                a10cConfig.WYPT.Points.Add(new WaypointInfo(wypt));
+                m2kConfig.WYPT.Points.Add(new WaypointInfo(wypt));
             }
             return true;
         }
 
-        public INavpointSystemImport NavptSystem(IConfiguration config)
+        public override void AppendFromPOIsToConfig(IEnumerable<Models.DCS.PointOfInterest> pois, IConfiguration config)
+        {
+            M2000CConfiguration m2kConfig = (M2000CConfiguration)config;
+            ObservableCollection<WaypointInfo> points = m2kConfig.WYPT.Points;
+            int startNumber = (points.Count == 0) ? 1 : points[^1].Number + 1;
+            foreach (Models.DCS.PointOfInterest poi in pois)
+            {
+                WaypointInfo wypt = new()
+                {
+                    Number = startNumber++,
+                    Name = poi.Name,
+                    Lat = poi.Latitude,
+                    Lon = poi.Longitude,
+                    Alt = poi.Elevation
+                };
+                m2kConfig.WYPT.Points.Add(new WaypointInfo(wypt));
+            }
+        }
+
+        public override INavpointSystemImport NavptSystem(IConfiguration config)
         {
             return ((M2000CConfiguration)config).WYPT;
         }
 
-        public void ResetSystem(IConfiguration config)
+        public override void ResetSystem(IConfiguration config)
         {
             ((M2000CConfiguration)config).WYPT.Reset();
         }
 
-        public void AddNavpoint(IConfiguration config)
+        public override void AddNavpoint(IConfiguration config)
         {
             ((M2000CConfiguration)config).WYPT.Add();
         }
 
-        public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
+        public override bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
         {
             return ((M2000CConfiguration)config).WYPT.ImportSerializedNavpoints(cbData, isReplace);
         }
 
-        public string ExportNavpoints(IConfiguration config)
+        public override string ExportNavpoints(IConfiguration config)
         {
             return ((M2000CConfiguration)config).WYPT.SerializeNavpoints();
         }
 
-        public void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
+        public override void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
         {
             WYPTSystem wyptSys = ((M2000CConfiguration)config).WYPT;
             for (int i = 0; i < wypts.Length; i++)
@@ -145,7 +161,7 @@ namespace JAFDTC.UI.M2000C
             }
         }
 
-        public object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt)
+        public override object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));
             return new EditNavptPageNavArgs(parentEditor, config, indexNavpt, isUnlinked, typeof(M2000CEditWaypointHelper));

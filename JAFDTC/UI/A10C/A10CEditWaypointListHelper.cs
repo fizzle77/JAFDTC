@@ -36,7 +36,7 @@ namespace JAFDTC.UI.A10C
     /// <summary>
     /// TODO: docuemnt
     /// </summary>
-    internal class A10CEditWaypointListHelper : IEditNavpointListPageHelper
+    internal class A10CEditWaypointListHelper : EditWaypointListHelperBase
     {
         public static ConfigEditorPageInfo PageInfo
             => new(WYPTSystem.SystemTag, "Waypoints", "WYPT", Glyphs.WYPT,
@@ -48,18 +48,14 @@ namespace JAFDTC.UI.A10C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public string SystemTag => WYPTSystem.SystemTag;
+        public override string SystemTag => WYPTSystem.SystemTag;
 
-        public string NavptListTag => WYPTSystem.WYPTListTag;
+        public override string NavptListTag => WYPTSystem.WYPTListTag;
 
-        public AirframeTypes AirframeType => AirframeTypes.A10C;
-
-        public string NavptName => "Waypoint";
-
-        public Type NavptEditorType => typeof(EditNavpointPage);
+        public override AirframeTypes AirframeType => AirframeTypes.A10C;
 
         // TODO: validate maximum navpoint count
-        public int NavptMaxCount => int.MaxValue;
+        public override int NavptMaxCount => int.MaxValue;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -67,12 +63,9 @@ namespace JAFDTC.UI.A10C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // TODO: document
-        public void SetupUserInterface(IConfiguration config, ListView listView)
-        {
-        }
+        public override int NavptCurrentCount(IConfiguration config) => ((A10CConfiguration)config).WYPT.Count;
 
-        public void CopyConfigToEdit(IConfiguration config, ObservableCollection<INavpointInfo> edit)
+        public override void CopyConfigToEdit(IConfiguration config, ObservableCollection<INavpointInfo> edit)
         {
             A10CConfiguration a10cConfig = (A10CConfiguration)config;
             edit.Clear();
@@ -82,7 +75,7 @@ namespace JAFDTC.UI.A10C
             }
         }
 
-        public bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config)
+        public override bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config)
         {
             A10CConfiguration a10cConfig = (A10CConfiguration)config;
             a10cConfig.WYPT.Points.Clear();
@@ -93,32 +86,51 @@ namespace JAFDTC.UI.A10C
             return true;
         }
 
-        public INavpointSystemImport NavptSystem(IConfiguration config)
+        public override void AppendFromPOIsToConfig(IEnumerable<Models.DCS.PointOfInterest> pois, IConfiguration config)
+        {
+            A10CConfiguration a10cConfig = (A10CConfiguration)config;
+            ObservableCollection<WaypointInfo> points = a10cConfig.WYPT.Points;
+            int startNumber = (points.Count == 0) ? 1 : points[^1].Number + 1;
+            foreach (Models.DCS.PointOfInterest poi in pois)
+            {
+                WaypointInfo wypt = new()
+                {
+                    Number = startNumber++,
+                    Name = poi.Name,
+                    Lat = poi.Latitude,
+                    Lon = poi.Longitude,
+                    Alt = poi.Elevation
+                };
+                a10cConfig.WYPT.Points.Add(new WaypointInfo(wypt));
+            }
+        }
+
+        public override INavpointSystemImport NavptSystem(IConfiguration config)
         {
             return ((A10CConfiguration)config).WYPT;
         }
 
-        public void ResetSystem(IConfiguration config)
+        public override void ResetSystem(IConfiguration config)
         {
             ((A10CConfiguration)config).WYPT.Reset();
         }
 
-        public void AddNavpoint(IConfiguration config)
+        public override void AddNavpoint(IConfiguration config)
         {
             ((A10CConfiguration)config).WYPT.Add();
         }
 
-        public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
+        public override bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
         {
             return ((A10CConfiguration)config).WYPT.ImportSerializedNavpoints(cbData, isReplace);
         }
 
-        public string ExportNavpoints(IConfiguration config)
+        public override string ExportNavpoints(IConfiguration config)
         {
             return ((A10CConfiguration)config).WYPT.SerializeNavpoints();
         }
 
-        public void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
+        public override void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
         {
             WYPTSystem wyptSys = ((A10CConfiguration)config).WYPT;
             for (int i = 0; i < wypts.Length; i++)
@@ -146,7 +158,7 @@ namespace JAFDTC.UI.A10C
             }
         }
 
-        public object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt)
+        public override object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));
             return new EditNavptPageNavArgs(parentEditor, config, indexNavpt, isUnlinked, typeof(A10CEditWaypointHelper));
