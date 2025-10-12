@@ -47,7 +47,11 @@ namespace JAFDTC.Utilities
         {
             MediaPlayer mediaPlayer = new()
             {
-                Source = MediaSource.CreateFromUri(new Uri($"ms-appx:///Audio/{filename}"))
+                // Works in dev environment, but not in deployed app, where no "AppX" folder is created.
+                //Source = MediaSource.CreateFromUri(new Uri($"ms-appx:///Audio/{filename}"))
+
+                // Should work in both dev and deployed app.
+                Source = MediaSource.CreateFromUri(new Uri(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Audio", filename)))
             };
             mediaPlayer.Play();
         }
