@@ -48,7 +48,7 @@ namespace JAFDTC.UI.App
     /// item class for an item in the point of interest list view. this provides ui-friendly views of properties
     /// suitable for display in the ui via bindings.
     /// </summary>
-    internal class PoIListItem
+    public class PoIListItem
     {
         public PointOfInterest PoI { get; set; }
 

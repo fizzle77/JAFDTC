@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+**********************************************************************************************************************
+    
+AddNavpointsFromPOIsPage.xaml : ui xaml point of interest navpoint addition
+Copyright(C) 2023-5 ilominar/raven, fizzle
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+You should have received a copy of the GNU General Public License along with this program.  If not, see
+https://www.gnu.org/licenses/.
+
+    {ThemeResource SystemAccentColor}
+    
+**********************************************************************************************************************
+-->
+<Page
+    x:Class="JAFDTC.UI.Base.AddNavpointsFromPOIsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JAFDTC.UI.App"
+    xmlns:ui_ctk="using:CommunityToolkit.WinUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+
+        <!-- brush for error fields. -->
+        <SolidColorBrush x:Key="ErrorFieldBorderBrush" Color="DarkRed"/>
+        <SolidColorBrush x:Key="ErrorFieldBackgroundBrush" Color="PaleVioletRed"/>
+
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--
+        ===============================================================================================================
+        row 0 : controls
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="0"
+              HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- poi search box -->
+            <AutoSuggestBox Grid.Column="0" Width="375" x:Name="uiPoINameFilterBox"
+                            VerticalAlignment="Center"
+                            PlaceholderText="Filter Points of Interest by Name"
+                            QueryIcon="Find"
+                            TextChanged="PoINameFilterBox_TextChanged"
+                            QuerySubmitted="PoINameFilterBox_QuerySubmitted"/>
+
+            <!-- command bar -->
+            <CommandBar Grid.Column="1" Margin="6,0,0,0"
+                        HorizontalAlignment="Left" VerticalAlignment="Center">
+                <AppBarToggleButton x:Name="uiBarBtnFilter" Label="Filter Points"
+                                    Click="CmdFilter_Click"
+                                    ToolTipService.ToolTip="Set filter to apply to points of interest">
+                    <AppBarToggleButton.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE71C;"/>
+                    </AppBarToggleButton.Icon>
+                </AppBarToggleButton>
+                <AppBarSeparator/>
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton x:Name="uiBarBtnCoords" Label="Coordinate Format"
+                                  Click="CmdCoords_Click"
+                                  ToolTipService.ToolTip="Select format for coordinates">
+                        <AppBarButton.Icon>
+                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE909;"/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                </CommandBar.SecondaryCommands>
+            </CommandBar>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 1 : list and header
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="1" Margin="0,6,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="0" Margin="16,0,12,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="24"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="110"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="1" Margin="0,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}">
+                    Theater
+                </TextBlock>
+                <TextBlock Grid.Column="2" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Left"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Point of Interest Name and Tags"/>
+                <TextBlock Grid.Column="3" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Latitude"/>
+                <TextBlock Grid.Column="4" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Longitude"/>
+                <TextBlock Grid.Column="5" Margin="6,0,0,0"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource TableHeaderTextStyle}"
+                           Text="Elevation (ft)"/>
+            </Grid>
+
+            <ListView Grid.Row="1" x:Name="uiPoIListView"
+                      SelectionMode="Extended"
+                      SelectionChanged="uiPoIListView_SelectionChanged"
+                      ItemsSource="{x:Bind CurPoIItems}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:PoIListItem">
+                        <Grid Margin="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="130"/>
+                                <ColumnDefinition Width="130"/>
+                                <ColumnDefinition Width="110"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       FontFamily="Segoe Fluent Icons"
+                                       Text="{x:Bind Glyph}"/>
+                            <TextBlock Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind PoI.Theater, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                            <StackPanel Grid.Column="2"
+                                        VerticalAlignment="Center">
+                                <TextBlock HorizontalTextAlignment="Left"
+                                           FontSize="16"
+                                           FontWeight="Medium"
+                                           Text="{x:Bind PoI.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                                <TextBlock HorizontalTextAlignment="Left"
+                                           FontSize="12"
+                                           FontStyle="Italic"
+                                           Foreground="{StaticResource TextFillColorTertiary}"
+                                           Text="{x:Bind TagsUI}">
+                                </TextBlock>
+                            </StackPanel>
+                            <TextBlock Grid.Column="3" Margin="6,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind LatUI}"/>
+                            <TextBlock Grid.Column="4" Margin="6,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind LonUI}"/>
+                            <TextBlock Grid.Column="5" Margin="6,0,0,0"
+                                       VerticalAlignment="Center"
+                                       HorizontalTextAlignment="Center"
+                                       Text="{x:Bind PoI.Elevation, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+
+        <!--
+        ===============================================================================================================
+        row 2 : buttons
+        ===============================================================================================================
+        -->
+        <Grid Grid.Row="2" Margin="24,12,24,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="110"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="3" Margin="20,0,0,0" x:Name="uiAcceptBtnCancel"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Click="AcceptBtnCancel_Click"
+                    ToolTipService.ToolTip="Return to navpoint editor without adding POIs">
+                Cancel
+            </Button>
+            <Button Grid.Column="4" Margin="20,0,0,0" x:Name="uiAcceptBtnOK"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Click="AcceptBtnOk_Click"
+                    ToolTipService.ToolTip="Append all listed POIs as navpoints">
+                Append All
+            </Button>
+        </Grid>
+
+    </Grid>
+</Page>
