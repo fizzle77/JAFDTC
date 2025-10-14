@@ -2,7 +2,7 @@
 //
 // IEditNavpointListHelper.cs : interface for EditNavPointListPage helper classes
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -19,6 +19,7 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
+using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.ObjectModel;
@@ -53,6 +54,11 @@ namespace JAFDTC.UI.Base
         /// string should be singular and capitalized.
         /// </summary>
         public string NavptName { get; }
+
+        /// <summary>
+        /// return the coordinate format used by navpoints in the navigation system.
+        /// </summary>
+        public LLFormat NavptCoordFmt { get; }
 
         /// <summary>
         /// return the type of the class for the editor interface page to use to edit a navpoint.

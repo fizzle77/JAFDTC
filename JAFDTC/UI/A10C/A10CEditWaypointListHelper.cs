@@ -2,7 +2,7 @@
 //
 // A10CEditWaypointListHelper.cs : IEditNavpointListPageHelper for the a-10c configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -17,18 +17,19 @@
 //
 // ********************************************************************************************************************
 
+using JAFDTC.Models;
 using JAFDTC.Models.A10C;
 using JAFDTC.Models.A10C.WYPT;
 using JAFDTC.Models.Base;
-using JAFDTC.Models;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
+using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.A10C
@@ -55,6 +56,8 @@ namespace JAFDTC.UI.A10C
         public AirframeTypes AirframeType => AirframeTypes.A10C;
 
         public string NavptName => "Waypoint";
+
+        public LLFormat NavptCoordFmt => LLFormat.DDM_P3ZF;
 
         public Type NavptEditorType => typeof(EditNavpointPage);
 

@@ -2,7 +2,7 @@
 //
 // F14ABEditWaypointListHelper.cs : IEditNavpointListPageHelper for the f-14a/b configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,15 +18,14 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
-using JAFDTC.Models.A10C;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.F14AB;
 using JAFDTC.Models.F14AB.WYPT;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
+using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -58,6 +57,8 @@ namespace JAFDTC.UI.F14AB
         public AirframeTypes AirframeType => AirframeTypes.F14AB;
 
         public string NavptName => "Waypoint";
+
+        public LLFormat NavptCoordFmt => LLFormat.DDM_P1ZF;
 
         public Type NavptEditorType => typeof(EditNavpointPage);
 

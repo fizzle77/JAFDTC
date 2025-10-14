@@ -2,7 +2,7 @@
 //
 // M2000CEditWaypointListHelper.cs : IEditNavpointListPageHelper for the f-14a/b configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -24,6 +24,7 @@ using JAFDTC.Models.M2000C;
 using JAFDTC.Models.M2000C.WYPT;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
+using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -58,6 +59,8 @@ namespace JAFDTC.UI.M2000C
         public AirframeTypes AirframeType => AirframeTypes.M2000C;
 
         public string NavptName => "Waypoint";
+
+        public LLFormat NavptCoordFmt => LLFormat.DDM_P3ZF;
 
         public Type NavptEditorType => typeof(EditNavpointPage);
 
