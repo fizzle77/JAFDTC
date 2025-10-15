@@ -30,7 +30,7 @@ namespace JAFDTC.Models.F16C.STPT
     /// <summary>
     /// TODO: document
     /// </summary>
-    public class STPTSystem : NavpointSystemBase<SteerpointInfo>
+    public partial class STPTSystem : NavpointSystemBase<SteerpointInfo>
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -64,7 +64,7 @@ namespace JAFDTC.Models.F16C.STPT
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public STPTSystem() => (Points) = (new ObservableCollection<SteerpointInfo>());
+        public STPTSystem() => (Points) = ([]);
 
         public STPTSystem(STPTSystem other) => (Points) = (new ObservableCollection<SteerpointInfo>(other.Points));
 
@@ -83,7 +83,7 @@ namespace JAFDTC.Models.F16C.STPT
         /// 
         /// NOTE: this computation is not exact as it assumes a perfect sphere while dcs doesn't.
         /// </summary>
-        private string StptRange(SteerpointInfo stptA, SteerpointInfo stptB, bool isFeet)
+        private static string StptRange(SteerpointInfo stptA, SteerpointInfo stptB, bool isFeet)
         {
             double latA = double.Parse(stptA.Lat) * DEG_TO_RAD;
             double lonA = double.Parse(stptA.Lon) * DEG_TO_RAD;
@@ -108,7 +108,7 @@ namespace JAFDTC.Models.F16C.STPT
         /// 
         /// NOTE: this computation is not exact as it assumes a perfect sphere while dcs doesn't.
         /// </summary>
-        private string StptBearing(SteerpointInfo stptA, SteerpointInfo stptB, double magVar)
+        private static string StptBearing(SteerpointInfo stptA, SteerpointInfo stptB, double magVar)
         {
             double latA = double.Parse(stptA.Lat) * DEG_TO_RAD;
             double lonA = double.Parse(stptA.Lon) * DEG_TO_RAD;
@@ -127,7 +127,7 @@ namespace JAFDTC.Models.F16C.STPT
         /// <summary>
         /// TODO: document
         /// </summary>
-        private string StptDeltaElev(SteerpointInfo stptA, SteerpointInfo stptB)
+        private static string StptDeltaElev(SteerpointInfo stptA, SteerpointInfo stptB)
         {
             int elevA = int.Parse(stptA.Alt);
             int elevB = int.Parse(stptB.Alt);
@@ -149,11 +149,11 @@ namespace JAFDTC.Models.F16C.STPT
             {
                 SteerpointInfo stpt = new()
                 {
-                    Name = (navptInfo.ContainsKey("name")) ? navptInfo["name"] : "",
-                    Lat = (navptInfo.ContainsKey("lat")) ? navptInfo["lat"] : "",
-                    Lon = (navptInfo.ContainsKey("lon")) ? navptInfo["lon"] : "",
-                    Alt = (navptInfo.ContainsKey("alt")) ? navptInfo["alt"] : "",
-                    TOS = (navptInfo.ContainsKey("ton")) ? navptInfo["ton"] : ""
+                    Name = (navptInfo.TryGetValue("name", out string valName)) ? valName : "",
+                    Lat = (navptInfo.TryGetValue("lat", out string lat)) ? lat : "",
+                    Lon = (navptInfo.TryGetValue("lon", out string lon)) ? lon : "",
+                    Alt = (navptInfo.TryGetValue("alt", out string alt)) ? alt : "",
+                    TOS = (navptInfo.TryGetValue("ton", out string ton)) ? ton : ""
                 };
                 string name = stpt.Name.ToUpper();
 
@@ -200,12 +200,18 @@ namespace JAFDTC.Models.F16C.STPT
             }
         }
 
-        public override SteerpointInfo Add(SteerpointInfo stpt = null)
+        public override SteerpointInfo Add(SteerpointInfo stpt = null, int atIndex = -1)
         {
             stpt ??= new();
-            stpt.Number = (Points.Count == 0) ? 1 : Points[^1].Number + 1;
+            atIndex = (atIndex >= Points.Count) ? -1 : atIndex;
+            if (Points.Count == 0)
+                stpt.Number = 1;
+            else if (atIndex == -1)
+                stpt.Number = Points[^1].Number + 1;
+            else
+                stpt.Number = Points[atIndex].Number;
             stpt.Name = (string.IsNullOrEmpty(stpt.Name)) ? $"SP{stpt.Number}" : stpt.Name;
-            return base.Add(stpt);
+            return base.Add(stpt, atIndex);
         }
     }
 }
