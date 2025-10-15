@@ -2,7 +2,7 @@
 //
 // Utilities.cs : general user interface utility functions
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -26,7 +26,6 @@ using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -45,6 +44,25 @@ namespace JAFDTC.UI
         private static readonly Regex regexInts = new("^[\\-]{0,1}[0-9]*$");
         // TODO: DEPRECATE
         private static readonly Regex regexTwoNegs = new("[^\\-]*[\\-][^\\-]*[\\-].*");
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // dispatch queue support
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// schedule a lambda on a dispatch queue to fire one or more times. 
+        /// </summary>
+        public static void DispatchAfterDelay(Microsoft.UI.Dispatching.DispatcherQueue queue, double seconds, bool repeats,
+                                              TypedEventHandler<Microsoft.UI.Dispatching.DispatcherQueueTimer, object> lambda)
+        {
+            Microsoft.UI.Dispatching.DispatcherQueueTimer timer = queue.CreateTimer();
+            timer.Interval = TimeSpan.FromSeconds(seconds);
+            timer.IsRepeating = repeats;
+            timer.Tick += lambda;
+            timer.Start();
+        }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -306,11 +324,8 @@ namespace JAFDTC.UI
             for (int i = 0; i < count; i++)
             {
                 DependencyObject current = VisualTreeHelper.GetChild(startNode, i);
-                if (current is T)
-                {
-                    T asType = (T)current;
+                if (current is T asType)
                     results.Add(asType);
-                }
                 FindDescendantControls<T>(results, current);
             }
         }
@@ -323,7 +338,7 @@ namespace JAFDTC.UI
             if ((input == null) || (input.Length < length))
                 return input;
 
-            int iNextSpace = input.LastIndexOf(" ", length);
+            int iNextSpace = input.LastIndexOf(' ', length);
             return string.Format("{0}...", input[..((iNextSpace > 0) ? iNextSpace : length)].Trim());
         }
 
@@ -446,7 +461,7 @@ namespace JAFDTC.UI
                     while (config.SystemLinkedTo(systemTag) != null)
                     {
                         string linkUID = config.SystemLinkedTo(systemTag);
-                        config = (uidToConfigMap.ContainsKey(linkUID)) ? uidToConfigMap[linkUID] : null;
+                        config = (uidToConfigMap.TryGetValue(linkUID, out IConfiguration value)) ? value : null;
                         if ((config == null) || (config.UID == myUID))
                         {
                             config = null;
@@ -473,7 +488,7 @@ namespace JAFDTC.UI
                                                TextBlock uiPageBtnTxtLink, TextBlock uiPageTxtLink)
         {
             string linkedUID = config.SystemLinkedTo(systemTag);
-            if (string.IsNullOrEmpty(linkedUID) || !uidToConfigMap.ContainsKey(linkedUID))
+            if (string.IsNullOrEmpty(linkedUID) || !uidToConfigMap.TryGetValue(linkedUID, out IConfiguration value))
             {
                 uiPageBtnTxtLink.Text = "Link To...";
                 uiPageTxtLink.Text = "";
@@ -482,7 +497,7 @@ namespace JAFDTC.UI
             else
             {
                 uiPageBtnTxtLink.Text = "Unlink From";
-                uiPageTxtLink.Text = TruncateAtWord(uidToConfigMap[linkedUID].Name, 46);
+                uiPageTxtLink.Text = TruncateAtWord(value.Name, 46);
             }
         }
 
