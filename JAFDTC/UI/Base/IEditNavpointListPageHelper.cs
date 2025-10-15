@@ -77,42 +77,46 @@ namespace JAFDTC.UI.Base
         public void SetupUserInterface(IConfiguration config, ListView listView);
 
         /// <summary>
-        /// TODO: document
+        /// update the edit navpoints from the configuration navpoints. the update will perform a deep copy of
+        /// the navpoints from the configuration.
         /// </summary>
         public void CopyConfigToEdit(IConfiguration config, ObservableCollection<INavpointInfo> edit);
 
         /// <summary>
-        /// TODO: document
+        /// update the configuration navpoints from the edit navpoints. the update will perform a deep copy of
+        /// the navpoints from the configuration.
         /// </summary>
         public bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config);
 
         /// <summary>
-        /// TODO: document
+        /// return the navpoint system.
         /// </summary>
         public INavpointSystemImport NavptSystem(IConfiguration config);
 
         /// <summary>
-        /// TODO: document
+        /// reset the navpoint system to its default state.
         /// </summary>
         public void ResetSystem(IConfiguration config);
 
         /// <summary>
-        /// TODO: document
+        /// add a navigation point to the navpoint list in the configuration at the indicated position (default is
+        /// end of list). this updates (but does not save) the configuration. returns index of added navpoint.
         /// </summary>
-        public void AddNavpoint(IConfiguration config);
+        public int AddNavpoint(IConfiguration config, int atIndex = -1);
 
         /// <summary>
-        /// TODO: document
+        /// paste navpoints from the clipboard data. pasted navpoints can replace or append to the current navpoint
+        /// list in the system.
         /// </summary>
         public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false);
 
         /// <summary>
-        /// TODO: document
+        /// return an export string for navpoints.
         /// </summary>
         public string ExportNavpoints(IConfiguration config);
 
         /// <summary>
-        /// TODO: document
+        /// capture navpoints from dcs using the dcs ui.
         /// </summary>
         public void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex);
 

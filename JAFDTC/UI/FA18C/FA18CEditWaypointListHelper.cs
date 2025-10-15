@@ -21,6 +21,7 @@ using JAFDTC.Models;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.FA18C;
 using JAFDTC.Models.FA18C.WYPT;
+using JAFDTC.Models.M2000C;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
 using JAFDTC.Utilities;
@@ -106,9 +107,10 @@ namespace JAFDTC.UI.FA18C
             ((FA18CConfiguration)config).WYPT.Reset();
         }
 
-        public void AddNavpoint(IConfiguration config)
+        public int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
-            ((FA18CConfiguration)config).WYPT.Add();
+            WaypointInfo wypt = ((FA18CConfiguration)config).WYPT.Add(null, atIndex);
+            return ((FA18CConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
 
         public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)

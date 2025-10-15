@@ -104,9 +104,10 @@ namespace JAFDTC.UI.F14AB
             ((F14ABConfiguration)config).WYPT.Reset();
         }
 
-        public void AddNavpoint(IConfiguration config)
+        public int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
-            ((F14ABConfiguration)config).WYPT.Add();
+            WaypointInfo wypt = ((F14ABConfiguration)config).WYPT.Add(null, atIndex);
+            return ((F14ABConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
 
         public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)

@@ -106,9 +106,10 @@ namespace JAFDTC.UI.AV8B
             ((AV8BConfiguration)config).WYPT.Reset();
         }
 
-        public void AddNavpoint(IConfiguration config)
+        public int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
-            ((AV8BConfiguration)config).WYPT.Add();
+            WaypointInfo wypt = ((AV8BConfiguration)config).WYPT.Add(null, atIndex);
+            return ((AV8BConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
 
         public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
