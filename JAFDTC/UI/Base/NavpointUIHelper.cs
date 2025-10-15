@@ -2,7 +2,7 @@
 //
 // NavpointUIHelper.cs : helper classes for navpoint ui
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -30,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Windows.Security.Credentials.UI;
 using Windows.Storage;
 
 namespace JAFDTC.UI.Base
@@ -56,7 +55,7 @@ namespace JAFDTC.UI.Base
         }
 
         public string Glyph => (PoI.Type == PointOfInterestType.USER)
-                           ? "\xE718" : ((PoI.Type == PointOfInterestType.CAMPAIGN) ? "\xE7C1" : "");
+                               ? "\xE718" : ((PoI.Type == PointOfInterestType.CAMPAIGN) ? "\xE7C1" : "");
 
         public PoIListItem(PointOfInterest poi) => (PoI) = (poi);
     }
@@ -98,6 +97,91 @@ namespace JAFDTC.UI.Base
     {
         // ------------------------------------------------------------------------------------------------------------
         //
+        // navpoint location functions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// returns a list of theaters that cover the list of navpoints.
+        /// </summary>
+        public static List<string> TheatersForNavpoints(List<INavpointInfo> navpts)
+        {
+            List<string> theaters = [ ];
+            foreach (INavpointInfo navpt in navpts)
+            {
+// TODO: this is kinda broken, due to overlap coord can be in multiple theaters. fix once we clean things up.
+                string theater = PointOfInterest.TheaterForCoords(navpt.Lat, navpt.Lon);
+                if (!theater.Contains(theater))
+                    theaters.Add(theater);
+            }
+            return theaters;
+        }
+
+        /// <summary>
+        /// propose a location for a new navpoint bast on the current set of navpoints. there are three cases:
+        /// (1) with no navpoints, prompts to select a theater and locates the navpoint in the center of the
+        /// bounds, (2) with one navpoint, places the navpoint slightly to the east, and (3) with two or more
+        /// navpoints, places the navpoint slightly beyond along a line from the next-to-last and last navpoint.
+        /// returns a tuple { lat, lon }, null if the user cancels.
+        /// </summary>
+        public static async Task<Tuple<string, string>> ProposeNewNavptLatLon(XamlRoot root, List<INavpointInfo> navpts)
+        {
+            double lat;
+            double lon;
+
+            if (navpts.Count == 0)
+            {
+                // no navpoints: prompt for a theater then locate the new navpoint in the center of the
+                // area for that theater.
+                //
+                GetListDialog theaterDialog = new(PointOfInterest.Theaters, "Theater", 0, 0)
+                {
+                    XamlRoot = root,
+                    Title = $"Select a Theater for the Navpoint",
+                    PrimaryButtonText = "OK",
+                    CloseButtonText = "Cancel"
+                };
+                ContentDialogResult result = await theaterDialog.ShowAsync(ContentDialogPlacement.Popup);
+                if (result == ContentDialogResult.Primary)
+                {
+                    TheaterBounds bounds = PointOfInterest.TheaterBounds[theaterDialog.SelectedItem];
+                    lat = bounds.LatMin + ((bounds.LatMax - bounds.LatMin) / 2.0);
+                    lon = bounds.LonMin + ((bounds.LonMax - bounds.LonMin) / 2.0);
+                }
+                else
+                {
+                    return null;                                    // EXIT: cancelled, no change...
+                }
+            }
+            else if (navpts.Count == 1)
+            {
+                // single navpoint: proposed new navpoint is a bit east of the existing navpoint.
+                //
+                lat = double.Parse(navpts[0].Lat);
+                lon = double.Parse(navpts[0].Lon) + 0.5;
+            }
+            else
+            {
+                // at least two navpoints: proposed new navpoint is a little bit down the line connecting the
+                // last two navpoints.
+                //
+                double p0Lat = double.Parse(navpts[^1].Lat);
+                double p0Lon = double.Parse(navpts[^1].Lon);
+
+                double p1Lat = double.Parse(navpts[^2].Lat);
+                double p1Lon = double.Parse(navpts[^2].Lon);
+
+                double len = Math.Sqrt(Math.Pow(p1Lat - p0Lat, 2) + Math.Pow(p1Lon - p0Lon, 2));
+
+                lat = p0Lat + ((p0Lat - p1Lat) / len) * 0.5;
+                lon = p0Lon + ((p0Lon - p1Lon) / len) * 0.5;
+            }
+
+            return new Tuple<string, string>($"{lat:F8}", $"{lon:F8}");
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
         // navpoint poi functions
         //
         // ------------------------------------------------------------------------------------------------------------
@@ -108,9 +192,7 @@ namespace JAFDTC.UI.Base
         public static async Task<PoIFilterSpec> FilterSpecDialog(XamlRoot root, PoIFilterSpec spec, ToggleButton button)
         {
             if (button.IsChecked != spec.IsFiltered)
-            {
                 button.IsChecked = spec.IsFiltered;
-            }
 
             GetPoIFilterDialog filterDialog = new(spec.Theater, spec.Campaign, spec.Tags, spec.IncludeTypes)
             {
@@ -148,13 +230,11 @@ namespace JAFDTC.UI.Base
         /// </summary>
         public static List<PoIListItem> RebuildPointsOfInterest(PoIFilterSpec spec, string name = null)
         {
-            List<PoIListItem> suitableItems = new();
+            List<PoIListItem> suitableItems = [ ];
             PointOfInterestDbQuery query = new(spec.IncludeTypes, spec.Theater, null, name, spec.Tags,
                                                PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH);
             foreach (PointOfInterest poi in PointOfInterestDbase.Instance.Find(query, true))
-            {
                 suitableItems.Add(new PoIListItem(poi));
-            }
             return suitableItems;
         }
 
@@ -361,13 +441,9 @@ namespace JAFDTC.UI.Base
                         "Append");
                 }
                 if (result == ContentDialogResult.None)
-                {
                     return false;                                           // exit, flight selection cancelled
-                }
                 if (!importer.Import(navptSys, flightName, (result == ContentDialogResult.Primary), options))
-                {
                     throw new Exception();                                  // exit, import error
-                }
             }
             catch (Exception ex)
             {
