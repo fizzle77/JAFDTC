@@ -120,7 +120,7 @@ namespace JAFDTC.UI.Base
 
         /// <summary>
         /// add a navigation point to the navpoint list in the configuration at the indicated position (default is
-        /// end of list). this updates (but does not save) the configuration.
+        /// end of list). this updates (but does not save) the configuration. returns index of added navpoint.
         /// </summary>
         public int AddNavpoint(IConfiguration config, int atIndex = -1);
     }
