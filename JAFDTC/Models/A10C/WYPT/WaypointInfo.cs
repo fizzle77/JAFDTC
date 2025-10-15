@@ -99,11 +99,6 @@ namespace JAFDTC.Models.A10C.WYPT
                                         IsDecimalFieldValid(Lat, -90.0, 90.0, false) &&
                                         IsDecimalFieldValid(Lon, -180.0, 180.0, false);
 
-        [JsonIgnore]
-        public override string LocationUI => ((string.IsNullOrEmpty(Lat)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LatUI)) + ", " +
-                                             ((string.IsNullOrEmpty(Lon)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LonUI)) + " / " +
-                                             ((string.IsNullOrEmpty(Alt)) ? "Ground" : Alt + "’");
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction

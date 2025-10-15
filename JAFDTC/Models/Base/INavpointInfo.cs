@@ -17,6 +17,8 @@
 //
 // ********************************************************************************************************************
 
+using System.Text.Json.Serialization;
+
 namespace JAFDTC.Models.Base
 {
     /// <summary>
@@ -60,5 +62,13 @@ namespace JAFDTC.Models.Base
         /// navpoint altitude in feet
         /// </summary>
         public string Alt { get; set; }
+
+        /// <summary>
+        /// navpoint location in format appropriate for interface or avionics. returned string is of the
+        /// format "[LatUI], [LonUI] / [Alt]". the setter will always update to match the current state
+        /// of the object, regardless of the provided value.
+        /// </summary>
+        [JsonIgnore]
+        public string LocationUI { get; set; }
     }
 }
