@@ -80,6 +80,10 @@ namespace JAFDTC.Utilities
 
         public LLFormat LastPoICoordFmtSelection { get; set; }
 
+        public string LastWindowSetupMain { get; set; }
+
+        public string LastWindowSetupMap { get; set; }
+
         public string WingName { get; set; }
 
         public string Callsign { get; set; }
@@ -127,6 +131,8 @@ namespace JAFDTC.Utilities
             LastPoIFilterTags = "";
             LastPoIFilterIncludeTypes = PointOfInterestTypeMask.ANY;
             LastPoICoordFmtSelection = LLFormat.DDM_P3ZF;
+            LastWindowSetupMain = "";
+            LastWindowSetupMap = "";
 
             WingName = "";
             Callsign = "";
@@ -455,6 +461,32 @@ namespace JAFDTC.Utilities
                 if (_currentSettings.LastPoICoordFmtSelection != value)
                 {
                     _currentSettings.LastPoICoordFmtSelection = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static string LastWindowSetupMain
+        {
+            get => _currentSettings.LastWindowSetupMain;
+            set
+            {
+                if (_currentSettings.LastWindowSetupMain != value)
+                {
+                    _currentSettings.LastWindowSetupMain = value;
+                    FileManager.WriteSettings(_currentSettings);
+                }
+            }
+        }
+
+        public static string LastWindowSetupMap
+        {
+            get => _currentSettings.LastWindowSetupMap;
+            set
+            {
+                if (_currentSettings.LastWindowSetupMap != value)
+                {
+                    _currentSettings.LastWindowSetupMap = value;
                     FileManager.WriteSettings(_currentSettings);
                 }
             }
