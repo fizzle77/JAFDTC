@@ -197,23 +197,48 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
+        /// returns a list of the names of the dcs theaters that contains the given coordinate, empty list if
+        /// no theater matches the coordinates. the match is based on approximate lat/lon bounds of the theaters.
+        /// note that a coordinate may appear in multiple theaters.
+        /// </summary>
+        public static List<string> TheatersForCoords(double lat, double lon)
+        {
+            List<string> theaters = [ ];
+            foreach (KeyValuePair<string, TheaterBounds> kvp in TheaterBounds)
+                if (kvp.Value.Contains(lat, lon))
+                    theaters.Add(kvp.Key);
+            return theaters;
+        }
+
+        /// <summary>
+        /// returns a list of the names of the dcs theaters that contains the given coordinate, empty list if
+        /// no theater matches the coordinates. the match is based on approximate lat/lon bounds of the theaters.
+        /// note that a coordinate may appear in multiple theaters.
+        /// </summary>
+        public static List<string> TheatersForCoords(string lat, string lon)
+            => TheatersForCoords(double.Parse(lat), double.Parse(lon));
+        
+// TODO: deprecate?
+        /// <summary>
         /// return the name of the dcs theater that contains the given coordinate, null if no theater matches the
         /// coordinates. the match is based on approximate lat/lon bounds of the theaters.
         /// </summary>
         public static string TheaterForCoords(double lat, double lon)
         {
-// TODO: this is kinda broken, theaters in dcs can overlap. return a List<string> instead?
+// TODO: this is kinda broken, theaters in dcs can overlap. use TheatersForCoords instead?
             foreach (KeyValuePair<string, TheaterBounds> kvp in TheaterBounds)
                 if (kvp.Value.Contains(lat, lon))
                     return kvp.Key;
             return null;
         }
 
+// TODO: deprecate?
         /// <summary>
         /// return the name of the dcs theater that contains the given coordinate, null if no theater matches the
         /// coordinates. the match is based on approximate lat/lon bounds of the theaters.
         /// </summary>
         public static string TheaterForCoords(string lat, string lon)
+// TODO: this is kinda broken, theaters in dcs can overlap. use TheatersForCoords instead?
             => TheaterForCoords(double.Parse(lat), double.Parse(lon));
 
         /// <summary>
