@@ -41,9 +41,9 @@ namespace JAFDTC.UI
     /// </summary>
     internal class Utilities
     {
-        // TODO: DEPRECATE
+// TODO: DEPRECATE
         private static readonly Regex regexInts = new("^[\\-]{0,1}[0-9]*$");
-        // TODO: DEPRECATE
+// TODO: DEPRECATE
         private static readonly Regex regexTwoNegs = new("[^\\-]*[\\-][^\\-]*[\\-].*");
 
         // ------------------------------------------------------------------------------------------------------------
@@ -53,13 +53,13 @@ namespace JAFDTC.UI
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// TODO: document
+        /// returns the setup string (basically, "{x} {y} {width} {height}" for a window based on position and size.
         /// </summary>
         public static string BuildWindowSetupString(PointInt32 windPosn, SizeInt32 windSize)
             => $"{windPosn.X} {windPosn.Y} {windSize.Width} {windSize.Height}";
 
         /// <summary>
-        /// TODO: document
+        /// returns the window size based on the last setup and a starting target size.
         /// </summary>
         public static SizeInt32 BuildWindowSize(double windowDPI, SizeInt32 size, string lastSetup = null)
         {
@@ -77,7 +77,8 @@ namespace JAFDTC.UI
         }
 
         /// <summary>
-        /// TODO: document
+        /// returns the window position based on the last setup, work area, and target window size. the window is 
+        /// centered in the work area if there's no setup or the placement would put it in a corner.
         /// </summary>
         public static PointInt32 BuildWindowPosition(RectInt32 workArea, SizeInt32 windSize, string lastSetup = null)
         {
