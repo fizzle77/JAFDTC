@@ -94,6 +94,8 @@ namespace JAFDTC.UI.App
 
         // ---- internal properties
 
+        private AutoSuggestBox AutoSuggestionBox { get; set; }
+
         private static WinProc _newWndProc = null;
         private static IntPtr _oldWndProc = IntPtr.Zero;
 
@@ -111,6 +113,8 @@ namespace JAFDTC.UI.App
         public MainWindow()
         {
             InitializeComponent();
+
+            AutoSuggestionBox = uiAppConfigFilterBox;
 
             Title = "JAFDTC";
 
@@ -219,6 +223,7 @@ namespace JAFDTC.UI.App
         {
             uiAppConfigFilterBox.Visibility = visibility;
             uiAppConfigFilterBox.IsEnabled = (visibility == Visibility.Visible);
+            uiAppTitleBar.Content = (visibility == Visibility.Visible) ? AutoSuggestionBox : null;
         }
 
         // ------------------------------------------------------------------------------------------------------------
