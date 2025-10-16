@@ -30,6 +30,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.Graphics;
 using Windows.System;
 using Windows.UI.Core;
 
@@ -44,6 +45,59 @@ namespace JAFDTC.UI
         private static readonly Regex regexInts = new("^[\\-]{0,1}[0-9]*$");
         // TODO: DEPRECATE
         private static readonly Regex regexTwoNegs = new("[^\\-]*[\\-][^\\-]*[\\-].*");
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // window sizing and setup support
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public static string BuildWindowSetupString(PointInt32 windPosn, SizeInt32 windSize)
+            => $"{windPosn.X} {windPosn.Y} {windSize.Width} {windSize.Height}";
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public static SizeInt32 BuildWindowSize(double windowDPI, SizeInt32 size, string lastSetup = null)
+        {
+            if (!string.IsNullOrEmpty(lastSetup))
+            {
+                List<int> fields = [.. Array.ConvertAll(lastSetup.Split(' '), int.Parse) ];
+                size.Width = fields[2];
+                size.Height = fields[3];
+            }
+            double scaleFactor = windowDPI / 96;
+            SizeInt32 baseSize;
+            baseSize.Width = (int)(size.Width * scaleFactor);
+            baseSize.Height = (int)(size.Height * scaleFactor);
+            return baseSize;
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public static PointInt32 BuildWindowPosition(RectInt32 workArea, SizeInt32 windSize, string lastSetup = null)
+        {
+            PointInt32 windPosn = new()
+            {
+                X = ((workArea.Width - windSize.Width) / 2),
+                Y = ((workArea.Height - windSize.Height) / 2)
+            };
+            if (!string.IsNullOrEmpty(lastSetup))
+            {
+                List<int> fields = [.. Array.ConvertAll(lastSetup.Split(' '), int.Parse) ];
+                if (((workArea.X + workArea.Width - 100) > fields[0]) &&
+                    ((workArea.Y + workArea.Height - 100) > fields[1]))
+                {
+                    windPosn.X = fields[0];
+                    windPosn.Y = fields[1];
+                }
+            }
+            return windPosn;
+        }
 
         // ------------------------------------------------------------------------------------------------------------
         //
