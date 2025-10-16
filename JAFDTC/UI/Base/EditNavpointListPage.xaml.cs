@@ -2,7 +2,7 @@
 //
 // EditNavpointListPage.cs : ui c# for general navigation point list editor page
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -35,6 +35,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
@@ -73,13 +74,10 @@ namespace JAFDTC.UI.Base
 
         private ObservableCollection<INavpointInfo> EditNavpt { get; set; }
 
-        private int StartingNavptNum { get; set; }
-
-        private bool IsClipboardValid { get; set; }
-
-        private bool IsMarshalling { get; set; }
-
-        private int CaptureIndex { get; set; }
+        private int _startingNavptNum;
+        private bool _isClipboardValid;
+        private bool _isMarshalling;
+        private int _captureIndex;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -89,7 +87,7 @@ namespace JAFDTC.UI.Base
 
         public EditNavpointListPage()
         {
-            EditNavpt = new ObservableCollection<INavpointInfo>();
+            EditNavpt = [ ];
 
             InitializeComponent();
             InitializeBase(null, null, uiCtlLinkResetBtns);
@@ -106,9 +104,9 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected override void CopyConfigToEditState()
         {
-            IsMarshalling = true;
+            _isMarshalling = true;
             PageHelper.CopyConfigToEdit(Config, EditNavpt);
-            IsMarshalling = false;
+            _isMarshalling = false;
             UpdateUIFromEditState();
         }
 
@@ -118,12 +116,12 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected override void SaveEditStateToConfig()
         {
-            IsMarshalling = true;
+            _isMarshalling = true;
             if (PageHelper.CopyEditToConfig(EditNavpt, Config))
             {
                 Config.Save(this, PageHelper.SystemTag);
             }
-            IsMarshalling = false;
+            _isMarshalling = false;
             UpdateUIFromEditState();
         }
 
@@ -145,12 +143,12 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
-        /// renumber waypoints sequentially starting from StartingNavptNum.
+        /// renumber waypoints sequentially starting from _startingNavptNum.
         /// </summary>
         private void RenumberWaypoints()
         {
             for (int i = 0; i < EditNavpt.Count; i++)
-                EditNavpt[i].Number = StartingNavptNum + i;
+                EditNavpt[i].Number = _startingNavptNum + i;
             SaveEditStateToConfig();
         }
 
@@ -168,7 +166,7 @@ namespace JAFDTC.UI.Base
             Utilities.SetEnableState(uiBarAdd, isEditable && !isFull);
             Utilities.SetEnableState(uiBarEdit, isEditable && (uiNavptListView.SelectedItems.Count == 1));
             Utilities.SetEnableState(uiBarCopy, isEditable && (uiNavptListView.SelectedItems.Count > 0));
-            Utilities.SetEnableState(uiBarPaste, isEditable && IsClipboardValid);
+            Utilities.SetEnableState(uiBarPaste, isEditable && _isClipboardValid);
             Utilities.SetEnableState(uiBarDelete, isEditable && (uiNavptListView.SelectedItems.Count > 0));
 
             Utilities.SetEnableState(uiBarCapture, isEditable && isDCSListening);
@@ -205,11 +203,17 @@ namespace JAFDTC.UI.Base
         /// <summary>
         /// add navpoint: append a new navpoint and save the configuration.
         /// </summary>
-        private void CmdAdd_Click(object sender, RoutedEventArgs args)
+        private async void CmdAdd_Click(object sender, RoutedEventArgs args)
         {
-            PageHelper.AddNavpoint(Config);
-            Config.Save(this, PageHelper.SystemTag);
-            CopyConfigToEditState();
+            Tuple<string, string> ll = await NavpointUIHelper.ProposeNewNavptLatLon(Content.XamlRoot, [.. EditNavpt ]);
+            if (ll != null)
+            {
+                int index = PageHelper.AddNavpoint(Config);
+                CopyConfigToEditState();
+                EditNavpt[index].Lat = ll.Item1;
+                EditNavpt[index].Lon = ll.Item2;
+                SaveEditStateToConfig();
+            }
         }
 
         /// <summary>
@@ -249,7 +253,7 @@ namespace JAFDTC.UI.Base
             if (await NavpointUIHelper.DeleteDialog(Content.XamlRoot, PageHelper.NavptName,
                                                     uiNavptListView.SelectedItems.Count))
             {
-                List<INavpointInfo> deleteList = new();
+                List<INavpointInfo> deleteList = [ ];
                 foreach (INavpointInfo navpt in uiNavptListView.SelectedItems.Cast<INavpointInfo>())
                     deleteList.Add(navpt);
                 uiNavptListView.SelectedItems.Clear();
@@ -269,7 +273,7 @@ namespace JAFDTC.UI.Base
             int newStartNum = await NavpointUIHelper.RenumberDialog(Content.XamlRoot, "Steerpoint", 1, 700);
             if (newStartNum != -1)
             {
-                StartingNavptNum = newStartNum;
+                _startingNavptNum = newStartNum;
                 RenumberWaypoints();
                 UpdateUIFromEditState();
             }
@@ -280,12 +284,12 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void CmdCapture_Click(object sender, RoutedEventArgs args)
         {
-            CaptureIndex = EditNavpt.Count;
+            _captureIndex = EditNavpt.Count;
             if (EditNavpt.Count > 0)
             {
                 ContentDialogResult result = await Utilities.CaptureActionDialog(Content.XamlRoot, PageHelper.NavptName);
                 if (result != ContentDialogResult.Primary)
-                    CaptureIndex = (uiNavptListView.SelectedIndex >= 0) ? uiNavptListView.SelectedIndex : 0;
+                    _captureIndex = (uiNavptListView.SelectedIndex >= 0) ? uiNavptListView.SelectedIndex : 0;
             }
 
             SaveEditStateToConfig();
@@ -302,7 +306,7 @@ namespace JAFDTC.UI.Base
         {
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
             {
-                PageHelper.CaptureNavpoints(Config, wypts, CaptureIndex);
+                PageHelper.CaptureNavpoints(Config, wypts, _captureIndex);
                 Config.Save(this, PageHelper.SystemTag);
                 CopyConfigToEditState();
             });
@@ -361,14 +365,14 @@ namespace JAFDTC.UI.Base
             uiNavptListCtxMenuFlyout.Items[4].IsEnabled = false;     // delete
             if (navpt == null)
             {
-                uiNavptListCtxMenuFlyout.Items[2].IsEnabled = isEditable && IsClipboardValid;               // paste
+                uiNavptListCtxMenuFlyout.Items[2].IsEnabled = isEditable && _isClipboardValid;               // paste
             }
             else
             {
                 bool isNotEmpty = (uiNavptListView.SelectedItems.Count >= 1);
                 uiNavptListCtxMenuFlyout.Items[0].IsEnabled = (uiNavptListView.SelectedItems.Count == 1);   // edit
                 uiNavptListCtxMenuFlyout.Items[1].IsEnabled = isEditable && isNotEmpty;                     // copy
-                uiNavptListCtxMenuFlyout.Items[2].IsEnabled = isEditable && IsClipboardValid;               // paste
+                uiNavptListCtxMenuFlyout.Items[2].IsEnabled = isEditable && _isClipboardValid;               // paste
                 uiNavptListCtxMenuFlyout.Items[4].IsEnabled = isEditable && isNotEmpty;                     // delete
             }
             uiNavptListCtxMenuFlyout.ShowAt(listView, args.GetPosition(listView));
@@ -395,7 +399,7 @@ namespace JAFDTC.UI.Base
         private async void ClipboardChangedHandler(object sender, object args)
         {
             ClipboardData cboard = await General.ClipboardDataAsync();
-            IsClipboardValid = ((cboard != null) && (cboard.SystemTag.StartsWith(PageHelper.NavptListTag)));
+            _isClipboardValid = ((cboard != null) && (cboard.SystemTag.StartsWith(PageHelper.NavptListTag)));
             UpdateUIFromEditState();
         }
 
@@ -408,7 +412,7 @@ namespace JAFDTC.UI.Base
             // TODO: other than looking for these changes.
             //
             ObservableCollection<INavpointInfo> list = (ObservableCollection<INavpointInfo>)sender;
-            if (!IsMarshalling && (list.Count > 0))
+            if (!_isMarshalling && (list.Count > 0))
                 RenumberWaypoints();
         }
 
@@ -445,7 +449,7 @@ namespace JAFDTC.UI.Base
 
             base.OnNavigatedTo(args);
 
-            StartingNavptNum = (EditNavpt.Count > 0) ? EditNavpt[0].Number : 1;
+            _startingNavptNum = (EditNavpt.Count > 0) ? EditNavpt[0].Number : 1;
 
             NavArgs.BackButton.IsEnabled = true;
 
