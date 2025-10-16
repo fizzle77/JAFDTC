@@ -75,22 +75,18 @@ namespace JAFDTC.UI.F14AB
 
         public void CopyConfigToEdit(IConfiguration config, ObservableCollection<INavpointInfo> edit)
         {
-            F14ABConfiguration a10cConfig = (F14ABConfiguration)config;
+            F14ABConfiguration f14Config = (F14ABConfiguration)config;
             edit.Clear();
-            foreach (WaypointInfo wypt in a10cConfig.WYPT.Points)
-            {
+            foreach (WaypointInfo wypt in f14Config.WYPT.Points)
                 edit.Add(new WaypointInfo(wypt));
-            }
         }
 
         public bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config)
         {
-            F14ABConfiguration a10cConfig = (F14ABConfiguration)config;
-            a10cConfig.WYPT.Points.Clear();
+            F14ABConfiguration f14Config = (F14ABConfiguration)config;
+            f14Config.WYPT.Points.Clear();
             foreach (WaypointInfo wypt in edit.Cast<WaypointInfo>())
-            {
-                a10cConfig.WYPT.Points.Add(new WaypointInfo(wypt));
-            }
+                f14Config.WYPT.Points.Add(new WaypointInfo(wypt));
             return true;
         }
 
