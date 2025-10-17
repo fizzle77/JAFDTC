@@ -173,7 +173,7 @@ https://www.gnu.org/licenses/.
                             <TextBlock Grid.Column="2" Margin="6,0,0,0"
                                        VerticalAlignment="Center"
                                        HorizontalTextAlignment="Center"
-                                       Text="{x:Bind Location}"/>
+                                       Text="{x:Bind LocationUI}"/>
                             <TextBlock Grid.Column="3" Margin="6,0,0,0"
                                        VerticalAlignment="Center"
                                        HorizontalTextAlignment="Center"

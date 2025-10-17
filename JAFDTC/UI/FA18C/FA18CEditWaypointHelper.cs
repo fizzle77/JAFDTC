@@ -2,7 +2,7 @@
 //
 // FA18CEditWaypointHelper.cs : IEditNavpointPageHelper for the fa-18c configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -23,13 +23,14 @@ using JAFDTC.Models.FA18C;
 using JAFDTC.Models.FA18C.WYPT;
 using JAFDTC.Models;
 using JAFDTC.UI.Base;
+using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
-using JAFDTC.Utilities;
 
 namespace JAFDTC.UI.FA18C
 {
@@ -107,7 +108,7 @@ namespace JAFDTC.UI.FA18C
 
         public List<string> GetErrors(INavpointInfo edit, string propertyName)
         {
-            return ((WaypointInfo)edit).GetErrors(propertyName).Cast<string>().ToList();
+            return [.. ((WaypointInfo)edit).GetErrors(propertyName).Cast<string>() ];
         }
 
         public int NavpointCount(IConfiguration config)
@@ -141,9 +142,9 @@ namespace JAFDTC.UI.FA18C
             }
         }
 
-        public int AddNavpoint(IConfiguration config)
+        public int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
-            WaypointInfo wypt = ((FA18CConfiguration)config).WYPT.Add();
+            WaypointInfo wypt = ((FA18CConfiguration)config).WYPT.Add(null, atIndex);
             return ((FA18CConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
     }

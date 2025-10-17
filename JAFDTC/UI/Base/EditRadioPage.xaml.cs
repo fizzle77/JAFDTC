@@ -27,9 +27,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using Microsoft.UI.Dispatching;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace JAFDTC.UI.Base
 {
@@ -47,8 +46,6 @@ namespace JAFDTC.UI.Base
         public int Radio { get; set; }
 
         public string Modulation { get; set; }
-
-        public List<TextBlock> ModulationItems { get; set; }
 
         private string _description;
         public string Description
@@ -88,7 +85,14 @@ namespace JAFDTC.UI.Base
         public int ModulationIndex
         {
             get => _modulationIndex;
-            set => SetProperty(ref _modulationIndex, value, null);
+            set => SetProperty(ref _modulationIndex, (value == -1) ? _modulationIndex : value, null);
+        }
+
+        private List<TextBlock> _modulationItems;
+        public List<TextBlock> ModulationItems
+        {
+            get => _modulationItems;
+            set => SetProperty(ref _modulationItems, value, null);
         }
 
         private bool _isEnabled;
@@ -112,7 +116,7 @@ namespace JAFDTC.UI.Base
     /// object presents a ui-centric generic version of the miscellaneous settings for a particular airframe suitable
     /// to binding to ui widgets.
     /// </summary>
-    public sealed partial class RadioMiscItem : BindableObject
+    public sealed class RadioMiscItem : BindableObject
     {
         public IEditRadioPageHelper PageHelper { get; }
 
@@ -185,7 +189,11 @@ namespace JAFDTC.UI.Base
 
         protected override string SystemName => "radio";
 
-        protected override bool IsPageStateDefault => (EditPresets.Count == 0);
+        protected override bool IsPageStateDefault =>
+            EditPresets.Count == 0 &&
+            PageHelper != null &&
+            Config != null &&
+            PageHelper.RadioSysIsDefault(Config);
 
         // ---- internal properties
 
@@ -207,12 +215,12 @@ namespace JAFDTC.UI.Base
 
         public EditRadioPage()
         {
-            EditPresets = [ ];
+            EditPresets = new ObservableCollection<RadioPresetItem>();
             EditRadio = 0;
             EditItemTag = 1;
 
             InitializeComponent();
-            InitializeBase(null, uiMiscValueDefaultFreq, uiCtlLinkResetBtns, [ ]);
+            InitializeBase(null, uiMiscValueDefaultFreq, uiCtlLinkResetBtns, new List<string>() { });
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -226,26 +234,33 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected override void CopyConfigToEditState()
         {
-            foreach (RadioPresetItem item in EditPresets)
-            {
-                item.ErrorsChanged -= PreField_DataValidationError;
-                item.PropertyChanged -= PreField_PropertyChanged;
-            }
-
             PageHelper.CopyConfigToEdit(EditRadio, Config, EditPresets, EditMisc);
             SortEditPresets();
-            
+
             foreach (RadioPresetItem item in EditPresets)
             {
-                item.Tag = EditItemTag++;
-                item.ModulationItems = PageHelper.RadioModulationItems(EditRadio, item.Frequency);
-                item.ModulationIndex = ModulationIndexForModulation(item);
-
                 item.ErrorsChanged += PreField_DataValidationError;
                 item.PropertyChanged += PreField_PropertyChanged;
+                item.Tag = EditItemTag++;
+                item.ModulationItems = PageHelper.RadioModulationItems(EditRadio, item.Frequency);
+                if (item.ModulationItems != null)
+                {
+                    int modIndex = 0;
+                    for (int i = 0; i < item.ModulationItems.Count; i++)
+                    {
+                        if (item.Modulation == (string)item.ModulationItems[i].Tag)
+                        {
+                            modIndex = i;
+                            break;
+                        }
+                    }
+                    item.ModulationIndex = modIndex;
+                }
             }
 
             UpdateUIFromEditState();
+            uiCtlLinkResetBtns.SetResetButtonEnabled(!IsPageStateDefault);
+            PageHelper.RadioSysIsDefault(Config);
         }
 
         /// <summary>
@@ -267,6 +282,7 @@ namespace JAFDTC.UI.Base
                 PageHelper.CopyEditToConfig(EditRadio, EditPresets, EditMisc, Config);
                 Config.Save(this, PageHelper.SystemTag);
                 UpdateUIFromEditState();
+                uiCtlLinkResetBtns.SetResetButtonEnabled(!IsPageStateDefault);
             }
         }
 
@@ -280,12 +296,6 @@ namespace JAFDTC.UI.Base
         {
             Grid gridRow = Utilities.FindControl<Grid>(uiPreListView, typeof(Grid), item.Tag);
             return (gridRow != null) ? Utilities.FindControl<TextBox>(gridRow, typeof(TextBox), name) : null;
-        }
-
-        private ComboBox FindComboForPresetItem(RadioPresetItem item)
-        {
-            Grid gridRow = Utilities.FindControl<Grid>(uiPreListView, typeof(Grid), item.Tag);
-            return (gridRow != null) ? Utilities.FindControl<ComboBox>(gridRow, typeof(ComboBox), "Modulation") : null;
         }
 
         private void ValidateAllFields()
@@ -353,6 +363,13 @@ namespace JAFDTC.UI.Base
                 RadioPresetItem item = (RadioPresetItem)sender;
                 item.ModulationItems = PageHelper.RadioModulationItems(EditRadio, item.Frequency);
                 item.ModulationIndex = ModulationIndexForModulation(item);
+
+                // For some reason the binding doesn't correctly update the selection
+                // when we change the property above, so we do it manually here.
+                Grid gridRow = Utilities.FindControl<Grid>(uiPreListView, typeof(Grid), item.Tag);
+                ComboBox cb = Utilities.FindControl<ComboBox>(gridRow, typeof(ComboBox), "Modulation");
+                if (cb != null)
+                    cb.SelectedIndex = ModulationIndexForModulation(item);
             }
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
@@ -402,11 +419,16 @@ namespace JAFDTC.UI.Base
             }
 
             RadioPresetItem newItem = new(PageHelper, EditItemTag++, radio);
-            newItem.ErrorsChanged += PreField_DataValidationError;
-            newItem.PropertyChanged += PreField_PropertyChanged;
             newItem.Preset = newPreset.ToString();
             newItem.Frequency = PageHelper.RadioDefaultFrequency(radio);
             newItem.ModulationItems = PageHelper.RadioModulationItems(radio, newItem.Frequency);
+            if (newItem.ModulationItems != null && newItem.ModulationItems.Count > 0)
+            {
+                newItem.Modulation = newItem.ModulationItems[0].ToString();
+                newItem.ModulationIndex = ModulationIndexForModulation(newItem);
+            }
+            newItem.ErrorsChanged += PreField_DataValidationError;
+            newItem.PropertyChanged += PreField_PropertyChanged;
             EditPresets.Insert(newIndex, newItem);
         }
 
@@ -415,11 +437,9 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void SortEditPresets()
         {
-            List<RadioPresetItem> sortableList = [.. EditPresets ];
+            List<RadioPresetItem> sortableList = new(EditPresets);
             sortableList.Sort((a, b) => int.Parse(a.Preset).CompareTo(int.Parse(b.Preset)));
-            EditPresets = [ ];
-            for (int i = 0; i < sortableList.Count; i++)
-                EditPresets.Add(sortableList[i]);
+            EditPresets = new ObservableCollection<RadioPresetItem>(sortableList);
         }
 
         /// <summary>
@@ -458,30 +478,13 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
-        /// TODO: document
-        /// </summary>
-        private static bool IsModulationItemsEqual(ComboBox combo, RadioPresetItem item)
-        {
-            if ((combo.ItemsSource != null) &&
-                (item.ModulationItems != null) &&
-                (combo.Items.Count == item.ModulationItems.Count))
-            {
-                for (int i = 0; i < combo.Items.Count; i++)
-                    if (((TextBlock)combo.Items[i]).Text != item.ModulationItems[i].Text)
-                        return false;
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
         /// update the "blue dot" state on the radio select menu to show the blue dot when the setup of the
         /// corresponding radio differs from defaults.
         /// </summary>
         private void RebuildRadioSelectMenu()
         {
             Utilities.SetBulletsInBulletComboBox(uiRadSelectCombo,
-                                                 i => !PageHelper.RadioModuleIsDefault(Config, i));
+                                                 (int i) => !PageHelper.RadioModuleIsDefault(Config, i));
         }
 
         /// <summary>
@@ -518,59 +521,6 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
-        /// update the per-preset modulation comboboxen. this method does nothing if the current radio does not
-        /// support per-preset modulation programming. depending on the state of the visual hierarchy, this
-        /// may schedule work for down the road.
-        /// </summary>
-        private void RebuildPerPresetModulationSelections()
-        {
-            if (!PageHelper.RadioCanProgramModulation(EditRadio))
-                return;
-
-            // TODO: revisit this code, it's proving to be fragile and the hack is maybe no longer a great idea.
-
-            // HACK: this shite seems to be necessary due to a gnarly interaction between Move and bindings.
-            // HACK: were life fair, we'd manage the modulation combo items and selections through bindings.
-            // HACK: tried that, it crashed.
-            //
-            foreach (RadioPresetItem item in EditPresets)
-            {
-                ComboBox combo = FindComboForPresetItem(item);
-                if ((combo != null) && (item.ModulationItems == null))
-                {
-                    combo.ItemsSource = null;
-                }
-                else if (combo != null)
-                {
-                    if (!IsModulationItemsEqual(combo, item))
-                    {
-                        combo.ItemsSource = item.ModulationItems;
-                        combo.SelectionChanged -= PreListModCombo_SelectionChanged;
-                        combo.SelectedIndex = item.ModulationIndex;
-                        combo.SelectionChanged += PreListModCombo_SelectionChanged;
-                    }
-                    else if (combo.SelectedIndex != item.ModulationIndex)
-                    {
-                        combo.SelectedIndex = item.ModulationIndex;
-                    }
-                }
-                else if (combo == null)
-                {
-                    // list view's view hierarchy hasn't been built out yet, revisit this setup later once the
-                    // hierarchy is built (which it will be, eventually). we'll wait a jiffy before trying again to
-                    // avoid pestering the framework too much: "ARE WE THERE YET?!?".
-                    //
-                    DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, async () =>
-                    {
-                        await Task.Delay(250);
-                        RebuildPerPresetModulationSelections();
-                    });
-                    break;
-                }
-            }
-        }
-
-        /// <summary>
         /// update the enable state on the ui elements based on the current settings. link controls must be set up via
         /// RebuildLinkControls() prior to calling this function.
         /// </summary>
@@ -580,7 +530,6 @@ namespace JAFDTC.UI.Base
 
             RebuildRadioSelectMenu();
             RebuildPerRadioMiscControls();
-            RebuildPerPresetModulationSelections();
 
             if ((EditPresets.Count > 0) && (EditPresets[0].IsEnabled != isEditable))
                 foreach (RadioPresetItem item in EditPresets)
@@ -720,20 +669,6 @@ namespace JAFDTC.UI.Base
             }
         }
 
-        /// <summary>
-        /// preset modulation combo selection changed: update the edit state and update the configuration.
-        /// </summary>
-        private void PreListModCombo_SelectionChanged(object sender, SelectionChangedEventArgs args)
-        {
-            ComboBox cbox = (ComboBox)sender;
-            RadioPresetItem item = FindPresetItemByTag(((Grid)cbox.Parent).Tag);
-            if ((item != null) && (cbox.SelectedIndex != -1))
-            {
-                item.ModulationIndex = cbox.SelectedIndex;
-                SaveEditStateToConfig();
-            }
-        }
-
         // ------------------------------------------------------------------------------------------------------------
         //
         // events
@@ -758,14 +693,27 @@ namespace JAFDTC.UI.Base
 
             base.OnNavigatedTo(args);
 
-            List<FrameworkElement> items = [ ];
+            List<FrameworkElement> items = new();
             for (int i = 0; i < PageHelper.RadioNames.Count; i++)
-                    items.Add(Utilities.BulletComboBoxItem(PageHelper.RadioNames[i], i.ToString()));
+                items.Add(Utilities.BulletComboBoxItem(PageHelper.RadioNames[i], i.ToString()));
             uiRadSelectCombo.ItemsSource = items;
 
             CopyConfigToEditState();
 
             uiRadSelectCombo.SelectedIndex = EditRadio;
+        }
+
+        private void InitialFreq_LostFocus(object sender, RoutedEventArgs _)
+        {
+            TextBox textBox = (TextBox)sender;
+            BindableObject editState = EditMisc;
+            PropertyInfo property = editState.GetType().GetProperty("DefaultTuning");
+
+            if (!IsUIRebuilding && (property != null) && (editState != null))
+            {
+                property.SetValue(editState, textBox.Text);
+                SaveEditStateToConfig();
+            }
         }
     }
 }

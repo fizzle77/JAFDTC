@@ -513,6 +513,8 @@ namespace JAFDTC
             }
             else
             {
+                if (Settings.UploadFeedback == UploadFeedbackTypes.AUDIO_PROGRESS)
+                    StatusMessageTx.Send("Avionics Setup Starting");
                 if (Settings.UploadFeedback != UploadFeedbackTypes.LIGHTS)
                 {
                     Window.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>

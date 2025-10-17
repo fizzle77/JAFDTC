@@ -21,6 +21,7 @@ using JAFDTC.Models;
 using JAFDTC.Models.F16C;
 using JAFDTC.Models.F16C.STPT;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Base;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
@@ -39,7 +40,6 @@ using System.Text.Json;
 using Windows.ApplicationModel.DataTransfer;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
-using JAFDTC.UI.Base;
 
 namespace JAFDTC.UI.F16C
 {
@@ -89,8 +89,8 @@ namespace JAFDTC.UI.F16C
 
             EditSTPT = new STPTSystem();
 
-            _configNameToUID = new Dictionary<string, string>();
-            _configNameList = new List<string>();
+            _configNameToUID = [ ];
+            _configNameList = [ ];
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -99,15 +99,14 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // marshall data between our local state and the steerpoint configuration.
-        //
+        /// <summary>
+        /// marshall data between our local state and the steerpoint configuration.
+        /// </summary>
         private void CopyConfigToEdit()
         {
             EditSTPT.Points.Clear();
             foreach (SteerpointInfo stpt in Config.STPT.Points)
-            {
                 EditSTPT.Add(new SteerpointInfo(stpt));
-            }
         }
 
         private void CopyEditToConfig(bool isPersist = false)
@@ -115,9 +114,7 @@ namespace JAFDTC.UI.F16C
             Config.STPT = (STPTSystem)EditSTPT.Clone();
 
             if (isPersist)
-            {
                 Config.Save(this, STPTSystem.SystemTag);
-            }
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -126,8 +123,9 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // launch the F16CEditSteerpointPage to edit the specified steerpoint.
-        //
+        /// <summary>
+        /// launch the F16CEditSteerpointPage to edit the specified steerpoint.
+        /// </summary>
         private void EditSteerpoint(SteerpointInfo stpt)
         {
             NavArgs.BackButton.IsEnabled = false;
@@ -137,24 +135,28 @@ namespace JAFDTC.UI.F16C
                            new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
         }
 
-        // renumber steerpoints sequentially starting from StartingStptNum.
-        //
+        /// <summary>
+        /// renumber steerpoints sequentially starting from StartingStptNum.
+        /// </summary>
         private void RenumberSteerpoints()
         {
             EditSTPT.RenumberFrom(StartingStptNum);
             CopyEditToConfig(true);
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void RebuildLinkControls()
         {
             Utilities.RebuildLinkControls(Config, STPTSystem.SystemTag, NavArgs.UIDtoConfigMap,
                                           uiPageBtnTxtLink, uiPageTxtLink);
         }
 
-        // update the enable state on the ui elements based on the current settings. link controls must be set up
-        // vi RebuildLinkControls() prior to calling this function.
-        //
+        /// <summary>
+        /// update the enable state on the ui elements based on the current settings. link controls must be set up
+        /// via RebuildLinkControls() prior to calling this function.
+        /// </summary>
         private void RebuildEnableState()
         {
             JAFDTC.App curApp = Application.Current as JAFDTC.App;
@@ -181,8 +183,9 @@ namespace JAFDTC.UI.F16C
             uiStptListView.ReorderMode = (isEditable) ? ListViewReorderMode.Enabled : ListViewReorderMode.Disabled;
         }
 
-        // rebuild the state of controls on the page in response to a change in the configuration.
-        //
+        /// <summary>
+        /// rebuild the state of controls on the page in response to a change in the configuration.
+        /// </summary>
         private void RebuildInterfaceState()
         {
             RebuildLinkControls();
@@ -197,37 +200,46 @@ namespace JAFDTC.UI.F16C
 
         // ---- command bar / commands --------------------------------------------------------------------------------
 
-        // open steerpoint button or context menu edit click: open the selected steerpoint.
-        //
+        /// <summary>
+        /// open steerpoint button or context menu edit click: open the selected steerpoint.
+        /// </summary>
         private void CmdOpen_Click(object sender, RoutedEventArgs args)
         {
             if (uiStptListView.SelectedItem is SteerpointInfo stpt)
-            {
                 EditSteerpoint(stpt);
+        }
+
+        /// <summary>
+        /// add steerpoint: append a new steerpoint and save the configuration.
+        /// </summary>
+        private async void CmdAdd_Click(object sender, RoutedEventArgs args)
+        {
+            Tuple<string, string> ll = await NavpointUIHelper.ProposeNewNavptLatLon(Content.XamlRoot, [.. EditSTPT.Points ]);
+            if (ll != null)
+            {
+                SteerpointInfo stpt = EditSTPT.Add();
+                int index = EditSTPT.Points.IndexOf(stpt);
+                EditSTPT.Points[index].Lat = ll.Item1;
+                EditSTPT.Points[index].Lon = ll.Item2;
+                CopyEditToConfig(true);
+                RebuildInterfaceState();
             }
         }
 
-        // add steerpoint: append a new steerpoint and save the configuration.
-        //
-        private void CmdAdd_Click(object sender, RoutedEventArgs args)
-        {
-            EditSTPT.Add();
-            CopyEditToConfig(true);
-            RebuildInterfaceState();
-        }
-
-        // copy button or context menu copy click: serialize the selected steerpoints to json and put the text on
-        // the clipboard.
-        //
+        /// <summary>
+        /// copy button or context menu copy click: serialize the selected steerpoints to json and put the text on
+        /// the clipboard.
+        /// </summary>
         private void CmdCopy_Click(object sender, RoutedEventArgs args)
         {
             General.DataToClipboard(STPTSystem.STPTListTag,
                                     JsonSerializer.Serialize(uiStptListView.SelectedItems, Configuration.JsonOptions));
         }
 
-        // paste button: deserialize the steerpoints on the clipboard from json and append them to the end of the
-        // steerpoint list.
-        //
+        /// <summary>
+        /// paste button: deserialize the steerpoints on the clipboard from json and append them to the end of the
+        /// steerpoint list.
+        /// </summary>
         private async void CmdPaste_Click(object sender, RoutedEventArgs args)
         {
             ClipboardData cboard = await General.ClipboardDataAsync();
@@ -235,9 +247,7 @@ namespace JAFDTC.UI.F16C
             {
                 List<SteerpointInfo> list = JsonSerializer.Deserialize<List<SteerpointInfo>>(cboard.Data);
                 foreach (SteerpointInfo stpt in list)
-                {
                     EditSTPT.Add(stpt);
-                }
                 CopyEditToConfig(true);
                 RebuildInterfaceState();
             }
@@ -252,26 +262,23 @@ namespace JAFDTC.UI.F16C
 
             if (await NavpointUIHelper.DeleteDialog(Content.XamlRoot, "Steerpoint", uiStptListView.SelectedItems.Count))
             {
-                List<SteerpointInfo> deleteList = new();
+                List<SteerpointInfo> deleteList = [ ];
                 foreach (SteerpointInfo item in uiStptListView.SelectedItems.Cast<SteerpointInfo>())
-                {
                     deleteList.Add(item);
-                }
                 uiStptListView.SelectedItems.Clear();
                 foreach (SteerpointInfo stpt in deleteList)
-                {
                     EditSTPT.Delete(stpt);
-                }
-                //
+
                 // steerpoint renumbering should be handled by observer to EditSTPT changes...
                 //
                 CopyEditToConfig(true);
             }
         }
 
-        // renumber button click: prompt the user for the new starting steerpoint number, renumber
-        // the steerpoints and save the updated configuration.
-        //
+        /// <summary>
+        /// renumber button click: prompt the user for the new starting steerpoint number, renumber
+        /// the steerpoints and save the updated configuration.
+        /// </summary>
         private async void CmdRenumber_Click(object sender, RoutedEventArgs args)
         {
             // TODO: check navpoint min/max range
@@ -294,9 +301,7 @@ namespace JAFDTC.UI.F16C
             {
                 ContentDialogResult result = await Utilities.CaptureActionDialog(Content.XamlRoot, "Steerpoint");
                 if (result != ContentDialogResult.Primary)
-                {
                     CaptureIndex = (uiStptListView.SelectedIndex >= 0) ? uiStptListView.SelectedIndex : 0;
-                }
             }
 
             CopyEditToConfig(true);
@@ -366,8 +371,9 @@ namespace JAFDTC.UI.F16C
 
         // ---- buttons -----------------------------------------------------------------------------------------------
 
-        // reset all button click: remove all steerpoints from the configuration and save it.
-        //
+        /// <summary>
+        /// reset all button click: remove all steerpoints from the configuration and save it.
+        /// </summary>
         private async void PageBtnResetAll_Click(object sender, RoutedEventArgs e)
         {
             if (await NavpointUIHelper.ResetDialog(Content.XamlRoot, "Steerpoint"))
@@ -380,7 +386,9 @@ namespace JAFDTC.UI.F16C
             }
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private async void PageBtnLink_Click(object sender, RoutedEventArgs args)
         {
             string selectedItem = await Utilities.PageBtnLink_Click(Content.XamlRoot, Config, STPTSystem.SystemTag,
@@ -401,15 +409,17 @@ namespace JAFDTC.UI.F16C
 
         // ---- steerpoint list ---------------------------------------------------------------------------------------
 
-        // steerpoint list selection change: update ui state to be consistent.
-        //
+        /// <summary>
+        /// steerpoint list selection change: update ui state to be consistent.
+        /// </summary>
         private void StptList_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
             RebuildInterfaceState();
         }
 
-        // steerpoint list right click: bring up the steerpoint context menu to select from.
-        //
+        /// <summary>
+        /// steerpoint list right click: bring up the steerpoint context menu to select from.
+        /// </summary>
         private void StptList_RightTapped(object sender, RightTappedRoutedEventArgs args)
         {
             ListView listView = (ListView)sender;
@@ -440,14 +450,13 @@ namespace JAFDTC.UI.F16C
             uiStptListCtxMenuFlyout.ShowAt(listView, args.GetPosition(listView));
         }
 
-        // steertpoint list double click: open the selected steerpoint in the editor.
-        //
+        /// <summary>
+        /// steertpoint list double click: open the selected steerpoint in the editor.
+        /// </summary>
         private void StptList_DoubleTapped(object sender, RoutedEventArgs args)
         {
             if (uiStptListView.SelectedItems.Count > 0)
-            {
                 EditSteerpoint((SteerpointInfo)uiStptListView.SelectedItems[0]);
-            }
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -456,8 +465,9 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // check for clipboard content changes and update state as necessary.
-        //
+        /// <summary>
+        /// check for clipboard content changes and update state as necessary.
+        /// </summary>
         private async void ClipboardChangedHandler(object sender, object args)
         {
             ClipboardData cboard = await General.ClipboardDataAsync();
@@ -465,8 +475,9 @@ namespace JAFDTC.UI.F16C
             RebuildInterfaceState();
         }
 
-        // when collection changes, renumber. just in case.
-        //
+        /// <summary>
+        /// when collection changes, renumber. just in case.
+        /// </summary>
         private void CollectionChangedHandler(object sender, NotifyCollectionChangedEventArgs args)
         {
             // TODO: this is a bit of a hack since there's no clear way to know when a re-order via drag has completed
@@ -474,12 +485,12 @@ namespace JAFDTC.UI.F16C
             //
             ObservableCollection<SteerpointInfo> list = (ObservableCollection<SteerpointInfo>)sender;
             if (list.Count > 0)
-            {
                 RenumberSteerpoints();
-            }
         }
 
-        // TODO: document
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private void WindowActivatedHandler(object sender, WindowActivatedEventArgs args)
         {
             if ((args.WindowActivationState == WindowActivationState.PointerActivated) ||
@@ -495,9 +506,10 @@ namespace JAFDTC.UI.F16C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // on configuration saved, rebuild the interface state to align with the latest save (assuming we go here
-        // through a CopyEditToConfig).
-        //
+        /// <summary>
+        /// on configuration saved, rebuild the interface state to align with the latest save (assuming we go here
+        /// through a CopyEditToConfig).
+        /// </summary>
         private void ConfigurationSavedHandler(object sender, ConfigurationSavedEventArgs args)
         {
             if (string.IsNullOrEmpty(args.SyncSysTag))
@@ -505,11 +517,12 @@ namespace JAFDTC.UI.F16C
             RebuildInterfaceState();
         }
 
-        // on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
-        // we are editing.
-        //
-        // we do not use page caching here as we're just tracking the configuration state.
-        //
+        /// <summary>
+        /// on navigating to/from this page, set up and tear down our internal and ui state based on the configuration
+        /// we are editing.
+        ///
+        /// we do not use page caching here as we're just tracking the configuration state.
+        /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             NavArgs = (ConfigEditorPageNavArgs)args.Parameter;

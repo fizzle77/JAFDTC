@@ -2,7 +2,7 @@
 //
 // F14ABEditWaypointHelper.cs : IEditNavpointPageHelper for the f-14a/b configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -109,7 +109,7 @@ namespace JAFDTC.UI.F14AB
 
         public List<string> GetErrors(INavpointInfo edit, string propertyName)
         {
-            return ((WaypointInfo)edit).GetErrors(propertyName).Cast<string>().ToList();
+            return [.. ((WaypointInfo)edit).GetErrors(propertyName).Cast<string>() ];
         }
 
         public int NavpointCount(IConfiguration config)
@@ -143,9 +143,9 @@ namespace JAFDTC.UI.F14AB
             }
         }
 
-        public int AddNavpoint(IConfiguration config)
+        public int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
-            WaypointInfo wypt = ((F14ABConfiguration)config).WYPT.Add();
+            WaypointInfo wypt = ((F14ABConfiguration)config).WYPT.Add(null, atIndex);
             return ((F14ABConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
     }

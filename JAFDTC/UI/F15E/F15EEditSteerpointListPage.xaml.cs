@@ -89,7 +89,7 @@ namespace JAFDTC.UI.F15E
             EditSTPT = new STPTSystem();
 
             InitializeComponent();
-            InitializeBase(null, null, uiCtlLinkResetBtns, new() { });
+            InitializeBase(null, null, uiCtlLinkResetBtns, [ ]);
 
             uiCmdComboSelRoute.SelectedIndex = 0;
         }
@@ -139,7 +139,7 @@ namespace JAFDTC.UI.F15E
                 // NOTE: complete set of steerpoints from EditSTPT (for current route) and Config.STPT (for other
                 // NOTE: routes).
 
-                List<SteerpointInfo> stpts = new();
+                List<SteerpointInfo> stpts = [ ];
                 foreach (SteerpointInfo stpt in EditSTPT.Points)
                     stpts.Add(stpt);
                 foreach (SteerpointInfo stpt in config.STPT.Points)
@@ -254,19 +254,25 @@ namespace JAFDTC.UI.F15E
         private void CmdOpen_Click(object sender, RoutedEventArgs args)
         {
             if (uiStptListView.SelectedItem is SteerpointInfo stpt)
-            {
                 EditSteerpoint(stpt);
-            }
         }
 
         /// <summary>
         /// add steerpoint: append a new steerpoint and save the configuration.
         /// </summary>
-        private void CmdAdd_Click(object sender, RoutedEventArgs args)
+        private async void CmdAdd_Click(object sender, RoutedEventArgs args)
         {
-            EditSTPT.Add();
-            Config.Save(this, STPTSystem.SystemTag);
-            CopyConfigToEditState();
+// TODO: allow other routes to leverage a theater setting so you don't prompt for theater on each route
+            Tuple<string, string> ll = await NavpointUIHelper.ProposeNewNavptLatLon(Content.XamlRoot, [.. EditSTPT.Points ]);
+            if (ll != null)
+            {
+                SteerpointInfo stpt = EditSTPT.Add();
+                int index = EditSTPT.Points.IndexOf(stpt);
+                EditSTPT.Points[index].Lat = ll.Item1;
+                EditSTPT.Points[index].Lon = ll.Item2;
+                SaveEditStateToConfig();
+                Config.Save(this, STPTSystem.SystemTag);
+            }
         }
 
         /// <summary>
@@ -312,17 +318,13 @@ namespace JAFDTC.UI.F15E
 
             if (await NavpointUIHelper.DeleteDialog(Content.XamlRoot, "Steerpoint", uiStptListView.SelectedItems.Count))
             {
-                List<SteerpointInfo> deleteList = new();
+                List<SteerpointInfo> deleteList = [ ];
                 foreach (SteerpointInfo item in uiStptListView.SelectedItems.Cast<SteerpointInfo>())
-                {
                     deleteList.Add(item);
-                }
                 uiStptListView.SelectedItems.Clear();
                 foreach (SteerpointInfo stpt in deleteList)
-                {
                     EditSTPT.Delete(stpt);
-                }
-                //
+
                 // steerpoint renumbering should be handled by observer to EditSTPT changes...
                 //
                 SaveEditStateToConfig();

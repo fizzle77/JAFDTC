@@ -3,7 +3,7 @@
 // PointOfInterestDbase.cs -- point of interest "database" model
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -22,7 +22,6 @@ using JAFDTC.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace JAFDTC.Models.DCS
 {
@@ -115,29 +114,17 @@ namespace JAFDTC.Models.DCS
         /// <summary>
         /// return a list of the names of known campaigns.
         /// </summary>
-        public List<string> KnownCampaigns => ((_dbase != null) && _dbase.ContainsKey(PointOfInterestType.CAMPAIGN))
-                                              ? _dbase[PointOfInterestType.CAMPAIGN].Keys.ToList<string>() : new();
+        public List<string> KnownCampaigns
+            => ((_dbase != null) && _dbase.TryGetValue(PointOfInterestType.CAMPAIGN,
+                                                       out Dictionary<string, List<PointOfInterest>> value))
+                    ? [.. value.Keys ] : new();
 
         /// <summary>
         /// return a list of strings for all of the theaters represented in the database.
         /// 
         /// TODO: consider allowing user-defined theaters.
         /// </summary>
-        public static List<string> KnownTheaters => new()
-        {
-            "Afghanistan",
-            "Caucasus",
-            "Germany",
-            "Iraq",
-            "Kola",
-            "Marianas",
-            "Nevada",
-            "Persian Gulf",
-            "Sinai",
-            "South Atlantic",
-            "Syria",
-            "Other"
-        };
+        public static List<string> KnownTheaters => PointOfInterest.Theaters;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -147,7 +134,7 @@ namespace JAFDTC.Models.DCS
 
         private PointOfInterestDbase()
         {
-            _dbase = new();
+            _dbase = [ ];
             Reset();
         }
 
@@ -182,7 +169,7 @@ namespace JAFDTC.Models.DCS
             bool isTagsAny = flags.HasFlag(PointOfInterestDbQueryFlags.TAGS_ANY_MATCH);
             bool isTagsPartial = flags.HasFlag(PointOfInterestDbQueryFlags.TAG_PARTIAL_MATCH);
 
-            List<PointOfInterest> results = new();
+            List<PointOfInterest> results = [ ];
             foreach (KeyValuePair<PointOfInterestType, Dictionary<string, List<PointOfInterest>>> kvpMain in _dbase)
             {
                 if (!types.HasFlag((PointOfInterestTypeMask)(1 << (int)kvpMain.Key)))
@@ -194,10 +181,12 @@ namespace JAFDTC.Models.DCS
                     {
                         string poiName = poi.Name.ToLower();
 
-                        if ((!string.IsNullOrEmpty(theater) && (theater != poi.Theater.ToLower())) ||
+                        if ((!string.IsNullOrEmpty(theater) &&
+                            (!theater.Equals(poi.Theater, StringComparison.CurrentCultureIgnoreCase))) ||
                             (!string.IsNullOrEmpty(name) && ((!isNamePartial && (name != poiName)) ||
                                                              (isNamePartial && !poiName.Contains(name)))) ||
-                            (!string.IsNullOrEmpty(campaign) && (campaign != poi.Campaign.ToLower())))
+                            (!string.IsNullOrEmpty(campaign) &&
+                            (!campaign.Equals(poi.Campaign, StringComparison.CurrentCultureIgnoreCase))))
                         {
                             continue;
                         }
@@ -205,9 +194,9 @@ namespace JAFDTC.Models.DCS
                         bool isMatch = true;
                         if (!string.IsNullOrEmpty(tags))
                         {
-                            List<string> tagVals = tags.Split(';').ToList<string>();
+                            List<string> tagVals = [.. tags.Split(';') ];
                             List<string> poiTagVals = (string.IsNullOrEmpty(poi.Tags))
-                                ? new() : poi.Tags.ToLower().Split(';').ToList<string>();
+                                ? new() : [.. poi.Tags.ToLower().Split(';') ];
 
                             if (isTagsAny)
                             {
@@ -296,11 +285,11 @@ namespace JAFDTC.Models.DCS
         public static List<PointOfInterest> ParseCSV(string csv)
         {
             // TODO: this needs to change to csv...
-            List<PointOfInterest> pois = new();
-            string[] lines = (string.IsNullOrEmpty(csv)) ? Array.Empty<string>() : csv.Replace("\r", "").Split('\n');
+            List<PointOfInterest> pois = [ ];
+            string[] lines = (string.IsNullOrEmpty(csv)) ? [ ] : csv.Replace("\r", "").Split('\n');
             foreach (string line in lines)
             {
-                PointOfInterest poi = new PointOfInterest(line);
+                PointOfInterest poi = new(line);
                 if (poi.Type != PointOfInterestType.UNKNOWN)
                     pois.Add(poi);
             }
@@ -326,9 +315,9 @@ namespace JAFDTC.Models.DCS
         public void AddCampaign(string campaign, bool isPersist = true)
         {
             if (!_dbase.ContainsKey(PointOfInterestType.CAMPAIGN))
-                _dbase[PointOfInterestType.CAMPAIGN] = new Dictionary<string, List<PointOfInterest>>();
+                _dbase[PointOfInterestType.CAMPAIGN] = [ ];
             if (!_dbase[PointOfInterestType.CAMPAIGN].ContainsKey(campaign))
-                _dbase[PointOfInterestType.CAMPAIGN][campaign] = new List<PointOfInterest>();
+                _dbase[PointOfInterestType.CAMPAIGN][campaign] = [ ];
 
             if (isPersist)
                 Save(campaign);
@@ -341,8 +330,8 @@ namespace JAFDTC.Models.DCS
         public void DeleteCampaign(string campaign, bool isPersist = true)
         {
             PointOfInterestType type = PointOfInterestType.CAMPAIGN;
-            if (_dbase.ContainsKey(type) && _dbase[type].ContainsKey(campaign))
-                _dbase[type].Remove(campaign);
+            if (_dbase.TryGetValue(type, out Dictionary<string, List<PointOfInterest>> value) && value.ContainsKey(campaign))
+                value.Remove(campaign);
 
             if (isPersist)
                 Save(campaign, true);
@@ -354,7 +343,8 @@ namespace JAFDTC.Models.DCS
         public int CountPoIInCampaign(string campaign)
         {
             PointOfInterestType type = PointOfInterestType.CAMPAIGN;
-            return (_dbase.ContainsKey(type) && _dbase[type].ContainsKey(campaign)) ? _dbase[type][campaign].Count : 0;
+            return (_dbase.TryGetValue(type, out Dictionary<string, List<PointOfInterest>> dbType) &&
+                    dbType.TryGetValue(campaign, out List<PointOfInterest> list)) ? list.Count : 0;
         }
 
         /// <summary>
@@ -365,9 +355,9 @@ namespace JAFDTC.Models.DCS
             string auxKey = AuxKey(poi);
 
             if (!_dbase.ContainsKey(poi.Type))
-                _dbase[poi.Type] = new Dictionary<string, List<PointOfInterest>>();
+                _dbase[poi.Type] = [ ];
             if (!_dbase[poi.Type].ContainsKey(auxKey))
-                _dbase[poi.Type][auxKey] = new List<PointOfInterest>();
+                _dbase[poi.Type][auxKey] = [ ];
             _dbase[poi.Type][auxKey].Add(poi);
 
             if (isPersist)
@@ -405,7 +395,7 @@ namespace JAFDTC.Models.DCS
                 List<PointOfInterest> pois = Find(query);
                 if (isCullEmptyCampaign && (pois.Count == 0))
                     FileManager.DeleteCampaignPointsOfInterest(campaign);
-                return (isCullEmptyCampaign) ? true : FileManager.SaveCampaignPointsOfInterest(campaign, pois);
+                return isCullEmptyCampaign || FileManager.SaveCampaignPointsOfInterest(campaign, pois);
             }
         }
     }

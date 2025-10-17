@@ -136,9 +136,11 @@ namespace JAFDTC.UI.AV8B
         /// </summary>
         private void EditNavpoint(INavpointInfo navpt)
         {
+// TODO: support map?
             SaveEditStateToConfig();
             NavArgs.BackButton.IsEnabled = false;
-            this.Frame.Navigate(PageHelper.NavptEditorType, PageHelper.NavptEditorArg(this, Config, EditNavpt.IndexOf(navpt)),
+            this.Frame.Navigate(PageHelper.NavptEditorType,
+                                PageHelper.NavptEditorArg(this, null, Config, EditNavpt.IndexOf(navpt)),
                                 new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
         }
 

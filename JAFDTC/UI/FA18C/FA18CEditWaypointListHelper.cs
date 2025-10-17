@@ -2,7 +2,7 @@
 //
 // FA18CEditWaypointListHelper.cs : IEditNavpointListPageHelper for the fa-18c configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,21 +18,21 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
-using JAFDTC.Models.A10C;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.F14AB;
 using JAFDTC.Models.FA18C;
 using JAFDTC.Models.FA18C.WYPT;
 using JAFDTC.Models.M2000C;
-using JAFDTC.UI.A10C;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
+using JAFDTC.UI.Controls.Map;
+using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.FA18C
@@ -57,6 +57,8 @@ namespace JAFDTC.UI.FA18C
         public override string NavptListTag => WYPTSystem.WYPTListTag;
 
         public override AirframeTypes AirframeType => AirframeTypes.FA18C;
+
+        // public LLFormat NavptCoordFmt => LLFormat.DDM_P2ZF;
 
         // TODO: validate maximum navpoint count
         public override int NavptMaxCount => int.MaxValue;
@@ -119,9 +121,10 @@ namespace JAFDTC.UI.FA18C
             ((FA18CConfiguration)config).WYPT.Reset();
         }
 
-        public override void AddNavpoint(IConfiguration config)
+        public override int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
-            ((FA18CConfiguration)config).WYPT.Add();
+            WaypointInfo wypt = ((FA18CConfiguration)config).WYPT.Add(null, atIndex);
+            return ((FA18CConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
 
         public override bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
@@ -163,10 +166,12 @@ namespace JAFDTC.UI.FA18C
             }
         }
 
-        public override object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt)
+        public override object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
+                                     int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));
-            return new EditNavptPageNavArgs(parentEditor, config, indexNavpt, isUnlinked, typeof(FA18CEditWaypointHelper));
+            return new EditNavptPageNavArgs(parentEditor, verbMirror, config, indexNavpt, isUnlinked,
+                                            typeof(FA18CEditWaypointHelper));
         }
     }
 }

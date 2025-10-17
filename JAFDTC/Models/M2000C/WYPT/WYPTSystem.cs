@@ -2,7 +2,7 @@
 //
 // WYPTSystem.cs -- m-2000c waypoint system configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -18,6 +18,7 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models.Base;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -27,7 +28,7 @@ namespace JAFDTC.Models.M2000C.WYPT
     /// <summary>
     /// TODO: document
     /// </summary>
-    public class WYPTSystem : NavpointSystemBase<WaypointInfo>
+    public partial class WYPTSystem : NavpointSystemBase<WaypointInfo>
     {
         public const string SystemTag = "JAFDTC:M2000C:STPT";
         public const string WYPTListTag = $"{SystemTag}:LIST";
@@ -38,7 +39,7 @@ namespace JAFDTC.Models.M2000C.WYPT
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public WYPTSystem() => (Points) = (new ObservableCollection<WaypointInfo>());
+        public WYPTSystem() => (Points) = ([ ]);
 
         public WYPTSystem(WYPTSystem other) => (Points) = (new ObservableCollection<WaypointInfo>(other.Points));
 
@@ -56,21 +57,27 @@ namespace JAFDTC.Models.M2000C.WYPT
             {
                 WaypointInfo wypt = new()
                 {
-                    Name = (navptInfo.ContainsKey("name")) ? navptInfo["name"] : "",
-                    Lat = (navptInfo.ContainsKey("lat")) ? navptInfo["lat"] : "",
-                    Lon = (navptInfo.ContainsKey("lon")) ? navptInfo["lon"] : "",
-                    Alt = (navptInfo.ContainsKey("alt")) ? navptInfo["alt"] : ""
+                    Name = (navptInfo.TryGetValue("name", out string name)) ? name : "",
+                    Lat = (navptInfo.TryGetValue("lat", out string lat)) ? lat : "",
+                    Lon = (navptInfo.TryGetValue("lon", out string lon)) ? lon : "",
+                    Alt = (navptInfo.TryGetValue("alt", out string alt)) ? alt : ""
                 };
                 Add(wypt);
             }
         }
 
-        public override WaypointInfo Add(WaypointInfo wypt = null)
+        public override WaypointInfo Add(WaypointInfo wypt = null, int atIndex = -1)
         {
             wypt ??= new();
-            wypt.Number = (Points.Count == 0) ? 1 : Points[^1].Number + 1;
+            atIndex = (atIndex >= Points.Count) ? -1 : atIndex;
+            if (Points.Count == 0)
+                wypt.Number = 1;
+            else if (atIndex == -1)
+                wypt.Number = Points[^1].Number + 1;
+            else
+                wypt.Number = Points[atIndex].Number;
             wypt.Name = (string.IsNullOrEmpty(wypt.Name)) ? $"WP{wypt.Number}" : wypt.Name;
-            return base.Add(wypt);
+            return base.Add(wypt, atIndex);
         }
     }
 }

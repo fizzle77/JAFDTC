@@ -29,6 +29,7 @@ using Microsoft.Windows.Storage.Pickers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using Windows.Storage;
 using Windows.UI;
@@ -104,7 +105,7 @@ namespace JAFDTC.UI.App
     /// </summary>
     public sealed partial class ConfigEditorPageNavArgs
     {
-        public ConfigurationPage ConfigPage {  get; }
+        public ConfigurationPage ConfigPage { get; }
 
         public IConfiguration Config { get; }
 
@@ -153,6 +154,8 @@ namespace JAFDTC.UI.App
 
         private bool IsRefreshingNavList { get; set; }
 
+        private readonly List<Window> _auxWindowList = [];
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction
@@ -162,7 +165,9 @@ namespace JAFDTC.UI.App
         public ConfigurationPage()
         {
             CurApp = Application.Current as JAFDTC.App;
-            CurApp.PropertyChanged += AppPropertyChangedHandler;
+            CurApp.PropertyChanged += App_PropertyChanged;
+
+            CurApp.Window.Closed += AppWindow_Closed;
 
             InitializeComponent();
 
@@ -174,6 +179,38 @@ namespace JAFDTC.UI.App
         // ui support
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// registers an auxiliary  window for use by an editor page. these windows are automatically closed when
+        /// the configuration editor moves off of the configuration editor page on which they were registered. closing
+        /// the window via Close() will unregister an auxiliary  window.
+        /// </summary>
+        public void RegisterAuxWindow(Window window)
+        {
+            _auxWindowList.Add(window);
+            window.Closed += AuxWindow_Closed;
+        }
+
+        /// <summary>
+        /// close the auxiliary  window with the given tag.
+        /// </summary>
+        public void CloseAuxWindows(Window window = null)
+        {
+            if (window == null)
+            {
+                foreach (Window wind in _auxWindowList)
+                {
+                    wind.Closed -= AuxWindow_Closed;
+                    wind.Close();
+                }
+                _auxWindowList.Clear();
+            }
+            else
+            {
+                window.Closed -= AuxWindow_Closed;
+                _auxWindowList.Remove(window);
+            }
+        }
 
         /// <summary>
         /// rebuild the editor icon foregrounds to implement the link/unlink badge on the editor icon.
@@ -194,9 +231,7 @@ namespace JAFDTC.UI.App
         private void RebuildInterfaceState()
         {
             foreach (ConfigEditorPageInfo info in EditorPages)
-            {
                 RebuildIconForeground(info);
-            }
 
             if (CurApp.IsDCSAvailable && (CurApp.DCSActiveAirframe == Config.Airframe) && !CurApp.IsDCSUploadInFlight)
             {
@@ -223,10 +258,11 @@ namespace JAFDTC.UI.App
         // ---- buttons -----------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// back button click: navigate back to the configuration list.
+        /// back button click: navigate back to the configuration list, closing any open auxiliary  windows.
         /// </summary>
         private void HdrBtnBack_Click(object sender, RoutedEventArgs args)
         {
+            CloseAuxWindows();
             Frame.GoBack();
         }
 
@@ -267,9 +303,7 @@ namespace JAFDTC.UI.App
         private void CmdCopy_Click(object sender, RoutedEventArgs args)
         {
             if (uiNavListEditors.SelectedItem is ConfigEditorPageInfo info)
-            {
                 General.DataToClipboard(info.Tag, Config.Serialize(info.Tag));
-            }
         }
 
         /// <summary>
@@ -329,6 +363,8 @@ namespace JAFDTC.UI.App
                 ConfigEditorPageNavArgs navArgs = new(this, Config, info.EditorHelperType, UIDtoConfigMap, uiHdrBtnBack);
                 ((Frame)uiNavSplitView.Content).Navigate(info.EditorPageType, navArgs);
                 Config.LastSystemEdited = uiNavListEditors.SelectedIndex;
+
+                CloseAuxWindows();
             }
         }
 
@@ -376,7 +412,7 @@ namespace JAFDTC.UI.App
         // ---- aux command list --------------------------------------------------------------------------------------
 
         /// <summary>
-        /// handle an auxilliary command by invoking the editor's HandleAuxCommand method. rebuild the contents of
+        /// handle an auxiliary  command by invoking the editor's HandleAuxCommand method. rebuild the contents of
         /// the aux command list if requested. raises an AuxCommandInvoked event.
         /// </summary>
         private void NavListAuxCmd_ItemClick(object sender, ItemClickEventArgs args)
@@ -458,9 +494,27 @@ namespace JAFDTC.UI.App
         /// <summary>
         /// TODO: document
         /// </summary>
-        private void AppPropertyChangedHandler(object sender, object args)
+        private void App_PropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// on closing the main app window, close any open aux windows too.
+        /// </summary>
+        private void AppWindow_Closed(object sender, object args)
+        {
+            CloseAuxWindows();
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void AuxWindow_Closed(object sender, WindowEventArgs args)
+        {
+            Window window = sender as Window;
+            window.Closed -= AuxWindow_Closed;
+            _auxWindowList.Remove(window);
         }
 
         /// <summary>
@@ -495,6 +549,8 @@ namespace JAFDTC.UI.App
 
         protected override void OnNavigatedFrom(NavigationEventArgs args)
         {
+            CloseAuxWindows();
+
             Config.ConfigurationSaved -= ConfigurationSavedHandler;
 
             base.OnNavigatedFrom(args);
