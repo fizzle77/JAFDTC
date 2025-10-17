@@ -362,8 +362,9 @@ namespace JAFDTC.UI
                 for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
                 {
                     UIElement child = VisualTreeHelper.GetChild(parent, i) as UIElement;
-                    if (FindControl<T>(child, targetType, tag) != null)
-                        return FindControl<T>(child, targetType, tag);
+                    T control = FindControl<T>(child, targetType, tag);
+                    if (control != null)
+                        return control;
                 }
             }
             return result;

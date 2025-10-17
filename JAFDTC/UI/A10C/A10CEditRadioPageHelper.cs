@@ -174,19 +174,45 @@ namespace JAFDTC.UI.A10C
         public override bool RadioCanProgramModulation(int radio)
             => (radio == (int)RadioSystem.Radios.COMM1);
 
+        // These are bound to combo boxes, and the built-in binding behaves better when we don't build
+        // a new list every time, so we build a series of fixed lists we can return as appropriate.
+        private List<TextBlock> BothAmFirst => new()
+        {
+            new TextBlock() { Text = Modulation.AM.ToString(), Tag = ((int)Modulation.AM).ToString() },
+            new TextBlock() { Text = Modulation.FM.ToString(), Tag = ((int)Modulation.FM).ToString() },
+        };
+        private static List<TextBlock> BothFmFirst => new()
+        {
+            new TextBlock() { Text = Modulation.FM.ToString(), Tag = ((int)Modulation.FM).ToString() },
+            new TextBlock() { Text = Modulation.AM.ToString(), Tag = ((int)Modulation.AM).ToString() },
+        };
+        private static List<TextBlock> AmOnly => new()
+        {
+            new TextBlock() { Text = Modulation.AM.ToString(), Tag = ((int)Modulation.AM).ToString() },
+        };
+        private static List<TextBlock> FmOnly => new()
+        {
+            new TextBlock() { Text = Modulation.FM.ToString(), Tag = ((int)Modulation.FM).ToString() },
+        };
+
         public override List<TextBlock> RadioModulationItems(int radio, string freq)
         {
             if (radio == (int)RadioSystem.Radios.COMM1)
             {
                 Modulation[] mods = DefaultModulationForFreqOnRadio((RadioSystem.Radios)radio, freq);
-                if (mods != null)
+                if (mods.Length == 2)
                 {
-                    List<TextBlock> result = new List<TextBlock>();
-                    for (int i = 0; i < mods.Length; i++)
-                    {
-                        result.Add(new TextBlock() { Text = mods[i].ToString(), Tag = ((int)mods[i]).ToString() });
-                    }
-                    return result;
+                    if (mods[0] == Modulation.AM)
+                        return BothAmFirst;
+                    else
+                        return BothFmFirst;
+                }
+                else if (mods.Length == 1)
+                {
+                    if (mods[0] == Modulation.AM)
+                        return AmOnly;
+                    else
+                        return FmOnly;
                 }
             }
             return null;
