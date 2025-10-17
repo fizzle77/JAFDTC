@@ -153,7 +153,7 @@ namespace JAFDTC.Models.Base
         {
             get => ((string.IsNullOrEmpty(Lat)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LatUI)) + ", " +
                    ((string.IsNullOrEmpty(Lon)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LonUI)) + " / " +
-                   ((string.IsNullOrEmpty(Alt)) ? "Ground" : Alt + "’");
+                   ((string.IsNullOrEmpty(Alt)) ? "Unknown" : Alt + "’");
             set
             {
                 // NOTE: set value is ignored to ensure consistency with the lat/lon/alt properties, setting just
