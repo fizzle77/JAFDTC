@@ -257,7 +257,8 @@ namespace JAFDTC.UI.Base
 
         /// <summary>
         /// paste button: deserialize the navpoints on the clipboard from json and append them to the end of the
-        /// navpoint list.
+        /// navpoint list. implicitly closes any open map window to avoid having to do the coordination/coherency
+        /// thing.
         /// </summary>
         private async void CmdPaste_Click(object sender, RoutedEventArgs args)
         {
@@ -322,7 +323,8 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
-        /// TODO: document
+        /// capture command: start the ui to allow coordinate capture from the dcs ui.  implicitly closes any open map
+        /// window to avoid having to do the coordination/coherency thing.
         /// </summary>
         private async void CmdCapture_Click(object sender, RoutedEventArgs args)
         {
@@ -357,10 +359,13 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
-        /// TODO: document
+        /// import poi command: navigate to the poi list to pull in pois. implicitly closes any open map window to
+        /// avoid having to do the coordination/coherency thing.
         /// </summary>
         private void CmdImportPOIs_Click(object sender, RoutedEventArgs args)
         {
+            MapWindow?.Close();
+
             SaveEditStateToConfig();
             NavArgs.BackButton.IsEnabled = false;
             Frame.Navigate(typeof(AddNavpointsFromPOIsPage), new AddNavpointsFromPOIsPage.NavigationArg(this, Config, PageHelper),
@@ -368,7 +373,8 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
-        /// TODO: document
+        /// import command: start the import flow to pull in navpoints. implicitly closes any open map window to
+        /// avoid having to do the coordination/coherency thing.
         /// </summary>
         private async void CmdImport_Click(object sender, RoutedEventArgs args)
         {
@@ -728,6 +734,10 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected override void OnNavigatedFrom(NavigationEventArgs args)
         {
+            // we can navigate from here by pushing to a navpoint detail editor (EditNavpointPage) or by pushing
+            // to a add poi list page (AddNavpointsFromPOIsPage). we use EditNavptDetailPage to determine when
+            // we have pushed the former and not the latter so we can correctly work with any map window.
+            //
             EditNavptDetailPage = args.Content as EditNavpointPage;
 
             EditNavpt.CollectionChanged -= CollectionChangedHandler;

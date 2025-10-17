@@ -21,13 +21,13 @@ using JAFDTC.Models;
 using JAFDTC.Models.AV8B;
 using JAFDTC.Models.AV8B.WYPT;
 using JAFDTC.Models.Base;
-using JAFDTC.Models.F14AB;
+using JAFDTC.Models.DCS;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
 using JAFDTC.UI.Controls.Map;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
-using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -57,7 +57,7 @@ namespace JAFDTC.UI.AV8B
 
         public override AirframeTypes AirframeType => AirframeTypes.AV8B;
 
-        // public LLFormat NavptCoordFmt => LLFormat.DMS;
+        public override LLFormat NavptCoordFmt => LLFormat.DMS;
 
         // TODO: validate maximum navpoint count
         public override int NavptMaxCount => int.MaxValue;
@@ -92,7 +92,7 @@ namespace JAFDTC.UI.AV8B
             return true;
         }
 
-        public override void AppendFromPOIsToConfig(IEnumerable<Models.DCS.PointOfInterest> pois, IConfiguration config)
+        public override void AppendFromPOIsToConfig(IEnumerable<PointOfInterest> pois, IConfiguration config)
         {
             AV8BConfiguration av8bConfig = (AV8BConfiguration)config;
             ObservableCollection<WaypointInfo> points = av8bConfig.WYPT.Points;
@@ -165,8 +165,8 @@ namespace JAFDTC.UI.AV8B
             }
         }
 
-        public override object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
-                                     int indexNavpt)
+        public override object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror,
+                                              IConfiguration config, int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));
             return new EditNavptPageNavArgs(parentEditor, verbMirror, config, indexNavpt, isUnlinked,

@@ -19,15 +19,15 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
+using JAFDTC.Models.DCS;
 using JAFDTC.Models.F14AB;
 using JAFDTC.Models.F14AB.WYPT;
-using JAFDTC.Models.FA18C;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
 using JAFDTC.UI.Controls.Map;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
-using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -60,7 +60,7 @@ namespace JAFDTC.UI.F14AB
 
         public override int NavptMaxCount => 3;
 
-        // public LLFormat NavptCoordFmt => LLFormat.DDM_P1ZF;
+        public override LLFormat NavptCoordFmt => LLFormat.DDM_P1ZF;
         
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -87,7 +87,7 @@ namespace JAFDTC.UI.F14AB
             return true;
         }
 
-        public override void AppendFromPOIsToConfig(IEnumerable<Models.DCS.PointOfInterest> pois, IConfiguration config)
+        public override void AppendFromPOIsToConfig(IEnumerable<PointOfInterest> pois, IConfiguration config)
         {
             F14ABConfiguration tomcatConfig = (F14ABConfiguration)config;
             ObservableCollection<WaypointInfo> points = tomcatConfig.WYPT.Points;
@@ -160,8 +160,8 @@ namespace JAFDTC.UI.F14AB
             }
         }
 
-        public override object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
-                                     int indexNavpt)
+        public override object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror,
+                                              IConfiguration config, int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));
             return new EditNavptPageNavArgs(parentEditor, verbMirror, config, indexNavpt, isUnlinked,

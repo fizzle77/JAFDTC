@@ -18,9 +18,8 @@
 // ********************************************************************************************************************
 
 using JAFDTC.Models;
-using JAFDTC.Models.A10C;
 using JAFDTC.Models.Base;
-using JAFDTC.Models.F14AB;
+using JAFDTC.Models.DCS;
 using JAFDTC.Models.M2000C;
 using JAFDTC.Models.M2000C.WYPT;
 using JAFDTC.UI.App;
@@ -28,7 +27,7 @@ using JAFDTC.UI.Base;
 using JAFDTC.UI.Controls.Map;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
-using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -61,7 +60,7 @@ namespace JAFDTC.UI.M2000C
 
         public override int NavptMaxCount => 10;
 
-        // public LLFormat NavptCoordFmt => LLFormat.DDM_P3ZF;
+        public override LLFormat NavptCoordFmt => LLFormat.DDM_P3ZF;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -92,7 +91,7 @@ namespace JAFDTC.UI.M2000C
             return true;
         }
 
-        public override void AppendFromPOIsToConfig(IEnumerable<Models.DCS.PointOfInterest> pois, IConfiguration config)
+        public override void AppendFromPOIsToConfig(IEnumerable<PointOfInterest> pois, IConfiguration config)
         {
             M2000CConfiguration m2kConfig = (M2000CConfiguration)config;
             ObservableCollection<WaypointInfo> points = m2kConfig.WYPT.Points;
@@ -165,8 +164,8 @@ namespace JAFDTC.UI.M2000C
             }
         }
 
-        public override object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
-                                     int indexNavpt)
+        public override object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror,
+                                              IConfiguration config, int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));
             return new EditNavptPageNavArgs(parentEditor, verbMirror, config, indexNavpt, isUnlinked,
