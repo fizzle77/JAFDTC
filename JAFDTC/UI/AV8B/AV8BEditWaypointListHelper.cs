@@ -2,7 +2,7 @@
 //
 // AV8BEditWaypointListHelper.cs : IEditNavpointListPageHelper for the av8b configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -23,9 +23,10 @@ using JAFDTC.Models.AV8B.WYPT;
 using JAFDTC.Models.Base;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
+using JAFDTC.UI.Controls.Map;
+using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -56,6 +57,8 @@ namespace JAFDTC.UI.AV8B
         public AirframeTypes AirframeType => AirframeTypes.AV8B;
 
         public string NavptName => "Waypoint";
+
+        public LLFormat NavptCoordFmt => LLFormat.DMS;
 
         public Type NavptEditorType => typeof(EditNavpointPage);
 
@@ -104,9 +107,10 @@ namespace JAFDTC.UI.AV8B
             ((AV8BConfiguration)config).WYPT.Reset();
         }
 
-        public void AddNavpoint(IConfiguration config)
+        public int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
-            ((AV8BConfiguration)config).WYPT.Add();
+            WaypointInfo wypt = ((AV8BConfiguration)config).WYPT.Add(null, atIndex);
+            return ((AV8BConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
 
         public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
@@ -147,10 +151,12 @@ namespace JAFDTC.UI.AV8B
             }
         }
 
-        public object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt)
+        public object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
+                                     int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));
-            return new EditNavptPageNavArgs(parentEditor, config, indexNavpt, isUnlinked, typeof(AV8BEditWaypointHelper));
+            return new EditNavptPageNavArgs(parentEditor, verbMirror, config, indexNavpt, isUnlinked,
+                                            typeof(AV8BEditWaypointHelper));
         }
     }
 }

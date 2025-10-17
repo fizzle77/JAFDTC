@@ -2,7 +2,7 @@
 //
 // M2000CEditWaypointListHelper.cs : IEditNavpointListPageHelper for the f-14a/b configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -19,14 +19,15 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
-using JAFDTC.Models.FA18C;
+using JAFDTC.Models.F14AB;
 using JAFDTC.Models.M2000C;
 using JAFDTC.Models.M2000C.WYPT;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
+using JAFDTC.UI.Controls.Map;
+using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -58,6 +59,8 @@ namespace JAFDTC.UI.M2000C
         public AirframeTypes AirframeType => AirframeTypes.M2000C;
 
         public string NavptName => "Waypoint";
+
+        public LLFormat NavptCoordFmt => LLFormat.DDM_P3ZF;
 
         public Type NavptEditorType => typeof(EditNavpointPage);
 
@@ -102,9 +105,10 @@ namespace JAFDTC.UI.M2000C
             ((M2000CConfiguration)config).WYPT.Reset();
         }
 
-        public void AddNavpoint(IConfiguration config)
+        public int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
-            ((M2000CConfiguration)config).WYPT.Add();
+            WaypointInfo wypt = ((M2000CConfiguration)config).WYPT.Add(null, atIndex);
+            return ((M2000CConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
 
         public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
@@ -145,10 +149,12 @@ namespace JAFDTC.UI.M2000C
             }
         }
 
-        public object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt)
+        public object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
+                                     int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));
-            return new EditNavptPageNavArgs(parentEditor, config, indexNavpt, isUnlinked, typeof(M2000CEditWaypointHelper));
+            return new EditNavptPageNavArgs(parentEditor, verbMirror, config, indexNavpt, isUnlinked,
+                                            typeof(M2000CEditWaypointHelper));
         }
     }
 }

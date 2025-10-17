@@ -119,9 +119,9 @@ namespace JAFDTC.UI.Base
         public void ApplyCapture(INavpointInfo edit, WyptCaptureData wypt);
 
         /// <summary>
-        /// add a navigation point to the end of the navpoint list in the configuration. this updates, but does not
-        /// save the configuration.
+        /// add a navigation point to the navpoint list in the configuration at the indicated position (default is
+        /// end of list). this updates (but does not save) the configuration. returns index of added navpoint.
         /// </summary>
-        public int AddNavpoint(IConfiguration config);
+        public int AddNavpoint(IConfiguration config, int atIndex = -1);
     }
 }

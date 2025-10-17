@@ -3,7 +3,7 @@
 // PointOfInterest.cs -- point of interest model
 //
 // Copyright(C) 2021-2023 the-paid-actor & others
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -19,8 +19,8 @@
 // ********************************************************************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 
 namespace JAFDTC.Models.DCS
 {
@@ -45,7 +45,26 @@ namespace JAFDTC.Models.DCS
         ANY = -1,
         DCS_CORE = 1 << PointOfInterestType.DCS_CORE,
         USER = 1 << PointOfInterestType.USER,
-        CAMPAIGN = 1 << PointOfInterestType.CAMPAIGN,
+        CAMPAIGN = 1 << PointOfInterestType.CAMPAIGN
+    }
+
+    // ================================================================================================================
+
+    /// <summary>
+    /// defines the boundary of a theater on the map in terms of a min/max latitude and longitude.
+    /// </summary>
+    public sealed class TheaterBounds
+    {
+        public double LatMin { get; }
+        public double LatMax { get; }
+        public double LonMin { get; }
+        public double LonMax { get; }
+
+        public TheaterBounds(double latMin, double latMax, double lonMin, double lonMax)
+            => (LatMin, LatMax, LonMin, LonMax) = (latMin, latMax, lonMin, lonMax);
+
+        public bool Contains(double lat, double lon)
+            => ((LatMin <= lat) && (lat <= LatMax) && (LonMin <= lon) && (lon <= LonMax));
     }
 
     // ================================================================================================================
@@ -53,7 +72,8 @@ namespace JAFDTC.Models.DCS
     /// <summary>
     /// defines the properties of a point of interest (poi) known to jafdtc. these instances are managed by the poi
     /// database (PointOfInterestDbase). pois include a theater (set based on lat/lon), optional campaign name,
-    /// semicolon-separated list of tags, and a lat/lon/elev.
+    /// semicolon-separated list of tags, and a lat/lon/elev. the tuple (type, theater, name) must be unique across
+    /// the database.
     /// </summary>
     public sealed class PointOfInterest
     {
@@ -80,6 +100,24 @@ namespace JAFDTC.Models.DCS
         public string Longitude { get; set; }                   // longitude (decimal degrees)
         
         public string Elevation { get; set; }                   // elevation (feet)
+
+        public static Dictionary<string, TheaterBounds> TheaterBounds => new()
+        {
+            ["Afghanistan"]     = new( 23.00,  38.75,   60.25,   73.25),
+            ["Caucasus"]        = new( 40.00,  46.00,   33.00,   46.00),
+            ["Germany"]         = new( 49.50,  54.50,    6.50,   16.00),
+            ["Iraq"]            = new( 26.25,  37.00,   38.50,   52.00),
+            ["Kola"]            = new( 64.00,  71.25,   12.00,   39.00),
+            ["Marianas"]        = new( 11.75,  22.00,  141.00,  149.00),
+            ["Nevada"]          = new( 34.50,  38.75, -118.50, -113.00),
+            ["Persian Gulf"]    = new( 22.00,  30.75,   50.00,   59.00),
+            ["Sinai"]           = new( 26.50,  32.00,   29.50,   35.75),
+            ["South Atlantic"]  = new(-57.00, -48.00,  -77.00,  -55.00),
+            ["Syria"]           = new( 31.25,  37.50,   30.75,   41.00)
+        };
+        public static List<string> Theaters => [.. TheaterBounds.Keys ];
+
+        public string UniqueID => $"{(int)Type}:{Theater}:{Name}";
 
         public override string ToString()
         {
@@ -159,68 +197,48 @@ namespace JAFDTC.Models.DCS
         }
 
         /// <summary>
-        /// return true if a value is on [min, max]; false otherwise.
+        /// returns a list of the names of the dcs theaters that contains the given coordinate, empty list if
+        /// no theater matches the coordinates. the match is based on approximate lat/lon bounds of the theaters.
+        /// note that a coordinate may appear in multiple theaters.
         /// </summary>
-        private static bool InRange(double min, double val, double max) => ((min <= val) && (val <= max));
+        public static List<string> TheatersForCoords(double lat, double lon)
+        {
+            List<string> theaters = [ ];
+            foreach (KeyValuePair<string, TheaterBounds> kvp in TheaterBounds)
+                if (kvp.Value.Contains(lat, lon))
+                    theaters.Add(kvp.Key);
+            return theaters;
+        }
 
+        /// <summary>
+        /// returns a list of the names of the dcs theaters that contains the given coordinate, empty list if
+        /// no theater matches the coordinates. the match is based on approximate lat/lon bounds of the theaters.
+        /// note that a coordinate may appear in multiple theaters.
+        /// </summary>
+        public static List<string> TheatersForCoords(string lat, string lon)
+            => TheatersForCoords(double.Parse(lat), double.Parse(lon));
+        
+// TODO: deprecate?
         /// <summary>
         /// return the name of the dcs theater that contains the given coordinate, null if no theater matches the
         /// coordinates. the match is based on approximate lat/lon bounds of the theaters.
         /// </summary>
         public static string TheaterForCoords(double lat, double lon)
         {
-            if (InRange(29.0, lat, 39.0) && InRange(59.0, lon, 76.0))
-            {
-                return "Afghanistan";
-            }
-            else if (InRange(40.0, lat, 46.0) && InRange(33.0, lon, 46.0))
-            {
-                return "Caucasus";
-            }
-            else if (InRange(48.0, lat, 54.0) && InRange(5.0, lon, 15.0))
-            {
-                return "Germany";
-            }
-            else if (InRange(24.0, lat, 38.0) && InRange(39.0, lon, 53.0))
-            {
-                return "Iraq";
-            }
-            else if (InRange(62.0, lat, 75.0) && InRange(15.0, lon, 48.0))
-            {
-                return "Kola";
-            }
-            else if (InRange(10.0, lat, 23.0) && InRange(149.0, lon, 137.0))
-            {
-                return "Marianas";
-            }
-            else if (InRange(34.0, lat, 40.0) && InRange(-119.0, lon, -112.0))
-            {
-                return "Nevada";
-            }
-            else if (InRange(23.0, lat, 33.0) && InRange(47.0, lon, 60.0))
-            {
-                return "Persian Gulf";
-            }
-            else if (InRange(26.0, lat, 32.0) && InRange(28.0, lon, 37.0))
-            {
-                return "Sinai";
-            }
-            else if (InRange(-57.0, lat, -48.0) && InRange(-86.0, lon, -45.0))
-            {
-                return "South Atlantic";
-            }
-            else if (InRange(32.0, lat, 38.0) && InRange(30.0, lon, 41.0))
-            {
-                return "Syria";
-            }
+// TODO: this is kinda broken, theaters in dcs can overlap. use TheatersForCoords instead?
+            foreach (KeyValuePair<string, TheaterBounds> kvp in TheaterBounds)
+                if (kvp.Value.Contains(lat, lon))
+                    return kvp.Key;
             return null;
         }
 
+// TODO: deprecate?
         /// <summary>
         /// return the name of the dcs theater that contains the given coordinate, null if no theater matches the
         /// coordinates. the match is based on approximate lat/lon bounds of the theaters.
         /// </summary>
         public static string TheaterForCoords(string lat, string lon)
+// TODO: this is kinda broken, theaters in dcs can overlap. use TheatersForCoords instead?
             => TheaterForCoords(double.Parse(lat), double.Parse(lon));
 
         /// <summary>

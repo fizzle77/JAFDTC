@@ -75,6 +75,27 @@ namespace JAFDTC.Models.AV8B.WYPT
             }
         }
 
+        // NOTE: AV8B WYPT system doesn't use the altitude, allow it to be empty without flagging an error.
+
+        public override string Alt
+        {
+            get => _alt;
+            set
+            {
+                string error = "Invalid altitude format";
+                if (IsIntegerFieldValid(value, -80000, 80000))
+                {
+                    value = FixupIntegerField(value);
+                    error = null;
+                }
+                SetProperty(ref _alt, value, error);
+                //
+                // NOTE: force a change notification for LocationUI too when changing this property.
+                //
+                LocationUI = null;
+            }
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // construction

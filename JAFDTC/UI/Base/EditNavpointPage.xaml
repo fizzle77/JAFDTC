@@ -175,12 +175,6 @@ https://www.gnu.org/licenses/.
                            Style="{StaticResource EditorTitleTextBlockStyle}">
                     FIXUP:Type FIXUP:Count Information
                 </TextBlock>
-                <Button Grid.Column="1" Margin="12,0,0,0" x:Name="uiNavptBtnAddPoI"
-                        VerticalAlignment="Center"
-                        Click="StptBtnAddPoI_Click"
-                        ToolTipService.ToolTip="Create point of interest from navpoint">
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xECAF;"/>
-                </Button>
                 <Button Grid.Column="2" Margin="24,0,6,0" x:Name="uiPoIBtnApply"
                         VerticalAlignment="Center"
                         Click="PoIBtnApply_Click"
@@ -270,6 +264,7 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.CustomMask="N:[nNsS]"
                          ui_ctk:TextBoxExtensions.Mask="N 99° 99’ 99’’"
                          TextChanged="NavptTextBoxExt_TextChanged"
+                         LostFocus="NavptTextBoxExt_LostFocus"
                          ToolTipService.ToolTip="Latitude of navpoint"/>
                 <TextBox Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" x:Name="uiNavptValueLon"
                          Tag="LonUI"
@@ -280,6 +275,7 @@ https://www.gnu.org/licenses/.
                          ui_ctk:TextBoxExtensions.CustomMask="E:[eEwW]"
                          ui_ctk:TextBoxExtensions.Mask="E 999° 99’ 99’’"
                          TextChanged="NavptTextBoxExt_TextChanged"
+                         LostFocus="NavptTextBoxExt_LostFocus"
                          ToolTipService.ToolTip="Longitude of navpoint"/>
                 <TextBox Grid.Row="0" Grid.Column="2" Margin="24,0,0,0" x:Name="uiNavptValueAlt"
                          Style="{StaticResource EditorParamEditTextBoxStyle}"

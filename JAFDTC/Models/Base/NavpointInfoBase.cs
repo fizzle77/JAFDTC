@@ -69,6 +69,10 @@ namespace JAFDTC.Models.Base
                     error = null;
                 }
                 SetProperty(ref _lat, value, error);
+                //
+                // NOTE: force a change notification for LocationUI too when changing this property.
+                //
+                LocationUI = null;
             }
         }
 
@@ -91,6 +95,10 @@ namespace JAFDTC.Models.Base
                     error = null;
                 }
                 SetProperty(ref _lon, value, error);
+                //
+                // NOTE: force a change notification for LocationUI too when changing this property.
+                //
+                LocationUI = null;
             }
         }
 
@@ -117,6 +125,10 @@ namespace JAFDTC.Models.Base
                     error = null;
                 }
                 SetProperty(ref _alt, value, error);
+                //
+                // NOTE: force a change notification for LocationUI too when changing this property.
+                //
+                LocationUI = null;
             }
         }
 
@@ -137,9 +149,19 @@ namespace JAFDTC.Models.Base
                                         string.IsNullOrEmpty(_lon));
 
         [JsonIgnore]
-        public virtual string Location => ((string.IsNullOrEmpty(Lat)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LatUI)) + ", " +
-                                          ((string.IsNullOrEmpty(Lon)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LonUI)) + " / " +
-                                          ((string.IsNullOrEmpty(Alt)) ? "Unknown" : Alt + "’");
+        public virtual string LocationUI
+        {
+            get => ((string.IsNullOrEmpty(Lat)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LatUI)) + ", " +
+                   ((string.IsNullOrEmpty(Lon)) ? "Unknown" : Coord.RemoveLLDegZeroFill(LonUI)) + " / " +
+                   ((string.IsNullOrEmpty(Alt)) ? "Unknown" : Alt + "’");
+            set
+            {
+                // NOTE: set value is ignored to ensure consistency with the lat/lon/alt properties, setting just
+                // NOTE: generates the property changed event.
+
+                OnPropertyChanged();
+            }
+        }
 
         // ------------------------------------------------------------------------------------------------------------
         //

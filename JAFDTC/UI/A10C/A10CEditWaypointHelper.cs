@@ -2,7 +2,7 @@
 //
 // A10CEditWaypointHelper.cs : IEditNavpointPageHelper for the a-10c configuration
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
 namespace JAFDTC.UI.A10C
@@ -107,7 +108,7 @@ namespace JAFDTC.UI.A10C
 
         public List<string> GetErrors(INavpointInfo edit, string propertyName)
         {
-            return ((WaypointInfo)edit).GetErrors(propertyName).Cast<string>().ToList();
+            return [.. ((WaypointInfo)edit).GetErrors(propertyName).Cast<string>() ];
         }
 
         public int NavpointCount(IConfiguration config)
@@ -141,9 +142,9 @@ namespace JAFDTC.UI.A10C
             }
         }
 
-        public int AddNavpoint(IConfiguration config)
+        public int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
-            WaypointInfo wypt = ((A10CConfiguration)config).WYPT.Add();
+            WaypointInfo wypt = ((A10CConfiguration)config).WYPT.Add(null, atIndex);
             return ((A10CConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
     }

@@ -2,7 +2,7 @@
 //
 // AV8BEditWaypointHelper.cs : IEditNavpointPageHelper for the av8b configuration
 //
-// Copyright(C) 2023 ilominar/raven
+// Copyright(C) 2023- ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -23,6 +23,7 @@ using JAFDTC.Models.AV8B.WYPT;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
 using JAFDTC.UI.Base;
+using JAFDTC.Utilities;
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -30,7 +31,6 @@ using System.ComponentModel;
 using System.Linq;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
-using JAFDTC.Utilities;
 
 namespace JAFDTC.UI.AV8B
 {
@@ -94,7 +94,7 @@ namespace JAFDTC.UI.AV8B
 
         public List<string> GetErrors(INavpointInfo edit, string propertyName)
         {
-            return ((WaypointInfo)edit).GetErrors(propertyName).Cast<string>().ToList();
+            return [.. ((WaypointInfo)edit).GetErrors(propertyName).Cast<string>() ];
         }
 
         public int NavpointCount(IConfiguration config)
@@ -128,9 +128,9 @@ namespace JAFDTC.UI.AV8B
             }
         }
 
-        public int AddNavpoint(IConfiguration config)
+        public int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
-            WaypointInfo wypt = ((AV8BConfiguration)config).WYPT.Add();
+            WaypointInfo wypt = ((AV8BConfiguration)config).WYPT.Add(null, atIndex);
             return ((AV8BConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
     }

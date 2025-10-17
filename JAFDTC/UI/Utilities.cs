@@ -2,7 +2,7 @@
 //
 // Utilities.cs : general user interface utility functions
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -26,11 +26,11 @@ using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.Graphics;
 using Windows.System;
 using Windows.UI.Core;
 
@@ -41,10 +41,83 @@ namespace JAFDTC.UI
     /// </summary>
     internal class Utilities
     {
-        // TODO: DEPRECATE
+// TODO: DEPRECATE
         private static readonly Regex regexInts = new("^[\\-]{0,1}[0-9]*$");
-        // TODO: DEPRECATE
+// TODO: DEPRECATE
         private static readonly Regex regexTwoNegs = new("[^\\-]*[\\-][^\\-]*[\\-].*");
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // window sizing and setup support
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// returns the setup string (basically, "{x} {y} {width} {height}" for a window based on position and size.
+        /// </summary>
+        public static string BuildWindowSetupString(PointInt32 windPosn, SizeInt32 windSize)
+            => $"{windPosn.X} {windPosn.Y} {windSize.Width} {windSize.Height}";
+
+        /// <summary>
+        /// returns the window size based on the last setup and a starting target size.
+        /// </summary>
+        public static SizeInt32 BuildWindowSize(double windowDPI, SizeInt32 size, string lastSetup = null)
+        {
+            if (!string.IsNullOrEmpty(lastSetup))
+            {
+                List<int> fields = [.. Array.ConvertAll(lastSetup.Split(' '), int.Parse) ];
+                size.Width = fields[2];
+                size.Height = fields[3];
+            }
+            double scaleFactor = windowDPI / 96;
+            SizeInt32 baseSize;
+            baseSize.Width = (int)(size.Width * scaleFactor);
+            baseSize.Height = (int)(size.Height * scaleFactor);
+            return baseSize;
+        }
+
+        /// <summary>
+        /// returns the window position based on the last setup, work area, and target window size. the window is 
+        /// centered in the work area if there's no setup or the placement would put it in a corner.
+        /// </summary>
+        public static PointInt32 BuildWindowPosition(RectInt32 workArea, SizeInt32 windSize, string lastSetup = null)
+        {
+            PointInt32 windPosn = new()
+            {
+                X = ((workArea.Width - windSize.Width) / 2),
+                Y = ((workArea.Height - windSize.Height) / 2)
+            };
+            if (!string.IsNullOrEmpty(lastSetup))
+            {
+                List<int> fields = [.. Array.ConvertAll(lastSetup.Split(' '), int.Parse) ];
+                if (((workArea.X + workArea.Width - 100) > fields[0]) &&
+                    ((workArea.Y + workArea.Height - 100) > fields[1]))
+                {
+                    windPosn.X = fields[0];
+                    windPosn.Y = fields[1];
+                }
+            }
+            return windPosn;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // dispatch queue support
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// schedule a lambda on a dispatch queue to fire one or more times. 
+        /// </summary>
+        public static void DispatchAfterDelay(Microsoft.UI.Dispatching.DispatcherQueue queue, double seconds, bool repeats,
+                                              TypedEventHandler<Microsoft.UI.Dispatching.DispatcherQueueTimer, object> lambda)
+        {
+            Microsoft.UI.Dispatching.DispatcherQueueTimer timer = queue.CreateTimer();
+            timer.Interval = TimeSpan.FromSeconds(seconds);
+            timer.IsRepeating = repeats;
+            timer.Tick += lambda;
+            timer.Start();
+        }
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -306,11 +379,8 @@ namespace JAFDTC.UI
             for (int i = 0; i < count; i++)
             {
                 DependencyObject current = VisualTreeHelper.GetChild(startNode, i);
-                if (current is T)
-                {
-                    T asType = (T)current;
+                if (current is T asType)
                     results.Add(asType);
-                }
                 FindDescendantControls<T>(results, current);
             }
         }
@@ -323,7 +393,7 @@ namespace JAFDTC.UI
             if ((input == null) || (input.Length < length))
                 return input;
 
-            int iNextSpace = input.LastIndexOf(" ", length);
+            int iNextSpace = input.LastIndexOf(' ', length);
             return string.Format("{0}...", input[..((iNextSpace > 0) ? iNextSpace : length)].Trim());
         }
 
@@ -446,7 +516,7 @@ namespace JAFDTC.UI
                     while (config.SystemLinkedTo(systemTag) != null)
                     {
                         string linkUID = config.SystemLinkedTo(systemTag);
-                        config = (uidToConfigMap.ContainsKey(linkUID)) ? uidToConfigMap[linkUID] : null;
+                        config = (uidToConfigMap.TryGetValue(linkUID, out IConfiguration value)) ? value : null;
                         if ((config == null) || (config.UID == myUID))
                         {
                             config = null;
@@ -473,7 +543,7 @@ namespace JAFDTC.UI
                                                TextBlock uiPageBtnTxtLink, TextBlock uiPageTxtLink)
         {
             string linkedUID = config.SystemLinkedTo(systemTag);
-            if (string.IsNullOrEmpty(linkedUID) || !uidToConfigMap.ContainsKey(linkedUID))
+            if (string.IsNullOrEmpty(linkedUID) || !uidToConfigMap.TryGetValue(linkedUID, out IConfiguration value))
             {
                 uiPageBtnTxtLink.Text = "Link To...";
                 uiPageTxtLink.Text = "";
@@ -482,7 +552,7 @@ namespace JAFDTC.UI
             else
             {
                 uiPageBtnTxtLink.Text = "Unlink From";
-                uiPageTxtLink.Text = TruncateAtWord(uidToConfigMap[linkedUID].Name, 46);
+                uiPageTxtLink.Text = TruncateAtWord(value.Name, 46);
             }
         }
 

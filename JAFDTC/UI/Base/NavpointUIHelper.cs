@@ -2,7 +2,7 @@
 //
 // NavpointUIHelper.cs : helper classes for navpoint ui
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -21,6 +21,7 @@ using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.Import;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Controls.Map;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -29,8 +30,8 @@ using Microsoft.Windows.Storage.Pickers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
-using Windows.Security.Credentials.UI;
 using Windows.Storage;
 
 namespace JAFDTC.UI.Base
@@ -56,7 +57,7 @@ namespace JAFDTC.UI.Base
         }
 
         public string Glyph => (PoI.Type == PointOfInterestType.USER)
-                           ? "\xE718" : ((PoI.Type == PointOfInterestType.CAMPAIGN) ? "\xE7C1" : "");
+                               ? "\xE718" : ((PoI.Type == PointOfInterestType.CAMPAIGN) ? "\xE7C1" : "");
 
         public PoIListItem(PointOfInterest poi) => (PoI) = (poi);
     }
@@ -64,7 +65,7 @@ namespace JAFDTC.UI.Base
     // ================================================================================================================
 
     /// <summary>
-    /// TODO
+    /// point of interest filter specification to build a PoIFilterSpec suitable for use by the poi find methods.
     /// </summary>
     public sealed class PoIFilterSpec
     {
@@ -98,6 +99,101 @@ namespace JAFDTC.UI.Base
     {
         // ------------------------------------------------------------------------------------------------------------
         //
+        // navpoint location functions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// returns a list of theaters that cover the list of navpoints. the list is sorted in order of membership:
+        /// first index is the theater with the most matches, last index is the theater with the least.
+        /// </summary>
+        public static List<string> TheatersForNavpoints(List<INavpointInfo> navpts)
+        {
+            Dictionary<string, int> theaterMap = [ ];
+            foreach (INavpointInfo navpt in navpts)
+                foreach (string theater in PointOfInterest.TheatersForCoords(navpt.Lat, navpt.Lon))
+                    theaterMap[theater] = theaterMap.GetValueOrDefault(theater, 0) + 1;
+
+            Dictionary<int, List<string>> freqMap = [];
+            foreach (KeyValuePair<string, int> kvp in theaterMap)
+                if (freqMap.ContainsKey(kvp.Value))
+                    freqMap[kvp.Value].Add(kvp.Key);
+                else
+                    freqMap[kvp.Value] = [ kvp.Key ];
+
+            List<string> theaters = [ ];
+            foreach (int freq in freqMap.Keys.OrderByDescending(k => k))
+                foreach (string theater in freqMap[freq])
+                    theaters.Add(theater);
+
+            return theaters;
+        }
+
+        /// <summary>
+        /// propose a location for a new navpoint bast on the current set of navpoints. there are three cases:
+        /// (1) with no navpoints, prompts to select a theater and locates the navpoint in the center of the
+        /// bounds, (2) with one navpoint, places the navpoint slightly to the east, and (3) with two or more
+        /// navpoints, places the navpoint slightly beyond along a line from the next-to-last and last navpoint.
+        /// returns a tuple { lat, lon }, null if the user cancels.
+        /// </summary>
+        public static async Task<Tuple<string, string>> ProposeNewNavptLatLon(XamlRoot root, List<INavpointInfo> navpts)
+        {
+            double lat;
+            double lon;
+
+            if (navpts.Count == 0)
+            {
+                // no navpoints: prompt for a theater then locate the new navpoint in the center of the
+                // area for that theater.
+                //
+                GetListDialog theaterDialog = new(PointOfInterest.Theaters, "Theater", 0, 0)
+                {
+                    XamlRoot = root,
+                    Title = $"Select a Theater for the Navpoint",
+                    PrimaryButtonText = "OK",
+                    CloseButtonText = "Cancel"
+                };
+                ContentDialogResult result = await theaterDialog.ShowAsync(ContentDialogPlacement.Popup);
+                if (result == ContentDialogResult.Primary)
+                {
+                    TheaterBounds bounds = PointOfInterest.TheaterBounds[theaterDialog.SelectedItem];
+                    lat = bounds.LatMin + ((bounds.LatMax - bounds.LatMin) / 2.0);
+                    lon = bounds.LonMin + ((bounds.LonMax - bounds.LonMin) / 2.0);
+                }
+                else
+                {
+                    return null;                                    // EXIT: cancelled, no change...
+                }
+            }
+            else if (navpts.Count == 1)
+            {
+                // single navpoint: proposed new navpoint is a bit east of the existing navpoint.
+                //
+                lat = double.Parse(navpts[0].Lat);
+                lon = double.Parse(navpts[0].Lon) + 0.5;
+            }
+            else
+            {
+                // at least two navpoints: proposed new navpoint is a little bit down the line connecting the
+                // last two navpoints.
+                //
+                double p0Lat = double.Parse(navpts[^1].Lat);
+                double p0Lon = double.Parse(navpts[^1].Lon);
+
+                double p1Lat = double.Parse(navpts[^2].Lat);
+                double p1Lon = double.Parse(navpts[^2].Lon);
+
+                double len = Math.Sqrt(Math.Pow(p1Lat - p0Lat, 2) + Math.Pow(p1Lon - p0Lon, 2));
+
+                lat = p0Lat + ((p0Lat - p1Lat) / len) * 0.5;
+                lon = p0Lon + ((p0Lon - p1Lon) / len) * 0.5;
+            }
+
+            return new Tuple<string, string>($"{lat:F8}", $"{lon:F8}");
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
         // navpoint poi functions
         //
         // ------------------------------------------------------------------------------------------------------------
@@ -108,9 +204,7 @@ namespace JAFDTC.UI.Base
         public static async Task<PoIFilterSpec> FilterSpecDialog(XamlRoot root, PoIFilterSpec spec, ToggleButton button)
         {
             if (button.IsChecked != spec.IsFiltered)
-            {
                 button.IsChecked = spec.IsFiltered;
-            }
 
             GetPoIFilterDialog filterDialog = new(spec.Theater, spec.Campaign, spec.Tags, spec.IncludeTypes)
             {
@@ -148,13 +242,11 @@ namespace JAFDTC.UI.Base
         /// </summary>
         public static List<PoIListItem> RebuildPointsOfInterest(PoIFilterSpec spec, string name = null)
         {
-            List<PoIListItem> suitableItems = new();
+            List<PoIListItem> suitableItems = [ ];
             PointOfInterestDbQuery query = new(spec.IncludeTypes, spec.Theater, null, name, spec.Tags,
                                                PointOfInterestDbQueryFlags.NAME_PARTIAL_MATCH);
             foreach (PointOfInterest poi in PointOfInterestDbase.Instance.Find(query, true))
-            {
                 suitableItems.Add(new PoIListItem(poi));
-            }
             return suitableItems;
         }
 
@@ -361,13 +453,9 @@ namespace JAFDTC.UI.Base
                         "Append");
                 }
                 if (result == ContentDialogResult.None)
-                {
                     return false;                                           // exit, flight selection cancelled
-                }
                 if (!importer.Import(navptSys, flightName, (result == ContentDialogResult.Primary), options))
-                {
                     throw new Exception();                                  // exit, import error
-                }
             }
             catch (Exception ex)
             {
@@ -380,9 +468,90 @@ namespace JAFDTC.UI.Base
 
         // ------------------------------------------------------------------------------------------------------------
         //
+        // navpoint list map functions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public static MapWindow OpenMap(IMapControlVerbHandler observer, int maxRouteLen,
+                                        LLFormat coordFormat, Dictionary<string, List<INavpointInfo>> routes)
+        {
+            List<INavpointInfo> allRoutes = [ ];
+            foreach (string route in routes.Keys)
+                allRoutes.AddRange(routes[route]);
+            List<string> theaters = TheatersForNavpoints(allRoutes);
+            string theater = (theaters.Count > 0) ? theaters[0] : null;
+
+            Dictionary<string, PointOfInterest> marks = [];
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater);
+            foreach (PointOfInterest poi in PointOfInterestDbase.Instance.Find(query))
+                marks[$"{poi.Theater}|{poi.Campaign}|{poi.Name}"] = poi;
+
+            MapWindow mapWindow = new()
+            {
+                Theater = theater,
+                OpenMask = MapMarkerInfo.MarkerTypeMask.NAVPT,
+                EditMask = MapMarkerInfo.MarkerTypeMask.ANY,
+                CoordFormat = coordFormat,
+                MaxRouteLength = maxRouteLen
+            };
+            mapWindow.SetupMapContent(routes, marks);
+            mapWindow.RegisterMapControlVerbObserver(observer);
+
+            mapWindow.Activate();
+
+            return mapWindow;
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public static PointOfInterest SummaryForMarkerOnMap(MapWindow mapWindow, string tag, int index = -1)
+        {
+#if NOPE
+            WorldMapDataSource ds = mapWindow.DataSource;
+
+            PointOfInterest navpt = null;
+            if (ds.Routes.TryGetValue(tag, out List<INavpointInfo> routes) && (index < routes.Count))
+            {
+                string pfx = (ds.Routes.Count > 1) ? $"{tag}: " : $"";
+                navpt = new()
+                {
+                    Name = (string.IsNullOrEmpty(routes[index].Name)) ? $"{pfx}{index}" : $"{pfx}{routes[index].Name}",
+                    Latitude = routes[index].Lat,
+                    Longitude = routes[index].Lon,
+                    Elevation = routes[index].Alt
+                };
+            }
+            else if (ds.Marks.TryGetValue(tag, out PointOfInterest poi))
+            {
+                navpt = new()
+                {
+                    Name = poi.Type switch
+                    {
+                        PointOfInterestType.CAMPAIGN => $"PoI {poi.Campaign}: {poi.Name}",
+                        PointOfInterestType.USER => $"PoI User: {poi.Name}",
+                        _ => $"PoI: {poi.Name}"
+                    },
+                    Latitude = poi.Latitude,
+                    Longitude = poi.Longitude,
+                    Elevation = poi.Elevation
+                };
+            }
+            return navpt;
+#endif
+            return null;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
         // navpoint list export functions
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        // TODO: DEPRECATE ALL
 
         /// <summary>
         /// present and handle a file save picker to select a .json/.cf/.miz file to export to. returns the result of

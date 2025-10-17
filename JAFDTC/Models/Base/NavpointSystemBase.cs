@@ -2,7 +2,7 @@
 //
 // NavpointSystemBase.cs -- navigation point system abstract base class
 //
-// Copyright(C) 2023-2024 ilominar/raven
+// Copyright(C) 2023-2025 ilominar/raven
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU General
 // Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
@@ -83,13 +83,9 @@ namespace JAFDTC.Models.Base
             {
                 ObservableCollection<T> navpts = JsonSerializer.Deserialize<ObservableCollection<T>>(json);
                 if (isReplace)
-                {
                     Points.Clear();
-                }
                 foreach (T navpt in navpts)
-                {
                     Add(navpt);
-                }
                 return true;
             }
             catch
@@ -111,13 +107,9 @@ namespace JAFDTC.Models.Base
             {
                 List<PointOfInterest> pois = JsonSerializer.Deserialize<List<PointOfInterest>>(json);
                 if (isReplace)
-                {
                     Points.Clear();
-                }
                 foreach (PointOfInterest poi in pois)
-                {
                     Add(ConvertPOIToNavPt(poi));
-                }
                 return true;
             }
             catch
@@ -156,9 +148,7 @@ namespace JAFDTC.Models.Base
             try
             {
                 if (isReplace)
-                {
                     Points.Clear();
-                }
                 AddNavpointsFromInfoList(navptInfoList);
                 return true;
             }
@@ -218,17 +208,19 @@ namespace JAFDTC.Models.Base
         public virtual void RenumberFrom(int startNumber)
         {
             for (int i = 0; i < Count; i++)
-            {
                 Points[i].Number = startNumber + i;
-            }
         }
 
         /// <summary>
-        /// add an existing navpoint to the end of the navpoint list. returns the navpoint added.
+        /// add an existing navpoint to the navpoint list at the specified index (default is end of list).
+        /// returns the navpoint added.
         /// </summary>
-        public virtual T Add(T navpt)
+        public virtual T Add(T navpt, int atIndex = -1)
         {
-            Points.Add(navpt);
+            if (atIndex == -1)
+                Points.Add(navpt);
+            else
+                Points.Insert(atIndex, navpt);
             return navpt;
         }
 
