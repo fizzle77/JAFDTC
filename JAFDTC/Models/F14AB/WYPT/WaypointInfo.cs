@@ -27,7 +27,7 @@ namespace JAFDTC.Models.F14AB.WYPT
     /// <summary>
     /// TODO: document
     /// </summary>
-    public class WaypointInfo : NavpointInfoBase
+    public partial class WaypointInfo : NavpointInfoBase
     {
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -37,7 +37,7 @@ namespace JAFDTC.Models.F14AB.WYPT
 
         // ---- following properties post change and validation events.
 
-        // TODO: double check coordinate format
+// TODO: double check coordinate format
         [JsonIgnore]
         private string _latUI;                      // string, DDM (DMTM) "[N|S] 00° 00.0’"
         [JsonIgnore]
@@ -60,7 +60,7 @@ namespace JAFDTC.Models.F14AB.WYPT
             }
         }
 
-        // TODO: double check coordinate format
+// TODO: double check coordinate format
         [JsonIgnore]
         private string _lonUI;                      // string, DDM (DMTM) "[E|W] 000° 00.0’"
         [JsonIgnore]
@@ -80,6 +80,27 @@ namespace JAFDTC.Models.F14AB.WYPT
                 }
                 Lon = Coord.ConvertToLonDD(value, LLFormat.DDM_P1ZF);
                 SetProperty(ref _lonUI, value, error);
+            }
+        }
+
+        // NOTE: F14AB WYPT system doesn't use the altitude, allow it to be empty without flagging an error.
+
+        public override string Alt
+        {
+            get => _alt;
+            set
+            {
+                string error = "Invalid altitude format";
+                if (IsIntegerFieldValid(value, -80000, 80000))
+                {
+                    value = FixupIntegerField(value);
+                    error = null;
+                }
+                SetProperty(ref _alt, value, error);
+                //
+                // NOTE: force a change notification for LocationUI too when changing this property.
+                //
+                LocationUI = null;
             }
         }
 
