@@ -163,9 +163,7 @@ namespace JAFDTC.UI.Base
         private void CopyEditToConfig(int index, bool isPersist = false)
         {
             if (PageHelper.CopyEditToConfig(index, EditNavpt, Config) && isPersist)
-            {
                 Config.Save(this, PageHelper.SystemTag);
-            }
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -189,15 +187,11 @@ namespace JAFDTC.UI.Base
 
         private void ValidateAllFields(Dictionary<string, TextBox> fields, IEnumerable errors)
         {
-            Dictionary<string, bool> map = new();
+            Dictionary<string, bool> map = [ ];
             foreach (string error in errors)
-            {
                 map[error] = true;
-            }
             foreach (KeyValuePair<string, TextBox> kvp in fields)
-            {
                 SetFieldValidState(kvp.Value, !map.ContainsKey(kvp.Key));
-            }
         }
 
         /// <summary>
@@ -224,10 +218,8 @@ namespace JAFDTC.UI.Base
             else
             {
                 List<string> errors = PageHelper.GetErrors(EditNavpt, args.PropertyName);
-                if (_curNavptFieldValueMap.ContainsKey(args.PropertyName))
-                {
-                    SetFieldValidState(_curNavptFieldValueMap[args.PropertyName], (errors.Count == 0));
-                }
+                if (_curNavptFieldValueMap.TryGetValue(args.PropertyName, out TextBox value))
+                    SetFieldValidState(value, (errors.Count == 0));
             }
             RebuildInterfaceState();
         }
@@ -246,12 +238,8 @@ namespace JAFDTC.UI.Base
         private bool CurStateHasErrors()
         {
             foreach (KeyValuePair<string, TextBox> kvp in _curNavptTxtBoxExtMap)
-            {
                 if (!TextBoxExtensions.GetIsValid(kvp.Value))
-                {
                     return true;
-                }
-            }
             return PageHelper.HasErrors(EditNavpt);
         }
 
@@ -260,30 +248,6 @@ namespace JAFDTC.UI.Base
         // ui support
         //
         // ------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// return true if the current edit navpoint is a valid poi, false otherwise. a valid poi has a name,
-        /// latitude, and longitude. the name should be unique within the user part of the poi database.
-        /// </summary>
-        private bool IsEditCoordValidPoI()
-        {
-            if (string.IsNullOrEmpty(EditNavpt.Name) || string.IsNullOrEmpty(EditNavpt.Alt) ||
-                !double.TryParse(EditNavpt.Lat, out double lat) || !double.TryParse(EditNavpt.Lon, out double lon))
-            {
-                return false;
-            }
-            string theater = PointOfInterest.TheaterForCoords(lat, lon);
-            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater, null, EditNavpt.Name);
-            List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
-            foreach (PointOfInterest poi in pois)
-            {
-                if (poi.Type != PointOfInterestType.USER)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
 
         /// <summary>
         /// rebuild the point of interest list in the filter box.
@@ -314,11 +278,8 @@ namespace JAFDTC.UI.Base
             Utilities.SetEnableState(uiNavptValueName, isEditable);
 
             foreach (KeyValuePair<string, TextBox> kvp in _curNavptFieldValueMap)
-            {
                 Utilities.SetEnableState(kvp.Value, isEditable);
-            }
 
-            Utilities.SetEnableState(uiNavptBtnAddPoI, isEditable && IsEditCoordValidPoI());
             Utilities.SetEnableState(uiNavptBtnPrev, !isErrorsInUI && (EditNavptIndex > 0));
             Utilities.SetEnableState(uiNavptBtnAdd, isEditable && !isErrorsInUI);
             Utilities.SetEnableState(uiNavptBtnNext, !isErrorsInUI &&
@@ -362,9 +323,7 @@ namespace JAFDTC.UI.Base
         private void AcceptBtnOk_Click(object sender, RoutedEventArgs args)
         {
             if (!CurStateHasErrors() && string.IsNullOrEmpty(Config.SystemLinkedTo(PageHelper.SystemTag)))
-            {
                 CopyEditToConfig(EditNavptIndex, true);
-            }
             Frame.GoBack();
         }
 
@@ -499,19 +458,6 @@ namespace JAFDTC.UI.Base
         // ---- steerpoint management ---------------------------------------------------------------------------------
 
         /// <summary>
-        /// steerpoint add poi click: add current steerpoint to the poi database or update a matching editable poi.
-        /// </summary>
-        private async void StptBtnAddPoI_Click(object sender, RoutedEventArgs args)
-        {
-            if (EditNavpt.IsValid && await NavpointUIHelper.CreatePoIAt(Content.XamlRoot, EditNavpt.Name, EditNavpt.Lat,
-                                                                        EditNavpt.Lon, EditNavpt.Alt))
-            {
-                RebuildPointsOfInterest();
-                RebuildInterfaceState();
-            }
-        }
-
-        /// <summary>
         /// steerpoint previous click: save the current steerpoint and move to the previous steerpoint.
         /// </summary>
         private void NavptBtnPrev_Click(object sender, RoutedEventArgs args)
@@ -561,7 +507,6 @@ namespace JAFDTC.UI.Base
         {
             RebuildInterfaceState();
         }
-
 
         private void NavptValueName_TextChanged(object sender, TextChangedEventArgs e)
         {
