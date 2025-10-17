@@ -21,6 +21,7 @@ using JAFDTC.Models;
 using JAFDTC.Models.AV8B;
 using JAFDTC.Models.AV8B.WYPT;
 using JAFDTC.Models.Base;
+using JAFDTC.Models.F14AB;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
 using JAFDTC.UI.Controls.Map;
@@ -38,7 +39,7 @@ namespace JAFDTC.UI.AV8B
     /// <summary>
     /// TODO: docuemnt
     /// </summary>
-    internal class AV8BEditWaypointListHelper : IEditNavpointListPageHelper
+    internal class AV8BEditWaypointListHelper : EditWaypointListHelperBase
     {
         public static ConfigEditorPageInfo PageInfo
             => new(WYPTSystem.SystemTag, "Waypoints", "WYPT", Glyphs.WYPT,
@@ -50,20 +51,16 @@ namespace JAFDTC.UI.AV8B
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public string SystemTag => WYPTSystem.SystemTag;
+        public override string SystemTag => WYPTSystem.SystemTag;
 
-        public string NavptListTag => WYPTSystem.WYPTListTag;
+        public override string NavptListTag => WYPTSystem.WYPTListTag;
 
-        public AirframeTypes AirframeType => AirframeTypes.AV8B;
+        public override AirframeTypes AirframeType => AirframeTypes.AV8B;
 
-        public string NavptName => "Waypoint";
-
-        public LLFormat NavptCoordFmt => LLFormat.DMS;
-
-        public Type NavptEditorType => typeof(EditNavpointPage);
+        // public LLFormat NavptCoordFmt => LLFormat.DMS;
 
         // TODO: validate maximum navpoint count
-        public int NavptMaxCount => int.MaxValue;
+        public override int NavptMaxCount => int.MaxValue;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -71,12 +68,10 @@ namespace JAFDTC.UI.AV8B
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // TODO: document
-        public void SetupUserInterface(IConfiguration config, ListView listView)
-        {
-        }
+        public override int NavptCurrentCount(IConfiguration config) => ((AV8BConfiguration)config).WYPT.Count;
 
-        public void CopyConfigToEdit(IConfiguration config, ObservableCollection<INavpointInfo> edit)
+
+        public override void CopyConfigToEdit(IConfiguration config, ObservableCollection<INavpointInfo> edit)
         {
             AV8BConfiguration av8bConfig = (AV8BConfiguration)config;
             edit.Clear();
@@ -86,7 +81,7 @@ namespace JAFDTC.UI.AV8B
             }
         }
 
-        public bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config)
+        public override bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config)
         {
             AV8BConfiguration av8bConfig = (AV8BConfiguration)config;
             av8bConfig.WYPT.Points.Clear();
@@ -97,33 +92,52 @@ namespace JAFDTC.UI.AV8B
             return true;
         }
 
-        public INavpointSystemImport NavptSystem(IConfiguration config)
+        public override void AppendFromPOIsToConfig(IEnumerable<Models.DCS.PointOfInterest> pois, IConfiguration config)
+        {
+            AV8BConfiguration av8bConfig = (AV8BConfiguration)config;
+            ObservableCollection<WaypointInfo> points = av8bConfig.WYPT.Points;
+            int startNumber = (points.Count == 0) ? 1 : points[^1].Number + 1;
+            foreach (Models.DCS.PointOfInterest poi in pois)
+            {
+                WaypointInfo wypt = new()
+                {
+                    Number = startNumber++,
+                    Name = poi.Name,
+                    Lat = poi.Latitude,
+                    Lon = poi.Longitude,
+                    Alt = poi.Elevation
+                };
+                av8bConfig.WYPT.Points.Add(new WaypointInfo(wypt));
+            }
+        }
+
+        public override INavpointSystemImport NavptSystem(IConfiguration config)
         {
             return ((AV8BConfiguration)config).WYPT;
         }
 
-        public void ResetSystem(IConfiguration config)
+        public override void ResetSystem(IConfiguration config)
         {
             ((AV8BConfiguration)config).WYPT.Reset();
         }
 
-        public int AddNavpoint(IConfiguration config, int atIndex = -1)
+        public override int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
             WaypointInfo wypt = ((AV8BConfiguration)config).WYPT.Add(null, atIndex);
             return ((AV8BConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
 
-        public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
+        public override bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
         {
             return ((AV8BConfiguration)config).WYPT.ImportSerializedNavpoints(cbData, isReplace);
         }
 
-        public string ExportNavpoints(IConfiguration config)
+        public override string ExportNavpoints(IConfiguration config)
         {
             return ((AV8BConfiguration)config).WYPT.SerializeNavpoints();
         }
 
-        public void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
+        public override void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
         {
             WYPTSystem wyptSys = ((AV8BConfiguration)config).WYPT;
             for (int i = 0; i < wypts.Length; i++)
@@ -151,7 +165,7 @@ namespace JAFDTC.UI.AV8B
             }
         }
 
-        public object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
+        public override object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
                                      int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));

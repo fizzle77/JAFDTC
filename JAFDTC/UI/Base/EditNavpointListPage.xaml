@@ -83,6 +83,13 @@ https://www.gnu.org/licenses/.
                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7B7;"/>
                 </AppBarButton.Icon>
             </AppBarButton>
+            <AppBarButton x:Name="uiBarImportPOIs" Label="Add From POIs"
+                          Click="CmdImportPOIs_Click"
+                          ToolTipService.ToolTip="Add multiple navpoints from POIs">
+                <AppBarButton.Icon>
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xECAF;"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
             <AppBarButton x:Name="uiBarImport" Icon="Download" Label="Import"
                           Click="CmdImport_Click"
                           ToolTipService.ToolTip="Import navpoints from a file"/>

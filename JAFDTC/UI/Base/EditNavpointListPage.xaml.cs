@@ -359,6 +359,17 @@ namespace JAFDTC.UI.Base
         /// <summary>
         /// TODO: document
         /// </summary>
+        private void CmdImportPOIs_Click(object sender, RoutedEventArgs args)
+        {
+            SaveEditStateToConfig();
+            NavArgs.BackButton.IsEnabled = false;
+            Frame.Navigate(typeof(AddNavpointsFromPOIsPage), new AddNavpointsFromPOIsPage.NavigationArg(this, Config, PageHelper),
+                new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
         private async void CmdImport_Click(object sender, RoutedEventArgs args)
         {
             MapWindow?.Close();

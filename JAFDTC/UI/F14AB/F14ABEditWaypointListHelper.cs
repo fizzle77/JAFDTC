@@ -21,6 +21,7 @@ using JAFDTC.Models;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.F14AB;
 using JAFDTC.Models.F14AB.WYPT;
+using JAFDTC.Models.FA18C;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
 using JAFDTC.UI.Controls.Map;
@@ -39,7 +40,7 @@ namespace JAFDTC.UI.F14AB
     /// helper class for EditNavpointListPage that implements IEditNavpointListPageHelper. this handles the
     /// specialization of the general navpoint list page for the f-14a/b airframe.
     /// </summary>
-    internal class F14ABEditWaypointListHelper : IEditNavpointListPageHelper
+    internal class F14ABEditWaypointListHelper : EditWaypointListHelperBase
     {
         public static ConfigEditorPageInfo PageInfo
             => new(WYPTSystem.SystemTag, "Waypoints", "WYPT", Glyphs.WYPT,
@@ -51,30 +52,25 @@ namespace JAFDTC.UI.F14AB
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public string SystemTag => WYPTSystem.SystemTag;
+        public override string SystemTag => WYPTSystem.SystemTag;
 
-        public string NavptListTag => WYPTSystem.WYPTListTag;
+        public override string NavptListTag => WYPTSystem.WYPTListTag;
 
-        public AirframeTypes AirframeType => AirframeTypes.F14AB;
+        public override AirframeTypes AirframeType => AirframeTypes.F14AB;
 
-        public string NavptName => "Waypoint";
+        public override int NavptMaxCount => 3;
 
-        public LLFormat NavptCoordFmt => LLFormat.DDM_P1ZF;
-
-        public Type NavptEditorType => typeof(EditNavpointPage);
-
-        public int NavptMaxCount => 3;
-
-
+        // public LLFormat NavptCoordFmt => LLFormat.DDM_P1ZF;
+        
         // ------------------------------------------------------------------------------------------------------------
         //
         // methods
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public void SetupUserInterface(IConfiguration config, ListView listView) { }
+        public override int NavptCurrentCount(IConfiguration config) => ((F14ABConfiguration)config).WYPT.Count;
 
-        public void CopyConfigToEdit(IConfiguration config, ObservableCollection<INavpointInfo> edit)
+        public override void CopyConfigToEdit(IConfiguration config, ObservableCollection<INavpointInfo> edit)
         {
             F14ABConfiguration f14Config = (F14ABConfiguration)config;
             edit.Clear();
@@ -82,7 +78,7 @@ namespace JAFDTC.UI.F14AB
                 edit.Add(new WaypointInfo(wypt));
         }
 
-        public bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config)
+        public override bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config)
         {
             F14ABConfiguration f14Config = (F14ABConfiguration)config;
             f14Config.WYPT.Points.Clear();
@@ -91,33 +87,52 @@ namespace JAFDTC.UI.F14AB
             return true;
         }
 
-        public INavpointSystemImport NavptSystem(IConfiguration config)
+        public override void AppendFromPOIsToConfig(IEnumerable<Models.DCS.PointOfInterest> pois, IConfiguration config)
+        {
+            F14ABConfiguration tomcatConfig = (F14ABConfiguration)config;
+            ObservableCollection<WaypointInfo> points = tomcatConfig.WYPT.Points;
+            int startNumber = (points.Count == 0) ? 1 : points[^1].Number + 1;
+            foreach (Models.DCS.PointOfInterest poi in pois)
+            {
+                WaypointInfo wypt = new()
+                {
+                    Number = startNumber++,
+                    Name = poi.Name,
+                    Lat = poi.Latitude,
+                    Lon = poi.Longitude,
+                    Alt = poi.Elevation
+                };
+                tomcatConfig.WYPT.Points.Add(new WaypointInfo(wypt));
+            }
+        }
+
+        public override INavpointSystemImport NavptSystem(IConfiguration config)
         {
             return ((F14ABConfiguration)config).WYPT;
         }
 
-        public void ResetSystem(IConfiguration config)
+        public override void ResetSystem(IConfiguration config)
         {
             ((F14ABConfiguration)config).WYPT.Reset();
         }
 
-        public int AddNavpoint(IConfiguration config, int atIndex = -1)
+        public override int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
             WaypointInfo wypt = ((F14ABConfiguration)config).WYPT.Add(null, atIndex);
             return ((F14ABConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
 
-        public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
+        public override bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
         {
             return ((F14ABConfiguration)config).WYPT.ImportSerializedNavpoints(cbData, isReplace);
         }
 
-        public string ExportNavpoints(IConfiguration config)
+        public override string ExportNavpoints(IConfiguration config)
         {
             return ((F14ABConfiguration)config).WYPT.SerializeNavpoints();
         }
 
-        public void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
+        public override void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
         {
             WYPTSystem wyptSys = ((F14ABConfiguration)config).WYPT;
             for (int i = 0; i < wypts.Length; i++)
@@ -145,7 +160,7 @@ namespace JAFDTC.UI.F14AB
             }
         }
 
-        public object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
+        public override object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
                                      int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));

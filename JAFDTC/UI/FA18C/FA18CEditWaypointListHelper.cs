@@ -19,6 +19,7 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
+using JAFDTC.Models.F14AB;
 using JAFDTC.Models.FA18C;
 using JAFDTC.Models.FA18C.WYPT;
 using JAFDTC.Models.M2000C;
@@ -39,7 +40,7 @@ namespace JAFDTC.UI.FA18C
     /// <summary>
     /// TODO: document
     /// </summary>
-    internal class FA18CEditWaypointListHelper : IEditNavpointListPageHelper
+    internal class FA18CEditWaypointListHelper : EditWaypointListHelperBase
     {
         public static ConfigEditorPageInfo PageInfo
             => new(WYPTSystem.SystemTag, "Waypoints", "WYPT", Glyphs.WYPT,
@@ -51,20 +52,16 @@ namespace JAFDTC.UI.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        public string SystemTag => WYPTSystem.SystemTag;
+        public override string SystemTag => WYPTSystem.SystemTag;
 
-        public string NavptListTag => WYPTSystem.WYPTListTag;
+        public override string NavptListTag => WYPTSystem.WYPTListTag;
 
-        public AirframeTypes AirframeType => AirframeTypes.FA18C;
+        public override AirframeTypes AirframeType => AirframeTypes.FA18C;
 
-        public string NavptName => "Waypoint";
-
-        public LLFormat NavptCoordFmt => LLFormat.DDM_P2ZF;
-
-        public Type NavptEditorType => typeof(EditNavpointPage);
+        // public LLFormat NavptCoordFmt => LLFormat.DDM_P2ZF;
 
         // TODO: validate maximum navpoint count
-        public int NavptMaxCount => int.MaxValue;
+        public override int NavptMaxCount => int.MaxValue;
 
         // ------------------------------------------------------------------------------------------------------------
         //
@@ -72,59 +69,75 @@ namespace JAFDTC.UI.FA18C
         //
         // ------------------------------------------------------------------------------------------------------------
 
-        // TODO: document
-        public void SetupUserInterface(IConfiguration config, ListView listView)
-        {
-        }
+        public override int NavptCurrentCount(IConfiguration config) => ((FA18CConfiguration)config).WYPT.Count;
 
-        public void CopyConfigToEdit(IConfiguration config, ObservableCollection<INavpointInfo> edit)
+        public override void CopyConfigToEdit(IConfiguration config, ObservableCollection<INavpointInfo> edit)
         {
-            FA18CConfiguration a10cConfig = (FA18CConfiguration)config;
+            FA18CConfiguration hornetConfig = (FA18CConfiguration)config;
             edit.Clear();
-            foreach (WaypointInfo wypt in a10cConfig.WYPT.Points)
+            foreach (WaypointInfo wypt in hornetConfig.WYPT.Points)
             {
                 edit.Add(new WaypointInfo(wypt));
             }
         }
 
-        public bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config)
+        public override bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config)
         {
-            FA18CConfiguration a10cConfig = (FA18CConfiguration)config;
-            a10cConfig.WYPT.Points.Clear();
+            FA18CConfiguration hornetConfig = (FA18CConfiguration)config;
+            hornetConfig.WYPT.Points.Clear();
             foreach (WaypointInfo wypt in edit.Cast<WaypointInfo>())
             {
-                a10cConfig.WYPT.Points.Add(new WaypointInfo(wypt));
+                hornetConfig.WYPT.Points.Add(new WaypointInfo(wypt));
             }
             return true;
         }
 
-        public INavpointSystemImport NavptSystem(IConfiguration config)
+        public override void AppendFromPOIsToConfig(IEnumerable<Models.DCS.PointOfInterest> pois, IConfiguration config)
+        {
+            FA18CConfiguration hornetConfig = (FA18CConfiguration)config;
+            ObservableCollection<WaypointInfo> points = hornetConfig.WYPT.Points;
+            int startNumber = (points.Count == 0) ? 1 : points[^1].Number + 1;
+            foreach (Models.DCS.PointOfInterest poi in pois)
+            {
+                WaypointInfo wypt = new()
+                {
+                    Number = startNumber++,
+                    Name = poi.Name,
+                    Lat = poi.Latitude,
+                    Lon = poi.Longitude,
+                    Alt = poi.Elevation
+                };
+                hornetConfig.WYPT.Points.Add(new WaypointInfo(wypt));
+            }
+        }
+
+        public override INavpointSystemImport NavptSystem(IConfiguration config)
         {
             return ((FA18CConfiguration)config).WYPT;
         }
 
-        public void ResetSystem(IConfiguration config)
+        public override void ResetSystem(IConfiguration config)
         {
             ((FA18CConfiguration)config).WYPT.Reset();
         }
 
-        public int AddNavpoint(IConfiguration config, int atIndex = -1)
+        public override int AddNavpoint(IConfiguration config, int atIndex = -1)
         {
             WaypointInfo wypt = ((FA18CConfiguration)config).WYPT.Add(null, atIndex);
             return ((FA18CConfiguration)config).WYPT.Points.IndexOf(wypt);
         }
 
-        public bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
+        public override bool PasteNavpoints(IConfiguration config, string cbData, bool isReplace = false)
         {
             return ((FA18CConfiguration)config).WYPT.ImportSerializedNavpoints(cbData, isReplace);
         }
 
-        public string ExportNavpoints(IConfiguration config)
+        public override string ExportNavpoints(IConfiguration config)
         {
             return ((FA18CConfiguration)config).WYPT.SerializeNavpoints();
         }
 
-        public void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
+        public override void CaptureNavpoints(IConfiguration config, WyptCaptureData[] wypts, int startIndex)
         {
             // TODO: implement target points
             WYPTSystem wyptSys = ((FA18CConfiguration)config).WYPT;
@@ -153,7 +166,7 @@ namespace JAFDTC.UI.FA18C
             }
         }
 
-        public object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
+        public override object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
                                      int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));

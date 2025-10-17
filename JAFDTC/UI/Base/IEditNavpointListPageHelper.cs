@@ -23,6 +23,7 @@ using JAFDTC.UI.Controls.Map;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
@@ -73,6 +74,16 @@ namespace JAFDTC.UI.Base
         public int NavptMaxCount { get; }
 
         /// <summary>
+        /// return the  number of navpoints currently configured.
+        /// </summary>
+        public int NavptCurrentCount(IConfiguration config);
+
+        /// <summary>
+        /// return the  number of navpoints that can be added before reaching the maximum.
+        /// </summary>
+        public int NavptRemainingCount(IConfiguration config);
+
+        /// <summary>
         /// set up the user interface for the navpoint list editor. this method is called at OnNavigatedTo. 
         /// </summary>
         public void SetupUserInterface(IConfiguration config, ListView listView);
@@ -88,6 +99,8 @@ namespace JAFDTC.UI.Base
         /// the navpoints from the configuration.
         /// </summary>
         public bool CopyEditToConfig(ObservableCollection<INavpointInfo> edit, IConfiguration config);
+
+        public void AppendFromPOIsToConfig(IEnumerable<Models.DCS.PointOfInterest> pois, IConfiguration config);
 
         /// <summary>
         /// return the navpoint system.
