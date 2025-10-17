@@ -19,12 +19,15 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
+using JAFDTC.Models.DCS;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Controls.Map;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
@@ -33,9 +36,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
@@ -50,8 +51,16 @@ namespace JAFDTC.UI.Base
     /// using IEditNavpointListHelper, this class can support other navigation point systems that go beyond the basic
     /// functionality in NavpointInfoBase and NavpointSystemBase.
     /// </summary>
-    public sealed partial class EditNavpointListPage : SystemEditorPageBase
+    public sealed partial class EditNavpointListPage : SystemEditorPageBase, IMapControlVerbHandler, IMapControlMarkerExplainer
     {
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // constants
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        public readonly static string ROUTE_NAME = "Primary";
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // properties
@@ -70,11 +79,28 @@ namespace JAFDTC.UI.Base
 
         // ---- internal properties
 
+        private MapWindow _mapWindow;
+        private MapWindow MapWindow
+        {
+            get => _mapWindow;
+            set
+            {
+                if (_mapWindow != value)
+                {
+                    _mapWindow = value;
+                    VerbMirror = value;
+                }
+            }
+        }
+
         private IEditNavpointListPageHelper PageHelper { get; set; }
 
         private ObservableCollection<INavpointInfo> EditNavpt { get; set; }
 
+        private EditNavpointPage EditNavptDetailPage { get; set; }
+
         private int _startingNavptNum;
+        private bool _isVerbEvent;
         private bool _isClipboardValid;
         private bool _isMarshalling;
         private int _captureIndex;
@@ -118,9 +144,7 @@ namespace JAFDTC.UI.Base
         {
             _isMarshalling = true;
             if (PageHelper.CopyEditToConfig(EditNavpt, Config))
-            {
                 Config.Save(this, PageHelper.SystemTag);
-            }
             _isMarshalling = false;
             UpdateUIFromEditState();
         }
@@ -138,7 +162,8 @@ namespace JAFDTC.UI.Base
         {
             SaveEditStateToConfig();
             NavArgs.BackButton.IsEnabled = false;
-            this.Frame.Navigate(PageHelper.NavptEditorType, PageHelper.NavptEditorArg(this, Config, EditNavpt.IndexOf(navpt)),
+            this.Frame.Navigate(PageHelper.NavptEditorType,
+                                PageHelper.NavptEditorArg(this, VerbMirror, Config, EditNavpt.IndexOf(navpt)),
                                 new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
         }
 
@@ -171,7 +196,7 @@ namespace JAFDTC.UI.Base
 
             Utilities.SetEnableState(uiBarCapture, isEditable && isDCSListening);
             Utilities.SetEnableState(uiBarImport, isEditable);
-            Utilities.SetEnableState(uiBarExport, isEditable && (EditNavpt.Count > 0));
+            Utilities.SetEnableState(uiBarMap, true);
             Utilities.SetEnableState(uiBarRenumber, isEditable && (EditNavpt.Count > 0));
 
             uiNavptListView.CanReorderItems = isEditable;
@@ -213,6 +238,10 @@ namespace JAFDTC.UI.Base
                 EditNavpt[index].Lat = ll.Item1;
                 EditNavpt[index].Lon = ll.Item2;
                 SaveEditStateToConfig();
+
+                MapMarkerInfo info = new(MapMarkerInfo.MarkerType.NAVPT, ROUTE_NAME, index + 1, ll.Item1, ll.Item2);
+                VerbMirror?.MirrorVerbMarkerAdded(this, info);
+                VerbMirror?.MirrorVerbMarkerSelected(this, info);
             }
         }
 
@@ -232,7 +261,10 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void CmdPaste_Click(object sender, RoutedEventArgs args)
         {
-            // TODO: need to check paste against maximum navpoint count
+// TODO: consider doing this without closing the map window?
+            MapWindow?.Close();
+
+// TODO: need to check paste against maximum navpoint count
             ClipboardData cboard = await General.ClipboardDataAsync();
             if (cboard?.SystemTag == PageHelper.NavptListTag)
             {
@@ -253,12 +285,22 @@ namespace JAFDTC.UI.Base
             if (await NavpointUIHelper.DeleteDialog(Content.XamlRoot, PageHelper.NavptName,
                                                     uiNavptListView.SelectedItems.Count))
             {
-                List<INavpointInfo> deleteList = [ ];
-                foreach (INavpointInfo navpt in uiNavptListView.SelectedItems.Cast<INavpointInfo>())
-                    deleteList.Add(navpt);
+                _isMarshalling = true;
+
+                List<int> selectedIndices = [ ];
+                foreach (ItemIndexRange range in uiNavptListView.SelectedRanges)
+                    for (int i = range.FirstIndex; i <= range.LastIndex; i++)
+                        selectedIndices.Add(i);
+                selectedIndices.Sort((a, b) => b.CompareTo(a));
                 uiNavptListView.SelectedItems.Clear();
-                foreach (INavpointInfo navpt in deleteList)
-                    EditNavpt.Remove(navpt);
+                foreach (int index in selectedIndices)
+                {
+                    EditNavpt.RemoveAt(index);
+                    VerbMirror?.MirrorVerbMarkerDeleted(this, new(MapMarkerInfo.MarkerType.NAVPT, ROUTE_NAME, index + 1));
+                }
+                VerbMirror?.MirrorVerbMarkerSelected(this, new());
+
+                _isMarshalling = false;
                 SaveEditStateToConfig();
             }
         }
@@ -269,8 +311,8 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void CmdRenumber_Click(object sender, RoutedEventArgs args)
         {
-            // TODO: check navpoint min/max range
-            int newStartNum = await NavpointUIHelper.RenumberDialog(Content.XamlRoot, "Steerpoint", 1, 700);
+// TODO: check navpoint min/max range
+            int newStartNum = await NavpointUIHelper.RenumberDialog(Content.XamlRoot, PageHelper.NavptName, 1, 700);
             if (newStartNum != -1)
             {
                 _startingNavptNum = newStartNum;
@@ -284,6 +326,8 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void CmdCapture_Click(object sender, RoutedEventArgs args)
         {
+            MapWindow?.Close();
+
             _captureIndex = EditNavpt.Count;
             if (EditNavpt.Count > 0)
             {
@@ -317,6 +361,8 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private async void CmdImport_Click(object sender, RoutedEventArgs args)
         {
+            MapWindow?.Close();
+
             if (await NavpointUIHelper.Import(Content.XamlRoot, PageHelper.AirframeType,
                                               PageHelper.NavptSystem(Config), PageHelper.NavptName))
             {
@@ -326,13 +372,30 @@ namespace JAFDTC.UI.Base
         }
 
         /// <summary>
-        /// export command: prompt the user for a path to save the waypoints to, then serialize the waypoints and
-        /// save them to the requested file.
+        /// map command: if the map window is not currently open, build out the data source and so on necessary for
+        /// the window and create it. otherwise, activate the window.
         /// </summary>
-        private async void CmdExport_Click(object sender, RoutedEventArgs args)
+        private void CmdMap_Click(object sender, RoutedEventArgs args)
         {
-            await NavpointUIHelper.Export(Content.XamlRoot, Config.Name,
-                                          PageHelper.ExportNavpoints(Config), PageHelper.NavptName);
+            if (MapWindow == null)
+            {
+                Dictionary<string, List<INavpointInfo>> routes = new()
+                {
+                    [ROUTE_NAME] = [.. EditNavpt ]
+                };
+                MapWindow = NavpointUIHelper.OpenMap(this, PageHelper.NavptMaxCount, PageHelper.NavptCoordFmt, routes);
+                MapWindow.MarkerExplainer = this;
+                MapWindow.Closed += MapWindow_Closed;
+                NavArgs.ConfigPage.RegisterAuxWindow(MapWindow);
+
+                if (uiNavptListView.SelectedIndex != -1)
+                    VerbMirror?.MirrorVerbMarkerSelected(this, new(MapMarkerInfo.MarkerType.ANY, ROUTE_NAME,
+                                                         uiNavptListView.SelectedIndex + 1));
+            }
+            else
+            {
+                MapWindow.Activate();
+            }
         }
 
         // ---- navigation point list ---------------------------------------------------------------------------------
@@ -342,7 +405,14 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void NavptList_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
-            UpdateUIFromEditState();
+            if (!_isMarshalling)
+            {
+                ListView list = sender as ListView;
+                if (!_isVerbEvent)
+                    VerbMirror?.MirrorVerbMarkerSelected(this, new(MapMarkerInfo.MarkerType.ANY,
+                                                                   ROUTE_NAME, list.SelectedIndex + 1));
+                UpdateUIFromEditState();
+            }
         }
 
         /// <summary>
@@ -365,14 +435,14 @@ namespace JAFDTC.UI.Base
             uiNavptListCtxMenuFlyout.Items[4].IsEnabled = false;     // delete
             if (navpt == null)
             {
-                uiNavptListCtxMenuFlyout.Items[2].IsEnabled = isEditable && _isClipboardValid;               // paste
+                uiNavptListCtxMenuFlyout.Items[2].IsEnabled = isEditable && _isClipboardValid;              // paste
             }
             else
             {
                 bool isNotEmpty = (uiNavptListView.SelectedItems.Count >= 1);
                 uiNavptListCtxMenuFlyout.Items[0].IsEnabled = (uiNavptListView.SelectedItems.Count == 1);   // edit
                 uiNavptListCtxMenuFlyout.Items[1].IsEnabled = isEditable && isNotEmpty;                     // copy
-                uiNavptListCtxMenuFlyout.Items[2].IsEnabled = isEditable && _isClipboardValid;               // paste
+                uiNavptListCtxMenuFlyout.Items[2].IsEnabled = isEditable && _isClipboardValid;              // paste
                 uiNavptListCtxMenuFlyout.Items[4].IsEnabled = isEditable && isNotEmpty;                     // delete
             }
             uiNavptListCtxMenuFlyout.ShowAt(listView, args.GetPosition(listView));
@@ -385,6 +455,176 @@ namespace JAFDTC.UI.Base
         {
             if (uiNavptListView.SelectedItems.Count > 0)
                 EditNavpoint((INavpointInfo)uiNavptListView.SelectedItems[0]);
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // IMapControlMarkerExplainer
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// returns the display name of the marker with the specified information.
+        /// </summary>
+        public string MarkerDisplayName(MapMarkerInfo info)
+        {
+            string name = null;
+            if (info.Type == MapMarkerInfo.MarkerType.NAVPT)
+            {
+                if (EditNavptDetailPage != null)
+                    CopyConfigToEditState();                            // just in case editor is FA, so it won't FO
+                name = EditNavpt[info.TagInt - 1].Name;
+                if (string.IsNullOrEmpty(name))
+                    name = $"{PageHelper.NavptName} {info.TagInt}";
+            }
+            else if ((info.Type == MapMarkerInfo.MarkerType.DCS_CORE) ||
+                     (info.Type == MapMarkerInfo.MarkerType.USER) ||
+                     (info.Type == MapMarkerInfo.MarkerType.CAMPAIGN))
+            {
+                string[] fields = info.TagStr.Split('|');
+                name = info.Type switch
+                {
+                    MapMarkerInfo.MarkerType.DCS_CORE => $"POI: {fields[2]}",
+                    MapMarkerInfo.MarkerType.USER => $"U: {fields[2]}",
+                    MapMarkerInfo.MarkerType.CAMPAIGN => $"{fields[1]}: {fields[2]}",
+                    _ => throw new NotImplementedException(),
+                };
+            }
+            return name;
+        }
+
+        /// <summary>
+        /// returns the elevation of the marker with the specified information.
+        /// </summary>
+        public string MarkerDisplayElevation(MapMarkerInfo info, string units = "")
+        {
+            string elev = null;
+            if (info.Type == MapMarkerInfo.MarkerType.NAVPT)
+            {
+                if (EditNavptDetailPage != null)
+                    CopyConfigToEditState();                            // just in case editor is FA, so it won't FO
+                elev = EditNavpt[info.TagInt - 1].Alt;
+                if (string.IsNullOrEmpty(elev))
+                    elev = "0";
+                elev = $"{elev}{units}";
+            }
+            else if ((info.Type == MapMarkerInfo.MarkerType.DCS_CORE) ||
+                     (info.Type == MapMarkerInfo.MarkerType.USER) ||
+                     (info.Type == MapMarkerInfo.MarkerType.CAMPAIGN))
+            {
+                string[] fields = info.TagStr.Split('|');
+                PointOfInterestDbQuery query = new((PointOfInterestTypeMask)(1 << (int)info.Type), fields[0], fields[1], fields[2]);
+                List<PointOfInterest> pois = PointOfInterestDbase.Instance.Find(query);
+                if (pois.Count == 1)
+                    elev = $"{pois[0].Elevation}{units}";
+            }
+            return elev;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
+        // IWorldMapControlVerbHandler
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        public string VerbHandlerTag => "EditNavpointListPage";
+
+        public IMapControlVerbMirror VerbMirror { get; set; }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public void VerbMarkerSelected(IMapControlVerbHandler sender, MapMarkerInfo info)
+        {
+            Debug.WriteLine($"ENLP:VerbMarkerSelected {info.Type}, {info.TagStr}, {info.TagInt}");
+            if ((info.Type == MapMarkerInfo.MarkerType.UNKNOWN) || (info.TagStr != ROUTE_NAME))
+            {
+                _isVerbEvent = true;
+                uiNavptListView.SelectedIndex = -1;
+                _isVerbEvent = false;
+            }
+            else if (info.TagStr == ROUTE_NAME)
+            {
+                _isVerbEvent = true;
+                uiNavptListView.SelectedIndex = info.TagInt - 1;
+                _isVerbEvent = false;
+
+                EditNavptDetailPage?.ChangeToEditNavpointAtIndex(info.TagInt - 1);
+            }
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public void VerbMarkerOpened(IMapControlVerbHandler sender, MapMarkerInfo info)
+        {
+            Debug.WriteLine($"ENLP:MarkerOpen {info.Type}, {info.TagStr}, {info.TagInt}");
+            if (info.TagStr == ROUTE_NAME)
+            {
+                if (EditNavptDetailPage == null)
+                    EditNavpoint(EditNavpt[info.TagInt - 1]);
+                else
+                    EditNavptDetailPage?.ChangeToEditNavpointAtIndex(info.TagInt - 1);
+            }
+// TODO: handle other types of markers (user pois?)
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public void VerbMarkerMoved(IMapControlVerbHandler sender, MapMarkerInfo info)
+        {
+            Debug.WriteLine($"ENLP:VerbMarkerMoved {info.Type}, {info.TagStr}, {info.TagInt}, {info.Lat}, {info.Lon}");
+            if (info.TagStr == ROUTE_NAME)
+            {
+                EditNavpt[info.TagInt - 1].Lat = info.Lat;
+                EditNavpt[info.TagInt - 1].Lon = info.Lon;
+                SaveEditStateToConfig();
+
+                EditNavptDetailPage?.CopyConfigToEditIfEditingNavpointAtIndex(info.TagInt - 1);
+            }
+// TODO: handle other types of markers (user pois?)
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public void VerbMarkerAdded(IMapControlVerbHandler sender, MapMarkerInfo info)
+        {
+            Debug.WriteLine($"ENLP:VerbMarkerAdded {info.Type}, {info.TagStr}, {info.TagInt}, {info.Lat}, {info.Lon}");
+            if (info.TagStr == ROUTE_NAME)
+            {
+                int index = PageHelper.AddNavpoint(Config, info.TagInt - 1);
+                CopyConfigToEditState();
+                EditNavpt[index].Lat = info.Lat;
+                EditNavpt[index].Lon = info.Lon;
+                SaveEditStateToConfig();
+
+                RenumberWaypoints();
+                UpdateUIFromEditState();
+            }
+// TODO: handle other types of markers (user pois?)
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public void VerbMarkerDeleted(IMapControlVerbHandler sender, MapMarkerInfo info)
+        {
+            Debug.WriteLine($"ENLP:VerbMarkerDeleted {info.Type}, {info.TagStr}, {info.TagInt}");
+            if (info.TagStr == ROUTE_NAME)
+            {
+                uiNavptListView.SelectedIndex = -1;
+
+                EditNavpt.RemoveAt(info.TagInt - 1);
+                SaveEditStateToConfig();
+
+                EditNavptDetailPage?.CancelIfEditingNavpointAtIndex(info.TagInt - 1);
+
+                RenumberWaypoints();
+                UpdateUIFromEditState();
+            }
+// TODO: handle other types of markers (user pois?)
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -428,6 +668,15 @@ namespace JAFDTC.UI.Base
             }
         }
 
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        private void MapWindow_Closed(object sender, WindowEventArgs args)
+        {
+            MapWindow.Closed -= MapWindow_Closed;
+            MapWindow = null;
+        }
+
         // ------------------------------------------------------------------------------------------------------------
         //
         // events
@@ -442,12 +691,14 @@ namespace JAFDTC.UI.Base
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             // HACK: fixes circular dependency where base.OnNavigatedTo needs PageHelper, but PageHelper needs
-            // NavArgs which are built inside base.OnNavigatedTo.
+            // HACK: NavArgs which are built inside base.OnNavigatedTo.
             ConfigEditorPageNavArgs navArgs = (ConfigEditorPageNavArgs)args.Parameter;
             PageHelper = (IEditNavpointListPageHelper)Activator.CreateInstance(navArgs.EditorHelperType);
             PageHelper.SetupUserInterface(navArgs.Config, uiNavptListView);
 
             base.OnNavigatedTo(args);
+
+            EditNavptDetailPage = null;
 
             _startingNavptNum = (EditNavpt.Count > 0) ? EditNavpt[0].Number : 1;
 
@@ -466,6 +717,8 @@ namespace JAFDTC.UI.Base
         /// </summary>
         protected override void OnNavigatedFrom(NavigationEventArgs args)
         {
+            EditNavptDetailPage = args.Content as EditNavpointPage;
+
             EditNavpt.CollectionChanged -= CollectionChangedHandler;
             Clipboard.ContentChanged -= ClipboardChangedHandler;
             ((Application.Current as JAFDTC.App)?.Window).Activated -= WindowActivatedHandler;

@@ -19,6 +19,7 @@
 
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
+using JAFDTC.UI.Controls.Map;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -124,6 +125,7 @@ namespace JAFDTC.UI.Base
         /// return an object to use as the argument to the navpoint editor. this object is passed in through the
         /// Parameter of a navigation operation.
         /// </summary>
-        public object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt);
+        public object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
+                                     int indexNavpt);
     }
 }

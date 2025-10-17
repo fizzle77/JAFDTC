@@ -21,6 +21,7 @@ using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
 using JAFDTC.Models.Import;
 using JAFDTC.UI.App;
+using JAFDTC.UI.Controls.Map;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -29,6 +30,7 @@ using Microsoft.Windows.Storage.Pickers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
 
@@ -63,7 +65,7 @@ namespace JAFDTC.UI.Base
     // ================================================================================================================
 
     /// <summary>
-    /// TODO
+    /// point of interest filter specification to build a PoIFilterSpec suitable for use by the poi find methods.
     /// </summary>
     public sealed class PoIFilterSpec
     {
@@ -102,18 +104,28 @@ namespace JAFDTC.UI.Base
         // ------------------------------------------------------------------------------------------------------------
 
         /// <summary>
-        /// returns a list of theaters that cover the list of navpoints.
+        /// returns a list of theaters that cover the list of navpoints. the list is sorted in order of membership:
+        /// first index is the theater with the most matches, last index is the theater with the least.
         /// </summary>
         public static List<string> TheatersForNavpoints(List<INavpointInfo> navpts)
         {
-            List<string> theaters = [ ];
+            Dictionary<string, int> theaterMap = [ ];
             foreach (INavpointInfo navpt in navpts)
-            {
-// TODO: this is kinda broken, due to overlap coord can be in multiple theaters. fix once we clean things up.
-                string theater = PointOfInterest.TheaterForCoords(navpt.Lat, navpt.Lon);
-                if (!theater.Contains(theater))
+                foreach (string theater in PointOfInterest.TheatersForCoords(navpt.Lat, navpt.Lon))
+                    theaterMap[theater] = theaterMap.GetValueOrDefault(theater, 0) + 1;
+
+            Dictionary<int, List<string>> freqMap = [];
+            foreach (KeyValuePair<string, int> kvp in theaterMap)
+                if (freqMap.ContainsKey(kvp.Value))
+                    freqMap[kvp.Value].Add(kvp.Key);
+                else
+                    freqMap[kvp.Value] = [ kvp.Key ];
+
+            List<string> theaters = [ ];
+            foreach (int freq in freqMap.Keys.OrderByDescending(k => k))
+                foreach (string theater in freqMap[freq])
                     theaters.Add(theater);
-            }
+
             return theaters;
         }
 
@@ -456,9 +468,90 @@ namespace JAFDTC.UI.Base
 
         // ------------------------------------------------------------------------------------------------------------
         //
+        // navpoint list map functions
+        //
+        // ------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public static MapWindow OpenMap(IMapControlVerbHandler observer, int maxRouteLen,
+                                        LLFormat coordFormat, Dictionary<string, List<INavpointInfo>> routes)
+        {
+            List<INavpointInfo> allRoutes = [ ];
+            foreach (string route in routes.Keys)
+                allRoutes.AddRange(routes[route]);
+            List<string> theaters = TheatersForNavpoints(allRoutes);
+            string theater = (theaters.Count > 0) ? theaters[0] : null;
+
+            Dictionary<string, PointOfInterest> marks = [];
+            PointOfInterestDbQuery query = new(PointOfInterestTypeMask.ANY, theater);
+            foreach (PointOfInterest poi in PointOfInterestDbase.Instance.Find(query))
+                marks[$"{poi.Theater}|{poi.Campaign}|{poi.Name}"] = poi;
+
+            MapWindow mapWindow = new()
+            {
+                Theater = theater,
+                OpenMask = MapMarkerInfo.MarkerTypeMask.NAVPT,
+                EditMask = MapMarkerInfo.MarkerTypeMask.ANY,
+                CoordFormat = coordFormat,
+                MaxRouteLength = maxRouteLen
+            };
+            mapWindow.SetupMapContent(routes, marks);
+            mapWindow.RegisterMapControlVerbObserver(observer);
+
+            mapWindow.Activate();
+
+            return mapWindow;
+        }
+
+        /// <summary>
+        /// TODO: document
+        /// </summary>
+        public static PointOfInterest SummaryForMarkerOnMap(MapWindow mapWindow, string tag, int index = -1)
+        {
+#if NOPE
+            WorldMapDataSource ds = mapWindow.DataSource;
+
+            PointOfInterest navpt = null;
+            if (ds.Routes.TryGetValue(tag, out List<INavpointInfo> routes) && (index < routes.Count))
+            {
+                string pfx = (ds.Routes.Count > 1) ? $"{tag}: " : $"";
+                navpt = new()
+                {
+                    Name = (string.IsNullOrEmpty(routes[index].Name)) ? $"{pfx}{index}" : $"{pfx}{routes[index].Name}",
+                    Latitude = routes[index].Lat,
+                    Longitude = routes[index].Lon,
+                    Elevation = routes[index].Alt
+                };
+            }
+            else if (ds.Marks.TryGetValue(tag, out PointOfInterest poi))
+            {
+                navpt = new()
+                {
+                    Name = poi.Type switch
+                    {
+                        PointOfInterestType.CAMPAIGN => $"PoI {poi.Campaign}: {poi.Name}",
+                        PointOfInterestType.USER => $"PoI User: {poi.Name}",
+                        _ => $"PoI: {poi.Name}"
+                    },
+                    Latitude = poi.Latitude,
+                    Longitude = poi.Longitude,
+                    Elevation = poi.Elevation
+                };
+            }
+            return navpt;
+#endif
+            return null;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        //
         // navpoint list export functions
         //
         // ------------------------------------------------------------------------------------------------------------
+
+        // TODO: DEPRECATE ALL
 
         /// <summary>
         /// present and handle a file save picker to select a .json/.cf/.miz file to export to. returns the result of

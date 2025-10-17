@@ -23,6 +23,7 @@ using JAFDTC.Models.AV8B.WYPT;
 using JAFDTC.Models.Base;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
+using JAFDTC.UI.Controls.Map;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -150,10 +151,12 @@ namespace JAFDTC.UI.AV8B
             }
         }
 
-        public object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt)
+        public object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
+                                     int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));
-            return new EditNavptPageNavArgs(parentEditor, config, indexNavpt, isUnlinked, typeof(AV8BEditWaypointHelper));
+            return new EditNavptPageNavArgs(parentEditor, verbMirror, config, indexNavpt, isUnlinked,
+                                            typeof(AV8BEditWaypointHelper));
         }
     }
 }

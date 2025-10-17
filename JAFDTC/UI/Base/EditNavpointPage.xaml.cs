@@ -21,13 +21,15 @@ using CommunityToolkit.WinUI;
 using JAFDTC.Models;
 using JAFDTC.Models.Base;
 using JAFDTC.Models.DCS;
+using JAFDTC.UI.App;
+using JAFDTC.UI.Controls.Map;
 using JAFDTC.Utilities;
 using JAFDTC.Utilities.Networking;
 using Microsoft.UI.Dispatching;
-using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
@@ -35,7 +37,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Windows.System;
-using Windows.UI.Core;
 
 using static JAFDTC.Utilities.Networking.WyptCaptureDataRx;
 
@@ -49,6 +50,8 @@ namespace JAFDTC.UI.Base
     {
         public Page ParentEditor { get; }                       // parent editor (typically a navpoint list)
 
+        public IMapControlVerbMirror VerbMirror { get; set; }   // map window (may be null)
+
         public IConfiguration Config { get; }                   // configuration
 
         public int IndexNavpt { get; }                          // index of navpoint being edited
@@ -59,8 +62,10 @@ namespace JAFDTC.UI.Base
 
         public Type EditorHelperType { get; }                   // helper class for EditNavpointPage
 
-        public EditNavptPageNavArgs(Page parent, IConfiguration config, int index, bool isUnlinked, Type helper)
-            => (ParentEditor, Config, IndexNavpt, IsUnlinked, EditorHelperType) = (parent, config, index, isUnlinked, helper);
+        public EditNavptPageNavArgs(Page parent, IMapControlVerbMirror mirror, IConfiguration config, int index,
+                                    bool isUnlinked, Type helper)
+            => (ParentEditor, VerbMirror, Config,
+                IndexNavpt, IsUnlinked, EditorHelperType) = (parent, mirror, config, index, isUnlinked, helper);
     }
 
     // ================================================================================================================
@@ -164,6 +169,49 @@ namespace JAFDTC.UI.Base
         {
             if (PageHelper.CopyEditToConfig(index, EditNavpt, Config) && isPersist)
                 Config.Save(this, PageHelper.SystemTag);
+        }
+
+        /// <summary>
+        /// change the editor to edit the navpoint at the given index.
+        /// </summary>
+        public void ChangeToEditNavpointAtIndex(int index)
+        {
+            if (!CurStateHasErrors())
+            {
+                CurSelectedPoI = null;
+                uiPoINameFilterBox.Text = null;
+                CopyEditToConfig(EditNavptIndex, true);
+                EditNavptIndex = index;
+                CopyConfigToEdit(EditNavptIndex);
+                RebuildInterfaceState();
+                uiNavptValueName.Focus(FocusState.Programmatic);
+
+                MapMarkerInfo info = new(MapMarkerInfo.MarkerType.NAVPT, EditNavpointListPage.ROUTE_NAME,
+                                         EditNavptIndex + 1);
+                NavArgs.VerbMirror?.MirrorVerbMarkerSelected(NavArgs.ParentEditor as IMapControlVerbHandler, info);
+            }
+        }
+
+        /// <summary>
+        /// copy config to edit if editing the navpoint at a given index (as this navpoint is being deleted).
+        /// </summary>
+        public void CopyConfigToEditIfEditingNavpointAtIndex(int index)
+        {
+            if (index == EditNavptIndex)
+            {
+                CopyConfigToEdit(EditNavptIndex);
+                EditNavpt.LatUI = EditNavpt.LatUI;              // clears transient false positive errors
+                EditNavpt.LonUI = EditNavpt.LonUI;
+            }
+        }
+
+        /// <summary>
+        /// cancel the current editor if editing the navpoint at a given index (as this navpoint is being deleted).
+        /// </summary>
+        public void CancelIfEditingNavpointAtIndex(int index)
+        {
+            if (index == EditNavptIndex)
+                Frame.GoBack();
         }
 
         // ------------------------------------------------------------------------------------------------------------
@@ -462,13 +510,7 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void NavptBtnPrev_Click(object sender, RoutedEventArgs args)
         {
-            CurSelectedPoI = null;
-            uiPoINameFilterBox.Text = null;
-            CopyEditToConfig(EditNavptIndex, true);
-            EditNavptIndex -= 1;
-            CopyConfigToEdit(EditNavptIndex);
-            RebuildInterfaceState();
-            uiNavptValueName.Focus(FocusState.Programmatic);
+            ChangeToEditNavpointAtIndex(EditNavptIndex - 1);
         }
 
         /// <summary>
@@ -476,26 +518,36 @@ namespace JAFDTC.UI.Base
         /// </summary>
         private void NavptBtnNext_Click(object sender, RoutedEventArgs args)
         {
-            CurSelectedPoI = null;
-            uiPoINameFilterBox.Text = null;
-            CopyEditToConfig(EditNavptIndex, true);
-            EditNavptIndex += 1;
-            CopyConfigToEdit(EditNavptIndex);
-            RebuildInterfaceState();
-            uiNavptValueName.Focus(FocusState.Programmatic);
+            ChangeToEditNavpointAtIndex(EditNavptIndex + 1);
         }
 
         /// <summary>
         /// steerpoint add click: save the current steerpoint and add a new steerpoint to the end of the list.
         /// </summary>
-        private void NavptBtnAdd_Click(object sender, RoutedEventArgs args)
+        private async void NavptBtnAdd_Click(object sender, RoutedEventArgs args)
         {
             CopyEditToConfig(EditNavptIndex, true);
-            EditNavptIndex = PageHelper.AddNavpoint(Config);
-            EditNavpt.Reset();
-            CopyConfigToEdit(EditNavptIndex);
-            RebuildInterfaceState();
-            uiNavptValueName.Focus(FocusState.Programmatic);
+            CopyConfigToEdit(PageHelper.NavpointCount(Config) - 1);
+
+            Tuple<string, string> ll = await NavpointUIHelper.ProposeNewNavptLatLon(Content.XamlRoot, [ EditNavpt ]);
+            if (ll != null)
+            {
+                EditNavptIndex = PageHelper.AddNavpoint(Config);
+                EditNavpt.Reset();
+                CopyConfigToEdit(EditNavptIndex);
+                EditNavpt.Lat = ll.Item1;
+                EditNavpt.Lon = ll.Item2;
+                EditNavpt.LatUI = EditNavpt.LatUI;              // regenerate ui flavors to clear errors...
+                EditNavpt.LonUI = EditNavpt.LonUI;
+                CopyEditToConfig(EditNavptIndex, true);
+                RebuildInterfaceState();
+                uiNavptValueName.Focus(FocusState.Programmatic);
+
+                MapMarkerInfo info = new(MapMarkerInfo.MarkerType.NAVPT, EditNavpointListPage.ROUTE_NAME,
+                                         EditNavptIndex + 1, ll.Item1, ll.Item2);
+                NavArgs.VerbMirror?.MirrorVerbMarkerAdded(NavArgs.ParentEditor as IMapControlVerbHandler, info);
+                NavArgs.VerbMirror?.MirrorVerbMarkerSelected(NavArgs.ParentEditor as IMapControlVerbHandler, info);
+            }
         }
 
         // ---- text field changes ------------------------------------------------------------------------------------
@@ -506,6 +558,20 @@ namespace JAFDTC.UI.Base
         private void NavptTextBoxExt_TextChanged(object sender, TextChangedEventArgs args)
         {
             RebuildInterfaceState();
+        }
+
+        /// <summary>
+        /// navpoint text box text lost focus: pass along lat/lon updates after there's been a jiffy to let the
+        /// changes propagate to the edit state.
+        /// </summary>
+        private void NavptTextBoxExt_LostFocus(object sender, RoutedEventArgs args)
+        {
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+            {
+                MapMarkerInfo info = new(MapMarkerInfo.MarkerType.NAVPT, EditNavpointListPage.ROUTE_NAME,
+                                         EditNavptIndex + 1, EditNavpt.Lat, EditNavpt.Lon);
+                NavArgs.VerbMirror?.MirrorVerbMarkerMoved(NavArgs.ParentEditor as IMapControlVerbHandler, info);
+            });
         }
 
         private void NavptValueName_TextChanged(object sender, TextChangedEventArgs e)

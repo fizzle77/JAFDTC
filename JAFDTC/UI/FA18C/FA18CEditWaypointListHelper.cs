@@ -24,6 +24,7 @@ using JAFDTC.Models.FA18C.WYPT;
 using JAFDTC.Models.M2000C;
 using JAFDTC.UI.App;
 using JAFDTC.UI.Base;
+using JAFDTC.UI.Controls.Map;
 using JAFDTC.Utilities;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -152,10 +153,12 @@ namespace JAFDTC.UI.FA18C
             }
         }
 
-        public object NavptEditorArg(Page parentEditor, IConfiguration config, int indexNavpt)
+        public object NavptEditorArg(Page parentEditor, IMapControlVerbMirror verbMirror, IConfiguration config,
+                                     int indexNavpt)
         {
             bool isUnlinked = string.IsNullOrEmpty(config.SystemLinkedTo(SystemTag));
-            return new EditNavptPageNavArgs(parentEditor, config, indexNavpt, isUnlinked, typeof(FA18CEditWaypointHelper));
+            return new EditNavptPageNavArgs(parentEditor, verbMirror, config, indexNavpt, isUnlinked,
+                                            typeof(FA18CEditWaypointHelper));
         }
     }
 }
